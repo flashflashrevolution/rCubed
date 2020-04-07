@@ -3,7 +3,7 @@ name: Bug report
 about: Found a bug in R3? Report it!
 title: ''
 labels: bug
-assignees: Zageron
+assignees: ''
 
 ---
 
