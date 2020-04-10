@@ -20,7 +20,7 @@ Follow these steps to reproduce bug:
 3. Scroll down to '....'
 4. See error
 
-** Reproduction Rate**
+**Reproduction Rate**
 This bug occurs xxx% of the time.
 
 **Expected behaviour**
