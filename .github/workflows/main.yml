@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - feat/workflow
   pull_request:
     branches:
       - master
@@ -61,13 +62,15 @@ jobs:
           # path to place the extract
           pathTarget: ${{ github.workspace }}\airsdk
    
-      - name: Fix Air SDK Target Bug
-        uses: microsoft/variable-substitution@v1
-        if: matrix.os == 'windows-latest' && steps.cache-air-sdk.outputs.cache-hit != 'true'
+      - name: Fix Air SDK Target
+        uses: cschleiden/replace-tokens@v1
         with:
-          files: ${{ github.workspace }}\airsdk\frameworks\flex-config.xml
+          files: '["${{ github.workspace }}\airsdk\frameworks\flex-config.xml"]'
+          tokenPrefix: '{'
+          tokenSuffix: '}'
         env:
-          flex-config.compiler.external-library-path.path-element: 'libs/player/32.0/playerglobal.swc'
+          targetPlayerMinorVersion: 0
+          targetPlayerMajorVersion: 32
 
       - uses: cschleiden/replace-tokens@v1
         with:
