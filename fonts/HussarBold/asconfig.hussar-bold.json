@@ -1,0 +1,9 @@
+{
+    "type": "lib",
+    "files": [
+        "src/HussarBold.as"
+    ],
+    "compilerOptions": {
+        "output": "bin/Font-HussarBold.swf"
+    }
+}

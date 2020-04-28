@@ -1,0 +1,4 @@
+R^3 (v1.2.0) [2020-04-04]
+---------------------------------------------------------------------
+- [Change] Complete repository formatting overhaul.
+- [Remove] Deleted April Fools special level code.

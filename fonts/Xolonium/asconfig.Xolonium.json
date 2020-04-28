@@ -1,0 +1,9 @@
+{
+    "type": "lib",
+    "files": [
+        "src/Xolonium.as"
+    ],
+    "compilerOptions": {
+        "output": "bin/Font-Xolonium.swf"
+    }
+}

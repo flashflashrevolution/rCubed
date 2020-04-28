@@ -1,0 +1,10 @@
+{
+	"recommendations": [
+		"bowlerhatllc.vscode-nextgenas",
+		"lonewolf.vscode-astools",
+		"codezombiech.gitignore",
+		"davidanson.vscode-markdownlint",
+		"yzhang.markdown-all-in-one"
+	],
+	"unwantedRecommendations": []
+}

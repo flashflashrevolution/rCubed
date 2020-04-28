@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<application xmlns="http://ns.adobe.com/air/application/32.0">
+  <id>R3</id>
+  <versionNumber>1.2.0</versionNumber>
+  <filename>R3</filename>
+  <name>
+    <text xml:lang="en">R^3</text>
+  </name>
+  <architecture>64</architecture>
+  <description>
+    <text xml:lang="en">R^3 Engine</text>
+  </description>
+  <supportedProfiles>extendedDesktop desktop</supportedProfiles>
+  <gpuPreference>discrete</gpuPreference>
+  <initialWindow>
+    <content>[Path to content will be replaced by Visual Studio Code.]</content>
+    <title>R^3</title>
+    <systemChrome>standard</systemChrome>
+    <transparent>false</transparent>
+    <visible>true</visible>
+    <minimizable>true</minimizable>
+    <maximizable>true</maximizable>
+    <resizable>true</resizable>
+    <renderMode>direct</renderMode>
+  </initialWindow>
+  <!-- 
+	More options:
+	http://livedocs.adobe.com/flex/3/html/File_formats_1.html#1043413
+	-->
+  <icon>
+    <image36x36>data/icons/icon-36.png</image36x36>
+    <image48x48>data/icons/icon-48.png</image48x48>
+    <image72x72>data/icons/icon-72.png</image72x72>
+    <image96x96>data/icons/icon-96.png</image96x96>
+    <image144x144>data/icons/icon-144.png</image144x144>
+    <image180x180>data/icons/icon-180.png</image180x180>
+    <image192x192>data/icons/icon-192.png</image192x192>
+    <image512x512>data/icons/icon-512.png</image512x512>
+  </icon>
+</application>

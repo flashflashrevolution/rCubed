@@ -1,0 +1,139 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.0.0
+        with:
+          lfs: true
+
+      - name: Import Air Signing Certificate
+        uses: RollyPeres/base64-to-path@v1
+        with:
+          filePath: ${{ github.workspace }}\certs\air-cert.p12
+          encodedString: ${{ secrets.CODESIGN_AIR_CERT }}
+
+      - name: Import Package Signing Certificate
+        uses: RollyPeres/base64-to-path@v1
+        with:
+          filePath: ${{ github.workspace }}\certs\7z-cert.p12
+          encodedString: ${{ secrets.CODESIGN_CERT }}
+
+      - name: Import Branding Swc Library
+        uses: RollyPeres/base64-to-path@v1
+        with:
+          filePath: ${{ github.workspace }}\libs\assets\branding.swc
+          encodedString: ${{ secrets.BRANDING_SWC }}
+
+      - name: Cache Air SDK
+        id: cache-air-sdk
+        uses: actions/cache@v1
+        with:
+          path: ${{ github.workspace }}\airsdk
+          key: ${{ runner.os }}-air-sdk
+
+      - name: Download Air Windows
+        if: matrix.os == 'windows-latest' && steps.cache-air-sdk.outputs.cache-hit != 'true'
+        run: |
+          $ProgressPreference = 'SilentlyContinue';
+          (irm -Uri "http://airdownload.adobe.com/air/win/download/latest/AIRSDK_Compiler.zip" -ContentType "application/octet-stream" -OutFile "air-sdk.zip")
+      
+      - name: extract-7z-action
+        if: matrix.os == 'windows-latest' && steps.cache-air-sdk.outputs.cache-hit != 'true'
+        uses: DuckSoft/extract-7z-action@v1.0
+        with:
+          # archive path to extract
+          pathSource: air-sdk.zip
+          # path to place the extract
+          pathTarget: ${{ github.workspace }}\airsdk
+   
+      - name: Fix Air SDK Target Bug
+        uses: microsoft/variable-substitution@v1
+        if: matrix.os == 'windows-latest' && steps.cache-air-sdk.outputs.cache-hit != 'true'
+        with:
+          files: ${{ github.workspace }}\airsdk\frameworks\flex-config.xml
+        env:
+          flex-config.compiler.external-library-path.path-element: 'libs/player/32.0/playerglobal.swc'
+
+      - uses: cschleiden/replace-tokens@v1
+        with:
+          files: '["asconfig.release.json"]'
+        env:
+          SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
+
+      - name: Install Dependencies
+        run: npm install asconfigc
+
+      - name: Build Embedded Fonts Library (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: cmd
+        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project ${{ github.workspace }}/fonts/asconfig.embed-fonts.json --verbose
+
+      - name: Build the Game (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: cmd
+        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.release.json --air windows --storepass ${{ secrets.CODESIGN_CERT_PASS }} --verbose
+
+      - name: Sign Game Executable
+        run: |
+          $VerbosePreference = "continue";
+          $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("${{ github.workspace }}\certs\7z-cert.p12", "${{ secrets.CODESIGN_CERT_PASS }}");
+          Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\dist\R3Release\R3.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
+
+      - name: Package Build in Self-Extracting Archive
+        run: 7z.exe a -t7z -mx=9 ${{ github.workspace }}\release\R3Release.exe ${{ github.workspace }}/dist/R3Release -sfx
+
+      - name: Package Build in Zip
+        run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\release\R3Release.zip ${{ github.workspace }}/dist/R3Release
+
+      - name: Sign Build Packages
+        run: |
+          $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("${{ github.workspace }}\certs\7z-cert.p12", "${{ secrets.CODESIGN_CERT_PASS }}");
+          Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\release\R3Release.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+          prerelease: true
+
+      - name: Upload SFX
+        id: upload-sfx-release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/release/R3Release.exe
+          asset_name: R3Release.exe
+          asset_content_type: application/executable
+
+      - name: Upload ZIP
+        id: upload-zip-release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/release/R3Release.zip
+          asset_name: R3Release.zip
+          asset_content_type: application/executable

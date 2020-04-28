@@ -1,0 +1,9 @@
+{
+    "type": "lib",
+    "files": [
+        "src/BreeSerif.as"
+    ],
+    "compilerOptions": {
+        "output": "bin/Font-BreeSerif-Regular.swf"
+    }
+}

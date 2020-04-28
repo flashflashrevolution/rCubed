@@ -1,0 +1,34 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"astools.braceStyle": "Adobe",
+		"editor.formatOnPaste": true,
+		"editor.formatOnSave": true,
+		"editor.fontLigatures": true,
+		"editor.renderFinalNewline": true,
+		"editor.insertSpaces": true,
+		"workbench.editor.highlightModifiedTabs": true,
+		"files.trimFinalNewlines": true,
+		"files.insertFinalNewline": true,
+		"as3mxml.sdk.framework": "c:\\airsdk\\32.0.0.116",
+		"files.eol": "\n",
+		"markdown.extension.toc.githubCompatibility": true,
+		"files.exclude": {
+			"node_modules/": true,
+			"package-lock.json": true,
+			"bin": true,
+			"dist": true,
+			"assets/DataStore": true,
+			"assets/RECOVER*": true
+		},
+		"yaml.schemas": {
+			"http://json.schemastore.org/github-workflow": [
+				".github/workflows/*"
+			]
+		}
+	}
+}

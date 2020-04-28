@@ -1,0 +1,9 @@
+{
+    "type": "lib",
+    "files": [
+        "src/NotoSans.as"
+    ],
+    "compilerOptions": {
+        "output": "bin/Font-NotoSans.swf"
+    }
+}

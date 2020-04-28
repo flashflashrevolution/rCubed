@@ -1,0 +1,11 @@
+{
+    "default": true,
+    "MD033": {
+        "allowed_elements": [
+            "kbd"
+        ]
+    },
+    "no-hard-tabs": false,
+    "MD013": false,
+    "indentation": true
+}

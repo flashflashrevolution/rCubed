@@ -1,0 +1,25 @@
+{
+    "type": "lib",
+    "compilerOptions": {
+        "debug": false,
+        "source-path": [
+            "./BebasNeue/src",
+            "./BreeSerifRegular/src",
+            "./Ultra/src",
+            "./Xolonium/src",
+            "./HussarBold/src",
+            "./NotoSans/src"
+        ],
+        "include-sources": [
+            "./BebasNeue/src",
+            "./BreeSerifRegular/src",
+            "./Ultra/src",
+            "./Xolonium/src",
+            "./HussarBold/src",
+            "./NotoSans/src"
+        ],
+        "output": "bin/Embedded-Fonts.swc",
+        "swf-version": 43,
+        "target-player": "32.0"
+    }
+}

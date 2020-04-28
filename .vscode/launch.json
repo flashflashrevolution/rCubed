@@ -1,0 +1,16 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "swf",
+			"request": "launch",
+			"name": "Launch R3",
+			"preLaunchTask": "ActionScript: compile debug - asconfig.json"
+		},
+		{
+			"type": "swf",
+			"request": "attach",
+			"name": "Attach SWF"
+		}
+	]
+}
