@@ -63,7 +63,7 @@ jobs:
           pathTarget: ${{ github.workspace }}\airsdk
    
       - name: Fix Air SDK Target
-        uses: Zageron/replace-tokens@v2
+        uses: cschleiden/replace-tokens@v1
         with:
           files: '["./airsdk/frameworks/flex-config.xml"]'
           tokenPrefix: '{'
