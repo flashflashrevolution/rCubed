@@ -109,4 +109,4 @@ To contact a member of the FFR development team:
 
 [CONTRIBUTING]: https://github.com/flashflashrevolution/.github/blob/master/CONTRIBUTING.md
 [fork-icon]: https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/svg/repo-forked.svg
-[build-status-badge]: https://github.com/flashflashrevolution/ffrGameMigration/workflows/Release/badge.svg
+[build-status-badge]: https://github.com/flashflashrevolution/rCubed/workflows/Release/badge.svg
