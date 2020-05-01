@@ -1,6 +1,7 @@
 # R^3 Engine
 
 ![Release][build-status-badge]
+[![FFR Discord][discord-badge]](https://discord.gg/ffr)
 
 R^3 is the third and latest game engine for **[Flash Flash Revolution](http://www.flashflashrevolution.com/)**, a free online rhythm game that has been played by over 2 million registered users since 2002.
 
@@ -110,3 +111,4 @@ To contact a member of the FFR development team:
 [CONTRIBUTING]: https://github.com/flashflashrevolution/.github/blob/master/CONTRIBUTING.md
 [fork-icon]: https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/svg/repo-forked.svg
 [build-status-badge]: https://github.com/flashflashrevolution/rCubed/workflows/Release/badge.svg
+[discord-badge]: https://discordapp.com/api/guilds/196381154880782336/widget.png?style=shield
