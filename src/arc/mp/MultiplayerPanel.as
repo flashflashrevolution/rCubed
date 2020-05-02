@@ -388,7 +388,7 @@ package arc.mp
                 title = divisionTitle[7];
                 division = 8;
             }
-            else if (room.level >= 95)
+            else if (room.level >= 94)
             {
                 color = divisionColor[6];
                 title = divisionTitle[6];

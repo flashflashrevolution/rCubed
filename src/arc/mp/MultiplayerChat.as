@@ -288,7 +288,7 @@ package arc.mp
                 title = divisionTitle[7];
                 division = 8;
             }
-            else if (user.userLevel >= 95)
+            else if (user.userLevel >= 94)
             {
                 color = divisionColor[6];
                 title = divisionTitle[6];
