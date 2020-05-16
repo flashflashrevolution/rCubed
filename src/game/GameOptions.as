@@ -62,7 +62,7 @@ package game
         public var isAutoplay:Boolean = false;
         public var multiplayer:Object = null;
         public var singleplayer:Boolean = false;
-        public var autofail:Array = [0, 0, 0, 0, 0, 0];
+        public var autofail:Array = [0, 0, 0, 0, 0, 0, 0];
 
         public var isolationOffset:int = 0;
         public var isolationLength:int = 0;
@@ -125,7 +125,8 @@ package game
                 user.autofailGood,
                 user.autofailAverage,
                 user.autofailMiss,
-                user.autofailBoo];
+                user.autofailBoo,
+                user.autofailRawGoods];
         }
 
         public function fillFromArcGlobals():void
