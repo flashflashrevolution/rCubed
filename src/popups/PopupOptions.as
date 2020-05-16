@@ -654,6 +654,22 @@ package popups
                     optionAutofail.push(optionAutofailInput);
                     yOff += 25;
                 }
+                // raw goods aren't a judge title, and is two words - so separate accordingly
+                optionAutofailText = new Text(_lang.string("game_raw_goods"));
+                optionAutofailText.x = xOff + 77;
+                optionAutofailText.y = yOff - 1;
+                box.addChild(optionAutofailText);
+
+                optionAutofailInput = new BoxText(70, 20);
+                optionAutofailInput.x = xOff;
+                optionAutofailInput.y = yOff;
+                optionAutofailInput.autofail = "rawGoods";
+                optionAutofailInput.restrict = ".0-9";
+                optionAutofailInput.field.maxChars = 6;
+                optionAutofailInput.addEventListener(Event.CHANGE, changeHandler);
+                box.addChild(optionAutofailInput);
+                optionAutofail.push(optionAutofailInput);
+                yOff += 25;
             }
             else if (CURRENT_TAB == TAB_VISUAL_MODS)
             {
@@ -1879,7 +1895,8 @@ package popups
                 // Set Autofails
                 for each (item in optionAutofail)
                 {
-                    item.text = _gvars.activeUser["autofail" + StringUtil.upperCase(item.autofail)];
+                    var autofailType:String = "autofail" + StringUtil.upperCase(item.autofail);
+                    item.text = _gvars.activeUser[autofailType];
                 }
             }
             else if (CURRENT_TAB == TAB_VISUAL_MODS)

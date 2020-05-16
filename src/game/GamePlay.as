@@ -150,6 +150,7 @@ package game
 
         private var gameLife:int;
         private var gameScore:int;
+        private var gameRawGoods:Number;
         private var gameReplay:Array; // Vector.<ReplayNote>;
         private var gameReplayHit:Array; // Vector.<int>;
 
@@ -557,6 +558,7 @@ package game
             _keys = [];
             gameLife = 50;
             gameScore = 0;
+            gameRawGoods = 0;
             gameReplay = []; // new Vector.<ReplayNote>;
             gameReplayHit = []; // new Vector.<int>;
 
@@ -1917,6 +1919,7 @@ package game
                         jscore = 50;
                         checkAutofail(options.autofail[0] + options.autofail[1], hitAmazing + hitPerfect);
                     }
+                    checkAutofail(options.autofail[6], gameRawGoods);
                     break;
                 case 50:
                     hitPerfect++;
@@ -1924,36 +1927,44 @@ package game
                     gameScore += 50;
                     health = 1;
                     checkAutofail(options.autofail[1], hitPerfect);
+                    checkAutofail(options.autofail[6], gameRawGoods);
                     break;
                 case 25:
                     hitGood++;
                     hitCombo++;
                     gameScore += 25;
+                    gameRawGoods += 1;
                     health = 1;
                     checkAutofail(options.autofail[2], hitGood);
+                    checkAutofail(options.autofail[6], gameRawGoods);
                     break;
                 case 5:
                     hitAverage++;
                     hitCombo++;
                     gameScore += 5;
+                    gameRawGoods += 1.8;
                     health = 1;
                     checkAutofail(options.autofail[3], hitAverage);
+                    checkAutofail(options.autofail[6], gameRawGoods);
                     break;
                 case -5:
                     if (frame < gameFirstNoteFrame)
                         return;
-
                     hitBoo++;
                     gameScore -= 5;
+                    gameRawGoods += 0.2;
                     health = -1;
                     checkAutofail(options.autofail[5], hitBoo);
+                    checkAutofail(options.autofail[6], gameRawGoods);
                     break;
                 case -10:
                     hitMiss++;
                     hitCombo = 0;
                     gameScore -= 10;
+                    gameRawGoods += 2.4;
                     health = -1;
                     checkAutofail(options.autofail[4], hitMiss);
+                    checkAutofail(options.autofail[6], gameRawGoods);
                     break;
             }
 
@@ -2002,7 +2013,7 @@ package game
             }
         }
 
-        private function checkAutofail(autofail:int, hit:int):void
+        private function checkAutofail(autofail:Number, hit:Number):void
         {
             if (autofail > 0 && hit >= autofail)
                 GAME_STATE = GAME_END;
