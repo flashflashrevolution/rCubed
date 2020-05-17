@@ -851,7 +851,6 @@ package popups
                 menuGameColors.boxActiveAlpha = 1;
 
                 ///- Col 1
-                menuGameColors.boxColor = 0x1495BD;
                 var gameJudgeColorTitle:Text = new Text(_lang.string("options_judge_colors_title"));
                 gameJudgeColorTitle.x = xOff + 5;
                 gameJudgeColorTitle.y = yOff;
