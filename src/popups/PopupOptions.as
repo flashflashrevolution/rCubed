@@ -369,6 +369,11 @@ package popups
 
             if (CURRENT_TAB == TAB_MAIN)
             {
+                menuMain.active = true;
+                menuMain.boxColor = 0x1495BD;
+                menuMain.boxNormalAlpha = 1;
+                menuMain.boxActiveAlpha = 1;
+
                 /// Col 1
                 //- Speed
                 var gameSpeed:Text = new Text(_lang.string("options_speed"));
@@ -657,6 +662,10 @@ package popups
             }
             else if (CURRENT_TAB == TAB_VISUAL_MODS)
             {
+                menuVisualMods.active = true;
+                menuVisualMods.boxColor = 0x1495BD;
+                menuVisualMods.boxNormalAlpha = 1;
+                menuVisualMods.boxActiveAlpha = 1;
                 ///- Col 1
                 //- Display
                 optionDisplays = [];
@@ -836,8 +845,13 @@ package popups
             }
             else if (CURRENT_TAB == TAB_COLORS)
             {
-                ///- Col 1
+                menuGameColors.active = true;
+                menuGameColors.boxColor = 0x1495BD;
+                menuGameColors.boxNormalAlpha = 1;
+                menuGameColors.boxActiveAlpha = 1;
 
+                ///- Col 1
+                menuGameColors.boxColor = 0x1495BD;
                 var gameJudgeColorTitle:Text = new Text(_lang.string("options_judge_colors_title"));
                 gameJudgeColorTitle.x = xOff + 5;
                 gameJudgeColorTitle.y = yOff;
@@ -1019,6 +1033,11 @@ package popups
             }
             else if (CURRENT_TAB == TAB_OTHER)
             {
+                menuOther.active = true;
+                menuOther.boxColor = 0x1495BD;
+                menuOther.boxNormalAlpha = 1;
+                menuOther.boxActiveAlpha = 1;
+
                 //- Isolation
                 var gameIsolationStart:Text = new Text(_lang.string("options_isolation_start"));
                 gameIsolationStart.x = xOff;
