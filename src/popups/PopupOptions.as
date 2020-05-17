@@ -1895,8 +1895,7 @@ package popups
                 // Set Autofails
                 for each (item in optionAutofail)
                 {
-                    var autofailType:String = "autofail" + StringUtil.upperCase(item.autofail);
-                    item.text = _gvars.activeUser[autofailType];
+                    item.text = _gvars.activeUser["autofail" + StringUtil.upperCase(item.autofail)];
                 }
             }
             else if (CURRENT_TAB == TAB_VISUAL_MODS)
