@@ -10,8 +10,15 @@ or when unicode characters are modified.
 - [R^3 Font Generators](#r3-font-generators)
   - [Generating a new Font](#generating-a-new-font)
   - [Adding a font to the Embedded Fonts library](#adding-a-font-to-the-embedded-fonts-library)
+  - [Adding Unicode Range to the R3 Unicode Font](#adding-unicode-range-to-the-r3-unicode-font)
 
 ---
+
+## Adding Unicode Range to the R3 Unicode Font
+
+1. Determine the unicode range you would like to add.
+2. Navigate to [master/fonts/NotoSans/src/NotoSans.as](NotoSans/src/NotoSans.as).
+3. Add the unicode range in a comment, and edit the unicode string to include your addition.
 
 ## Generating a new Font
 
