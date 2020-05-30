@@ -2,12 +2,7 @@ name: Release
 
 on:
   push:
-    branches:
-      - master
-      - feat/workflow
-  pull_request:
-    branches:
-      - master
+    tags: v*
 
 jobs:
   build:
