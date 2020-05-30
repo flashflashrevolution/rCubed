@@ -5,7 +5,7 @@ on:
     tags: v*
   pull_request:
     branches: 
-      - feat/workflow
+      - master
 
 jobs:
   build:
