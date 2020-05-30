@@ -1,9 +1,10 @@
 name: Check
 
 on:
-  branches:
-    - master
-    - feat/workflow
+  push:
+    branches:
+      - master
+      - feat/workflow
   pull_request:
     branches:
       - master
