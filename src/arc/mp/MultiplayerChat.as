@@ -271,18 +271,24 @@ package arc.mp
 
         public static function textFormatLevel(user:Object):String
         {
-            var divisionColor:Array = [0xC27BA0, 0x8E7CC3, 0x6D9EEB, 0x93C47D, 0xFFD966, 0xE06666, 0x919C86, 0xBF0000];
-            var divisionTitle:Array = ["Novice", "Intermediate", "Advanced", "Expert", "Master", "Guru", "Legendary", "Developer"];
+            var divisionColor:Array = [0xC27BA0, 0x8E7CC3, 0x6D9EEB, 0x93C47D, 0xFFD966, 0xE06666, 0x919C86, 0xD2C7AC, 0xBF0000];
+            var divisionTitle:Array = ["Novice", "Intermediate", "Advanced", "Expert", "Master", "Guru", "Legendary", "Godly", "Developer"];
             var color:int;
             var division:int;
             var title:String;
             if (user.userLevel > 121)
             {
+                color = divisionColor[8];
+                title = divisionTitle[8];
+                division = 9;
+            }
+            else if (user.userLevel >= 101)
+            {
                 color = divisionColor[7];
                 title = divisionTitle[7];
                 division = 8;
             }
-            else if (user.userLevel >= 95)
+            else if (user.userLevel >= 94)
             {
                 color = divisionColor[6];
                 title = divisionTitle[6];
