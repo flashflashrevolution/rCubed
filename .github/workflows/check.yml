@@ -65,4 +65,4 @@ jobs:
       - name: Build the Game (Windows)
         if: matrix.os == 'windows-latest'
         shell: cmd
-        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.release.json --air windows --storepass ${{ secrets.CODESIGN_CERT_PASS }} --verbose
+        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.json --air windows --verbose
