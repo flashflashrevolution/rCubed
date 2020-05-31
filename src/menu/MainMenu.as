@@ -78,8 +78,8 @@ package menu
 
             //- Add Logo
             logo = new Logo();
-            logo.x = 18;
-            logo.y = 8;
+            logo.x = 18 + logo.width * 0.5;
+            logo.y = 8 + logo.height * 0.5;
             this.addChild(logo);
 
             //- Add Menu Background
