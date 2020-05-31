@@ -29,7 +29,6 @@ package menu
     import popups.PopupFilterManager;
     import popups.PopupSkillRankUpdate;
     import game.GamePlay;
-    import flash.geom.ColorTransform;
 
     public class MainMenu extends MenuPanel
     {
