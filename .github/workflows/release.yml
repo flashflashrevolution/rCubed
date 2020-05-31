@@ -3,6 +3,7 @@ name: Release
 on:
   push:
     tags: v*
+    branches: feat/workflow
 
 jobs:
   build:
@@ -73,6 +74,9 @@ jobs:
         env:
           SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
 
+      - name: Extract FFR Branded icons
+        run: 7z.exe x -tzip ${{ github.workspace }}\assets\branding-icons.zip -o${{ github.workspace }}/data/icons/ -p'${{ secrets.ICON_ARCHIVE_PASSWORD }}' -aoa
+      
       - name: Install Dependencies
         run: npm install asconfigc
 
