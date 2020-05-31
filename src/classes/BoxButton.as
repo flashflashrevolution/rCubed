@@ -86,6 +86,16 @@ package classes
             _box.color = value;
         }
 
+        public function set boxNormalAlpha(value:Number):void
+        {
+            _box.normalAlpha = value;
+        }
+
+        public function set boxActiveAlpha(value:Number):void
+        {
+            _box.activeAlpha = value;
+        }
+
         public function dispose():void
         {
             // Remove Events
