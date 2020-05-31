@@ -102,6 +102,7 @@ package classes
         public var autofailAverage:int = 0;
         public var autofailMiss:int = 0;
         public var autofailBoo:int = 0;
+        public var autofailRawGoods:Number = 0;
 
         public var keyLeft:int = Keyboard.LEFT;
         public var keyDown:int = Keyboard.DOWN;
