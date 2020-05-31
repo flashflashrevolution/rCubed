@@ -1,3 +1,10 @@
+R^3 (v1.2.1) [2020-05-31]
+---------------------------------------------------------------------
+- Add Division 8 title, adjust D7 cutoff. @maxproske
+- Build and asset pipeline overhaul. @Zageron
+- Add property to User class for tracking raw good count (#36) @TCHalogen
+- Highlight options menu button when in corresponding screen (#9) (#37) @TCHalogen
+
 R^3 (v1.2.0) [2020-04-04]
 ---------------------------------------------------------------------
 - [Change] Complete repository formatting overhaul.
