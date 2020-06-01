@@ -115,5 +115,5 @@ To contact a member of the FFR development team:
 [fork-icon]: https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/svg/repo-forked.svg
 [release-status-badge]: https://github.com/flashflashrevolution/rCubed/workflows/Release/badge.svg
 [master-status-badge]: https://github.com/flashflashrevolution/rCubed/workflows/Check/badge.svg
-[latest-release-badge]: https://img.shields.io/github/v/release/rCubed/releases
+[latest-release-badge]: https://img.shields.io/github/v/release/flashflashrevolution/rcubed?label=rCubed
 [discord-badge]: https://discordapp.com/api/guilds/196381154880782336/widget.png?style=shield
