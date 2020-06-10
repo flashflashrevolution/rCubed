@@ -29,7 +29,7 @@ package popups
         private var bmp:Bitmap;
 
         private var page:int = 0;
-        private var maxPage:int = 100;
+        private var maxPage:int = 2147483647; // Max Int Limit
         private var throbber:Throbber;
         private var pageText:Text;
         private var songDetails:Object;
