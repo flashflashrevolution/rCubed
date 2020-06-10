@@ -206,6 +206,11 @@ package popups
                         scorePane.addChild(textLine);
                         tY += 25;
                     }
+                    else
+                    {
+                        maxPage = page;
+                        break;
+                    }
                 }
             }
             else
