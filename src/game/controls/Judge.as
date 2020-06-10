@@ -20,19 +20,19 @@ package game.controls
 
         private var lastScore:Number = 100;
         private var frame:uint = 0;
+        private var subframe:Number = 0;
+        private var subframeinc:Number = 1;
         private var sX:Number = 0;
 
-        private var frameRateMod:int = 1;
+        // Not hooked up to anything currently.
+        private var speedScale:Number = 1;
+        private var speedScaleInverse:Number = 1;
 
         public function Judge(options:GameOptions)
         {
             this.options = options;
 
-            var fps:int = this.options.frameRate;
-            if (fps >= 60)
-            {
-                frameRateMod = fps / 60;
-            }
+            subframeinc = (30 / this.options.frameRate); // Animation keys are 30fps.
 
             labelDesc[100] = {colour: options.judgeColours[0], title: "AMAZING!!!"};
             labelDesc[50] = {colour: options.judgeColours[1], title: "PERFECT!"};
@@ -74,6 +74,7 @@ package game.controls
         public function hideJudge():void
         {
             this.frame = 0;
+            this.subframe = 0;
             this.alpha = 0;
             this.visible = false;
         }
@@ -93,6 +94,7 @@ package game.controls
             field.text = labelDesc[newScore].title;
             sX = field.x;
             frame = 0;
+            subframe = 0;
             freeze = doFreeze;
             updateDisplay();
         }
@@ -101,9 +103,13 @@ package game.controls
         {
             if (!freeze && this.alpha > 0)
             {
-                frame++;
-                updateDisplay();
-                this.visible = true;
+                subframe += subframeinc * speedScale;
+                while (int(subframe) > frame)
+                {
+                    frame++;
+                    updateDisplay();
+                    this.visible = true;
+                }
             }
         }
 
@@ -126,12 +132,11 @@ package game.controls
                     return;
 
                 // Tween
-                if (i[0] > 1 && indexes[lastScore][frame + i[0]])
+                var next:Array = indexes[lastScore][frame + i[6]]; // Next Frame
+                if (i[0] > 0 && next != null)
                 {
-                    var n:Array = indexes[lastScore][frame + i[0]]; // Next Frame
-                    TweenLite.to(this, i[0] * frameRateMod, {useFrames: true, scaleX: n[3], scaleY: n[4], alpha: n[5]});
-
-                    TweenLite.to(field, i[0] * frameRateMod, {useFrames: true, x: sX + n[1], y: (n[2] - 30)});
+                    TweenLite.to(this, i[0] * speedScaleInverse, {scaleX: next[3], scaleY: next[4], alpha: next[5]});
+                    TweenLite.to(field, i[0] * speedScaleInverse, {x: sX + next[1], y: (next[2] - 30)});
                 }
             }
         }
