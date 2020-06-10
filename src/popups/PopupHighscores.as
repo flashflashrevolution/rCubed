@@ -15,6 +15,8 @@ package popups
     import flash.filters.BlurFilter;
     import flash.geom.Point;
     import menu.MenuPanel;
+    import com.flashfla.loader.DataEvent;
+    import com.flashfla.utils.ObjectUtil;
 
     public class PopupHighscores extends MenuPanel
     {
@@ -27,6 +29,7 @@ package popups
         private var bmp:Bitmap;
 
         private var page:int = 0;
+        private var maxPage:int = 100;
         private var throbber:Throbber;
         private var pageText:Text;
         private var songDetails:Object;
@@ -77,8 +80,6 @@ package popups
             pageText.y = box.height - 42;
             box.addChild(pageText);
 
-            renderHighscores();
-
             var infoRanks:Object = _gvars.activeUser.getLevelRank(songDetails);
             // Username
             var textLine:Text = new Text("#" + infoRanks.rank + ": " + _gvars.activeUser.name, 16, "#D9FF9E");
@@ -121,6 +122,9 @@ package popups
             closeBtn.y = box.height - 42;
             closeBtn.addEventListener(MouseEvent.CLICK, clickHandler);
             box.addChild(closeBtn);
+
+            //- Render List
+            renderHighscores();
         }
 
         private function renderHighscores():void
@@ -144,6 +148,9 @@ package popups
                     box.removeChild(throbber);
                 throbber.stop();
             }
+
+            if (page > maxPage)
+                page = maxPage;
 
             var highscores:Object = _gvars.getHighscores(songDetails.level);
             if (highscores && (highscores[(10 * page) + 1] != null))
@@ -216,11 +223,31 @@ package popups
                 _gvars.loadHighscores(songDetails.level, page * 10);
             }
             pageText.text = "Page " + (page + 1);
+
+            prevBtn.enabled = page == 0 ? false : true;
+            prevBtn.alpha = page == 0 ? 0.5 : 1;
+            nextBtn.enabled = page == maxPage ? false : true;
+            nextBtn.alpha = page == maxPage ? 0.5 : 1;
         }
 
-        private function highscoresLoaded(e:Event):void
+        private function highscoresLoaded(e:DataEvent):void
         {
             _gvars.removeEventListener(GlobalVariables.HIGHSCORES_LOAD_COMPLETE, highscoresLoaded);
+            if (e.data.error == null)
+            {
+                var newEntriesCount:uint = ObjectUtil.count(e.data);
+                // No entries but no error, last page.
+                if (newEntriesCount == 0)
+                {
+                    page--;
+                    maxPage = page;
+                }
+                // Less then 10 entries, most likely the last page.
+                else if (newEntriesCount < 10)
+                {
+                    maxPage = page;
+                }
+            }
             renderHighscores();
         }
 
