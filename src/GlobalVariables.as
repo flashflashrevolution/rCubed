@@ -12,7 +12,7 @@ package
     import classes.chart.Song;
     import classes.filter.EngineLevelFilter;
     import com.flashfla.net.DynamicURLLoader;
-    import com.flashfla.net.MultipartURLLoader;
+    import com.flashfla.loader.DataEvent;
     import com.flashfla.utils.DateUtil;
     import com.flashfla.utils.SystemUtil;
     import flash.display.BitmapData;
@@ -437,7 +437,7 @@ package
                     songHighscores[lvlID][item.id] = item;
                 }
             }
-            this.dispatchEvent(new Event(GlobalVariables.HIGHSCORES_LOAD_COMPLETE));
+            this.dispatchEvent(new DataEvent(GlobalVariables.HIGHSCORES_LOAD_COMPLETE, data));
         }
 
         private function highscoreLoadError(e:Event = null):void
