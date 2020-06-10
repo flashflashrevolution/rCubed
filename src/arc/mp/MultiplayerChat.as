@@ -271,8 +271,8 @@ package arc.mp
 
         public static function textFormatLevel(user:Object):String
         {
-            var divisionColor:Array = [0xC27BA0, 0x8E7CC3, 0x6D9EEB, 0x93C47D, 0xFFD966, 0xE06666, 0x919C86, 0xD2C7AC, 0xBF0000];
-            var divisionTitle:Array = ["Novice", "Intermediate", "Advanced", "Expert", "Master", "Guru", "Legendary", "Godly", "Developer"];
+            var divisionColor:Array = ArcGlobals.divisionColor;
+            var divisionTitle:Array = ArcGlobals.divisionTitle;
             var color:int;
             var division:int;
             var title:String;
