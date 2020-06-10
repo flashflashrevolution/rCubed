@@ -9,6 +9,7 @@ package game.controls
     import flash.text.TextFormat;
     import game.GameOptions;
     import flash.geom.Matrix;
+    import flash.utils.getTimer;
 
     public class Judge extends Sprite
     {
@@ -21,7 +22,7 @@ package game.controls
         private var lastScore:Number = 100;
         private var frame:uint = 0;
         private var subframe:Number = 0;
-        private var subframeinc:Number = 1;
+        private var lastTime:Number = 0;
         private var sX:Number = 0;
 
         // Not hooked up to anything currently.
@@ -31,8 +32,6 @@ package game.controls
         public function Judge(options:GameOptions)
         {
             this.options = options;
-
-            subframeinc = (30 / this.options.frameRate); // Animation keys are 30fps.
 
             labelDesc[100] = {colour: options.judgeColours[0], title: "AMAZING!!!"};
             labelDesc[50] = {colour: options.judgeColours[1], title: "PERFECT!"};
@@ -96,6 +95,7 @@ package game.controls
             frame = 0;
             subframe = 0;
             freeze = doFreeze;
+            lastTime = getTimer();
             updateDisplay();
         }
 
@@ -103,13 +103,15 @@ package game.controls
         {
             if (!freeze && this.alpha > 0)
             {
-                subframe += subframeinc * speedScale;
+                var curTime:Number = getTimer();
+                subframe += ((curTime - lastTime) / 30) * speedScale; // Animation keys are 30fps.
                 while (int(subframe) > frame)
                 {
                     frame++;
                     updateDisplay();
                     this.visible = true;
                 }
+                lastTime = curTime;
             }
         }
 
