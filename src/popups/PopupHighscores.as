@@ -32,12 +32,16 @@ package popups
         private var maxPage:int = 2147483647; // Max Int Limit
         private var throbber:Throbber;
         private var pageText:Text;
+        private var myUsernameText:Text;
+        private var myScoreText:Text;
+        private var myAVText:Text;
         private var songDetails:Object;
         private var scorePane:Sprite;
 
         private var prevBtn:BoxButton;
         private var nextBtn:BoxButton;
         private var closeBtn:BoxButton;
+        private var refreshBtn:BoxButton;
 
         public function PopupHighscores(myParent:MenuPanel, songDetails:Object)
         {
@@ -75,32 +79,32 @@ package popups
             titleDisplay.align = Text.CENTER;
             box.addChild(titleDisplay);
 
-            pageText = new Text("Page: " + (page + 1));
+            pageText = new Text("Page " + (page + 1));
             pageText.x = 200;
             pageText.y = box.height - 42;
             box.addChild(pageText);
 
             var infoRanks:Object = _gvars.activeUser.getLevelRank(songDetails);
             // Username
-            var textLine:Text = new Text("#" + infoRanks.rank + ": " + _gvars.activeUser.name, 16, "#D9FF9E");
-            textLine.x = 25;
-            textLine.y = 345;
-            textLine.width = 164;
-            box.addChild(textLine);
+            myUsernameText = new Text("#" + infoRanks.rank + ": " + _gvars.activeUser.name, 16, "#D9FF9E");
+            myUsernameText.x = 25;
+            myUsernameText.y = 345;
+            myUsernameText.width = 164;
+            box.addChild(myUsernameText);
 
             // Score
-            textLine = new Text(NumberUtil.numberFormat(infoRanks.rawscore), 15, "#B8D8B3");
-            textLine.x = 360;
-            textLine.y = 345;
-            textLine.width = 150;
-            box.addChild(textLine);
+            myScoreText = new Text(NumberUtil.numberFormat(infoRanks.rawscore), 15, "#B8D8B3");
+            myScoreText.x = 360;
+            myScoreText.y = 345;
+            myScoreText.width = 150;
+            box.addChild(myScoreText);
 
             // AV
-            textLine = new Text(infoRanks.results, 15, "#99B793");
-            textLine.x = 545;
-            textLine.y = 345;
-            textLine.width = 200;
-            box.addChild(textLine);
+            myAVText = new Text(infoRanks.results, 15, "#99B793");
+            myAVText.x = 545;
+            myAVText.y = 345;
+            myAVText.width = 200;
+            box.addChild(myAVText);
 
             //- Previous
             prevBtn = new BoxButton(79.5, 27, "PREVIOUS");
@@ -122,6 +126,13 @@ package popups
             closeBtn.y = box.height - 42;
             closeBtn.addEventListener(MouseEvent.CLICK, clickHandler);
             box.addChild(closeBtn);
+
+            //- Refresh
+            refreshBtn = new BoxButton(79.5, 27, "REFRESH");
+            refreshBtn.x = box.width - 184.5;
+            refreshBtn.y = box.height - 42;
+            refreshBtn.addEventListener(MouseEvent.CLICK, clickHandler);
+            box.addChild(refreshBtn);
 
             //- Render List
             renderHighscores();
@@ -256,6 +267,14 @@ package popups
             renderHighscores();
         }
 
+        private function refreshPersonalRanks():void
+        {
+            var infoRanks:Object = _gvars.activeUser.getLevelRank(songDetails);
+            myUsernameText.text = "#" + infoRanks.rank + ": " + _gvars.activeUser.name;
+            myScoreText.text = NumberUtil.numberFormat(infoRanks.rawscore);
+            myAVText.text = infoRanks.results;
+        }
+
         override public function stageRemove():void
         {
             box.dispose();
@@ -281,6 +300,14 @@ package popups
                 page++;
                 renderHighscores();
             }
+            if (e.target == refreshBtn)
+            {
+                _gvars.clearHighscores();
+                _gvars.activeUser.loadLevelRanks();
+                refreshPersonalRanks();
+                renderHighscores();
+            }
+
             //- Close
             if (e.target == closeBtn)
             {
