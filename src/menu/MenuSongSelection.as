@@ -1000,7 +1000,7 @@ package menu
 
                 infoRanks = _gvars.activeUser.getLevelRank(songDetails);
                 var highscores:Object = _gvars.getHighscores(songDetails.level);
-                if (highscores && highscores[1])
+                if (highscores && highscores["1"]) // Check for rank 1 entry.
                 {
                     var lastRank:int = 0;
                     var lastScore:Number = Number.MAX_VALUE;
