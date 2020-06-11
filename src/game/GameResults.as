@@ -33,6 +33,7 @@ package game
     import flash.ui.ContextMenuItem;
     import flash.ui.Keyboard;
     import menu.MenuPanel;
+    import menu.MenuSongSelection;
     import popups.PopupHighscores;
     import popups.PopupMessage;
     import popups.PopupSongRating;
@@ -71,7 +72,9 @@ package game
         private var navOptions:BoxButton;
         private var navHighscores:BoxButton;
         private var navMenu:BoxButton;
+        private var navRandomSong:BoxButton;
         private var resultsTime:String = TimeUtil.getCurrentDate();
+        private var _playlist:Playlist = Playlist.instance;
 
         private var songResults:Array;
         private var songIndex:int;
@@ -204,6 +207,12 @@ package game
             navSaveReplay.y = 6;
             navSaveReplay.addEventListener(MouseEvent.CLICK, eventHandler);
             this.addChild(navSaveReplay);
+
+            navRandomSong = new BoxButton(110, 32, "Play Random Song");
+            navRandomSong.x = 268;
+            navRandomSong.y = 6;
+            navRandomSong.addEventListener(MouseEvent.CLICK, eventHandler);
+            this.addChild(navRandomSong);
 
             navPrev = new BoxButton(90, 32, _lang.string("game_results_queue_previous"));
             navPrev.x = 18;
@@ -1354,6 +1363,42 @@ package game
                     switchTo(GameMenu.GAME_LOADING);
                 }
             }
+
+            else if (target == navRandomSong && navRandomSong.visible)
+            {
+                var randomSongLevel:int;
+                var selectedSong:Array;
+                var loader:MenuSongSelection = new MenuSongSelection(this);
+                //Check for filters and filter the songs list
+                if (_gvars.activeFilter != null)
+                {
+                    var filteredSongList:Array = _playlist.indexList.filter(function(item:Object, index:int, array:Array):Boolean
+                    {
+                        return _gvars.activeFilter.process(item, _gvars.activeUser);
+                    });
+
+                    //Check if selected song is accessible
+                    do
+                    {
+                        randomSongLevel = Math.floor(Math.random() * (filteredSongList.length - 1));
+                        selectedSong = filteredSongList[randomSongLevel];
+                    } while (_gvars.checkSongAccess(selectedSong) != 0)
+                    loader.playSong(selectedSong.level);
+                }
+
+                //If no filters are used, get random song from engine
+                else
+                {
+                    var SongList:Array = _playlist.playList;
+                    do
+                    {
+                        randomSongLevel = Math.floor(Math.random() * (SongList.length - 1));
+                        selectedSong = SongList[randomSongLevel];
+                    } while (_gvars.checkSongAccess(selectedSong) != 0)
+                    loader.playSong(selectedSong.level);
+                }
+            }
+
             else if (target == navOptions)
             {
                 addPopup(Main.POPUP_OPTIONS);

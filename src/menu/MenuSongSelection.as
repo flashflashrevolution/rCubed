@@ -1491,7 +1491,7 @@ package menu
             }
         }
 
-        private function playSong(level:int = -1):void
+        public function playSong(level:int = -1):void
         {
             if (songList != _gvars.songQueue && (level >= 0 || options.activeSongID >= 0))
             {
