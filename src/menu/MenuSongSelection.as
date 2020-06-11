@@ -991,9 +991,16 @@ package menu
                 songInfoTitle.width = 164;
                 info.addChild(songInfoTitle);
 
+                // Refresh button
+                var refreshBtn:BoxButton = new BoxButton(19, 19, "R");
+                refreshBtn.x = info.width - refreshBtn.width + 2;
+                refreshBtn.y = 2;
+                refreshBtn.addEventListener(MouseEvent.CLICK, refreshHighscoresClick);
+                info.addChild(refreshBtn);
+
                 infoRanks = _gvars.activeUser.getLevelRank(songDetails);
                 var highscores:Object = _gvars.getHighscores(songDetails.level);
-                if (highscores)
+                if (highscores && highscores[1])
                 {
                     var lastRank:int = 0;
                     var lastScore:Number = Number.MAX_VALUE;
@@ -1371,6 +1378,13 @@ package menu
         private function songStartClick(e:Event):void
         {
             playSong(e.target.level);
+        }
+
+        private function refreshHighscoresClick(e:Event):void
+        {
+            _gvars.clearHighscores();
+            _gvars.activeUser.loadLevelRanks();
+            buildInfoTab();
         }
 
         private function mouseWheelHandler(e:MouseEvent):void
