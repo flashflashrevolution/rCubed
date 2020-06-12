@@ -403,6 +403,11 @@ package
             return null;
         }
 
+        public function clearHighscores():void
+        {
+            songHighscores = {};
+        }
+
         public function loadHighscores(lvlID:int, startIndex:int = 0):void
         {
             _loader = new DynamicURLLoader();
