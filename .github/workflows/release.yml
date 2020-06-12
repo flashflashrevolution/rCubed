@@ -2,8 +2,8 @@ name: Release
 
 on:
   push:
-    tags: v*
-    branches: feat/workflow
+    tags:
+      - "v*.*.*"
 
 jobs:
   build:
@@ -13,6 +13,11 @@ jobs:
         os: [windows-latest]
 
     steps:
+      - name: Get Numerical Version Number
+        shell: bash
+        id: versionNumber
+        run: echo ::set-output name=tag::${GITHUB_REF/refs\/tags\/v/}
+
       - name: Checkout
         uses: actions/checkout@v2.0.0
         with:
@@ -48,7 +53,7 @@ jobs:
         run: |
           $ProgressPreference = 'SilentlyContinue';
           (irm -Uri "http://airdownload.adobe.com/air/win/download/latest/AIRSDK_Compiler.zip" -ContentType "application/octet-stream" -OutFile "air-sdk.zip")
-      
+
       - name: extract-7z-action
         if: matrix.os == 'windows-latest' && steps.cache-air-sdk.outputs.cache-hit != 'true'
         uses: DuckSoft/extract-7z-action@v1.0
@@ -57,13 +62,13 @@ jobs:
           pathSource: air-sdk.zip
           # path to place the extract
           pathTarget: ${{ github.workspace }}\airsdk
-   
+
       - name: Fix Air SDK Target
         uses: cschleiden/replace-tokens@v1
         with:
           files: '["./airsdk/frameworks/flex-config.xml"]'
-          tokenPrefix: '{'
-          tokenSuffix: '}'
+          tokenPrefix: "{"
+          tokenSuffix: "}"
         env:
           targetPlayerMinorVersion: 0
           targetPlayerMajorVersion: 32
@@ -73,10 +78,18 @@ jobs:
           files: '["asconfig.release.json"]'
         env:
           SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
+          VERSION: ${{ steps.versionNumber.outputs.tag }}
+
+      - name: Variable Substitution
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: "application.xml"
+        env:
+          application.versionNumber: ${{ steps.versionNumber.outputs.tag }}
 
       - name: Extract FFR Branded icons
         run: 7z.exe x -tzip ${{ github.workspace }}\assets\branding-icons.zip -o${{ github.workspace }}/data/icons/ -p'${{ secrets.ICON_ARCHIVE_PASSWORD }}' -aoa
-      
+
       - name: Install Dependencies
         run: npm install asconfigc
 
@@ -114,7 +127,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          release_name: rCubed - ${{ github.ref }}
           draft: true
           prerelease: true
 
