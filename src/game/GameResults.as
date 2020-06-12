@@ -208,7 +208,7 @@ package game
             navSaveReplay.addEventListener(MouseEvent.CLICK, eventHandler);
             this.addChild(navSaveReplay);
 
-            navRandomSong = new BoxButton(110, 32, "Play Random Song");
+            navRandomSong = new BoxButton(110, 32, _lang.string("game_results_play_random_song"));
             navRandomSong.x = 268;
             navRandomSong.y = 6;
             navRandomSong.addEventListener(MouseEvent.CLICK, eventHandler);
