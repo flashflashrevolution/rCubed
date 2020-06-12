@@ -389,6 +389,10 @@ package game
             if (!_gvars.flashvars.preview_file)
                 navScreenShot.visible = true;
 
+            // Random Song Button
+            if (result.options.replay || _gvars.flashvars.preview_file || _mp.gameplayPlayingStatus)
+                navRandomSong.visible = false;
+
             // Skill rating
             var rawgoods:Number = zRanking.getRawGoods(result);
             var songweight:Number = zRanking.getSongWeight(song, result);
