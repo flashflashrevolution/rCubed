@@ -33,7 +33,6 @@ package game
     import flash.ui.ContextMenuItem;
     import flash.ui.Keyboard;
     import menu.MenuPanel;
-    import menu.MenuSongSelection;
     import popups.PopupHighscores;
     import popups.PopupMessage;
     import popups.PopupSongRating;
@@ -1366,38 +1365,35 @@ package game
 
             else if (target == navRandomSong && navRandomSong.visible)
             {
-                var randomSongLevel:int;
-                var selectedSong:Array;
-                var loader:MenuSongSelection = new MenuSongSelection(this);
+                var songList:Array = _playlist.playList;
+                var selectedSong:Object;
+
                 //Check for filters and filter the songs list
                 if (_gvars.activeFilter != null)
                 {
-                    var filteredSongList:Array = _playlist.indexList.filter(function(item:Object, index:int, array:Array):Boolean
+                    songList = _playlist.indexList.filter(function(item:Object, index:int, array:Array):Boolean
                     {
                         return _gvars.activeFilter.process(item, _gvars.activeUser);
                     });
-
-                    //Check if selected song is accessible
-                    do
-                    {
-                        randomSongLevel = Math.floor(Math.random() * (filteredSongList.length - 1));
-                        selectedSong = filteredSongList[randomSongLevel];
-                    } while (_gvars.checkSongAccess(selectedSong) != 0)
-                    loader.playSong(selectedSong.level);
                 }
 
-                //If no filters are used, get random song from engine
-                else
+                // Filter to only Playable Songs
+                songList = songList.filter(function(item:Object, index:int, array:Array):Boolean
                 {
-                    var SongList:Array = _playlist.playList;
-                    do
-                    {
-                        randomSongLevel = Math.floor(Math.random() * (SongList.length - 1));
-                        selectedSong = SongList[randomSongLevel];
-                    } while (_gvars.checkSongAccess(selectedSong) != 0)
-                    loader.playSong(selectedSong.level);
+                    return _gvars.checkSongAccess(item) == GlobalVariables.SONG_ACCESS_PLAYABLE;
+                });
+
+                // Check for at least 1 possible playable song.
+                if (songList.length > 0)
+                {
+                    selectedSong = songList[Math.floor(Math.random() * (songList.length - 1))];
+                    _gvars.songQueue.push(selectedSong);
+                    _gvars.options = new GameOptions();
+                    _gvars.options.fill();
+                    switchTo(Main.GAME_PLAY_PANEL);
                 }
             }
+
 
             else if (target == navOptions)
             {
