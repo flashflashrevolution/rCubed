@@ -280,7 +280,7 @@ package
 
         public function checkSongAccess(song:Object):int
         {
-            if (isNaN(song.level))
+            if (song == null || isNaN(song.level))
                 return SONG_ACCESS_BANNED;
             if (song.credits > 0 && activeUser.credits < song.credits)
                 return SONG_ACCESS_CREDITS;

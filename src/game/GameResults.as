@@ -71,7 +71,9 @@ package game
         private var navOptions:BoxButton;
         private var navHighscores:BoxButton;
         private var navMenu:BoxButton;
+        private var navRandomSong:BoxButton;
         private var resultsTime:String = TimeUtil.getCurrentDate();
+        private var _playlist:Playlist = Playlist.instance;
 
         private var songResults:Array;
         private var songIndex:int;
@@ -204,6 +206,12 @@ package game
             navSaveReplay.y = 6;
             navSaveReplay.addEventListener(MouseEvent.CLICK, eventHandler);
             this.addChild(navSaveReplay);
+
+            navRandomSong = new BoxButton(110, 32, _lang.string("game_results_play_random_song"));
+            navRandomSong.x = 268;
+            navRandomSong.y = 6;
+            navRandomSong.addEventListener(MouseEvent.CLICK, eventHandler);
+            this.addChild(navRandomSong);
 
             navPrev = new BoxButton(90, 32, _lang.string("game_results_queue_previous"));
             navPrev.x = 18;
@@ -380,6 +388,10 @@ package game
             // Save Screenshot
             if (!_gvars.flashvars.preview_file)
                 navScreenShot.visible = true;
+
+            // Random Song Button
+            if (result.options.replay || _gvars.flashvars.preview_file || _mp.gameplayPlayingStatus())
+                navRandomSong.visible = false;
 
             // Skill rating
             var rawgoods:Number = zRanking.getRawGoods(result);
@@ -1354,6 +1366,39 @@ package game
                     switchTo(GameMenu.GAME_LOADING);
                 }
             }
+
+            else if (target == navRandomSong && navRandomSong.visible)
+            {
+                var songList:Array = _playlist.playList;
+                var selectedSong:Object;
+
+                //Check for filters and filter the songs list
+                if (_gvars.activeFilter != null)
+                {
+                    songList = _playlist.indexList.filter(function(item:Object, index:int, array:Array):Boolean
+                    {
+                        return _gvars.activeFilter.process(item, _gvars.activeUser);
+                    });
+                }
+
+                // Filter to only Playable Songs
+                songList = songList.filter(function(item:Object, index:int, array:Array):Boolean
+                {
+                    return _gvars.checkSongAccess(item) == GlobalVariables.SONG_ACCESS_PLAYABLE;
+                });
+
+                // Check for at least 1 possible playable song.
+                if (songList.length > 0)
+                {
+                    selectedSong = songList[Math.floor(Math.random() * (songList.length - 1))];
+                    _gvars.songQueue.push(selectedSong);
+                    _gvars.options = new GameOptions();
+                    _gvars.options.fill();
+                    switchTo(Main.GAME_PLAY_PANEL);
+                }
+            }
+
+
             else if (target == navOptions)
             {
                 addPopup(Main.POPUP_OPTIONS);
