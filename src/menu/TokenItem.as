@@ -79,7 +79,7 @@ package menu
             messageText.htmlText = "<font face=\"" + Language.UNI_FONT_NAME + "\" color=\"#FFFFFF\" size=\"12\"><b>" + messageString + "</b></font>";
 
             //- Make Display
-            var box:Box = new Box(577, Math.max(54, (32 + (messageText.numLines * 15))), false);
+            var box:Box = new Box(577, Math.max(54, (32 + (messageText.numLines * 17))), false);
 
             //- Name
             var nameText:Text = new Text(token_info["name"], 14);
