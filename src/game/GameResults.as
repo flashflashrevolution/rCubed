@@ -390,7 +390,7 @@ package game
                 navScreenShot.visible = true;
 
             // Random Song Button
-            if (result.options.replay || _gvars.flashvars.preview_file || _mp.gameplayPlayingStatus)
+            if (result.options.replay || _gvars.flashvars.preview_file || _mp.gameplayPlayingStatus())
                 navRandomSong.visible = false;
 
             // Skill rating
