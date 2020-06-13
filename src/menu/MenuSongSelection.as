@@ -1188,7 +1188,7 @@ package menu
                 }
                 else if (clickAction == "playQueue")
                 {
-                    playQueue(true);
+                    playQueue();
                 }
                 else if (clickAction == "doSearch")
                 {
@@ -1514,34 +1514,20 @@ package menu
             var songData:Object = _playlist.getSong(level);
             if (songData.error == null)
             {
-                var accessLevel:int = _gvars.checkSongAccess(songData);
-                if (accessLevel == GlobalVariables.SONG_ACCESS_PLAYABLE)
-                {
-                    _gvars.songQueue.push(songData);
-                }
+                _gvars.songQueue.push(songData);
+                playQueue();
             }
-
-            playQueue();
         }
 
-        private function playQueue(checkQueue:Boolean = false):void
+        private function playQueue():void
         {
+            _gvars.songQueue = _gvars.songQueue.filter(function(item:*, index:int, array:Array):Boolean
+            {
+                return (_gvars.checkSongAccess(item) == GlobalVariables.SONG_ACCESS_PLAYABLE);
+            });
+
             if (_gvars.songQueue.length <= 0)
                 return;
-
-            if (checkQueue)
-            {
-                var tempQueue:Array = _gvars.songQueue;
-                _gvars.songQueue = [];
-                for each (var songData:Object in tempQueue)
-                {
-                    var accessLevel:int = _gvars.checkSongAccess(songData);
-                    if (accessLevel == GlobalVariables.SONG_ACCESS_PLAYABLE)
-                    {
-                        _gvars.songQueue.push(songData);
-                    }
-                }
-            }
 
             _gvars.options = new GameOptions();
             _gvars.options.fill();
