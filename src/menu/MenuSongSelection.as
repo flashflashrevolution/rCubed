@@ -1521,7 +1521,7 @@ package menu
 
         private function playQueue():void
         {
-            _gvars.songQueue = _gvars.songQueue.filter(function(item:*, index:int, array:Array):Boolean
+            _gvars.songQueue = _gvars.songQueue.filter(function(item:Object, index:int, array:Array):Boolean
             {
                 return (_gvars.checkSongAccess(item) == GlobalVariables.SONG_ACCESS_PLAYABLE);
             });
