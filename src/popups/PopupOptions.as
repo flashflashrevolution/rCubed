@@ -149,6 +149,7 @@ package popups
             private var autoSaveLocalCheckbox:checkBox;
             private var useVSyncCheckbox:checkBox;
         }
+        private var flipGraphCheckbox:checkBox;
 
         public function PopupOptions(myParent:MenuPanel)
         {
@@ -1130,6 +1131,19 @@ package popups
                     box.addChild(useVSyncCheckbox);
                     yOff += 30;
                 }
+                
+                var flipGraphCheckboxText:Text = new Text(_lang.string("game_results_flip_graph"));
+                flipGraphCheckboxText.x = xOff + 22;
+                flipGraphCheckboxText.y = yOff;
+                box.addChild(flipGraphCheckboxText);
+                yOff += 2;
+
+                flipGraphCheckbox = new checkBox();
+                flipGraphCheckbox.x = xOff + 2;
+                flipGraphCheckbox.y = yOff;
+                flipGraphCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                box.addChild(flipGraphCheckbox);
+                yOff += 30;
 
                 ///- Col 2
                 xOff += 176;
@@ -1726,6 +1740,11 @@ package popups
                     _gvars.gameMain.addAlert("Set VSYNC: " + stage.vsyncEnabled, 120, Alert.RED);
                 }
             }
+            if (e.target == flipGraphCheckbox)
+            {
+                var flipGraph:Boolean = LocalStore.getVariable("result_flip_graph", false);
+                LocalStore.setVariable("result_flip_graph", !flipGraph);
+            }
             // Set Settings
             setSettings();
 
@@ -2002,6 +2021,8 @@ package popups
                     useCacheCheckbox.gotoAndStop(_gvars.air_useLocalFileCache ? 2 : 1);
                     useVSyncCheckbox.gotoAndStop(_gvars.air_useVSync ? 2 : 1);
                 }
+                var flipGraph:Boolean = LocalStore.getVariable("result_flip_graph", false);
+                flipGraphCheckbox.gotoAndStop(flipGraph ? 2 : 1);
             }
             // Save Local
             if (_gvars.activeUser == _gvars.playerUser)
