@@ -2,7 +2,7 @@ on:
   pull_request:
     types: [opened, reopened]
 
-name: Pull Request
+name: Pull Request Discord Notification
 jobs:
   discordNotification:
     name: Discord Notification
@@ -10,5 +10,4 @@ jobs:
     steps:
       - uses: binotaliu/action-discord-notifier@v1.2.0
         with:
-            # A full discord webhook url
             webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
