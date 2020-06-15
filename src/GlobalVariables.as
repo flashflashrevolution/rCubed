@@ -119,6 +119,7 @@ package
             public var air_useLocalFileCache:Boolean = false;
             public var air_autoSaveLocalReplays:Boolean = false;
             public var air_useVSync:Boolean = true;
+            public var air_vFlipResultGraph:Boolean = false;
 
             public var sql_connect:Boolean = false;
             public var sql_conn:SQLConnection;
@@ -129,6 +130,7 @@ package
                 air_useLocalFileCache = LocalStore.getVariable("air_useLocalFileCache", false);
                 air_autoSaveLocalReplays = LocalStore.getVariable("air_autoSaveLocalReplays", false);
                 air_useVSync = LocalStore.getVariable("air_useVSync", false);
+                air_vFlipResultGraph = LocalStore.getVariable("air_vFlipResultGraph", false);
             }
 
             public function initSQLConnection():void
