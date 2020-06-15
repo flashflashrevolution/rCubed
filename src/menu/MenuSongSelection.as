@@ -954,7 +954,7 @@ package menu
                 // Actions
                 var songQueuePlay:BoxButton = new BoxButton(164, 27, _lang.string("song_selection_queue_panel_play"), 12);
                 songQueuePlay.y = 192;
-                songQueuePlay.action = "playSong";
+                songQueuePlay.action = "playQueue";
                 songQueuePlay.addEventListener(MouseEvent.CLICK, clickHandler);
                 info.addChild(songQueuePlay);
 
@@ -1186,9 +1186,9 @@ package menu
                     buildInfoTab();
                     return;
                 }
-                else if (clickAction == "playSong")
+                else if (clickAction == "playQueue")
                 {
-                    playSong();
+                    playQueue();
                 }
                 else if (clickAction == "doSearch")
                 {
@@ -1469,7 +1469,7 @@ package menu
                         if (_mp.gameplayHasOpponent())
                             multiplayerLoad();
                         else
-                            playSong();
+                            playSong(options.activeSongID);
                     }
                     return;
 
@@ -1505,34 +1505,33 @@ package menu
             }
         }
 
-        private function playSong(level:int = -1):void
+        private function playSong(level:int):void
         {
-            if (songList != _gvars.songQueue && (level >= 0 || options.activeSongID >= 0))
+            if (level < 0)
+                return;
+
+            _gvars.songQueue = [];
+            var songData:Object = _playlist.getSong(level);
+            if (songData.error == null)
             {
-                var songData:Object = _playlist.getSong(level < 0 ? options.activeSongID : level);
-                if (songData.error == null)
-                {
-                    var accessLevel:int = _gvars.checkSongAccess(songData);
-                    if (accessLevel == GlobalVariables.SONG_ACCESS_PLAYABLE)
-                    {
-                        // Should we prevent PLAY from adding to queue, if the last song in the queue is already the same song?
-                        if (_gvars.songQueue.length > 0)
-                        {
-                            var lastSongData:Object = _gvars.songQueue[_gvars.songQueue.length - 1];
-                            if (lastSongData.level != songData.level)
-                                _gvars.songQueue.push(songData);
-                        }
-                        else
-                            _gvars.songQueue.push(songData);
-                    }
-                }
+                _gvars.songQueue.push(songData);
+                playQueue();
             }
-            if (_gvars.songQueue.length > 0)
+        }
+
+        private function playQueue():void
+        {
+            _gvars.songQueue = _gvars.songQueue.filter(function(item:Object, index:int, array:Array):Boolean
             {
-                _gvars.options = new GameOptions();
-                _gvars.options.fill();
-                switchTo(Main.GAME_PLAY_PANEL);
-            }
+                return (_gvars.checkSongAccess(item) == GlobalVariables.SONG_ACCESS_PLAYABLE);
+            });
+
+            if (_gvars.songQueue.length <= 0)
+                return;
+
+            _gvars.options = new GameOptions();
+            _gvars.options.fill();
+            switchTo(Main.GAME_PLAY_PANEL);
         }
 
         private function doSearch(name:String):void
