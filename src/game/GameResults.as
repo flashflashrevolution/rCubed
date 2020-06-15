@@ -78,6 +78,7 @@ package game
         private var songResults:Array;
         private var songIndex:int;
         private var graphType:int = 0;
+        private var flipGraph:Boolean = false;
 
         public function GameResults(myParent:MenuPanel)
         {
@@ -122,7 +123,8 @@ package game
 
             // Get Graph Type
             graphType = LocalStore.getVariable("result_graph_type", 0);
-
+            flipGraph = LocalStore.getVariable("result_flip_graph", false);
+            
             // Text Style
             TEXT_STYLE = new StyleSheet();
             TEXT_STYLE.setStyle("BODY", {fontWeight: "bold"});
@@ -524,7 +526,6 @@ package game
             var graphHeight:int = 117;
             var posX:Number;
             var posY:Number = 0;
-            var flipGraph:Boolean = _gvars.air_vFlipResultGraph;
 
             var ratioX:Number = graphWidth;
             var ratioY:Number = graphHeight;
