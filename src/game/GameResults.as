@@ -523,7 +523,8 @@ package game
             var graphWidth:int = 718;
             var graphHeight:int = 117;
             var posX:Number;
-            var posY:Number;
+            var posY:Number = 0;
+            var flipGraph:Boolean = _gvars.air_vFlipResultGraph;
 
             var ratioX:Number = graphWidth;
             var ratioY:Number = graphHeight;
@@ -591,17 +592,38 @@ package game
                         default:
                             continue;
                     }
+                    if (flipGraph)
+                    {
+                        posY += jn_rect_height;
+                    }
+                    else
+                    {
+                        posY = ((jncj.t * -1) - MIN_TIME) * ratioY;
+                    }
+
                     graphDraw.graphics.beginFill(bgColor, 0.25);
-                    graphDraw.graphics.drawRect(0, ((jncj.t * -1) - MIN_TIME) * ratioY - jn_rect_height, graphWidth, jn_rect_height);
+                    graphDraw.graphics.drawRect(0, posY - jn_rect_height, graphWidth, jn_rect_height);
                     graphDraw.graphics.endFill();
                 }
+
                 // Draw Judge Regions Dividers
+                posY = 0;
                 graphDraw.graphics.lineStyle(1, 0x000000, 0.25);
                 for (jn = 1; jn < judgeSettings.length - 1; jn++)
                 {
                     jncj = judgeSettings[jn];
-                    graphDraw.graphics.moveTo(0, ((jncj.t * -1) - MIN_TIME) * ratioY);
-                    graphDraw.graphics.lineTo(graphWidth, ((jncj.t * -1) - MIN_TIME) * ratioY);
+                    if (flipGraph)
+                    {
+                        jnnj = judgeSettings[jn + 1];
+                        jn_rect_height = (jnnj.t - jncj.t) * ratioY;
+                        posY += jn_rect_height;
+                    }
+                    else
+                    {
+                        posY = ((jncj.t * -1) - MIN_TIME) * ratioY;
+                    }
+                    graphDraw.graphics.moveTo(0, posY);
+                    graphDraw.graphics.lineTo(graphWidth, posY);
                 }
 
                 // Draw Hit Markers
@@ -635,15 +657,20 @@ package game
                                 break;
                             case 0:
                             default:
-                                posY = GAP_TIME * ratioY;
+                                posY = 0;
                                 bgColor = 0xff0000;
                                 break;
                         }
                     }
                     else
                     {
-                        posY = GAP_TIME * ratioY;
+                        posY = 0;
                         bgColor = 0xff0000;
+                    }
+
+                    if (flipGraph)
+                    {
+                        posY = graphHeight - posY;
                     }
 
                     graphDraw.graphics.lineStyle(1, bgColor, 1);
