@@ -1,0 +1,14 @@
+on:
+  pull_request:
+    types: [opened, reopened]
+
+name: Pull Request
+jobs:
+  discordNotification:
+    name: Discord Notification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: binotaliu/action-discord-notifier@v1.2.0
+        with:
+            # A full discord webhook url
+            webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
