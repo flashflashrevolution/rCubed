@@ -33,7 +33,7 @@
             },
             {
                 "name": "CONFIG::timeStamp",
-                "value": "\"2020-05-31\""
+                "value": "\"2020-06-14\""
             },
             {
                 "name": "R3::HASH_STRING",
@@ -53,7 +53,7 @@
             },
             {
                 "name": "R3::VERSION",
-                "value": "\"1.2.1\""
+                "value": "\"1.2.2\""
             }
         ],
         "default-size": {
