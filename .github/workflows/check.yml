@@ -3,11 +3,11 @@ name: Check
 on:
   push:
     branches:
-      - master
+      - main
       - feat/workflow
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
