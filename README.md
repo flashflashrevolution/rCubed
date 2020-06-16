@@ -2,9 +2,15 @@
 
 [![Latest Release][latest-release-badge]](https://github.com/flashflashrevolution/rCubed/releases)
 
+![Platform Support][platforms-badge]
+
 ![Release][release-status-badge]
+
 ![Master][master-status-badge]
+
 [![FFR Discord][discord-badge]](https://discord.gg/ffr)
+
+---
 
 R^3 is the third and latest game engine for **[Flash Flash Revolution](http://www.flashflashrevolution.com/)**, a free online rhythm game that has been played by over 2 million registered users since 2002.
 
@@ -109,11 +115,19 @@ To contact a member of the FFR development team:
 - [Open an issue](https://github.com/flashflashrevolution/rCubed/issues/new/choose) on GitHub.
 - [Private message](http://www.flashflashrevolution.com/team/)  a developer on FFR.
 
-[//]: # (The following hidden section is for link shorteners.)
+[//]: # URL Shortlinks
 
 [CONTRIBUTING]: https://github.com/flashflashrevolution/.github/blob/master/CONTRIBUTING.md
-[fork-icon]: https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/svg/repo-forked.svg
+
+[//]: # Badge Shortlinks
+
 [release-status-badge]: https://github.com/flashflashrevolution/rCubed/workflows/Release/badge.svg
 [master-status-badge]: https://github.com/flashflashrevolution/rCubed/workflows/Check/badge.svg
 [latest-release-badge]: https://img.shields.io/github/v/release/flashflashrevolution/rcubed?label=rCubed
 [discord-badge]: https://discordapp.com/api/guilds/196381154880782336/widget.png?style=shield
+[platforms-badge]: https://img.shields.io/badge/platforms-windows-lightgrey
+
+[//]: # Image Shortlinks
+
+[fork-icon]: https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/svg/repo-forked.svg
+
