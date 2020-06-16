@@ -877,7 +877,6 @@ package menu
                     searchBox.text = _gvars.tempFlags['active_search_temp'];
                     searchBox.field.setSelection(searchBox.field.length, searchBox.field.length); // caret at end of text
                     //searchBox.field.setSelection(0, searchBox.field.length); // select all text
-                    stage.focus = searchBox.field;
                 }
 
                 if (searchTypeBox == null)
@@ -899,7 +898,6 @@ package menu
                 searchBtn.action = "doSearch";
                 searchBtn.addEventListener(MouseEvent.CLICK, clickHandler);
                 info.addChild(searchBtn);
-                stage.focus = searchBox.field;
 
                 var randomButton:BoxButton = new BoxButton(164, 27, _lang.string("song_selection_filter_panel_random"));
                 randomButton.action = "doFilterRandom";
@@ -1152,6 +1150,10 @@ package menu
             //- Add to box.
             info.x = 5;
             infoBox.addChild(info);
+
+            // For search, set focus on search box:
+            if (options.infoTab == TAB_SEARCH)
+                stage.focus = searchBox.field;
         }
 
         private function highscoresLoaded(e:Event):void
