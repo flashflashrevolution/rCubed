@@ -8,8 +8,6 @@ jobs:
     name: Discord Notification
     runs-on: ubuntu-latest
     steps:
-      - uses: Ilshidur/action-discord@master
+      - uses: Ilshidur/action-discord@759f6ea
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        with:
-            args: 'A new PR on {{ EVENT_PAYLOAD.repository.full_name }} is available\n{{EVENT_PAYLOAD.pull_request.html}}.'
