@@ -195,25 +195,33 @@ package popups
                     var r:int = (10 * page) + vr;
                     if (highscores[r])
                     {
+                        var username:String = highscores[r]['name'];
+                        var score:Number = highscores[r]['score'];
+                        var av:String = highscores[r]['av'];
+                        var isMyPB:Boolean = (!_gvars.activeUser.isGuest) && (_gvars.activeUser.name == username);
+
                         // Username
-                        textLine = new Text("#" + r + ": " + highscores[r]['name'], 16);
+                        textLine = new Text("#" + r + ": " + username, 16);
                         textLine.x = 25;
                         textLine.y = tY;
                         textLine.width = 200;
+                        textLine.fontColor = isMyPB ? "#D9FF9E" : "#FFFFFF";
                         scorePane.addChild(textLine);
 
                         // Score
-                        textLine = new Text(NumberUtil.numberFormat(highscores[r]['score']), 15, "#DDDDDD");
+                        textLine = new Text(NumberUtil.numberFormat(score), 15);
                         textLine.x = 360;
                         textLine.y = tY;
                         textLine.width = 150;
+                        textLine.fontColor = isMyPB ? "#B8D8B3" : "#DDDDDD";
                         scorePane.addChild(textLine);
 
                         // AV
-                        textLine = new Text(highscores[r]['av'], 15, "#BBBBBB");
+                        textLine = new Text(av, 15);
                         textLine.x = 545;
                         textLine.y = tY;
                         textLine.width = 200;
+                        textLine.fontColor = isMyPB ? "#99B793" : "#BBBBBB";
                         scorePane.addChild(textLine);
                         tY += 25;
                     }

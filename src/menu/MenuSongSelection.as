@@ -1007,25 +1007,31 @@ package menu
                     {
                         if (highscores[r])
                         {
-                            if (highscores[r]['score'] < lastScore)
+                            var username:String = highscores[r]['name'];
+                            var score:Number = highscores[r]['score'];
+                            var isMyPB:Boolean = (!_gvars.activeUser.isGuest) && (_gvars.activeUser.name == username);
+
+                            if (score < lastScore)
                             {
-                                lastScore = highscores[r]['score'];
+                                lastScore = score;
                                 lastRank = r;
                             }
 
                             // Username
-                            songInfoTitle = new Text("#" + lastRank + ": " + highscores[r]['name'], 14);
+                            songInfoTitle = new Text("#" + lastRank + ": " + username, 14);
                             songInfoTitle.x = 0;
                             songInfoTitle.y = tY;
                             songInfoTitle.width = 164;
+                            songInfoTitle.fontColor = isMyPB ? "#D9FF9E" : "#FFFFFF";
                             info.addChild(songInfoTitle);
                             tY += 16;
 
                             // Rank
-                            songInfoDetails = new Text(NumberUtil.numberFormat(highscores[r]['score']), 12, "#DDDDDD");
+                            songInfoDetails = new Text(NumberUtil.numberFormat(score), 12);
                             songInfoDetails.x = 0;
                             songInfoDetails.y = tY;
                             songInfoDetails.width = 164;
+                            songInfoDetails.fontColor = isMyPB ? "#B8D8B3" : "#DDDDDD";
                             info.addChild(songInfoDetails);
                             tY += 23;
                         }
