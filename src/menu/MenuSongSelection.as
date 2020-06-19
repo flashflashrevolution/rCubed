@@ -1432,7 +1432,7 @@ package menu
 
             var newIndex:int = options.activeIndex;
             var lastIndex:int = options.activeIndex;
-            var up:Boolean = true;
+            var isNavDirectionUp:Boolean = true;
             switch (e.keyCode)
             {
                 case Keyboard.PAGE_UP:
@@ -1451,14 +1451,14 @@ package menu
                     newIndex += 11;
                     if (newIndex > genreLength - 1)
                         newIndex = genreLength - 1;
-                    up = false;
+                    isNavDirectionUp = false;
                     break;
 
                 case Keyboard.DOWN:
                     newIndex += 1;
                     if (newIndex > genreLength - 1)
                         newIndex = genreLength - 1;
-                    up = false;
+                    isNavDirectionUp = false;
                     break;
 
                 case Keyboard.TAB:
@@ -1497,8 +1497,8 @@ package menu
             if (newIndex != lastIndex)
             {
                 var song:Array;
-                var action:int = up ? -1 : 1;
-                var limit:int = up ? newIndex : (genreLength - 1 - newIndex);
+                var action:int = isNavDirectionUp ? -1 : 1;
+                var limit:int = isNavDirectionUp ? newIndex : (genreLength - 1 - newIndex);
                 for (var counter:int = 0; counter <= limit; ++counter, newIndex += action)
                 {
                     song = songList[newIndex];
