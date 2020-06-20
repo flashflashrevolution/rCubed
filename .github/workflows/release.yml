@@ -19,7 +19,7 @@ jobs:
         run: echo ${{ github.ref }}
       
       - name: Get Numerical Version Number from Tag
-        if: startsWith("", github.ref)
+        if: startsWith(ref, github.ref)
         shell: bash
         id: versionNumber
         run: echo ::set-output name=tag::${GITHUB_REF/refs\/tags\/v/}
