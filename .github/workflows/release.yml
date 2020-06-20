@@ -192,7 +192,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}.exe
-          asset_name: ${{ steps.packageFilemame.outputs.name }}.exe
+          asset_name: ${{ steps.packageFilename.outputs.name }}.exe
           asset_content_type: application/executable
 
       - name: Upload ZIP
@@ -203,5 +203,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}.zip
-          asset_name: ${{ steps.packageFilemame.outputs.name }}.zip
+          asset_name: ${{ steps.packageFilename.outputs.name }}.zip
           asset_content_type: application/executable
