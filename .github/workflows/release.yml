@@ -50,28 +50,14 @@ jobs:
         if: startsWith(github.ref, 'refs/tags')
         run: xml ed -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:versionNumber" -v ${{ steps.versionNumber.outputs.tag }} application.xml
 
-      - name: Token Replace asconfig score save salt
-        uses: cschleiden/replace-tokens@v1
-        with:
-          files: '["asconfig.release.json"]'
-        env:
-          SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
-      
-      - name: Token Replace asconfig version from ref
+      - name: Token Replace in asconfig
         if: startsWith(github.ref, 'refs/tags')
         uses: cschleiden/replace-tokens@v1
         with:
           files: '["asconfig.release.json"]'
         env:
+          SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
           VERSION: ${{ steps.versionNumber.outputs.tag }}
-
-      - name: Token Replace asconfig version from branch
-        if: startsWith(github.ref, 'refs/heads')
-        uses: cschleiden/replace-tokens@v1
-        with:
-          files: '["asconfig.release.json"]'
-        env:
-          VERSION: ${{ github.sha }}
 
       - name: Import Air Signing Certificate
         uses: RollyPeres/base64-to-path@v1
