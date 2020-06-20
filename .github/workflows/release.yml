@@ -29,16 +29,16 @@ jobs:
         with:
           lfs: true
 
-      - name: Cache xmlstarlet
-        id: cache-xmlstarlet
+      - name: Cache Choco
+        id: cache-choco
         uses: actions/cache@v1
         with:
-          path: C:\ProgramData\chocolatey\lib\xmlstarlet.portable\tools
-          key: ${{ runner.os }}-cache-xmlstarlet
+          path: C:\ProgramData\chocolatey\
+          key: ${{ runner.os }}-cache-choco
 
       - name: Choco Install xmlstarlet
         uses: crazy-max/ghaction-chocolatey@v1
-       #if: steps.cache-xmlstarlet.outputs.cache-hit != 'true'
+        #if: steps.cache-choco.outputs.cache-hit != 'true'
         with:
           args: install xmlstarlet -y
 
