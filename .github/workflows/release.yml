@@ -15,11 +15,14 @@ jobs:
         os: [windows-latest]
 
     steps:
+      - name: Print Data
+        run: echo ${{ github.ref }}
+      
       - name: Get Numerical Version Number from Tag
-        if: 
+        if: startsWith("", github.ref)
         shell: bash
         id: versionNumber
-        run: echo ::set-output name=tag::${{ GITHUB_REF/refs\/tags\/v/ }}
+        run: echo ::set-output name=tag::${GITHUB_REF/refs\/tags\/v/}
 
       - name: Checkout
         uses: actions/checkout@v2.0.0
