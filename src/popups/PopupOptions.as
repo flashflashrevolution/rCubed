@@ -148,6 +148,7 @@ package popups
             private var useCacheCheckbox:checkBox;
             private var autoSaveLocalCheckbox:checkBox;
             private var useVSyncCheckbox:checkBox;
+            private var useWebsocketCheckbox:checkBox;
         }
         private var flipGraphCheckbox:checkBox;
 
@@ -1130,8 +1131,21 @@ package popups
                     useVSyncCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                     box.addChild(useVSyncCheckbox);
                     yOff += 30;
+
+                    var useWebsocketCheckboxText:Text = new Text(_lang.string("air_options_use_websockets"));
+                    useWebsocketCheckboxText.x = xOff + 22;
+                    useWebsocketCheckboxText.y = yOff;
+                    box.addChild(useWebsocketCheckboxText);
+                    yOff += 2;
+
+                    useWebsocketCheckbox = new checkBox();
+                    useWebsocketCheckbox.x = xOff + 2;
+                    useWebsocketCheckbox.y = yOff;
+                    useWebsocketCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                    box.addChild(useWebsocketCheckbox);
+                    yOff += 30;
                 }
-                
+
                 var flipGraphCheckboxText:Text = new Text(_lang.string("game_results_flip_graph"));
                 flipGraphCheckboxText.x = xOff + 22;
                 flipGraphCheckboxText.y = yOff;
@@ -1732,12 +1746,25 @@ package popups
                     _gvars.air_useLocalFileCache = !_gvars.air_useLocalFileCache;
                     LocalStore.setVariable("air_useLocalFileCache", _gvars.air_useLocalFileCache);
                 }
+                // Vsync Toggle
                 if (e.target == useVSyncCheckbox)
                 {
                     _gvars.air_useVSync = !_gvars.air_useVSync;
                     LocalStore.setVariable("air_useVSync", _gvars.air_useVSync);
                     stage.vsyncEnabled = _gvars.air_useVSync;
                     _gvars.gameMain.addAlert("Set VSYNC: " + stage.vsyncEnabled, 120, Alert.RED);
+                }
+                // Use HTTP Websockets
+                if (e.target == useWebsocketCheckbox)
+                {
+                    _gvars.air_useWebsockets = !_gvars.air_useWebsockets;
+
+                    if (_gvars.air_useWebsockets)
+                        _gvars.initWebsocketServer();
+                    else
+                        _gvars.destroyWebsocketServer();
+
+                    LocalStore.setVariable("air_useWebsockets", _gvars.air_useWebsockets);
                 }
             }
             if (e.target == flipGraphCheckbox)
@@ -2020,6 +2047,7 @@ package popups
                     autoSaveLocalCheckbox.gotoAndStop(_gvars.air_autoSaveLocalReplays ? 2 : 1);
                     useCacheCheckbox.gotoAndStop(_gvars.air_useLocalFileCache ? 2 : 1);
                     useVSyncCheckbox.gotoAndStop(_gvars.air_useVSync ? 2 : 1);
+                    useWebsocketCheckbox.gotoAndStop(_gvars.air_useWebsockets ? 2 : 1);
                 }
                 var flipGraph:Boolean = LocalStore.getVariable("result_flip_graph", false);
                 flipGraphCheckbox.gotoAndStop(flipGraph ? 2 : 1);
