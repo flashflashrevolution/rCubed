@@ -371,22 +371,10 @@ package arc.mp
                colour = "#101010";
                }
              */
-            const divisionColor:Array = ArcGlobals.divisionColor;
-            const divisionTitle:Array = ArcGlobals.divisionTitle;
-            const divisionLevel:Array = ArcGlobals.divisionLevel;
             const level:int = room.level;
+            const color:int = ArcGlobals.getDivisionColor(level);
+            const title:String = ArcGlobals.getDivisionTitle(level);
 
-            var i:int;
-            for (i = divisionLevel.length - 1; i >= 0; --i)
-            {
-                if (level >= divisionLevel[i])
-                {
-                    break;
-                }
-            }
-
-            const color:int = divisionColor[i];
-            const title:String = divisionTitle[i];
             const dulledColour:String = MultiplayerChat.textDullColour(color, 1).toString(16);
             const roomName:String = "(" + title + ")";
             const spectatorString:String = (room.spectatorCount > 0) ? "+" + room.spectatorCount + " " : "";
