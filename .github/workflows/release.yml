@@ -19,7 +19,7 @@ jobs:
         run: echo ${{ github.ref }}
       
       - name: Get Numerical Version Number from Tag
-        if: startsWith('ref', github.ref)
+        if: startsWith('refs/tags', github.ref)
         shell: bash
         id: versionNumber
         run: echo ::set-output name=tag::${GITHUB_REF/refs\/tags\/v/}
@@ -43,16 +43,26 @@ jobs:
           args: install xmlstarlet -y
 
       - name: Version Number Substition
+        if: startsWith('refs/tags', github.ref)
         run: xml ed --inplace -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:versionNumber" -v ${{ steps.versionNumber.outputs.tag }} application.xml
       
       - name: Version Number Substition (Debug)
+        if: startsWith('refs/tags', github.ref)
         run: xml ed -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:versionNumber" -v ${{ steps.versionNumber.outputs.tag }} application.xml
 
-      - uses: cschleiden/replace-tokens@v1
+      - name: Token Replace asconfig score save salt
+        uses: cschleiden/replace-tokens@v1
         with:
           files: '["asconfig.release.json"]'
         env:
           SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
+      
+      - name: Token Replace asconfig version
+        if: startsWith('refs/tags', github.ref)
+        uses: cschleiden/replace-tokens@v1
+        with:
+          files: '["asconfig.release.json"]'
+        env:
           VERSION: ${{ steps.versionNumber.outputs.tag }}
 
       - name: Import Air Signing Certificate
