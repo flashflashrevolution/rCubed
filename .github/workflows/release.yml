@@ -33,7 +33,9 @@ jobs:
         id: cache-choco
         uses: actions/cache@v1
         with:
-          path: C:\ProgramData\chocolatey\
+          path: |
+            C:\ProgramData\chocolatey\lib
+            C:\ProgramData\chocolatey\bin
           key: ${{ runner.os }}-cache-choco
 
       - name: Choco Install xmlstarlet
