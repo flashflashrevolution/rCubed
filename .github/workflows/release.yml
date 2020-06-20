@@ -145,22 +145,33 @@ jobs:
           $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("${{ github.workspace }}\certs\7z-cert.p12", "${{ secrets.CODESIGN_CERT_PASS }}");
           Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\dist\R3Release\R3.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
 
-      - name: Generate Filename
+      - name: Generate Filename from tag push
         if: startsWith('refs/tags', github.ref)
         shell: bash
-        id: packageFilemame
-        run: echo ::set-output name=name::rCubed-${{ steps.versionNumber.outputs.tag }}-${{ github.sha }}
+        id: tagFileName
+        run: echo ::set-output name=name::-${{ steps.versionNumber.outputs.tag }}-${{ github.sha }}
+        
+      - name: Generate Filename from branch push
+        if: startsWith('refs/heads', github.ref)
+        shell: bash
+        id: branchFileName
+        run: echo ::set-output name=name::-${{ github.sha }}
+
+      - name: Build Filename from Generated Names
+        shell: bash
+        id: packageFilename
+        run: echo ::set-output name=name::rCubed${{ steps.tagFileName.outputs.name }}${{ steps.branchFileName.outputs.name }}
       
       - name: Package Build in Self-Extracting Archive
-        run: 7z.exe a -t7z -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilemame.outputs.name }}.exe ${{ github.workspace }}/dist/R3Release -sfx
+        run: 7z.exe a -t7z -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}.exe ${{ github.workspace }}/dist/R3Release -sfx
 
       - name: Package Build in Zip
-        run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilemame.outputs.name }}.zip ${{ github.workspace }}/dist/R3Release
+        run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}.zip ${{ github.workspace }}/dist/R3Release
 
       - name: Sign Build Packages
         run: |
           $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("${{ github.workspace }}\certs\7z-cert.p12", "${{ secrets.CODESIGN_CERT_PASS }}");
-          Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\release\R3Release.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
+          Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
 
       - name: Create Release
         id: create_release
@@ -180,7 +191,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilemame.outputs.name }}.exe
+          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}.exe
           asset_name: ${{ steps.packageFilemame.outputs.name }}.exe
           asset_content_type: application/executable
 
@@ -191,6 +202,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilemame.outputs.name }}.zip
+          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}.zip
           asset_name: ${{ steps.packageFilemame.outputs.name }}.zip
           asset_content_type: application/executable
