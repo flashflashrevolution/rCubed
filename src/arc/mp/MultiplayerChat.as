@@ -271,22 +271,9 @@ package arc.mp
 
         public static function textFormatLevel(user:Object):String
         {
-            const divisionColor:Array = ArcGlobals.divisionColor;
-            const divisionTitle:Array = ArcGlobals.divisionTitle;
-            const divisionLevel:Array = ArcGlobals.divisionLevel;
             const level:int = user.userLevel;
-
-            var i:int;
-            for (i = divisionLevel.length - 1; i >= 0; --i)
-            {
-                if (level >= divisionLevel[i])
-                {
-                    break;
-                }
-            }
-
-            const color:int = divisionColor[i];
-            const title:String = divisionTitle[i];
+            const color:int = ArcGlobals.getDivisionColor(level);
+            const title:String = ArcGlobals.getDivisionTitle(level);
             const dulledColour:String = textDullColour(color, 1).toString(16);
             //return textFormatColour(" ", "#" + dulledColour);
             //return textFormatColour("D" + division + " [" + user.userLevel + "] ", "#" + dulledColour);
