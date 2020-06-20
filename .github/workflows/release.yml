@@ -40,7 +40,7 @@ jobs:
 
       - name: Choco Install xmlstarlet
         uses: crazy-max/ghaction-chocolatey@v1
-        #if: steps.cache-choco.outputs.cache-hit != 'true'
+        if: steps.cache-choco.outputs.cache-hit != 'true'
         with:
           args: install xmlstarlet -y
 
