@@ -80,12 +80,10 @@ jobs:
           SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
           VERSION: ${{ steps.versionNumber.outputs.tag }}
 
-      - name: Variable Substitution
-        uses: microsoft/variable-substitution@v1
+      - name: Version Number Substitution
+        uses: Mudlet/xmlstarlet-action@master
         with:
-          files: "application.xml"
-        env:
-          application.versionNumber: ${{ steps.versionNumber.outputs.tag }}
+          args: xml ed --inplace -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:versionNumber" -v ${{ steps.versionNumber.outputs.tag }} application.xml
 
       - name: Extract FFR Branded icons
         run: 7z.exe x -tzip ${{ github.workspace }}\assets\branding-icons.zip -o${{ github.workspace }}/data/icons/ -p'${{ secrets.ICON_ARCHIVE_PASSWORD }}' -aoa
