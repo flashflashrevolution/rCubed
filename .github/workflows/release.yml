@@ -23,6 +23,32 @@ jobs:
         with:
           lfs: true
 
+      - name: Cache xmlstarlet
+        id: cache-xmlstarlet
+        uses: actions/cache@v1
+        with:
+          path: C:\ProgramData\chocolatey\lib\xmlstarlet.portable\tools
+          key: ${{ runner.os }}-cache-xmlstarlet
+
+      - name: Choco Install xmlstarlet
+        uses: crazy-max/ghaction-chocolatey@v1
+        if: steps.cache-xmlstarlet.outputs.cache-hit != 'true'
+        with:
+          args: install xmlstarlet -y
+      
+      - name: Version Number Substition
+        run: xml ed --inplace -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:versionNumber" -v ${{ steps.versionNumber.outputs.tag }} application.xml
+      
+      - name: Version Number Substition (Debug)
+        run: xml ed -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:versionNumber" -v ${{ steps.versionNumber.outputs.tag }} application.xml
+      
+      - uses: cschleiden/replace-tokens@v1
+        with:
+          files: '["asconfig.release.json"]'
+        env:
+          SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
+          VERSION: ${{ steps.versionNumber.outputs.tag }}
+      
       - name: Import Air Signing Certificate
         uses: RollyPeres/base64-to-path@v1
         with:
@@ -72,18 +98,6 @@ jobs:
         env:
           targetPlayerMinorVersion: 0
           targetPlayerMajorVersion: 32
-
-      - uses: cschleiden/replace-tokens@v1
-        with:
-          files: '["asconfig.release.json"]'
-        env:
-          SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
-          VERSION: ${{ steps.versionNumber.outputs.tag }}
-
-      - name: Version Number Substitution
-        uses: Mudlet/xmlstarlet-action@master
-        with:
-          args: xml ed --inplace -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:versionNumber" -v ${{ steps.versionNumber.outputs.tag }} application.xml
 
       - name: Extract FFR Branded icons
         run: 7z.exe x -tzip ${{ github.workspace }}\assets\branding-icons.zip -o${{ github.workspace }}/data/icons/ -p'${{ secrets.ICON_ARCHIVE_PASSWORD }}' -aoa
