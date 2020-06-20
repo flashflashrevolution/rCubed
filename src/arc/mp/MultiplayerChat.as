@@ -271,70 +271,26 @@ package arc.mp
 
         public static function textFormatLevel(user:Object):String
         {
-            var divisionColor:Array = ArcGlobals.divisionColor;
-            var divisionTitle:Array = ArcGlobals.divisionTitle;
-            var color:int;
-            var division:int;
-            var title:String;
-            if (user.userLevel > 121)
+            const divisionColor:Array = ArcGlobals.divisionColor;
+            const divisionTitle:Array = ArcGlobals.divisionTitle;
+            const divisionLevel:Array = ArcGlobals.divisionLevel;
+            const level:int = user.userLevel;
+
+            var i:int;
+            for (i = divisionLevel.length - 1; i >= 0; --i)
             {
-                color = divisionColor[8];
-                title = divisionTitle[8];
-                division = 9;
-            }
-            else if (user.userLevel >= 101)
-            {
-                color = divisionColor[7];
-                title = divisionTitle[7];
-                division = 8;
-            }
-            else if (user.userLevel >= 94)
-            {
-                color = divisionColor[6];
-                title = divisionTitle[6];
-                division = 7;
-            }
-            else if (user.userLevel >= 83)
-            {
-                color = divisionColor[5];
-                title = divisionTitle[5];
-                division = 6;
-            }
-            else if (user.userLevel >= 69)
-            {
-                color = divisionColor[4];
-                title = divisionTitle[4];
-                division = 5;
-            }
-            else if (user.userLevel >= 59)
-            {
-                color = divisionColor[3];
-                title = divisionTitle[3];
-                division = 4;
-            }
-            else if (user.userLevel >= 50)
-            {
-                color = divisionColor[2];
-                title = divisionTitle[2];
-                division = 3;
-            }
-            else if (user.userLevel >= 26)
-            {
-                color = divisionColor[1];
-                title = divisionTitle[1];
-                division = 2;
-            }
-            else
-            {
-                color = divisionColor[0];
-                title = divisionTitle[0];
-                division = 1;
+                if (level >= divisionLevel[i])
+                {
+                    break;
+                }
             }
 
-            var dulledColour:String = textDullColour(color, 1).toString(16);
+            const color:int = divisionColor[i];
+            const title:String = divisionTitle[i];
+            const dulledColour:String = textDullColour(color, 1).toString(16);
             //return textFormatColour(" ", "#" + dulledColour);
             //return textFormatColour("D" + division + " [" + user.userLevel + "] ", "#" + dulledColour);
-            return textFormatColour("Lv." + user.userLevel + " (" + title + ") ", "#" + dulledColour);
+            return textFormatColour("Lv." + level + " (" + title + ") ", "#" + dulledColour);
         }
 
         public static function textFormatServerMessage(user:Object, message:String):String
