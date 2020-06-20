@@ -15,10 +15,11 @@ jobs:
         os: [windows-latest]
 
     steps:
-      - name: Get Numerical Version Number
+      - name: Get Numerical Version Number from Tag
+        if: 
         shell: bash
         id: versionNumber
-        run: echo ::set-output name=tag::${GITHUB_REF/refs\/tags\/v/}
+        run: echo ::set-output name=tag::${{ GITHUB_REF/refs\/tags\/v/ }}
 
       - name: Checkout
         uses: actions/checkout@v2.0.0
@@ -37,20 +38,20 @@ jobs:
         if: steps.cache-xmlstarlet.outputs.cache-hit != 'true'
         with:
           args: install xmlstarlet -y
-      
+
       - name: Version Number Substition
         run: xml ed --inplace -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:versionNumber" -v ${{ steps.versionNumber.outputs.tag }} application.xml
       
       - name: Version Number Substition (Debug)
         run: xml ed -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:versionNumber" -v ${{ steps.versionNumber.outputs.tag }} application.xml
-      
+
       - uses: cschleiden/replace-tokens@v1
         with:
           files: '["asconfig.release.json"]'
         env:
           SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
           VERSION: ${{ steps.versionNumber.outputs.tag }}
-      
+
       - name: Import Air Signing Certificate
         uses: RollyPeres/base64-to-path@v1
         with:
