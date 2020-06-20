@@ -269,10 +269,21 @@ package game
 
             // Prebuild Websocket Message, this is updated instead of creating a new object every message.
             SOCKET_MESSAGE = {"player": {
-                //"settings": options.settingsEncode(),
+                        "settings": options.settingsEncode(),
                         "name": _gvars.activeUser.name,
-                        "userid": _gvars.activeUser.id
+                        "userid": _gvars.activeUser.id,
+                        "avatar": Constant.USER_AVATAR_URL + "?uid=" + _gvars.activeUser.id,
+                        "skill_rating": _gvars.activeUser.skillRating,
+                        "skill_level": _gvars.activeUser.skillLevel,
+                        "game_rank": _gvars.activeUser.gameRank,
+                        "game_played": _gvars.activeUser.gamesPlayed,
+                        "game_grand_total": _gvars.activeUser.grandTotal
                     },
+                    "engine": (song.entry.engine == null ? null : {"id": song.entry.engine.id,
+                            "name": song.entry.engine.name,
+                            "config": song.entry.engine.config_url,
+                            "domain": song.entry.engine.domain})
+                    ,
                     "song": {
                         "name": song.entry.name,
                         "level": song.entry.level,
@@ -292,6 +303,7 @@ package game
                         "song_rating": song.entry.song_rating
                     },
                     "score": {
+                        "best_score": _gvars.activeUser.getLevelRank(song.entry),
                         "amazing": 0,
                         "perfect": 0,
                         "good": 0,
