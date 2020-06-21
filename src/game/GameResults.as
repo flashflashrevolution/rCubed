@@ -79,6 +79,7 @@ package game
         private var songIndex:int;
         private var graphType:int = 0;
         private var flipGraph:Boolean = false;
+        private var grayedOut:Boolean = false;
 
         public function GameResults(myParent:MenuPanel)
         {
@@ -124,7 +125,7 @@ package game
             // Get Graph Type
             graphType = LocalStore.getVariable("result_graph_type", 0);
             flipGraph = LocalStore.getVariable("result_flip_graph", false);
-            
+
             // Text Style
             TEXT_STYLE = new StyleSheet();
             TEXT_STYLE.setStyle("BODY", {fontWeight: "bold"});
@@ -381,6 +382,13 @@ package game
                 // Save Replay Button
                 if (canSendScore(result, true, false, true, true) && !_gvars.flashvars.preview_file)
                     navSaveReplay.visible = true;
+                else
+                {
+                    navSaveReplay.boxColor = 0x000000;
+                    navSaveReplay.enabled = false;
+                    grayedOut = true;
+                    navSaveReplay.visible = true;
+                }
 
                 // Display Song Rating Popup
                 if ((result["songprogress"] > 0.90 || result["playtime_secs"] >= 90) && !result.options.replay)
@@ -1317,7 +1325,7 @@ package game
                 return;
 
             // Based on target
-            if (target == navSaveReplay && navSaveReplay.visible)
+            if (target == navSaveReplay && navSaveReplay.visible && !grayedOut)
             {
                 var gameResult:Object = songResults[resultIndex];
 
