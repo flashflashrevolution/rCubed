@@ -380,7 +380,7 @@ package game
 
             if (MultiplayerSingleton.getInstance().connection.connected && !MultiplayerSingleton.getInstance().isInRoom())
             {
-                MultiplayerSingleton.getInstance().connection.disconnect();
+                MultiplayerSingleton.getInstance().connection.disconnect(true);
             }
 
             /*
