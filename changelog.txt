@@ -5,6 +5,7 @@ R^3 (v1.2.3) [2020-06-20]
 - Highlight personal best scores (#87) - @G-flat
 - Skip over inaccessible songs during menu navigation (#90) - @G-flat
 - Make division level array static (#91) - @G-flat
+- Implement Websocket Support for Game Status (#95) - @Psycast
 
 R^3 (v1.2.2) [2020-06-14]
 ---------------------------------------------------------------------
