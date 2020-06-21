@@ -671,7 +671,7 @@ package game
                         SOCKET_MESSAGE["score"]["maxcombo"] = hitMaxCombo;
                         SOCKET_MESSAGE["score"]["score"] = gameScore;
                         SOCKET_MESSAGE["score"]["last_hit"] = null;
-                        SOCKET_MESSAGE["restarts"] = _gvars.songRestarts;
+                        SOCKET_MESSAGE["score"]["restarts"] = _gvars.songRestarts;
                         _gvars.websocketSend("SONG_START", SOCKET_MESSAGE);
                     }
                 }
@@ -1488,7 +1488,7 @@ package game
             {
                 if (_gvars.air_useWebsockets)
                 {
-                    SOCKET_MESSAGE["restarts"] = _gvars.songRestarts;
+                    SOCKET_MESSAGE["score"]["restarts"] = _gvars.songRestarts;
                     _gvars.websocketSend("SONG_RESTART", SOCKET_MESSAGE);
                 }
             }
