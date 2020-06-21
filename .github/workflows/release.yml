@@ -34,7 +34,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            C:\ProgramData\chocolatey\lib
+            C:\ProgramData\chocolatey\lib\xmlstarlet.portable
             C:\ProgramData\chocolatey\bin
           key: ${{ runner.os }}-cache-choco
 
