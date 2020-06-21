@@ -15,9 +15,6 @@ jobs:
         os: [windows-latest]
 
     steps:
-      - name: Print Data
-        run: echo ${{ github.ref }}
-      
       - name: Get Numerical Version Number from Tag
         if: startsWith(github.ref, 'refs/tags')
         shell: bash
