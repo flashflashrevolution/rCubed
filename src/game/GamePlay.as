@@ -1265,12 +1265,28 @@ package game
                 GAME_STATE = GAME_PAUSE;
                 songPausePosition = getTimer();
                 song.pause();
+
+                CONFIG::air
+                {
+                    if (_gvars.air_useWebsockets)
+                    {
+                        _gvars.websocketSend("SONG_PAUSE", SOCKET_MESSAGE);
+                    }
+                }
             }
             else if (GAME_STATE == GAME_PAUSE)
             {
                 GAME_STATE = GAME_PLAY;
                 absoluteStart += (getTimer() - songPausePosition);
                 song.resume();
+
+                CONFIG::air
+                {
+                    if (_gvars.air_useWebsockets)
+                    {
+                        _gvars.websocketSend("SONG_RESUME", SOCKET_MESSAGE);
+                    }
+                }
             }
         }
 
