@@ -877,7 +877,6 @@ package menu
                     searchBox.text = _gvars.tempFlags['active_search_temp'];
                     searchBox.field.setSelection(searchBox.field.length, searchBox.field.length); // caret at end of text
                     //searchBox.field.setSelection(0, searchBox.field.length); // select all text
-                    stage.focus = searchBox.field;
                 }
 
                 if (searchTypeBox == null)
@@ -899,7 +898,6 @@ package menu
                 searchBtn.action = "doSearch";
                 searchBtn.addEventListener(MouseEvent.CLICK, clickHandler);
                 info.addChild(searchBtn);
-                stage.focus = searchBox.field;
 
                 var randomButton:BoxButton = new BoxButton(164, 27, _lang.string("song_selection_filter_panel_random"));
                 randomButton.action = "doFilterRandom";
@@ -1009,25 +1007,31 @@ package menu
                     {
                         if (highscores[r])
                         {
-                            if (highscores[r]['score'] < lastScore)
+                            var username:String = highscores[r]['name'];
+                            var score:Number = highscores[r]['score'];
+                            var isMyPB:Boolean = (!_gvars.activeUser.isGuest) && (_gvars.activeUser.name == username);
+
+                            if (score < lastScore)
                             {
-                                lastScore = highscores[r]['score'];
+                                lastScore = score;
                                 lastRank = r;
                             }
 
                             // Username
-                            songInfoTitle = new Text("#" + lastRank + ": " + highscores[r]['name'], 14);
+                            songInfoTitle = new Text("#" + lastRank + ": " + username, 14);
                             songInfoTitle.x = 0;
                             songInfoTitle.y = tY;
                             songInfoTitle.width = 164;
+                            songInfoTitle.fontColor = isMyPB ? "#D9FF9E" : "#FFFFFF";
                             info.addChild(songInfoTitle);
                             tY += 16;
 
                             // Rank
-                            songInfoDetails = new Text(NumberUtil.numberFormat(highscores[r]['score']), 12, "#DDDDDD");
+                            songInfoDetails = new Text(NumberUtil.numberFormat(score), 12);
                             songInfoDetails.x = 0;
                             songInfoDetails.y = tY;
                             songInfoDetails.width = 164;
+                            songInfoDetails.fontColor = isMyPB ? "#B8D8B3" : "#DDDDDD";
                             info.addChild(songInfoDetails);
                             tY += 23;
                         }
@@ -1152,6 +1156,10 @@ package menu
             //- Add to box.
             info.x = 5;
             infoBox.addChild(info);
+
+            // For search, set focus on search box:
+            if (options.infoTab == TAB_SEARCH)
+                stage.focus = searchBox.field;
         }
 
         private function highscoresLoaded(e:Event):void
@@ -1424,6 +1432,7 @@ package menu
 
             var newIndex:int = options.activeIndex;
             var lastIndex:int = options.activeIndex;
+            var isNavDirectionUp:Boolean = true;
             switch (e.keyCode)
             {
                 case Keyboard.PAGE_UP:
@@ -1442,12 +1451,14 @@ package menu
                     newIndex += 11;
                     if (newIndex > genreLength - 1)
                         newIndex = genreLength - 1;
+                    isNavDirectionUp = false;
                     break;
 
                 case Keyboard.DOWN:
                     newIndex += 1;
                     if (newIndex > genreLength - 1)
                         newIndex = genreLength - 1;
+                    isNavDirectionUp = false;
                     break;
 
                 case Keyboard.TAB:
@@ -1485,8 +1496,19 @@ package menu
 
             if (newIndex != lastIndex)
             {
-                setActiveIndex(newIndex, lastIndex, true);
-                buildInfoTab();
+                var song:Array;
+                var action:int = isNavDirectionUp ? -1 : 1;
+                var limit:int = isNavDirectionUp ? newIndex : (genreLength - 1 - newIndex);
+                for (var counter:int = 0; counter <= limit; ++counter, newIndex += action)
+                {
+                    song = songList[newIndex];
+                    if ((song != null) && (!song["access"] || song["access"] == GlobalVariables.SONG_ACCESS_PLAYABLE))
+                    {
+                        setActiveIndex(newIndex, lastIndex, true);
+                        buildInfoTab();
+                        break;
+                    }
+                }
             }
         }
 

@@ -180,9 +180,33 @@ package arc
 
         public var configMPSize:int = 10;
         
-        public static var divisionColor:Array = [0xC27BA0, 0x8E7CC3, 0x6D9EEB, 0x93C47D, 0xFFD966, 0xE06666, 0x919C86, 0xD2C7AC, 0xBF0000];
-        public static var divisionTitle:Array = ["Novice", "Intermediate", "Advanced", "Expert", "Master", "Guru", "Legendary", "Godly", "Developer"];
+        public static const divisionColor:Array = [0xC27BA0, 0x8E7CC3, 0x6D9EEB, 0x93C47D, 0xFFD966, 0xE06666, 0x919C86, 0xD2C7AC, 0xBF0000];
+        public static const divisionTitle:Array = ["Novice", "Intermediate", "Advanced", "Expert", "Master", "Guru", "Legendary", "Godly", "Developer"];
+        public static const divisionLevel:Array = [0, 26, 50, 59, 69, 83, 94, 101, 122];
+        
+        public static function getDivisionColor(level:int):int
+        {
+            return divisionColor[getDivisionNumber(level)];
+        }
 
+        public static function getDivisionTitle(level:int):String
+        {
+            return divisionTitle[getDivisionNumber(level)];
+        }
+
+        public static function getDivisionNumber(level:int):int
+        {
+            var div:int;
+            for (div = divisionLevel.length - 1; div >= 0; --div)
+            {
+                if (level >= divisionLevel[div])
+                {
+                    break;
+                }
+            }
+            return div;
+        }
+        
         public function mpLoad():void
         {
             var save:SharedObject = SharedObject.getLocal(Constant.LOCAL_SO_NAME);
