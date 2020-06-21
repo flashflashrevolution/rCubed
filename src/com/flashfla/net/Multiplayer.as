@@ -85,6 +85,7 @@ package com.flashfla.net
         public var rooms:Array;
         public var ghostRooms:Array;
         public var lobby:Object;
+        public var inSolo:Boolean;
 
         public var mode:int;
 
@@ -165,8 +166,9 @@ package com.flashfla.net
             server.connect(serverAddress, serverPort);
         }
 
-        public function disconnect():void
+        public function disconnect(_inSolo:Boolean = false):void
         {
+            inSolo = _inSolo;
             server.disconnect();
         }
 
@@ -946,7 +948,8 @@ package com.flashfla.net
             connected = false;
 
             eventConnection();
-            eventError("Multiplayer Connection Lost");
+            if (inSolo == false)
+                eventError("Multiplayer Connection Lost");
         }
 
         CONFIG::debug
