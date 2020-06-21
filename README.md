@@ -115,11 +115,11 @@ To contact a member of the FFR development team:
 - [Open an issue](https://github.com/flashflashrevolution/rCubed/issues/new/choose) on GitHub.
 - [Private message](http://www.flashflashrevolution.com/team/)  a developer on FFR.
 
-[//]: # URL Shortlinks
+<!-- URL Shortlinks -->
 
 [CONTRIBUTING]: https://github.com/flashflashrevolution/.github/blob/master/CONTRIBUTING.md
 
-[//]: # Badge Shortlinks
+<!-- Badge Shortlinks -->
 
 [release-status-badge]: https://github.com/flashflashrevolution/rCubed/workflows/Release/badge.svg
 [master-status-badge]: https://github.com/flashflashrevolution/rCubed/workflows/Check/badge.svg
@@ -127,7 +127,7 @@ To contact a member of the FFR development team:
 [discord-badge]: https://discordapp.com/api/guilds/196381154880782336/widget.png?style=shield
 [platforms-badge]: https://img.shields.io/badge/platforms-windows-lightgrey
 
-[//]: # Image Shortlinks
+<!-- Image Shortlinks -->
 
 [fork-icon]: https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/svg/repo-forked.svg
 
