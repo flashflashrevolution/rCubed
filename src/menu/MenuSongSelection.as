@@ -1457,13 +1457,11 @@ package menu
 
             if (newIndex != lastIndex)
             {
-                var song:Array;
                 var action:int = isNavDirectionUp ? -1 : 1;
                 var limit:int = isNavDirectionUp ? newIndex : (genreLength - 1 - newIndex);
                 for (var counter:int = 0; counter <= limit; ++counter, newIndex += action)
                 {
-                    song = songList[newIndex];
-                    if ((song != null) && (!song["access"] || song["access"] == GlobalVariables.SONG_ACCESS_PLAYABLE))
+                    if (!songItems[newIndex].isLocked)
                     {
                         setActiveIndex(newIndex, lastIndex, true);
                         buildInfoTab();
