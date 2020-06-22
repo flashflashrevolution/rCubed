@@ -4,6 +4,8 @@ package
     import flash.text.TextFormat;
     import flash.text.TextFormatAlign;
     import classes.Language;
+    import flash.geom.Matrix;
+    import flash.text.StyleSheet;
 
     public class Constant
     {
@@ -98,6 +100,17 @@ package
         public static const TEXT_FORMAT_UNICODE:TextFormat = new TextFormat(Language.UNI_FONT_NAME, 14, 0xFFFFFF, true);
         public static const TEXT_FORMAT_UNICODE_12:TextFormat = new TextFormat(Language.UNI_FONT_NAME, 12, 0xFFFFFF, true);
         public static const JUDGE_WINDOW:Array = [{t: -118, s: 5, f: -3}, {t: -85, s: 25, f: -2}, {t: -51, s: 50, f: -1}, {t: -18, s: 100, f: 0}, {t: 17, s: 50, f: 1}, {t: 50, s: 25, f: 2}, {t: 84, s: 25, f: 3}, {t: 117, s: 0}];
+
+        // Static Initializer
+        {
+            GRADIENT_MATRIX = new Matrix();
+            GRADIENT_MATRIX.createGradientBox(100, 100, (Math.PI / 180) * 225);
+
+            STYLESHEET = new StyleSheet();
+            STYLESHEET.setStyle("A", {textDecoration: "underline", fontWeight: "bold"});
+        }
+        public static var GRADIENT_MATRIX:Matrix;
+        public static var STYLESHEET:StyleSheet;
 
         //- Functions
         public static function cleanScrollDirection(dir:String):String
