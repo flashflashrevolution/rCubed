@@ -75,6 +75,7 @@ package menu
 
         private var songItemContextMenu:ContextMenu;
         private var songItemContextMenuItem:ContextMenuItem;
+        private var removeFromQueueCMItemIndex:int = 1;
         private var isQueuePlaylist:Boolean = false;
 
         ///- Constructor
@@ -162,6 +163,7 @@ package menu
                     songItemContextMenuItem = new ContextMenuItem("Song Options");
                     songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_songOptionsContextSelect);
                     songItemContextMenu.customItems.push(songItemContextMenuItem);
+                    removeFromQueueCMItemIndex = 2;
                 }
             }
             songItemContextMenuItem = new ContextMenuItem("Remove from Queue");
@@ -669,7 +671,7 @@ package menu
                 if (!song["access"] || song["access"] == GlobalVariables.SONG_ACCESS_PLAYABLE)
                 {
                     sI = new SongItem(song, _gvars.activeUser.getLevelRank(song), options.activeIndex == sX);
-                    songItemContextMenu.customItems[2].visible = isQueuePlaylist;
+                    songItemContextMenu.customItems[removeFromQueueCMItemIndex].visible = isQueuePlaylist;
                     (sI as SongItem).contextMenu = songItemContextMenu;
                     sI.y = yOffset;
                     sI.genre = -1;
