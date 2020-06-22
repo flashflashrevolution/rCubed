@@ -1079,6 +1079,7 @@ package com.flashfla.net {
 			}
 			updateRoom(event.params.roomId);
 			room.isJoined = false;
+			currentUser.room = null;
 			eventRoomLeft(room);
 		}
 
