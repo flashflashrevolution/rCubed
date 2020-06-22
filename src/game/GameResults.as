@@ -380,14 +380,13 @@ package game
                 songIndex = result.game_index + 1;
 
                 // Save Replay Button
-                if (canSendScore(result, true, false, true, true) && !_gvars.flashvars.preview_file)
-                    navSaveReplay.visible = true;
-                else
+                navSaveReplay.visible = true;
+                if (!canSendScore(result, true, false, true, true) || _gvars.flashvars.preview_file)
                 {
                     navSaveReplay.boxColor = 0x000000;
+                    navSaveReplay.alpha = 0.5;
                     navSaveReplay.enabled = false;
                     grayedOut = true;
-                    navSaveReplay.visible = true;
                 }
 
                 // Display Song Rating Popup
