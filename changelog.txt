@@ -6,6 +6,12 @@ R^3 (v1.2.3) [2020-06-20]
 - Skip over inaccessible songs during menu navigation (#90) - @G-flat
 - Make division level array static (#91) - @G-flat
 - Implement Websocket Support for Game Status (#95) - @Psycast
+- Fix for multiplayer room join bug. (#97) - @dave936
+- Enable editing songs in the current queue (#96) - G-flat
+- "MP Connection Lost" hidden while in solo (#98, #102) - @dave936
+- Implement Websocket Support for Game Status (#95) - @Psycast
+- Refactor Song Selection and Song Item (#100) - @Psycast
+- Gray out "Save Replay" button rather than hide it (#99) - @dave936
 
 R^3 (v1.2.2) [2020-06-14]
 ---------------------------------------------------------------------
