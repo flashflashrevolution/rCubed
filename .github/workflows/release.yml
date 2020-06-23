@@ -2,8 +2,10 @@ name: Release
 
 on:
   push:
-    tags: v*
-    branches: feat/workflow
+    tags:
+      - "v*.*.*"
+    branches: 
+      - feat/workflow
 
 jobs:
   build:
@@ -13,10 +15,48 @@ jobs:
         os: [windows-latest]
 
     steps:
+      - name: Get Numerical Version Number from Tag
+        if: startsWith(github.ref, 'refs/tags')
+        shell: bash
+        id: versionNumber
+        run: echo ::set-output name=tag::${GITHUB_REF/refs\/tags\/v/}
+
       - name: Checkout
         uses: actions/checkout@v2.0.0
         with:
           lfs: true
+
+      - name: Cache Choco
+        id: cache-choco
+        uses: actions/cache@v2
+        with:
+          path: |
+            C:\ProgramData\chocolatey\lib\xmlstarlet.portable
+            C:\ProgramData\chocolatey\bin
+          key: ${{ runner.os }}-cache-choco
+
+      - name: Choco Install xmlstarlet
+        uses: crazy-max/ghaction-chocolatey@v1
+        if: steps.cache-choco.outputs.cache-hit != 'true'
+        with:
+          args: install xmlstarlet -y
+
+      - name: Version Number Substition
+        if: startsWith(github.ref, 'refs/tags')
+        run: xml ed --inplace -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:versionNumber" -v ${{ steps.versionNumber.outputs.tag }} application.xml
+      
+      - name: Version Number Substition (Debug)
+        if: startsWith(github.ref, 'refs/tags')
+        run: xml ed -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:versionNumber" -v ${{ steps.versionNumber.outputs.tag }} application.xml
+
+      - name: Token Replace in asconfig
+        if: startsWith(github.ref, 'refs/tags')
+        uses: cschleiden/replace-tokens@v1
+        with:
+          files: '["asconfig.release.json"]'
+        env:
+          SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
+          VERSION: ${{ steps.versionNumber.outputs.tag }}
 
       - name: Import Air Signing Certificate
         uses: RollyPeres/base64-to-path@v1
@@ -38,7 +78,7 @@ jobs:
 
       - name: Cache Air SDK
         id: cache-air-sdk
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ${{ github.workspace }}\airsdk
           key: ${{ runner.os }}-air-sdk
@@ -48,7 +88,7 @@ jobs:
         run: |
           $ProgressPreference = 'SilentlyContinue';
           (irm -Uri "http://airdownload.adobe.com/air/win/download/latest/AIRSDK_Compiler.zip" -ContentType "application/octet-stream" -OutFile "air-sdk.zip")
-      
+
       - name: extract-7z-action
         if: matrix.os == 'windows-latest' && steps.cache-air-sdk.outputs.cache-hit != 'true'
         uses: DuckSoft/extract-7z-action@v1.0
@@ -57,26 +97,20 @@ jobs:
           pathSource: air-sdk.zip
           # path to place the extract
           pathTarget: ${{ github.workspace }}\airsdk
-   
+
       - name: Fix Air SDK Target
         uses: cschleiden/replace-tokens@v1
         with:
           files: '["./airsdk/frameworks/flex-config.xml"]'
-          tokenPrefix: '{'
-          tokenSuffix: '}'
+          tokenPrefix: "{"
+          tokenSuffix: "}"
         env:
           targetPlayerMinorVersion: 0
           targetPlayerMajorVersion: 32
 
-      - uses: cschleiden/replace-tokens@v1
-        with:
-          files: '["asconfig.release.json"]'
-        env:
-          SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
-
       - name: Extract FFR Branded icons
         run: 7z.exe x -tzip ${{ github.workspace }}\assets\branding-icons.zip -o${{ github.workspace }}/data/icons/ -p'${{ secrets.ICON_ARCHIVE_PASSWORD }}' -aoa
-      
+
       - name: Install Dependencies
         run: npm install asconfigc
 
@@ -96,16 +130,33 @@ jobs:
           $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("${{ github.workspace }}\certs\7z-cert.p12", "${{ secrets.CODESIGN_CERT_PASS }}");
           Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\dist\R3Release\R3.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
 
+      - name: Generate Filename from tag push
+        if: startsWith(github.ref, 'refs/tags')
+        shell: bash
+        id: tagFileName
+        run: echo ::set-output name=name::-${{ steps.versionNumber.outputs.tag }}-${{ github.sha }}
+        
+      - name: Generate Filename from branch push
+        if: startsWith(github.ref, 'refs/heads')
+        shell: bash
+        id: branchFileName
+        run: echo ::set-output name=name::-${{ github.sha }}
+
+      - name: Build Filename from Generated Names
+        shell: bash
+        id: packageFilename
+        run: echo ::set-output name=name::rCubed${{ steps.tagFileName.outputs.name }}${{ steps.branchFileName.outputs.name }}
+      
       - name: Package Build in Self-Extracting Archive
-        run: 7z.exe a -t7z -mx=9 ${{ github.workspace }}\release\R3Release.exe ${{ github.workspace }}/dist/R3Release -sfx
+        run: 7z.exe a -t7z -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}.exe ${{ github.workspace }}/dist/R3Release -sfx
 
       - name: Package Build in Zip
-        run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\release\R3Release.zip ${{ github.workspace }}/dist/R3Release
+        run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}.zip ${{ github.workspace }}/dist/R3Release
 
       - name: Sign Build Packages
         run: |
           $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("${{ github.workspace }}\certs\7z-cert.p12", "${{ secrets.CODESIGN_CERT_PASS }}");
-          Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\release\R3Release.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
+          Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
 
       - name: Create Release
         id: create_release
@@ -114,7 +165,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          release_name: rCubed - ${{ github.ref }}
           draft: true
           prerelease: true
 
@@ -125,8 +176,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/release/R3Release.exe
-          asset_name: R3Release.exe
+          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}.exe
+          asset_name: ${{ steps.packageFilename.outputs.name }}.exe
           asset_content_type: application/executable
 
       - name: Upload ZIP
@@ -136,6 +187,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/release/R3Release.zip
-          asset_name: R3Release.zip
+          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}.zip
+          asset_name: ${{ steps.packageFilename.outputs.name }}.zip
           asset_content_type: application/executable

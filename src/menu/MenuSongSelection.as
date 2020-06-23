@@ -75,6 +75,8 @@ package menu
 
         private var songItemContextMenu:ContextMenu;
         private var songItemContextMenuItem:ContextMenuItem;
+        private var removeFromQueueCMItemIndex:int = 1;
+        private var isQueuePlaylist:Boolean = false;
 
         ///- Constructor
         public function MenuSongSelection(myParent:MenuPanel)
@@ -161,8 +163,13 @@ package menu
                     songItemContextMenuItem = new ContextMenuItem("Song Options");
                     songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_songOptionsContextSelect);
                     songItemContextMenu.customItems.push(songItemContextMenuItem);
+                    removeFromQueueCMItemIndex = 2;
                 }
             }
+            songItemContextMenuItem = new ContextMenuItem("Remove from Queue");
+            songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_removeFromQueueContextSelect);
+            songItemContextMenu.customItems.push(songItemContextMenuItem);
+
             draw();
 
             return true;
@@ -531,8 +538,8 @@ package menu
                     songList = songList.slice(options.pageNumber * 500, (options.pageNumber + 1) * 500);
                     genreLength = _gvars.songQueue.length;
                 }
-                    // DM_ALL
             }
+            // DM_ALL
             else if (options.activeGenre == -1)
             {
                 songList = _playlist.indexList;
@@ -647,6 +654,13 @@ package menu
                 genreLength = songList.length;
             }
 
+            // Refresh the queue playlist if we're viewing it right now
+            if (isQueuePlaylist)
+            {
+                songList = _gvars.songQueue;
+                genreLength = songList.length;
+            }
+
             drawPages();
 
             //- Build Playlist
@@ -657,6 +671,7 @@ package menu
                 if (!song["access"] || song["access"] == GlobalVariables.SONG_ACCESS_PLAYABLE)
                 {
                     sI = new SongItem(song, _gvars.activeUser.getLevelRank(song), options.activeIndex == sX);
+                    songItemContextMenu.customItems[removeFromQueueCMItemIndex].visible = isQueuePlaylist;
                     (sI as SongItem).contextMenu = songItemContextMenu;
                     sI.y = yOffset;
                     sI.genre = -1;
@@ -1180,6 +1195,7 @@ package menu
                 _gvars.tempFlags['genre_mode_temp'] = GENRE_MODE;
                 LocalStore.setVariable("genre_mode", GENRE_MODE);
                 options.activeGenre = 0;
+                isQueuePlaylist = false;
                 buildGenreList();
                 buildPlayList();
                 buildInfoTab();
@@ -1210,6 +1226,7 @@ package menu
                     }
                     else
                     {
+                        isQueuePlaylist = (options.infoTab != TAB_QUEUE);
                         options.infoTab = options.infoTab == TAB_QUEUE ? TAB_PLAYLIST : TAB_QUEUE;
                     }
                     swapToQueue();
@@ -1311,6 +1328,7 @@ package menu
 
                 delete _gvars.tempFlags['scroll_dist_temp'];
 
+                isQueuePlaylist = false;
                 buildGenreList();
                 buildPlayList();
                 buildInfoTab();
@@ -1432,6 +1450,7 @@ package menu
 
             var newIndex:int = options.activeIndex;
             var lastIndex:int = options.activeIndex;
+            var isNavDirectionUp:Boolean = true;
             switch (e.keyCode)
             {
                 case Keyboard.PAGE_UP:
@@ -1450,12 +1469,14 @@ package menu
                     newIndex += 11;
                     if (newIndex > genreLength - 1)
                         newIndex = genreLength - 1;
+                    isNavDirectionUp = false;
                     break;
 
                 case Keyboard.DOWN:
                     newIndex += 1;
                     if (newIndex > genreLength - 1)
                         newIndex = genreLength - 1;
+                    isNavDirectionUp = false;
                     break;
 
                 case Keyboard.TAB:
@@ -1465,6 +1486,7 @@ package menu
                         options.activeGenre = _gvars.TOTAL_GENRES - 1;
                     if (options.activeGenre > _gvars.TOTAL_GENRES - 1)
                         options.activeGenre = -1;
+                    isQueuePlaylist = false;
                     buildGenreList();
                     buildPlayList();
                     buildInfoTab();
@@ -1493,8 +1515,19 @@ package menu
 
             if (newIndex != lastIndex)
             {
-                setActiveIndex(newIndex, lastIndex, true);
-                buildInfoTab();
+                var song:Array;
+                var action:int = isNavDirectionUp ? -1 : 1;
+                var limit:int = isNavDirectionUp ? newIndex : (genreLength - 1 - newIndex);
+                for (var counter:int = 0; counter <= limit; ++counter, newIndex += action)
+                {
+                    song = songList[newIndex];
+                    if ((song != null) && (!song["access"] || song["access"] == GlobalVariables.SONG_ACCESS_PLAYABLE))
+                    {
+                        setActiveIndex(newIndex, lastIndex, true);
+                        buildInfoTab();
+                        break;
+                    }
+                }
             }
         }
 
@@ -1507,6 +1540,7 @@ package menu
         {
             if (options.activeSongID != -1)
             {
+                isQueuePlaylist = false;
                 _mp.gameplayPicking(_playlist.getSong(level < 0 ? options.activeSongID : level));
                 _mp.gameplayLoading();
                 switchTo(MainMenu.MENU_MULTIPLAYER);
@@ -1537,6 +1571,7 @@ package menu
             if (_gvars.songQueue.length <= 0)
                 return;
 
+            isQueuePlaylist = false;
             _gvars.options = new GameOptions();
             _gvars.options.fill();
             switchTo(Main.GAME_PLAY_PANEL);
@@ -1544,6 +1579,8 @@ package menu
 
         private function doSearch(name:String):void
         {
+            isQueuePlaylist = false;
+
             var searchTypeParam:String = searchTypeBox.selectedItem["data"];
             options.activeGenre = -2;
             options.activeSongID = -1;
@@ -1610,6 +1647,8 @@ package menu
 
         public function multiplayerSelect(songName:String, song:Object):void
         {
+            isQueuePlaylist = false;
+
             options.activeGenre = -2;
             options.activeSongID = (song != null && song.level != null) ? song.level : -1;
             options.isFilter = true;
@@ -1676,6 +1715,14 @@ package menu
                     song.addEventListener(Event.COMPLETE, e_menuMusicConvertSongLoad);
                 }
             }
+        }
+
+        private function e_removeFromQueueContextSelect(e:ContextMenuEvent):void
+        {
+            var songItem:SongItem = (e.contextMenuOwner as SongItem);
+            _gvars.songQueue.removeAt(songItem.index);
+            buildPlayList();
+            buildInfoTab();
         }
 
         private function e_menuMusicConvertSongLoad(e:Event):void

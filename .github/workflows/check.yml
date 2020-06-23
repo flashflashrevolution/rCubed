@@ -24,7 +24,7 @@ jobs:
 
       - name: Cache Air SDK
         id: cache-air-sdk
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ${{ github.workspace }}\airsdk
           key: ${{ runner.os }}-air-sdk
@@ -34,7 +34,7 @@ jobs:
         run: |
           $ProgressPreference = 'SilentlyContinue';
           (irm -Uri "http://airdownload.adobe.com/air/win/download/latest/AIRSDK_Compiler.zip" -ContentType "application/octet-stream" -OutFile "air-sdk.zip")
-      
+
       - name: extract-7z-action
         if: matrix.os == 'windows-latest' && steps.cache-air-sdk.outputs.cache-hit != 'true'
         uses: DuckSoft/extract-7z-action@v1.0
@@ -43,7 +43,7 @@ jobs:
           pathSource: air-sdk.zip
           # path to place the extract
           pathTarget: ${{ github.workspace }}\airsdk
-   
+
       - name: Fix Air SDK Target
         uses: cschleiden/replace-tokens@v1
         with:

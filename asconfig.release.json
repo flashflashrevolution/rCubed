@@ -53,7 +53,7 @@
             },
             {
                 "name": "R3::VERSION",
-                "value": "\"1.2.2\""
+                "value": "\"#{VERSION}#\""
             }
         ],
         "default-size": {
