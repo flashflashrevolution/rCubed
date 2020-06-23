@@ -68,8 +68,10 @@ package be.aboutme.airserver
          * Starts the server: this will start all added endpoints and listen for
          * connections / data on those endpoints.
          */
-        public function start():void
+        public function start():Boolean
         {
+            var startedEndpoints:uint = 0;
+
             //open all endpoints
             for each (var endPoint:IEndPoint in endPoints)
             {
@@ -77,9 +79,14 @@ package be.aboutme.airserver
                 endPoint.addEventListener(EndPointEvent.CLIENT_HANDLER_ADDED, clientHandlerAddedHandler, false, 0, true);
 
                 //open it
-                endPoint.open();
+                if (endPoint.open())
+                {
+                    startedEndpoints++;
+                }
             }
             started = true;
+
+            return startedEndpoints == endPoints.length;
         }
 
         /**
@@ -151,6 +158,24 @@ package be.aboutme.airserver
         public function getClientById(clientId:uint):Client
         {
             return clientsMap[clientId];
+        }
+
+        /**
+         * Get the port number of open endpoint for the given type.
+         * @param type Type of endpoint
+         * @return port number
+         */
+        public function getPortNumber(type:String):uint
+        {
+            for each (var endPoint:IEndPoint in endPoints)
+            {
+                if (endPoint.type() == type)
+                {
+                    return endPoint.currentPort();
+                }
+            }
+
+            return 0;
         }
 
         private function messageReceivedHandler(event:MessageReceivedEvent):void

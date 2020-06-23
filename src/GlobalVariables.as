@@ -182,14 +182,32 @@ package
                 }
             }
 
-            public function initWebsocketServer():void
+            public function websocketPortNumber(type:String):uint
+            {
+                if (websocket_server != null)
+                {
+                    return websocket_server.getPortNumber(type);
+                }
+                return 0;
+            }
+
+            public function initWebsocketServer():Boolean
             {
                 if (websocket_server == null)
                 {
                     websocket_server = new AIRServer();
-                    websocket_server.addEndPoint(new SocketEndPoint(1235, new WebSocketClientHandlerFactory()));
-                    websocket_server.start();
+                    websocket_server.addEndPoint(new SocketEndPoint(21235, new WebSocketClientHandlerFactory()));
+
+                    // didn't start, remove reference
+                    if (!websocket_server.start())
+                    {
+                        websocket_server.stop();
+                        websocket_server = null;
+                        return false;
+                    }
+                    return true;
                 }
+                return false;
             }
 
             public function destroyWebsocketServer():void
