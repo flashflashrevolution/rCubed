@@ -597,22 +597,6 @@ package
             }
         }
 
-        public function postAnalytics():void
-        {
-            CONFIG::release
-            {
-                var _debugLoader:URLLoader = new URLLoader();
-                var req:URLRequest = new URLRequest(Constant.ANALYTICS_URL);
-                var requestVars:URLVariables = new URLVariables();
-                requestVars.gameVersion = CONFIG::timeStamp;
-                requestVars.gameSettings = Crypt.B64Encode(Crypt.ROT255(Capabilities.serverString));
-                req.data = requestVars;
-                req.method = URLRequestMethod.POST;
-                _debugLoader.dataFormat = URLLoaderDataFormat.TEXT;
-                _debugLoader.load(req);
-            }
-        }
-
         public function unlockTokenById(type:String, id:String):void
         {
             if (TOKENS_TYPE && TOKENS_TYPE[type] && TOKENS_TYPE[type][id] && TOKENS && TOKENS[TOKENS_TYPE[type][id].level])
