@@ -33,17 +33,15 @@ package
     import flash.system.Capabilities;
     import flash.utils.ByteArray;
     import game.GameOptions;
-    import popups.PopupScreenShot;
-
-    CONFIG::release
-    {
-        import com.flashfla.utils.Crypt;
-    }
 
     CONFIG::air
     {
         import flash.data.SQLConnection;
         import flash.filesystem.File;
+        import be.aboutme.airserver.AIRServer;
+        import be.aboutme.airserver.endpoints.socket.SocketEndPoint;
+        import be.aboutme.airserver.endpoints.socket.handlers.websocket.WebSocketClientHandlerFactory;
+        import be.aboutme.airserver.messages.Message;
     }
 
     public class GlobalVariables extends EventDispatcher
@@ -119,16 +117,23 @@ package
             public var air_useLocalFileCache:Boolean = false;
             public var air_autoSaveLocalReplays:Boolean = false;
             public var air_useVSync:Boolean = true;
+            public var air_useWebsockets:Boolean = false;
 
             public var sql_connect:Boolean = false;
             public var sql_conn:SQLConnection;
             public var sql_db:File;
+
+            private var websocket_server:AIRServer;
 
             public function loadAirOptions():void
             {
                 air_useLocalFileCache = LocalStore.getVariable("air_useLocalFileCache", false);
                 air_autoSaveLocalReplays = LocalStore.getVariable("air_autoSaveLocalReplays", false);
                 air_useVSync = LocalStore.getVariable("air_useVSync", false);
+                air_useWebsockets = LocalStore.getVariable("air_useWebsockets", false);
+
+                if (air_useWebsockets)
+                    initWebsocketServer();
             }
 
             public function initSQLConnection():void
@@ -177,6 +182,43 @@ package
                 }
             }
 
+            public function initWebsocketServer():void
+            {
+                if (websocket_server == null)
+                {
+                    websocket_server = new AIRServer();
+                    websocket_server.addEndPoint(new SocketEndPoint(1235, new WebSocketClientHandlerFactory()));
+                    websocket_server.start();
+                }
+            }
+
+            public function destroyWebsocketServer():void
+            {
+                if (websocket_server != null)
+                {
+                    websocket_server.stop();
+                    websocket_server = null;
+                }
+            }
+
+            public function websocketSend(cmd:String, data:Object):void
+            {
+                if (websocket_server != null)
+                {
+                    var msg:Message = new Message();
+                    msg.command = cmd;
+                    msg.data = data;
+                    websocket_server.sendMessageToAllClients(msg);
+                }
+            }
+
+            public function onNativeProcessClose(e:Event):void
+            {
+                if (websocket_server != null)
+                {
+                    websocket_server.stop();
+                }
+            }
         }
 
         CONFIG::air
