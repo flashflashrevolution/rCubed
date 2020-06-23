@@ -47,6 +47,7 @@ package popups
     import flash.media.SoundMixer;
     import flash.media.SoundTransform;
     import menu.MenuSongSelection;
+    import com.flashfla.utils.sprintf;
 
     CONFIG::air
     {
@@ -1142,6 +1143,7 @@ package popups
                     useWebsocketCheckbox.x = xOff + 2;
                     useWebsocketCheckbox.y = yOff;
                     useWebsocketCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                    useWebsocketCheckbox.addEventListener(MouseEvent.MOUSE_OVER, e_websocketMouseOver, false, 0, true);
                     box.addChild(useWebsocketCheckbox);
                     yOff += 30;
                 }
@@ -1510,6 +1512,25 @@ package popups
             removeChild(hover_message);
         }
 
+        private function e_websocketMouseOver(e:Event = null):void
+        {
+            if (_gvars.air_useWebsockets)
+            {
+                var activePort:uint = _gvars.websocketPortNumber("websocket");
+                if (activePort > 0)
+                {
+                    useWebsocketCheckbox.addEventListener(MouseEvent.MOUSE_OUT, e_websocketMouseOut);
+                    displayToolTip(useWebsocketCheckbox.x + 40, useWebsocketCheckbox.y + 15, sprintf(_lang.string("air_options_active_port"), {"port": _gvars.websocketPortNumber("websocket").toString()}), "left");
+                }
+            }
+        }
+
+        private function e_websocketMouseOut(e:Event):void
+        {
+            useWebsocketCheckbox.removeEventListener(MouseEvent.MOUSE_OUT, e_websocketMouseOut);
+            removeChild(hover_message);
+        }
+
         private function displayToolTip(tx:Number, ty:Number, text:String, align:String = "left"):void
         {
             if (!hover_message)
@@ -1757,14 +1778,24 @@ package popups
                 // Use HTTP Websockets
                 if (e.target == useWebsocketCheckbox)
                 {
-                    _gvars.air_useWebsockets = !_gvars.air_useWebsockets;
-
                     if (_gvars.air_useWebsockets)
-                        _gvars.initWebsocketServer();
-                    else
+                    {
                         _gvars.destroyWebsocketServer();
-
-                    LocalStore.setVariable("air_useWebsockets", _gvars.air_useWebsockets);
+                        _gvars.air_useWebsockets = false;
+                    }
+                    else
+                    {
+                        if (_gvars.initWebsocketServer())
+                        {
+                            _gvars.air_useWebsockets = true;
+                            LocalStore.setVariable("air_useWebsockets", _gvars.air_useWebsockets);
+                            e_websocketMouseOver();
+                        }
+                        else
+                        {
+                            _gvars.gameMain.addAlert(_lang.string("air_options_unable_to_start_websockets"), 120, Alert.RED);
+                        }
+                    }
                 }
             }
             if (e.target == flipGraphCheckbox)
