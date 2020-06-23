@@ -100,13 +100,6 @@ package menu
                 }
             }
 
-            //- Analytics
-            if (!_gvars.tempFlags['analytics_post'])
-            {
-                _gvars.postAnalytics();
-                _gvars.tempFlags['analytics_post'] = true;
-            }
-
             MultiplayerSingleton.getInstance().gameplayReset();
 
             //- Add Main Panel to Stage
