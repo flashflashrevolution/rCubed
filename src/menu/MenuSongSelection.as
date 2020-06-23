@@ -1027,7 +1027,12 @@ package menu
             else
             {
                 infoRanks = _gvars.activeUser.getLevelRank(songDetails) || {};
-                var infoDisplay:Array = [[_lang.string("song_selection_song_panel_song"), songDetails['name']], [_lang.string("song_selection_song_panel_author"), songDetails['author']], [_lang.string("song_selection_song_panel_stepfile"), songDetails['stepauthor']], [_lang.string("song_selection_song_panel_length"), songDetails['time']], [_lang.string("song_selection_song_panel_style"), songDetails['style']], [_lang.string("song_selection_song_panel_best"), (infoRanks.score > 0 ? "\n" + NumberUtil.numberFormat(infoRanks.score) + "\n" + infoRanks.results : _lang.string("song_selection_song_panel_unplayed"))]];
+                var infoDisplay:Array = [[_lang.string("song_selection_song_panel_song"), songDetails['name']],
+                    [_lang.string("song_selection_song_panel_author"), songDetails['author']],
+                    [_lang.string("song_selection_song_panel_stepfile"), songDetails['stepauthor']],
+                    [_lang.string("song_selection_song_panel_length"), songDetails['time']],
+                    [_lang.string("song_selection_song_panel_style"), songDetails['style']],
+                    [_lang.string("song_selection_song_panel_best"), (infoRanks.score > 0 ? "\n" + NumberUtil.numberFormat(infoRanks.score) + "\n" + infoRanks.results : _lang.string("song_selection_song_panel_unplayed"))]];
 
                 if (songDetails['song_rating'])
                 {

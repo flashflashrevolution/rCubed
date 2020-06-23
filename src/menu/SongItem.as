@@ -19,6 +19,11 @@ package menu
 
     public class SongItem extends Sprite
     {
+        private static const GRADIENT_COLORS:Array = [0xFFFFFF, 0xFFFFFF];
+        private static const GRADIENT_ALPHA_HIGHLIGHT:Array = [0.35, 0.1225];
+        private static const GRADIENT_ALPHA:Array = [0.2, 0.04];
+        private static const GRADIENT_RATIO:Array = [0, 255];
+
         /** Marks the Button as in-use to avoid removal in song selector. */
         //public var garbageSweep:Boolean = false;
 
@@ -58,9 +63,11 @@ package menu
 
         public function draw():void
         {
+            const ALPHAS:Array = (highlight ? GRADIENT_ALPHA_HIGHLIGHT : GRADIENT_ALPHA);
+
             this.graphics.clear();
             this.graphics.lineStyle(1, 0xFFFFFF, (highlight ? 0.8 : 0.55));
-            this.graphics.beginGradientFill(GradientType.LINEAR, [0xFFFFFF, 0xFFFFFF], (highlight ? [0.35, 0.1225] : [0.2, 0.04]), [0, 255], Constant.GRADIENT_MATRIX);
+            this.graphics.beginGradientFill(GradientType.LINEAR, GRADIENT_COLORS, ALPHAS, GRADIENT_RATIO, Constant.GRADIENT_MATRIX);
             this.graphics.drawRect(0, 0, width - 1, height - 1);
             this.graphics.endFill();
 
@@ -202,9 +209,11 @@ package menu
             switch (songData["access"])
             {
                 case GlobalVariables.SONG_ACCESS_CREDITS:
-                    return sprintf(_lang.string("song_selection_banned_credits"), {more_needed: NumberUtil.numberFormat(songData.credits - _gvars.activeUser.credits), user_credits: NumberUtil.numberFormat(_gvars.activeUser.credits), song_price: NumberUtil.numberFormat(songData.credits)});
+                    return sprintf(_lang.string("song_selection_banned_credits"), {"more_needed": NumberUtil.numberFormat(songData.credits - _gvars.activeUser.credits),
+                            "user_credits": NumberUtil.numberFormat(_gvars.activeUser.credits),
+                            "song_price": NumberUtil.numberFormat(songData.credits)});
                 case GlobalVariables.SONG_ACCESS_PURCHASED:
-                    return sprintf(_lang.string("song_selection_banned_purchased"), {song_price: NumberUtil.numberFormat(songData.price)});
+                    return sprintf(_lang.string("song_selection_banned_purchased"), {"song_price": NumberUtil.numberFormat(songData.price)});
                 case GlobalVariables.SONG_ACCESS_VETERAN:
                     return _lang.string("song_selection_banned_veteran");
                 case GlobalVariables.SONG_ACCESS_TOKEN:
