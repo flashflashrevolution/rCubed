@@ -29,24 +29,24 @@ package be.aboutme.airserver.endpoints.socket
 
         public function open():Boolean
         {
-            if (port > portLimit)
-                return false;
+            clientHandlers = new Vector.<SocketClientHandler>();
 
-            try
+            for (; this.port < this.portLimit; this.port++)
             {
-                clientHandlers = new Vector.<SocketClientHandler>();
+                try
+                {
+                    //bind the server socket
+                    serverSocket = new ServerSocket();
+                    serverSocket.addEventListener(ServerSocketConnectEvent.CONNECT, clientConnectHandler, false, 0, true);
+                    serverSocket.addEventListener(Event.CLOSE, serverSocketCloseHandler, false, 0, true);
+                    serverSocket.bind(port);
+                    serverSocket.listen();
+                    break;
+                }
+                catch (error:Error)
+                {
 
-                //bind the server socket
-                serverSocket = new ServerSocket();
-                serverSocket.addEventListener(ServerSocketConnectEvent.CONNECT, clientConnectHandler, false, 0, true);
-                serverSocket.addEventListener(Event.CLOSE, serverSocketCloseHandler, false, 0, true);
-                serverSocket.bind(port);
-                serverSocket.listen();
-            }
-            catch (error:Error)
-            {
-                this.port++;
-                return open();
+                }
             }
 
             return true;

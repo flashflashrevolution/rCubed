@@ -196,7 +196,7 @@ package
                 if (websocket_server == null)
                 {
                     websocket_server = new AIRServer();
-                    websocket_server.addEndPoint(new SocketEndPoint(1235, new WebSocketClientHandlerFactory()));
+                    websocket_server.addEndPoint(new SocketEndPoint(21235, new WebSocketClientHandlerFactory()));
 
                     // didn't start, remove reference
                     if (!websocket_server.start())
