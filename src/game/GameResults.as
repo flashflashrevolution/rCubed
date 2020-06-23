@@ -124,7 +124,7 @@ package game
             // Get Graph Type
             graphType = LocalStore.getVariable("result_graph_type", 0);
             flipGraph = LocalStore.getVariable("result_flip_graph", false);
-            
+
             // Text Style
             TEXT_STYLE = new StyleSheet();
             TEXT_STYLE.setStyle("BODY", {fontWeight: "bold"});
@@ -379,8 +379,13 @@ package game
                 songIndex = result.game_index + 1;
 
                 // Save Replay Button
-                if (canSendScore(result, true, false, true, true) && !_gvars.flashvars.preview_file)
-                    navSaveReplay.visible = true;
+                navSaveReplay.visible = true;
+                if (!canSendScore(result, true, false, true, true) || _gvars.flashvars.preview_file)
+                {
+                    navSaveReplay.boxColor = 0x000000;
+                    navSaveReplay.alpha = 0.5;
+                    navSaveReplay.enabled = false;
+                }
 
                 // Display Song Rating Popup
                 if ((result["songprogress"] > 0.90 || result["playtime_secs"] >= 90) && !result.options.replay)
@@ -1317,7 +1322,7 @@ package game
                 return;
 
             // Based on target
-            if (target == navSaveReplay && navSaveReplay.visible)
+            if (target == navSaveReplay && navSaveReplay.visible && navSaveReplay.enabled)
             {
                 var gameResult:Object = songResults[resultIndex];
 

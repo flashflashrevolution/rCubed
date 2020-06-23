@@ -56,7 +56,7 @@ package menu
         private var background:SongSelectionBackground;
         private var scrollbar:ScrollBar;
         private var pane:ScrollPane;
-        private var paneItems:Array;
+        private var songItems:Vector.<SongItem>;
         private var optionsBox:Sprite;
         private var infoBox:Sprite;
         private var info:Sprite;
@@ -184,13 +184,8 @@ package menu
         override public function dispose():void
         {
             var i:uint = 0;
-            for (i = 0; i < paneItems.length; i++)
-            {
-                paneItems[i].dispose();
-                paneItems[i].removeEventListener(MouseEvent.CLICK, songItemClicked);
-                paneItems[i] = null;
-            }
-            paneItems = null;
+
+            songItems = null;
 
             for (i = 0; i < genrelistItems.length; i++)
             {
@@ -206,6 +201,7 @@ package menu
             }
             if (pane)
             {
+                pane.clear();
                 pane.removeEventListener(MouseEvent.CLICK, songItemClicked);
                 pane.removeEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler);
                 pane.dispose();
@@ -485,17 +481,7 @@ package menu
         public function buildPlayList():void
         {
             //- Clear out/reset pane items and pages.
-            if (paneItems)
-            {
-                for (i = 0; i < paneItems.length; i++)
-                {
-                    paneItems[i].dispose();
-                    paneItems[i].removeEventListener(MouseEvent.CLICK, songItemClicked);
-                    paneItems[i] = null;
-                }
-            }
-            paneItems = null;
-            paneItems = [];
+            songItems = new Vector.<SongItem>();
 
             scrollbar.reset();
             pane.clear();
@@ -504,7 +490,7 @@ package menu
             var i:uint;
             var yOffset:int = 0;
             var song:Array;
-            var sI:*;
+            var sI:SongItem;
 
             //- Set Song array based on selected genre
             // DM_SEARCH
@@ -539,17 +525,18 @@ package menu
                     genreLength = _gvars.songQueue.length;
                 }
             }
+            
             // DM_ALL
             else if (options.activeGenre == -1)
             {
                 songList = _playlist.indexList;
 
                 // Legacy Filter
-                if (!_playlist.engine)
+                if (!_playlist.engine && !_gvars.activeUser.DISPLAY_LEGACY_SONGS)
                 {
                     songList = songList.filter(function(item:Object, index:int, array:Array):Boolean
                     {
-                        return item.genre == Constant.LEGACY_GENRE ? _gvars.activeUser.DISPLAY_LEGACY_SONGS : true;
+                        return item.genre != Constant.LEGACY_GENRE;
                     });
                 }
 
@@ -564,6 +551,7 @@ package menu
                 genreLength = songList.length;
                 songList = songList.slice(options.pageNumber * 500, (options.pageNumber + 1) * 500);
             }
+
             // STANDARD_DISPLAY
             else
             {
@@ -585,11 +573,11 @@ package menu
                     }
 
                     // Legacy Filter
-                    if (!_playlist.engine)
+                    if (!_playlist.engine && !_gvars.activeUser.DISPLAY_LEGACY_SONGS)
                     {
                         songList = songList.filter(function(item:Object, index:int, array:Array):Boolean
                         {
-                            return item.genre == Constant.LEGACY_GENRE ? _gvars.activeUser.DISPLAY_LEGACY_SONGS : true;
+                            return item.genre != Constant.LEGACY_GENRE;
                         });
                         genreLength = songList.length;
                     }
@@ -613,11 +601,11 @@ package menu
                     });
 
                     // Legacy Filter
-                    if (!_playlist.engine)
+                    if (!_playlist.engine && !_gvars.activeUser.DISPLAY_LEGACY_SONGS)
                     {
                         songList = songList.filter(function(item:Object, index:int, array:Array):Boolean
                         {
-                            return item.genre == Constant.LEGACY_GENRE ? _gvars.activeUser.DISPLAY_LEGACY_SONGS : true;
+                            return item.genre != Constant.LEGACY_GENRE;
                         });
                     }
 
@@ -664,36 +652,18 @@ package menu
             drawPages();
 
             //- Build Playlist
+            songItemContextMenu.customItems[removeFromQueueCMItemIndex].visible = isQueuePlaylist;
             for (var sX:int = 0; sX < songList.length; sX++)
             {
                 song = songList[sX];
-                // Playable
-                if (!song["access"] || song["access"] == GlobalVariables.SONG_ACCESS_PLAYABLE)
-                {
-                    sI = new SongItem(song, _gvars.activeUser.getLevelRank(song), options.activeIndex == sX);
-                    songItemContextMenu.customItems[removeFromQueueCMItemIndex].visible = isQueuePlaylist;
-                    (sI as SongItem).contextMenu = songItemContextMenu;
-                    sI.y = yOffset;
-                    sI.genre = -1;
-                    sI.index = sX;
-                    sI.level = song.level;
-                    paneItems[paneItems.length] = sI;
-                    pane.content.addChild(sI);
-                    yOffset += 29;
-                }
-
-                // Locked Song
-                else
-                {
-                    sI = new SongItemLocked(song, getSongLockText(song["access"], song), (song["access"] == GlobalVariables.SONG_ACCESS_PURCHASED ? Constant.SHOP_URL : ""));
-
-                    sI.y = yOffset;
-                    if (song["access"] == GlobalVariables.SONG_ACCESS_TOKEN)
-                        sI.mouseChildren = true;
-                    paneItems[paneItems.length] = sI;
-                    pane.content.addChild(sI);
-                    yOffset += sI.height + 2;
-                }
+                sI = new SongItem();
+                sI.setData(song, _gvars.activeUser.getLevelRank(song));
+                sI.setContextMenu(songItemContextMenu);
+                sI.y = yOffset;
+                sI.index = sX;
+                songItems[songItems.length] = sI;
+                pane.content.addChild(sI);
+                yOffset += sI.height + 2;
             }
 
             // Scroll to last song
@@ -716,24 +686,6 @@ package menu
             {
                 setActiveID(0, false);
             }
-        }
-
-        public function getSongLockText(access:int, song:Object):String
-        {
-            switch (access)
-            {
-                case GlobalVariables.SONG_ACCESS_CREDITS:
-                    return sprintf(_lang.string("song_selection_banned_credits"), {more_needed: NumberUtil.numberFormat(song.credits - _gvars.activeUser.credits), user_credits: NumberUtil.numberFormat(_gvars.activeUser.credits), song_price: NumberUtil.numberFormat(song.credits)});
-                case GlobalVariables.SONG_ACCESS_PURCHASED:
-                    return sprintf(_lang.string("song_selection_banned_purchased"), {song_price: NumberUtil.numberFormat(song.price)});
-                case GlobalVariables.SONG_ACCESS_VETERAN:
-                    return _lang.string("song_selection_banned_veteran");
-                case GlobalVariables.SONG_ACCESS_TOKEN:
-                    return _gvars.TOKENS[song.level].info;
-                case GlobalVariables.SONG_ACCESS_BANNED:
-                    return _lang.string("song_selection_banned_invalid");
-            }
-            return "Unknown Lock Reason (" + access + ") - This shouldn't appear, message Velocity";
         }
 
         public function drawPages():void
@@ -876,8 +828,9 @@ package menu
             var songInfoDetails:Text;
             var tY:int = 0;
 
+            // Song Search
             if (options.infoTab == TAB_SEARCH)
-            { // Song Search
+            {
                 optionsBox.getChildAt(0).alpha = 1;
                 if (searchBox == null)
                 {
@@ -891,7 +844,7 @@ package menu
                 {
                     searchBox.text = _gvars.tempFlags['active_search_temp'];
                     searchBox.field.setSelection(searchBox.field.length, searchBox.field.length); // caret at end of text
-                    //searchBox.field.setSelection(0, searchBox.field.length); // select all text
+                        //searchBox.field.setSelection(0, searchBox.field.length); // select all text
                 }
 
                 if (searchTypeBox == null)
@@ -927,8 +880,10 @@ package menu
                 info.addChild(filterQueueManager);
 
             }
+
+            // Playlist Queue
             else if (options.infoTab == TAB_QUEUE)
-            { // Playlist Queue
+            {
                 optionsBox.getChildAt(1).alpha = 1;
                 // Get Song Length
                 var songTotalLength:int = 0;
@@ -996,8 +951,10 @@ package menu
                 songQueueClear.addEventListener(MouseEvent.CLICK, clickHandler);
                 info.addChild(songQueueClear);
             }
+
+            // Song Ranks
             else if (options.infoTab == TAB_HIGHSCORES)
-            { // Song Ranks
+            {
                 songInfoTitle = new Text(_lang.string("song_selection_song_panel_highscores"), 14, "#DDDDDD");
                 songInfoTitle.x = 0;
                 songInfoTitle.y = tY;
@@ -1079,10 +1036,17 @@ package menu
                     _gvars.loadHighscores(songDetails.level);
                 }
             }
+
+            // Song Details
             else
-            { // Song Details
+            {
                 infoRanks = _gvars.activeUser.getLevelRank(songDetails) || {};
-                var infoDisplay:Array = [[_lang.string("song_selection_song_panel_song"), songDetails['name']], [_lang.string("song_selection_song_panel_author"), songDetails['author']], [_lang.string("song_selection_song_panel_stepfile"), songDetails['stepauthor']], [_lang.string("song_selection_song_panel_length"), songDetails['time']], [_lang.string("song_selection_song_panel_style"), songDetails['style']], [_lang.string("song_selection_song_panel_best"), (infoRanks.score > 0 ? "\n" + NumberUtil.numberFormat(infoRanks.score) + "\n" + infoRanks.results : _lang.string("song_selection_song_panel_unplayed"))]];
+                var infoDisplay:Array = [[_lang.string("song_selection_song_panel_song"), songDetails['name']],
+                    [_lang.string("song_selection_song_panel_author"), songDetails['author']],
+                    [_lang.string("song_selection_song_panel_stepfile"), songDetails['stepauthor']],
+                    [_lang.string("song_selection_song_panel_length"), songDetails['time']],
+                    [_lang.string("song_selection_song_panel_style"), songDetails['style']],
+                    [_lang.string("song_selection_song_panel_best"), (infoRanks.score > 0 ? "\n" + NumberUtil.numberFormat(infoRanks.score) + "\n" + infoRanks.results : _lang.string("song_selection_song_panel_unplayed"))]];
 
                 if (songDetails['song_rating'])
                 {
@@ -1341,6 +1305,7 @@ package menu
             if (e.target is SongItem)
             {
                 var tarSongItem:SongItem = (e.target as SongItem);
+                tarSongItem.e_onClick(e);
                 if (tarSongItem.index != options.activeIndex)
                 {
                     options.infoTab = TAB_PLAYLIST;
@@ -1515,13 +1480,11 @@ package menu
 
             if (newIndex != lastIndex)
             {
-                var song:Array;
                 var action:int = isNavDirectionUp ? -1 : 1;
                 var limit:int = isNavDirectionUp ? newIndex : (genreLength - 1 - newIndex);
                 for (var counter:int = 0; counter <= limit; ++counter, newIndex += action)
                 {
-                    song = songList[newIndex];
-                    if ((song != null) && (!song["access"] || song["access"] == GlobalVariables.SONG_ACCESS_PLAYABLE))
+                    if (!songItems[newIndex].isLocked)
                     {
                         setActiveIndex(newIndex, lastIndex, true);
                         buildInfoTab();
@@ -1604,7 +1567,7 @@ package menu
 
         private function setActiveID(index:int, mpUpdate:Boolean):void
         {
-            options.activeSongID = (paneItems[index] != null && paneItems[index] is SongItem ? paneItems[index].level : -1);
+            options.activeSongID = (songItems[index] != null ? songItems[index].level : -1);
             _gvars.tempFlags['active_songid_temp'] = options.activeSongID;
             if (mpUpdate && options.activeSongID != -1)
                 _mp.gameplayPicking(_playlist.getSong(options.activeSongID));
@@ -1632,14 +1595,14 @@ package menu
             setActiveID(index, true);
 
             // Set Active Highlights
-            paneItems[index].active = true;
-            if (paneItems[last] != null)
-                paneItems[last].active = false;
+            songItems[index].active = true;
+            if (last >= 0 && last < songItems.length)
+                songItems[last].active = false;
 
             // Scroll when doScroll is set.
             if (doScroll && scrollbar.draggerVisibility)
             {
-                var scrollVal:Number = (((paneItems[index].y / pane.content.height) > 0.5) ? ((paneItems[index].y + paneItems[index].height) / pane.content.height) : ((paneItems[index].y) / pane.content.height));
+                var scrollVal:Number = (((songItems[index].y / pane.content.height) > 0.5) ? ((songItems[index].y + songItems[index].height) / pane.content.height) : ((songItems[index].y) / pane.content.height));
                 pane.scrollTo(scrollVal);
                 scrollbar.scrollTo(scrollVal);
             }
@@ -1667,9 +1630,9 @@ package menu
             buildPlayList();
             buildInfoTab();
 
-            for (var i:int = 0; i < paneItems.length; i++)
+            for (var i:int = 0; i < songItems.length; i++)
             {
-                if (paneItems[i] is SongItem && paneItems[i].level == options.activeSongID)
+                if (songItems[i].level == options.activeSongID)
                     setActiveIndex(i, -1, true);
             }
         }
