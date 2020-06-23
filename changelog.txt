@@ -1,8 +1,23 @@
+R^3 (v1.2.3) [2020-06-20]
+---------------------------------------------------------------------
+- Add checkbox for vertically flipping the marker result graph (#75) - @G-flat
+- Fix for #5 - Search Auto Focus (#89) - @Psycast
+- Highlight personal best scores (#87) - @G-flat
+- Skip over inaccessible songs during menu navigation (#90) - @G-flat
+- Make division level array static (#91) - @G-flat
+- Implement Websocket Support for Game Status (#95) - @Psycast
+- Fix for multiplayer room join bug. (#97) - @dave936
+- Enable editing songs in the current queue (#96) - G-flat
+- "MP Connection Lost" hidden while in solo (#98, #102) - @dave936
+- Implement Websocket Support for Game Status (#95) - @Psycast
+- Refactor Song Selection and Song Item (#100) - @Psycast
+- Gray out "Save Replay" button rather than hide it (#99) - @dave936
+
 R^3 (v1.2.2) [2020-06-14]
 ---------------------------------------------------------------------
 - Make division colour and title arrays static (#61) - @G-flat
-- Rebuild Judge Animations to use Time instead of Frames (#62) - @NSSVelocity
-- Fix Infinite loading when accessing in-game song leaderboards out-of-bounds (#57) - @NSSVelocity
+- Rebuild Judge Animations to use Time instead of Frames (#62) - @Psycast
+- Fix Infinite loading when accessing in-game song leaderboards out-of-bounds (#57) - @Psycast
 - Add refresh buttons in the song selection menu and highscores popup (#66) - @G-flat
 - Additional height added to token display boxes for token descriptions that are 5+ lines. (#68) - @Xyr00
 - Add "Play Random Button" To GameResults Screen (#67) - @dave936
