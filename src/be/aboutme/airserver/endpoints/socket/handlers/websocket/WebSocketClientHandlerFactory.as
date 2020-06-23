@@ -17,6 +17,8 @@ package be.aboutme.airserver.endpoints.socket.handlers.websocket
                 messageSerializer = new JSONSerializer();
             }
             super(messageSerializer, crossDomainPolicyXML);
+
+            type = "websocket";
         }
 
         override public function createHandler(socket:Socket):SocketClientHandler

@@ -6,6 +6,7 @@ package be.aboutme.airserver.endpoints.socket.handlers
 
     public class SocketClientHandlerFactory
     {
+        public var type:String = "unknown";
 
         protected var messageSerializer:IMessageSerializer;
         protected var crossDomainPolicyXML:XML;

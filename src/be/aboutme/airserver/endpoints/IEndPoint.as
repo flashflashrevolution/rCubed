@@ -4,7 +4,9 @@ package be.aboutme.airserver.endpoints
 
     public interface IEndPoint extends IEventDispatcher
     {
-        function open():void;
+        function open():Boolean;
         function close():void;
+        function type():String;
+        function currentPort():uint;
     }
 }
