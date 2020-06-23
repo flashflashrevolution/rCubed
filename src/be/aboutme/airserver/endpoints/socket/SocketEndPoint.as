@@ -64,7 +64,7 @@ package be.aboutme.airserver.endpoints.socket
             clientHandlers = new Vector.<SocketClientHandler>();
 
             //close the socket
-            if (serverSocket != null)
+            if (serverSocket != null && serverSocket.bound)
             {
                 serverSocket.close();
             }
@@ -110,7 +110,7 @@ package be.aboutme.airserver.endpoints.socket
 
         public function currentPort():uint
         {
-            return this.port;
+            return serverSocket != null && serverSocket.bound ? serverSocket.localPort : 0;
         }
     }
 }
