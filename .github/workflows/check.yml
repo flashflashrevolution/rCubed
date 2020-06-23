@@ -62,7 +62,12 @@ jobs:
         shell: cmd
         run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project ${{ github.workspace }}/fonts/asconfig.embed-fonts.json --verbose
 
-      - name: Build the Game (Windows)
+      - name: Build the Game (Windows Debug)
         if: matrix.os == 'windows-latest'
         shell: cmd
-        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.json --debug=false --verbose
+        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.json --debug=true --verbose
+      
+      - name: Build the Game (Windows Release)
+        if: matrix.os == 'windows-latest'
+        shell: cmd
+        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.release.json --debug=false --verbose
