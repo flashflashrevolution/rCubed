@@ -74,17 +74,7 @@ package com.flashfla.utils
 
         public static function gc():void
         {
-            CONFIG::air
-            {
-                System.gc();
-            }
-            CONFIG::not_air
-            {
-                if (isFlashNewerThan(11))
-                {
-                    System["pauseForGCIfCollectionImminent"](0);
-                }
-            }
+            System.gc();
         }
 
         static public function setClipboard(value:String):Boolean

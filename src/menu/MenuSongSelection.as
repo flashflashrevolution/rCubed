@@ -156,16 +156,15 @@ package menu
             songItemContextMenuItem = new ContextMenuItem("Set as Menu Music");
             songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_setAsMenuMusicContextSelect);
             songItemContextMenu.customItems.push(songItemContextMenuItem);
-            CONFIG::air
+
+            if (_gvars.sql_connect)
             {
-                if (_gvars.sql_connect)
-                {
-                    songItemContextMenuItem = new ContextMenuItem("Song Options");
-                    songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_songOptionsContextSelect);
-                    songItemContextMenu.customItems.push(songItemContextMenuItem);
-                    removeFromQueueCMItemIndex = 2;
-                }
+                songItemContextMenuItem = new ContextMenuItem("Song Options");
+                songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_songOptionsContextSelect);
+                songItemContextMenu.customItems.push(songItemContextMenuItem);
+                removeFromQueueCMItemIndex = 2;
             }
+
             songItemContextMenuItem = new ContextMenuItem("Remove from Queue");
             songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_removeFromQueueContextSelect);
             songItemContextMenu.customItems.push(songItemContextMenuItem);
@@ -525,7 +524,7 @@ package menu
                     genreLength = _gvars.songQueue.length;
                 }
             }
-            
+
             // DM_ALL
             else if (options.activeGenre == -1)
             {
@@ -1711,15 +1710,7 @@ package menu
 
         private function writeMenuMusicBytes(song:Song):void
         {
-            CONFIG::air
-            {
-                AirContext.writeFile(AirContext.getAppPath(Constant.MENU_MUSIC_PATH), song.bytesSWF);
-            }
-
-            CONFIG::not_air
-            {
-                LocalStore.setVariable("menu_music_bytes", song.bytesSWF, 20971520); // 20MB Mins size requested.
-            }
+            AirContext.writeFile(AirContext.getAppPath(Constant.MENU_MUSIC_PATH), song.bytesSWF);
         }
 
         private function clearSearchStateParams():void

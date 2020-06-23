@@ -16,14 +16,6 @@
         ],
         "define": [
             {
-                "name": "CONFIG::not_air",
-                "value": false
-            },
-            {
-                "name": "CONFIG::air",
-                "value": true
-            },
-            {
                 "name": "CONFIG::debug",
                 "value": false
             },

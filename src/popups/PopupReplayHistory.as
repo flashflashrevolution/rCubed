@@ -63,7 +63,6 @@ package popups
 
         private var loadNumberText:Text = new Text("0/0");
 
-        CONFIG::air
         private var FILE_TRACK:FileTracker;
 
         public function PopupReplayHistory(myParent:MenuPanel)
@@ -133,17 +132,14 @@ package popups
             titleDisplay.align = Text.CENTER;
             box.addChild(titleDisplay);
 
-            //- replay count / file size [AIR]
-            CONFIG::air
-            {
-                itemDisplay = new Text(_lang.string("popup_replay_count"), 14);
-                itemDisplay.x = 5;
-                itemDisplay.y = 8;
-                itemDisplay.width = box.width - 10;
-                itemDisplay.align = Text.RIGHT;
-                itemDisplay.visible = false;
-                box.addChild(itemDisplay);
-            }
+            //- replay count / file size
+            itemDisplay = new Text(_lang.string("popup_replay_count"), 14);
+            itemDisplay.x = 5;
+            itemDisplay.y = 8;
+            itemDisplay.width = box.width - 10;
+            itemDisplay.align = Text.RIGHT;
+            itemDisplay.visible = false;
+            box.addChild(itemDisplay);
 
             //- replay search
             engine_search = new BoxText(150, 20);
@@ -196,14 +192,11 @@ package popups
             box.addChild(closeBtn);
 
             //- Recent/External Swap
-            CONFIG::air
-            {
-                sourceBtn = new BoxButton(79.5, 27, _lang.string("popup_replay_external"));
-                sourceBtn.x = 20;
-                sourceBtn.y = box.height - 42;
-                sourceBtn.addEventListener(MouseEvent.CLICK, e_boxClickHandler);
-                box.addChild(sourceBtn);
-            }
+            sourceBtn = new BoxButton(79.5, 27, _lang.string("popup_replay_external"));
+            sourceBtn.x = 20;
+            sourceBtn.y = box.height - 42;
+            sourceBtn.addEventListener(MouseEvent.CLICK, e_boxClickHandler);
+            box.addChild(sourceBtn);
 
             //- Build Recent Engine List
             for each (var r:Replay in _gvars.replayHistory)
@@ -224,7 +217,6 @@ package popups
             renderReplays();
         }
 
-        CONFIG::air
         private function e_loadExternalQueue(e:Event):void
         {
             var sT:Number = getTimer();

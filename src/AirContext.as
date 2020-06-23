@@ -1,21 +1,17 @@
 package
 {
+    import by.blooddy.crypto.MD5;
     import classes.FileTracker;
+    import classes.chart.Song;
+    import flash.events.Event;
+    import flash.events.IOErrorEvent;
+    import flash.events.SecurityErrorEvent;
+    import flash.filesystem.File;
+    import flash.filesystem.FileMode;
+    import flash.filesystem.FileStream;
+    import flash.system.ApplicationDomain;
     import flash.system.LoaderContext;
-
-    CONFIG::air
-    {
-        import flash.events.Event;
-        import flash.events.IOErrorEvent;
-        import flash.events.SecurityErrorEvent;
-        import flash.filesystem.File;
-        import flash.filesystem.FileMode;
-        import flash.filesystem.FileStream;
-        import classes.chart.Song;
-        import by.blooddy.crypto.MD5;
-        import flash.system.ApplicationDomain;
-        import flash.utils.ByteArray;
-    }
+    import flash.utils.ByteArray;
 
     /**
      * Contains methods that deal with AIR specific things, in regular flash builds, these are either excluded or stubbed.
@@ -60,13 +56,6 @@ package
             return file_name;
         }
 
-        CONFIG::not_air
-        static public function getLoaderContext():LoaderContext
-        {
-            return null;
-        }
-
-        CONFIG::air
         static public function getLoaderContext():LoaderContext
         {
             var lc:LoaderContext = new LoaderContext();
@@ -75,19 +64,16 @@ package
             return lc;
         }
 
-        CONFIG::air
         static public function getSongCachePath(song:Song):String
         {
             return Constant.SONG_CACHE_PATH + (song.entry.engine ? MD5.hash(song.entry.engine.id) + "/" + MD5.hash(song.entry.levelid.toString()) : '57fea2a7e69445179686b7579d5118ef/' + MD5.hash(song.id.toString())) + "/";
         }
 
-        CONFIG::air
         static public function getReplayPath(song:Song):String
         {
             return Constant.REPLAY_PATH + (song.entry.engine ? createFileName(song.entry.engine.id) : Constant.BRAND_NAME_SHORT_LOWER()) + "/";
         }
 
-        CONFIG::air
         static public function encodeData(rawData:ByteArray, key:uint = 0):ByteArray
         {
             if (key == 0)
@@ -107,33 +93,28 @@ package
             return storeData;
         }
 
-        CONFIG::air
         static private function e_fileError(e:Event):void
         {
             trace(e);
         }
 
-        CONFIG::air
         static public function getAppFile(path:String):File
         {
             return new File("app:/" + path);
         }
 
-        CONFIG::air
         static public function getAppPath(path:String):String
         {
             var tf:File = new File("app:/" + path);
             return tf.nativePath;
         }
 
-        CONFIG::air
         static public function doesFileExist(path:String):Boolean
         {
             var tf:File = new File("app:/" + path);
             return tf.exists;
         }
 
-        CONFIG::air
         static public function writeFile(appPath:String, bytes:ByteArray, key:uint = 0, errorCallback:Function = null):File
         {
             var cacheFile:File = new File(appPath);
@@ -147,7 +128,6 @@ package
             return cacheFile;
         }
 
-        CONFIG::air
         static public function readFile(appPath:String, key:uint = 0, errorCallback:Function = null):ByteArray
         {
             var cacheFile:File = new File(appPath);
@@ -166,7 +146,6 @@ package
             return null;
         }
 
-        CONFIG::air
         static public function deleteFile(appPath:String):Boolean
         {
             var cacheFile:File = new File(appPath);
@@ -178,7 +157,6 @@ package
             return false;
         }
 
-        CONFIG::air
         public static function getFileSize(file:File, track:FileTracker = null, track_file_paths:Boolean = false):FileTracker
         {
             if (!track)

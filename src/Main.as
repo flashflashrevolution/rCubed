@@ -24,12 +24,13 @@ package
     import com.flashfla.components.ProgressBar;
     import com.flashfla.utils.ObjectUtil;
     import com.flashfla.utils.SystemUtil;
+    import com.greensock.TweenLite;
+    import com.greensock.TweenMax;
     import com.greensock.easing.SineInOut;
     import com.greensock.plugins.AutoAlphaPlugin;
     import com.greensock.plugins.TintPlugin;
     import com.greensock.plugins.TweenPlugin;
-    import com.greensock.TweenLite;
-    import com.greensock.TweenMax;
+    import flash.desktop.NativeApplication;
     import flash.events.ContextMenuEvent;
     import flash.events.Event;
     import flash.events.KeyboardEvent;
@@ -49,11 +50,6 @@ package
     import popups.PopupHelp;
     import popups.PopupOptions;
     import popups.PopupReplayHistory;
-
-    CONFIG::air
-    {
-        import flash.desktop.NativeApplication;
-    }
 
     public class Main extends MenuPanel
     {
@@ -144,13 +140,11 @@ package
             TweenLite.defaultOverwrite = "all";
             stage.stageFocusRect = false;
 
-            CONFIG::air
-            {
-                //trace(AirContext.getFileSize(AirContext.getAppFile(Constant.SONG_CACHE_PATH)));
-                _gvars.loadAirOptions();
-                stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE;
-                NativeApplication.nativeApplication.addEventListener(Event.EXITING, _gvars.onNativeProcessClose);
-            }
+            //- Load Air Items
+            _gvars.loadAirOptions();
+            stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE;
+            NativeApplication.nativeApplication.addEventListener(Event.EXITING, _gvars.onNativeProcessClose);
+
             //- Load Menu Music
             _gvars.loadMenuMusic();
 
@@ -179,17 +173,12 @@ package
             TweenMax.to(epilepsyWarning, 1, {alpha: 0.6, ease: SineInOut, yoyo: true, repeat: -1});
 
             //- Add Debug Tracking
-            var ver:Text = new Text(Capabilities.version.replace(/,/g, ".") + " - Build " + CONFIG::timeStamp);
+            var ver:Text = new Text(Capabilities.version.replace(/,/g, ".") + " - Build " + CONFIG::timeStamp + " - " + Constant.AIR_VERSION);
             ver.alpha = 0.15;
             ver.x = stage.width - 5;
             ver.y = 2;
             ver.align = Text.RIGHT;
             this.addChild(ver);
-
-            CONFIG::air
-            {
-                ver.text += " - " + Constant.AIR_VERSION;
-            }
 
             // Holidays!
             var d:Date = new Date();
@@ -206,7 +195,7 @@ package
             var cm:ContextMenu = new ContextMenu();
 
             //- Toggle Fullscreen
-            var fscmi:ContextMenuItem = new ContextMenuItem("Show Menu", CONFIG::not_air);
+            var fscmi:ContextMenuItem = new ContextMenuItem("Show Menu");
             fscmi.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, toggleContextPopup);
             cm.customItems.push(fscmi);
 
@@ -217,11 +206,8 @@ package
 
             CONFIG::debug
             {
-                CONFIG::air
-                {
-                    stage.nativeWindow.x = (Capabilities.screenResolutionX - stage.nativeWindow.width) * 0.5;
-                    stage.nativeWindow.y = (Capabilities.screenResolutionY - stage.nativeWindow.height) * 0.5;
-                }
+                stage.nativeWindow.x = (Capabilities.screenResolutionX - stage.nativeWindow.width) * 0.5;
+                stage.nativeWindow.y = (Capabilities.screenResolutionY - stage.nativeWindow.height) * 0.5;
             }
 
             // Assign Menu Context
@@ -389,35 +375,34 @@ package
                     retryLoadButton.removeEventListener(MouseEvent.CLICK, e_retryClick);
                     retryLoadButton = null;
                 }
-                CONFIG::air
-                {
-                    CONFIG::release
-                    {
-                        // Do Air Update Check
-                        if (!_gvars.tempFlags["did_air_update_check"])
-                        {
-                            _gvars.tempFlags["did_air_update_check"] = true;
-                            var airUpdateCheck:int = AirContext.serverVersionHigher(_site.data["game_r3air_version"]);
-                            //addAlert(_site.data["game_r3air_version"] + " " + (airUpdateCheck == -1 ? "&gt;" : (airUpdateCheck == 1 ? "&lt;" : "==")) + " " + Constant.AIR_VERSION, 240);
-                            if (airUpdateCheck == -1)
-                            {
-                                loadScripts = 0;
-                                preloader.remove();
-                                removeChild(loadStatus);
-                                removeChild(epilepsyWarning);
-                                this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
 
-                                // Switch to game
-                                switchTo(GAME_UPDATE_PANEL);
-                                return;
-                            }
-                            else
-                            {
-                                LocalStore.deleteVariable("air_update_checks");
-                            }
+                CONFIG::release
+                {
+                    // Do Air Update Check
+                    if (!_gvars.tempFlags["did_air_update_check"])
+                    {
+                        _gvars.tempFlags["did_air_update_check"] = true;
+                        var airUpdateCheck:int = AirContext.serverVersionHigher(_site.data["game_r3air_version"]);
+                        //addAlert(_site.data["game_r3air_version"] + " " + (airUpdateCheck == -1 ? "&gt;" : (airUpdateCheck == 1 ? "&lt;" : "==")) + " " + Constant.AIR_VERSION, 240);
+                        if (airUpdateCheck == -1)
+                        {
+                            loadScripts = 0;
+                            preloader.remove();
+                            removeChild(loadStatus);
+                            removeChild(epilepsyWarning);
+                            this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
+
+                            // Switch to game
+                            switchTo(GAME_UPDATE_PANEL);
+                            return;
+                        }
+                        else
+                        {
+                            LocalStore.deleteVariable("air_update_checks");
                         }
                     }
                 }
+
                 if (_gvars.options && _gvars.options.replay)
                 {
                     if (_gvars.options.replay is SongPreview && !_gvars.options.replay.isLoaded)
@@ -525,13 +510,11 @@ package
             switch (_panel)
             {
                 case GAME_UPDATE_PANEL:
-                    CONFIG::air
-                {
                     nextPanel = new AirUpdater(this);
                     bg.visible = true;
                     isFound = true;
-                }
                     break;
+
                 case GAME_LOGIN_PANEL:
                     nextPanel = new LoginMenu(this);
                     bg.visible = true;
