@@ -79,7 +79,6 @@ package game
         private var songIndex:int;
         private var graphType:int = 0;
         private var flipGraph:Boolean = false;
-        private var grayedOut:Boolean = false;
 
         public function GameResults(myParent:MenuPanel)
         {
@@ -386,7 +385,6 @@ package game
                     navSaveReplay.boxColor = 0x000000;
                     navSaveReplay.alpha = 0.5;
                     navSaveReplay.enabled = false;
-                    grayedOut = true;
                 }
 
                 // Display Song Rating Popup
@@ -1324,7 +1322,7 @@ package game
                 return;
 
             // Based on target
-            if (target == navSaveReplay && navSaveReplay.visible && !grayedOut)
+            if (target == navSaveReplay && navSaveReplay.visible && navSaveReplay.enabled)
             {
                 var gameResult:Object = songResults[resultIndex];
 
