@@ -1,4 +1,9 @@
-R^3 (v1.2.3) [2020-06-20]
+R^3 (v1.2.4) [2020-06-22]
+---------------------------------------------------------------------
+- Flip result graph when switching graph type. (Fix) (#107) - @G-flat
+- Add rolling port selection and error handling for Websockets. (#108) - @Psycast
+
+R^3 (v1.2.3) [2020-06-21]
 ---------------------------------------------------------------------
 - Add checkbox for vertically flipping the marker result graph (#75) - @G-flat
 - Fix for #5 - Search Auto Focus (#89) - @Psycast
