@@ -123,7 +123,6 @@ package game
 
             // Get Graph Type
             graphType = LocalStore.getVariable("result_graph_type", 0);
-            flipGraph = LocalStore.getVariable("result_flip_graph", false);
 
             // Text Style
             TEXT_STYLE = new StyleSheet();
@@ -518,6 +517,7 @@ package game
             graphDraw.graphics.clear();
 
             var graph_type:int = graphType;
+            flipGraph = LocalStore.getVariable("result_flip_graph", false);
 
             // Get Result
             if (result == null && songResults[resultIndex] != null)
