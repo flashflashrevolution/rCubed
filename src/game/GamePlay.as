@@ -177,6 +177,8 @@ package game
 
         private var GAME_STATE:uint = GAME_PLAY;
 
+        private var SOCKET_MESSAGE:Object = {};
+
         public function GamePlay(myParent:MenuPanel)
         {
             super(myParent);
@@ -264,6 +266,56 @@ package game
                 stage.addEventListener(KeyboardEvent.KEY_DOWN, keyboardKeyDown, false, int.MAX_VALUE, true);
                 stage.addEventListener(KeyboardEvent.KEY_UP, keyboardKeyUp, false, int.MAX_VALUE, true);
             }
+
+            // Prebuild Websocket Message, this is updated instead of creating a new object every message.
+            SOCKET_MESSAGE = {"player": {
+                        "settings": options.settingsEncode(),
+                        "name": _gvars.activeUser.name,
+                        "userid": _gvars.activeUser.id,
+                        "avatar": Constant.USER_AVATAR_URL + "?uid=" + _gvars.activeUser.id,
+                        "skill_rating": _gvars.activeUser.skillRating,
+                        "skill_level": _gvars.activeUser.skillLevel,
+                        "game_rank": _gvars.activeUser.gameRank,
+                        "game_played": _gvars.activeUser.gamesPlayed,
+                        "game_grand_total": _gvars.activeUser.grandTotal
+                    },
+                    "engine": (song.entry.engine == null ? null : {"id": song.entry.engine.id,
+                            "name": song.entry.engine.name,
+                            "config": song.entry.engine.config_url,
+                            "domain": song.entry.engine.domain})
+                    ,
+                    "song": {
+                        "name": song.entry.name,
+                        "level": song.entry.level,
+                        "difficulty": song.entry.difficulty,
+                        "style": song.entry.style,
+                        "time": song.entry.time,
+                        "time_seconds": song.entry.timeSecs,
+                        "note_count": song.entry.arrows,
+                        "author": song.entry.author,
+                        "author_url": song.entry.author_url,
+                        "stepauthor": song.entry.stepauthor,
+                        "credits": song.entry.credits,
+                        "genre": song.entry.genre,
+                        "nps_min": song.entry.min_nps,
+                        "nps_max": song.entry.max_nps,
+                        "release_date": song.entry.releasedate,
+                        "song_rating": song.entry.song_rating
+                    },
+                    "score": {
+                        "best_score": _gvars.activeUser.getLevelRank(song.entry),
+                        "amazing": 0,
+                        "perfect": 0,
+                        "good": 0,
+                        "average": 0,
+                        "miss": 0,
+                        "boo": 0,
+                        "score": 0,
+                        "combo": 0,
+                        "maxcombo": 0,
+                        "restarts": 0,
+                        "last_hit": null
+                    }};
 
             // Init Game
             initUI();
@@ -601,7 +653,29 @@ package game
             songDelayStarted = false;
 
             if (postStart)
+            {
                 updateFieldVars();
+
+                // Websocket
+                CONFIG::air
+                {
+                    if (_gvars.air_useWebsockets)
+                    {
+                        SOCKET_MESSAGE["score"]["amazing"] = hitAmazing;
+                        SOCKET_MESSAGE["score"]["perfect"] = hitPerfect;
+                        SOCKET_MESSAGE["score"]["good"] = hitGood;
+                        SOCKET_MESSAGE["score"]["average"] = hitAverage;
+                        SOCKET_MESSAGE["score"]["boo"] = hitBoo;
+                        SOCKET_MESSAGE["score"]["miss"] = hitMiss;
+                        SOCKET_MESSAGE["score"]["combo"] = hitCombo;
+                        SOCKET_MESSAGE["score"]["maxcombo"] = hitMaxCombo;
+                        SOCKET_MESSAGE["score"]["score"] = gameScore;
+                        SOCKET_MESSAGE["score"]["last_hit"] = null;
+                        SOCKET_MESSAGE["score"]["restarts"] = _gvars.songRestarts;
+                        _gvars.websocketSend("SONG_START", SOCKET_MESSAGE);
+                    }
+                }
+            }
         }
 
         private function siteLoadComplete(e:Event):void
@@ -1191,12 +1265,28 @@ package game
                 GAME_STATE = GAME_PAUSE;
                 songPausePosition = getTimer();
                 song.pause();
+
+                CONFIG::air
+                {
+                    if (_gvars.air_useWebsockets)
+                    {
+                        _gvars.websocketSend("SONG_PAUSE", SOCKET_MESSAGE);
+                    }
+                }
             }
             else if (GAME_STATE == GAME_PAUSE)
             {
                 GAME_STATE = GAME_PLAY;
                 absoluteStart += (getTimer() - songPausePosition);
                 song.resume();
+
+                CONFIG::air
+                {
+                    if (_gvars.air_useWebsockets)
+                    {
+                        _gvars.websocketSend("SONG_RESUME", SOCKET_MESSAGE);
+                    }
+                }
             }
         }
 
@@ -1273,6 +1363,25 @@ package game
             {
                 _avars.configMusicOffset = (_avars.configMusicOffset * 0.85) + songOffset.value * 0.15;
                 _avars.musicOffsetSave();
+            }
+
+            // Websocket
+            CONFIG::air
+            {
+                if (_gvars.air_useWebsockets)
+                {
+                    SOCKET_MESSAGE["score"]["amazing"] = hitAmazing;
+                    SOCKET_MESSAGE["score"]["perfect"] = hitPerfect;
+                    SOCKET_MESSAGE["score"]["good"] = hitGood;
+                    SOCKET_MESSAGE["score"]["average"] = hitAverage;
+                    SOCKET_MESSAGE["score"]["boo"] = hitBoo;
+                    SOCKET_MESSAGE["score"]["miss"] = hitMiss;
+                    SOCKET_MESSAGE["score"]["combo"] = hitCombo;
+                    SOCKET_MESSAGE["score"]["maxcombo"] = hitMaxCombo;
+                    SOCKET_MESSAGE["score"]["score"] = gameScore;
+                    SOCKET_MESSAGE["score"]["last_hit"] = null;
+                    _gvars.websocketSend("SONG_END", SOCKET_MESSAGE);
+                }
             }
 
             // Cleanup
@@ -1389,6 +1498,16 @@ package game
             if (player1Judge)
                 player1Judge.hideJudge();
             _gvars.songRestarts++;
+
+            // Websocket
+            CONFIG::air
+            {
+                if (_gvars.air_useWebsockets)
+                {
+                    SOCKET_MESSAGE["score"]["restarts"] = _gvars.songRestarts;
+                    _gvars.websocketSend("SONG_RESTART", SOCKET_MESSAGE);
+                }
+            }
         }
 
         /*#########################################################################################*\
@@ -2010,6 +2129,25 @@ package game
                         hitAverage: hitAverage,
                         hitMiss: hitMiss,
                         hitBoo: hitBoo}));
+            }
+
+            // Websocket
+            CONFIG::air
+            {
+                if (_gvars.air_useWebsockets)
+                {
+                    SOCKET_MESSAGE["score"]["amazing"] = hitAmazing;
+                    SOCKET_MESSAGE["score"]["perfect"] = hitPerfect;
+                    SOCKET_MESSAGE["score"]["good"] = hitGood;
+                    SOCKET_MESSAGE["score"]["average"] = hitAverage;
+                    SOCKET_MESSAGE["score"]["boo"] = hitBoo;
+                    SOCKET_MESSAGE["score"]["miss"] = hitMiss;
+                    SOCKET_MESSAGE["score"]["combo"] = hitCombo;
+                    SOCKET_MESSAGE["score"]["maxcombo"] = hitMaxCombo;
+                    SOCKET_MESSAGE["score"]["score"] = gameScore;
+                    SOCKET_MESSAGE["score"]["last_hit"] = score;
+                    _gvars.websocketSend("NOTE_JUDGE", SOCKET_MESSAGE);
+                }
             }
         }
 
