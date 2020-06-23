@@ -50,6 +50,11 @@ package
     import popups.PopupOptions;
     import popups.PopupReplayHistory;
 
+    CONFIG::air
+    {
+        import flash.desktop.NativeApplication;
+    }
+
     public class Main extends MenuPanel
     {
         public static const GAME_WIDTH:int = 780;
@@ -144,6 +149,7 @@ package
                 //trace(AirContext.getFileSize(AirContext.getAppFile(Constant.SONG_CACHE_PATH)));
                 _gvars.loadAirOptions();
                 stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE;
+                NativeApplication.nativeApplication.addEventListener(Event.EXITING, _gvars.onNativeProcessClose);
             }
             //- Load Menu Music
             _gvars.loadMenuMusic();
