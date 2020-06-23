@@ -949,7 +949,9 @@ package com.flashfla.net
 
             eventConnection();
             if (inSolo == false)
+            {
                 eventError("Multiplayer Connection Lost");
+            }
         }
 
         CONFIG::debug
