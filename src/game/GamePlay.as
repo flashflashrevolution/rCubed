@@ -49,15 +49,7 @@ package game
     import game.controls.Score;
     import it.gotoandplay.smartfoxserver.SFSEvent;
     import menu.MenuPanel;
-
-    CONFIG::air
-    {
-        import sql.SQLSongDetails;
-        //import flash.display.Stage3D;
-        import flash.display3D.Context3D;
-        import flash.display3D.Context3DProfile;
-        import flash.display3D.Context3DRenderMode;
-    }
+    import sql.SQLSongDetails;
 
     public class GamePlay extends MenuPanel
     {
@@ -189,42 +181,39 @@ package game
             options = _gvars.options;
             song = options.song;
 
-            // --- Per Song Options - Super hacky, but actually solid.
-            CONFIG::air
+            // --- Per Song Options - Super hacky, but actually solid
+            if (_gvars.sql_connect && !options.isEditor && !options.replay)
             {
-                if (_gvars.sql_connect && !options.isEditor && !options.replay)
+                options.fill(); // Reset
+                SQLQueries.getSongDetails(_gvars.sql_conn, {"engine": (song.entry.engine != null ? song.entry.engine : Constant.BRAND_NAME_SHORT_LOWER()), "song_id": song.entry.level}, function(results:Vector.<SQLSongDetails>):void
                 {
-                    options.fill(); // Reset
-                    SQLQueries.getSongDetails(_gvars.sql_conn, {"engine": (song.entry.engine != null ? song.entry.engine : Constant.BRAND_NAME_SHORT_LOWER()), "song_id": song.entry.level}, function(results:Vector.<SQLSongDetails>):void
+                    //trace("Delay Gameplay init for:", song.entry.level);
+                    if (results != null && results.length > 0)
                     {
-                        //trace("Delay Gameplay init for:", song.entry.level);
-                        if (results != null && results.length > 0)
+                        var result:SQLSongDetails = results[0];
+
+                        // Custom Offsets
+                        if (result.set_custom_offsets)
                         {
-                            var result:SQLSongDetails = results[0];
-
-                            // Custom Offsets
-                            if (result.set_custom_offsets)
-                            {
-                                options.offsetJudge = result.offset_judge;
-                                options.offsetGlobal = result.offset_music;
-                            }
-
-                            // Invert Mirror Mod
-                            if (result.set_mirror_invert)
-                            {
-                                if (options.modEnabled("mirror"))
-                                    delete options.modCache["mirror"];
-                                else
-                                    options.modCache["mirror"] = true;
-                            }
+                            options.offsetJudge = result.offset_judge;
+                            options.offsetGlobal = result.offset_music;
                         }
 
-                        stageAdd(); // This is cancelled by returning false below.
-                    });
+                        // Invert Mirror Mod
+                        if (result.set_mirror_invert)
+                        {
+                            if (options.modEnabled("mirror"))
+                                delete options.modCache["mirror"];
+                            else
+                                options.modCache["mirror"] = true;
+                        }
+                    }
 
-                    initBackground();
-                    return false; // Cancel stageAdd, will be called when callback is complete.
-                }
+                    stageAdd(); // This is cancelled by returning false below.
+                });
+
+                initBackground();
+                return false; // Cancel stageAdd, will be called when callback is complete.
             }
             // --- End Per Song Settings
 
@@ -352,11 +341,8 @@ package game
             if (!options.isEditor && !options.replay && !mpSpectate)
                 Mouse.hide();
 
-            CONFIG::air
-            {
-                if (song.entry && song.entry.name)
-                    stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE + " - " + song.entry.name;
-            }
+            if (song.entry && song.entry.name)
+                stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE + " - " + song.entry.name;
         }
 
         override public function stageRemove():void
@@ -658,23 +644,20 @@ package game
                 updateFieldVars();
 
                 // Websocket
-                CONFIG::air
+                if (_gvars.air_useWebsockets)
                 {
-                    if (_gvars.air_useWebsockets)
-                    {
-                        SOCKET_MESSAGE["score"]["amazing"] = hitAmazing;
-                        SOCKET_MESSAGE["score"]["perfect"] = hitPerfect;
-                        SOCKET_MESSAGE["score"]["good"] = hitGood;
-                        SOCKET_MESSAGE["score"]["average"] = hitAverage;
-                        SOCKET_MESSAGE["score"]["boo"] = hitBoo;
-                        SOCKET_MESSAGE["score"]["miss"] = hitMiss;
-                        SOCKET_MESSAGE["score"]["combo"] = hitCombo;
-                        SOCKET_MESSAGE["score"]["maxcombo"] = hitMaxCombo;
-                        SOCKET_MESSAGE["score"]["score"] = gameScore;
-                        SOCKET_MESSAGE["score"]["last_hit"] = null;
-                        SOCKET_MESSAGE["score"]["restarts"] = _gvars.songRestarts;
-                        _gvars.websocketSend("SONG_START", SOCKET_MESSAGE);
-                    }
+                    SOCKET_MESSAGE["score"]["amazing"] = hitAmazing;
+                    SOCKET_MESSAGE["score"]["perfect"] = hitPerfect;
+                    SOCKET_MESSAGE["score"]["good"] = hitGood;
+                    SOCKET_MESSAGE["score"]["average"] = hitAverage;
+                    SOCKET_MESSAGE["score"]["boo"] = hitBoo;
+                    SOCKET_MESSAGE["score"]["miss"] = hitMiss;
+                    SOCKET_MESSAGE["score"]["combo"] = hitCombo;
+                    SOCKET_MESSAGE["score"]["maxcombo"] = hitMaxCombo;
+                    SOCKET_MESSAGE["score"]["score"] = gameScore;
+                    SOCKET_MESSAGE["score"]["last_hit"] = null;
+                    SOCKET_MESSAGE["score"]["restarts"] = _gvars.songRestarts;
+                    _gvars.websocketSend("SONG_START", SOCKET_MESSAGE);
                 }
             }
         }
@@ -1267,12 +1250,9 @@ package game
                 songPausePosition = getTimer();
                 song.pause();
 
-                CONFIG::air
+                if (_gvars.air_useWebsockets)
                 {
-                    if (_gvars.air_useWebsockets)
-                    {
-                        _gvars.websocketSend("SONG_PAUSE", SOCKET_MESSAGE);
-                    }
+                    _gvars.websocketSend("SONG_PAUSE", SOCKET_MESSAGE);
                 }
             }
             else if (GAME_STATE == GAME_PAUSE)
@@ -1281,12 +1261,9 @@ package game
                 absoluteStart += (getTimer() - songPausePosition);
                 song.resume();
 
-                CONFIG::air
+                if (_gvars.air_useWebsockets)
                 {
-                    if (_gvars.air_useWebsockets)
-                    {
-                        _gvars.websocketSend("SONG_RESUME", SOCKET_MESSAGE);
-                    }
+                    _gvars.websocketSend("SONG_RESUME", SOCKET_MESSAGE);
                 }
             }
         }
@@ -1367,22 +1344,19 @@ package game
             }
 
             // Websocket
-            CONFIG::air
+            if (_gvars.air_useWebsockets)
             {
-                if (_gvars.air_useWebsockets)
-                {
-                    SOCKET_MESSAGE["score"]["amazing"] = hitAmazing;
-                    SOCKET_MESSAGE["score"]["perfect"] = hitPerfect;
-                    SOCKET_MESSAGE["score"]["good"] = hitGood;
-                    SOCKET_MESSAGE["score"]["average"] = hitAverage;
-                    SOCKET_MESSAGE["score"]["boo"] = hitBoo;
-                    SOCKET_MESSAGE["score"]["miss"] = hitMiss;
-                    SOCKET_MESSAGE["score"]["combo"] = hitCombo;
-                    SOCKET_MESSAGE["score"]["maxcombo"] = hitMaxCombo;
-                    SOCKET_MESSAGE["score"]["score"] = gameScore;
-                    SOCKET_MESSAGE["score"]["last_hit"] = null;
-                    _gvars.websocketSend("SONG_END", SOCKET_MESSAGE);
-                }
+                SOCKET_MESSAGE["score"]["amazing"] = hitAmazing;
+                SOCKET_MESSAGE["score"]["perfect"] = hitPerfect;
+                SOCKET_MESSAGE["score"]["good"] = hitGood;
+                SOCKET_MESSAGE["score"]["average"] = hitAverage;
+                SOCKET_MESSAGE["score"]["boo"] = hitBoo;
+                SOCKET_MESSAGE["score"]["miss"] = hitMiss;
+                SOCKET_MESSAGE["score"]["combo"] = hitCombo;
+                SOCKET_MESSAGE["score"]["maxcombo"] = hitMaxCombo;
+                SOCKET_MESSAGE["score"]["score"] = gameScore;
+                SOCKET_MESSAGE["score"]["last_hit"] = null;
+                _gvars.websocketSend("SONG_END", SOCKET_MESSAGE);
             }
 
             // Cleanup
@@ -1501,13 +1475,10 @@ package game
             _gvars.songRestarts++;
 
             // Websocket
-            CONFIG::air
+            if (_gvars.air_useWebsockets)
             {
-                if (_gvars.air_useWebsockets)
-                {
-                    SOCKET_MESSAGE["score"]["restarts"] = _gvars.songRestarts;
-                    _gvars.websocketSend("SONG_RESTART", SOCKET_MESSAGE);
-                }
+                SOCKET_MESSAGE["score"]["restarts"] = _gvars.songRestarts;
+                _gvars.websocketSend("SONG_RESTART", SOCKET_MESSAGE);
             }
         }
 
@@ -2133,22 +2104,19 @@ package game
             }
 
             // Websocket
-            CONFIG::air
+            if (_gvars.air_useWebsockets)
             {
-                if (_gvars.air_useWebsockets)
-                {
-                    SOCKET_MESSAGE["score"]["amazing"] = hitAmazing;
-                    SOCKET_MESSAGE["score"]["perfect"] = hitPerfect;
-                    SOCKET_MESSAGE["score"]["good"] = hitGood;
-                    SOCKET_MESSAGE["score"]["average"] = hitAverage;
-                    SOCKET_MESSAGE["score"]["boo"] = hitBoo;
-                    SOCKET_MESSAGE["score"]["miss"] = hitMiss;
-                    SOCKET_MESSAGE["score"]["combo"] = hitCombo;
-                    SOCKET_MESSAGE["score"]["maxcombo"] = hitMaxCombo;
-                    SOCKET_MESSAGE["score"]["score"] = gameScore;
-                    SOCKET_MESSAGE["score"]["last_hit"] = score;
-                    _gvars.websocketSend("NOTE_JUDGE", SOCKET_MESSAGE);
-                }
+                SOCKET_MESSAGE["score"]["amazing"] = hitAmazing;
+                SOCKET_MESSAGE["score"]["perfect"] = hitPerfect;
+                SOCKET_MESSAGE["score"]["good"] = hitGood;
+                SOCKET_MESSAGE["score"]["average"] = hitAverage;
+                SOCKET_MESSAGE["score"]["boo"] = hitBoo;
+                SOCKET_MESSAGE["score"]["miss"] = hitMiss;
+                SOCKET_MESSAGE["score"]["combo"] = hitCombo;
+                SOCKET_MESSAGE["score"]["maxcombo"] = hitMaxCombo;
+                SOCKET_MESSAGE["score"]["score"] = gameScore;
+                SOCKET_MESSAGE["score"]["last_hit"] = score;
+                _gvars.websocketSend("NOTE_JUDGE", SOCKET_MESSAGE);
             }
         }
 

@@ -95,12 +95,12 @@ package popups
 
             // Context Menus
             _contextExport = new ContextMenu();
-            var expFilterExport:ContextMenuItem = new ContextMenuItem(_lang.stringSimple("popup_filter_filter_single_export"), CONFIG::not_air);
+            var expFilterExport:ContextMenuItem = new ContextMenuItem(_lang.stringSimple("popup_filter_filter_single_export"));
             expFilterExport.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_contextFilterExport);
             _contextExport.customItems.push(expFilterExport);
 
             _contextImport = new ContextMenu();
-            var expFilterImport:ContextMenuItem = new ContextMenuItem(_lang.stringSimple("popup_filter_filter_single_import"), CONFIG::not_air);
+            var expFilterImport:ContextMenuItem = new ContextMenuItem(_lang.stringSimple("popup_filter_filter_single_import"));
             expFilterImport.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_contextFilterImport);
             _contextImport.customItems.push(expFilterImport);
 

@@ -4,6 +4,10 @@
 
 package
 {
+    import be.aboutme.airserver.AIRServer;
+    import be.aboutme.airserver.endpoints.socket.SocketEndPoint;
+    import be.aboutme.airserver.endpoints.socket.handlers.websocket.WebSocketClientHandlerFactory;
+    import be.aboutme.airserver.messages.Message;
     import by.blooddy.crypto.image.PNGEncoder;
     import classes.Playlist;
     import classes.SongPlayerBytes;
@@ -11,10 +15,11 @@ package
     import classes.User;
     import classes.chart.Song;
     import classes.filter.EngineLevelFilter;
-    import com.flashfla.net.DynamicURLLoader;
     import com.flashfla.loader.DataEvent;
+    import com.flashfla.net.DynamicURLLoader;
     import com.flashfla.utils.DateUtil;
     import com.flashfla.utils.SystemUtil;
+    import flash.data.SQLConnection;
     import flash.display.BitmapData;
     import flash.display.StageDisplayState;
     import flash.events.Event;
@@ -23,6 +28,7 @@ package
     import flash.events.SQLErrorEvent;
     import flash.events.SQLEvent;
     import flash.events.SecurityErrorEvent;
+    import flash.filesystem.File;
     import flash.media.SoundTransform;
     import flash.net.FileReference;
     import flash.net.URLLoader;
@@ -32,17 +38,8 @@ package
     import flash.net.URLVariables;
     import flash.system.Capabilities;
     import flash.utils.ByteArray;
-    import game.GameOptions;
 
-    CONFIG::air
-    {
-        import flash.data.SQLConnection;
-        import flash.filesystem.File;
-        import be.aboutme.airserver.AIRServer;
-        import be.aboutme.airserver.endpoints.socket.SocketEndPoint;
-        import be.aboutme.airserver.endpoints.socket.handlers.websocket.WebSocketClientHandlerFactory;
-        import be.aboutme.airserver.messages.Message;
-    }
+    import game.GameOptions;
 
     public class GlobalVariables extends EventDispatcher
     {
@@ -112,116 +109,112 @@ package
         public var menuMusicSoundTransform:SoundTransform = new SoundTransform();
 
         ///- Air Options
-        CONFIG::air
+        public var air_useLocalFileCache:Boolean = false;
+        public var air_autoSaveLocalReplays:Boolean = false;
+        public var air_useVSync:Boolean = true;
+        public var air_useWebsockets:Boolean = false;
+
+        public var sql_connect:Boolean = false;
+        public var sql_conn:SQLConnection;
+        public var sql_db:File;
+
+        private var websocket_server:AIRServer;
+
+        public function loadAirOptions():void
         {
-            public var air_useLocalFileCache:Boolean = false;
-            public var air_autoSaveLocalReplays:Boolean = false;
-            public var air_useVSync:Boolean = true;
-            public var air_useWebsockets:Boolean = false;
+            air_useLocalFileCache = LocalStore.getVariable("air_useLocalFileCache", false);
+            air_autoSaveLocalReplays = LocalStore.getVariable("air_autoSaveLocalReplays", false);
+            air_useVSync = LocalStore.getVariable("air_useVSync", false);
+            air_useWebsockets = LocalStore.getVariable("air_useWebsockets", false);
 
-            public var sql_connect:Boolean = false;
-            public var sql_conn:SQLConnection;
-            public var sql_db:File;
+            if (air_useWebsockets)
+                initWebsocketServer();
+        }
 
-            private var websocket_server:AIRServer;
+        public function initSQLConnection():void
+        {
+            // Clean Up Possible Connection
+            if (sql_conn != null && sql_connect)
+                sql_conn.close();
 
-            public function loadAirOptions():void
+            // DB Name
+            var sql_name:String = "dbinfo/" + (activeUser != null && activeUser.id > 0 ? activeUser.id : "0") + "_info.db";
+
+            sql_db = new File(AirContext.getAppPath(sql_name));
+
+            // Copy Template
+            if (!sql_db.exists)
             {
-                air_useLocalFileCache = LocalStore.getVariable("air_useLocalFileCache", false);
-                air_autoSaveLocalReplays = LocalStore.getVariable("air_autoSaveLocalReplays", false);
-                air_useVSync = LocalStore.getVariable("air_useVSync", false);
-                air_useWebsockets = LocalStore.getVariable("air_useWebsockets", false);
-
-                if (air_useWebsockets)
-                    initWebsocketServer();
-            }
-
-            public function initSQLConnection():void
-            {
-                // Clean Up Possible Connection
-                if (sql_conn != null && sql_connect)
-                    sql_conn.close();
-
-                // DB Name
-                var sql_name:String = "dbinfo/" + (activeUser != null && activeUser.id > 0 ? activeUser.id : "0") + "_info.db";
-
-                sql_db = new File(AirContext.getAppPath(sql_name));
-
-                // Copy Template
+                sql_db = AirContext.writeFile(AirContext.getAppPath(sql_name), new SQL_DB_TEMPLATE as ByteArray);
                 if (!sql_db.exists)
                 {
-                    sql_db = AirContext.writeFile(AirContext.getAppPath(sql_name), new SQL_DB_TEMPLATE as ByteArray);
-                    if (!sql_db.exists)
-                    {
-                        trace("Missing DB Template File @", sql_db.nativePath)
-                        return;
-                    }
-                }
-
-                // Create Connection
-                sql_conn = new SQLConnection();
-                sql_conn.addEventListener(SQLEvent.OPEN, sql_openHandler);
-                sql_conn.addEventListener(SQLErrorEvent.ERROR, sql_errorHandler);
-
-                sql_conn.openAsync(sql_db);
-
-                function sql_openHandler(event:SQLEvent):void
-                {
-                    sql_connect = true;
-
-                    trace("Database was connected successfully");
-
-                    SQLQueries.refreshStatements(sql_conn);
-                }
-
-                function sql_errorHandler(event:SQLErrorEvent):void
-                {
-                    sql_connect = false;
-                    trace("Error message:", event.error.message);
-                    trace("Details:", event.error.details);
+                    trace("Missing DB Template File @", sql_db.nativePath)
+                    return;
                 }
             }
 
-            public function initWebsocketServer():void
+            // Create Connection
+            sql_conn = new SQLConnection();
+            sql_conn.addEventListener(SQLEvent.OPEN, sql_openHandler);
+            sql_conn.addEventListener(SQLErrorEvent.ERROR, sql_errorHandler);
+
+            sql_conn.openAsync(sql_db);
+
+            function sql_openHandler(event:SQLEvent):void
             {
-                if (websocket_server == null)
-                {
-                    websocket_server = new AIRServer();
-                    websocket_server.addEndPoint(new SocketEndPoint(1235, new WebSocketClientHandlerFactory()));
-                    websocket_server.start();
-                }
+                sql_connect = true;
+
+                trace("Database was connected successfully");
+
+                SQLQueries.refreshStatements(sql_conn);
             }
 
-            public function destroyWebsocketServer():void
+            function sql_errorHandler(event:SQLErrorEvent):void
             {
-                if (websocket_server != null)
-                {
-                    websocket_server.stop();
-                    websocket_server = null;
-                }
-            }
-
-            public function websocketSend(cmd:String, data:Object):void
-            {
-                if (websocket_server != null)
-                {
-                    var msg:Message = new Message();
-                    msg.command = cmd;
-                    msg.data = data;
-                    websocket_server.sendMessageToAllClients(msg);
-                }
-            }
-
-            public function onNativeProcessClose(e:Event):void
-            {
-                if (websocket_server != null)
-                {
-                    websocket_server.stop();
-                }
+                sql_connect = false;
+                trace("Error message:", event.error.message);
+                trace("Details:", event.error.details);
             }
         }
 
-        CONFIG::air
+        public function initWebsocketServer():void
+        {
+            if (websocket_server == null)
+            {
+                websocket_server = new AIRServer();
+                websocket_server.addEndPoint(new SocketEndPoint(1235, new WebSocketClientHandlerFactory()));
+                websocket_server.start();
+            }
+        }
+
+        public function destroyWebsocketServer():void
+        {
+            if (websocket_server != null)
+            {
+                websocket_server.stop();
+                websocket_server = null;
+            }
+        }
+
+        public function websocketSend(cmd:String, data:Object):void
+        {
+            if (websocket_server != null)
+            {
+                var msg:Message = new Message();
+                msg.command = cmd;
+                msg.data = data;
+                websocket_server.sendMessageToAllClients(msg);
+            }
+        }
+
+        public function onNativeProcessClose(e:Event):void
+        {
+            if (websocket_server != null)
+            {
+                websocket_server.stop();
+            }
+        }
+
         public function loadMenuMusic():void
         {
             menuMusicSoundVolume = menuMusicSoundTransform.volume = LocalStore.getVariable("menuMusicSoundVolume", 1);
@@ -243,17 +236,6 @@ package
                     menuMusic = new SongPlayerBytes(mp3Bytes, true);
                     LocalStore.setVariable("menu_music", "External MP3");
                 }
-            }
-        }
-
-        CONFIG::not_air
-        public function loadMenuMusic():void
-        {
-            menuMusicSoundVolume = menuMusicSoundTransform.volume = LocalStore.getVariable("menuMusicSoundVolume", 1);
-            var mp3SWFBytes:ByteArray = LocalStore.getVariable("menu_music_bytes", null);
-            if (mp3SWFBytes && mp3SWFBytes.length > 0)
-            {
-                menuMusic = new SongPlayerBytes(mp3SWFBytes);
             }
         }
 

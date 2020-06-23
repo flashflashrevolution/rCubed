@@ -3,26 +3,26 @@ package popups
     import arc.ArcGlobals;
     import arc.mp.MultiplayerPrompt;
     import assets.GameBackgroundColor;
-    import classes.Alert;
-    import classes.BoxSlider;
-    import classes.MouseTooltip;
-    import com.bit101.components.Window;
-    import com.flashfla.components.ColorField;
-    import com.flashfla.net.Multiplayer;
     import assets.options.checkBox;
+    import classes.Alert;
     import classes.Box;
     import classes.BoxButton;
+    import classes.BoxSlider;
     import classes.BoxText;
-    import classes.chart.Song;
-    import classes.chart.parse.ChartFFRLegacy;
     import classes.GameNote;
     import classes.Language;
+    import classes.MouseTooltip;
     import classes.Noteskins;
     import classes.Playlist;
     import classes.Text;
     import classes.User;
+    import classes.chart.Song;
+    import classes.chart.parse.ChartFFRLegacy;
     import com.bit101.components.ComboBox;
     import com.bit101.components.Style;
+    import com.bit101.components.Window;
+    import com.flashfla.components.ColorField;
+    import com.flashfla.net.Multiplayer;
     import com.flashfla.utils.ArrayUtil;
     import com.flashfla.utils.ColorUtil;
     import com.flashfla.utils.StringUtil;
@@ -30,28 +30,21 @@ package popups
     import flash.display.Bitmap;
     import flash.display.BitmapData;
     import flash.display.DisplayObject;
-    import flash.display.Sprite;
+    import flash.events.ContextMenuEvent;
     import flash.events.Event;
     import flash.events.KeyboardEvent;
     import flash.events.MouseEvent;
     import flash.filters.BlurFilter;
     import flash.geom.Point;
-    import flash.text.TextFieldAutoSize;
-    import flash.text.TextFormat;
-    import flash.ui.ContextMenu;
-    import flash.ui.ContextMenuItem;
-    import flash.events.ContextMenuEvent;
-    import menu.MainMenu;
-    import menu.MenuPanel;
-    import game.GameOptions;
     import flash.media.SoundMixer;
     import flash.media.SoundTransform;
+    import flash.text.TextFieldAutoSize;
+    import flash.ui.ContextMenu;
+    import flash.ui.ContextMenuItem;
+    import game.GameOptions;
+    import menu.MainMenu;
+    import menu.MenuPanel;
     import menu.MenuSongSelection;
-
-    CONFIG::air
-    {
-        import flash.filesystem.File;
-    }
 
     public class PopupOptions extends MenuPanel
     {
@@ -143,13 +136,11 @@ package popups
         private var engineComboIgnore:Boolean;
         private var legacySongsCheck:checkBox;
 
-        CONFIG::air
-        {
-            private var useCacheCheckbox:checkBox;
-            private var autoSaveLocalCheckbox:checkBox;
-            private var useVSyncCheckbox:checkBox;
-            private var useWebsocketCheckbox:checkBox;
-        }
+        private var useCacheCheckbox:checkBox;
+        private var autoSaveLocalCheckbox:checkBox;
+        private var useVSyncCheckbox:checkBox;
+        private var useWebsocketCheckbox:checkBox;
+
         private var flipGraphCheckbox:checkBox;
 
         public function PopupOptions(myParent:MenuPanel)
@@ -1085,66 +1076,63 @@ package popups
                 yOff += 80;
 
                 //- Air Options
-                CONFIG::air
-                {
-                    var airDividerText:Text = new Text("______________________________");
-                    airDividerText.x = xOff;
-                    airDividerText.y = yOff;
-                    box.addChild(airDividerText);
-                    yOff += 30;
+                var airDividerText:Text = new Text("______________________________");
+                airDividerText.x = xOff;
+                airDividerText.y = yOff;
+                box.addChild(airDividerText);
+                yOff += 30;
 
-                    var autoSaveLocalCheckboxText:Text = new Text(_lang.string("air_options_save_local_replays"));
-                    autoSaveLocalCheckboxText.x = xOff + 22;
-                    autoSaveLocalCheckboxText.y = yOff;
-                    box.addChild(autoSaveLocalCheckboxText);
-                    yOff += 2;
+                var autoSaveLocalCheckboxText:Text = new Text(_lang.string("air_options_save_local_replays"));
+                autoSaveLocalCheckboxText.x = xOff + 22;
+                autoSaveLocalCheckboxText.y = yOff;
+                box.addChild(autoSaveLocalCheckboxText);
+                yOff += 2;
 
-                    autoSaveLocalCheckbox = new checkBox();
-                    autoSaveLocalCheckbox.x = xOff + 2;
-                    autoSaveLocalCheckbox.y = yOff;
-                    autoSaveLocalCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-                    box.addChild(autoSaveLocalCheckbox);
-                    yOff += 30;
+                autoSaveLocalCheckbox = new checkBox();
+                autoSaveLocalCheckbox.x = xOff + 2;
+                autoSaveLocalCheckbox.y = yOff;
+                autoSaveLocalCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                box.addChild(autoSaveLocalCheckbox);
+                yOff += 30;
 
-                    var useCacheCheckboxText:Text = new Text(_lang.string("air_options_use_cache"));
-                    useCacheCheckboxText.x = xOff + 22;
-                    useCacheCheckboxText.y = yOff;
-                    box.addChild(useCacheCheckboxText);
-                    yOff += 2;
+                var useCacheCheckboxText:Text = new Text(_lang.string("air_options_use_cache"));
+                useCacheCheckboxText.x = xOff + 22;
+                useCacheCheckboxText.y = yOff;
+                box.addChild(useCacheCheckboxText);
+                yOff += 2;
 
-                    useCacheCheckbox = new checkBox();
-                    useCacheCheckbox.x = xOff + 2;
-                    useCacheCheckbox.y = yOff;
-                    useCacheCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-                    box.addChild(useCacheCheckbox);
-                    yOff += 30;
+                useCacheCheckbox = new checkBox();
+                useCacheCheckbox.x = xOff + 2;
+                useCacheCheckbox.y = yOff;
+                useCacheCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                box.addChild(useCacheCheckbox);
+                yOff += 30;
 
-                    var useVSyncCheckboxText:Text = new Text(_lang.string("air_options_use_vsync"));
-                    useVSyncCheckboxText.x = xOff + 22;
-                    useVSyncCheckboxText.y = yOff;
-                    box.addChild(useVSyncCheckboxText);
-                    yOff += 2;
+                var useVSyncCheckboxText:Text = new Text(_lang.string("air_options_use_vsync"));
+                useVSyncCheckboxText.x = xOff + 22;
+                useVSyncCheckboxText.y = yOff;
+                box.addChild(useVSyncCheckboxText);
+                yOff += 2;
 
-                    useVSyncCheckbox = new checkBox();
-                    useVSyncCheckbox.x = xOff + 2;
-                    useVSyncCheckbox.y = yOff;
-                    useVSyncCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-                    box.addChild(useVSyncCheckbox);
-                    yOff += 30;
+                useVSyncCheckbox = new checkBox();
+                useVSyncCheckbox.x = xOff + 2;
+                useVSyncCheckbox.y = yOff;
+                useVSyncCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                box.addChild(useVSyncCheckbox);
+                yOff += 30;
 
-                    var useWebsocketCheckboxText:Text = new Text(_lang.string("air_options_use_websockets"));
-                    useWebsocketCheckboxText.x = xOff + 22;
-                    useWebsocketCheckboxText.y = yOff;
-                    box.addChild(useWebsocketCheckboxText);
-                    yOff += 2;
+                var useWebsocketCheckboxText:Text = new Text(_lang.string("air_options_use_websockets"));
+                useWebsocketCheckboxText.x = xOff + 22;
+                useWebsocketCheckboxText.y = yOff;
+                box.addChild(useWebsocketCheckboxText);
+                yOff += 2;
 
-                    useWebsocketCheckbox = new checkBox();
-                    useWebsocketCheckbox.x = xOff + 2;
-                    useWebsocketCheckbox.y = yOff;
-                    useWebsocketCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-                    box.addChild(useWebsocketCheckbox);
-                    yOff += 30;
-                }
+                useWebsocketCheckbox = new checkBox();
+                useWebsocketCheckbox.x = xOff + 2;
+                useWebsocketCheckbox.y = yOff;
+                useWebsocketCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                box.addChild(useWebsocketCheckbox);
+                yOff += 30;
 
                 var flipGraphCheckboxText:Text = new Text(_lang.string("game_results_flip_graph"));
                 flipGraphCheckboxText.x = xOff + 22;
@@ -1539,12 +1527,15 @@ package popups
             {
                 CURRENT_TAB = e.target.menu_select;
                 renderOptions();
-            } //- Scroll Direction
+            }
+
+            //- Scroll Direction
             else if (e.target.hasOwnProperty("slideDirection"))
             {
                 var dir:String = e.target.slideDirection;
                 _gvars.activeUser.slideDirection = dir;
             }
+
             //- Keys
             else if (e.target.hasOwnProperty("key"))
             {
@@ -1553,6 +1544,7 @@ package popups
                 keyListenerTarget.htmlText = _lang.string("options_key_pick");
                 return;
             }
+
             //- Visual Mods
             else if (e.target.hasOwnProperty("visual_mod"))
             {
@@ -1566,6 +1558,7 @@ package popups
                     _gvars.activeUser.activeVisualMods.push(visual_mod);
                 }
             }
+
             //- Mods
             else if (e.target.hasOwnProperty("mod"))
             {
@@ -1581,16 +1574,19 @@ package popups
                 if (mod == "reverse")
                     _gvars.removeSongFiles();
             }
-            //- Skin
+
+            //- Noteskin
             else if (e.target.hasOwnProperty("skin"))
             {
                 _gvars.activeUser.activeNoteskin = e.target.skin;
             }
-            //- custom Notekin
+
+            //- Custom Notekin
             else if (e.target == optionNoteskinsCustom)
             {
                 _gvars.gameMain.addPopup(new PopupCustomNoteskin(_gvars.gameMain), true);
             }
+
             //- Language
             else if (e.target.hasOwnProperty("languageID"))
             {
@@ -1598,6 +1594,7 @@ package popups
                 _gvars.gameMain.activePanel.draw();
                 renderOptions();
             }
+
             //- Displays
             else if (e.target.hasOwnProperty("display"))
             {
@@ -1607,6 +1604,7 @@ package popups
                     _gvars.gameMain.activePanel.draw();
                 }
             }
+
             //- Auto Judge Offset
             else if (e.target == autoJudgeOffsetCheck)
             {
@@ -1614,31 +1612,37 @@ package popups
                 optionJudgeOffset.selectable = _gvars.activeUser.AUTO_JUDGE_OFFSET;
                 optionJudgeOffset.alpha = _gvars.activeUser.AUTO_JUDGE_OFFSET ? 0.55 : 1.0;
             }
+
             // Force Judge Mode
             else if (e.target == forceJudgeCheck)
             {
                 _gvars.activeUser.forceNewJudge = !_gvars.activeUser.forceNewJudge;
             }
+
             // MP Timestamp
             else if (e.target == timestampCheck)
             {
                 _gvars.activeUser.DISPLAY_MP_TIMESTAMP = !_gvars.activeUser.DISPLAY_MP_TIMESTAMP;
             }
+
             // Legacy Songs
             else if (e.target == legacySongsCheck)
             {
                 _gvars.activeUser.DISPLAY_LEGACY_SONGS = !_gvars.activeUser.DISPLAY_LEGACY_SONGS;
             }
+
             // Judge Color Reset
             else if (e.target.hasOwnProperty("judge_color_reset_id"))
             {
                 _gvars.activeUser.judgeColours[e.target.judge_color_reset_id] = DEFAULT_OPTIONS.judgeColours[e.target.judge_color_reset_id];
             }
+
             // Combo Color Reset
             else if (e.target.hasOwnProperty("combo_color_reset_id"))
             {
                 _gvars.activeUser.comboColours[e.target.combo_color_reset_id] = DEFAULT_OPTIONS.comboColours[e.target.combo_color_reset_id];
             }
+
             // Game Background Color Reset
             else if (e.target.hasOwnProperty("game_color_reset_id"))
             {
@@ -1732,46 +1736,50 @@ package popups
                 removePopup();
                 return;
             }
-            CONFIG::air
+
+            //- Auto Save Local Replays
+            else if (e.target == autoSaveLocalCheckbox)
             {
-                // Auto Save Local Replays
-                if (e.target == autoSaveLocalCheckbox)
-                {
-                    _gvars.air_autoSaveLocalReplays = !_gvars.air_autoSaveLocalReplays;
-                    LocalStore.setVariable("air_autoSaveLocalReplays", _gvars.air_autoSaveLocalReplays);
-                }
-                // Auto Save Local Replays
-                if (e.target == useCacheCheckbox)
-                {
-                    _gvars.air_useLocalFileCache = !_gvars.air_useLocalFileCache;
-                    LocalStore.setVariable("air_useLocalFileCache", _gvars.air_useLocalFileCache);
-                }
-                // Vsync Toggle
-                if (e.target == useVSyncCheckbox)
-                {
-                    _gvars.air_useVSync = !_gvars.air_useVSync;
-                    LocalStore.setVariable("air_useVSync", _gvars.air_useVSync);
-                    stage.vsyncEnabled = _gvars.air_useVSync;
-                    _gvars.gameMain.addAlert("Set VSYNC: " + stage.vsyncEnabled, 120, Alert.RED);
-                }
-                // Use HTTP Websockets
-                if (e.target == useWebsocketCheckbox)
-                {
-                    _gvars.air_useWebsockets = !_gvars.air_useWebsockets;
-
-                    if (_gvars.air_useWebsockets)
-                        _gvars.initWebsocketServer();
-                    else
-                        _gvars.destroyWebsocketServer();
-
-                    LocalStore.setVariable("air_useWebsockets", _gvars.air_useWebsockets);
-                }
+                _gvars.air_autoSaveLocalReplays = !_gvars.air_autoSaveLocalReplays;
+                LocalStore.setVariable("air_autoSaveLocalReplays", _gvars.air_autoSaveLocalReplays);
             }
-            if (e.target == flipGraphCheckbox)
+
+            //- Auto Save Local Replays
+            else if (e.target == useCacheCheckbox)
+            {
+                _gvars.air_useLocalFileCache = !_gvars.air_useLocalFileCache;
+                LocalStore.setVariable("air_useLocalFileCache", _gvars.air_useLocalFileCache);
+            }
+
+            //- Vsync Toggle
+            else if (e.target == useVSyncCheckbox)
+            {
+                _gvars.air_useVSync = !_gvars.air_useVSync;
+                LocalStore.setVariable("air_useVSync", _gvars.air_useVSync);
+                stage.vsyncEnabled = _gvars.air_useVSync;
+                _gvars.gameMain.addAlert("Set VSYNC: " + stage.vsyncEnabled, 120, Alert.RED);
+            }
+
+            //- Use HTTP Websockets
+            else if (e.target == useWebsocketCheckbox)
+            {
+                _gvars.air_useWebsockets = !_gvars.air_useWebsockets;
+
+                if (_gvars.air_useWebsockets)
+                    _gvars.initWebsocketServer();
+                else
+                    _gvars.destroyWebsocketServer();
+
+                LocalStore.setVariable("air_useWebsockets", _gvars.air_useWebsockets);
+            }
+
+            //- Flip Results Graph Axis
+            else if (e.target == flipGraphCheckbox)
             {
                 var flipGraph:Boolean = LocalStore.getVariable("result_flip_graph", false);
                 LocalStore.setVariable("result_flip_graph", !flipGraph);
             }
+
             // Set Settings
             setSettings();
 
@@ -2042,13 +2050,11 @@ package popups
                     item.gotoAndStop(item.languageID == _gvars.activeUser.language ? 2 : 1);
                 }
 
-                CONFIG::air
-                {
-                    autoSaveLocalCheckbox.gotoAndStop(_gvars.air_autoSaveLocalReplays ? 2 : 1);
-                    useCacheCheckbox.gotoAndStop(_gvars.air_useLocalFileCache ? 2 : 1);
-                    useVSyncCheckbox.gotoAndStop(_gvars.air_useVSync ? 2 : 1);
-                    useWebsocketCheckbox.gotoAndStop(_gvars.air_useWebsockets ? 2 : 1);
-                }
+                autoSaveLocalCheckbox.gotoAndStop(_gvars.air_autoSaveLocalReplays ? 2 : 1);
+                useCacheCheckbox.gotoAndStop(_gvars.air_useLocalFileCache ? 2 : 1);
+                useVSyncCheckbox.gotoAndStop(_gvars.air_useVSync ? 2 : 1);
+                useWebsocketCheckbox.gotoAndStop(_gvars.air_useWebsockets ? 2 : 1);
+
                 var flipGraph:Boolean = LocalStore.getVariable("result_flip_graph", false);
                 flipGraphCheckbox.gotoAndStop(flipGraph ? 2 : 1);
             }

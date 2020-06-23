@@ -9,9 +9,9 @@ package game
     import classes.Language;
     import classes.Playlist;
     import classes.StarSelector;
+    import classes.Text;
     import classes.replay.Replay;
     import classes.replay.ReplayNote;
-    import classes.Text;
     import com.flashfla.net.DynamicURLLoader;
     import com.flashfla.utils.NumberUtil;
     import com.flashfla.utils.ObjectUtil;
@@ -24,11 +24,13 @@ package game
     import flash.events.KeyboardEvent;
     import flash.events.MouseEvent;
     import flash.events.SecurityErrorEvent;
+    import flash.filesystem.File;
+    import flash.filesystem.FileMode;
+    import flash.filesystem.FileStream;
     import flash.net.URLRequest;
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
     import flash.text.StyleSheet;
-    import flash.text.TextField;
     import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
     import flash.ui.Keyboard;
@@ -37,13 +39,6 @@ package game
     import popups.PopupMessage;
     import popups.PopupSongRating;
     import popups.PopupTokenUnlock;
-
-    CONFIG::air
-    {
-        import flash.filesystem.File;
-        import flash.filesystem.FileMode;
-        import flash.filesystem.FileStream;
-    }
 
     public class GameResults extends MenuPanel
     {
@@ -116,10 +111,8 @@ package game
             // Add keyboard navigation
             stage.addEventListener(KeyboardEvent.KEY_DOWN, eventHandler);
 
-            CONFIG::air
-            {
-                stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE;
-            }
+            // Reset Window Title
+            stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE;
 
             // Get Graph Type
             graphType = LocalStore.getVariable("result_graph_type", 0);
@@ -902,39 +895,30 @@ package game
                 _gvars.tempFlags['f2_replays'] = true;
             }
 
-            CONFIG::air
+            if (_gvars.air_autoSaveLocalReplays)
             {
-                if (_gvars.air_autoSaveLocalReplays)
+                try
                 {
-                    try
+                    var path:String = AirContext.getReplayPath(result.songFile);
+                    path += (result.songFile.entry.levelid != null ? result.songFile.entry.levelid : result.songFile.id.toString())
+                    path += "_" + (new Date().getTime())
+                    path += "_" + ((result.amazing + result.perfect) + "-" + result.good + "-" + result.average + "-" + result.miss + "-" + result.boo + "-" + result.maxcombo);
+
+                    var fileStream:FileStream;
+
+                    // Store Bin Encoded Replay
+                    if (!AirContext.doesFileExist(path + ".txt") && result.replay_bin != null)
                     {
-                        var path:String = AirContext.getReplayPath(result.songFile) + (result.songFile.entry.levelid != null ? result.songFile.entry.levelid : result.songFile.id.toString()) + "_" + (new Date().getTime()) + "_" + ((result.amazing + result.perfect) + "-" + result.good + "-" + result.average + "-" + result.miss + "-" + result.boo + "-" + result.maxcombo);
-                        var fileStream:FileStream;
-                        /*
-                           // Store Bin Replay
-                           if(!AirContext.doesFileExist(path+".bin") && result.replay_bin != null) {
-                           var replayFile:File = new File(AirContext.getAppPath(path+".bin"));
-                           fileStream = new FileStream();
-                           fileStream.open(replayFile, FileMode.WRITE);
-                           fileStream.writeBytes(result.replay_bin);
-                           fileStream.close();
-                           trace("Saving Replay for " + result.songFile.id + ": " + replayFile.nativePath);
-                           }
-                         */
-                        // Store Bin Encoded Replay
-                        if (!AirContext.doesFileExist(path + ".txt") && result.replay_bin != null)
-                        {
-                            var replayFileText:File = new File(AirContext.getAppPath(path + ".txt"));
-                            fileStream = new FileStream();
-                            fileStream.open(replayFileText, FileMode.WRITE);
-                            fileStream.writeUTFBytes(nR.getEncode());
-                            fileStream.close();
-                            trace("Saving Replay for " + result.songFile.id + ": " + replayFileText.nativePath);
-                        }
+                        var replayFileText:File = new File(AirContext.getAppPath(path + ".txt"));
+                        fileStream = new FileStream();
+                        fileStream.open(replayFileText, FileMode.WRITE);
+                        fileStream.writeUTFBytes(nR.getEncode());
+                        fileStream.close();
+                        trace("Saving Replay for " + result.songFile.id + ": " + replayFileText.nativePath);
                     }
-                    catch (e:Error)
-                    {
-                    }
+                }
+                catch (e:Error)
+                {
                 }
             }
         }
