@@ -66,19 +66,50 @@ package game.controls
             field.text = combo.toString();
             fieldShadow.text = combo.toString();
 
+            /* colors[i]:
+               [0] = Normal,
+               [1] = FC,
+               [2] = AAA,
+               [3] = SDG,
+               [4] = BlackFlag,
+               [5] = AvFlag,
+               [6] = BooFlag
+             */
+
             if (options && (!options.isAutoplay || options.isEditor || options.multiplayer))
             {
-                if (miss)
+                if (miss) // Display blue combo text if miss has occurred
                 {
                     field.textColor = colors[0];
                     fieldShadow.textColor = darkcolors[0];
                 }
-                else if (good + average + boo == 0)
+                else if (good + average + boo == 0) // Display AAA color
                 {
                     field.textColor = colors[2];
                     fieldShadow.textColor = darkcolors[2];
                 }
-                else
+                else if (good == 1 && average + boo == 0) // Display BlackFlag color
+                {
+                    field.textColor = colors[4];
+                    fieldShadow.textColor = darkcolors[4];
+                }
+                else if (average == 1 && good + boo == 0) // Display AvFlag color
+                {
+                    field.textColor = colors[5];
+                    fieldShadow.textColor = darkcolors[5];
+                }
+                else if (boo == 1 && good + average == 0) // Display BooFlag color
+                {
+                    field.textColor = colors[6];
+                    fieldShadow.textColor = darkcolors[6];
+                }
+                // !! gameRawGoods variable throwing warning but is functioning as expected
+                else if (gameRawGoods < 10) // Display SDG color if raw goods < 10
+                {
+                    field.textColor = colors[3];
+                    fieldShadow.textColor = darkcolors[3];
+                }
+                else // Display green for FC
                 {
                     field.textColor = colors[1];
                     fieldShadow.textColor = darkcolors[1];
