@@ -1,9 +1,7 @@
 package classes.chart
 {
     import arc.NoteMod;
-    import flash.events.SampleDataEvent;
-    import flash.media.SoundMixer;
-    import game.GameOptions;
+    import by.blooddy.crypto.MD5;
     import classes.chart.parse.ChartFFRLegacy;
     import com.flashfla.media.MP3Extraction;
     import com.flashfla.media.SwfSilencer;
@@ -16,20 +14,17 @@ package classes.chart
     import flash.events.EventDispatcher;
     import flash.events.IOErrorEvent;
     import flash.events.ProgressEvent;
+    import flash.events.SampleDataEvent;
     import flash.events.SecurityErrorEvent;
+    import flash.filesystem.File;
     import flash.media.Sound;
     import flash.media.SoundChannel;
+    import flash.media.SoundMixer;
     import flash.net.URLLoader;
-    import flash.net.URLRequest;
     import flash.net.URLLoaderDataFormat;
+    import flash.net.URLRequest;
     import flash.utils.ByteArray;
-    //import popups.PopupMessage;
-
-    CONFIG::air
-    {
-        import by.blooddy.crypto.MD5;
-        import flash.filesystem.File;
-    }
+    import game.GameOptions;
 
     public class Song extends EventDispatcher
     {
@@ -72,11 +67,8 @@ package classes.chart
         private var musicForcibleLoader:ForcibleLoader;
         public var musicDelay:int = 0;
 
-        CONFIG::air
-        {
-            private var localFileData:ByteArray = null;
-            private var localFileHash:String = "";
-        }
+        private var localFileData:ByteArray = null;
+        private var localFileHash:String = "";
 
         public function Song(song:Object, isPreview:Boolean = false):void
         {
@@ -131,22 +123,19 @@ package classes.chart
 
             // Load Stored SWF
             var url_file_hash:String = "";
-            CONFIG::air
+            if ((_gvars.air_useLocalFileCache) && AirContext.doesFileExist(AirContext.getSongCachePath(this) + "data.bin"))
             {
-                if ((_gvars.air_useLocalFileCache) && AirContext.doesFileExist(AirContext.getSongCachePath(this) + "data.bin"))
-                {
-                    localFileData = AirContext.readFile(AirContext.getAppPath(AirContext.getSongCachePath(this) + "data.bin"), (this.entry.engine ? 0 : this.id));
-                    localFileHash = MD5.hashBytes(localFileData);
-                    url_file_hash = "hash=" + localFileHash + "&";
+                localFileData = AirContext.readFile(AirContext.getAppPath(AirContext.getSongCachePath(this) + "data.bin"), (this.entry.engine ? 0 : this.id));
+                localFileHash = MD5.hashBytes(localFileData);
+                url_file_hash = "hash=" + localFileHash + "&";
 
-                    if (this.entry.engine && localFileData && type == NoteChart.FFR_MP3)
-                    {
-                        removeLoaderListeners();
-                        musicLoader = new Loader();
-                        addLoaderListeners(true);
-                        musicLoader.loadBytes(localFileData, AirContext.getLoaderContext());
-                        return;
-                    }
+                if (this.entry.engine && localFileData && type == NoteChart.FFR_MP3)
+                {
+                    removeLoaderListeners();
+                    musicLoader = new Loader();
+                    addLoaderListeners(true);
+                    musicLoader.loadBytes(localFileData, AirContext.getLoaderContext());
+                    return;
                 }
             }
 
@@ -283,30 +272,27 @@ package classes.chart
                 isMusic2Loaded = false;
 
                 // Check for server response for matching hash. Encode Compressed SWF Data
-                CONFIG::air
-                {
-                    var storeChartData:ByteArray;
-                    if (_gvars.air_useLocalFileCache)
-                    { // && !this.entry.engine) {
-                        // Alt Engine has Data
-                        if (this.entry.engine && localFileData)
-                        {
+                var storeChartData:ByteArray;
+                if (_gvars.air_useLocalFileCache)
+                { // && !this.entry.engine) {
+                    // Alt Engine has Data
+                    if (this.entry.engine && localFileData)
+                    {
 
-                        }
-                        else if (chartData.length == 3)
+                    }
+                    else if (chartData.length == 3)
+                    {
+                        chartData.position = 0;
+                        var code:String = chartData.readUTFBytes(3);
+                        if (code == "403")
                         {
-                            chartData.position = 0;
-                            var code:String = chartData.readUTFBytes(3);
-                            if (code == "403")
-                            {
-                                chartData = localFileData;
-                                bytesLoaded = bytesTotal = localFileData.length;
-                            }
+                            chartData = localFileData;
+                            bytesLoaded = bytesTotal = localFileData.length;
                         }
-                        else
-                        {
-                            storeChartData = AirContext.encodeData(chartData, (this.entry.engine ? 0 : this.id));
-                        }
+                    }
+                    else
+                    {
+                        storeChartData = AirContext.encodeData(chartData, (this.entry.engine ? 0 : this.id));
                     }
                 }
 
@@ -342,18 +328,15 @@ package classes.chart
                 mloader.loadBytes(mbytes, AirContext.getLoaderContext());
 
                 // Store SWF
-                CONFIG::air
+                if (_gvars.air_useLocalFileCache && storeChartData)
                 {
-                    if (_gvars.air_useLocalFileCache && storeChartData)
-                    { // && !this.entry.engine) {
-                        try
-                        {
-                            var cacheFile:File = AirContext.writeFile(AirContext.getAppPath(AirContext.getSongCachePath(this) + "data.bin"), storeChartData);
-                            trace("Saving SWF for " + this.id + ": " + cacheFile.nativePath);
-                        }
-                        catch (e:Error)
-                        {
-                        }
+                    try
+                    {
+                        var cacheFile:File = AirContext.writeFile(AirContext.getAppPath(AirContext.getSongCachePath(this) + "data.bin"), storeChartData);
+                        trace("Saving SWF for " + this.id + ": " + cacheFile.nativePath);
+                    }
+                    catch (e:Error)
+                    {
                     }
                 }
 

@@ -339,14 +339,7 @@ package menu
                         _gvars.menuMusic = null;
                         menuMusicControls.parent.removeChild(menuMusicControls);
 
-                        CONFIG::air
-                        {
-                            AirContext.deleteFile(AirContext.getAppPath(Constant.MENU_MUSIC_PATH));
-                        }
-                        CONFIG::not_air
-                        {
-                            LocalStore.setVariable("menu_music_bytes", null);
-                        }
+                        AirContext.deleteFile(AirContext.getAppPath(Constant.MENU_MUSIC_PATH));
                     }
                 });
                 this.addChild(menuMusicControls);

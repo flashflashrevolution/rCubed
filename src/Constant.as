@@ -13,7 +13,6 @@ package
         private static const BRAND_NAME_SHORT:String = R3::BRAND_NAME_SHORT;
         public static const ROOT_URL:String = "http://" + R3::ROOT_URL + "/";
 
-        public static const ANALYTICS_URL:String = ROOT_URL + "game/r3/r3-analytics.php";
         public static const FONT_SWF_URL:String = ROOT_URL + "game/r3/fonts/";
         public static const FONT_URL:String = ROOT_URL + "game/r3/r3-fonts.json";
         public static const HISCORES_URL:String = ROOT_URL + "game/r3/r3-hiscores.php";
@@ -45,15 +44,12 @@ package
 
         public static const LEGACY_GENRE:int = 13;
 
-        CONFIG::air
-        {
-            public static const MENU_MUSIC_PATH:String = "menu_music.swf";
-            public static const MENU_MUSIC_MP3_PATH:String = "menu_music.mp3"
-            public static const REPLAY_PATH:String = "replays/";
-            public static const SONG_CACHE_PATH:String = "song_cache/";
-            public static const AIR_VERSION:String = R3::VERSION;
-            public static const AIR_WINDOW_TITLE:String = R3::BRAND_NAME_SHORT + " R^3 [" + AIR_VERSION + "]";
-        }
+        public static const MENU_MUSIC_PATH:String = "menu_music.swf";
+        public static const MENU_MUSIC_MP3_PATH:String = "menu_music.mp3"
+        public static const REPLAY_PATH:String = "replays/";
+        public static const SONG_CACHE_PATH:String = "song_cache/";
+        public static const AIR_VERSION:String = R3::VERSION;
+        public static const AIR_WINDOW_TITLE:String = R3::BRAND_NAME_SHORT + " R^3 [" + AIR_VERSION + "]";
 
         // Embed Fonts
         BreeSerif;
@@ -147,12 +143,8 @@ package
         static public function addDefaultRequestVariables(requestVars:URLVariables):void
         {
             requestVars['ver'] = Constant.VERSION;
-            requestVars['is_air'] = CONFIG::air;
-
-            CONFIG::air
-            {
-                requestVars['air_ver'] = Constant.AIR_VERSION;
-            }
+            requestVars['is_air'] = true;
+            requestVars['air_ver'] = Constant.AIR_VERSION;
         }
     }
 }

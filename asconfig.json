@@ -20,14 +20,6 @@
         // The FFR branding is Copyright to Synthlight, you MUST modify before redistributing.
         "define": [
             {
-                "name": "CONFIG::not_air",
-                "value": false
-            },
-            {
-                "name": "CONFIG::air",
-                "value": true
-            },
-            {
                 "name": "CONFIG::debug",
                 "value": true
             },
