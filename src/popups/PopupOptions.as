@@ -909,56 +909,6 @@ package popups
 
                 yOff += 25;
 
-                var gameComboColorTitle:Text = new Text(_lang.string("options_combo_colors_title"));
-                gameComboColorTitle.x = xOff + 5;
-                gameComboColorTitle.y = yOff;
-                gameComboColorTitle.width = 211;
-                gameComboColorTitle.align = Text.CENTER;
-                box.addChild(gameComboColorTitle);
-                yOff += 24;
-
-                optionComboColors = [];
-                for (i = 0; i < DEFAULT_OPTIONS.comboColours.length; i++)
-                {
-                    var gameComboColor:Text = new Text(_lang.string("options_combo_colors_" + i));
-                    gameComboColor.x = xOff;
-                    gameComboColor.y = yOff;
-                    gameComboColor.width = 70;
-                    gameComboColor.align = Text.RIGHT;
-                    box.addChild(gameComboColor);
-
-                    var optionComboColor:BoxText = new BoxText(70, 20);
-                    optionComboColor.x = xOff + 75;
-                    optionComboColor.y = yOff;
-                    optionComboColor.combo_color_id = i;
-                    optionComboColor.restrict = "#0-9a-f";
-                    optionComboColor.field.maxChars = 7;
-                    optionComboColor.addEventListener(Event.CHANGE, changeHandler);
-                    box.addChild(optionComboColor);
-
-                    var gameComboColorDisplay:ColorField = new ColorField(0, 45, 20);
-                    gameComboColorDisplay.x = xOff + 150;
-                    gameComboColorDisplay.y = yOff;
-                    gameComboColorDisplay.key_name = "gameComboColorDisplay";
-                    gameComboColorDisplay.addEventListener(Event.CHANGE, changeHandler);
-                    box.addChild(gameComboColorDisplay);
-
-                    var optionComboColorReset:BoxButton = new BoxButton(20, 20, "R");
-                    optionComboColorReset.x = xOff + 200;
-                    optionComboColorReset.y = yOff;
-                    optionComboColorReset.combo_color_reset_id = i;
-                    optionComboColorReset.boxColor = 0xff0000;
-                    optionComboColorReset.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-                    box.addChild(optionComboColorReset);
-                    optionComboColors.push({"text": optionComboColor, "display": gameComboColorDisplay, "reset": optionComboColorReset});
-
-                    yOff += 25;
-                }
-
-                ///- Col 2
-                xOff += 245;
-                yOff = BASE_Y_POSITION;
-
                 var gameGameColorTitle:Text = new Text(_lang.string("options_game_colors_title"));
                 gameGameColorTitle.x = xOff + 5;
                 gameGameColorTitle.y = yOff;
@@ -1003,6 +953,56 @@ package popups
                     optionGameColorReset.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                     box.addChild(optionGameColorReset);
                     optionGameColors.push({"text": optionGameColor, "display": gameGameColorDisplay, "reset": optionGameColorReset});
+
+                    yOff += 25;
+                }
+
+                ///- Col 2
+                xOff += 245;
+                yOff = BASE_Y_POSITION;
+
+                var gameComboColorTitle:Text = new Text(_lang.string("options_combo_colors_title"));
+                gameComboColorTitle.x = xOff + 5;
+                gameComboColorTitle.y = yOff;
+                gameComboColorTitle.width = 211;
+                gameComboColorTitle.align = Text.CENTER;
+                box.addChild(gameComboColorTitle);
+                yOff += 24;
+
+                optionComboColors = [];
+                for (i = 0; i < DEFAULT_OPTIONS.comboColours.length; i++)
+                {
+                    var gameComboColor:Text = new Text(_lang.string("options_combo_colors_" + i));
+                    gameComboColor.x = xOff;
+                    gameComboColor.y = yOff;
+                    gameComboColor.width = 70;
+                    gameComboColor.align = Text.RIGHT;
+                    box.addChild(gameComboColor);
+
+                    var optionComboColor:BoxText = new BoxText(70, 20);
+                    optionComboColor.x = xOff + 75;
+                    optionComboColor.y = yOff;
+                    optionComboColor.combo_color_id = i;
+                    optionComboColor.restrict = "#0-9a-f";
+                    optionComboColor.field.maxChars = 7;
+                    optionComboColor.addEventListener(Event.CHANGE, changeHandler);
+                    box.addChild(optionComboColor);
+
+                    var gameComboColorDisplay:ColorField = new ColorField(0, 45, 20);
+                    gameComboColorDisplay.x = xOff + 150;
+                    gameComboColorDisplay.y = yOff;
+                    gameComboColorDisplay.key_name = "gameComboColorDisplay";
+                    gameComboColorDisplay.addEventListener(Event.CHANGE, changeHandler);
+                    box.addChild(gameComboColorDisplay);
+
+                    var optionComboColorReset:BoxButton = new BoxButton(20, 20, "R");
+                    optionComboColorReset.x = xOff + 200;
+                    optionComboColorReset.y = yOff;
+                    optionComboColorReset.combo_color_reset_id = i;
+                    optionComboColorReset.boxColor = 0xff0000;
+                    optionComboColorReset.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                    box.addChild(optionComboColorReset);
+                    optionComboColors.push({"text": optionComboColor, "display": gameComboColorDisplay, "reset": optionComboColorReset});
 
                     yOff += 25;
                 }

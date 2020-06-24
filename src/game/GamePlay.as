@@ -2161,7 +2161,7 @@ package game
                 score.update(gameScore);
 
             if (combo)
-                combo.update(hitCombo, hitAmazing, hitPerfect, hitGood, hitAverage, hitMiss, hitBoo);
+                combo.update(hitCombo, hitAmazing, hitPerfect, hitGood, hitAverage, hitMiss, hitBoo, gameRawGoods);
         }
 
         private var previousDiffs:Array = new Array();
