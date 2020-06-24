@@ -503,8 +503,14 @@ package classes
                 this.activeVisualMods = _settings.visual;
             if (_settings.judgeColours != null)
                 this.judgeColours = _settings.judgeColours;
-            if (_settings.comboColours != null)
-                this.comboColours = _settings.comboColours;
+            if(_settings.comboColours != null)
+            {
+                var comboColorCount:int = Math.min(this.comboColours.length, _settings.comboColours.length);
+                for(var i:int=0; i < comboColorCount; i++)
+                {
+                    this.comboColours[i] = _settings.comboColours[i];
+                }
+            }
             if (_settings.gameColours != null)
                 this.gameColours = _settings.gameColours;
             if (_settings.noteColours != null)

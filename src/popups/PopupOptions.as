@@ -2040,22 +2040,10 @@ package popups
                     optionJudgeColors[i]["text"].text = "#" + StringUtil.pad(_gvars.activeUser.judgeColours[i].toString(16).substr(0, 6), 6, "0", StringUtil.STR_PAD_LEFT);
                     optionJudgeColors[i]["display"].color = _gvars.activeUser.judgeColours[i];
                 }
-                // Set Combo Colors -- if User data has values to match all fields, use them - otherwise use default values. This prevents crash when user data array doesn't contain correct # of values
-                if (_gvars.activeUser.comboColours.length == DEFAULT_OPTIONS.comboColours.length)
+                for (i = 0; i < DEFAULT_OPTIONS.comboColours.length; i++)
                 {
-                    for (i = 0; i < DEFAULT_OPTIONS.comboColours.length; i++)
-                    {
-                        optionComboColors[i]["text"].text = "#" + StringUtil.pad(_gvars.activeUser.comboColours[i].toString(16).substr(0, 6), 6, "0", StringUtil.STR_PAD_LEFT);
-                        optionComboColors[i]["display"].color = _gvars.activeUser.comboColours[i];
-                    }
-                }
-                else
-                {
-                    for (i = 0; i < DEFAULT_OPTIONS.comboColours.length; i++)
-                    {
-                        optionComboColors[i]["text"].text = "#" + StringUtil.pad(DEFAULT_OPTIONS.comboColours[i].toString(16).substr(0, 6), 6, "0", StringUtil.STR_PAD_LEFT);
-                        optionComboColors[i]["display"].color = DEFAULT_OPTIONS.comboColours[i];
-                    }
+                    optionComboColors[i]["text"].text = "#" + StringUtil.pad(_gvars.activeUser.comboColours[i].toString(16).substr(0, 6), 6, "0", StringUtil.STR_PAD_LEFT);
+                    optionComboColors[i]["display"].color = _gvars.activeUser.comboColours[i];
                 }
                 for (i = 0; i < DEFAULT_OPTIONS.gameColours.length; i++)
                 {

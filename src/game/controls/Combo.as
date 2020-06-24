@@ -61,7 +61,7 @@ package game.controls
             }
         }
 
-        public function update(combo:int, amazing:int = 0, perfect:int = 0, good:int = 0, average:int = 0, miss:int = 0, boo:int = 0):void
+        public function update(combo:int, amazing:int = 0, perfect:int = 0, good:int = 0, average:int = 0, miss:int = 0, boo:int = 0, raw_goods:Number = 0):void
         {
             field.text = combo.toString();
             fieldShadow.text = combo.toString();
@@ -103,8 +103,7 @@ package game.controls
                     field.textColor = colors[6];
                     fieldShadow.textColor = darkcolors[6];
                 }
-                // !! gameRawGoods variable throwing warning but is functioning as expected
-                else if (gameRawGoods < 10) // Display SDG color if raw goods < 10
+                else if (raw_goods < 10) // Display SDG color if raw goods < 10
                 {
                     field.textColor = colors[3];
                     fieldShadow.textColor = darkcolors[3];
