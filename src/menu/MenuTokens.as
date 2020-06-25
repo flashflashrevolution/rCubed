@@ -221,19 +221,20 @@ package menu
 
         private function addTokenImageLoader(token_info:Object, token_ui:TokenItem):void
         {
-            if (loadedTokenImages[MD5.hash(token_info['picture'])] != null)
+            var imageHash:String = MD5.hash(token_info['picture']);
+            if (loadedTokenImages[imageHash] != null)
             {
-                token_ui.addTokenImage(loadedTokenImages[MD5.hash(token_info['picture'])] as Bitmap, false);
+                token_ui.addTokenImage(loadedTokenImages[imageHash] as Bitmap, false);
                 return;
             }
 
             // Load Image
-            loadQueue.push({"url": token_info['picture'], "ui": token_ui});
+            loadQueue.push({"hash": imageHash, "url": token_info['picture'], "ui": token_ui});
         }
 
         private function downloadTokenImage():void
         {
-            if (loadQueue.length <= 0)
+            if (loadQueue.length <= 0 || ACTIVE_DOWNLOAD != null)
                 return;
 
             ACTIVE_DOWNLOAD = loadQueue.shift();
@@ -246,9 +247,12 @@ package menu
 
         private function downloadTokenImageComplete(e:Event):void
         {
-            loadedTokenImages[MD5.hash(ACTIVE_DOWNLOAD['url'])] = e.target.content as Bitmap;
+            loadedTokenImages[ACTIVE_DOWNLOAD['hash']] = e.target.content as Bitmap;
 
-            (ACTIVE_DOWNLOAD['ui'] as TokenItem).addTokenImage(e.target.content as Bitmap);
+            if ((ACTIVE_DOWNLOAD['ui'] as TokenItem).parent != null)
+                (ACTIVE_DOWNLOAD['ui'] as TokenItem).addTokenImage(e.target.content as Bitmap);
+
+            ACTIVE_DOWNLOAD = null;
 
             downloadTokenImage();
         }
