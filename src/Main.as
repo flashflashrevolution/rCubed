@@ -90,6 +90,7 @@ package
         public var loadStatus:TextField;
         public var epilepsyWarning:TextField;
 
+        public var ver:Text;
         public var bg:GameBackgroundColor
 
         ///- Constructor
@@ -173,11 +174,13 @@ package
             TweenMax.to(epilepsyWarning, 1, {alpha: 0.6, ease: SineInOut, yoyo: true, repeat: -1});
 
             //- Add Debug Tracking
-            var ver:Text = new Text(Capabilities.version.replace(/,/g, ".") + " - Build " + CONFIG::timeStamp + " - " + Constant.AIR_VERSION);
+            ver = new Text(Capabilities.version.replace(/,/g, ".") + " - Build " + CONFIG::timeStamp + " - " + Constant.AIR_VERSION);
             ver.alpha = 0.15;
             ver.x = stage.width - 5;
             ver.y = 2;
             ver.align = Text.RIGHT;
+            ver.mouseEnabled = false;
+            ver.cacheAsBitmap = true;
             this.addChild(ver);
 
             // Holidays!
@@ -511,19 +514,18 @@ package
             {
                 case GAME_UPDATE_PANEL:
                     nextPanel = new AirUpdater(this);
-                    bg.visible = true;
                     isFound = true;
                     break;
 
                 case GAME_LOGIN_PANEL:
                     nextPanel = new LoginMenu(this);
-                    bg.visible = true;
                     isFound = true;
                     break;
 
                 case GAME_MENU_PANEL:
-                    nextPanel = new MainMenu(this);
                     bg.visible = true;
+                    ver.visible = true;
+                    nextPanel = new MainMenu(this);
                     isFound = true;
 
                     if (this.contains(epilepsyWarning))
@@ -535,7 +537,6 @@ package
 
                 case GAME_PLAY_PANEL:
                     nextPanel = new GameMenu(this);
-                    bg.visible = false;
                     isFound = true;
                     break;
             }
