@@ -323,7 +323,7 @@ package
                 _gvars.gameMain.addAlert(_lang.string("login_invalid_session"));
                 changeUserEvent(e);
             }
-            else if (_data.result >= 1 || _data.result <= 3)
+            else if (_data.result >= 1 && _data.result <= 3)
             {
                 if (_data.result == 1 || _data.result == 2)
                     saveLoginDetails(this.rememberPassword, _data.session);
