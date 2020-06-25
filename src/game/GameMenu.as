@@ -77,11 +77,15 @@ package game
                     break;
 
                 case GAME_PLAY:
+                    _gvars.gameMain.bg.visible = false;
+                    _gvars.gameMain.ver.visible = false;
                     panel = new GamePlay(this);
                     isFound = true;
                     break;
 
                 case GAME_REPLAY:
+                    _gvars.gameMain.bg.visible = false;
+                    _gvars.gameMain.ver.visible = false;
                     panel = new GameReplay(this);
                     isFound = true;
                     break;
