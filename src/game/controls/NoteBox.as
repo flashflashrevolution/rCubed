@@ -41,7 +41,7 @@ package game.controls
             this.song = song;
             this.options = options;
 
-            notes = [];
+            // Create Object Pools
             notePool = [];
             for each (var item:Object in _noteskins.data)
             {
@@ -51,25 +51,37 @@ package game.controls
                 {
                     for each (var colour:String in options.noteColors)
                     {
-                        var pool:ObjectPool = notePool[item.id][direction][colour] = new ObjectPool();
-
-                        var preLoadCount:int = 32;
-                        for (var i:int = 0; i < preLoadCount; i++)
-                        {
-                            var gameNote:GameNote = pool.addObject(new GameNote(0, direction, colour, 1 * 1000, 0, 0, options.noteskin));
-                            gameNote.visible = false;
-                            pool.unmarkObject(gameNote);
-                            addChild(gameNote);
-                        }
+                        notePool[item.id][direction][colour] = new ObjectPool();
                     }
                 }
             }
 
+            // Check for invalid Noteskin / Pool
             if (notePool[options.noteskin] == null)
             {
                 options.noteskin = 1;
             }
 
+            // Prefill Object Pools for active noteskin.
+            var i:int = 0;
+            var preLoadCount:int = 4;
+            for each (var pre_dir:String in options.noteDirections)
+            {
+                for each (var pre_color:String in options.noteColors)
+                {
+                    var pool:ObjectPool = notePool[options.noteskin][pre_dir][pre_color];
+
+                    for (i = 0; i < preLoadCount; i++)
+                    {
+                        var gameNote:GameNote = pool.addObject(new GameNote(0, pre_dir, pre_color, 1 * 1000, 0, 0, options.noteskin));
+                        gameNote.visible = false;
+                        pool.unmarkObject(gameNote);
+                        addChild(gameNote);
+                    }
+                }
+            }
+
+            // Setup Receptors
             leftReceptor = _noteskins.getReceptor(options.noteskin, "L");
             leftReceptor.KEY = "Left";
             downReceptor = _noteskins.getReceptor(options.noteskin, "D");
@@ -84,11 +96,12 @@ package game.controls
             addChild(upReceptor);
             addChild(rightReceptor);
 
+            // Other Stuff
             sideScroll = options.scrollDirection == "left" || options.scrollDirection == "right";
             scrollSpeed = options.scrollSpeed * (sideScroll ? 1.5 : 1);
             readahead = (sideScroll ? Main.GAME_WIDTH : Main.GAME_HEIGHT) / 300 * 1000 / scrollSpeed;
             receptorAlpha = 1.0;
-            notes = new Array();
+            notes = [];
             noteCount = 0;
             totalNotes = song.totalNotes;
         }
