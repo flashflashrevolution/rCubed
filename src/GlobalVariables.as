@@ -18,7 +18,6 @@ package
     import com.flashfla.loader.DataEvent;
     import com.flashfla.net.DynamicURLLoader;
     import com.flashfla.utils.DateUtil;
-    import com.flashfla.utils.SystemUtil;
     import flash.data.SQLConnection;
     import flash.display.BitmapData;
     import flash.display.StageDisplayState;
@@ -526,14 +525,7 @@ package
                 }
                 catch (e:Error)
                 {
-                    if (SystemUtil.isFlashNewerThan(10, 0))
-                    {
-                        gameMain.addAlert("ERROR: Unable to save image.", 120);
-                    }
-                    else
-                    {
-                        gameMain.addAlert("ERROR: Local screenshots requires player player 10.0+, older versions don't support this.", 120);
-                    }
+                    gameMain.addAlert("ERROR: Unable to save image.", 120);
                 }
             }
         }
@@ -568,23 +560,16 @@ package
         //- Full screen support for Flash 11.3+
         public function toggleFullScreen(e:Event = null):void
         {
-            if (SystemUtil.isFlashNewerThan(11, 3))
+            if (gameMain.stage)
             {
-                if (gameMain.stage)
+                if (gameMain.stage.displayState == StageDisplayState.NORMAL)
                 {
-                    if (gameMain.stage.displayState == StageDisplayState.NORMAL)
-                    {
-                        gameMain.stage.displayState = "fullScreenInteractive"; //StageDisplayState.FULL_SCREEN_INTERACTIVE;
-                    }
-                    else
-                    {
-                        gameMain.stage.displayState = StageDisplayState.NORMAL;
-                    }
+                    gameMain.stage.displayState = "fullScreenInteractive"; //StageDisplayState.FULL_SCREEN_INTERACTIVE;
                 }
-            }
-            else
-            {
-                gameMain.addAlert("ERROR: Fullscreen requires player player 11.3+, older versions don't support this.", 120);
+                else
+                {
+                    gameMain.stage.displayState = StageDisplayState.NORMAL;
+                }
             }
         }
 
