@@ -175,16 +175,6 @@ package popups
             box.activeAlpha = 0.4;
             this.addChild(box);
 
-            // Create ComboBox Data
-            for (var i:int = 0; i < DEFAULT_OPTIONS.noteColors.length; i++)
-            {
-                noteColorComboArray.push({"label": _lang.stringSimple("note_colors_" + DEFAULT_OPTIONS.noteColors[i]), "data": DEFAULT_OPTIONS.noteColors[i]});
-            }
-            for (i = 0; i <= 2; i++)
-            {
-                startUpScreenSelections.push({"label": _lang.stringSimple("options_startup_" + i), "data": i});
-            }
-
             // Import / Export Context Menu
             _contextImportExport = new ContextMenu();
             var expOptionsImport:ContextMenuItem = new ContextMenuItem(_lang.stringSimple("popup_options_import"));
@@ -1019,6 +1009,13 @@ package popups
                 box.addChild(gameNoteColorTitle);
                 yOff += 24;
 
+                // Create ComboBox Data
+                noteColorComboArray = [];
+                for (i = 0; i < DEFAULT_OPTIONS.noteColors.length; i++)
+                {
+                    noteColorComboArray.push({"label": _lang.stringSimple("note_colors_" + DEFAULT_OPTIONS.noteColors[i]), "data": DEFAULT_OPTIONS.noteColors[i]});
+                }
+
                 optionNoteColors = [];
                 for (i = 0; i < DEFAULT_OPTIONS.noteColors.length; i++)
                 {
@@ -1188,6 +1185,12 @@ package popups
                 startUpScreenLabel.y = yOff;
                 box.addChild(startUpScreenLabel);
                 yOff += 20;
+
+                startUpScreenSelections = [];
+                for (i = 0; i <= 2; i++)
+                {
+                    startUpScreenSelections.push({"label": _lang.stringSimple("options_startup_" + i), "data": i});
+                }
 
                 startUpScreenCombo = new ComboBox(box, xOff, yOff, "Selection...", startUpScreenSelections);
                 startUpScreenCombo.x = xOff;
@@ -1780,7 +1783,7 @@ package popups
                 stage.vsyncEnabled = _gvars.air_useVSync;
                 _gvars.gameMain.addAlert("Set VSYNC: " + stage.vsyncEnabled, 120, Alert.RED);
             }
-            
+
             // Use HTTP Websockets
             else if (e.target == useWebsocketCheckbox)
             {
