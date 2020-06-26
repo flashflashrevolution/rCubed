@@ -7,11 +7,6 @@ package com.flashfla.utils
     {
         public var pool:Object;
 
-        private static var flash10:Boolean;
-        {
-            flash10 = SystemUtil.isFlashNewerThan(10);
-        }
-
         private static function newvector():Object
         {
             return new Vector.<Object>();
@@ -19,10 +14,7 @@ package com.flashfla.utils
 
         public function ObjectPool()
         {
-            if (flash10)
-                pool = newvector();
-            else
-                pool = new Array();
+            pool = newvector();
         }
 
         public function addObject(object:GameNote, mark:Boolean = true):GameNote

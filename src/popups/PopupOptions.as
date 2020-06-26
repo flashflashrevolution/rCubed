@@ -477,22 +477,12 @@ package popups
                 box.addChild(gameRate);
                 yOff += 20;
 
-                if (SystemUtil.isFlashNewerThan(10, 0))
-                {
-                    optionRate = new BoxText(100, 20);
-                    optionRate.x = xOff;
-                    optionRate.y = yOff;
-                    optionRate.restrict = ".0-9";
-                    optionRate.addEventListener(Event.CHANGE, changeHandler);
-                    box.addChild(optionRate);
-                }
-                else
-                {
-                    var gameRateF10:Text = new Text(_lang.string("options_f10_required"));
-                    gameRateF10.x = xOff;
-                    gameRateF10.y = yOff;
-                    box.addChild(gameRateF10);
-                }
+                optionRate = new BoxText(100, 20);
+                optionRate.x = xOff;
+                optionRate.y = yOff;
+                optionRate.restrict = ".0-9";
+                optionRate.addEventListener(Event.CHANGE, changeHandler);
+                box.addChild(optionRate);
                 yOff += 40;
 
                 // Force engine Judge Mode

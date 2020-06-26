@@ -120,15 +120,7 @@ package popups
             btn_importImage = new BoxButton(sidebar_width - 20, 25, _lang.string("popup_noteskin_import_image")); // "Import Image"
             btn_importImage.x = xPos;
             btn_importImage.y = yPos;
-            if (SystemUtil.isFlashNewerThan(10))
-            {
-                btn_importImage.addEventListener(MouseEvent.CLICK, clickHandler);
-            }
-            else
-            {
-                btn_importImage.enabled = false;
-                btn_importImage.alpha = 0.5;
-            }
+            btn_importImage.addEventListener(MouseEvent.CLICK, clickHandler);
             box.addChild(btn_importImage);
             yPos += 30;
 
