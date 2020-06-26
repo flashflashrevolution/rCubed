@@ -46,6 +46,7 @@ package popups
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import com.flashfla.utils.sprintf;
+    import classes.ValidatedText;
 
     public class PopupOptions extends MenuPanel
     {
@@ -366,7 +367,8 @@ package popups
                 box.addChild(gameSpeed);
                 yOff += 20;
 
-                optionGameSpeed = new BoxText(100, 20);
+                optionGameSpeed = new ValidatedText(100, 20);
+                optionGameSpeed.validator = /^(?!0*(\.0+)?$)(\d+|\d*\.\d?[05]?)$/;
                 optionGameSpeed.x = xOff;
                 optionGameSpeed.y = yOff;
                 optionGameSpeed.restrict = "0-9.";

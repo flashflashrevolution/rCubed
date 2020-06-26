@@ -9,15 +9,15 @@ package classes
 
     dynamic public class BoxText extends Sprite
     {
-        private var _textFormat:TextFormat = Constant.TEXT_FORMAT_UNICODE;
-        private var _box:Box;
-        private var _input:TextField;
-        private var _isFocused:Boolean = false;
+        protected var _textFormat:TextFormat = Constant.TEXT_FORMAT_UNICODE;
+        protected var _box:Box;
+        protected var _input:TextField;
+        protected var _isFocused:Boolean = false;
 
-        private var _width:Number;
-        private var _height:Number;
+        protected var _width:Number;
+        protected var _height:Number;
 
-        public function BoxText(width:int = 100, height:int = 20, textformat:TextFormat = null)
+        public function BoxText(width:int = 100, height:int = 20, textformat:TextFormat = null, registerChangeEvent:Boolean = true)
         {
             super();
 
@@ -46,7 +46,12 @@ package classes
 
             _input.addEventListener(FocusEvent.FOCUS_IN, onFocus);
             _input.addEventListener(FocusEvent.FOCUS_OUT, onFocus);
-            _input.addEventListener(Event.CHANGE, onChange);
+
+            if (registerChangeEvent)
+            {
+                _input.addEventListener(Event.CHANGE, onChange);
+            }
+
             this.addChild(_input);
         }
 
