@@ -20,7 +20,6 @@ package game
     import com.flashfla.net.Multiplayer;
     import com.flashfla.utils.Average;
     import com.flashfla.utils.RollingAverage;
-    import com.flashfla.utils.SystemUtil;
     import com.flashfla.utils.TimeUtil;
     import flash.display.GradientType;
     import flash.display.MovieClip;
@@ -163,7 +162,6 @@ package game
 
         private var noteBoxOffset:Object = {"x": 0, "y": 0};
         private var noteBoxPositionDefault:Object;
-        private var isOldFlash:Boolean;
 
         private var keyHints:Array;
 
@@ -623,7 +621,6 @@ package game
             }
             if (comboTotal)
                 comboTotal.update(song.totalNotes);
-            isOldFlash = !SystemUtil.isFlashNewerThan(10, 0);
 
             msStartTime = getTimer();
             absoluteStart = getTimer();
@@ -886,9 +883,7 @@ package game
             if (legacyMode)
             {
                 var songFrame:int = song_background.currentFrame;
-                if (isOldFlash && songFrame == gameSongFrames - 15)
-                    song.stop();
-                else if (songFrame == gameSongFrames - 1)
+                if (songFrame == gameSongFrames - 1)
                     song.stop();
             }
 
