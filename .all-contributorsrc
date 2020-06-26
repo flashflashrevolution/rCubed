@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "mat100payette",
+      "name": "Oppiie",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/20545324?v=4",
+      "profile": "https://github.com/mat100payette",
+      "contributions": [
+        "bug"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "rCubed",
+  "projectOwner": "flashflashrevolution",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
