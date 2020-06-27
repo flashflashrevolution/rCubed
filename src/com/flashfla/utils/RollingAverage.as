@@ -4,20 +4,15 @@ package com.flashfla.utils
     public class RollingAverage
     {
         private var size:int;
-        private var data:Object;
+        private var data:Vector.<int>;
         private var dataValue:int;
-
-        private static function newvector(size:int):Object
-        {
-            return new Vector.<int>(size);
-        }
 
         public function RollingAverage(size:int, value:int = 0)
         {
             this.size = size;
             this.dataValue = value * size;
 
-            data = newvector(size);
+            data = new Vector.<int>(size);
 
             for (var i:int = 0; i < size; i++)
                 data[i] = value;
