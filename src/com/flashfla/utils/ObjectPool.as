@@ -5,16 +5,11 @@ package com.flashfla.utils
 
     public class ObjectPool
     {
-        public var pool:Object;
-
-        private static function newvector():Object
-        {
-            return new Vector.<Object>();
-        }
+        public var pool:Vector.<Object>;
 
         public function ObjectPool()
         {
-            pool = newvector();
+            pool = new Vector.<Object>();
         }
 
         public function addObject(object:GameNote, mark:Boolean = true):GameNote
