@@ -1,0 +1,15 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\ffrgame]
+@="\"URL:FFR Replay\""
+"URL Protocol"="\"\""
+
+[HKEY_CLASSES_ROOT\ffrgame\DefaultIcon]
+@="\"R3Air.exe,1\""
+
+[HKEY_CLASSES_ROOT\ffrgame\shell]
+
+[HKEY_CLASSES_ROOT\ffrgame\shell\open]
+
+[HKEY_CLASSES_ROOT\ffrgame\shell\open\command]
+@="\"F:\\git\\nuffr\\r3\\rCubed\\air\\R3Air.3.32.0\\R3Air.exe\" \"%1\""

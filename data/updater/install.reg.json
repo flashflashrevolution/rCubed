@@ -1,0 +1,15 @@
+{
+    "HKEY_CLASSES_ROOT\\ffrgame": {
+        "@": "URL:FFR Replay",
+        "URL Protocol": ""
+    },
+    "HKEY_CLASSES_ROOT\\ffrgame\\DefaultIcon": {
+        "@": "R3Air.exe,1"
+    },
+    "HKEY_CLASSES_ROOT\\ffrgame\\shell\\open\\command": {
+        "@": [
+            "{{EXECUTABLE}}",
+            "%1"
+        ]
+    }
+}
