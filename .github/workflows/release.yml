@@ -6,6 +6,10 @@ on:
       - "v*.*.*"
     branches: 
       - feat/workflow
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - '.all-contributorsrc'
 
 jobs:
   skip:
