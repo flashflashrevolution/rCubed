@@ -33,6 +33,9 @@ package game.controls
         {
             this.options = options;
 
+            if (!this.options.displayJudgeAnimations)
+                indexes = Judge_Tweens.judge_indexes_static;
+
             labelDesc[100] = {colour: options.judgeColours[0], title: "AMAZING!!!"};
             labelDesc[50] = {colour: options.judgeColours[1], title: "PERFECT!"};
             labelDesc[25] = {colour: options.judgeColours[2], title: "GOOD"};

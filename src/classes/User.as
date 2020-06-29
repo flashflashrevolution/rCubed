@@ -77,6 +77,7 @@ package classes
         public var JUDGE_OFFSET:Number = 0;
         public var AUTO_JUDGE_OFFSET:Boolean = false;
         public var DISPLAY_JUDGE:Boolean = true;
+        public var DISPLAY_JUDGE_ANIMATIONS:Boolean = true;
         public var DISPLAY_HEALTH:Boolean = true;
         public var DISPLAY_GAME_TOP_BAR:Boolean = true;
         public var DISPLAY_GAME_BOTTOM_BAR:Boolean = true;
@@ -439,6 +440,8 @@ package classes
                 this.DISPLAY_SONG_FLAG = _settings.viewSongFlag;
             if (_settings.viewJudge != null)
                 this.DISPLAY_JUDGE = _settings.viewJudge;
+            if (_settings.viewJudgeAnimations != null)
+                this.DISPLAY_JUDGE_ANIMATIONS = _settings.viewJudgeAnimations;
             if (_settings.viewHealth != null)
                 this.DISPLAY_HEALTH = _settings.viewHealth;
             if (_settings.viewGameTopBar != null)
@@ -569,6 +572,7 @@ package classes
             gameSave.viewSongFlag = this.DISPLAY_SONG_FLAG;
             gameSave.viewJudge = this.DISPLAY_JUDGE;
             gameSave.viewHealth = this.DISPLAY_HEALTH;
+            gameSave.viewJudgeAnimations = this.DISPLAY_JUDGE_ANIMATIONS;
             gameSave.viewGameTopBar = this.DISPLAY_GAME_TOP_BAR;
             gameSave.viewGameBottomBar = this.DISPLAY_GAME_BOTTOM_BAR;
             gameSave.viewScore = this.DISPLAY_SCORE;

@@ -74,7 +74,7 @@ package popups
         //- Arrays
         private var keyInputs:Array = ["left", "down", "up", "right", "restart", "quit", "options"];
         private var judgeTitles:Array = ["amazing", "perfect", "good", "average", "miss", "boo"];
-        private var displayArray:Array = ["SONG_FLAG", "----", "JUDGE", "HEALTH", "SCORE", "COMBO", "PACOUNT", "SONGPROGRESS", "AMAZING", "PERFECT", "TOTAL", "SCREENCUT", "MP_MASK", "GAME_TOP_BAR", "GAME_BOTTOM_BAR"];
+        private var displayArray:Array = ["SONG_FLAG", "----", "JUDGE", "JUDGE_ANIMATIONS", "HEALTH", "SCORE", "COMBO", "PACOUNT", "SONGPROGRESS", "AMAZING", "PERFECT", "TOTAL", "SCREENCUT", "MP_MASK", "GAME_TOP_BAR", "GAME_BOTTOM_BAR"];
         private var noteColorComboArray:Array = [];
         private var startUpScreenSelections:Array = [];
 
