@@ -5,6 +5,10 @@ on:
     branches:
       - main
       - feat/workflow
+    paths-ignore:
+      - '*.md'
+      - 'docs/'
+      - '.all-contributorsrc'
   pull_request:
     branches:
       - main
@@ -13,7 +17,8 @@ jobs:
   skip:
     runs-on: ubuntu-latest
     if: |
-      !contains(format('{0} {1} {2}', github.event.head_commit.message, github.event.pull_request.title, github.event.pull_request.body), '[skip ci]')
+      !contains(format('{0} {1} {2}', github.event.head_commit.message, github.event.pull_request.title, github.event.pull_request.body), '[skip ci]') ||
+      !contains(format('{0} {1} {2}', github.event.head_commit.message, github.event.pull_request.title, github.event.pull_request.body), 'docs:')
     steps:
       - run: |
           cat <<'MESSAGE'
