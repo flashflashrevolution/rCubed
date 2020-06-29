@@ -1,6 +1,6 @@
 # R^3 Engine
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Latest Release][latest-release-badge]](https://github.com/flashflashrevolution/rCubed/releases)
@@ -145,6 +145,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tr>
     <td align="center"><a href="https://github.com/mat100payette"><img src="https://avatars1.githubusercontent.com/u/20545324?v=4" width="100px;" alt=""/><br /><sub><b>Oppiie</b></sub></a><br /><a href="https://github.com/flashflashrevolution/rCubed/issues?q=author%3Amat100payette" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/goldstinger"><img src="https://avatars1.githubusercontent.com/u/13899258?v=4" width="100px;" alt=""/><br /><sub><b>goldstinger</b></sub></a><br /><a href="https://github.com/flashflashrevolution/rCubed/issues?q=author%3Agoldstinger" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
