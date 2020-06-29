@@ -146,6 +146,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://github.com/mat100payette"><img src="https://avatars1.githubusercontent.com/u/20545324?v=4" width="100px;" alt=""/><br /><sub><b>Oppiie</b></sub></a><br /><a href="https://github.com/flashflashrevolution/rCubed/issues?q=author%3Amat100payette" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/TCHalogen"><img src="https://avatars2.githubusercontent.com/u/27454436?v=4" width="100px;" alt=""/><br /><sub><b>TCHalogen</b></sub></a><br /><a href="https://github.com/flashflashrevolution/rCubed/issues?q=author%3ATCHalogen" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/goldstinger"><img src="https://avatars1.githubusercontent.com/u/13899258?v=4" width="100px;" alt=""/><br /><sub><b>goldstinger</b></sub></a><br /><a href="https://github.com/flashflashrevolution/rCubed/issues?q=author%3Agoldstinger" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
