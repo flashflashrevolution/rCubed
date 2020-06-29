@@ -7,7 +7,7 @@ on:
     branches: 
       - feat/workflow
     paths-ignore:
-      - '*.md'
+      - 'README.md'
       - 'docs/**'
       - '.all-contributorsrc'
 
