@@ -8,10 +8,6 @@ on:
   pull_request:
     branches:
       - main
-    paths-ignore:
-      - 'README.md'
-      - 'docs/**'
-      - '.all-contributorsrc'
 
 jobs:
   skip:
