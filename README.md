@@ -149,7 +149,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/TCHalogen"><img src="https://avatars2.githubusercontent.com/u/27454436?v=4" width="100px;" alt=""/><br /><sub><b>TCHalogen</b></sub></a><br /><a href="https://github.com/flashflashrevolution/rCubed/issues?q=author%3ATCHalogen" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/goldstinger"><img src="https://avatars1.githubusercontent.com/u/13899258?v=4" width="100px;" alt=""/><br /><sub><b>goldstinger</b></sub></a><br /><a href="https://github.com/flashflashrevolution/rCubed/issues?q=author%3Agoldstinger" title="Bug reports">🐛</a></td>
     <td align="center"><a href="http://www.flashflashrevolution.com"><img src="https://avatars2.githubusercontent.com/u/1892473?v=4" width="100px;" alt=""/><br /><sub><b>Zageron</b></sub></a><br /><a href="https://github.com/flashflashrevolution/rCubed/issues?q=author%3AZageron" title="Bug reports">🐛</a></td>
-    <td align="center"><a href="http:////mproske.com//"><img src="https://avatars1.githubusercontent.com/u/14317828?v=4" width="100px;" alt=""/><br /><sub><b>Max Proske</b></sub></a><br /><a href="#ideas-maxproske" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="http:////mproske.com//"><img src="https://avatars1.githubusercontent.com/u/14317828?v=4" width="100px;" alt=""/><br /><sub><b>Max Proske</b></sub></a><br /><a href="#ideas-maxproske" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/flashflashrevolution/rCubed/issues?q=author%3Amaxproske" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
