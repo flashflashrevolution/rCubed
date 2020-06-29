@@ -67,6 +67,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "dave936",
+      "name": "SoFast",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/50265779?v=4",
+      "profile": "https://github.com/dave936",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
