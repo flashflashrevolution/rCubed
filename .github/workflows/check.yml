@@ -7,7 +7,7 @@ on:
       - feat/workflow
     paths-ignore:
       - '*.md'
-      - 'docs/'
+      - 'docs/**'
       - '.all-contributorsrc'
   pull_request:
     branches:
