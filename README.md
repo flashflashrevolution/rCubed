@@ -1,6 +1,6 @@
 # R^3 Engine
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Latest Release][latest-release-badge]](https://github.com/flashflashrevolution/rCubed/releases)
@@ -151,6 +151,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://www.flashflashrevolution.com"><img src="https://avatars2.githubusercontent.com/u/1892473?v=4" width="100px;" alt=""/><br /><sub><b>Zageron</b></sub></a><br /><a href="https://github.com/flashflashrevolution/rCubed/issues?q=author%3AZageron" title="Bug reports">🐛</a></td>
     <td align="center"><a href="http:////mproske.com//"><img src="https://avatars1.githubusercontent.com/u/14317828?v=4" width="100px;" alt=""/><br /><sub><b>Max Proske</b></sub></a><br /><a href="#ideas-maxproske" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://github.com/SalemKitkat"><img src="https://avatars1.githubusercontent.com/u/31890883?v=4" width="100px;" alt=""/><br /><sub><b>Salem Kallien</b></sub></a><br /><a href="https://github.com/flashflashrevolution/rCubed/issues?q=author%3ASalemKitkat" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/G-flat"><img src="https://avatars0.githubusercontent.com/u/63449095?v=4" width="100px;" alt=""/><br /><sub><b>G-flat</b></sub></a><br /><a href="https://github.com/flashflashrevolution/rCubed/issues?q=author%3AG-flat" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
