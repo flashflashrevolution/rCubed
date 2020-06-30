@@ -87,6 +87,26 @@ package classes
             _box.borderColor = newVal;
         }
 
+        public function get activeAlpha():Number
+        {
+            return _box.activeAlpha;
+        }
+
+        public function set activeAlpha(newVal:Number):void
+        {
+            _box.activeAlpha = newVal;
+        }
+
+        public function get borderAlpha():Number
+        {
+            return _box.borderAlpha;
+        }
+
+        public function set borderAlpha(newVal:Number):void
+        {
+            _box.borderAlpha = newVal;
+        }
+
         public function get color():uint
         {
             return _box.color;
