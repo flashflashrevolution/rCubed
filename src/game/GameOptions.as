@@ -29,6 +29,7 @@ package game
         public var displayGameTopBar:Boolean = true;
         public var displayGameBottomBar:Boolean = true;
         public var displayJudge:Boolean = true;
+        public var displayJudgeAnimations:Boolean = true;
         public var displayHealth:Boolean = true;
         public var displayScore:Boolean = true;
         public var displayCombo:Boolean = true;
@@ -98,6 +99,7 @@ package game
             autoJudgeOffset = user.AUTO_JUDGE_OFFSET;
 
             displayJudge = user.DISPLAY_JUDGE;
+            displayJudgeAnimations = user.DISPLAY_JUDGE_ANIMATIONS;
             displayHealth = user.DISPLAY_HEALTH;
             displayGameTopBar = user.DISPLAY_GAME_TOP_BAR;
             displayGameBottomBar = user.DISPLAY_GAME_BOTTOM_BAR;
