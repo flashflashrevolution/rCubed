@@ -3,7 +3,15 @@ $todaydt = Get-Date
 $expiery = $todaydt.AddMonths(1)
 
 # Generate the certificate.
-$cert = New-SelfSignedCertificate -Subject "CN=Air Signing Certificate" -type CodeSigningCert -notafter $expiery -KeyAlgorithm RSA -KeyLength 2048 -HashAlgorithm SHA1 -FriendlyName R3TestCertificate
+$cert = New-SelfSignedCertificate `
+-Subject "CN=Air Signing Certificate" `
+-type CodeSigningCert `
+-notafter $expiery `
+-KeyAlgorithm RSA `
+-KeyLength 2048 `
+-HashAlgorithm SHA1 `
+-FriendlyName R3TestCertificate `
+-CertStoreLocation Cert:\CurrentUser\My
 
 # Export the certificate as a pfx code signing key.
 $password = Read-Host 'Choose a password for your key.' -AsSecureString
@@ -11,15 +19,15 @@ $fileOut = Join-Path $PSScriptRoot air-cert.p12
 Export-PfxCertificate -Cert $cert -ChainOption BuildChain -Password $password -FilePath $fileOut
 
 # Clean up the certificate from the Windows Certificate Store.
-Get-ChildItem Cert:\LocalMachine\My |
+Get-ChildItem Cert:\CurrentUser\My |
 Where-Object { $_.Thumbprint -match $cert.Thumbprint } |
 Remove-Item
 
 # SIG # Begin signature block
 # MIIVaQYJKoZIhvcNAQcCoIIVWjCCFVYCAQExDzANBglghkgBZQMEAgEFADB5Bgor
 # BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
-# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCB4Fz7r3ulT+6kt
-# qZSRSDwMdznZ5y43RB+QEvIOew6Jz6CCEKwwggNpMIICUaADAgECAhBHAdI3ecdg
+# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCDLHnEnNtyoOCMn
+# 6TGUVvL8rYm8gcABgf9M19DLPjmwUKCCEKwwggNpMIICUaADAgECAhBHAdI3ecdg
 # vkGGpG/BMAlaMA0GCSqGSIb3DQEBCwUAMDoxFDASBgNVBAMMC0FkYW0gQnJ5YW50
 # MSIwIAYJKoZIhvcNAQkBFhNoZWxsb0BhZGFtYnJ5YW50LmNhMB4XDTIwMDQwNDA0
 # MTM1NFoXDTIzMDQwNDA0MjM1NVowOjEUMBIGA1UEAwwLQWRhbSBCcnlhbnQxIjAg
@@ -112,23 +120,23 @@ Remove-Item
 # QWRhbSBCcnlhbnQxIjAgBgkqhkiG9w0BCQEWE2hlbGxvQGFkYW1icnlhbnQuY2EC
 # EEcB0jd5x2C+QYakb8EwCVowDQYJYIZIAWUDBAIBBQCggYQwGAYKKwYBBAGCNwIB
 # DDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEE
-# AYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAvBgkqhkiG9w0BCQQxIgQgzGRNHON7RNhB
-# QOatrYhbIhBspk+AhRtdLPyPI1uGmcowDQYJKoZIhvcNAQEBBQAEggEALKd5SZqS
-# H9txDAsLcLS1HRxcQfRk5RS6Oe/gIAbwSQ7QI1bkpY440/U9zUtIqeqywMUyA32r
-# pjhbDvka6FEBwJVXgLXqcRLX2tQeOHiqioIQaITOaq3XGBnubt9zIa/Tk1+uzP9R
-# nYxB+7Az6hCyB+Giiqk/0TODNNEuJ9Q47MxvBQwpFFTMUIxPXCfe8upIWH56z7kG
-# xB+1VbdKsss6X7uYav2seNaaX2d94qslgJH8hOUU9QY3nDSu6aTj7Li5U9H4P/sA
-# kUd3eZL+xYF4TyrHWRNzWeLdJFf4WOaJ1jSz1iN3TTxnKQJW9wO/BhP/ptQRgsB9
-# w7Vh7W7auwIhI6GCAg8wggILBgkqhkiG9w0BCQYxggH8MIIB+AIBATB2MGIxCzAJ
+# AYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAvBgkqhkiG9w0BCQQxIgQgcPu2EZWh7G1n
+# dVLo9Mye4xXlHhSP/X99DAcUA+L32lMwDQYJKoZIhvcNAQEBBQAEggEAfN0j+7ur
+# i/aqwthu+Sz+UC4NVy5x8N31L9JruP46Ve5tMs+XRIYoKbZPD0SY7tAq4gjTX1t8
+# 2UyWeQndHLvIKSvPPbnWPeuEM0WckHJ+j0EN6N9sMtfCaKXviKMEr+BI7mnS/VAi
+# AigU+NYee4MMlpDM4RrRsv4zQw1/OKsyw6lqosC9kp+U6hjF0pxYnZkMfad3vowx
+# 1CNx5bXHAq/OgA+Wa7n1RUYW/HsX0sLS/JeOYCah4sye+PCN70mNyvq+OlVoAtgu
+# fUVkiOEQek4+FRsdxrQr9HJeyD0f3J6tb3dFQszK8bD1n7eAveTTgt24h8IlS7Sf
+# hBYxS2khCiYrzKGCAg8wggILBgkqhkiG9w0BCQYxggH8MIIB+AIBATB2MGIxCzAJ
 # BgNVBAYTAlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5k
 # aWdpY2VydC5jb20xITAfBgNVBAMTGERpZ2lDZXJ0IEFzc3VyZWQgSUQgQ0EtMQIQ
 # AwGaAjr/WLFr1tXq5hfwZjAJBgUrDgMCGgUAoF0wGAYJKoZIhvcNAQkDMQsGCSqG
-# SIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAwNDA0MDY1NjUyWjAjBgkqhkiG9w0B
-# CQQxFgQURhxbM0K7eP43U2n/ObpYyRSEJyQwDQYJKoZIhvcNAQEBBQAEggEAVdbr
-# QQ1wPs8BRvYMGuXEEvrBJ9a703z8UJ1iZBAX6Z+jWFMl/K3qkReyYC4luaRKHxYo
-# 16YjPQoSYaXw8LQqtHMkWibz3eBc3EJraDL5ygT+v+q7gWOnamANer4lwOfLQT5K
-# 7K6wlvgw8CWK23YuloOXGFS8LYloqAzRO4SrQwpZkdCmFUIZxYldYWedjY+WRWzl
-# v9i9jkPddUcXABnaT7OIgHaVJg2UUtM7wZPqMSf/a51m57QjD4esl6Nbao3nm4+1
-# dqEQ4qrtBulpF7R2WCWc3ix4bGp5X30X3FIagGPTSUs43dGjWu4rIlpyHVG/hDIo
-# +QeBOf7ikLMNoWGc9w==
+# SIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAwNjMwMDE0ODUxWjAjBgkqhkiG9w0B
+# CQQxFgQUbcl4uMyl4kLo2F2XCiKD4u/trC8wDQYJKoZIhvcNAQEBBQAEggEAhTRC
+# YiNw9ldUxqGPAQpvtYcpO1HAcm7LkPT1hypg7zQwbeiqkK8klw9TWj5jKlwsGF+w
+# k34JOznRPVaEBvVfDUL7dHFzZiSBOlcF+OnyHSSKW54kCNroNQs5OL0oKTl6hjH4
+# uX9UTQvHmiQsKxea1yf3M91RZbIv2hDhrwFN9lEw4oinO9V8TG2Lb3U9My32Ng6X
+# 7SsFapDiU67Mci9xAixBBIlQQchBWHuKIgxaVzzRlisA/8hVxgCZa0bkxtz0fG6A
+# Pc2xFqxfQhPoimdD9qhfrq00cRHrz1RE78IDqohw0MDZVEbcfga/S9if7g+4+1JO
+# uj7+O5BaqA022Rarkw==
 # SIG # End signature block
