@@ -41,14 +41,18 @@ package classes
 
         private function RenderValid():void
         {
-            super.color = 0xFFFFFFFF;
-            super.borderColor = 0xFFFFFFFF;
+            super.color = 0xFFFFFF;
+            super.borderColor = 0xFFFFFF;
+            super.activeAlpha = 0.35;
+            super.borderAlpha = 0.55;
         }
 
         private function RenderInvalid():void
         {
-            super.color = 0xFFFFAAAA;
-            super.borderColor = 0xFFFF4444;
+            super.color = 0xFF0000;
+            super.borderColor = 0xFF0000;
+            super.activeAlpha = 0.90;
+            super.borderAlpha = 0.90;
         }
     }
 }

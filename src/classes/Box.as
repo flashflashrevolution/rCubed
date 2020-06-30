@@ -19,8 +19,8 @@ package classes
         private var _normalAlpha:Number = 0.2;
         private var _borderAlpha:Number = 0.55;
         private var _activeAlpha:Number = 0.35;
-        private var _color:uint = 0xFFFFFFFF;
-        private var _borderColor:uint = 0xFFFFFFFF;
+        private var _color:uint = 0xFFFFFF;
+        private var _borderColor:uint = 0xFFFFFF;
 
         public function Box(width:Number, height:Number, useHover:Boolean = true, useGradient:Boolean = true):void
         {
@@ -111,11 +111,21 @@ package classes
             }
         }
 
+        public function get activeAlpha():Number
+        {
+            return _activeAlpha;
+        }
+
         public function set activeAlpha(value:Number):void
         {
             _activeAlpha = value;
             dispose();
             init();
+        }
+
+        public function get normalAlpha():Number
+        {
+            return _normalAlpha;
         }
 
         public function set normalAlpha(value:Number):void
