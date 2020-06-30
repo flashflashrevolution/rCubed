@@ -1566,7 +1566,7 @@ package menu
 
         private function setActiveID(index:int, mpUpdate:Boolean):void
         {
-            options.activeSongID = (songItems[index] != null ? songItems[index].level : -1);
+            options.activeSongID = (songItems.length > 0 && index < songItems.length ? songItems[index].level : -1);
             _gvars.tempFlags['active_songid_temp'] = options.activeSongID;
             if (mpUpdate && options.activeSongID != -1)
                 _mp.gameplayPicking(_playlist.getSong(options.activeSongID));
