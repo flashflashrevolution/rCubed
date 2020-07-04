@@ -1,6 +1,6 @@
 # R^3 Engine
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-11-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-12-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Latest Release][latest-release-badge]](https://github.com/flashflashrevolution/rCubed/releases)
@@ -157,7 +157,8 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/dave936"><img src="https://avatars0.githubusercontent.com/u/50265779?v=4" width="100px;" alt=""/><br /><sub><b>SoFast</b></sub></a><br /><a href="https://github.com/flashflashrevolution/rCubed/commits?author=dave936" title="Code">💻</a></td>
     <td align="center"><a href="https://pikachucards.com"><img src="https://avatars1.githubusercontent.com/u/2185274?v=4" width="100px;" alt=""/><br /><sub><b>Justin</b></sub></a><br /><a href="https://github.com/flashflashrevolution/rCubed/issues?q=author%3AXyr00" title="Bug reports">🐛</a> <a href="https://github.com/flashflashrevolution/rCubed/commits?author=Xyr00" title="Code">💻</a> <a href="#ideas-Xyr00" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://github.com/Psycast"><img src="https://avatars1.githubusercontent.com/u/418690?v=4" width="100px;" alt=""/><br /><sub><b>Psycast</b></sub></a><br /><a href="https://github.com/flashflashrevolution/rCubed/commits?author=Psycast" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/SmexxxyBeast"><img src="https://avatars0.githubusercontent.com/u/67475645?v=4" width="100px;" alt=""/><br /><sub><b>SmexxxyBeast</b></sub></a><br /><a href="#ideas-SmexxxyBeast" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/SmexxxyBeast"><img src="https://avatars0.githubusercontent.com/u/67475645?v=4" width="100px;" alt=""/><br /><sub><b>SmexxxyBeast</b></sub></a><br /><a href="https://github.com/flashflashrevolution/rCubed/commits?author=SmexxxyBeast" title="Code">💻</a> <a href="#ideas-SmexxxyBeast" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/qrrbrbirbel"><img src="https://avatars3.githubusercontent.com/u/67676739?v=4" width="100px;" alt=""/><br /><sub><b>qrrbrbirbel</b></sub></a><br /><a href="#ideas-qrrbrbirbel" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
