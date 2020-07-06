@@ -74,7 +74,8 @@ package
         public var loadTimer:int = 0;
         public var preloader:ProgressBar;
         public var loadScripts:uint = 0;
-        public var loadTotal:uint = 5;
+        public var loadTotal:uint;
+        public var isLoginLoad:Boolean = false;
         public var loadComplete:Boolean = false;
         public var retryLoadButton:BoxButton;
         public var disablePopups:Boolean = false;
@@ -265,7 +266,7 @@ package
             //- Status Display
             loadStatus = new TextField();
             loadStatus.x = 8;
-            loadStatus.y = GAME_HEIGHT - 155;
+            loadStatus.y = GAME_HEIGHT - ((isLoginLoad) ? 118 : 155);
             loadStatus.width = GAME_WIDTH - 20;
             loadStatus.selectable = false;
             loadStatus.embedFonts = true;
@@ -287,6 +288,8 @@ package
         ///- Game Data
         public function loadGameData():void
         {
+            loadTotal = (!isLoginLoad) ? 5 : 3;
+
             _gvars.playerUser = new User(true, true);
             _gvars.activeUser = _gvars.playerUser;
             _gvars.activeUser.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
@@ -296,18 +299,22 @@ package
             _site.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
             _playlist.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
             _playlist.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
-            _lang.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
-            _lang.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
-            //_friends.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
-            //_friends.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
-            _noteskins.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
-            _noteskins.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
-
             _site.load();
             _playlist.load();
-            _lang.load();
+
+            if (!isLoginLoad)
+            {
+                _lang.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
+                _lang.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
+                _noteskins.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
+                _noteskins.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
+                _lang.load();
+                _noteskins.load();
+            }
+
+            //_friends.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
+            //_friends.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
             //_friends.load();
-            _noteskins.load();
 
             // Update Text
             updateLoaderText();
@@ -338,7 +345,7 @@ package
         {
             if (loadStatus != null)
             {
-                loadStatus.htmlText = "Total: " + loadScripts + " / " + loadTotal + "\n" + "Playlist: " + getLoadText(_playlist.isLoaded(), _playlist.isError()) + "\n" + "User Data: " + getLoadText(_gvars.playerUser.isLoaded(), _gvars.playerUser.isError()) + "\n" + "Site Data: " + getLoadText(_site.isLoaded(), _site.isError()) + "\n" + "Noteskin Data: " + getLoadText(_noteskins.isLoaded(), _noteskins.isError()) + "\n" + "Language Data: " + getLoadText(_lang.isLoaded(), _lang.isError());
+                loadStatus.htmlText = "Total: " + loadScripts + " / " + loadTotal + "\n" + "Playlist: " + getLoadText(_playlist.isLoaded(), _playlist.isError()) + "\n" + "User Data: " + getLoadText(_gvars.playerUser.isLoaded(), _gvars.playerUser.isError()) + "\n" + "Site Data: " + getLoadText(_site.isLoaded(), _site.isError()) + ((!isLoginLoad) ? ("\n" + "Noteskin Data: " + getLoadText(_noteskins.isLoaded(), _noteskins.isError()) + "\n" + "Language Data: " + getLoadText(_lang.isLoaded(), _lang.isError())) : "");
             }
         }
 
@@ -458,6 +465,12 @@ package
                 _site.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
                 _site.load();
             }
+            if (!_gvars.activeUser.isLoaded())
+            {
+                _gvars.activeUser.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
+                _gvars.activeUser.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
+                _gvars.activeUser.load();
+            }
             /*
                if (!_friends.isLoaded()) {
                _friends.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
@@ -465,23 +478,20 @@ package
                _friends.load();
                }
              */
-            if (!_noteskins.isLoaded())
+            if (!isLoginLoad)
             {
-                _noteskins.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
-                _noteskins.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
-                _noteskins.load();
-            }
-            if (!_lang.isLoaded())
-            {
-                _lang.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
-                _lang.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
-                _lang.load();
-            }
-            if (!_gvars.activeUser.isLoaded())
-            {
-                _gvars.activeUser.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
-                _gvars.activeUser.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
-                _gvars.activeUser.load();
+                if (!_noteskins.isLoaded())
+                {
+                    _noteskins.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
+                    _noteskins.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
+                    _noteskins.load();
+                }
+                if (!_lang.isLoaded())
+                {
+                    _lang.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
+                    _lang.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
+                    _lang.load();
+                }
             }
 
             // Update Text
@@ -499,6 +509,9 @@ package
                 //- Remove last panel if exist
                 if (activePanel != null)
                     TweenLite.to(activePanel, 0.5, {alpha: 0, onComplete: removeLastPanel, onCompleteParams: [activePanel]});
+
+                // Only load data that depend on the global session token after logging in
+                this.isLoginLoad = true;
 
                 //- Build Preloader
                 buildPreloader();
