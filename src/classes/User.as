@@ -93,7 +93,8 @@ package classes
         public var DISPLAY_MP_MASK:Boolean = false;
         public var DISPLAY_MP_TIMESTAMP:Boolean = false;
         public var judgeColours:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
-        public var comboColours:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag
+        public var comboColours:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag
+        public var enableComboColors:Array = [true, true, true, false, false, false, false, false];
         public var gameColours:Array = [0x1495BD, 0x033242, 0x0C6A88, 0x074B62];
         public var noteColours:Object = ["red", "blue", "purple", "yellow", "pink", "orange", "cyan", "green", "white"];
 
@@ -506,12 +507,19 @@ package classes
                 this.activeVisualMods = _settings.visual;
             if (_settings.judgeColours != null)
                 this.judgeColours = _settings.judgeColours;
-            if(_settings.comboColours != null)
+            if (_settings.comboColours != null)
             {
                 var comboColorCount:int = Math.min(this.comboColours.length, _settings.comboColours.length);
-                for(var i:int=0; i < comboColorCount; i++)
+                for (var i:int = 0; i < comboColorCount; i++)
                 {
                     this.comboColours[i] = _settings.comboColours[i];
+                }
+            }
+            if (_settings.enableComboColors != null)
+            {
+                for (i = 0; i < enableComboColors.length; i++)
+                {
+                    this.enableComboColors[i] = _settings.enableComboColors[i];
                 }
             }
             if (_settings.gameColours != null)
@@ -600,6 +608,7 @@ package classes
             gameSave.visual = this.activeVisualMods;
             gameSave.judgeColours = this.judgeColours;
             gameSave.comboColours = this.comboColours;
+            gameSave.enableComboColors = this.enableComboColors;
             gameSave.gameColours = this.gameColours;
             gameSave.noteColours = this.noteColours;
             gameSave.songQueues = this.songQueues;

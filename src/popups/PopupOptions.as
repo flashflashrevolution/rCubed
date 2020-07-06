@@ -47,6 +47,7 @@ package popups
     import menu.MenuSongSelection;
     import com.flashfla.utils.sprintf;
 
+
     public class PopupOptions extends MenuPanel
     {
         private const TAB_MAIN:int = 0;
@@ -123,6 +124,7 @@ package popups
 
         private var optionJudgeColors:Array;
         private var optionComboColors:Array;
+        private var optionComboColorCheck:checkBox;
         private var optionGameColors:Array;
         private var optionNoteColors:Array;
 
@@ -982,7 +984,18 @@ package popups
                     optionComboColorReset.boxColor = 0xff0000;
                     optionComboColorReset.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                     box.addChild(optionComboColorReset);
-                    optionComboColors.push({"text": optionComboColor, "display": gameComboColorDisplay, "reset": optionComboColorReset});
+
+                    if (i > 0)
+                    {
+                        optionComboColorCheck = new checkBox();
+                        optionComboColorCheck.x = xOff + 225;
+                        optionComboColorCheck.y = yOff + 3;
+                        optionComboColorCheck.combo_color_enable_id = i;
+                        optionComboColorCheck.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                        box.addChild(optionComboColorCheck);
+                    }
+
+                    optionComboColors.push({"text": optionComboColor, "display": gameComboColorDisplay, "reset": optionComboColorReset, "enable": optionComboColorCheck});
 
                     yOff += 25;
                 }
@@ -1657,6 +1670,12 @@ package popups
                 _gvars.activeUser.comboColours[e.target.combo_color_reset_id] = DEFAULT_OPTIONS.comboColours[e.target.combo_color_reset_id];
             }
 
+            // Combo Color Enable/Disable
+            else if (e.target.hasOwnProperty("combo_color_enable_id"))
+            {
+                _gvars.activeUser.enableComboColors[e.target.combo_color_enable_id] = !_gvars.activeUser.enableComboColors[e.target.combo_color_enable_id];
+            }
+
             // Game Background Color Reset
             else if (e.target.hasOwnProperty("game_color_reset_id"))
             {
@@ -2041,11 +2060,17 @@ package popups
                     optionJudgeColors[i]["text"].text = "#" + StringUtil.pad(_gvars.activeUser.judgeColours[i].toString(16).substr(0, 6), 6, "0", StringUtil.STR_PAD_LEFT);
                     optionJudgeColors[i]["display"].color = _gvars.activeUser.judgeColours[i];
                 }
+                // Set Combo Colors
                 for (i = 0; i < DEFAULT_OPTIONS.comboColours.length; i++)
                 {
                     optionComboColors[i]["text"].text = "#" + StringUtil.pad(_gvars.activeUser.comboColours[i].toString(16).substr(0, 6), 6, "0", StringUtil.STR_PAD_LEFT);
                     optionComboColors[i]["display"].color = _gvars.activeUser.comboColours[i];
+                    if (i > 0)
+                    {
+                        optionComboColors[i]["enable"].gotoAndStop(_gvars.activeUser.enableComboColors[i] ? 2 : 1);
+                    }
                 }
+                // Set Game Colors
                 for (i = 0; i < DEFAULT_OPTIONS.gameColours.length; i++)
                 {
                     if (i == 2 || i == 3)

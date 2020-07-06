@@ -61,7 +61,7 @@ package game.controls
             }
         }
 
-        public function update(combo:int, amazing:int = 0, perfect:int = 0, good:int = 0, average:int = 0, miss:int = 0, boo:int = 0, raw_goods:Number = 0):void
+        public function update(combo:int, userComboOptions:Array, amazing:int = 0, perfect:int = 0, good:int = 0, average:int = 0, miss:int = 0, boo:int = 0, raw_goods:Number = 0):void
         {
             field.text = combo.toString();
             fieldShadow.text = combo.toString();
@@ -71,47 +71,53 @@ package game.controls
                [1] = FC,
                [2] = AAA,
                [3] = SDG,
-               [4] = BlackFlag,
-               [5] = AvFlag,
-               [6] = BooFlag
+               [4] = Black Flag,
+               [5] = Average Flag,
+               [6] = Boo Flag,
+               [7] = Miss Flag
              */
 
             if (options && (!options.isAutoplay || options.isEditor || options.multiplayer))
             {
-                if (miss) // Display blue combo text if miss has occurred
-                {
-                    field.textColor = colors[0];
-                    fieldShadow.textColor = darkcolors[0];
-                }
-                else if (good + average + boo == 0) // Display AAA color
+                if (userComboOptions[2] && good + average + boo + miss == 0) // Display AAA color
                 {
                     field.textColor = colors[2];
                     fieldShadow.textColor = darkcolors[2];
                 }
-                else if (good == 1 && average + boo == 0) // Display BlackFlag color
+                else if (userComboOptions[4] && good == 1 && average + boo + miss == 0) // Display Black Flag color
                 {
                     field.textColor = colors[4];
                     fieldShadow.textColor = darkcolors[4];
                 }
-                else if (average == 1 && good + boo == 0) // Display AvFlag color
+                else if (userComboOptions[5] && average == 1 && good + boo + miss == 0) // Display Average Flag color
                 {
                     field.textColor = colors[5];
                     fieldShadow.textColor = darkcolors[5];
                 }
-                else if (boo == 1 && good + average == 0) // Display BooFlag color
+                else if (userComboOptions[6] && boo == 1 && good + average + miss == 0) // Display Boo Flag color
                 {
                     field.textColor = colors[6];
                     fieldShadow.textColor = darkcolors[6];
                 }
-                else if (raw_goods < 10) // Display SDG color if raw goods < 10
+                else if (userComboOptions[7] && miss == 1 && good + average + boo == 0) // Display Miss Flag color
+                {
+                    field.textColor = colors[7];
+                    fieldShadow.textColor = darkcolors[7];
+                }
+                else if (userComboOptions[3] && raw_goods < 10) // Display SDG color if raw goods < 10
                 {
                     field.textColor = colors[3];
                     fieldShadow.textColor = darkcolors[3];
                 }
-                else // Display green for FC
+                else if (userComboOptions[1] && miss == 0) // Display green for FC
                 {
                     field.textColor = colors[1];
                     fieldShadow.textColor = darkcolors[1];
+                }
+                else // Display blue combo text
+                {
+                    field.textColor = colors[0];
+                    fieldShadow.textColor = darkcolors[0];
                 }
             }
         }
