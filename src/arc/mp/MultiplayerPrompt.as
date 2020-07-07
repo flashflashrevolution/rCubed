@@ -1,17 +1,11 @@
 package arc.mp
 {
-    import arc.mp.MultiplayerConnection;
-
-    import flash.ui.Keyboard;
-    import flash.events.KeyboardEvent;
-    import flash.events.Event;
-    import flash.display.DisplayObjectContainer;
-
-    import com.bit101.components.Label;
-    import com.bit101.components.PushButton;
     import com.bit101.components.InputText;
     import com.bit101.components.Window;
-
+    import flash.display.DisplayObjectContainer;
+    import flash.events.Event;
+    import flash.events.KeyboardEvent;
+    import flash.ui.Keyboard;
     import it.gotoandplay.smartfoxserver.SFSEvent;
 
     public class MultiplayerPrompt extends Window
