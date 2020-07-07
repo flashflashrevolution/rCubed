@@ -756,8 +756,9 @@ package
             var keyCode:int = e.keyCode;
             if (loadComplete && !disablePopups)
             {
-                if (keyCode == _gvars.playerUser.keyOptions)
-                { // Scroll Lock
+                // Options
+                if (keyCode == _gvars.playerUser.keyOptions && (stage.focus == null || !(stage.focus is TextField)))
+                {
                     if (current_popup is PopupOptions)
                     {
                         removePopup();
@@ -767,6 +768,8 @@ package
                         addPopup(Main.POPUP_OPTIONS);
                     }
                 }
+
+                // Help Menu
                 else if (keyCode == Keyboard.F1)
                 {
                     if (current_popup is PopupHelp)
@@ -778,6 +781,8 @@ package
                         addPopup(Main.POPUP_HELP);
                     }
                 }
+
+                // Replay History
                 else if (keyCode == Keyboard.F2)
                 {
                     if (current_popup is PopupReplayHistory)
@@ -787,14 +792,6 @@ package
                     else
                     {
                         addPopup(Main.POPUP_REPLAY_HISTORY);
-                    }
-                }
-                CONFIG::debug
-                {
-                    if (keyCode == Keyboard.F3)
-                    {
-                        _gvars.activeUser.DISPLAY_LEGACY_SONGS = !_gvars.activeUser.DISPLAY_LEGACY_SONGS;
-                        addAlert("Legacy:" + _gvars.activeUser.DISPLAY_LEGACY_SONGS);
                     }
                 }
             }
