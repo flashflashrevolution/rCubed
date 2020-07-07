@@ -26,7 +26,6 @@ package game.controls
         private var notePool:Array;
         public var notes:Array;
 
-        public var receptorHeldDown:Array = [];
         public var leftReceptor:MovieClip;
         public var downReceptor:MovieClip;
         public var upReceptor:MovieClip;
@@ -250,12 +249,6 @@ package game.controls
             }
         }
 
-        public function receptorHeld(dir:String, down:Boolean = true):void
-        {
-            receptorHeldDown[dir] = down;
-            getReceptor(dir).gotoAndStop(down ? 14 : 1);
-        }
-
         public function get nextNote():Note
         {
             return noteCount < totalNotes ? song.getNote(noteCount) : null;
@@ -321,17 +314,6 @@ package game.controls
                 downReceptor.alpha = (downReceptor.currentFrame == 1) ? 0.0 : receptorAlpha;
                 upReceptor.alpha = (upReceptor.currentFrame == 1) ? 0.0 : receptorAlpha;
                 rightReceptor.alpha = (rightReceptor.currentFrame == 1) ? 0.0 : receptorAlpha;
-            }
-
-            for (var name:String in receptorHeldDown)
-            {
-                if (receptorHeldDown[name])
-                {
-                    if (getReceptor(name).currentFrame == 1)
-                    {
-                        receptorHeld(name, true);
-                    }
-                }
             }
 
             for each (var note:GameNote in notes)

@@ -126,7 +126,6 @@ package classes
         public var screencutPosition:Number = 0.5;
         public var frameRate:int = 60;
         public var forceNewJudge:Boolean = false;
-        public var guitarMode:Boolean = false;
         public var songRate:Number = 1;
 
 

@@ -130,7 +130,6 @@ package game
         private var judgeSettings:Array;
 
         private var quitDoubleTap:int = -1;
-        private var inputDisabled:Boolean = false;
 
         private var options:GameOptions;
         private var mpSpectate:Boolean;
@@ -591,7 +590,6 @@ package game
             }
 
             // Game Vars
-            inputDisabled = false;
             _keys = [];
             gameLife = 50;
             gameScore = 0;
@@ -976,46 +974,12 @@ package game
             // Set Key as used.
             _keys[keyCode] = false;
 
-            // Guitar Mode Key Tracking
-            if (_gvars.activeUser.guitarMode)
-            {
-                switch (keyCode)
-                {
-                    case _gvars.activeUser.keyLeft:
-                        //case Keyboard.NUMPAD_4:
-                        _keys["L"] = false;
-                        noteBox.receptorHeld("L", false);
-                        break;
-
-                    case _gvars.activeUser.keyRight:
-                        //case Keyboard.NUMPAD_6:
-                        _keys["R"] = false;
-                        noteBox.receptorHeld("R", false);
-                        break;
-
-                    case _gvars.activeUser.keyUp:
-                        //case Keyboard.NUMPAD_8:
-                        _keys["U"] = false;
-                        noteBox.receptorHeld("U", false);
-                        break;
-
-                    case _gvars.activeUser.keyDown:
-                        //case Keyboard.NUMPAD_2:
-                        _keys["D"] = false;
-                        noteBox.receptorHeld("D", false);
-                        break;
-                }
-            }
-
             e.stopImmediatePropagation();
         }
 
         private function keyboardKeyDown(e:KeyboardEvent):void
         {
             var keyCode:int = e.keyCode;
-
-            if (inputDisabled)
-                return;
 
             // Don't allow key presses unless the key is up.
             if (_keys[keyCode])
@@ -1031,95 +995,46 @@ package game
             {
                 if (!options.replay)
                 {
-                    // Guitar Mode, Requires Struming
-                    if (_gvars.activeUser.guitarMode)
+                    var dir:String = null;
+                    switch (keyCode)
                     {
+                        case _gvars.activeUser.keyLeft:
+                            //case Keyboard.NUMPAD_4:
+                            dir = "L";
+                            break;
 
-                        // Strum Key Press
-                        if (keyCode == _gvars.activeUser.keyStrum)
-                        {
-                            for (var k:int = 0; k < keyDirections.length; k++)
-                            {
-                                if (_keys[keyDirections[k]])
-                                {
-                                    if (legacyMode)
-                                        judgeScore(keyDirections[k], gameProgress);
-                                    else
-                                        judgeScorePosition(keyDirections[k], Math.round(getTimer() - absoluteStart + songOffset.value));
-                                }
-                            }
-                        }
-                        // Other Keys Pressed
-                        else
-                        {
-                            switch (keyCode)
-                            {
-                                case _gvars.activeUser.keyLeft:
-                                    //case Keyboard.NUMPAD_4:
-                                    _keys["L"] = true;
-                                    noteBox.receptorHeld("L");
-                                    break;
+                        case _gvars.activeUser.keyRight:
+                            //case Keyboard.NUMPAD_6:
+                            dir = "R";
+                            break;
 
-                                case _gvars.activeUser.keyRight:
-                                    //case Keyboard.NUMPAD_6:
-                                    _keys["R"] = true;
-                                    noteBox.receptorHeld("R");
-                                    break;
+                        case _gvars.activeUser.keyUp:
+                            //case Keyboard.NUMPAD_8:
+                            dir = "U";
+                            break;
 
-                                case _gvars.activeUser.keyUp:
-                                    //case Keyboard.NUMPAD_8:
-                                    _keys["U"] = true;
-                                    noteBox.receptorHeld("U");
-                                    break;
-
-                                case _gvars.activeUser.keyDown:
-                                    //case Keyboard.NUMPAD_2:
-                                    _keys["D"] = true;
-                                    noteBox.receptorHeld("D");
-                                    break;
-                            }
-                        }
+                        case _gvars.activeUser.keyDown:
+                            //case Keyboard.NUMPAD_2:
+                            dir = "D";
+                            break;
                     }
-                    else
+                    if (dir)
                     {
-                        var dir:String = null;
-                        switch (keyCode)
-                        {
-                            case _gvars.activeUser.keyLeft:
-                                //case Keyboard.NUMPAD_4:
-                                dir = "L";
-                                break;
-
-                            case _gvars.activeUser.keyRight:
-                                //case Keyboard.NUMPAD_6:
-                                dir = "R";
-                                break;
-
-                            case _gvars.activeUser.keyUp:
-                                //case Keyboard.NUMPAD_8:
-                                dir = "U";
-                                break;
-
-                            case _gvars.activeUser.keyDown:
-                                //case Keyboard.NUMPAD_2:
-                                dir = "D";
-                                break;
-                        }
-                        if (dir)
-                        {
-                            if (legacyMode)
-                                judgeScore(dir, gameProgress);
-                            else
-                                judgeScorePosition(dir, Math.round(getTimer() - absoluteStart + songOffset.value));
-                        }
+                        if (legacyMode)
+                            judgeScore(dir, gameProgress);
+                        else
+                            judgeScorePosition(dir, Math.round(getTimer() - absoluteStart + songOffset.value));
                     }
                 }
             }
 
+            // Game Restart
             if (keyCode == _gvars.playerUser.keyRestart && !options.multiplayer)
             {
                 GAME_STATE = GAME_RESTART;
             }
+
+            // Quit
             else if (keyCode == _gvars.playerUser.keyQuit)
             {
                 if (_gvars.songQueue.length > 0)
@@ -1139,10 +1054,14 @@ package game
                     GAME_STATE = GAME_END;
                 }
             }
+
+            // Pause
             else if (keyCode == 19 && (CONFIG::debug || _gvars.playerUser.isAdmin || _gvars.playerUser.isDeveloper || options.replay))
-            { // Pause
+            {
                 togglePause();
             }
+
+            // Auto-Play
             else if (keyCode == Keyboard.F8 && (CONFIG::debug || _gvars.playerUser.isDeveloper || _gvars.playerUser.isAdmin))
             {
                 options.isAutoplay = !options.isAutoplay;
