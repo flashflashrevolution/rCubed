@@ -102,10 +102,10 @@ package arc.mp
             controlCreate.move(controlRooms.x, controlRooms.y + controlRooms.height);
             controlCreate.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void
             {
-                var prompt:MultiplayerPrompt = new MultiplayerPrompt(self, "Create Room");
-                prompt.addEventListener(MultiplayerPrompt.EVENT_SEND, function(subevent:SFSEvent):void
+                var prompt:MultiplayerRoomCreatePrompt = new MultiplayerRoomCreatePrompt(self, "Create Room");
+                prompt.addEventListener(MultiplayerRoomCreatePrompt.EVENT_SEND, function(subevent:SFSEvent):void
                 {
-                    connection.createRoom(subevent.params.value);
+                    connection.createRoom(subevent.params.room, subevent.params.password);
                 });
             });
             window.addChild(controlCreate);
