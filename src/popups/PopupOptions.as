@@ -1717,12 +1717,13 @@ package popups
                 confirmP.addChild(resB);
                 resB.addEventListener(MouseEvent.CLICK, function(e:Event):void
                 {
+                    box.removeChild(confirmP);
                     if (_gvars.activeUser == _gvars.playerUser)
                     {
                         _gvars.activeUser.settings = new User().settings;
                         _avars.resetSettings();
                     }
-                    box.removeChild(confirmP);
+                    renderOptions();
                 });
 
                 var conB:BoxButton = new BoxButton(100, 35, "Close", 12, "#000000");
