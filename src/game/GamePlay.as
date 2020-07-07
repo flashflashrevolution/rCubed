@@ -620,7 +620,7 @@ package game
                 gameFirstNoteFrame = song.getNote(0).frame;
             }
             if (comboTotal)
-                comboTotal.update(song.totalNotes, _gvars.activeUser.enableComboColors);
+                comboTotal.update(song.totalNotes);
 
             msStartTime = getTimer();
             absoluteStart = getTimer();
@@ -2156,7 +2156,7 @@ package game
                 score.update(gameScore);
 
             if (combo)
-                combo.update(hitCombo, _gvars.activeUser.enableComboColors, hitAmazing, hitPerfect, hitGood, hitAverage, hitMiss, hitBoo, gameRawGoods);
+                combo.update(hitCombo, hitAmazing, hitPerfect, hitGood, hitAverage, hitMiss, hitBoo, gameRawGoods);
         }
 
         private var previousDiffs:Array = new Array();
