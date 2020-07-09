@@ -23,7 +23,7 @@
             },
             {
                 "name": "R3::VERSION",
-                "value": "\"9.9.9\""
+                "value": "\"#{VERSION}#\""
             }
         ],
         "debug": false,
