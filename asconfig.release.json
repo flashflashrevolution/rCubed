@@ -1,19 +1,9 @@
 {
-    "application": "application.xml",
-    "config": "air",
-    "type": "app",
+    "extends": "asconfig.json",
     "compilerOptions": {
-        "advanced-telemetry": true,
-        "use-direct-blit": true,
-        "source-path": [
-            "src"
-        ],
+        "verbose-stacktraces": false,
+        "advanced-telemetry": false,
         "output": "bin/release/R3Air.swf",
-        "library-path": [
-            "libs/",
-            "libs/assets/",
-            "fonts/bin/"
-        ],
         "define": [
             {
                 "name": "CONFIG::debug",
@@ -32,38 +22,15 @@
                 "value": "\"hash:#{SCORE_SAVE_SALT}#\""
             },
             {
-                "name": "R3::BRAND_NAME_LONG",
-                "value": "\"FlashFlashRevolution\""
-            },
-            {
-                "name": "R3::BRAND_NAME_SHORT",
-                "value": "\"FFR\""
-            },
-            {
-                "name": "R3::ROOT_URL",
-                "value": "\"www.flashflashrevolution.com\""
-            },
-            {
                 "name": "R3::VERSION",
                 "value": "\"#{VERSION}#\""
             }
         ],
-        "default-size": {
-            "width": 780,
-            "height": 480
-        },
-        "default-frame-rate": 60,
-        "default-background-color": "#000000",
         "debug": false,
+        // Overrides left here for alternate builds.
         "swf-version": 43,
-        "target-player": "32.0",
-        "locale": [
-            "en_US"
-        ]
+        "target-player": "32.0"
     },
-    "files": [
-        "src/Main.as"
-    ],
     "airOptions": {
         "windows": {
             "target": "bundle",
@@ -82,16 +49,6 @@
                 "keystore": "certs/air-cert.p12",
                 "tsa": "http://timestamp.digicert.com"
             }
-        },
-        "files": [
-            {
-                "file": "data",
-                "path": "data"
-            },
-            {
-                "file": "changelog.txt",
-                "path": "changelog.txt"
-            }
-        ]
+        }
     }
 }
