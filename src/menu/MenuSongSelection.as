@@ -1151,6 +1151,7 @@ package menu
         {
             if (e.target == genre_mode_prev || e.target == genre_mode_next)
             {
+                clearSearchStateParams();
                 GENRE_MODE = (GENRE_MODE + (e.target == genre_mode_prev ? -1 : 1));
                 if (GENRE_MODE < 0)
                     GENRE_MODE = GENRE_MODES;
@@ -1169,6 +1170,7 @@ package menu
                 var clickAction:String = e.target.action;
                 if (clickAction == "search")
                 {
+                    clearSearchStateParams();
                     options.infoTab = options.infoTab == TAB_SEARCH ? TAB_PLAYLIST : TAB_SEARCH;
                     _gvars.tempFlags['active_tab_temp'] = options.infoTab;
                     buildInfoTab();
@@ -1456,6 +1458,7 @@ package menu
                     break;
 
                 case Keyboard.TAB:
+                    clearSearchStateParams();
                     options.activeGenre = options.activeGenre + (e.ctrlKey ? -1 : 1);
                     options.activeIndex = -1;
                     if (options.activeGenre < -1)
@@ -1480,19 +1483,19 @@ package menu
                     return;
 
                 default:
-                    if (!(stage.focus is PushButton) && ((e.keyCode >= 48 && e.keyCode <= 111) || (e.keyCode >= 186 && e.keyCode <= 222)))
+                    if (!(stage.focus is PushButton) && ((e.keyCode == Keyboard.BACKSPACE) || (e.keyCode >= 48 && e.keyCode <= 111) || (e.keyCode >= 186 && e.keyCode <= 222)))
                     {
+                        // Store the string from the searchbox.
+                        var tempSearchBoxString:String = "";
+                        if (searchBox != null)
+                        {
+                            tempSearchBoxString = searchBox.text;
+                        }
+
                         // Focus on search and begin typing.
-                        if (options.infoTab != TAB_SEARCH)
-                        {
-                            options.infoTab = TAB_SEARCH;
-                            buildInfoTab();
-                            searchBox.text = ""; // Empty the box if resetting.
-                        }
-                        else
-                        {
-                            buildInfoTab();
-                        }
+                        options.infoTab = TAB_SEARCH;
+                        buildInfoTab();
+                        searchBox.text = tempSearchBoxString; // Restore the string.
                     }
                     return;
             }
