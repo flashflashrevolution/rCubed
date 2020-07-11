@@ -12,6 +12,7 @@ package menu
     import classes.*;
     import classes.chart.Song;
     import com.bit101.components.ComboBox;
+    import com.bit101.components.PushButton;
     import com.flashfla.components.*;
     import com.flashfla.utils.ArrayUtil;
     import com.flashfla.utils.NumberUtil;
@@ -1415,31 +1416,42 @@ package menu
             var newIndex:int = options.activeIndex;
             var lastIndex:int = options.activeIndex;
             var isNavDirectionUp:Boolean = true;
+            var maxGenreIndex:int;
+            if (GENRE_MODE == GENRE_DIFFICULTIES)
+            {
+                maxGenreIndex = _gvars.DIFFICULTY_RANGES.length - 1;
+            }
+            else if (GENRE_MODE == GENRE_SONGFLAGS)
+            {
+                maxGenreIndex = GlobalVariables.SONG_ICON_TEXT.length - 1;
+            }
+            else
+            {
+                maxGenreIndex = (!_gvars.activeUser.DISPLAY_LEGACY_SONGS && !_playlist.engine) ? _gvars.TOTAL_GENRES - 2 : _gvars.TOTAL_GENRES - 1;
+            }
+
+            if (options.activeIndex == -1)
+            {
+                newIndex = lastIndex = 0;
+            }
+
             switch (e.keyCode)
             {
                 case Keyboard.PAGE_UP:
                     newIndex -= 11;
-                    if (newIndex < 0)
-                        newIndex = 0;
                     break;
 
                 case Keyboard.UP:
                     newIndex -= 1;
-                    if (newIndex < 0)
-                        newIndex = 0;
                     break;
 
                 case Keyboard.PAGE_DOWN:
                     newIndex += 11;
-                    if (newIndex > genreLength - 1)
-                        newIndex = genreLength - 1;
                     isNavDirectionUp = false;
                     break;
 
                 case Keyboard.DOWN:
                     newIndex += 1;
-                    if (newIndex > genreLength - 1)
-                        newIndex = genreLength - 1;
                     isNavDirectionUp = false;
                     break;
 
@@ -1447,8 +1459,8 @@ package menu
                     options.activeGenre = options.activeGenre + (e.ctrlKey ? -1 : 1);
                     options.activeIndex = -1;
                     if (options.activeGenre < -1)
-                        options.activeGenre = _gvars.TOTAL_GENRES - 1;
-                    if (options.activeGenre > _gvars.TOTAL_GENRES - 1)
+                        options.activeGenre = maxGenreIndex;
+                    if (options.activeGenre > maxGenreIndex)
                         options.activeGenre = -1;
                     isQueuePlaylist = false;
                     buildGenreList();
@@ -1458,7 +1470,7 @@ package menu
 
                 case Keyboard.ENTER:
                 case Keyboard.SPACE:
-                    if (stage.focus == stage && options.activeSongID >= 0)
+                    if (!(stage.focus is PushButton) && options.activeSongID >= 0)
                     {
                         if (_mp.gameplayHasOpponent())
                             multiplayerLoad();
@@ -1468,13 +1480,33 @@ package menu
                     return;
 
                 default:
-                    if (stage.focus == stage && ((e.keyCode >= 48 && e.keyCode <= 111) || (e.keyCode >= 186 && e.keyCode <= 222)))
+                    if (!(stage.focus is PushButton) && ((e.keyCode >= 48 && e.keyCode <= 111) || (e.keyCode >= 186 && e.keyCode <= 222)))
                     {
                         // Focus on search and begin typing.
-                        options.infoTab = options.infoTab == TAB_SEARCH ? TAB_PLAYLIST : TAB_SEARCH;
-                        buildInfoTab();
-                        searchBox.text = ""; // Empty the box if resetting.
+                        if (options.infoTab != TAB_SEARCH)
+                        {
+                            options.infoTab = TAB_SEARCH;
+                            buildInfoTab();
+                            searchBox.text = ""; // Empty the box if resetting.
+                        }
+                        else
+                        {
+                            buildInfoTab();
+                        }
                     }
+                    return;
+            }
+
+            if (genreLength == 0)
+                return;
+
+            if (newIndex < 0)
+            {
+                newIndex = 0;
+            }
+            else if (newIndex > genreLength - 1)
+            {
+                newIndex = genreLength - 1;
             }
 
             if (newIndex != lastIndex)
