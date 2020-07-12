@@ -1472,7 +1472,6 @@ package menu
                     return;
 
                 case Keyboard.ENTER:
-                case Keyboard.SPACE:
                     if (!(stage.focus is PushButton) && options.activeSongID >= 0)
                     {
                         if (_mp.gameplayHasOpponent())
@@ -1483,7 +1482,7 @@ package menu
                     return;
 
                 default:
-                    if (!(stage.focus is PushButton) && ((e.keyCode == Keyboard.BACKSPACE) || (e.keyCode >= 48 && e.keyCode <= 111) || (e.keyCode >= 186 && e.keyCode <= 222)))
+                    if (!(stage.focus is PushButton) && ((e.keyCode == Keyboard.BACKSPACE) || (e.keyCode == Keyboard.SPACE) || (e.keyCode >= 48 && e.keyCode <= 111) || (e.keyCode >= 186 && e.keyCode <= 222)))
                     {
                         // Store the string from the searchbox.
                         var tempSearchBoxString:String = "";
