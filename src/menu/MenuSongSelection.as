@@ -1388,19 +1388,7 @@ package menu
             var newIndex:int = options.activeIndex;
             var lastIndex:int = options.activeIndex;
             var isNavDirectionUp:Boolean = true;
-            var maxGenreIndex:int;
-            if (GENRE_MODE == GENRE_DIFFICULTIES)
-            {
-                maxGenreIndex = _gvars.DIFFICULTY_RANGES.length - 1;
-            }
-            else if (GENRE_MODE == GENRE_SONGFLAGS)
-            {
-                maxGenreIndex = GlobalVariables.SONG_ICON_TEXT.length - 1;
-            }
-            else
-            {
-                maxGenreIndex = (!_gvars.activeUser.DISPLAY_LEGACY_SONGS && !_playlist.engine) ? _gvars.TOTAL_GENRES - 2 : _gvars.TOTAL_GENRES - 1;
-            }
+            var maxGenreIndex:int = getTotalGenres() - 1;
 
             if (options.activeIndex == -1)
             {
