@@ -1431,7 +1431,7 @@ package menu
                     if (!(stage.focus is PushButton) && options.activeSongID >= 0)
                     {
                         if (_mp.gameplayHasOpponent())
-                            multiplayerLoad();
+                            multiplayerLoad(options.activeSongID);
                         else
                             playSong(options.activeSongID);
                     }
@@ -1488,15 +1488,15 @@ package menu
             multiplayerLoad(e.target.level);
         }
 
-        private function multiplayerLoad(level:int = -1):void
+        private function multiplayerLoad(level:int):void
         {
-            if (options.activeSongID != -1)
-            {
-                isQueuePlaylist = false;
-                _mp.gameplayPicking(_playlist.getSong(level < 0 ? options.activeSongID : level));
-                _mp.gameplayLoading();
-                switchTo(MainMenu.MENU_MULTIPLAYER);
-            }
+            if (level < 0)
+                return;
+
+            isQueuePlaylist = false;
+            _mp.gameplayPicking(_playlist.getSong(level));
+            _mp.gameplayLoading();
+            switchTo(MainMenu.MENU_MULTIPLAYER);
         }
 
         private function playSong(level:int):void
