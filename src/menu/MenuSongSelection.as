@@ -69,8 +69,6 @@ package menu
         // Info Page
         private var searchBox:BoxText;
         private var searchTypeBox:ComboBox;
-        private var levelBoxLow:BoxText;
-        private var levelBoxHigh:BoxText;
 
         public var options:Object;
 
@@ -386,95 +384,34 @@ package menu
             GENRE_MODE_TEXT.text = _lang.string("genre_mode_" + GENRE_MODE);
 
             //- Build Genre List
-            var SongGenre:Text;
             genrelistItems = []; // new Vector.<Text>;
+            var genre_text:String;
             var gindex:int;
-            var str:String;
-            if (GENRE_MODE == GENRE_DIFFICULTIES)
-            {
-                var max_diff_genres:int = _gvars.DIFFICULTY_RANGES.length;
-                for (gindex = -1; gindex < max_diff_genres; gindex++)
-                {
-                    if (gindex == -1)
-                        str = _lang.string("genre_" + gindex);
-                    else
-                        str = _lang.string("difficulty_title_" + gindex);
+            var gposy:int = -1;
+            var separation:Number;
+            var y:Number;
+            var isActiveGenre:Boolean;
 
-                    if (options.activeGenre == gindex)
-                    {
-                        SELECTED_GENRE_BACKGROUND.y = ((337 / (max_diff_genres + 1)) * (gindex + 1)) - 2;
-                        genrelist.addChild(SELECTED_GENRE_BACKGROUND);
-                    }
-                    SongGenre = new Text(str, (options.activeGenre == gindex ? 18 : 14));
-                    SongGenre.height = 22.6;
-                    SongGenre.width = 130.75;
-                    SongGenre.y = ((337 / (max_diff_genres + 1)) * (gindex + 1));
-                    SongGenre.mouseChildren = false;
-                    SongGenre.useHandCursor = true;
-                    SongGenre.buttonMode = true;
-                    SongGenre.index = gindex;
-                    SongGenre.addEventListener(MouseEvent.CLICK, genreClick);
-                    genrelistItems[genrelistItems.length] = SongGenre;
-                    genrelist.addChild(SongGenre);
-                }
-            }
-            else if (GENRE_MODE == GENRE_SONGFLAGS)
+            const totalGenres:int = getTotalGenres();
+            for (gindex = -1; gindex < totalGenres; ++gindex)
             {
-                var max_flags_genres:int = GlobalVariables.SONG_ICON_TEXT.length;
-                for (gindex = -1; gindex < max_flags_genres; gindex++)
+                if (GENRE_MODE == GENRE_GENRES)
                 {
-                    str = _lang.string("genre_" + gindex);
-                    if (gindex >= 0)
-                        str = GlobalVariables.SONG_ICON_TEXT[gindex];
-                    if (gindex == 1)
-                        str = "PLAYED";
-                    if (options.activeGenre == gindex)
-                    {
-                        SELECTED_GENRE_BACKGROUND.y = ((337 / (Math.max(12, max_flags_genres) + 1)) * (gindex + 1)) - 2;
-                        genrelist.addChild(SELECTED_GENRE_BACKGROUND);
-                    }
-                    SongGenre = new Text(str, (options.activeGenre == gindex ? 18 : 14));
-                    SongGenre.height = 22.6;
-                    SongGenre.width = 130.75;
-                    SongGenre.y = ((337 / (Math.max(12, max_flags_genres) + 1)) * (gindex + 1));
-                    SongGenre.mouseChildren = false;
-                    SongGenre.useHandCursor = true;
-                    SongGenre.buttonMode = true;
-                    SongGenre.index = gindex;
-                    SongGenre.addEventListener(MouseEvent.CLICK, genreClick);
-                    genrelistItems[genrelistItems.length] = SongGenre;
-                    genrelist.addChild(SongGenre);
-                }
-            }
-            else
-            {
-                var totalGenres:int = (!_gvars.activeUser.DISPLAY_LEGACY_SONGS && !_playlist.engine) ? _gvars.TOTAL_GENRES - 1 : _gvars.TOTAL_GENRES;
-                var gposy:int = -1;
-                for (gindex = -1; gindex < totalGenres; gindex++)
-                {
-
-                    // Legacy Playlist
                     if (!_gvars.activeUser.DISPLAY_LEGACY_SONGS && !_playlist.engine && gindex == (Constant.LEGACY_GENRE - 1))
                         continue;
-
-                    if (options.activeGenre == gindex)
-                    {
-                        SELECTED_GENRE_BACKGROUND.y = ((337 / (totalGenres + 1)) * (gposy + 1)) - 2;
-                        genrelist.addChild(SELECTED_GENRE_BACKGROUND);
-                    }
-                    SongGenre = new Text(_lang.string("genre_" + gindex), (options.activeGenre == gindex ? 18 : 14));
-                    SongGenre.height = 22.6;
-                    SongGenre.width = 130.75;
-                    SongGenre.y = ((337 / (totalGenres + 1)) * (gposy + 1));
-                    SongGenre.mouseChildren = false;
-                    SongGenre.useHandCursor = true;
-                    SongGenre.buttonMode = true;
-                    SongGenre.index = gindex;
-                    SongGenre.addEventListener(MouseEvent.CLICK, genreClick);
-                    genrelistItems[genrelistItems.length] = SongGenre;
-                    genrelist.addChild(SongGenre);
-                    gposy++;
+                    ++gposy;
                 }
+                else
+                {
+                    gposy = gindex + 1;
+                }
+
+                genre_text = getGenreText(gindex);
+                isActiveGenre = (options.activeGenre == gindex);
+                separation = (GENRE_MODE == GENRE_SONGFLAGS) ? (337 / (Math.max(12, totalGenres) + 1)) : (337 / (totalGenres + 1));
+                y = separation * gposy;
+
+                buildGenreEntry(genre_text, isActiveGenre, y, gindex);
             }
         }
 
@@ -690,110 +627,21 @@ package menu
 
         public function drawPages():void
         {
+            // Remove pages
             if (pages != null)
             {
                 this.removeChild(pages);
                 pages = null;
             }
 
-            var totalPages:int;
-            var pY:int;
-            var pBox:DynamicSprite;
-            var pText:Text;
-
             pages = new Sprite();
             pages.y = 424;
 
-            if (options.activeGenre <= -1 || GENRE_MODE == GENRE_SONGFLAGS)
-            {
-                totalPages = Math.ceil(genreLength / 500);
+            var isBigPage:Boolean = (options.activeGenre <= -1 || GENRE_MODE == GENRE_SONGFLAGS);
+            var totalPages:int = getTotalPages(isBigPage);
 
-                if (totalPages > 7)
-                {
-                    background.pageBackground.x = 3;
-                    background.pageBackground.width = 605;
-                }
-                else
-                {
-                    background.pageBackground.x = 32;
-                    background.pageBackground.width = 545;
-                }
-
-                for (pY = 0; pY < totalPages; pY++)
-                {
-                    pBox = new DynamicSprite();
-                    pBox.graphics.lineStyle(1, 0xFFFFFF, 0.5, false);
-                    pBox.graphics.beginFill(GameBackgroundColor.BG_STATIC, 1);
-                    pBox.graphics.drawRect(0, 0, 72, 16);
-                    pBox.graphics.endFill();
-                    pBox.x = 75 * (pY % 8);
-                    pBox.y = 18 * Math.floor(pY / 8);
-                    pBox.page = pY;
-
-                    pText = new Text((pY * 500) + 1 + " - " + ((pY + 1) * 500 > genreLength ? genreLength : (pY + 1) * 500), 12);
-                    pText.width = 72;
-                    pText.height = 15;
-                    pText.align = Text.CENTER;
-                    pBox.addChild(pText);
-
-                    pBox.mouseChildren = false;
-                    pBox.useHandCursor = true;
-                    pBox.buttonMode = true;
-
-                    //- Add Listeners
-                    pBox.addEventListener(MouseEvent.CLICK, pageClicked, false, 0, true);
-
-                    pages.addChild(pBox);
-                }
-                pages.x = 145 + ((610 - pages.width) / 2);
-                this.addChild(pages);
-            }
-            else
-            {
-                totalPages = Math.ceil(genreLength / 12);
-                if (totalPages > 20)
-                    totalPages = 20;
-
-                if (totalPages > 18)
-                {
-                    background.pageBackground.x = 3;
-                    background.pageBackground.width = 605;
-                }
-                else
-                {
-                    background.pageBackground.x = 32;
-                    background.pageBackground.width = 545;
-                }
-
-                for (pY = 0; pY < totalPages; pY++)
-                {
-                    pBox = new DynamicSprite();
-                    pBox.graphics.lineStyle(1, 0xFFFFFF, 0.5, false);
-                    pBox.graphics.beginFill(GameBackgroundColor.BG_STATIC, 1);
-                    pBox.graphics.drawRect(0, 0, 27, 16);
-                    pBox.graphics.endFill();
-                    pBox.x = 30 * (pY % 20);
-                    pBox.y = 18 * Math.floor(pY / 20);
-                    pBox.page = (pY / (totalPages - 1));
-
-                    pText = new Text((pY + 1), 12);
-                    pText.width = 27;
-                    pText.height = 15;
-                    pText.align = Text.CENTER;
-                    pBox.addChild(pText);
-
-                    pBox.mouseChildren = false;
-                    pBox.useHandCursor = true;
-                    pBox.buttonMode = true;
-
-                    //- Add Listeners
-                    pBox.addEventListener(MouseEvent.CLICK, pageClicked, false, 0, true);
-
-                    pages.addChild(pBox);
-                }
-                pages.x = 145 + ((610 - pages.width) / 2);
-                this.addChild(pages);
-            }
+            configurePageBackground(totalPages, isBigPage);
+            buildPages(totalPages, isBigPage);
         }
 
         public function buildInfoTab():void
@@ -1278,6 +1126,63 @@ package menu
             buildInfoTab();
         }
 
+        private function getGenreText(gindex:int):String
+        {
+            if (GENRE_MODE == GENRE_GENRES || gindex == -1)
+                return _lang.string("genre_" + gindex);
+
+            if (GENRE_MODE == GENRE_DIFFICULTIES)
+                return _lang.string("difficulty_title_" + gindex);
+
+            if (gindex == 1)
+                return "PLAYED";
+
+            return GlobalVariables.SONG_ICON_TEXT[gindex];
+        }
+
+        private function getTotalGenres():int
+        {
+            switch (GENRE_MODE)
+            {
+                case GENRE_DIFFICULTIES:
+                    return _gvars.DIFFICULTY_RANGES.length;
+                case GENRE_SONGFLAGS:
+                    return GlobalVariables.SONG_ICON_TEXT.length;
+                default:
+                    return (!_gvars.activeUser.DISPLAY_LEGACY_SONGS && !_playlist.engine) ? _gvars.TOTAL_GENRES - 1 : _gvars.TOTAL_GENRES;
+            }
+        }
+
+        private function buildGenreEntry(genre_text:String, isActiveGenre:Boolean, y:Number, gindex:int):void
+        {
+            if (isActiveGenre)
+            {
+                addGenreBackground(y - 2);
+            }
+            addGenreText(genre_text, isActiveGenre, y, gindex);
+        }
+
+        private function addGenreBackground(y:Number):void
+        {
+            SELECTED_GENRE_BACKGROUND.y = y;
+            genrelist.addChild(SELECTED_GENRE_BACKGROUND);
+        }
+
+        private function addGenreText(genre_text:String, isActiveGenre:Boolean, y:Number, gindex:int):void
+        {
+            var SongGenre:Text = new Text(genre_text, (isActiveGenre ? 18 : 14));
+            SongGenre.height = 22.6;
+            SongGenre.width = 130.75;
+            SongGenre.y = y;
+            SongGenre.mouseChildren = false;
+            SongGenre.useHandCursor = true;
+            SongGenre.buttonMode = true;
+            SongGenre.index = gindex;
+            SongGenre.addEventListener(MouseEvent.CLICK, genreClick);
+            genrelistItems[genrelistItems.length] = SongGenre;
+            genrelist.addChild(SongGenre);
+        }
+
         private function genreClick(e:Event = null):void
         {
             if (options.activeGenre != e.target.index)
@@ -1298,6 +1203,92 @@ package menu
                 buildGenreList();
                 buildPlayList();
                 buildInfoTab();
+            }
+            stage.focus = stage;
+        }
+
+        private function getTotalPages(isBigPage:Boolean):int
+        {
+            if (isBigPage)
+                return Math.ceil(genreLength / 500);
+            return Math.min(Math.ceil(genreLength / 12), 20);
+        }
+
+        private function configurePageBackground(totalPages:int, isBigPage:Boolean):void
+        {
+            var limit:int = (isBigPage) ? 7 : 18;
+            background.pageBackground.x = (totalPages > limit) ? 3 : 32;
+            background.pageBackground.width = (totalPages > limit) ? 605 : 545;
+        }
+
+        private function buildPages(totalPages:int, isBigPage:Boolean):void
+        {
+            var page_width:int = (isBigPage) ? 72 : 27;
+            var page_height:int = 16;
+            var pages_per_row:int = 600 / (page_width + 3);
+
+            for (var pY:int = 0; pY < totalPages; ++pY)
+            {
+                var page_x:Number = (page_width + 3) * (pY % pages_per_row);
+                var page_y:Number = (page_height + 2) * Math.floor(pY / pages_per_row);
+                var page_number:Number = (isBigPage) ? pY : (pY / (totalPages - 1));
+
+                var pBox:DynamicSprite = new DynamicSprite();
+                pBox.graphics.lineStyle(1, 0xFFFFFF, 0.5, false);
+                pBox.graphics.beginFill(GameBackgroundColor.BG_STATIC, 1);
+                pBox.graphics.drawRect(0, 0, page_width, page_height);
+                pBox.graphics.endFill();
+                pBox.x = page_x;
+                pBox.y = page_y;
+                pBox.page = page_number;
+
+                var page_str:*;
+                if (isBigPage)
+                {
+                    page_str = ((pY * 500) + 1) + " - " + (((pY + 1) * 500) > genreLength ? genreLength : ((pY + 1) * 500));
+                }
+                else
+                {
+                    page_str = (pY + 1);
+                }
+
+                var pText:Text = new Text(page_str, page_height - 4);
+                pText.width = page_width;
+                pText.height = page_height - 1;
+                pText.align = Text.CENTER;
+                pBox.addChild(pText);
+
+                pBox.mouseChildren = false;
+                pBox.useHandCursor = true;
+                pBox.buttonMode = true;
+
+                //- Add Listeners
+                pBox.addEventListener(MouseEvent.CLICK, pageClicked, false, 0, true);
+
+                pages.addChild(pBox);
+            }
+
+            pages.x = 145 + ((610 - pages.width) / 2);
+            this.addChild(pages);
+        }
+
+        private function pageClicked(e:Event = null):void
+        {
+            if (options.activeGenre <= -1 || GENRE_MODE == GENRE_SONGFLAGS)
+            {
+                if (options.pageNumber != e.target.page)
+                {
+                    options.activeSongID = -1;
+                    options.activeIndex = -1;
+                    options.pageNumber = e.target.page;
+                    buildPlayList();
+                    buildInfoTab();
+                }
+            }
+            else
+            {
+                scrollbar.scrollTo(e.target.page);
+                pane.scrollTo(e.target.page);
             }
             stage.focus = stage;
         }
@@ -1331,27 +1322,6 @@ package menu
                     }
                 }
             }
-        }
-
-        private function pageClicked(e:Event = null):void
-        {
-            if (options.activeGenre <= -1 || GENRE_MODE == GENRE_SONGFLAGS)
-            {
-                if (options.pageNumber != e.target.page)
-                {
-                    options.activeSongID = -1;
-                    options.activeIndex = -1;
-                    options.pageNumber = e.target.page;
-                    buildPlayList();
-                    buildInfoTab();
-                }
-            }
-            else
-            {
-                scrollbar.scrollTo(e.target.page);
-                pane.scrollTo(e.target.page);
-            }
-            stage.focus = stage;
         }
 
         private function songQueueClick(e:Event):void
