@@ -1156,9 +1156,7 @@ package menu
         private function buildGenreEntry(genre_text:String, isActiveGenre:Boolean, y:Number, gindex:int):void
         {
             if (isActiveGenre)
-            {
                 addGenreBackground(y - 2);
-            }
             addGenreText(genre_text, isActiveGenre, y, gindex);
         }
 
