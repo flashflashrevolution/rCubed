@@ -90,10 +90,10 @@ package game.controls
             rightReceptor = _noteskins.getReceptor(options.noteskin, "R");
             rightReceptor.KEY = "Right";
 
-            addChild(leftReceptor);
-            addChild(downReceptor);
-            addChild(upReceptor);
-            addChild(rightReceptor);
+            addChildAt(leftReceptor, 0);
+            addChildAt(downReceptor, 0);
+            addChildAt(upReceptor, 0);
+            addChildAt(rightReceptor, 0);
 
             // Other Stuff
             sideScroll = options.scrollDirection == "left" || options.scrollDirection == "right";
