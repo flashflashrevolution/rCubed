@@ -119,7 +119,7 @@ package arc
             {
                 index = notes.length - 1 - index;
                 if (reverseLastFrame < 0)
-                    reverseLastFrame = notes[notes.length - 1].getFrame() - song.musicDelay * 2;
+                    reverseLastFrame = notes[notes.length - 1].frame - song.musicDelay * 2;
             }
 
             var note:Note = notes[index];
