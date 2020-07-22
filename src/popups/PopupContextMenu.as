@@ -161,6 +161,8 @@ package popups
             else if (e.target.action == "switch_profile")
             {
                 _gvars.tempFlags = {};
+                _gvars.activeUser = null;
+                _gvars.userSession = "0";
                 _gvars.gameMain.switchTo("GameLoginPanel");
             }
         }
