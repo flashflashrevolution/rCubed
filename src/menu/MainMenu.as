@@ -117,7 +117,10 @@ package menu
 
                     // Auto - Connect MP
                     if (playerStartup == 0 || playerStartup == 1)
+                    {
+                        MultiplayerSingleton.destroyInstance();
                         var pan:MultiplayerPanel = MultiplayerSingleton.getInstance().getPanel(this);
+                    }
 
                     if (playerStartup == 0)
                         targetMenu = MENU_MULTIPLAYER;
