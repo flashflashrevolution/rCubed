@@ -52,6 +52,8 @@ package arc.mp
 
         public static function destroyInstance():void
         {
+            if (instance.connection.connected)
+                instance.connection.disconnect();
             instance = null;
         }
 
