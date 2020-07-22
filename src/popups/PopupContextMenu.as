@@ -132,7 +132,7 @@ package popups
             }
             else if (e.target.action == "screenshotLocal")
             {
-                _gvars.takeScreenShot({o: false, s: 1});
+                _gvars.takeScreenShot();
             }
             else if (e.target.action == "options")
             {
