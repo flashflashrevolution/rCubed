@@ -171,6 +171,12 @@ package classes
             }
         }
 
+        public function refreshUser():void
+        {
+            _gvars.playerUser = new User(true, true);
+            _gvars.activeUser = _gvars.playerUser;
+        }
+
         ///- Public
         public function calculateAverageRank():void
         {

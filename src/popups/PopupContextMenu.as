@@ -164,6 +164,7 @@ package popups
                 MultiplayerSingleton.destroyInstance();
                 _gvars.tempFlags = {};
                 _gvars.userSession = "0";
+                _gvars.playerUser.refreshUser();
                 _gvars.gameMain.switchTo("GameLoginPanel");
             }
         }
