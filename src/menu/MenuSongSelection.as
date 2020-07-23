@@ -1248,6 +1248,7 @@ package menu
             else
             {
                 var songHighscoresButtonLocked:BoxButton = new BoxButton(164, 27, (options.infoTab == TAB_HIGHSCORES ? _lang.string("song_selection_song_panel_info") : _lang.string("song_selection_song_panel_scores")), 12);
+                songHighscoresButtonLocked.x = 5;
                 songHighscoresButtonLocked.y = 288;
                 songHighscoresButtonLocked.level = songDetails.level;
                 songHighscoresButtonLocked.action = "highscores";
