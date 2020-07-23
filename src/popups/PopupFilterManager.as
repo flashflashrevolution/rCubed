@@ -392,7 +392,7 @@ package popups
             if ((_gvars.gameMain.activePanel is MainMenu) && (_gvars.gameMain.activePanel as MainMenu).panel is MenuSongSelection)
             {
                 ((_gvars.gameMain.activePanel as MainMenu).panel as MenuSongSelection).buildPlayList();
-                ((_gvars.gameMain.activePanel as MainMenu).panel as MenuSongSelection).buildInfoTab();
+                ((_gvars.gameMain.activePanel as MainMenu).panel as MenuSongSelection).buildInfoBox();
             }
         }
 

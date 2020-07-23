@@ -73,16 +73,7 @@ package com.flashfla.components
 
         public function clear():void
         {
-            if (content != null)
-            {
-                while (content.numChildren > 0)
-                    content.removeChild(content.getChildAt(0));
-                this.removeChild(content);
-                content = null;
-            }
-            content = new ScrollPaneContent();
-            content.mask = _mask;
-            this.addChild(content);
+            content.clear();
         }
 
         public function update():void

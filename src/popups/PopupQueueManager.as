@@ -432,7 +432,7 @@ internal class QueueBox extends Sprite
         popup.removePopup();
         var panel:MenuSongSelection = ((_gvars.gameMain.activePanel as MainMenu).panel as MenuSongSelection);
         panel.buildPlayList();
-        panel.buildInfoTab();
+        panel.buildInfoBox();
     }
 
     private function renameQueue():void

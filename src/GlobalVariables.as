@@ -86,7 +86,6 @@ package
         public var userSession:String = "0";
         public var activeUser:User;
         public var playerUser:User;
-        public var tempFlags:Object = {};
 
         ///- GamePlay
         public var songQueue:Array = [];
@@ -557,14 +556,14 @@ package
             _debugLoader.load(req);
         }
 
-        //- Full screen support for Flash 11.3+
+        //- Full Screen
         public function toggleFullScreen(e:Event = null):void
         {
             if (gameMain.stage)
             {
                 if (gameMain.stage.displayState == StageDisplayState.NORMAL)
                 {
-                    gameMain.stage.displayState = "fullScreenInteractive"; //StageDisplayState.FULL_SCREEN_INTERACTIVE;
+                    gameMain.stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
                 }
                 else
                 {
