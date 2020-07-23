@@ -1845,8 +1845,10 @@ package menu
          */
         private function e_menuMusicConvertSongLoad(e:Event):void
         {
-            writeMenuMusicBytes(e.target as Song);
-            playMenuMusicSong(e.target as Song);
+            var song:Song = (e.target as Song);
+            song.removeEventListener(Event.COMPLETE, e_menuMusicConvertSongLoad);
+            writeMenuMusicBytes(song);
+            playMenuMusicSong(song);
         }
 
         /**
