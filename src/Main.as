@@ -389,9 +389,9 @@ package
                 CONFIG::release
                 {
                     // Do Air Update Check
-                    if (!_gvars.tempFlags["did_air_update_check"])
+                    if (!Flags.VALUES[Flags.DID_AIR_UPDATE_CHECK])
                     {
-                        _gvars.tempFlags["did_air_update_check"] = true;
+                        Flags.VALUES[Flags.DID_AIR_UPDATE_CHECK] = true;
                         var airUpdateCheck:int = AirContext.serverVersionHigher(_site.data["game_r3air_version"]);
                         //addAlert(_site.data["game_r3air_version"] + " " + (airUpdateCheck == -1 ? "&gt;" : (airUpdateCheck == 1 ? "&lt;" : "==")) + " " + Constant.AIR_VERSION, 240);
                         if (airUpdateCheck == -1)
