@@ -173,6 +173,7 @@ package classes
 
         public function refreshUser():void
         {
+            _gvars.userSession = "0";
             _gvars.playerUser = new User(true, true);
             _gvars.activeUser = _gvars.playerUser;
         }
