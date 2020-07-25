@@ -3,10 +3,10 @@ package popups
     import arc.ArcGlobals;
     import arc.mp.MultiplayerPrompt;
     import assets.GameBackgroundColor;
-    import assets.options.checkBox;
     import classes.Alert;
     import classes.Box;
     import classes.BoxButton;
+    import classes.BoxCheck;
     import classes.BoxSlider;
     import classes.BoxText;
     import classes.GameNote;
@@ -27,6 +27,7 @@ package popups
     import com.flashfla.utils.ColorUtil;
     import com.flashfla.utils.StringUtil;
     import com.flashfla.utils.SystemUtil;
+    import com.flashfla.utils.sprintf;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
     import flash.display.DisplayObject;
@@ -45,8 +46,6 @@ package popups
     import menu.MainMenu;
     import menu.MenuPanel;
     import menu.MenuSongSelection;
-    import com.flashfla.utils.sprintf;
-
 
     public class PopupOptions extends MenuPanel
     {
@@ -98,7 +97,7 @@ package popups
         private var optionOffset:BoxText;
         private var optionJudgeOffset:BoxText;
         private var gameJudgeOffset:Text
-        private var autoJudgeOffsetCheck:checkBox;
+        private var autoJudgeOffsetCheck:BoxCheck;
         private var gameAutoJudgeOffset:Text;
         private var optionReceptorSpacing:BoxText;
         private var optionNoteScale:BoxSlider;
@@ -106,9 +105,9 @@ package popups
         private var gameVolumeValueDisplay:Text;
         private var optionFPS:BoxText;
         private var optionRate:BoxText;
-        private var forceJudgeCheck:checkBox;
+        private var forceJudgeCheck:BoxCheck;
         private var gameForceJudgeMode:Text;
-        private var optionScrollDirections:Array;
+        private var optionScrollDirections:Vector.<BoxCheck>;
         private var menuVolumeValueDisplay:Text;
         private var noteScaleValueDisplay:Text;
         private var optionMenuVolume:BoxSlider;
@@ -124,27 +123,27 @@ package popups
 
         private var optionJudgeColors:Array;
         private var optionComboColors:Array;
-        private var optionComboColorCheck:checkBox;
+        private var optionComboColorCheck:BoxCheck;
         private var optionGameColors:Array;
         private var optionNoteColors:Array;
 
         private var isolationText:BoxText;
         private var isolationTotalText:BoxText;
         private var optionMPSize:BoxText;
-        private var timestampCheck:checkBox;
+        private var timestampCheck:BoxCheck;
         private var startUpScreenCombo:ComboBox;
         private var optionGameLanguages:Array;
         private var engineCombo:ComboBox;
         private var engineDefaultCombo:ComboBox;
         private var engineComboIgnore:Boolean;
-        private var legacySongsCheck:checkBox;
+        private var legacySongsCheck:BoxCheck;
 
-        private var useCacheCheckbox:checkBox;
-        private var autoSaveLocalCheckbox:checkBox;
-        private var useVSyncCheckbox:checkBox;
-        private var useWebsocketCheckbox:checkBox;
+        private var useCacheCheckbox:BoxCheck;
+        private var autoSaveLocalCheckbox:BoxCheck;
+        private var useVSyncCheckbox:BoxCheck;
+        private var useWebsocketCheckbox:BoxCheck;
 
-        private var flipGraphCheckbox:checkBox;
+        private var flipGraphCheckbox:BoxCheck;
 
         public function PopupOptions(myParent:MenuPanel)
         {
@@ -257,7 +256,7 @@ package popups
             resetOptions = new BoxButton(80, 27, _lang.string("menu_reset"));
             resetOptions.x = box.width - 180;
             resetOptions.y = box.height - 42;
-            resetOptions.boxColor = 0xff0000;
+            resetOptions.color = 0xff0000;
 
             //- Editor
             editorOptions = new BoxButton(80, 27, _lang.string("menu_editor"));
@@ -338,7 +337,7 @@ package popups
                 return;
             }
 
-            for (var index:int = box.numChildren - 1; index >= 2; index--)
+            for (var index:int = box.numChildren - 1; index >= 0; index--)
             {
                 var olditem:DisplayObject = box.getChildAt(index);
                 olditem.removeEventListener(MouseEvent.CLICK, clickHandler);
@@ -356,9 +355,9 @@ package popups
             if (CURRENT_TAB == TAB_MAIN)
             {
                 menuMain.active = true;
-                menuMain.boxColor = 0x1495BD;
-                menuMain.boxNormalAlpha = 1;
-                menuMain.boxActiveAlpha = 1;
+                menuMain.color = GameBackgroundColor.BG_POPUP;
+                menuMain.normalAlpha = 0.9;
+                menuMain.activeAlpha = 1;
 
                 /// Col 1
                 //- Speed
@@ -408,7 +407,7 @@ package popups
 
                 //- Auto Judge Offset
                 xOff += 105;
-                autoJudgeOffsetCheck = new checkBox();
+                autoJudgeOffsetCheck = new BoxCheck();
                 autoJudgeOffsetCheck.x = xOff;
                 autoJudgeOffsetCheck.y = yOff;
                 autoJudgeOffsetCheck.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
@@ -488,7 +487,7 @@ package popups
                 yOff += 40;
 
                 // Force engine Judge Mode
-                forceJudgeCheck = new checkBox();
+                forceJudgeCheck = new BoxCheck();
                 forceJudgeCheck.x = xOff;
                 forceJudgeCheck.y = yOff;
                 forceJudgeCheck.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
@@ -504,7 +503,7 @@ package popups
                 yOff = BASE_Y_POSITION;
 
                 //- Direction
-                optionScrollDirections = [];
+                optionScrollDirections = new <BoxCheck>[];
                 var gameDirection:Text = new Text(_lang.string("options_scroll"));
                 gameDirection.x = xOff;
                 gameDirection.y = yOff;
@@ -520,7 +519,7 @@ package popups
                     box.addChild(gameDirectionOptionText);
                     yOff += 2;
 
-                    var optionScrollCheck:checkBox = new checkBox();
+                    var optionScrollCheck:BoxCheck = new BoxCheck();
                     optionScrollCheck.x = xOff + 2;
                     optionScrollCheck.y = yOff;
                     optionScrollCheck.slideDirection = directionData[i];
@@ -655,9 +654,10 @@ package popups
             else if (CURRENT_TAB == TAB_VISUAL_MODS)
             {
                 menuVisualMods.active = true;
-                menuVisualMods.boxColor = 0x1495BD;
-                menuVisualMods.boxNormalAlpha = 1;
-                menuVisualMods.boxActiveAlpha = 1;
+                menuVisualMods.color = GameBackgroundColor.BG_POPUP;
+                menuVisualMods.normalAlpha = 0.9;
+                menuVisualMods.activeAlpha = 1;
+
                 ///- Col 1
                 //- Display
                 optionDisplays = [];
@@ -685,7 +685,7 @@ package popups
                         gameDisplayName.y = yOff - 3;
                         box.addChild(gameDisplayName);
 
-                        var gameDisplayCheck:checkBox = new checkBox();
+                        var gameDisplayCheck:BoxCheck = new BoxCheck();
                         gameDisplayCheck.x = xOff + 3;
                         gameDisplayCheck.y = yOff;
                         gameDisplayCheck.display = displayArray[i];
@@ -725,7 +725,7 @@ package popups
                     gameModOptionText.y = yOff - 3;
                     box.addChild(gameModOptionText);
 
-                    var optionModCheck:checkBox = new checkBox();
+                    var optionModCheck:BoxCheck = new BoxCheck();
                     optionModCheck.x = xOff + 3;
                     optionModCheck.y = yOff;
                     optionModCheck.mod = modsData[i];
@@ -764,7 +764,7 @@ package popups
                     gameVisualModOptionText.y = yOff - 3;
                     box.addChild(gameVisualModOptionText);
 
-                    var optionVisualModCheck:checkBox = new checkBox();
+                    var optionVisualModCheck:BoxCheck = new BoxCheck();
                     optionVisualModCheck.x = xOff + 3;
                     optionVisualModCheck.y = yOff;
                     optionVisualModCheck.visual_mod = modsVisualData[i];
@@ -787,7 +787,7 @@ package popups
                 yOff += 20;
 
                 var gameNoteskinName:Text;
-                var gameNoteskinCheck:checkBox;
+                var gameNoteskinCheck:BoxCheck;
 
                 // Custom
                 gameNoteskinName = new Text(_lang.string("options_noteskin_custom"));
@@ -795,7 +795,7 @@ package popups
                 gameNoteskinName.y = yOff - 3;
                 box.addChild(gameNoteskinName);
 
-                gameNoteskinCheck = new checkBox();
+                gameNoteskinCheck = new BoxCheck();
                 gameNoteskinCheck.x = xOff + 3;
                 gameNoteskinCheck.y = yOff;
                 gameNoteskinCheck.skin = 0;
@@ -818,7 +818,7 @@ package popups
                     gameNoteskinName.y = yOff - 3;
                     box.addChild(gameNoteskinName);
 
-                    gameNoteskinCheck = new checkBox();
+                    gameNoteskinCheck = new BoxCheck();
                     gameNoteskinCheck.x = xOff + 3;
                     gameNoteskinCheck.y = yOff;
                     gameNoteskinCheck.skin = item.id;
@@ -838,9 +838,9 @@ package popups
             else if (CURRENT_TAB == TAB_COLORS)
             {
                 menuGameColors.active = true;
-                menuGameColors.boxColor = 0x1495BD;
-                menuGameColors.boxNormalAlpha = 1;
-                menuGameColors.boxActiveAlpha = 1;
+                menuGameColors.color = GameBackgroundColor.BG_POPUP;
+                menuGameColors.normalAlpha = 0.9;
+                menuGameColors.activeAlpha = 1;
 
                 ///- Col 1
                 var gameJudgeColorTitle:Text = new Text(_lang.string("options_judge_colors_title"));
@@ -881,7 +881,7 @@ package popups
                     optionJudgeColorReset.x = xOff + 200;
                     optionJudgeColorReset.y = yOff;
                     optionJudgeColorReset.judge_color_reset_id = i;
-                    optionJudgeColorReset.boxColor = 0xff0000;
+                    optionJudgeColorReset.color = 0xff0000;
                     optionJudgeColorReset.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                     box.addChild(optionJudgeColorReset);
                     optionJudgeColors.push({"text": optionJudgeColor, "display": gameJudgeColorDisplay, "reset": optionJudgeColorReset});
@@ -931,7 +931,7 @@ package popups
                     optionGameColorReset.x = xOff + 200;
                     optionGameColorReset.y = yOff;
                     optionGameColorReset.game_color_reset_id = i;
-                    optionGameColorReset.boxColor = 0xff0000;
+                    optionGameColorReset.color = 0xff0000;
                     optionGameColorReset.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                     box.addChild(optionGameColorReset);
                     optionGameColors.push({"text": optionGameColor, "display": gameGameColorDisplay, "reset": optionGameColorReset});
@@ -981,13 +981,13 @@ package popups
                     optionComboColorReset.x = xOff + 200;
                     optionComboColorReset.y = yOff;
                     optionComboColorReset.combo_color_reset_id = i;
-                    optionComboColorReset.boxColor = 0xff0000;
+                    optionComboColorReset.color = 0xff0000;
                     optionComboColorReset.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                     box.addChild(optionComboColorReset);
 
                     if (i > 0)
                     {
-                        optionComboColorCheck = new checkBox();
+                        optionComboColorCheck = new BoxCheck();
                         optionComboColorCheck.x = xOff + 225;
                         optionComboColorCheck.y = yOff + 3;
                         optionComboColorCheck.combo_color_enable_id = i;
@@ -1043,9 +1043,9 @@ package popups
             else if (CURRENT_TAB == TAB_OTHER)
             {
                 menuOther.active = true;
-                menuOther.boxColor = 0x1495BD;
-                menuOther.boxNormalAlpha = 1;
-                menuOther.boxActiveAlpha = 1;
+                menuOther.color = GameBackgroundColor.BG_POPUP;
+                menuOther.normalAlpha = 0.9;
+                menuOther.activeAlpha = 1;
 
                 //- Isolation
                 var gameIsolationStart:Text = new Text(_lang.string("options_isolation_start"));
@@ -1089,7 +1089,7 @@ package popups
                 box.addChild(autoSaveLocalCheckboxText);
                 yOff += 2;
 
-                autoSaveLocalCheckbox = new checkBox();
+                autoSaveLocalCheckbox = new BoxCheck();
                 autoSaveLocalCheckbox.x = xOff + 2;
                 autoSaveLocalCheckbox.y = yOff;
                 autoSaveLocalCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
@@ -1102,7 +1102,7 @@ package popups
                 box.addChild(useCacheCheckboxText);
                 yOff += 2;
 
-                useCacheCheckbox = new checkBox();
+                useCacheCheckbox = new BoxCheck();
                 useCacheCheckbox.x = xOff + 2;
                 useCacheCheckbox.y = yOff;
                 useCacheCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
@@ -1115,7 +1115,7 @@ package popups
                 box.addChild(useVSyncCheckboxText);
                 yOff += 2;
 
-                useVSyncCheckbox = new checkBox();
+                useVSyncCheckbox = new BoxCheck();
                 useVSyncCheckbox.x = xOff + 2;
                 useVSyncCheckbox.y = yOff;
                 useVSyncCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
@@ -1128,7 +1128,7 @@ package popups
                 box.addChild(useWebsocketCheckboxText);
                 yOff += 2;
 
-                useWebsocketCheckbox = new checkBox();
+                useWebsocketCheckbox = new BoxCheck();
                 useWebsocketCheckbox.x = xOff + 2;
                 useWebsocketCheckbox.y = yOff;
                 useWebsocketCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
@@ -1142,7 +1142,7 @@ package popups
                 box.addChild(flipGraphCheckboxText);
                 yOff += 2;
 
-                flipGraphCheckbox = new checkBox();
+                flipGraphCheckbox = new BoxCheck();
                 flipGraphCheckbox.x = xOff + 2;
                 flipGraphCheckbox.y = yOff;
                 flipGraphCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
@@ -1170,7 +1170,7 @@ package popups
                 yOff += 30;
 
                 // Multiplayer - Timestamps
-                timestampCheck = new checkBox();
+                timestampCheck = new BoxCheck();
                 timestampCheck.x = xOff + 3;
                 timestampCheck.y = yOff;
                 timestampCheck.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
@@ -1225,7 +1225,7 @@ package popups
                     box.addChild(gameLanguageOptionText);
                     yOff += 2;
 
-                    var optionLanguageCheck:checkBox = new checkBox();
+                    var optionLanguageCheck:BoxCheck = new BoxCheck();
                     optionLanguageCheck.x = xOff + 2;
                     optionLanguageCheck.y = yOff;
                     optionLanguageCheck.languageID = lang;
@@ -1276,7 +1276,7 @@ package popups
 
 
                 // Legacy Song Display
-                legacySongsCheck = new checkBox();
+                legacySongsCheck = new BoxCheck();
                 legacySongsCheck.x = xOff + 3;
                 legacySongsCheck.y = yOff;
                 legacySongsCheck.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
@@ -1713,7 +1713,7 @@ package popups
                 var resB:BoxButton = new BoxButton(100, 35, "RESET", 12, "#990000");
                 resB.x = 5;
                 resB.y = 5;
-                resB.boxColor = 0x330000;
+                resB.color = 0x330000;
                 confirmP.addChild(resB);
                 resB.addEventListener(MouseEvent.CLICK, function(e:Event):void
                 {
@@ -1729,7 +1729,7 @@ package popups
                 var conB:BoxButton = new BoxButton(100, 35, "Close", 12, "#000000");
                 conB.x = 5;
                 conB.y = 45;
-                conB.boxColor = 0;
+                conB.color = 0;
                 confirmP.addChild(conB);
                 conB.addEventListener(MouseEvent.CLICK, function(e:Event):void
                 {
@@ -1950,6 +1950,7 @@ package popups
         public function setSettings():void
         {
             var i:int;
+            var item:*;
 
             if (box == null)
             {
@@ -1962,9 +1963,9 @@ package popups
                 optionGameSpeed.text = _gvars.activeUser.gameSpeed.toString();
 
                 // Set Scroll
-                for each (var item:Object in optionScrollDirections)
+                for each (item in optionScrollDirections)
                 {
-                    item.gotoAndStop(_gvars.activeUser.slideDirection == item.slideDirection ? 2 : 1);
+                    item.checked = (_gvars.activeUser.slideDirection == item.slideDirection);
                 }
 
                 // Set Keys
@@ -1980,7 +1981,7 @@ package popups
                 optionJudgeOffset.text = _gvars.activeUser.JUDGE_OFFSET.toString();
 
                 // Set Auto Judge Offset
-                autoJudgeOffsetCheck.gotoAndStop(_gvars.activeUser.AUTO_JUDGE_OFFSET ? 2 : 1);
+                autoJudgeOffsetCheck.checked = _gvars.activeUser.AUTO_JUDGE_OFFSET;
                 optionJudgeOffset.selectable = !_gvars.activeUser.AUTO_JUDGE_OFFSET;
                 optionJudgeOffset.alpha = _gvars.activeUser.AUTO_JUDGE_OFFSET ? 0.55 : 1.0;
 
@@ -2005,7 +2006,7 @@ package popups
                     optionRate.text = _gvars.activeUser.songRate.toString();
                 }
 
-                forceJudgeCheck.gotoAndStop(_gvars.activeUser.forceNewJudge ? 2 : 1);
+                forceJudgeCheck.checked = _gvars.activeUser.forceNewJudge;
                 forceJudgeCheck.visible = gameForceJudgeMode.visible = (_gvars.activeUser.frameRate <= 30);
 
                 // Set Autofails
@@ -2019,19 +2020,19 @@ package popups
                 // Set Game Mods
                 for each (item in optionGameMods)
                 {
-                    item.gotoAndStop(_gvars.activeUser.activeMods.indexOf(item.mod) != -1 ? 2 : 1);
+                    item.checked = (_gvars.activeUser.activeMods.indexOf(item.mod) != -1);
                 }
 
                 // Set Visual Game Mods
                 for each (item in optionVisualGameMods)
                 {
-                    item.gotoAndStop(_gvars.activeUser.activeVisualMods.indexOf(item.visual_mod) != -1 ? 2 : 1);
+                    item.checked = (_gvars.activeUser.activeVisualMods.indexOf(item.visual_mod) != -1);
                 }
 
                 // Set Noteskin
                 for each (item in optionNoteskins)
                 {
-                    item.gotoAndStop(item.skin == _gvars.activeUser.activeNoteskin ? 2 : 1);
+                    item.checked = (item.skin == _gvars.activeUser.activeNoteskin);
                 }
                 if (optionNoteskinPreview != null)
                 {
@@ -2050,7 +2051,7 @@ package popups
                 // Set Display
                 for each (item in optionDisplays)
                 {
-                    item.gotoAndStop(_gvars.activeUser["DISPLAY_" + item.display] ? 2 : 1);
+                    item.checked = (_gvars.activeUser["DISPLAY_" + item.display]);
                 }
             }
             else if (CURRENT_TAB == TAB_COLORS)
@@ -2068,7 +2069,7 @@ package popups
                     optionComboColors[i]["display"].color = _gvars.activeUser.comboColours[i];
                     if (i > 0)
                     {
-                        optionComboColors[i]["enable"].gotoAndStop(_gvars.activeUser.enableComboColors[i] ? 2 : 1);
+                        optionComboColors[i]["enable"].checked = (_gvars.activeUser.enableComboColors[i]);
                     }
                 }
                 // Set Game Colors
@@ -2089,24 +2090,24 @@ package popups
                 isolationText.text = (_avars.configIsolationStart + 1).toString();
                 isolationTotalText.text = _avars.configIsolationLength.toString();
 
-                timestampCheck.gotoAndStop(_gvars.activeUser.DISPLAY_MP_TIMESTAMP ? 2 : 1);
-                legacySongsCheck.gotoAndStop(_gvars.activeUser.DISPLAY_LEGACY_SONGS ? 2 : 1);
+                timestampCheck.checked = _gvars.activeUser.DISPLAY_MP_TIMESTAMP;
+                legacySongsCheck.checked = _gvars.activeUser.DISPLAY_LEGACY_SONGS;
                 optionMPSize.text = _avars.configMPSize.toString();
                 startUpScreenCombo.selectedIndex = _gvars.activeUser.startUpScreen;
 
                 // Set Language
                 for each (item in optionGameLanguages)
                 {
-                    item.gotoAndStop(item.languageID == _gvars.activeUser.language ? 2 : 1);
+                    item.checked = (item.languageID == _gvars.activeUser.language);
                 }
 
-                autoSaveLocalCheckbox.gotoAndStop(_gvars.air_autoSaveLocalReplays ? 2 : 1);
-                useCacheCheckbox.gotoAndStop(_gvars.air_useLocalFileCache ? 2 : 1);
-                useVSyncCheckbox.gotoAndStop(_gvars.air_useVSync ? 2 : 1);
-                useWebsocketCheckbox.gotoAndStop(_gvars.air_useWebsockets ? 2 : 1);
+                autoSaveLocalCheckbox.checked = _gvars.air_autoSaveLocalReplays;
+                useCacheCheckbox.checked = _gvars.air_useLocalFileCache;
+                useVSyncCheckbox.checked = _gvars.air_useVSync;
+                useWebsocketCheckbox.checked = _gvars.air_useWebsockets;
 
                 var flipGraph:Boolean = LocalStore.getVariable("result_flip_graph", false);
-                flipGraphCheckbox.gotoAndStop(flipGraph ? 2 : 1);
+                flipGraphCheckbox.checked = flipGraph;
             }
             // Save Local
             if (_gvars.activeUser == _gvars.playerUser)

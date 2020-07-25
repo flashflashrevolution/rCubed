@@ -374,7 +374,7 @@ package game
                 navSaveReplay.visible = true;
                 if (!canSendScore(result, true, false, true, true) || _gvars.flashvars.preview_file)
                 {
-                    navSaveReplay.boxColor = 0x000000;
+                    navSaveReplay.color = 0x000000;
                     navSaveReplay.alpha = 0.5;
                     navSaveReplay.enabled = false;
                 }

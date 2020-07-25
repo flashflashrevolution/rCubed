@@ -24,7 +24,7 @@ package menu
         private var pane:ScrollPane;
         private var friendBoxItems:Array; // Vector.<FriendItem>;
         private var selectedGenre:Sprite;
-        private var Refresh:Text;
+        private var refreshButton:Text;
 
         public var options:Object;
         public var isLoading:Boolean = false;
@@ -34,7 +34,7 @@ package menu
             super(myParent);
         }
 
-        override public function init():void
+        override public function init():Boolean
         {
             //- Setup Settings
             options = new Object();
@@ -71,19 +71,21 @@ package menu
             selectedGenre.y = 120;
             this.addChild(selectedGenre);
 
-            Refresh = new Text("Refresh", 14);
-            Refresh.x = 5;
-            Refresh.y = 122;
-            Refresh.height = 22.6;
-            Refresh.width = 130.75;
-            Refresh.mouseChildren = false;
-            Refresh.useHandCursor = true;
-            Refresh.buttonMode = true;
-            Refresh.addEventListener(MouseEvent.CLICK, refreshClick);
-            this.addChild(Refresh);
+            refreshButton = new Text("Refresh", 14);
+            refreshButton.x = 5;
+            refreshButton.y = 122;
+            refreshButton.height = 22.6;
+            refreshButton.width = 130.75;
+            refreshButton.mouseChildren = false;
+            refreshButton.useHandCursor = true;
+            refreshButton.buttonMode = true;
+            refreshButton.addEventListener(MouseEvent.CLICK, refreshClick);
+            this.addChild(refreshButton);
 
             //- Add Content
             buildFriends();
+
+            return true;
         }
 
         override public function dispose():void

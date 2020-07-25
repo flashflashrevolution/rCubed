@@ -3,15 +3,13 @@ package menu
     import assets.menu.ScrollBackground;
     import assets.menu.ScrollDragger;
     import assets.menu.SongSelectionBackground;
-    import assets.options.checkBox;
     import by.blooddy.crypto.MD5;
     import classes.BoxButton;
-    import classes.Language;
+    import classes.BoxCheck;
     import classes.Playlist;
     import classes.Text;
     import com.flashfla.components.ScrollBar;
     import com.flashfla.components.ScrollPane;
-    import com.flashfla.utils.ObjectUtil;
     import flash.display.Bitmap;
     import flash.display.Loader;
     import flash.display.Sprite;
@@ -31,7 +29,7 @@ package menu
 
         private var normalTokenButton:BoxButton;
         private var skillTokenButton:BoxButton;
-        private var hideCompleteCheck:checkBox;
+        private var hideCompleteCheck:BoxCheck;
 
         public var options:Object;
         public var isLoading:Boolean = false;
@@ -96,7 +94,7 @@ package menu
             hideLabel.y = 230;
             addChild(hideLabel);
 
-            hideCompleteCheck = new checkBox();
+            hideCompleteCheck = new BoxCheck();
             hideCompleteCheck.x = 106;
             hideCompleteCheck.y = 233;
             hideCompleteCheck.addEventListener(MouseEvent.CLICK, hideCompleteClick);
@@ -111,7 +109,7 @@ package menu
         private function hideCompleteClick(e:Event):void
         {
             options.filter_complete = !options.filter_complete;
-            hideCompleteCheck.gotoAndStop(options.filter_complete ? 2 : 1);
+            hideCompleteCheck.checked = options.filter_complete;
             buildTokens();
         }
 

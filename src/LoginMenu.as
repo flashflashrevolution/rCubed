@@ -1,8 +1,8 @@
 package
 {
-    import assets.options.checkBox;
     import classes.Box;
     import classes.BoxButton;
+    import classes.BoxCheck;
     import classes.BoxText;
     import classes.Language;
     import classes.Playlist;
@@ -44,7 +44,7 @@ package
 
         private var input_user:BoxText;
         private var input_pass:BoxText;
-        private var saveDetails:checkBox;
+        private var saveDetails:BoxCheck;
 
         private var isLoading:Boolean = false;
 
@@ -171,7 +171,7 @@ package
             input_pass.displayAsPassword = true;
             panel_login.addChild(input_pass);
 
-            saveDetails = new checkBox();
+            saveDetails = new BoxCheck();
             saveDetails.x = 92;
             saveDetails.y = 113;
             saveDetails.addEventListener(MouseEvent.CLICK, toggleDetailsSave);
@@ -204,7 +204,7 @@ package
             {
                 input_user.text = savedInfos.username;
                 input_pass.text = savedInfos.password;
-                saveDetails.gotoAndStop(2);
+                saveDetails.checked = true;
             }
 
             // Set Focus when at textboxes
@@ -223,12 +223,12 @@ package
 
         private function get rememberPassword():Boolean
         {
-            return saveDetails.currentFrame == 2;
+            return saveDetails.checked;
         }
 
         public function toggleDetailsSave(e:Event):void
         {
-            saveDetails.gotoAndStop(saveDetails.currentFrame % 2 == 0 ? 1 : 2);
+            saveDetails.checked = !saveDetails.checked;
         }
 
         public function playAsGuest(e:Event = null):void

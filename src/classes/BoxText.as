@@ -1,37 +1,29 @@
 package classes
 {
-    import flash.display.Sprite;
     import flash.events.Event;
     import flash.events.FocusEvent;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
     import flash.text.TextFormat;
 
-    dynamic public class BoxText extends Sprite
+    dynamic public class BoxText extends Box
     {
         private var _textFormat:TextFormat = Constant.TEXT_FORMAT_UNICODE;
-        private var _box:Box;
         private var _input:TextField;
         private var _isFocused:Boolean = false;
 
-        private var _width:Number;
-        private var _height:Number;
-
         public function BoxText(width:int = 100, height:int = 20, textformat:TextFormat = null)
         {
-            super();
-
-            this._width = width;
-            this._height = height;
-
             if (textformat)
                 _textFormat = textformat;
 
-            _box = new Box(this._width, this._height, false, false);
-            this.addChild(_box);
+            super(width + 1, height + 1, false, false);
+        }
 
+        override protected function init():void
+        {
             _input = new TextField();
-            _input.width = this._width - 4;
+            _input.width = width - 4;
             _input.type = "input";
             _input.embedFonts = true;
             _input.antiAliasType = AntiAliasType.ADVANCED;
@@ -39,31 +31,34 @@ package classes
 
             // Position Input within Box
             _input.text = "X";
-            _input.height = Math.min(_input.textHeight + 4, _height);
+            _input.height = Math.min(_input.textHeight + 4, height);
             _input.text = "";
             _input.x = 2;
-            _input.y = Math.round(_height / 2 - _input.height / 2) - 1;
+            _input.y = Math.round(height / 2 - _input.height / 2) - 1;
 
             _input.addEventListener(FocusEvent.FOCUS_IN, onFocus);
             _input.addEventListener(FocusEvent.FOCUS_OUT, onFocus);
             _input.addEventListener(Event.CHANGE, onChange);
             this.addChild(_input);
+
+            super.init();
         }
 
-        public function dispose():void
+        override public function dispose():void
         {
-            _box.dispose();
-            _box = null;
-
+            super.dispose();
             _input.removeEventListener(FocusEvent.FOCUS_IN, onFocus);
             _input.removeEventListener(FocusEvent.FOCUS_OUT, onFocus);
             _input.removeEventListener(Event.CHANGE, onChange);
-            _input = null;
         }
 
+
+        ////////////////////////////////////////////////////////////////////////
+        //- Events
         private function onFocus(e:FocusEvent):void
         {
-            _isFocused = (e.type == "focusIn");
+            _isFocused = (e.type == FocusEvent.FOCUS_IN);
+            draw();
         }
 
         private function onChange(e:Event):void
@@ -71,27 +66,13 @@ package classes
             this.dispatchEvent(e);
         }
 
-        // Proxy Methods
-        public function get borderColor():uint
+        override public function get highlight():Boolean
         {
-            return _box.borderColor;
+            return _isFocused || super.highlight;
         }
 
-        public function set borderColor(newVal:uint):void
-        {
-            _box.borderColor = newVal;
-        }
-
-        public function get color():uint
-        {
-            return _box.color;
-        }
-
-        public function set color(newVal:uint):void
-        {
-            _box.color = newVal;
-        }
-
+        ////////////////////////////////////////////////////////////////////////
+        //- Getters / Setters
         public function get text():String
         {
             return _input.text;

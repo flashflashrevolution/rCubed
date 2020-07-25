@@ -162,7 +162,7 @@ package popups
                 btn_note_color_input.x = (n % 2 == 0 ? xPos : xPos + ((sidebar_width - 25) / 2) + 5);
                 btn_note_color_input.y = yPos;
                 btn_note_color_input.alpha = 0.75;
-                btn_note_color_input.color = DEFAULT_OPTIONS.noteColors[n];
+                btn_note_color_input.note_color = DEFAULT_OPTIONS.noteColors[n];
 
                 if (n % 2 == 1)
                     yPos += 25;
@@ -455,7 +455,7 @@ package popups
                 });
                 return;
             }
-            else if (e.target.hasOwnProperty("color"))
+            else if (e.target.hasOwnProperty("note_color"))
             {
                 active_color = e.target.color;
                 updateDirections();

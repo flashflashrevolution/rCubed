@@ -348,9 +348,9 @@ package popups
             if (e.target is BoxButton)
             {
                 if (DRAW_EXTERNAL)
-                    ENGINE_EXTERNAL_ID = e.target.engineId;
+                    ENGINE_EXTERNAL_ID = e.target.engine_id;
                 else
-                    ENGINE_RECENT_ID = e.target.engineId;
+                    ENGINE_RECENT_ID = e.target.engine_id;
                 renderReplays();
             }
         }
@@ -475,7 +475,7 @@ package popups
                 engineID = list[i];
                 var engineBox:BoxButton = new BoxButton(133, 27, engineID.toUpperCase() + " (" + (DRAW_EXTERNAL ? EXTERNAL_REPLAYS[engineID].length : INTERNAL_REPLAYS[engineID]) + ")", 12);
                 engineBox.x = i * 138 + xOffset;
-                engineBox.engineId = engineID;
+                engineBox.engine_id = engineID;
                 engine_list.addChild(engineBox);
 
                 engineBox.alpha = engineID == selectedID ? 1 : 0.5;
