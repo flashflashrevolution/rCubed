@@ -107,9 +107,21 @@ package classes
             return _width;
         }
 
+        override public function set width(val:Number):void
+        {
+            _width = val;
+            draw();
+        }
+
         override public function get height():Number
         {
             return _height;
+        }
+
+        override public function set height(val:Number):void
+        {
+            _height = val;
+            draw();
         }
 
         public function get highlight():Boolean

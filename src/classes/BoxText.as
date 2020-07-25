@@ -110,7 +110,7 @@ package classes
 
         public function set autoSize(newString:String):void
         {
-            _input.x = newString == "center" ? 2 : 0;
+            _input.x = newString == "center" ? 4 : 0;
             _input.autoSize = newString;
         }
 
