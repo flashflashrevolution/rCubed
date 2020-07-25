@@ -36,6 +36,7 @@ package menu
     import flash.events.Event;
     import flash.events.KeyboardEvent;
     import flash.events.MouseEvent;
+    import flash.text.TextField;
     import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
     import flash.ui.Keyboard;
@@ -340,6 +341,7 @@ package menu
          */
         private function e_defaultEngineLoadFail(e:Event):void
         {
+            _playlist.removeEventListener(GlobalVariables.LOAD_ERROR, e_defaultEngineLoadFail);
             _playlist.engineChangeHandler(e);
             switchTo(MainMenu.MENU_SONGSELECTION, true);
         }
@@ -503,9 +505,16 @@ package menu
             var song:Array;
             var sI:SongItem;
 
+            // Refresh the queue playlist if we're viewing it right now
+            if (isQueuePlaylist)
+            {
+                songList = _gvars.songQueue;
+                genreLength = songList.length;
+            }
+
             //- Set Song array based on selected genre
             // DM_SEARCH
-            if (options.activeGenre == PLAYLIST_OTHER)
+            else if (options.activeGenre == PLAYLIST_OTHER)
             {
                 // Doing search, build array based on case-insensitive match
                 if (options.isFilter)
@@ -595,12 +604,6 @@ package menu
                 }
             }
 
-            // Refresh the queue playlist if we're viewing it right now
-            if (isQueuePlaylist)
-            {
-                songList = _gvars.songQueue;
-                genreLength = songList.length;
-            }
             songItemRemoveQueueContext.visible = isQueuePlaylist;
 
             //- Pages
@@ -721,9 +724,6 @@ package menu
             // No need to do anything if nothing changed
             if (index == last)
                 return;
-
-            // Remove Highscore Load listener
-            _gvars.removeEventListener(GlobalVariables.LOAD_COMPLETE, highscoresLoaded);
 
             // Set Index
             options.activeIndex = index;
@@ -1649,19 +1649,8 @@ package menu
                 {
                     var prompt:MultiplayerPrompt = new MultiplayerPrompt(this, "Song Queue Name");
                     prompt.move(Main.GAME_WIDTH / 2 - prompt.width / 2, Main.GAME_HEIGHT / 2 - prompt.height / 2);
-                    prompt.addEventListener(MultiplayerPrompt.EVENT_SEND, function(subevent:Object):void
-                    {
-                        if (subevent.params.value.length > 0)
-                        {
-                            var songArray:Array = [];
-                            for (var songQueueI:int = 0; songQueueI < _gvars.songQueue.length; songQueueI++)
-                            {
-                                songArray[songArray.length] = _gvars.songQueue[songQueueI].level;
-                            }
-                            _gvars.playerUser.songQueues.push(new SongQueueItem(subevent.params.value, songArray));
-                            _gvars.playerUser.save();
-                        }
-                    });
+                    prompt.addEventListener(MultiplayerPrompt.EVENT_SEND, e_saveSongQueue);
+                    prompt.addEventListener(Event.CLOSE, e_closeSongQueuePrompt);
                 }
                 else if (clickAction == "queueManager")
                 {
@@ -1693,6 +1682,35 @@ package menu
                 }
             }
             stage.focus = stage;
+        }
+
+        /**
+         * Callback for saving a song queue.
+         * @param subevent
+         */
+        private function e_saveSongQueue(subevent:Object):void
+        {
+            if (subevent.params.value.length > 0)
+            {
+                var songArray:Array = [];
+                for (var songQueueI:int = 0; songQueueI < _gvars.songQueue.length; songQueueI++)
+                {
+                    songArray[songArray.length] = _gvars.songQueue[songQueueI].level;
+                }
+                _gvars.playerUser.songQueues.push(new SongQueueItem(subevent.params.value, songArray));
+                _gvars.playerUser.save();
+            }
+        }
+
+        /**
+         * Callback for closing the prompt for saving a song queue.
+         * @param e
+         */
+        private function e_closeSongQueuePrompt(e:Event):void
+        {
+            var prompt:MultiplayerPrompt = (e.target as MultiplayerPrompt);
+            prompt.removeEventListener(MultiplayerPrompt.EVENT_SEND, e_saveSongQueue);
+            prompt.removeEventListener(Event.CLOSE, e_closeSongQueuePrompt);
         }
 
         /**
@@ -1757,7 +1775,7 @@ package menu
                     return;
 
                 case Keyboard.ENTER:
-                    if (!(stage.focus is PushButton) && options.activeSongID >= 0)
+                    if (!((stage.focus is PushButton) || (stage.focus is TextField)) && options.activeSongID >= 0)
                     {
                         if (_mp.gameplayHasOpponent())
                             multiplayerLoad(options.activeSongID);
@@ -1767,7 +1785,7 @@ package menu
                     return;
 
                 default:
-                    if (!(stage.focus is PushButton) && ((e.keyCode == Keyboard.BACKSPACE) || (e.keyCode == Keyboard.SPACE) || (e.keyCode >= 48 && e.keyCode <= 111) || (e.keyCode >= 186 && e.keyCode <= 222)))
+                    if (!((stage.focus is PushButton) || (stage.focus is TextField)) && ((e.keyCode == Keyboard.BACKSPACE) || (e.keyCode == Keyboard.SPACE) || (e.keyCode >= 48 && e.keyCode <= 111) || (e.keyCode >= 186 && e.keyCode <= 222)))
                     {
                         // Focus on search and begin typing.
                         if (options.infoTab != TAB_SEARCH)
@@ -1802,6 +1820,7 @@ package menu
                     {
                         setActiveIndex(newIndex, lastIndex, true);
                         buildInfoBox();
+                        stage.focus = null;
                         break;
                     }
                 }
@@ -2001,6 +2020,7 @@ internal class HoverPABox extends Sprite
     {
         _hoverTimer.stop();
         this.removeEventListener(MouseEvent.ROLL_OUT, e_hoverRollOut);
+        this.removeEventListener(Event.ENTER_FRAME, e_onEnterFrame);
 
         if (_hoverSprite.parent)
             _hoverSprite.parent.removeChild(_hoverSprite);
