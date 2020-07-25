@@ -14,7 +14,10 @@ package popups
 
     public class PopupContextMenu extends MenuPanel
     {
-        private static var redrawBoolean:Boolean = false;
+        CONFIG::debug
+        {
+            private static var redrawBoolean:Boolean = false;
+        }
 
         public var _gvars:GlobalVariables = GlobalVariables.instance;
 
