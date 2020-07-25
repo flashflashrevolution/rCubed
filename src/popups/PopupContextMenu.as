@@ -8,10 +8,15 @@ package popups
     import flash.events.MouseEvent;
     import flash.filters.BlurFilter;
     import flash.geom.Point;
+    import flash.profiler.showRedrawRegions;
+
     import menu.MenuPanel;
+    import arc.mp.MultiplayerSingleton;
 
     public class PopupContextMenu extends MenuPanel
     {
+        private static var redrawBoolean:Boolean = false;
+
         public var _gvars:GlobalVariables = GlobalVariables.instance;
 
         //- Background
@@ -43,13 +48,15 @@ package popups
             var cButtonHeight:Number = 39;
             var yOff:Number = 5;
 
+            // Debug Options
             CONFIG::debug
             {
                 //- Profiler
                 cButton = new BoxButton(box.width - 10, cButtonHeight, "Toggle Profiler");
                 cButton.x = 5;
                 cButton.y = yOff;
-                cButton.action = "debugProfiler";
+                cButton.action = "debug_profiler";
+                cButton.boxColor = 0x222222;
                 cButton.addEventListener(MouseEvent.CLICK, clickHandler);
                 this.addChild(cButton);
                 yOff += cButtonHeight + 5;
@@ -58,17 +65,27 @@ package popups
                 cButton = new BoxButton(box.width - 10, cButtonHeight, "Toggle ReDraw Regions");
                 cButton.x = 5;
                 cButton.y = yOff;
-                cButton.action = "redrawRegions";
+                cButton.action = "redraw_regions";
+                cButton.boxColor = 0x222222;
                 cButton.addEventListener(MouseEvent.CLICK, clickHandler);
                 this.addChild(cButton);
                 yOff = 5;
             }
 
-            //- Fullscreen
+            //- Reload Engine
+            cButton = new BoxButton(box.width - 10, cButtonHeight, "Reload Engine / User");
+            cButton.x = 5;
+            cButton.y = yOff;
+            cButton.action = "reload_engine";
+            cButton.addEventListener(MouseEvent.CLICK, clickHandler);
+            box.addChild(cButton);
+            yOff += cButtonHeight + 5;
+
+            //- Screenshot - Local
             cButton = new BoxButton(box.width - 10, cButtonHeight, "Save ScreenShot - Local");
             cButton.x = 5;
             cButton.y = yOff;
-            cButton.action = "screenshotLocal";
+            cButton.action = "screenshot_local";
             cButton.addEventListener(MouseEvent.CLICK, clickHandler);
             box.addChild(cButton);
             yOff += cButtonHeight + 5;
@@ -78,6 +95,15 @@ package popups
             cButton.x = 5;
             cButton.y = yOff;
             cButton.action = "fullscreen";
+            cButton.addEventListener(MouseEvent.CLICK, clickHandler);
+            box.addChild(cButton);
+            yOff += cButtonHeight + 5;
+
+            //- Switch Profile
+            cButton = new BoxButton(box.width - 10, cButtonHeight, "Switch Profile");
+            cButton.x = 5;
+            cButton.y = yOff;
+            cButton.action = "switch_profile";
             cButton.addEventListener(MouseEvent.CLICK, clickHandler);
             box.addChild(cButton);
             yOff += cButtonHeight + 5;
@@ -103,40 +129,42 @@ package popups
 
         private function clickHandler(e:MouseEvent):void
         {
-
             removePopup();
 
             //- Debug Actions
             CONFIG::debug
             {
-                if (e.target.action == "debugProfiler")
+                if (e.target.action == "debug_profiler")
                 {
                     SWFProfiler.onSelect();
                 }
-                else if (e.target.action == "redrawRegions")
+                else if (e.target.action == "redraw_regions")
                 {
-
+                    redrawBoolean = !redrawBoolean;
+                    showRedrawRegions(redrawBoolean, 0xFF0000);
                 }
             }
 
             //- Close
             if (e.target.action == "fullscreen")
             {
-                try
-                {
-                    _gvars.toggleFullScreen();
-                }
-                catch (e:Error)
-                {
-                }
+                _gvars.toggleFullScreen();
             }
-            else if (e.target.action == "screenshotLocal")
+            else if (e.target.action == "screenshot_local")
             {
                 _gvars.takeScreenShot({o: false, s: 1});
             }
-            else if (e.target.action == "options")
+            else if (e.target.action == "reload_engine")
             {
-                addPopup(Main.POPUP_OPTIONS);
+                _gvars.tempFlags = {};
+                _gvars.gameMain.switchTo("none");
+            }
+            else if (e.target.action == "switch_profile")
+            {
+                MultiplayerSingleton.destroyInstance();
+                _gvars.tempFlags = {};
+                _gvars.playerUser.refreshUser();
+                _gvars.gameMain.switchTo("GameLoginPanel");
             }
         }
     }

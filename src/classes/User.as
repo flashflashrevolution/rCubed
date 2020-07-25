@@ -61,7 +61,7 @@ package classes
         public var credits:Number;
         public var purchased:Array;
         public var averageRank:Number;
-        public var level_ranks:Object;
+        public var level_ranks:Object = {};
         public var avatar:Loader;
         public var startUpScreen:int = 0; // 0 = MP Connect + MP Screen   |   1 = MP Connect + Song List   |   2 = Song List
 
@@ -169,6 +169,13 @@ package classes
                     load();
                 }
             }
+        }
+
+        public function refreshUser():void
+        {
+            _gvars.userSession = "0";
+            _gvars.playerUser = new User(true, true);
+            _gvars.activeUser = _gvars.playerUser;
         }
 
         ///- Public
@@ -308,7 +315,7 @@ package classes
             this.avatar.load(new URLRequest(Constant.USER_AVATAR_URL + "?uid=" + this.id + "&cHeight=99&cWidth=99"));
 
             // Setup Settings from server or local
-            if (_data["settings"] && !this.isGuest)
+            if (_data["settings"] != null && !this.isGuest)
             {
                 settings = JSON.parse(_data.settings);
             }
