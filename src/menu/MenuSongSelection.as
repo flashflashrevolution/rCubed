@@ -519,10 +519,7 @@ package menu
                 // Doing search, build array based on case-insensitive match
                 if (options.isFilter)
                 {
-                    songList = _playlist.indexList.filter(function(item:Object, index:int, array:Array):Boolean
-                    {
-                        return options.filter(item);
-                    });
+                    songList = _playlist.indexList.filter(filterSongOptionsFilter);
 
                     genreLength = songList.length;
                     songList = songList.slice(options.pageNumber * ITEM_PER_PAGE, (options.pageNumber + 1) * ITEM_PER_PAGE);
@@ -544,7 +541,7 @@ package menu
 
                 // Song List Filters
                 songList = filterSongListLegacy(songList);
-                songList = filterSongListUserFilter(songList);
+                songList = filterSongListUser(songList);
 
                 // List Length and Slice into pages.
                 genreLength = songList.length;
@@ -574,7 +571,7 @@ package menu
 
                     // Song List Filters
                     songList = filterSongListLegacy(songList);
-                    songList = filterSongListUserFilter(songList);
+                    songList = filterSongListUser(songList);
 
                     // Sort and get List Length
                     songList.sortOn(["access", "difficulty", "name"], [Array.NUMERIC, Array.NUMERIC, Array.CASEINSENSITIVE]);
@@ -590,7 +587,7 @@ package menu
 
                     // Song List Filters
                     songList = filterSongListLegacy(songList);
-                    songList = filterSongListUserFilter(songList);
+                    songList = filterSongListUser(songList);
 
                     // Sort, List Length, and Slice into pages.
                     songList.sortOn(["access", "difficulty", "name"], [Array.NUMERIC, Array.NUMERIC, Array.CASEINSENSITIVE]);
@@ -616,7 +613,7 @@ package menu
             // User Filter
             if (options.activeGenre != PLAYLIST_ALL && options.infoTab != TAB_QUEUE)
             {
-                songList = filterSongListUserFilter(songList);
+                songList = filterSongListUser(songList);
                 genreLength = songList.length;
             }
 
@@ -669,6 +666,14 @@ package menu
         }
 
         /**
+         * Array filter for options.filter
+         */
+        private function filterSongOptionsFilter(item:Object, index:int, array:Array):Boolean
+        {
+            return options.filter(item);
+        }
+
+        /**
          * Process the legacy filter on the given song list if enabled.
          * @param songList Song List Array for Song objects to filter.
          */
@@ -676,29 +681,39 @@ package menu
         {
             if (!_playlist.engine && !_gvars.activeUser.DISPLAY_LEGACY_SONGS)
             {
-                songList = songList.filter(function(item:Object, index:int, array:Array):Boolean
-                {
-                    return item.genre != Constant.LEGACY_GENRE;
-                });
+                songList = songList.filter(filterSongListLegacyFilter);
             }
 
             return songList;
         }
 
         /**
+         * Array filter for filterSongListLegacy.
+         */
+        private function filterSongListLegacyFilter(item:Object, index:int, array:Array):Boolean
+        {
+            return item.genre != Constant.LEGACY_GENRE;
+        }
+
+        /**
          * Process the user filter on the given song list if enabled.
          * @param songList Song List Array for Song objects to filter.
          */
-        private function filterSongListUserFilter(songList:Array):Array
+        private function filterSongListUser(songList:Array):Array
         {
             if (_gvars.activeFilter != null)
             {
-                songList = songList.filter(function(item:Object, index:int, array:Array):Boolean
-                {
-                    return _gvars.activeFilter.process(item, _gvars.activeUser);
-                });
+                songList = songList.filter(filterSongListUserFilter);
             }
             return songList;
+        }
+
+        /**
+         * Array filter for filterSongListUser.
+         */
+        private function filterSongListUserFilter(item:Object, index:int, array:Array):Boolean
+        {
+            return _gvars.activeFilter.process(item, _gvars.activeUser);
         }
 
         /**
@@ -2053,7 +2068,23 @@ internal class HoverPABox extends Sprite
         // Position
         _hoverSprite.x = stagePoint.x;
         _hoverSprite.y = stagePoint.y;
-        this.parent.stage.addChild(_hoverSprite);
+
+        if (this.parent && this.parent.stage)
+        {
+            this.parent.stage.addChild(_hoverSprite);
+            this.addEventListener(Event.ENTER_FRAME, e_onEnterFrame, false, 0, true);
+        }
+    }
+
+    private function e_onEnterFrame(e:Event):void
+    {
+        if (!this.parent || !this.parent.stage)
+        {
+            this.removeEventListener(Event.ENTER_FRAME, e_onEnterFrame);
+
+            if (_hoverSprite && _hoverSprite.parent)
+                _hoverSprite.parent.removeChild(_hoverSprite);
+        }
     }
 
     private function drawHoverSprite():void
