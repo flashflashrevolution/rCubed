@@ -634,6 +634,35 @@ package classes.chart
             return chart.Notes.length;
         }
 
+        public function get chartTime():Number
+        {
+            if (noteMod.required())
+            {
+                return noteMod.transformSongLength();
+            }
+
+            if (!chart.Notes)
+            {
+                return 0;
+            }
+
+            return getNote(totalNotes - 1).time + 1; // 1 second for fadeout.
+        }
+
+        public function get chartTimeFormatted():String
+        {
+            var totalSecs:int = chartTime;
+            var minutes:String = Math.floor(totalSecs / 60).toString();
+            var seconds:String = (totalSecs % 60).toString();
+
+            if (seconds.length == 1)
+            {
+                seconds = "0" + seconds;
+            }
+
+            return minutes + ":" + seconds;
+        }
+
         public function get noteSteps():int
         {
             return chart.framerate + 1;

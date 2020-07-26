@@ -204,5 +204,39 @@ package arc
             }
             return notes.length;
         }
+
+        public function transformSongLength():Number
+        {
+            if (notes.length <= 0)
+                return 0;
+
+            var firstNote:Note;
+            var lastNote:Note = notes[notes.length - 1];
+            var time:Number = lastNote.time;
+
+            if (modIsolation)
+            {
+
+                if (options.isolationLength > 0)
+                {
+                    firstNote = notes[Math.min(notes.length - 1, options.isolationOffset - 1)];
+                    lastNote = notes[Math.min(notes.length - 1, options.isolationOffset + options.isolationLength)];
+                    time = lastNote.time - firstNote.time;
+                }
+                else
+                {
+                    firstNote = notes[Math.min(notes.length - 1, options.isolationOffset - 1)];
+                    time = lastNote.time - firstNote.time;
+                }
+            }
+
+            // Rates after everything.
+            if (modRate)
+            {
+                time /= options.songRate;
+            }
+
+            return time + 1; // 1 seconds for fade out.
+        }
     }
 }
