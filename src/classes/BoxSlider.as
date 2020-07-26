@@ -22,7 +22,7 @@ package classes
             init();
         }
 
-        protected function init(e:Event = null):void
+        protected function init():void
         {
             this.graphics.lineStyle(1, 0xFFFFFF, 0.3);
             this.graphics.moveTo(0, _height / 2);
