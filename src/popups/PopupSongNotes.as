@@ -1,16 +1,15 @@
 package popups
 {
     import assets.GameBackgroundColor;
-    import assets.options.checkBox;
     import classes.Alert;
     import classes.Box;
     import classes.BoxButton;
+    import classes.BoxCheck;
     import classes.BoxText;
     import classes.Language;
     import classes.Playlist;
     import classes.StarSelector;
     import classes.Text;
-    import flash.data.SQLResult;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
     import flash.events.Event;
@@ -47,8 +46,8 @@ package popups
 
         private var notesLength:Text;
         private var notesField:TextField;
-        private var setMirrorInvert:checkBox;
-        private var setCustomOffsets:checkBox;
+        private var setMirrorInvert:BoxCheck;
+        private var setCustomOffsets:BoxCheck;
 
         private var optionMusicOffset:BoxText;
         private var optionJudgeOffset:BoxText;
@@ -171,7 +170,7 @@ package popups
             setMirrorInvertText.y = yOff;
             box.addChild(setMirrorInvertText);
 
-            setMirrorInvert = new checkBox();
+            setMirrorInvert = new BoxCheck();
             setMirrorInvert.x = xOff + 2;
             setMirrorInvert.y = yOff + 2;
             setMirrorInvert.addEventListener(MouseEvent.CLICK, clickHandler);
@@ -183,7 +182,7 @@ package popups
             setCustomOffsetsText.y = yOff;
             box.addChild(setCustomOffsetsText);
 
-            setCustomOffsets = new checkBox();
+            setCustomOffsets = new BoxCheck();
             setCustomOffsets.x = xOff + 2;
             setCustomOffsets.y = yOff + 2;
             setCustomOffsets.addEventListener(MouseEvent.CLICK, clickHandler);
@@ -224,7 +223,7 @@ package popups
             revertOptions = new BoxButton(80, 27, _lang.string("menu_revert"));
             revertOptions.x = 20;
             revertOptions.y = box.height - 42;
-            revertOptions.boxColor = 0xff0000;
+            revertOptions.color = 0xff0000;
             revertOptions.addEventListener(MouseEvent.CLICK, clickHandler);
             box.addChild(revertOptions);
 
@@ -251,8 +250,8 @@ package popups
             {
                 notesField.text = sDetails.notes;
                 notesLength.text = "(" + notesField.length + " / 250)";
-                setMirrorInvert.gotoAndStop(1 + sDetails.set_mirror_invert);
-                setCustomOffsets.gotoAndStop(1 + sDetails.set_custom_offsets);
+                setMirrorInvert.checked = sDetails.set_mirror_invert;
+                setCustomOffsets.checked = sDetails.set_custom_offsets;
                 optionMusicOffset.text = sDetails.offset_music.toString();
                 optionJudgeOffset.text = sDetails.offset_judge.toString();
             }
@@ -273,10 +272,10 @@ package popups
         private function clickHandler(e:MouseEvent):void
         {
             if (e.target == setMirrorInvert)
-                setMirrorInvert.gotoAndStop(setMirrorInvert.currentFrame == 1 ? 2 : 1);
+                setMirrorInvert.checked = !setMirrorInvert.checked
 
             else if (e.target == setCustomOffsets)
-                setCustomOffsets.gotoAndStop(setCustomOffsets.currentFrame == 1 ? 2 : 1);
+                setCustomOffsets.checked = !setCustomOffsets.checked;
 
             //- Confirm Rating
             else if (e.target == confirmOptions)
@@ -300,8 +299,8 @@ package popups
                     "song_id": sObject["level"],
                     "offset_music": verifyFloat(optionMusicOffset.text, 0),
                     "offset_judge": verifyFloat(optionJudgeOffset.text, 0),
-                    "set_mirror_invert": (setMirrorInvert.currentFrame - 1),
-                    "set_custom_offsets": (setCustomOffsets.currentFrame - 1),
+                    "set_mirror_invert": (setMirrorInvert.checked ? 1 : 0),
+                    "set_custom_offsets": (setCustomOffsets.checked ? 1 : 0),
                     "notes": notesField.text};
             SQLQueries.saveSongDetails(_gvars.sql_conn, params);
         }

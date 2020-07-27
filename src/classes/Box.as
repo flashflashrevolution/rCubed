@@ -2,25 +2,33 @@ package classes
 {
     import flash.display.GradientType;
     import flash.display.Sprite;
-    import flash.events.Event;
     import flash.events.MouseEvent;
-    import flash.geom.Matrix;
 
-    public dynamic class Box extends Sprite
+    dynamic public class Box extends Sprite
     {
+        // Display
         private var _width:Number;
         private var _height:Number;
-        private var _box:Sprite;
-        private var _border:Sprite;
-        private var _isActive:Boolean = false;
-        private var _useHover:Boolean = true;
+        private var _highlight:Boolean = false;
+        private var _active:Boolean = false;
+
+        // Variables
+        protected var _useHover:Boolean = true;
         private var _useGradient:Boolean = true;
 
-        private var _normalAlpha:Number = 0.2;
-        private var _borderAlpha:Number = 0.55;
-        private var _activeAlpha:Number = 0.35;
-        private var _color:uint = 0xFFFFFF;
-        private var _borderColor:uint = 0xFFFFFF;
+        // Colors & Gradient
+        private var GRADIENT_COLOR:Array = [0xFFFFFF, 0xFFFFFF];
+        private var GRADIENT_ALPHA_HIGHLIGHT:Array = [0.35, 0.1225];
+        private var GRADIENT_ALPHA:Array = [0.2, 0.04];
+        private var GRADIENT_RATIO:Array = [0, 255];
+
+        private var BOX_COLOR:uint = 0xFFFFFF;
+        private var BOX_ALPHA:Number = 0.07;
+        private var BOX_ALPHA_ACTIVE:Number = 0.1225;
+
+        private var BORDER_COLOR:uint = 0xFFFFFF;
+        private var BORDER_ALPHA:Number = 0.35;
+        private var BORDER_ALPHA_ACTIVE:Number = 0.55;
 
         public function Box(width:Number, height:Number, useHover:Boolean = true, useGradient:Boolean = true):void
         {
@@ -30,128 +38,79 @@ package classes
             this._useGradient = useGradient;
 
             init();
-        }
-
-        protected function init(e:Event = null):void
-        {
-            //- Remove Stage Listener
-            if (e != null)
-                this.removeEventListener(Event.ADDED_TO_STAGE, init);
-
-            //- Gradient Box
-            var matrix:Matrix = new Matrix();
-            matrix.createGradientBox(100, 100, (Math.PI / 180) * 225);
-
-            //- Draw Box
-            _box = new Sprite();
-            _box.graphics.lineStyle(1, _color, 0, true);
-            if (_useGradient)
-                _box.graphics.beginGradientFill(GradientType.LINEAR, [_color, _color], [1, _normalAlpha], [0, 255], matrix);
-            else
-                _box.graphics.beginFill(_color, _activeAlpha);
-            _box.graphics.drawRect(0, 0, _width, _height);
-            _box.graphics.endFill();
-            _box.alpha = (_isActive ? _activeAlpha : _normalAlpha);
-            this.addChildAt(_box, 0);
-
-            //- Draw Border
-            _border = new Sprite();
-            _border.graphics.lineStyle(1, _borderColor, 1, true);
-            _border.graphics.beginFill(_borderColor, 0);
-            _border.graphics.drawRect(0, 0, _width, _height);
-            _border.graphics.endFill();
-            _border.alpha = (_isActive ? _borderAlpha : _activeAlpha);
-            this.addChildAt(_border, 1);
 
             //- Add Hover Listeners
-            if (_useHover)
-            {
-                this.addEventListener(MouseEvent.ROLL_OVER, boxOver, false, 0, true);
-            }
+            setHoverStatus(_useHover);
+        }
+
+        protected function init():void
+        {
+            draw();
+        }
+
+        public function draw():void
+        {
+            var gradient_alphas:Array = (highlight ? GRADIENT_ALPHA_HIGHLIGHT : GRADIENT_ALPHA);
+            var draw_fill_alpha:Number = (highlight ? BOX_ALPHA_ACTIVE : BOX_ALPHA);
+            var draw_border_alpha:Number = (highlight ? BORDER_ALPHA_ACTIVE : BORDER_ALPHA);
+
+            this.graphics.clear();
+
+            this.graphics.lineStyle(1, BORDER_COLOR, draw_border_alpha, true);
+            if (_useGradient)
+                this.graphics.beginGradientFill(GradientType.LINEAR, GRADIENT_COLOR, gradient_alphas, GRADIENT_RATIO, Constant.GRADIENT_MATRIX);
+            else
+                this.graphics.beginFill(BOX_COLOR, draw_fill_alpha);
+            this.graphics.drawRect(0, 0, _width, _height);
+            this.graphics.endFill();
         }
 
         public function dispose():void
         {
-            this.removeEventListener(MouseEvent.ROLL_OVER, boxOver);
-            this.removeEventListener(MouseEvent.ROLL_OUT, boxOut);
+            this.removeEventListener(MouseEvent.ROLL_OVER, e_onHover);
+            this.removeEventListener(MouseEvent.ROLL_OUT, e_onHoverOut);
+        }
 
-            if (_box != null)
+        public function setHoverStatus(enabled:Boolean):void
+        {
+            if (enabled)
             {
-                this.removeChild(_box);
-                _box = null;
+                this.addEventListener(MouseEvent.ROLL_OVER, e_onHover, false, 0, true);
             }
-            if (_border != null)
+            else
             {
-                this.removeChild(_border);
-                _border = null;
-            }
-        }
-
-        public function boxOver(e:MouseEvent = null):void
-        {
-            this.addEventListener(MouseEvent.ROLL_OUT, boxOut, false, 0, true);
-            _box.alpha = _activeAlpha;
-            _border.alpha = _borderAlpha;
-        }
-
-        public function boxOut(e:MouseEvent = null):void
-        {
-            this.removeEventListener(MouseEvent.ROLL_OUT, boxOut);
-            _box.alpha = (_isActive ? _activeAlpha : _normalAlpha);
-            _border.alpha = (_isActive ? _borderAlpha : _activeAlpha);
-        }
-
-        public function set active(inBool:Boolean):void
-        {
-            _isActive = inBool;
-            if (_box != null)
-            {
-                _box.alpha = (_isActive ? _activeAlpha : _normalAlpha);
-                _border.alpha = (_isActive ? _borderAlpha : _activeAlpha);
+                this.removeEventListener(MouseEvent.ROLL_OVER, e_onHover);
+                this.removeEventListener(MouseEvent.ROLL_OUT, e_onHoverOut);
             }
         }
 
-        public function set activeAlpha(value:Number):void
+        ////////////////////////////////////////////////////////////////////////
+        //- Events
+        private function e_onHover(e:MouseEvent):void
         {
-            _activeAlpha = value;
-            dispose();
-            init();
+            _highlight = true;
+            draw();
+            this.addEventListener(MouseEvent.ROLL_OUT, e_onHoverOut, false, 0, true);
         }
 
-        public function set normalAlpha(value:Number):void
+        private function e_onHoverOut(e:MouseEvent):void
         {
-            _normalAlpha = value;
-            dispose();
-            init();
+            _highlight = false;
+            draw();
+            this.removeEventListener(MouseEvent.ROLL_OUT, e_onHoverOut);
         }
 
-        public function get color():uint
-        {
-            return _color;
-        }
-
-        public function set color(value:uint):void
-        {
-            _color = value;
-            dispose();
-            init();
-        }
-
-        public function get borderAlpha():Number
-        {
-            return _borderAlpha;
-        }
-
-        public function set borderAlpha(value:Number):void
-        {
-            _borderAlpha = value;
-            dispose();
-            init();
-        }
-
+        ////////////////////////////////////////////////////////////////////////
+        //- Getters / Setters
         override public function get width():Number
         {
             return _width;
+        }
+
+        override public function set width(val:Number):void
+        {
+            _width = val;
+            draw();
         }
 
         override public function get height():Number
@@ -159,22 +118,64 @@ package classes
             return _height;
         }
 
-        public function get useGradient():Boolean
+        override public function set height(val:Number):void
         {
-            return _useGradient;
+            _height = val;
+            draw();
         }
 
-        public function get borderColor():uint
+        public function get highlight():Boolean
         {
-            return _borderColor;
+            return _highlight || _active;
         }
 
-        public function set borderColor(value:uint):void
+        public function set active(val:Boolean):void
         {
-            _borderColor = value;
-            dispose();
-            init();
+            _active = val;
+            draw();
+        }
+
+        public function get active():Boolean
+        {
+            return _active;
+        }
+
+        public function set color(val:uint):void
+        {
+            GRADIENT_COLOR = [val, val];
+            BOX_COLOR = val;
+            draw();
+        }
+
+        public function set borderColor(val:uint):void
+        {
+            BORDER_COLOR = val;
+            draw();
+        }
+
+        public function set normalAlpha(val:Number):void
+        {
+            BOX_ALPHA = val;
+            draw();
+        }
+
+        public function set activeAlpha(val:Number):void
+        {
+            BOX_ALPHA_ACTIVE = val;
+            draw();
+        }
+
+        public function set borderAlpha(val:Number):void
+        {
+            BORDER_ALPHA = val;
+            BORDER_ALPHA_ACTIVE = Math.min(1, BORDER_ALPHA + 0.25);
+            draw();
+        }
+
+        public function set borderActiveAlpha(val:Number):void
+        {
+            BORDER_ALPHA_ACTIVE = val;
+            draw();
         }
     }
-
 }

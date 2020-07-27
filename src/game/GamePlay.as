@@ -2,7 +2,6 @@ package game
 {
     import arc.ArcGlobals;
     import arc.mp.MultiplayerSingleton;
-    import assets.gameplay.lifemeterDisplay;
     import assets.gameplay.viewLR;
     import assets.gameplay.viewUD;
     import classes.Alert;
@@ -42,6 +41,7 @@ package game
     import game.controls.Combo;
     import game.controls.ComboStatic;
     import game.controls.Judge;
+    import game.controls.LifeBar;
     import game.controls.MPHeader;
     import game.controls.NoteBox;
     import game.controls.PAWindow;
@@ -103,7 +103,7 @@ package game
         private var exitEditor:BoxButton;
         private var resetEditor:BoxButton;
 
-        private var player1Life:lifemeterDisplay;
+        private var player1Life:LifeBar;
         private var player1Judge:Judge;
         private var player1JudgeOffset:int;
 
@@ -1110,6 +1110,9 @@ package game
 
         private function editorKeyboardKeyDown(e:KeyboardEvent):void
         {
+            if (noteBox == null)
+                return;
+
             var keyCode:int = e.keyCode;
             var dir:String = "";
 
@@ -1276,6 +1279,7 @@ package game
             // Cleanup
             initVars(false);
 
+            song.stop();
             song = null;
 
             if (song_background)
@@ -1540,10 +1544,9 @@ package game
         {
             if (!options.displayHealth)
                 return;
-            player1Life = new lifemeterDisplay();
+            player1Life = new LifeBar();
             player1Life.x = Main.GAME_WIDTH - 37;
             player1Life.y = 71.5;
-            player1Life.gotoAndStop(gameLife);
             addChild(player1Life);
         }
 
@@ -2061,7 +2064,7 @@ package game
                 gameLife = 100;
             }
             if (player1Life)
-                player1Life.gotoAndStop(gameLife);
+                player1Life.health = gameLife;
         }
 
         private function updateFieldVars():void

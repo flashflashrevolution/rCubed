@@ -19,18 +19,11 @@ package classes
             this._width = width;
             this._height = height;
 
-            if (stage)
-                init();
-            else
-                this.addEventListener(Event.ADDED_TO_STAGE, init);
+            init();
         }
 
-        protected function init(e:Event = null):void
+        protected function init():void
         {
-            //- Remove Stage Listener
-            if (e != null)
-                this.removeEventListener(Event.ADDED_TO_STAGE, init);
-
             this.graphics.lineStyle(1, 0xFFFFFF, 0.3);
             this.graphics.moveTo(0, _height / 2);
             this.graphics.lineTo(_width, _height / 2);
