@@ -608,7 +608,11 @@ package menu
 
             //- Sanity
             if (songList == null || songList.length <= 0)
+            {
+                options.activeIndex = -1;
+                options.activeSongID = -1;
                 return;
+            }
 
             // User Filter
             if (options.activeGenre != PLAYLIST_ALL && options.infoTab != TAB_QUEUE)
