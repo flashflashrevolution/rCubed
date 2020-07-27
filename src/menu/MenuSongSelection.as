@@ -519,7 +519,7 @@ package menu
                 // Doing search, build array based on case-insensitive match
                 if (options.isFilter)
                 {
-                    songList = _playlist.indexList.filter(filterSongOptionsFilter);
+                    songList = _playlist.indexList.filter(filterSongListOptionsFilter);
 
                     genreLength = songList.length;
                     songList = songList.slice(options.pageNumber * ITEM_PER_PAGE, (options.pageNumber + 1) * ITEM_PER_PAGE);
@@ -556,17 +556,11 @@ package menu
                     // Difficulty Filter
                     if (options.activeGenre == _gvars.DIFFICULTY_RANGES.length - 1)
                     {
-                        songList = _playlist.indexList.filter(function(item:Object, index:int, array:Array):Boolean
-                        {
-                            return item.difficulty <= 0 || item.difficulty >= _gvars.DIFFICULTY_RANGES[options.activeGenre][0];
-                        });
+                        songList = _playlist.indexList.filter(filterSongListDifficultyMax);
                     }
                     else
                     {
-                        songList = _playlist.indexList.filter(function(item:Object, index:int, array:Array):Boolean
-                        {
-                            return item.difficulty >= _gvars.DIFFICULTY_RANGES[options.activeGenre][0] && item.difficulty <= _gvars.DIFFICULTY_RANGES[options.activeGenre][1];
-                        });
+                        songList = _playlist.indexList.filter(filterSongListDifficultyRange);
                     }
 
                     // Song List Filters
@@ -580,10 +574,7 @@ package menu
                 else if (GENRE_MODE == GENRE_SONGFLAGS)
                 {
                     // Song Flag Filter
-                    songList = _playlist.indexList.filter(function(item:Object, index:int, array:Array):Boolean
-                    {
-                        return GlobalVariables.getSongIconIndex(item, _gvars.activeUser.getLevelRank(item)) == options.activeGenre;
-                    });
+                    songList = _playlist.indexList.filter(filterSongListSongFlags);
 
                     // Song List Filters
                     songList = filterSongListLegacy(songList);
@@ -670,9 +661,33 @@ package menu
         }
 
         /**
+         * Array filter for difficulty ranges. This one handles everything at and above the top range and the special case for difficulty 0.
+         */
+        private function filterSongListDifficultyMax(item:Object, index:int, array:Array):Boolean
+        {
+            return item.difficulty <= 0 || item.difficulty >= _gvars.DIFFICULTY_RANGES[options.activeGenre][0];
+        }
+
+        /**
+         * Array filter for difficulty ranges. This one handles the range between two difficulty points.
+         */
+        private function filterSongListDifficultyRange(item:Object, index:int, array:Array):Boolean
+        {
+            return item.difficulty >= _gvars.DIFFICULTY_RANGES[options.activeGenre][0] && item.difficulty <= _gvars.DIFFICULTY_RANGES[options.activeGenre][1];
+        }
+
+        /**
+         * Array filter for song flags.
+         */
+        private function filterSongListSongFlags(item:Object, index:int, array:Array):Boolean
+        {
+            return GlobalVariables.getSongIconIndex(item, _gvars.activeUser.getLevelRank(item)) == options.activeGenre;
+        }
+
+        /**
          * Array filter for options.filter
          */
-        private function filterSongOptionsFilter(item:Object, index:int, array:Array):Boolean
+        private function filterSongListOptionsFilter(item:Object, index:int, array:Array):Boolean
         {
             return options.filter(item);
         }
@@ -1694,7 +1709,7 @@ package menu
                 }
                 else if (clickAction == "doFilterRandom")
                 {
-                    var randomList:Array = songList.filter(function(item:*, index:int, array:Array):Boolean
+                    var randomList:Array = songList.filter(function(item:Object, index:int, array:Array):Boolean
                     {
                         return (_gvars.activeFilter ? _gvars.activeFilter.process(item, _gvars.activeUser) : true) && _gvars.checkSongAccess(item) == GlobalVariables.SONG_ACCESS_PLAYABLE;
                     });
