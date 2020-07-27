@@ -946,12 +946,14 @@ package menu
             {
                 searchBox.text = options.last_search_text;
                 searchBox.field.setSelection(searchBox.field.length, searchBox.field.length);
+                options.last_search_text = null;
             }
 
             // Saved Search Type
             if (options.last_search_type != null)
             {
                 searchTypeBox.selectedItemByData = options.last_search_type;
+                options.last_search_type = null;
             }
 
             var searchBtn:BoxButton = new BoxButton(164, 27, _lang.string("song_selection_search_panel_search"));
@@ -1354,6 +1356,8 @@ package menu
                 return;
 
             isQueuePlaylist = false;
+            saveSearchTextAndType();
+
             _gvars.options = new GameOptions();
             _gvars.options.fill();
             switchTo(Main.GAME_PLAY_PANEL);
@@ -1378,8 +1382,6 @@ package menu
             {
                 return song[searchTypeParam].toLowerCase().indexOf(search_term.toLowerCase()) > -1;
             };
-            options.last_search_text = search_term;
-            options.last_search_type = searchTypeParam;
             options.scroll_position = 0;
 
             buildGenreList();
@@ -1396,7 +1398,7 @@ package menu
         public function multiplayerSelect(songName:String, song:Object):void
         {
             isQueuePlaylist = false;
-
+            saveSearchTextAndType();
             options.activeGenre = PLAYLIST_OTHER;
             options.activeSongID = (song != null && song.level != null) ? song.level : -1;
             options.pageNumber = 0;
@@ -1465,6 +1467,17 @@ package menu
         {
             options.filter = null;
             options.isFilter = false;
+        }
+
+        /**
+         * Save the search text and type.
+         */
+        private function saveSearchTextAndType():void
+        {
+            if (searchBox != null)
+                options.last_search_text = searchBox.text;
+            if (searchTypeBox != null)
+                options.last_search_type = searchTypeBox.selectedItem["data"];
         }
 
         //******************************************************************************************//
