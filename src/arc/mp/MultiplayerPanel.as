@@ -389,6 +389,9 @@ package arc.mp
 
         private function showButton(button:BoxButton, show:Boolean):void
         {
+            if (button == null)
+                return;
+            
             if (button.parent == null && show)
                 addChild(button);
             else if (button.parent == this && !show)
