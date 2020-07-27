@@ -1184,7 +1184,7 @@ package menu
             var infoDisplay:Array = [[_lang.string("song_selection_song_panel_song"), songDetails['name']],
                 [_lang.string("song_selection_song_panel_author"), songDetails['author']],
                 [_lang.string("song_selection_song_panel_stepfile"), songDetails['stepauthor']],
-                [_lang.string("song_selection_song_panel_length"), songDetails['time']],
+                [_lang.string("song_selection_song_panel_length"), sprintf(_lang.string("song_selection_song_panel_length_value"), {"time": songDetails['time'], "note_count": songDetails['arrows']})],
                 [_lang.string("song_selection_song_panel_style"), songDetails['style']],
                 [_lang.string("song_selection_song_panel_best"), (infoRanks.score > 0 ? "\n" + NumberUtil.numberFormat(infoRanks.score) + "\n" + infoRanks.results : _lang.string("song_selection_song_panel_unplayed"))]];
 
