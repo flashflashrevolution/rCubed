@@ -11,13 +11,16 @@ package popups
     import flash.profiler.showRedrawRegions;
 
     import menu.MenuPanel;
+    import arc.mp.MultiplayerSingleton;
 
     public class PopupContextMenu extends MenuPanel
     {
+
         CONFIG::debug
         {
             private static var redrawBoolean:Boolean = false;
         }
+
 
         public var _gvars:GlobalVariables = GlobalVariables.instance;
 
@@ -101,6 +104,15 @@ package popups
             box.addChild(cButton);
             yOff += cButtonHeight + 5;
 
+            //- Switch Profile
+            cButton = new BoxButton(box.width - 10, cButtonHeight, "Switch Profile");
+            cButton.x = 5;
+            cButton.y = yOff;
+            cButton.action = "switch_profile";
+            cButton.addEventListener(MouseEvent.CLICK, clickHandler);
+            box.addChild(cButton);
+            yOff += cButtonHeight + 5;
+
             //- Close
             cButton = new BoxButton(box.width - 10, 27, "CLOSE");
             cButton.x = 5;
@@ -151,6 +163,13 @@ package popups
             {
                 _gvars.tempFlags = {};
                 _gvars.gameMain.switchTo("none");
+            }
+            else if (e.target.action == "switch_profile")
+            {
+                MultiplayerSingleton.destroyInstance();
+                _gvars.tempFlags = {};
+                _gvars.playerUser.refreshUser();
+                _gvars.gameMain.switchTo("GameLoginPanel");
             }
         }
     }
