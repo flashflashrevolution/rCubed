@@ -160,15 +160,15 @@ package popups
             }
             else if (e.target.action == "reload_engine")
             {
-                _gvars.tempFlags = {};
+                Flags.VALUES = {};
                 _gvars.gameMain.switchTo("none");
             }
             else if (e.target.action == "switch_profile")
             {
                 MultiplayerSingleton.destroyInstance();
-                _gvars.tempFlags = {};
+                Flags.VALUES = {};
                 _gvars.playerUser.refreshUser();
-                _gvars.gameMain.switchTo("GameLoginPanel");  
+                _gvars.gameMain.switchTo("GameLoginPanel");
             }
         }
     }
