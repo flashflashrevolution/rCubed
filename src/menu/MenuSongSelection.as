@@ -654,7 +654,7 @@ package menu
             }
 
             // No song selected, select the first in the list if valid.
-            if (songItems.length > 0 && options.activeIndex == -1)
+            if (options.activeIndex == -1)
             {
                 setActiveIndex(0, -1);
             }
@@ -781,6 +781,7 @@ package menu
             if (doScroll && scrollbar.draggerVisibility)
             {
                 var scrollVal:Number = (((songItems[index].y / pane.content.height) > 0.5) ? ((songItems[index].y + songItems[index].height) / pane.content.height) : ((songItems[index].y) / pane.content.height));
+                options.scroll_position = scrollVal;
                 pane.scrollTo(scrollVal);
                 scrollbar.scrollTo(scrollVal);
             }
@@ -1609,8 +1610,9 @@ package menu
                 }
                 else
                 {
-                    scrollbar.scrollTo(pagebox.page_scroll);
-                    pane.scrollTo(pagebox.page_scroll);
+                    options.scroll_position = pagebox.page_scroll;
+                    scrollbar.scrollTo(options.scroll_position);
+                    pane.scrollTo(options.scroll_position);
                 }
             }
             stage.focus = stage;
@@ -1635,7 +1637,10 @@ package menu
                 if (GENRE_MODE > GENRE_MODES)
                     GENRE_MODE = 0;
                 LocalStore.setVariable("genre_mode", GENRE_MODE);
+                options.scroll_position = 0;
                 options.activeGenre = 0;
+                options.activeIndex = -1;
+                options.activeSongID = -1;
                 isQueuePlaylist = false;
                 buildGenreList();
                 buildPlayList();
@@ -1809,8 +1814,9 @@ package menu
                 case Keyboard.TAB:
                     resetFilterOptions();
                     options.scroll_position = 0;
-                    options.activeGenre = options.activeGenre + (e.ctrlKey ? -1 : 1);
                     options.activeIndex = -1;
+                    options.activeSongID = -1;
+                    options.activeGenre = options.activeGenre + (e.ctrlKey ? -1 : 1);
                     if (options.activeGenre < -1)
                         options.activeGenre = maxGenreIndex;
                     if (options.activeGenre > maxGenreIndex)
