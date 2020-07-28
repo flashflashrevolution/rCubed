@@ -118,6 +118,7 @@ package
         public var sql_db:File;
 
         private var websocket_server:AIRServer;
+        private static var websocket_message:Message = new Message();
 
         public function loadAirOptions():void
         {
@@ -217,10 +218,9 @@ package
         {
             if (websocket_server != null)
             {
-                var msg:Message = new Message();
-                msg.command = cmd;
-                msg.data = data;
-                websocket_server.sendMessageToAllClients(msg);
+                websocket_message.command = cmd;
+                websocket_message.data = data;
+                websocket_server.sendMessageToAllClients(websocket_message);
             }
         }
 
