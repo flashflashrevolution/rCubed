@@ -1197,12 +1197,12 @@ package menu
             var tY:int = 0;
 
             var infoRanks:Object = _gvars.activeUser.getLevelRank(songDetails) || {};
-            var infoDisplay:Array = [[_lang.string("song_selection_song_panel_song"), songDetails['name']],
-                [_lang.string("song_selection_song_panel_author"), songDetails['author']],
-                [_lang.string("song_selection_song_panel_stepfile"), songDetails['stepauthor']],
-                [_lang.string("song_selection_song_panel_length"), sprintf(_lang.string("song_selection_song_panel_length_value"), {"time": songDetails['time'], "note_count": songDetails['arrows']})],
-                [_lang.string("song_selection_song_panel_style"), songDetails['style']],
-                [_lang.string("song_selection_song_panel_best"), (infoRanks.score > 0 ? "\n" + NumberUtil.numberFormat(infoRanks.score) + "\n" + infoRanks.results : _lang.string("song_selection_song_panel_unplayed"))]];
+            var infoDisplay:Array = [["song", songDetails['name']],
+                ["author", songDetails['author']],
+                ["stepfile", songDetails['stepauthor']],
+                ["length", (songDetails['arrows'] > 0 ? sprintf(_lang.string("song_selection_song_panel_length_value"), {"time": songDetails['time'], "note_count": songDetails['arrows']}) : songDetails['time'])],
+                ["style", songDetails['style']],
+                ["best", (infoRanks.score > 0 ? "\n" + NumberUtil.numberFormat(infoRanks.score) + "\n" + infoRanks.results : _lang.string("song_selection_song_panel_unplayed"))]];
 
             if (songDetails['song_rating'])
             {
@@ -1217,7 +1217,7 @@ package menu
             for (var item:String in infoDisplay)
             {
                 // Info Title
-                infoTitle = new Text(infoDisplay[item][0], 14, "#DDDDDD");
+                infoTitle = new Text(_lang.string("song_selection_song_panel_" + infoDisplay[item][0]), 14, "#DDDDDD");
                 infoTitle.x = 5;
                 infoTitle.y = tY;
                 infoTitle.width = 164;
