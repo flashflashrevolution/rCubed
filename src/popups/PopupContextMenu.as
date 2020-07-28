@@ -21,7 +21,6 @@ package popups
             private static var redrawBoolean:Boolean = false;
         }
 
-
         public var _gvars:GlobalVariables = GlobalVariables.instance;
 
         //- Background
@@ -169,7 +168,7 @@ package popups
                 MultiplayerSingleton.destroyInstance();
                 _gvars.tempFlags = {};
                 _gvars.playerUser.refreshUser();
-                _gvars.gameMain.switchTo("GameLoginPanel");
+                _gvars.gameMain.switchTo("GameLoginPanel");  
             }
         }
     }
