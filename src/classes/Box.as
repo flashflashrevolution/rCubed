@@ -147,10 +147,20 @@ package classes
             draw();
         }
 
+        public function get color():uint
+        {
+            return BOX_COLOR;
+        }
+
         public function set borderColor(val:uint):void
         {
             BORDER_COLOR = val;
             draw();
+        }
+
+        public function get borderColor():uint
+        {
+            return BORDER_COLOR;
         }
 
         public function set normalAlpha(val:Number):void
@@ -159,10 +169,20 @@ package classes
             draw();
         }
 
+        public function get normalAlpha():Number
+        {
+            return BOX_ALPHA;
+        }
+
         public function set activeAlpha(val:Number):void
         {
             BOX_ALPHA_ACTIVE = val;
             draw();
+        }
+
+        public function get activeAlpha():Number
+        {
+            return BOX_ALPHA_ACTIVE;
         }
 
         public function set borderAlpha(val:Number):void
@@ -172,10 +192,20 @@ package classes
             draw();
         }
 
+        public function get borderAlpha():Number
+        {
+            return BORDER_ALPHA;
+        }
+
         public function set borderActiveAlpha(val:Number):void
         {
             BORDER_ALPHA_ACTIVE = val;
             draw();
+        }
+
+        public function get borderActiveAlpha():Number
+        {
+            return BORDER_ALPHA_ACTIVE;
         }
     }
 }
