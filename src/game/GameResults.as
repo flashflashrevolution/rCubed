@@ -374,7 +374,7 @@ package game
                 navSaveReplay.visible = true;
                 if (!canSendScore(result, true, false, true, true) || _gvars.flashvars.preview_file)
                 {
-                    navSaveReplay.boxColor = 0x000000;
+                    navSaveReplay.color = 0x000000;
                     navSaveReplay.alpha = 0.5;
                     navSaveReplay.enabled = false;
                 }
@@ -1357,7 +1357,7 @@ package game
 
                     ext = "R^3 - " + grS.name + rateString + " - " + gRP.score + " - " + (gRP.perfect + gRP.amazing) + "-" + gRP.good + "-" + gRP.average + "-" + gRP.miss + "-" + gRP.boo;
                 }
-                _gvars.takeScreenShot({o: false, s: 1, text: ext});
+                _gvars.takeScreenShot(ext);
             }
             else if (target == navPrev && navPrev.visible)
             {

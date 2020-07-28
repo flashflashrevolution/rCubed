@@ -35,9 +35,9 @@ package popups
             super(327, 33, false, false);
         }
 
-        override protected function init(e:Event = null):void
+        override protected function init():void
         {
-            super.init(e);
+            super.init();
 
             remove_button = new BoxButton(23, height, "X");
             remove_button.x = width;

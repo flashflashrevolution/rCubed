@@ -50,6 +50,13 @@ package arc.mp
             return instance;
         }
 
+        public static function destroyInstance():void
+        {
+            if (instance.connection.connected)
+                instance.connection.disconnect();
+            instance = null;
+        }
+
         private var panel:MultiplayerPanel = null;
 
         public function getPanel(parent:MenuPanel):MultiplayerPanel

@@ -58,7 +58,7 @@ package menu
             this.buttonMode = true;
 
             //- Events
-            this.addEventListener(MouseEvent.ROLL_OVER, e_onHover);
+            this.addEventListener(MouseEvent.ROLL_OVER, e_onHover, false, 0, true);
         }
 
         public function draw():void

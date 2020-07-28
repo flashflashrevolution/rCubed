@@ -509,23 +509,20 @@ package
         /**
          * Takes a screenshot of the stage and saves it to disk.
          */
-        public function takeScreenShot(params:Object):void
+        public function takeScreenShot(filename:String = null):void
         {
             // Create Bitmap of Stage
             var b:BitmapData = new BitmapData(Main.GAME_WIDTH, Main.GAME_HEIGHT, false, 0x000000);
             b.draw(gameMain.stage);
 
-            if (params.o == false)
+            try
             {
-                try
-                {
-                    var _file:FileReference = new FileReference();
-                    _file.save(PNGEncoder.encode(b), AirContext.createFileName((params["text"] != null ? params["text"] : "R^3 - " + DateUtil.toRFC822(new Date()).replace(/:/g, ".")) + ".png"));
-                }
-                catch (e:Error)
-                {
-                    gameMain.addAlert("ERROR: Unable to save image.", 120);
-                }
+                var _file:FileReference = new FileReference();
+                _file.save(PNGEncoder.encode(b), AirContext.createFileName((filename != null ? filename : "R^3 - " + DateUtil.toRFC822(new Date()).replace(/:/g, ".")) + ".png"));
+            }
+            catch (e:Error)
+            {
+                gameMain.addAlert("ERROR: Unable to save image.", 120);
             }
         }
 

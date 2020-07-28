@@ -56,7 +56,11 @@ package game
         {
             //- Check Parent Function first.
             if (super.switchTo(_panel, useNew))
+            {
+                _gvars.gameMain.bg.visible = true;
+                _gvars.gameMain.ver.visible = true;
                 return true;
+            }
 
             //- Do Current Panel
             var isFound:Boolean = false;
@@ -73,6 +77,8 @@ package game
             {
                 case GAME_LOADING:
                     panel = new GameLoading(this);
+                    _gvars.gameMain.bg.visible = true;
+                    _gvars.gameMain.ver.visible = true;
                     isFound = true;
                     break;
 
