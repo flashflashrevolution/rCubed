@@ -1801,6 +1801,7 @@ package popups
                 {
                     _gvars.destroyWebsocketServer();
                     _gvars.air_useWebsockets = false;
+                    LocalStore.setVariable("air_useWebsockets", _gvars.air_useWebsockets);
                 }
                 else
                 {
