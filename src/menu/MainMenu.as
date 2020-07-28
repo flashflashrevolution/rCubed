@@ -111,7 +111,7 @@ package menu
             }
             else
             {
-                if (!_gvars.tempFlags['startup_screen'])
+                if (!Flags.VALUES[Flags.STARTUP_SCREEN])
                 {
                     var playerStartup:int = _gvars.activeUser.startUpScreen;
 
@@ -124,7 +124,7 @@ package menu
                     else
                         targetMenu = MENU_SONGSELECTION;
 
-                    _gvars.tempFlags['startup_screen'] = true;
+                    Flags.VALUES[Flags.STARTUP_SCREEN] = true;
                 }
                 else
                 {

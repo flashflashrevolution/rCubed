@@ -167,9 +167,23 @@ package classes
                     songData[b] = data[a][b];
                 }
 
+                // Song Time
+                if (songData.time == null)
+                {
+                    songData.time = "0:00";
+                }
+
+                // Note Count
+                if (songData.arrows == null || isNaN(Number(songData.arrows)))
+                {
+                    songData.arrows = 0;
+                }
+
                 // Extra Info
                 songData.index = genreList[genre].length;
                 songData.timeSecs = (Number(songData.time.split(":")[0]) * 60) + Number(songData.time.split(":")[1]);
+
+                // Author with URL
                 if (songData["authorURL"] != null && songData["authorURL"].length > 7)
                 {
                     songData.authorwithurl = "<a href=\"" + songData["authorURL"] + "\">" + songData["author"] + "</a>";
@@ -178,6 +192,8 @@ package classes
                 {
                     songData.authorwithurl = songData["author"];
                 }
+
+                // Multiple Step Authors
                 if (songData["stepauthor"].indexOf(" & ") !== false)
                 {
                     var stepAuthors:Array = songData["stepauthor"].split(" & ");
@@ -191,20 +207,28 @@ package classes
                 {
                     songData.stepauthorwithurl = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(songData["stepauthor"]) + "\">" + songData["stepauthor"] + "</a>";
                 }
+
+                // Song Price
                 if (isNaN(Number(songData.price)))
                 {
                     songData.price = -1;
                 }
+
+                // Secret Credits
                 if (isNaN(Number(songData.credits)))
                 {
                     songData.credits = -1;
                 }
+
+                // Max Score Totals
                 songData.scoreTotal = songData.arrows * 1550;
                 songData.scoreRaw = songData.arrows * 50;
 
+                // Legacy Sync
                 if (!legacy && isNaN(songData.sync))
                     songData.sync = oldOffsets(songData.level);
 
+                // Add to lists
                 playList[songData.level] = songData;
                 indexList.push(songData);
                 genreList[genre].push(songData);

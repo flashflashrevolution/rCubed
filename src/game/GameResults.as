@@ -889,10 +889,10 @@ package game
             nR.replay = result.replay;
             nR.timestamp = int(new Date().getTime() / 1000);
             _gvars.replayHistory.unshift(nR);
-            if (!_gvars.tempFlags['f2_replays'])
+            if (!Flags.VALUES[Flags.F2_REPLAYS])
             {
                 _gvars.gameMain.addAlert("Replay saved to History. (Press F2)", 90);
-                _gvars.tempFlags['f2_replays'] = true;
+                Flags.VALUES[Flags.F2_REPLAYS] = true;
             }
 
             if (_gvars.air_autoSaveLocalReplays)

@@ -212,8 +212,8 @@ package menu
                 return;
 
             switchTo(MainMenu.MENU_SONGSELECTION);
+            MenuSongSelection.options.infoTab = MenuSongSelection.TAB_QUEUE;
             var panel:MenuSongSelection = ((_gvars.gameMain.activePanel as MainMenu).panel as MenuSongSelection);
-            panel.options.infoTab = MenuSongSelection.TAB_QUEUE;
             panel.swapToQueue();
         }
 

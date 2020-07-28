@@ -131,7 +131,7 @@ package menu
             // Locked Song Item, basically anything but playable songs.
             if (isLocked)
             {
-                this.mouseChildren = true;
+                this.mouseChildren = (song["access"] == GlobalVariables.SONG_ACCESS_TOKEN);
 
                 var _message:String = getSongLockText();
 

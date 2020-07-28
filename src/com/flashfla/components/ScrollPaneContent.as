@@ -74,6 +74,13 @@ package com.flashfla.components
             _height = super.height;
         }
 
+        public function clear():void
+        {
+            this.removeChildren();
+            _width = -1;
+            _height = -1;
+        }
+
         override public function get width():Number
         {
             if (_width == -1)
