@@ -191,6 +191,9 @@ package arc
 
         public function transformTotalNotes():int
         {
+            if (!notes)
+                return 0;
+
             if (modIsolation)
             {
                 if (options.isolationLength > 0)
@@ -207,7 +210,7 @@ package arc
 
         public function transformSongLength():Number
         {
-            if (notes.length <= 0)
+            if (!notes || notes.length <= 0)
                 return 0;
 
             var firstNote:Note;

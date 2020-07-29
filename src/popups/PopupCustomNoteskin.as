@@ -246,8 +246,8 @@ package popups
         {
             for (var b:int = 0; b < note_colors_btns.length; b++)
             {
-                note_colors_btns[b].alpha = active_color == note_colors_btns[b].color ? 1 : 0.75;
-                note_colors_btns[b].boxColor = active_color == note_colors_btns[b].color ? 0x00FF00 : 0xFFFFFF;
+                note_colors_btns[b].alpha = active_color == note_colors_btns[b].note_color ? 1 : 0.75;
+                note_colors_btns[b].boxColor = active_color == note_colors_btns[b].note_color ? 0x00FF00 : 0xFFFFFF;
             }
 
             var c:BoxText;
@@ -457,7 +457,7 @@ package popups
             }
             else if (e.target.hasOwnProperty("note_color"))
             {
-                active_color = e.target.color;
+                active_color = e.target.note_color;
                 updateDirections();
                 return;
             }
