@@ -306,6 +306,16 @@ package game
                     "restarts": 0,
                     "last_hit": null};
 
+            // Set Defaults for Editor Mode
+            if (options.isEditor)
+            {
+                SOCKET_SONG_MESSAGE["song"]["name"] = "Editor Mode";
+                SOCKET_SONG_MESSAGE["song"]["author"] = "rCubed Engine";
+                SOCKET_SONG_MESSAGE["song"]["difficulty"] = 0;
+                SOCKET_SONG_MESSAGE["song"]["time"] = "10:00";
+                SOCKET_SONG_MESSAGE["song"]["time_seconds"] = 600;
+            }
+
             // Init Game
             initUI();
             initVars();

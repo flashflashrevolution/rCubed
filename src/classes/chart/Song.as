@@ -641,7 +641,7 @@ package classes.chart
                 return noteMod.transformSongLength();
             }
 
-            if (!chart.Notes)
+            if (!chart.Notes || chart.Notes.length <= 0)
             {
                 return 0;
             }
