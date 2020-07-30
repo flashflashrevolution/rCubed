@@ -633,6 +633,10 @@ package menu
             scrollbar.draggerVisibility = (yOffset > pane.height);
 
             //- Update Selected Index
+            // No song items to select, bail.
+            if (songList.length <= 0)
+                return;
+
             // Find and select last active song id.
             var hasSelected:Boolean = false;
             for (sX = 0; sX < songList.length; sX++)
@@ -755,8 +759,8 @@ package menu
          */
         public function setActiveIndex(index:int, last:int, doScroll:Boolean = false):void
         {
-            // No need to do anything if nothing changed
-            if (index == last)
+            // No need to do anything if nothing changed, or nothing to select
+            if (index == last || songItems.length <= 0)
                 return;
 
             // Set Index
