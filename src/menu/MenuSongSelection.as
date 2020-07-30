@@ -50,7 +50,8 @@ package menu
     {
         public static const ITEM_PER_PAGE:int = 500;
 
-        public static const PLAYLIST_OTHER:int = -2;
+        public static const PLAYLIST_QUEUE:int = -3;
+        public static const PLAYLIST_SEARCH:int = -2;
         public static const PLAYLIST_ALL:int = -1;
 
         public static const TAB_PLAYLIST:int = 0;
@@ -99,7 +100,6 @@ package menu
         private var songItemContextMenu:ContextMenu;
         private var songItemContextMenuItem:ContextMenuItem;
         private var songItemRemoveQueueContext:ContextMenuItem;
-        private var isQueuePlaylist:Boolean = false;
 
         ///- Constructor
         public function MenuSongSelection(myParent:MenuPanel)
@@ -476,7 +476,6 @@ package menu
 
                 resetFilterOptions();
 
-                isQueuePlaylist = false;
                 buildGenreList();
                 buildPlayList();
                 buildInfoBox();
@@ -505,16 +504,16 @@ package menu
             var song:Array;
             var sI:SongItem;
 
-            // Refresh the queue playlist if we're viewing it right now
-            if (isQueuePlaylist)
+            //- Set Song array based on selected genre
+            // DM_QUEUE
+            if (options.activeGenre == PLAYLIST_QUEUE)
             {
-                songList = _gvars.songQueue;
-                genreLength = songList.length;
+                songList = _gvars.songQueue.slice(options.pageNumber * ITEM_PER_PAGE, (options.pageNumber + 1) * ITEM_PER_PAGE);
+                genreLength = _gvars.songQueue.length;
             }
 
-            //- Set Song array based on selected genre
             // DM_SEARCH
-            else if (options.activeGenre == PLAYLIST_OTHER)
+            else if (options.activeGenre == PLAYLIST_SEARCH)
             {
                 // Doing search, build array based on case-insensitive match
                 if (options.isFilter)
@@ -523,14 +522,6 @@ package menu
 
                     genreLength = songList.length;
                     songList = songList.slice(options.pageNumber * ITEM_PER_PAGE, (options.pageNumber + 1) * ITEM_PER_PAGE);
-                }
-
-                // Queued Song List
-                if (options.infoTab == TAB_QUEUE)
-                {
-                    songList = _gvars.songQueue;
-                    songList = songList.slice(options.pageNumber * ITEM_PER_PAGE, (options.pageNumber + 1) * ITEM_PER_PAGE);
-                    genreLength = _gvars.songQueue.length;
                 }
             }
 
@@ -592,7 +583,7 @@ package menu
                 }
             }
 
-            songItemRemoveQueueContext.visible = isQueuePlaylist;
+            songItemRemoveQueueContext.visible = options.activeGenre == PLAYLIST_QUEUE;
 
             //- Pages
             drawPages();
@@ -1342,7 +1333,6 @@ package menu
             if (level < 0)
                 return;
 
-            isQueuePlaylist = false;
             _mp.gameplayPicking(_playlist.getSong(level));
             _mp.gameplayLoading();
             switchTo(MainMenu.MENU_MULTIPLAYER);
@@ -1379,7 +1369,6 @@ package menu
             if (_gvars.songQueue.length <= 0)
                 return;
 
-            isQueuePlaylist = false;
             saveSearchTextAndType();
 
             _gvars.options = new GameOptions();
@@ -1394,10 +1383,8 @@ package menu
          */
         private function doSearch(search_term:String):void
         {
-            isQueuePlaylist = false;
-
             var searchTypeParam:String = searchTypeBox.selectedItem["data"];
-            options.activeGenre = PLAYLIST_OTHER;
+            options.activeGenre = PLAYLIST_SEARCH;
             options.activeSongID = -1;
             options.activeIndex = -1;
             options.pageNumber = 0;
@@ -1421,9 +1408,8 @@ package menu
          */
         public function multiplayerSelect(songName:String, song:Object):void
         {
-            isQueuePlaylist = false;
             saveSearchTextAndType();
-            options.activeGenre = PLAYLIST_OTHER;
+            options.activeGenre = PLAYLIST_SEARCH;
             options.activeSongID = (song != null && song.level != null) ? song.level : -1;
             options.pageNumber = 0;
             options.isFilter = true;
@@ -1474,7 +1460,7 @@ package menu
          */
         public function swapToQueue():void
         {
-            options.activeGenre = (options.infoTab == TAB_QUEUE ? PLAYLIST_OTHER : 0);
+            options.activeGenre = (options.infoTab == TAB_QUEUE ? PLAYLIST_QUEUE : 0);
             options.pageNumber = 0;
             options.activeIndex = -1;
             options.activeSongID = -1;
@@ -1645,7 +1631,6 @@ package menu
                 options.activeGenre = 0;
                 options.activeIndex = -1;
                 options.activeSongID = -1;
-                isQueuePlaylist = false;
                 buildGenreList();
                 buildPlayList();
                 buildInfoBox();
@@ -1670,15 +1655,7 @@ package menu
                 }
                 else if (clickAction == "queue")
                 {
-                    if (songList == _gvars.songQueue && options.infoTab != TAB_QUEUE)
-                    {
-                        options.infoTab = TAB_QUEUE;
-                    }
-                    else
-                    {
-                        isQueuePlaylist = (options.infoTab != TAB_QUEUE);
-                        options.infoTab = options.infoTab == TAB_QUEUE ? TAB_PLAYLIST : TAB_QUEUE;
-                    }
+                    options.infoTab = options.infoTab == TAB_QUEUE ? TAB_PLAYLIST : TAB_QUEUE;
                     swapToQueue();
                 }
                 else if (clickAction == "highscores")
@@ -1825,7 +1802,6 @@ package menu
                         options.activeGenre = maxGenreIndex;
                     if (options.activeGenre > maxGenreIndex)
                         options.activeGenre = -1;
-                    isQueuePlaylist = false;
                     buildGenreList();
                     buildPlayList();
                     buildInfoBox();
