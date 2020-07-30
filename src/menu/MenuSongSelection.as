@@ -644,7 +644,7 @@ package menu
                 song = songList[sX];
                 if (options.activeSongID == song.level)
                 {
-                    setActiveIndex(sX, -1);
+                    setActiveIndex(sX, -1, false, false);
                     hasSelected = true;
                     break;
                 }
@@ -660,7 +660,7 @@ package menu
             // No song selected, select the first in the list if valid.
             if (options.activeIndex == -1)
             {
-                setActiveIndex(0, -1);
+                setActiveIndex(0, -1, false, false);
             }
         }
 
@@ -746,7 +746,7 @@ package menu
          * @param doScroll Scrolls to the song item when true.
          * @param mpUpdate Send update to multiplayer for selection. Only send for user selection events.
          */
-        public function setActiveIndex(index:int, last:int, doScroll:Boolean = false, mpUpdate:Boolean = false):void
+        public function setActiveIndex(index:int, last:int, doScroll:Boolean = false, mpUpdate:Boolean = true):void
         {
             // No need to do anything if nothing changed, or nothing to select
             if (index == last)
@@ -807,7 +807,7 @@ package menu
                 if (tarSongItem.index != options.activeIndex)
                 {
                     options.infoTab = TAB_PLAYLIST;
-                    setActiveIndex(tarSongItem.index, options.activeIndex, false, true);
+                    setActiveIndex(tarSongItem.index, options.activeIndex);
                     buildInfoBox();
                 }
                 else
@@ -1446,7 +1446,7 @@ package menu
             for (var i:int = 0; i < songItems.length; i++)
             {
                 if (songItems[i].level == options.activeSongID)
-                    setActiveIndex(i, -1, true, true);
+                    setActiveIndex(i, -1, true);
             }
         }
 
@@ -1876,7 +1876,7 @@ package menu
                 {
                     if (!songItems[newIndex].isLocked)
                     {
-                        setActiveIndex(newIndex, lastIndex, true, true);
+                        setActiveIndex(newIndex, lastIndex, true);
                         buildInfoBox();
                         stage.focus = null;
                         break;
