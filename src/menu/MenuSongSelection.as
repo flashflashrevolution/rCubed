@@ -635,7 +635,7 @@ package menu
                 song = songList[sX];
                 if (options.activeSongID == song.level)
                 {
-                    setActiveIndex(sX, -1, false);
+                    setActiveIndex(sX, -1, false, false);
                     hasSelected = true;
                     break;
                 }
@@ -651,7 +651,7 @@ package menu
             // No song selected, select the first in the list if valid.
             if (options.activeIndex == -1)
             {
-                setActiveIndex(0, -1);
+                setActiveIndex(0, -1, false, false);
             }
         }
 
@@ -731,28 +731,25 @@ package menu
         }
 
         /**
-         * Sets the active song id from the song items list based on the given index.
-         * @param item_index Index in the Song Items array.
-         * @param mpUpdate Send update to multiplayer for selection.
-         */
-        private function setActiveSongID(item_index:int, mpUpdate:Boolean):void
-        {
-            options.activeSongID = (songItems.length > 0 && item_index < songItems.length ? songItems[item_index].level : -1);
-            if (mpUpdate && options.activeSongID != -1)
-                _mp.gameplayPicking(_playlist.getSong(options.activeSongID));
-        }
-
-        /**
          * Selects and highlights a Song Item in the playlist for the given index.
          * @param index New Index
          * @param last Last Selected Index, if not -1, unhighlights the given index.
          * @param doScroll Scrolls to the song item when true.
+         * @param mpUpdate Send update to multiplayer for selection. Only send for user selection events.
          */
-        public function setActiveIndex(index:int, last:int, doScroll:Boolean = false):void
+        public function setActiveIndex(index:int, last:int, doScroll:Boolean = false, mpUpdate:Boolean = true):void
         {
             // No need to do anything if nothing changed, or nothing to select
-            if (index == last || songItems.length <= 0)
+            if (index == last)
                 return;
+
+            // Reset on invalid index.
+            if (songItems.length <= 0 || index < 0 || index >= songItems.length)
+            {
+                options.activeIndex = -1;
+                options.activeSongID = -1;
+                return;
+            }
 
             // Set Index
             options.activeIndex = index;
@@ -765,7 +762,7 @@ package menu
             }
 
             // Set Song
-            setActiveSongID(index, true);
+            options.activeSongID = songItems[index].level;
 
             // Set Active Highlights
             songItems[index].active = true;
@@ -780,6 +777,10 @@ package menu
                 pane.scrollTo(scrollVal);
                 scrollbar.scrollTo(scrollVal);
             }
+
+            // Update Multiplayer Selection
+            if (mpUpdate && options.activeSongID != -1)
+                _mp.gameplayPicking(_playlist.getSong(options.activeSongID));
         }
 
         /**
