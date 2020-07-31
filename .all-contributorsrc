@@ -13,10 +13,12 @@
       "contributions": [
         "code",
         "ideas",
-        "bug"
+        "bug",
+        "doc",
+        "maintenance"
       ]
     },
-	{
+    {
       "login": "arcnmx",
       "name": "arcnmx",
       "avatar_url": "https://avatars1.githubusercontent.com/u/13426784?v=4",
