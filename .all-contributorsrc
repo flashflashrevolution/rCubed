@@ -6,32 +6,24 @@
   "commit": false,
   "contributors": [
     {
-      "login": "mat100payette",
-      "name": "Oppiie",
-      "avatar_url": "https://avatars1.githubusercontent.com/u/20545324?v=4",
-      "profile": "https://github.com/mat100payette",
+      "login": "Psycast",
+      "name": "Psycast",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/418690?v=4",
+      "profile": "https://github.com/Psycast",
       "contributions": [
-        "bug",
-        "ideas"
-      ]
-    },
-    {
-      "login": "TCHalogen",
-      "name": "TCHalogen",
-      "avatar_url": "https://avatars2.githubusercontent.com/u/27454436?v=4",
-      "profile": "https://github.com/TCHalogen",
-      "contributions": [
-        "bug",
+        "code",
         "ideas",
-        "code"
+        "bug"
       ]
     },
-    {
-      "login": "goldstinger",
-      "name": "goldstinger",
-      "avatar_url": "https://avatars1.githubusercontent.com/u/13899258?v=4",
-      "profile": "https://github.com/goldstinger",
+	{
+      "login": "arcnmx",
+      "name": "arcnmx",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/13426784?v=4",
+      "profile": "https://github.com/arcnmx",
       "contributions": [
+        "code",
+        "ideas",
         "bug"
       ]
     },
@@ -41,9 +33,9 @@
       "avatar_url": "https://avatars2.githubusercontent.com/u/1892473?v=4",
       "profile": "http://www.flashflashrevolution.com",
       "contributions": [
-        "bug",
+        "code",
         "ideas",
-        "code"
+        "bug"
       ]
     },
     {
@@ -52,17 +44,19 @@
       "avatar_url": "https://avatars1.githubusercontent.com/u/14317828?v=4",
       "profile": "http:////mproske.com//",
       "contributions": [
+        "code",
         "ideas",
-        "code"
+        "bug"
       ]
     },
     {
-      "login": "SalemKitkat",
-      "name": "Salem Kallien",
-      "avatar_url": "https://avatars1.githubusercontent.com/u/31890883?v=4",
-      "profile": "https://github.com/SalemKitkat",
+      "login": "Hakulyte",
+      "name": "Hakulyte",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/63508408?v=4",
+      "profile": "https://github.com/Hakulyte",
       "contributions": [
-        "bug"
+        "bug",
+        "ideas"
       ]
     },
     {
@@ -78,15 +72,6 @@
       ]
     },
     {
-      "login": "dave936",
-      "name": "SoFast",
-      "avatar_url": "https://avatars0.githubusercontent.com/u/50265779?v=4",
-      "profile": "https://github.com/dave936",
-      "contributions": [
-        "code"
-      ]
-    },
-    {
       "login": "Xyr00",
       "name": "Justin",
       "avatar_url": "https://avatars1.githubusercontent.com/u/2185274?v=4",
@@ -98,13 +83,60 @@
       ]
     },
     {
-      "login": "Psycast",
-      "name": "Psycast",
-      "avatar_url": "https://avatars1.githubusercontent.com/u/418690?v=4",
-      "profile": "https://github.com/Psycast",
+      "login": "Sploder12",
+      "name": "Sploder12",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/49347001?v=4",
+      "profile": "https://github.com/Sploder12",
       "contributions": [
-        "code",
+        "code"
+      ]
+    },
+    {
+      "login": "TCHalogen",
+      "name": "TCHalogen",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/27454436?v=4",
+      "profile": "https://github.com/TCHalogen",
+      "contributions": [
+        "bug",
+        "ideas",
+        "code"
+      ]
+    },
+    {
+      "login": "mat100payette",
+      "name": "Oppiie",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/20545324?v=4",
+      "profile": "https://github.com/mat100payette",
+      "contributions": [
+        "bug",
+        "ideas"
+      ]
+    },
+    {
+      "login": "goldstinger",
+      "name": "goldstinger",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/13899258?v=4",
+      "profile": "https://github.com/goldstinger",
+      "contributions": [
         "bug"
+      ]
+    },
+    {
+      "login": "SalemKitkat",
+      "name": "Salem Kallien",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/31890883?v=4",
+      "profile": "https://github.com/SalemKitkat",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "dave936",
+      "name": "SoFast",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/50265779?v=4",
+      "profile": "https://github.com/dave936",
+      "contributions": [
+        "code"
       ]
     },
     {
@@ -124,15 +156,6 @@
       "contributions": [
         "ideas",
         "bug"
-      ]
-    },
-    {
-      "login": "Sploder12",
-      "name": "Sploder12",
-      "avatar_url": "https://avatars0.githubusercontent.com/u/49347001?v=4",
-      "profile": "https://github.com/Sploder12",
-      "contributions": [
-        "code"
       ]
     }
   ],
