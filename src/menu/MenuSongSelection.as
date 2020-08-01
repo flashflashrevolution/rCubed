@@ -768,7 +768,10 @@ package menu
             // Set Active Highlights
             songItems[index].active = true;
             if (last >= 0 && last < songItems.length)
+            {
+                songItems[last].highlight = false;
                 songItems[last].active = false;
+            }
 
             // Scroll when doScroll is set.
             if (doScroll && scrollbar.draggerVisibility)
