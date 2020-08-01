@@ -196,20 +196,22 @@ package menu
 
         private function e_tokenClick(e:Event):void
         {
-            _gvars.songQueue = [];
-
+            var token_songs:Array = [];
             for each (var level:int in(e.target as TokenItem).token_levels)
             {
                 if (level > 0)
                 {
                     var songData:Object = _playlist.getSong(level);
                     if (songData.error == null)
-                        _gvars.songQueue.push(songData);
+                        token_songs.push(songData);
                 }
             }
 
-            if (_gvars.songQueue.length <= 0)
+            if (token_songs.length <= 0)
                 return;
+
+            _gvars.songQueue = token_songs;
+            MenuSongSelection.options.queuePlaylist = _gvars.songQueue;
 
             switchTo(MainMenu.MENU_SONGSELECTION);
             MenuSongSelection.options.infoTab = MenuSongSelection.TAB_QUEUE;
