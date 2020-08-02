@@ -48,6 +48,7 @@ package game
     import game.controls.Score;
     import it.gotoandplay.smartfoxserver.SFSEvent;
     import menu.MenuPanel;
+    import menu.MenuSongSelection;
     import sql.SQLSongDetails;
 
     public class GamePlay extends MenuPanel
@@ -228,6 +229,9 @@ package game
         {
             if (_gvars.menuMusic)
                 _gvars.menuMusic.stop();
+
+            if (MenuSongSelection.previewMusic)
+                MenuSongSelection.previewMusic.stop();
 
             // var stage3D:Stage3D = stage.stage3Ds[0];
             // stage.stage3Ds[0].addEventListener(Event.CONTEXT3D_CREATE, initStage3D);
