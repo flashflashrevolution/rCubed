@@ -101,6 +101,8 @@ package menu
         private var songItemContextMenuItem:ContextMenuItem;
         private var songItemRemoveQueueContext:ContextMenuItem;
 
+        public static var previewMusic:SongPlayerBytes;
+
         ///- Constructor
         public function MenuSongSelection(myParent:MenuPanel)
         {
@@ -142,6 +144,10 @@ package menu
             songItemContextMenu = new ContextMenu();
             songItemContextMenuItem = new ContextMenuItem("Set as Menu Music");
             songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_setAsMenuMusicContextSelect);
+            songItemContextMenu.customItems.push(songItemContextMenuItem);
+
+            songItemContextMenuItem = new ContextMenuItem("Listen to Song Preview");
+            songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_listenToSongPreviewContextSelect);
             songItemContextMenu.customItems.push(songItemContextMenuItem);
 
             if (_gvars.sql_connect)
@@ -839,7 +845,7 @@ package menu
         }
 
         /**
-         * Song Item Context Menu: Sets the interacted as the current menu music.
+         * Song Item Context Menu: Sets the interacted song as the current menu music.
          * This handles loading the music in the background if not already loaded,
          * or sets the music from the already loaded copy if available.
          * @param e
@@ -865,6 +871,35 @@ package menu
                 {
                     _gvars.gameMain.addAlert("Loading Music for \"" + songData["name"] + "\"", 90);
                     song.addEventListener(Event.COMPLETE, e_menuMusicConvertSongLoad);
+                }
+            }
+        }
+
+        /**
+         * Song Item Context Menu: Same as for setting a song as the current menu music,
+         * but for playing a song preview instead.
+         * @param e
+         */
+        private function e_listenToSongPreviewContextSelect(e:ContextMenuEvent):void
+        {
+            if (!_gvars.options)
+            {
+                _gvars.options = new GameOptions();
+                _gvars.options.fill();
+            }
+            var songItem:SongItem = (e.contextMenuOwner as SongItem);
+            var songData:Object = _playlist.getSong(songItem.level);
+            if (songData.error == null)
+            {
+                var song:Song = _gvars.getSongFile(songData);
+                if (song.isLoaded)
+                {
+                    playSongPreview(song);
+                }
+                else
+                {
+                    _gvars.gameMain.addAlert("Loading Music for \"" + songData["name"] + "\"", 90);
+                    song.addEventListener(Event.COMPLETE, e_songPreviewConvertSongLoad);
                 }
             }
         }
@@ -1905,6 +1940,16 @@ package menu
         }
 
         /**
+         * Callback for menu song preview when loaded and available.
+         */
+        private function e_songPreviewConvertSongLoad(e:Event):void
+        {
+            var song:Song = (e.target as Song);
+            song.removeEventListener(Event.COMPLETE, e_songPreviewConvertSongLoad);
+            playSongPreview(song);
+        }
+
+        /**
          * Begins play of a loaded Song class object.
          * This updates the stored song name, begins music playback
          * and display the song controls.
@@ -1912,6 +1957,8 @@ package menu
          */
         private function playMenuMusicSong(song:Song):void
         {
+            _gvars.gameMain.addAlert("Playing menu music...");
+
             LocalStore.setVariable("menu_music", song.entry.name);
             var par:MainMenu = ((this.my_Parent) as MainMenu);
             if (par.menuMusicControls)
@@ -1920,9 +1967,30 @@ package menu
             if (_gvars.menuMusic)
                 _gvars.menuMusic.stop();
 
+            if (previewMusic)
+                previewMusic.stop();
+
             _gvars.menuMusic = new SongPlayerBytes(song.bytesSWF);
             _gvars.menuMusic.start();
             par.drawMenuMusicControls();
+        }
+        
+        /**
+         * Same as playMenuMusicSong, but it plays the song preview without repeat
+         * and the song controls aren't drawn.
+         */
+        private function playSongPreview(song:Song):void
+        {
+            _gvars.gameMain.addAlert("Playing song preview...");
+
+            if (_gvars.menuMusic)
+                _gvars.menuMusic.stop();
+
+            if (previewMusic)
+                previewMusic.stop();
+
+            previewMusic = new SongPlayerBytes(song.bytesSWF, false, true);
+            previewMusic.start();
         }
 
         /**
