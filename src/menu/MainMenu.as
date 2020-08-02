@@ -28,7 +28,6 @@ package menu
     import flash.ui.ContextMenuItem;
     import popups.PopupFilterManager;
     import popups.PopupSkillRankUpdate;
-    import game.GamePlay;
 
     public class MainMenu extends MenuPanel
     {
@@ -249,7 +248,8 @@ package menu
                 spr_play.borderAlpha = 0.75;
                 spr_play.x = 5;
                 spr_play.y = 5;
-                with (spr_play.graphics)
+                var playIcon:Sprite = new Sprite();
+                with (playIcon.graphics)
                 {
                     lineStyle(1, 0xFFFFFF, 0);
                     beginFill(0xFFFFFF, 0.75);
@@ -259,6 +259,7 @@ package menu
                     lineTo(7, 6);
                     endFill();
                 }
+                spr_play.addChild(playIcon);
                 spr_play.addEventListener(MouseEvent.CLICK, function(e:Event):void
                 {
                     if (_gvars.menuMusic && !_gvars.menuMusic.isPlaying)
@@ -272,7 +273,8 @@ package menu
                 spr_pause.borderAlpha = 0.75;
                 spr_pause.x = 35;
                 spr_pause.y = 5;
-                with (spr_pause.graphics)
+                var pauseIcon:Sprite = new Sprite();
+                with (pauseIcon.graphics)
                 {
                     lineStyle(1, 0xFFFFFF, 0);
                     beginFill(0xFFFFFF, 0.75);
@@ -280,6 +282,7 @@ package menu
                     drawRect(14, 6, 5, 15);
                     endFill();
                 }
+                spr_pause.addChild(pauseIcon);
                 spr_pause.addEventListener(MouseEvent.CLICK, function(e:Event):void
                 {
                     if (_gvars.menuMusic && _gvars.menuMusic.isPlaying)
@@ -293,13 +296,15 @@ package menu
                 spr_stop.borderAlpha = 0.75;
                 spr_stop.x = 65;
                 spr_stop.y = 5;
-                with (spr_stop.graphics)
+                var stopIcon:Sprite = new Sprite();
+                with (stopIcon.graphics)
                 {
                     lineStyle(1, 0xFFFFFF, 0);
                     beginFill(0xFFFFFF, 0.75);
                     drawRect(6, 6, 13, 15);
                     endFill();
                 }
+                spr_stop.addChild(stopIcon);
                 spr_stop.addEventListener(MouseEvent.CLICK, function(e:Event):void
                 {
                     if (_gvars.menuMusic && _gvars.menuMusic.isPlaying)
@@ -313,7 +318,8 @@ package menu
                 spr_delete.borderAlpha = 0.75;
                 spr_delete.x = 95;
                 spr_delete.y = 5;
-                with (spr_delete.graphics)
+                var deleteIcon:Sprite = new Sprite();
+                with (deleteIcon.graphics)
                 {
                     lineStyle(1, 0xFFFFFF, 0);
                     beginFill(0xFFFFFF, 0.75);
@@ -330,6 +336,7 @@ package menu
                     lineTo(11, 5);
                     endFill();
                 }
+                spr_delete.addChild(deleteIcon);
                 menuMusicControls.addChild(spr_delete);
                 spr_delete.addEventListener(MouseEvent.CLICK, function(e:Event):void
                 {
