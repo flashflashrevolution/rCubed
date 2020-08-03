@@ -798,7 +798,7 @@ package menu
             if (e.target is SongItem)
             {
                 var tarSongItem:SongItem = (e.target as SongItem);
-                var isLocked:Boolean = tarSongItem.e_onClick(e);
+                tarSongItem.e_onClick(e);
                 if (tarSongItem.index != options.activeIndex)
                 {
                     options.infoTab = TAB_PLAYLIST;
@@ -807,7 +807,7 @@ package menu
                 }
                 else
                 {
-                    if (isLocked == false && options.infoTab == TAB_PLAYLIST)
+                    if (tarSongItem.isLocked == false && options.infoTab == TAB_PLAYLIST)
                     {
                         if (_mp.gameplayHasOpponent())
                             multiplayerLoad(tarSongItem.level);
