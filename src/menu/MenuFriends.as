@@ -26,7 +26,6 @@ package menu
         private var selectedGenre:Sprite;
         private var refreshButton:Text;
 
-        public var options:Object;
         public var isLoading:Boolean = false;
 
         public function MenuFriends(myParent:MenuPanel)
@@ -36,10 +35,6 @@ package menu
 
         override public function init():Boolean
         {
-            //- Setup Settings
-            options = new Object();
-            options.activeIndex = -1;
-
             //- Add Background
             background = new SongSelectionBackground();
             background.x = 145;
@@ -132,14 +127,10 @@ package menu
             var sI:FriendItem;
             for (var sX:int = 0; sX < friendsLength; sX++)
             {
-                sI = new FriendItem(_friends.list[sX], (options.activeIndex == sX));
+                sI = new FriendItem(_friends.list[sX]);
                 sI.y = yOffset + 30 * sX;
-                sI.index = sX;
-                sI.addEventListener(MouseEvent.CLICK, friendItemClick, false, 0, true);
                 pane.content.addChild(sI);
                 friendBoxItems[friendBoxItems.length] = sI;
-                if (options.activeIndex == sX)
-                    yOffset += 60;
             }
             pane.scrollTo(scrollbar.scroll, false);
             scrollbar.visible = (pane.content.height > pane.height);
@@ -160,22 +151,7 @@ package menu
         {
             _friends.removeEventListener(GlobalVariables.LOAD_COMPLETE, friendScriptLoad);
             _friends.removeEventListener(GlobalVariables.LOAD_ERROR, friendScriptLoad);
-            options.activeIndex = -1;
             isLoading = false;
-            buildFriends();
-        }
-
-        private function friendItemClick(e:Event = null):void
-        {
-            // Set Active
-            if (options.activeIndex != e.target.index)
-            {
-                options.activeIndex = e.target.index;
-            }
-            else if (options.activeIndex == e.target.index)
-            {
-                options.activeIndex = -1;
-            }
             buildFriends();
         }
 
