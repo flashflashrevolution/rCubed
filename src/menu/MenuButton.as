@@ -11,9 +11,10 @@ package menu
         public var panel:String;
         public var index:String;
 
-        public function MenuButton(message:String, isActive:Boolean = false):void
+        public function MenuButton(message:String, isActive:Boolean = false, width:Number = 115, height:Number = 28, size:int = 12):void
         {
-            super(115, 28, message, 12, "#FFFFFF", true, true);
+            super(width, height, message, size, "#FFFFFF", true, true);
+            super.active = isActive;
         }
     }
 }
