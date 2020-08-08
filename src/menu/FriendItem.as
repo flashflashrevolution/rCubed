@@ -14,14 +14,11 @@ package menu
         //- Song Details
         private var nameText:Text;
         private var statusText:Text;
-        public var index:Number;
-        public var box:Box;
 
-        public function FriendItem(user_data:Object, isActive:Boolean = false):void
+        public function FriendItem(user_data:Object):void
         {
             this.user_data = user_data;
-            this.active = isActive;
-            super(577, 27 + (isActive ? 60 : 0), false);
+            super(577, 27, false);
         }
 
         override protected function init():void
