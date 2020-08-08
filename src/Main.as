@@ -12,6 +12,7 @@ package
     import assets.GameBackgroundColor;
     import classes.Alert;
     import classes.BoxButton;
+    import classes.Friends;
     import classes.Language;
     import classes.Noteskins;
     import classes.Playlist;
@@ -68,7 +69,7 @@ package
         public var _site:Site = Site.instance;
         public var _playlist:Playlist = Playlist.instance;
         public var _lang:Language = Language.instance;
-        //public var _friends:Friends = Friends.instance;
+        public var _friends:Friends = Friends.instance;
         public var _noteskins:Noteskins = Noteskins.instance;
 
         public var loadTimer:int = 0;
@@ -266,7 +267,7 @@ package
             //- Status Display
             loadStatus = new TextField();
             loadStatus.x = 8;
-            loadStatus.y = GAME_HEIGHT - ((isLoginLoad) ? 118 : 155);
+            loadStatus.y = GAME_HEIGHT - ((isLoginLoad) ? 134 : 171);
             loadStatus.width = GAME_WIDTH - 20;
             loadStatus.selectable = false;
             loadStatus.embedFonts = true;
@@ -288,7 +289,7 @@ package
         ///- Game Data
         public function loadGameData():void
         {
-            loadTotal = (!isLoginLoad) ? 5 : 3;
+            loadTotal = (!isLoginLoad) ? 6 : 4;
 
             _gvars.playerUser = new User(true, true);
             _gvars.activeUser = _gvars.playerUser;
@@ -299,8 +300,11 @@ package
             _site.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
             _playlist.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
             _playlist.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
+            _friends.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
+            _friends.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
             _site.load();
             _playlist.load();
+            _friends.load();
 
             if (!isLoginLoad)
             {
@@ -311,10 +315,6 @@ package
                 _lang.load();
                 _noteskins.load();
             }
-
-            //_friends.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
-            //_friends.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
-            //_friends.load();
 
             // Update Text
             updateLoaderText();
@@ -345,7 +345,7 @@ package
         {
             if (loadStatus != null)
             {
-                loadStatus.htmlText = "Total: " + loadScripts + " / " + loadTotal + "\n" + "Playlist: " + getLoadText(_playlist.isLoaded(), _playlist.isError()) + "\n" + "User Data: " + getLoadText(_gvars.playerUser.isLoaded(), _gvars.playerUser.isError()) + "\n" + "Site Data: " + getLoadText(_site.isLoaded(), _site.isError()) + ((!isLoginLoad) ? ("\n" + "Noteskin Data: " + getLoadText(_noteskins.isLoaded(), _noteskins.isError()) + "\n" + "Language Data: " + getLoadText(_lang.isLoaded(), _lang.isError())) : "");
+                loadStatus.htmlText = "Total: " + loadScripts + " / " + loadTotal + "\n" + "Playlist: " + getLoadText(_playlist.isLoaded(), _playlist.isError()) + "\n" + "User Data: " + getLoadText(_gvars.playerUser.isLoaded(), _gvars.playerUser.isError()) + "\n" + "Site Data: " + getLoadText(_site.isLoaded(), _site.isError()) + "\n" + "Friends Data: " + getLoadText(_friends.isLoaded(), _friends.isError()) + ((!isLoginLoad) ? ("\n" + "Noteskin Data: " + getLoadText(_noteskins.isLoaded(), _noteskins.isError()) + "\n" + "Language Data: " + getLoadText(_lang.isLoaded(), _lang.isError())) : "");
             }
         }
 
@@ -471,13 +471,12 @@ package
                 _gvars.activeUser.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
                 _gvars.activeUser.load();
             }
-            /*
-               if (!_friends.isLoaded()) {
-               _friends.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
-               _friends.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
-               _friends.load();
-               }
-             */
+            if (!_friends.isLoaded())
+            {
+                _friends.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
+                _friends.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
+                _friends.load();
+            }
             if (!isLoginLoad)
             {
                 if (!_noteskins.isLoaded())
