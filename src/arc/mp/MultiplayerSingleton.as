@@ -3,14 +3,11 @@ package arc.mp
     import menu.MenuPanel;
     import menu.MainMenu;
     import menu.MenuSongSelection;
-    import game.GamePlay;
-    import game.GameMenu;
     import game.GameOptions;
     import classes.Playlist;
     import classes.chart.Song;
     import classes.replay.Replay;
     import GlobalVariables;
-    import arc.ArcGlobals;
     import arc.mp.MultiplayerPanel;
     import flash.net.URLVariables;
     import flash.net.URLLoader;
@@ -22,8 +19,6 @@ package arc.mp
     import flash.events.Event;
     import com.flashfla.net.Multiplayer;
     import it.gotoandplay.smartfoxserver.SFSEvent;
-
-    import com.bit101.components.TextArea;
 
     public class MultiplayerSingleton extends Object
     {
@@ -52,7 +47,7 @@ package arc.mp
 
         public static function destroyInstance():void
         {
-            if (instance.connection.connected)
+            if (instance && instance.connection && instance.connection.connected)
                 instance.connection.disconnect();
             instance = null;
         }
