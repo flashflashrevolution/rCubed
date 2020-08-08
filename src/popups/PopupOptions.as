@@ -144,6 +144,7 @@ package popups
         private var useWebsocketCheckbox:BoxCheck;
 
         private var flipGraphCheckbox:BoxCheck;
+        private var enableFriendsMenuCheckbox:BoxCheck;
 
         public function PopupOptions(myParent:MenuPanel)
         {
@@ -1149,6 +1150,19 @@ package popups
                 box.addChild(flipGraphCheckbox);
                 yOff += 30;
 
+                var enableFriendsMenuCheckboxText:Text = new Text("Enable Friends Menu");
+                enableFriendsMenuCheckboxText.x = xOff + 22;
+                enableFriendsMenuCheckboxText.y = yOff;
+                box.addChild(enableFriendsMenuCheckboxText);
+                yOff += 2;
+
+                enableFriendsMenuCheckbox = new BoxCheck();
+                enableFriendsMenuCheckbox.x = xOff + 2;
+                enableFriendsMenuCheckbox.y = yOff;
+                enableFriendsMenuCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                box.addChild(enableFriendsMenuCheckbox);
+                yOff += 30;
+
                 ///- Col 2
                 xOff += 176;
                 yOff = BASE_Y_POSITION;
@@ -1825,6 +1839,21 @@ package popups
                 LocalStore.setVariable("result_flip_graph", !flipGraph);
             }
 
+            // Enable Friends menu
+            else if (e.target == enableFriendsMenuCheckbox)
+            {
+                var enableFriendsMenu:Boolean = LocalStore.getVariable("enable_friends_menu", false);
+                LocalStore.setVariable("enable_friends_menu", !enableFriendsMenu);
+                if (_gvars.gameMain.activePanel is MainMenu)
+                {
+                    (_gvars.gameMain.activePanel as MainMenu).rebuildMenu();
+                }
+                else
+                {
+                    _gvars.gameMain.activePanel.draw();
+                }
+            }
+
             // Set Settings
             setSettings();
 
@@ -2109,6 +2138,9 @@ package popups
 
                 var flipGraph:Boolean = LocalStore.getVariable("result_flip_graph", false);
                 flipGraphCheckbox.checked = flipGraph;
+
+                var enableFriendsMenu:Boolean = LocalStore.getVariable("enable_friends_menu", false);
+                enableFriendsMenuCheckbox.checked = enableFriendsMenu;
             }
             // Save Local
             if (_gvars.activeUser == _gvars.playerUser)
