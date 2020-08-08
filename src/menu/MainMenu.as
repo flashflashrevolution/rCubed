@@ -58,7 +58,7 @@ package menu
         private var statUpdaterBtn:SimpleBoxButton;
         private var rankUpdateThrobber:Throbber;
 
-        public var menuItems:Array = [["menu_play", MENU_SONGSELECTION], ["menu_multiplayer", MENU_MULTIPLAYER], ["menu_tokens", MENU_TOKENS], ["menu_filters", MENU_FILTERS], ["menu_options", MENU_OPTIONS]];
+        public var menuItems:Array;
         public var panel:MenuPanel;
         public var options:Object;
 
@@ -178,6 +178,32 @@ package menu
             panel.draw();
         }
 
+        public function rebuildMenu():void
+        {
+            // Tokens --> Tokens
+            if (options.activePanel == 3)
+            {
+                switchTo(MENU_TOKENS);
+            }
+            else if (options.activePanel == 2)
+            {
+                var enableFriendsMenu:Boolean = LocalStore.getVariable("enable_friends_menu", false);
+
+                // Tokens --> Friends
+                if (enableFriendsMenu)
+                {
+                    switchTo(MENU_FRIENDS);
+                }
+
+                // Friends --> Tokens
+                else
+                {
+                    switchTo(MENU_TOKENS);
+                }
+            }
+            this.draw();
+        }
+
         public function buildMenuItems():void
         {
             if (menuItemBox != null)
@@ -187,6 +213,17 @@ package menu
 
                 this.removeChild(user_text);
                 user_text = null;
+            }
+
+            //- Configure menu item array
+            var enableFriendsMenu:Boolean = LocalStore.getVariable("enable_friends_menu", false);
+            if (enableFriendsMenu)
+            {
+                menuItems = [["menu_play", MENU_SONGSELECTION], ["menu_multiplayer", MENU_MULTIPLAYER], ["menu_friends", MENU_FRIENDS], ["menu_tokens", MENU_TOKENS], ["menu_filters", MENU_FILTERS], ["menu_options", MENU_OPTIONS]];
+            }
+            else
+            {
+                menuItems = [["menu_play", MENU_SONGSELECTION], ["menu_multiplayer", MENU_MULTIPLAYER], ["menu_tokens", MENU_TOKENS], ["menu_filters", MENU_FILTERS], ["menu_options", MENU_OPTIONS]];
             }
 
             //- User Info Display
@@ -220,10 +257,14 @@ package menu
             menuItemBox.y = 8;
 
             //- Add Menu Buttons
+            var gap:Number = 7;
+            var width:Number = (610 / menuItems.length) - gap;
+            var height:Number = 28;
+            var fontSize:int = (enableFriendsMenu) ? 11 : 12;
             for (var item:String in menuItems)
             {
-                var menuItem:MenuButton = new MenuButton(_lang.string(menuItems[item][0]), item == options.activePanel);
-                menuItem.x = Number(item) * 122;
+                var menuItem:MenuButton = new MenuButton(_lang.string(menuItems[item][0]), item == options.activePanel, width, height, fontSize);
+                menuItem.x = Number(item) * (width + gap);
                 menuItem.panel = menuItems[item][1];
                 menuItem.mouseChildren = false;
                 menuItem.useHandCursor = true;
@@ -383,6 +424,7 @@ package menu
                 this.removeChild(panel);
             }
 
+            var enableFriendsMenu:Boolean = LocalStore.getVariable("enable_friends_menu", false);
             switch (_panel)
             {
                 case MENU_SONGSELECTION:
@@ -400,28 +442,28 @@ package menu
                     options.activePanel = 1;
                     isFound = true;
                     break;
-                /*
-                   case MENU_FRIENDS:
-                   if (_MenuFriends == null || useNew)
-                   _MenuFriends = new MenuFriends(this);
-                   panel = _MenuFriends;
-                   options.activePanel = 2;
-                   isFound = true;
-                   break;
-                   case MENU_STATS:
+
+                case MENU_FRIENDS:
+                    if (_MenuFriends == null || useNew)
+                        _MenuFriends = new MenuFriends(this);
+                    panel = _MenuFriends;
+                    options.activePanel = 2;
+                    isFound = true;
+                    break;
+
+                /* case MENU_STATS:
                    if (_MenuStats == null || useNew)
                    _MenuStats = new MenuStats(this);
                    panel = _MenuStats;
                    options.activePanel = 2;
                    isFound = true;
-                   break;
-                 */
+                   break; */
 
                 case MENU_TOKENS:
                     if (_MenuTokens == null || useNew)
                         _MenuTokens = new MenuTokens(this);
                     panel = _MenuTokens;
-                    options.activePanel = 2;
+                    options.activePanel = (enableFriendsMenu) ? 3 : 2;
                     isFound = true;
                     break;
             }
