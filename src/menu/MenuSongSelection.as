@@ -886,7 +886,6 @@ package menu
             }
             _gvars.options.replay = new SongPreview((e.contextMenuOwner as SongItem).level);
             _gvars.options.loadPreview = true;
-            _gvars.replayHistory.push(_gvars.options.replay);
 
             if (!_gvars.options.replay.isLoaded)
             {
