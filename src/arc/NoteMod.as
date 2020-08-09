@@ -222,13 +222,13 @@ package arc
 
                 if (options.isolationLength > 0)
                 {
-                    firstNote = notes[Math.min(notes.length - 1, options.isolationOffset - 1)];
+                    firstNote = notes[Math.min(notes.length - 1, Math.max(0, options.isolationOffset - 1))];
                     lastNote = notes[Math.min(notes.length - 1, options.isolationOffset + options.isolationLength)];
                     time = lastNote.time - firstNote.time;
                 }
                 else
                 {
-                    firstNote = notes[Math.min(notes.length - 1, options.isolationOffset - 1)];
+                    firstNote = notes[Math.min(notes.length - 1, Math.max(0, options.isolationOffset - 1))];
                     time = lastNote.time - firstNote.time;
                 }
             }
