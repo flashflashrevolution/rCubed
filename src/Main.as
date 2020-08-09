@@ -413,7 +413,7 @@ package
                     }
                 }
 
-                if (_gvars.options && _gvars.options.replay)
+                if ((_gvars.flashvars.replay != null || _gvars.flashvars.preview_file != null) && _gvars.options && _gvars.options.replay)
                 {
                     if (_gvars.options.replay is SongPreview && !_gvars.options.replay.isLoaded)
                     {
@@ -424,8 +424,12 @@ package
                     {
                         loadScripts = 0;
                         preloader.remove();
-                        removeChild(loadStatus);
-                        removeChild(epilepsyWarning)
+
+                        if (this.contains(loadStatus))
+                            removeChild(loadStatus);
+                        if (this.contains(epilepsyWarning))
+                            removeChild(epilepsyWarning);
+
                         this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
 
                         // Setup Vars
