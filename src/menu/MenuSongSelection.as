@@ -18,6 +18,7 @@ package menu
     import classes.Language;
     import classes.Playlist;
     import classes.SongPlayerBytes;
+    import classes.SongPreview;
     import classes.SongQueueItem;
     import classes.StarSelector;
     import classes.Text;
@@ -142,6 +143,10 @@ package menu
             songItemContextMenu = new ContextMenu();
             songItemContextMenuItem = new ContextMenuItem("Set as Menu Music");
             songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_setAsMenuMusicContextSelect);
+            songItemContextMenu.customItems.push(songItemContextMenuItem);
+
+            songItemContextMenuItem = new ContextMenuItem("Play Chart Preview");
+            songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_playChartPreviewContextSelect);
             songItemContextMenu.customItems.push(songItemContextMenuItem);
 
             if (_gvars.sql_connect)
@@ -866,6 +871,37 @@ package menu
                     _gvars.gameMain.addAlert("Loading Music for \"" + songData["name"] + "\"", 90);
                     song.addEventListener(Event.COMPLETE, e_menuMusicConvertSongLoad);
                 }
+            }
+        }
+        
+        /**
+         * Song Item Context Menu: Plays the chart preview of the selected song.
+         */
+        private function e_playChartPreviewContextSelect(e:ContextMenuEvent):void
+        {
+            if (!_gvars.options)
+            {
+                _gvars.options = new GameOptions();
+                _gvars.options.fill();
+            }
+            _gvars.options.replay = new SongPreview((e.contextMenuOwner as SongItem).level);
+            _gvars.options.loadPreview = true;
+            _gvars.replayHistory.push(_gvars.options.replay);
+
+            if (!_gvars.options.replay.isLoaded)
+            {
+                (_gvars.options.replay as SongPreview).setupSongPreview();
+            }
+
+            if (_gvars.options.replay.isLoaded)
+            {
+                // Setup Vars
+                _gvars.songQueue = [];
+                _gvars.songQueue.push(Playlist.instance.getSong(_gvars.options.replay.level));
+
+                // Switch to game
+                _gvars.gameMain.addAlert("Playing chart preview...");
+                switchTo(Main.GAME_PLAY_PANEL);
             }
         }
 
