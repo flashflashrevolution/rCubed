@@ -14,7 +14,7 @@ package game
         public static const D4:Number = -434698.513947563;
         public static const D5:Number = 3060.24243867853;
 
-        static public function getSongWeight(song:Object, result:Object):Number
+        static public function getSongWeight(song:Object, result:GameScoreResult):Number
         {
             var rawgoods:Number = getRawGoods(result);
             var songweight:Number = 0;
@@ -23,12 +23,12 @@ package game
             {
                 songweight = Math.pow((delta - rawgoods * LAMBDA) / delta * Math.pow(song.difficulty + ALPHA, BETA), 1 / BETA) - ALPHA;
             }
-            if (songweight < 0 || result.score <= 0 || song.engine != null)
+            if (songweight < 0 || result.score <= 0 || result.options.songRate != 1 || song.engine != null)
                 songweight = 0;
             return songweight;
         }
 
-        static public function getRawGoods(result:Object):Number
+        static public function getRawGoods(result:GameScoreResult):Number
         {
             return (result.good) + (result.average * 1.8) + (result.miss * 2.4) + (result.boo * 0.2);
         }

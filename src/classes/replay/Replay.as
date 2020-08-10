@@ -38,7 +38,7 @@ package classes.replay
         public var miss:Number;
         public var boo:Number;
         public var maxcombo:Number;
-        public var replay:Array;
+        public var replay:Vector.<ReplayNote>;
         public var timestamp:Number;
 
         public function Replay(id:Number, doLoad:Boolean = false)
@@ -172,7 +172,7 @@ package classes.replay
 
             //- Frames
             var tempReplay:String = data.replayframes;
-            replay = [];
+            replay = new <ReplayNote>[];
 
             //- Clean up
             // Legacy Replay Format ((LDUR),(FRAME)|), Handled in the Velo Converter
@@ -220,7 +220,7 @@ package classes.replay
             this.settings = data.settings;
 
             //- Replay
-            this.replay = [];
+            this.replay = new <ReplayNote>[];
             for each (var item:Object in data.rep_boos)
                 this.replay.push(new ReplayNote(item["d"], -2, item["t"]));
 
@@ -327,7 +327,7 @@ package classes.replay
             return replay[index];
         }
 
-        public function getEncode():String
+        public function getEncode(onlyBinReplay:Boolean = false):String
         {
             if (replay_bin != null)
             {
@@ -335,7 +335,8 @@ package classes.replay
                 enc.encodeBytes(replay_bin);
                 return ReplayPack.MAGIC + "|" + enc.toString();
             }
-            else
+
+            if (!onlyBinReplay)
             {
                 var sT:Number = (perfect * 550) + (good * 275) + (average * 55) + (maxcombo * 1000) - (miss * 310) - (boo * 20);
                 var o:Object = {};
@@ -350,6 +351,8 @@ package classes.replay
                 var outJson:String = JSON.stringify(o);
                 return (outJson + "|" + MD5.hash(outJson + "|" + MD5.hash(outJson)));
             }
+
+            return null;
         }
 
         public function parseEncode(str:String, loadUser:Boolean = true):void

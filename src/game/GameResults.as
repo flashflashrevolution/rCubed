@@ -11,7 +11,6 @@ package game
     import classes.StarSelector;
     import classes.Text;
     import classes.replay.Replay;
-    import classes.replay.ReplayNote;
     import com.flashfla.net.DynamicURLLoader;
     import com.flashfla.utils.NumberUtil;
     import com.flashfla.utils.ObjectUtil;
@@ -30,7 +29,6 @@ package game
     import flash.net.URLRequest;
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
-    import flash.text.StyleSheet;
     import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
     import flash.ui.Keyboard;
@@ -39,41 +37,61 @@ package game
     import popups.PopupMessage;
     import popups.PopupSongRating;
     import popups.PopupTokenUnlock;
+    import game.graph.GraphBase;
+    import game.graph.GraphCombo;
+    import game.graph.GraphAccuracy;
+    import classes.BoxIcon;
+    import assets.menu.icons.fa.iconPhoto;
+    import assets.menu.icons.fa.iconSave;
+    import assets.menu.icons.fa.iconRandom;
 
     public class GameResults extends MenuPanel
     {
+        public static const GRAPH_WIDTH:int = 718;
+        public static const GRAPH_HEIGHT:int = 117;
+        public static const GRAPH_COMBO:int = 0;
+        public static const GRAPH_ACCURACY:int = 1;
+
+        private var graph_cache:Object = {"0": {}, "1": {}};
 
         private var _mp:MultiplayerSingleton = MultiplayerSingleton.getInstance();
         private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _avars:ArcGlobals = ArcGlobals.instance;
         private var _lang:Language = Language.instance;
         private var _loader:DynamicURLLoader;
+        private var _playlist:Playlist = Playlist.instance;
+
+        // Results
+        private var resultsTime:String = TimeUtil.getCurrentDate();
         private var resultIndex:int = 0;
-        private var TEXT_STYLE:StyleSheet;
+        private var songResults:Vector.<GameScoreResult>;
+        private var songRankIndex:int = -1;
 
+        // Title Bar
+        private var navSaveReplay:BoxIcon;
+        private var navScreenShot:BoxIcon;
+        private var navRandomSong:BoxIcon;
+
+        // Game Result
         private var resultsDisplay:ResultsBackground;
-        private var graphDraw:Sprite;
-        private var graphToggle:BoxButton;
-
         private var navRating:Sprite;
         private var navPrev:BoxButton;
         private var navNext:BoxButton;
-        private var navSaveReplay:BoxButton;
         private var resultsMods:Text;
 
-        private var navScreenShot:BoxButton;
+        // Graph
+        private var graphType:int = 0;
+        private var graphToggle:BoxButton;
+        private var activeGraph:GraphBase;
+        private var graphDraw:Sprite;
+        private var graphOverlay:Sprite;
+        private var graphOverlayText:Text;
+
+        // Menu Bar
         private var navReplay:BoxButton;
         private var navOptions:BoxButton;
         private var navHighscores:BoxButton;
         private var navMenu:BoxButton;
-        private var navRandomSong:BoxButton;
-        private var resultsTime:String = TimeUtil.getCurrentDate();
-        private var _playlist:Playlist = Playlist.instance;
-
-        private var songResults:Array;
-        private var songIndex:int;
-        private var graphType:int = 0;
-        private var flipGraph:Boolean = false;
 
         public function GameResults(myParent:MenuPanel)
         {
@@ -82,14 +100,13 @@ package game
 
         override public function init():Boolean
         {
-            songResults = _gvars.songResults;
-            songIndex = _gvars.CUR_GAME_INDEX;
+            songResults = _gvars.songResults.concat();
 
             // Send last score
             if (!_gvars.options.replay)
             {
                 sendScore();
-                saveReplay();
+                saveLocalReplay();
             }
 
             // More songs to play, jump to gameplay or loading.
@@ -100,16 +117,22 @@ package game
             }
             else
             {
-                _gvars.songResults = [];
-                _gvars.CUR_GAME_INDEX = -1;
+                _gvars.songResults.length = 0;
             }
             return true;
         }
+
+        //******************************************************************************************//
+        // Panel Stage Functions
+        //******************************************************************************************//
 
         override public function stageAdd():void
         {
             // Add keyboard navigation
             stage.addEventListener(KeyboardEvent.KEY_DOWN, eventHandler);
+
+            // Add Mouse Move for graphs
+            stage.addEventListener(MouseEvent.MOUSE_MOVE, e_graphHover);
 
             // Reset Window Title
             stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE;
@@ -117,18 +140,13 @@ package game
             // Get Graph Type
             graphType = LocalStore.getVariable("result_graph_type", 0);
 
-            // Text Style
-            TEXT_STYLE = new StyleSheet();
-            TEXT_STYLE.setStyle("BODY", {fontWeight: "bold"});
-            TEXT_STYLE.setStyle("A", {textDecoration: "underline"});
-
             // Background
             resultsDisplay = new ResultsBackground();
-            resultsDisplay.song_description.styleSheet = TEXT_STYLE;
+            resultsDisplay.song_description.styleSheet = Constant.STYLESHEET;
             this.addChild(resultsDisplay);
 
             // Avatar
-            var result:Object = songResults[songResults.length - 1];
+            var result:GameScoreResult = songResults[songResults.length - 1];
             if (result.user)
             {
                 var userAvatar:DisplayObject = result.user.avatar;
@@ -189,21 +207,28 @@ package game
             resultsDisplay.addChild(navRating);
 
             // Song Results Buttons
-            navScreenShot = new BoxButton(84, 32, _lang.string("game_results_queue_save_screenshot"));
-            navScreenShot.x = 470;
+            navScreenShot = new BoxIcon(32, 32, new iconPhoto());
+            navScreenShot.x = 522;
             navScreenShot.y = 6;
+            navScreenShot.setIconColor("#E2FEFF");
+            navScreenShot.setHoverText(_lang.string("game_results_queue_save_screenshot"), "bottom");
             navScreenShot.addEventListener(MouseEvent.CLICK, eventHandler);
             this.addChild(navScreenShot);
 
-            navSaveReplay = new BoxButton(84, 32, _lang.string("game_results_queue_save_replay"));
-            navSaveReplay.x = 382;
+
+            navSaveReplay = new BoxIcon(32, 32, new iconSave());
+            navSaveReplay.x = 485;
             navSaveReplay.y = 6;
+            navSaveReplay.setIconColor("#E2FEFF");
+            navSaveReplay.setHoverText(_lang.string("game_results_queue_save_replay"), "bottom");
             navSaveReplay.addEventListener(MouseEvent.CLICK, eventHandler);
             this.addChild(navSaveReplay);
 
-            navRandomSong = new BoxButton(110, 32, _lang.string("game_results_play_random_song"));
-            navRandomSong.x = 268;
+            navRandomSong = new BoxIcon(32, 32, new iconRandom());
+            navRandomSong.x = 448;
             navRandomSong.y = 6;
+            navRandomSong.setIconColor("#E2FEFF");
+            navRandomSong.setHoverText(_lang.string("game_results_play_random_song"), "bottom");
             navRandomSong.addEventListener(MouseEvent.CLICK, eventHandler);
             this.addChild(navRandomSong);
 
@@ -229,6 +254,11 @@ package game
             graphDraw.y = 298;
             this.addChild(graphDraw);
 
+            graphOverlay = new Sprite();
+            graphOverlay.x = 30;
+            graphOverlay.y = 298;
+            this.addChild(graphOverlay);
+
             graphToggle = new BoxButton(17, 19, "&gt;");
             graphToggle.x = 10;
             graphToggle.y = 297;
@@ -247,27 +277,26 @@ package game
             // Remove keyboard navigation
             stage.removeEventListener(KeyboardEvent.KEY_DOWN, eventHandler);
 
+            // Remove Mouse Move for graphs
+            stage.removeEventListener(MouseEvent.MOUSE_MOVE, e_graphHover);
+
             super.stageRemove();
         }
+
+        //******************************************************************************************//
+        // Results Display Logic
+        //******************************************************************************************//
 
         public function displayGameResult(gameIndex:int):void
         {
             // Set Index
             resultIndex = gameIndex;
 
-            // Star
-            navRating.visible = false;
-            if (resultIndex >= 0)
-            {
-                navRating.graphics.clear();
-                StarSelector.drawStar(navRating.graphics, 18, 0, 0, (_gvars.playerUser.getSongRating(songResults[resultIndex]["song"]["level"]) != 0), 0xF2D60D, 1);
-            }
-
             // Buttons
             if (navScreenShot)
-                navScreenShot.visible = false;
+                navScreenShot.enabled = false;
             if (navSaveReplay)
-                navSaveReplay.visible = false;
+                navSaveReplay.enabled = false;
             if (navPrev)
                 navPrev.visible = false;
             if (navNext)
@@ -287,7 +316,7 @@ package game
             // Variables
             var skillLevel:String = (songResults[0].user != null) ? ("[Lv." + songResults[0].user.skillLevel + "]" + " ") : "";
             var displayTime:String = "";
-            var song:Object;
+            var song_entry:Object;
             var songTitle:String = "";
             var songSubTitle:String = "";
 
@@ -295,28 +324,23 @@ package game
             var scoreCredits:int = 0;
 
             // Song Results
-            var result:Object = {"user": songResults[0].user,
-                    "options": songResults[0].options,
-                    "amazing": 0,
-                    "perfect": 0,
-                    "good": 0,
-                    "average": 0,
-                    "miss": 0,
-                    "boo": 0,
-                    "score": 0,
-                    "replay_hit": [],
-                    "arrows": 0};
+            var result:GameScoreResult;
 
             // Song Queue (Multiple Songs)
             if (gameIndex == -1)
             {
+                navHighscores.enabled = false;
+                result = new GameScoreResult();
+                result.user = songResults[0].user;
+                result.options = songResults[0].options;
+                result.replay_hit = [];
+
                 for (var x:int = 0; x < songResults.length; x++)
                 {
-                    var tempResult:Object = songResults[x];
-                    var tempTotal:int = ((tempResult.amazing + tempResult.perfect) * 500) + (tempResult.good * 250) + (tempResult.average * 50) + (tempResult.maxcombo * 1000) - (tempResult.miss * 300) - (tempResult.boo * 15) + tempResult.score;
-                    song = tempResult.song;
-                    songSubTitle += song.name + ", ";
-                    result.arrows += song.arrows;
+                    var tempResult:GameScoreResult = songResults[x];
+                    song_entry = tempResult.song_entry;
+                    songSubTitle += song_entry.name + ", ";
+                    result.note_count += tempResult.note_count;
                     result.amazing += tempResult.amazing;
                     result.perfect += tempResult.perfect;
                     result.good += tempResult.good;
@@ -330,73 +354,81 @@ package game
                         result.replay_hit.push(tempResult.replay_hit[y]);
 
                     // Score Total
-                    scoreTotal += tempTotal;
+                    scoreTotal += tempResult.total;
 
                     // Credits
-                    scoreCredits += calculateCredits(tempTotal);
+                    scoreCredits += calculateCredits(tempResult.total);
                 }
+                result.updateJudge();
 
-                result.maxcombo = getMaxCombo(result);
+                result.max_combo = getMaxCombo(result);
                 songTitle = sprintf(_lang.string("game_results_total_songs"), {"total": NumberUtil.numberFormat(songResults.length)});
                 songSubTitle = songSubTitle.substr(0, songSubTitle.length - 2);
                 displayTime = resultsTime;
 
                 // Index
-                songIndex = -1;
+                songRankIndex = -1;
             }
 
             // Single Song
             else
             {
+                navHighscores.enabled = true;
                 result = songResults[resultIndex];
-                song = result.song;
+                song_entry = result.song_entry;
 
-                var seconds:Number = Math.floor(song.timeSecs * (1 / result.options.songRate));
+                var seconds:Number = Math.floor(song_entry.timeSecs * (1 / result.options.songRate));
                 var songLength:String = (Math.floor(seconds / 60)) + ":" + (seconds % 60 >= 10 ? "" : "0") + (seconds % 60);
                 var rateString:String = result.options.songRate != 1 ? " (" + result.options.songRate + "x Rate)" : "";
 
                 // Song Title
-                songTitle = song.engine ? song.name + rateString : "<a href=\"" + Constant.LEVEL_STATS_URL + song.level + "\">" + song.name + rateString + "</a>";
-                songSubTitle = sprintf(_lang.string("game_results_subtitle_difficulty"), {"value": song.difficulty}) + " - " + sprintf(_lang.string("game_results_subtitle_length"), {"value": songLength});
-                if (song.author != "")
-                    songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_author"), {"value": song.authorwithurl}));
-                if (song.stepauthor != "")
-                    songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_stepauthor"), {"value": song.stepauthorwithurl}));
+                songTitle = song_entry.engine ? song_entry.name + rateString : "<a href=\"" + Constant.LEVEL_STATS_URL + song_entry.level + "\">" + song_entry.name + rateString + "</a>";
+                songSubTitle = sprintf(_lang.string("game_results_subtitle_difficulty"), {"value": song_entry.difficulty}) + " - " + sprintf(_lang.string("game_results_subtitle_length"), {"value": songLength});
+                if (song_entry.author != "")
+                    songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_author"), {"value": song_entry.authorwithurl}));
+                if (song_entry.stepauthor != "")
+                    songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_stepauthor"), {"value": song_entry.stepauthorwithurl}));
 
                 displayTime = result.endtime;
-                scoreTotal = ((result.amazing + result.perfect) * 500) + (result.good * 250) + (result.average * 50) + (result.maxcombo * 1000) - (result.miss * 300) - (result.boo * 15) + result.score
+                scoreTotal = result.total;
                 scoreCredits += calculateCredits(scoreTotal);
 
-                // Index
-                songIndex = result.game_index + 1;
+                // Star
+                navRating.visible = false;
+                if (resultIndex >= 0)
+                {
+                    navRating.graphics.clear();
+                    StarSelector.drawStar(navRating.graphics, 18, 0, 0, (_gvars.playerUser.getSongRating(result.song_entry.level) != 0), 0xF2D60D, 1);
+                }
+
+                // Cached Rank Index
+                songRankIndex = result.game_index + 1;
 
                 // Save Replay Button
-                navSaveReplay.visible = true;
+                navSaveReplay.enabled = true;
                 if (!canSendScore(result, true, false, true, true) || _gvars.flashvars.preview_file)
                 {
-                    navSaveReplay.color = 0x000000;
-                    navSaveReplay.alpha = 0.5;
                     navSaveReplay.enabled = false;
                 }
 
                 // Display Song Rating Popup
-                if ((result["songprogress"] > 0.90 || result["playtime_secs"] >= 90) && !result.options.replay)
+                if ((result.songprogress > 0.25 || result.playtime_secs >= 30) && !result.options.replay)
                     navRating.visible = true;
             }
 
             // Save Screenshot
             if (!_gvars.flashvars.preview_file)
-                navScreenShot.visible = true;
+                navScreenShot.enabled = true;
 
             // Random Song Button
             if (result.options.replay || _gvars.flashvars.preview_file || _mp.gameplayPlayingStatus())
-                navRandomSong.visible = false;
+                navRandomSong.enabled = false;
 
             // Skill rating
-            var rawgoods:Number = zRanking.getRawGoods(result);
-            var songweight:Number = zRanking.getSongWeight(song, result);
-            if (songweight < 0 || result.options.songRate != 1 || result.lastNote > 0 || result.score <= 0 || song.engine != null)
-                songweight = 0;
+            var raw_goods:Number = zRanking.getRawGoods(result);
+            var song_weight:Number = zRanking.getSongWeight(song_entry, result);
+            if (result.last_note > 0)
+                song_weight = 0;
 
             // Display Results
             if (Text.isUnicode(songTitle))
@@ -414,12 +446,12 @@ package game
             resultsDisplay.result_average.htmlText = "<B>" + NumberUtil.numberFormat(result.average) + "</B>";
             resultsDisplay.result_miss.htmlText = "<B>" + NumberUtil.numberFormat(result.miss) + "</B>";
             resultsDisplay.result_boo.htmlText = "<B>" + NumberUtil.numberFormat(result.boo) + "</B>";
-            resultsDisplay.result_maxcombo.htmlText = "<B>" + NumberUtil.numberFormat(result.maxcombo) + "</B>";
+            resultsDisplay.result_maxcombo.htmlText = "<B>" + NumberUtil.numberFormat(result.max_combo) + "</B>";
             resultsDisplay.result_rawscore.htmlText = "<B>" + NumberUtil.numberFormat(result.score) + "</B>";
             resultsDisplay.result_total.htmlText = "<B>" + NumberUtil.numberFormat(scoreTotal) + "</B>";
             resultsDisplay.result_credits.htmlText = "<B>" + scoreCredits + "</B>";
-            resultsDisplay.result_rawgoods.htmlText = "<B>" + NumberUtil.numberFormat(rawgoods, 1, true) + "</B>";
-            resultsDisplay.result_equivalency.htmlText = "<B>" + NumberUtil.numberFormat(songweight, 2, true) + "</B>";
+            resultsDisplay.result_rawgoods.htmlText = "<B>" + NumberUtil.numberFormat(raw_goods, 1, true) + "</B>";
+            resultsDisplay.result_equivalency.htmlText = "<B>" + NumberUtil.numberFormat(song_weight, 2, true) + "</B>";
 
             // Align Rating Star to Song Title
             navRating.x = resultsDisplay.song_title.x + (resultsDisplay.song_title.width / 2) - (resultsDisplay.song_title.textWidth / 2) - 22;
@@ -427,13 +459,13 @@ package game
 
             /// - Rank Text
             // Has R3 Highscore
-            if (_gvars.songResultRanks[songIndex] != null)
+            if (_gvars.songResultRanks[songRankIndex] != null)
             {
-                resultsDisplay.result_rank.htmlText = "<B>Rank: " + _gvars.songResultRanks[songIndex].new_ranking;
-                resultsDisplay.result_last_best.htmlText = "<B>Last Best: " + _gvars.songResultRanks[songIndex].old_ranking;
+                resultsDisplay.result_rank.htmlText = "<B>Rank: " + _gvars.songResultRanks[songRankIndex].new_ranking;
+                resultsDisplay.result_last_best.htmlText = "<B>Last Best: " + _gvars.songResultRanks[songRankIndex].old_ranking;
             }
             // Alt Engine Score
-            else if (result.song && result.song.engine)
+            else if (result.song_entry && result.song_entry.engine)
             {
                 resultsDisplay.result_credits.htmlText = "<B>--</B>";
                 var rank:Object = result.legacyLastRank;
@@ -484,309 +516,146 @@ package game
             for each (var mod:String in result.options.mods)
                 mods.push(_lang.string("options_mod_" + mod));
             if (result.options.judgeWindow)
-                mods.push("Judge");
+                mods.push(_lang.string("options_mod_judge"));
             if (mods.length > 0)
                 resultsMods.text += ", Game Mods: " + mods.join(", ");
-            if (result.lastNote > 0)
-                resultsMods.text += ", Last Note: " + result.lastNote;
+            if (result.last_note > 0)
+                resultsMods.text += ", Last Note: " + result.last_note;
 
             if (gameIndex != -1)
             {
                 var arcMenu:ContextMenu = new ContextMenu();
-                var arcItem:ContextMenuItem = new ContextMenuItem("Accuracy: " + (result.accuracy.toFixed(3)) + " (±" + result.accuracyDeviation.toFixed(3) + ")");
+                var arcItem:ContextMenuItem = new ContextMenuItem("Accuracy: " + (result.accuracy_frames.toFixed(3)) + " (±" + result.accuracy_deviation_frames.toFixed(3) + ")");
                 arcMenu.customItems.push(arcItem);
                 resultsMods.contextMenu = arcMenu;
             }
 
             drawResultGraph(result);
-
-            _gvars.gameMain.displayPopupQueue();
         }
 
-        ////////////////////////////////
-        //Graph Drawing
-        private function drawResultGraph(result:Object = null):void
+        //******************************************************************************************//
+        // Graph Logic
+        //******************************************************************************************//
+
+        /**
+         * Displays a valid graph for the given GameScoreResult, this checks if the
+         * selected graph can be displayed for the given result.
+         *
+         * @param result Current GameScoreResult
+         */
+        private function drawResultGraph(result:GameScoreResult):void
         {
-            graphDraw.graphics.clear();
-
             var graph_type:int = graphType;
-            flipGraph = LocalStore.getVariable("result_flip_graph", false);
 
-            // Get Result
-            if (result == null && songResults[resultIndex] != null)
-                result = songResults[resultIndex];
+            // Check for Totals Index
+            if (graph_type == GRAPH_ACCURACY && (result.song == null || result.replay_bin_notes == null))
+                graph_type = GRAPH_COMBO;
 
-            // Bail if no result data.
-            if (result == null)
-                return;
+            // Graph Toggle
+            graphToggle.visible = (result.song != null);
 
-            var graphWidth:int = 718;
-            var graphHeight:int = 117;
-            var posX:Number;
-            var posY:Number = 0;
-
-            var ratioX:Number = graphWidth;
-            var ratioY:Number = graphHeight;
-            var songFile:Object = result.songFile;
-            var songArrows:int = (result.arrows != null ? result.arrows : result.song.arrows);
-            graphToggle.visible = (songFile != null);
-
-            // Queue Total can only render FC graph.
-            if (resultIndex == -1)
-                graph_type = 0;
-
-            // Check for Valid Data - Accuracy Graph
-            if (graph_type == 1 && result["_binReplayNotes"] == null)
-                graph_type = 0;
-
-            // Full Combo / Default Graph
-            if (graph_type == 1)
+            // Remove Old Graph
+            if (activeGraph != null)
             {
-                var MIN_TIME:int = 0;
-                var MAX_TIME:int = 0;
-                var GAP_TIME:int = 0;
-
-                // Get Judge Window
-                var judgeSettings:Array = Constant.JUDGE_WINDOW;
-                if (result.options.judgeWindow)
-                    judgeSettings = result.options.judgeWindow;
-
-                // Get Judge Window Size
-                for (var jn:int = 0; jn < judgeSettings.length; jn++)
-                {
-                    var jni:Object = judgeSettings[jn];
-                    if (jni.t < MIN_TIME)
-                        MIN_TIME = jni.t;
-                    if (jni.t > MAX_TIME)
-                        MAX_TIME = jni.t;
-                }
-                GAP_TIME = MAX_TIME - MIN_TIME;
-                ratioX /= songArrows;
-                ratioY /= GAP_TIME;
-
-                // Draw Judge Regions
-                graphDraw.graphics.lineStyle(0, 0, 0);
-                for (jn = 0; jn < judgeSettings.length; jn++)
-                {
-                    var jncj:Object = judgeSettings[jn];
-                    var jnnj:Object = judgeSettings[jn + 1] ? judgeSettings[jn + 1] : null;
-                    if (jncj == null || jnnj == null)
-                        break;
-                    var jn_rect_height:Number = (jnnj.t - jncj.t) * ratioY;
-                    var bgColor:uint = 0x000000;
-                    switch (jncj.s)
-                    {
-                        case 100: // Good
-                            bgColor = 0x97f658;
-                            break;
-                        case 50: // Good
-                            bgColor = 0x12e006;
-                            break;
-                        case 25: // Good
-                            bgColor = 0x01aa0f;
-                            break;
-                        case 5: // Average
-                            bgColor = 0xf99800
-                            break;
-                        default:
-                            continue;
-                    }
-                    if (flipGraph)
-                    {
-                        posY += jn_rect_height;
-                    }
-                    else
-                    {
-                        posY = ((jncj.t * -1) - MIN_TIME) * ratioY;
-                    }
-
-                    graphDraw.graphics.beginFill(bgColor, 0.25);
-                    graphDraw.graphics.drawRect(0, posY - jn_rect_height, graphWidth, jn_rect_height);
-                    graphDraw.graphics.endFill();
-                }
-
-                // Draw Judge Regions Dividers
-                posY = 0;
-                graphDraw.graphics.lineStyle(1, 0x000000, 0.25);
-                for (jn = 1; jn < judgeSettings.length - 1; jn++)
-                {
-                    jncj = judgeSettings[jn];
-                    if (flipGraph)
-                    {
-                        jnnj = judgeSettings[jn + 1];
-                        jn_rect_height = (jnnj.t - jncj.t) * ratioY;
-                        posY += jn_rect_height;
-                    }
-                    else
-                    {
-                        posY = ((jncj.t * -1) - MIN_TIME) * ratioY;
-                    }
-                    graphDraw.graphics.moveTo(0, posY);
-                    graphDraw.graphics.lineTo(graphWidth, posY);
-                }
-
-                // Draw Hit Markers
-                var playerTimings:Array = result["_binReplayNotes"];
-                graphDraw.graphics.lineStyle(1, 0xFFFFFF, 1, true);
-                for (jn = 0; jn < playerTimings.length; jn++)
-                {
-                    var lastJudge:Object;
-                    posX = jn * ratioX;
-                    posY = (playerTimings[jn] - MIN_TIME) * ratioY;
-
-                    if (playerTimings[jn] != null)
-                    {
-                        for each (var j:Object in judgeSettings)
-                            if ((playerTimings[jn] * -1) > j.t)
-                                lastJudge = j;
-
-                        switch (lastJudge.s)
-                        {
-                            case 100: // Amazing
-                                bgColor = 0xffffff;
-                                break;
-                            case 50: // Perfect
-                                bgColor = 0xd0ffd4;
-                                break;
-                            case 25: // Good
-                                bgColor = 0x76dd7e;
-                                break;
-                            case 5: // Average
-                                bgColor = 0xf99800;
-                                break;
-                            case 0:
-                            default:
-                                posY = 0;
-                                bgColor = 0xff0000;
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        posY = 0;
-                        bgColor = 0xff0000;
-                    }
-
-                    if (flipGraph)
-                    {
-                        posY = graphHeight - posY;
-                    }
-
-                    graphDraw.graphics.lineStyle(1, bgColor, 1);
-                    graphDraw.graphics.moveTo(posX - 2, posY - 2);
-                    graphDraw.graphics.lineTo(posX + 2, posY + 2);
-                    graphDraw.graphics.moveTo(posX + 2, posY - 2);
-                    graphDraw.graphics.lineTo(posX - 2, posY + 2);
-                }
+                activeGraph.onStageRemove();
             }
+
+            activeGraph = getGraph(graph_type, result);
+            activeGraph.onStage(this);
+            activeGraph.draw();
+        }
+
+        /**
+         * Gets the request graph object, either from cache of by creation.
+         * @param graph_type Graph Type
+         * @param result GameScoreResult
+         * @return Graph Class
+         */
+        public function getGraph(graph_type:int, result:GameScoreResult):GraphBase
+        {
+            var cache_id:String = graph_type + "_" + resultIndex;
+
+            // From Cache
+            if (graph_cache[cache_id] != null)
+            {
+                return graph_cache[cache_id];
+            }
+
+            // Create New
             else
             {
-                var curCombo:int = 0;
-                var lastColor:int = 0x0;
-                var aaaColor:int = 0xFCC100;
-                var lineColor:int = 0xFCC100;
-                if (songFile == null)
+                var new_graph:GraphBase;
+
+                if (graph_type == GRAPH_ACCURACY)
                 {
-                    ratioX /= songArrows;
-                    ratioY /= songArrows;
+                    new_graph = new GraphAccuracy(graphDraw, graphOverlay, result);
                 }
                 else
                 {
-                    ratioX /= songFile.chart.Notes[songFile.chart.Notes.length - 1].frame + 5; // 5 Frame Buffer
-                    ratioY /= result.maxcombo > 0 ? result.maxcombo : songArrows;
-                    songArrows = songFile.totalNotes;
+                    new_graph = new GraphCombo(graphDraw, graphOverlay, result);
                 }
 
-                // Draw Combo Graph
-                var fullcombo:Boolean = true;
-                graphDraw.graphics.moveTo(0, 118);
-                for (var n:int = 0; n < songArrows; n++)
-                {
-                    var status:int = result.replay_hit[n];
-                    if (songFile == null)
-                        posX = n * ratioX;
-                    else
-                        posX = (songFile.getNote(n).frame * result.options.songRate + songFile.musicDelay) * ratioX;
-                    if (result.replay_hit.length <= n || (status == -5 && songFile != null))
-                    {
-                        graphDraw.graphics.lineStyle(2, 0xFF0000, 1, true);
-                        graphDraw.graphics.lineTo(posX, 118);
-                        graphDraw.graphics.lineTo(719, 118);
-                        break;
-                    }
-                    if (status == -10)
-                    {
-                        if (songFile == null)
-                        {
-                            graphDraw.graphics.lineStyle(1, 0x5F5F5F, 1, true);
-                            graphDraw.graphics.moveTo(posX, 0);
-                            graphDraw.graphics.lineTo(posX, 118);
-                        }
-                        continue;
-                    }
-                    else if (status == -5)
-                    {
-                        graphDraw.graphics.lineStyle(2, 0xFF0000, 1, true);
-                        graphDraw.graphics.lineTo(posX, 118);
-                    }
-                    if (status <= 0)
-                    {
-                        curCombo = 0;
-                        fullcombo = false;
-                        lineColor = 0xFFFFFF;
-                    }
-                    else
-                    {
-                        curCombo++;
-                    }
+                graph_cache[cache_id] = new_graph;
 
-                    graphDraw.graphics.lineStyle(2, lineColor, 1, true);
-                    graphDraw.graphics.lineTo(posX, 118 - curCombo * ratioY);
-
-                    if (status >= 0 && status < 50 && fullcombo == true)
-                        lineColor = 0x00D42A;
-                    if (status >= 0 && status < 50 && fullcombo == false)
-                        lineColor = 0xFFFFFF;
-                }
-                if (songFile != null)
-                {
-                    for each (var replayHit:ReplayNote in result.replay)
-                    {
-                        posX = (replayHit.frame * result.options.songRate + songFile.musicDelay) * ratioX;
-                        status = replayHit.score;
-                        switch (status)
-                        {
-                            case 25: // Good
-                                lineColor = 0x40aa40;
-                                break;
-                            case 5: // Average
-                                lineColor = 0xa0a000
-                                break;
-                            case 0: // Boo
-                                lineColor = 0x804010;
-                                break;
-                            case -10: // Miss
-                                lineColor = 0xFF0000;
-                                break;
-                            default:
-                                continue;
-                        }
-                        graphDraw.graphics.lineStyle(1, lineColor, 1, true);
-                        graphDraw.graphics.moveTo(posX - 2, -2);
-                        graphDraw.graphics.lineTo(posX + 2, 2);
-                        graphDraw.graphics.moveTo(posX + 2, -2);
-                        graphDraw.graphics.lineTo(posX - 2, 2);
-                    }
-                }
+                return new_graph;
             }
         }
 
-        private function calculateCredits(score:int):int
+        /**
+         * Updates the active graph overlay with the current mouse coordinates
+         * @param e
+         */
+        private function e_graphHover(e:MouseEvent):void
         {
-            return Math.max(0, Math.min(Math.floor(score / _gvars.SCORE_PER_CREDIT), _gvars.MAX_CREDITS));
+            //trace(e.stageX - graphOverlay.x, e.stageY - graphOverlay.y); 
+            if (activeGraph != null)
+            {
+                activeGraph.drawOverlay(e.stageX - graphOverlay.x, e.stageY - graphOverlay.y);
+            }
         }
 
-        private function getMaxCombo(gameResult:Object):int
+        //******************************************************************************************//
+        // Helper Functions
+        //******************************************************************************************//
+
+        /**
+         * Handles Auto Judge Offset options by changing the judge offset and saving
+         * the user settings. This is called when scores are saved successfully and
+         * passes in the site response post vars, not GameScoreResult.
+         * @param result Post Vars
+         */
+        private function updateJudgeOffset(result:Object):void
+        {
+            if (_gvars.activeUser.AUTO_JUDGE_OFFSET && // Auto Judge Offset enabled 
+                (result.amazing + result.perfect + result.good + result.average >= 50) && // Accuracy data is reliable
+                result.accuracy !== 0)
+            {
+                _gvars.activeUser.JUDGE_OFFSET = result.accuracy.toFixed(3);
+                // Save settings
+                _gvars.activeUser.saveLocal();
+                _gvars.activeUser.save();
+            }
+        }
+
+        /**
+         * Calculate the credits earned for the given total score.
+         * Caps at 0 and site provided max credits.
+         * @param total_score
+         * @return int
+         */
+        private function calculateCredits(total_score:int):int
+        {
+            return Math.max(0, Math.min(Math.floor(total_score / _gvars.SCORE_PER_CREDIT), _gvars.MAX_CREDITS));
+        }
+
+        /**
+         * Calculates the max combo in a game score result based on the replay.
+         * This is used for queue results to display the max combo across
+         * multiple songs for the UI.
+         * @param gameResult
+         * @return int
+         */
+        private function getMaxCombo(gameResult:GameScoreResult):int
         {
             var maxCombo:int = 0;
             var curCombo:int = 0;
@@ -807,208 +676,274 @@ package game
             return maxCombo;
         }
 
-        private function getScoreGrade(percent:Number, result:Object):String
+        /**
+         * Generates a score has that needs to be matched on the server for
+         * a score to be considered valid.
+         * @param result PostVars
+         * @return SHA1 Hash
+         */
+        private function getSaveHash(result:Object):String
         {
-            if (percent == 100 && result.perfect == 0)
-            {
-                return "AAAA";
-            }
-            else if (percent == 100)
-            {
-                return "AAA";
-            }
-            else if (percent == 99)
-            {
-                return "AA";
-            }
-            else if (percent <= 99 && percent >= 95)
-            {
-                return "A";
-            }
-            else if (percent <= 94 && percent >= 85)
-            {
-                return "B";
-            }
-            else if (percent <= 84 && percent >= 75)
-            {
-                return "C";
-            }
-            else if (percent <= 74 && percent >= 65)
-            {
-                return "D";
-            }
-            return "E";
+            var dataSerial:String = "";
+            dataSerial += "amazing:" + result.amazing + ",";
+            dataSerial += "perfect:" + result.perfect + ",";
+            dataSerial += "good:" + result.good + ",";
+            dataSerial += "average:" + result.average + ",";
+            dataSerial += "miss:" + result.miss + ",";
+            dataSerial += "boo:" + result.boo + ",";
+            dataSerial += "max_combo:" + result.max_combo + ",";
+            dataSerial += "score:" + result.score + ",";
+            dataSerial += "replay:" + result.replay + ",";
+            dataSerial += "level:" + result.level + ",";
+            dataSerial += "session:" + result.session + ",";
+            dataSerial += "uid:" + _gvars.activeUser.id + ",";
+            dataSerial += "ses:" + _gvars.activeUser.hash + ",";
+            dataSerial += R3::HASH_STRING;
+            return SHA1.hash(dataSerial);
         }
 
-        private function canSendScore(gameResult:Object = null, mods:Boolean = true, modsReplay:Boolean = true, score:Boolean = true, replay:Boolean = true):Boolean
-        {
-            if (gameResult == null)
-                gameResult = songResults[songResults.length - 1];
-            var ret:Object = false;
-            ret ||= mods && !gameResult.options.isScoreValid(true, false);
-            ret ||= modsReplay && !gameResult.options.isScoreValid(false, true);
-            ret ||= score && (_gvars.flashvars.replay || gameResult.replay.length <= 0 || gameResult.score <= 0 || (gameResult.options.replay && gameResult.options.replay.isEdited) || gameResult.user.id != _gvars.playerUser.id)
-            ret ||= replay && (gameResult.user.id <= 2 || gameResult.song.engine != null);
-            return !ret;
-        }
+        //******************************************************************************************//
+        // Event Handlers
+        //******************************************************************************************//
 
-        // new function
-        private function canUpdateScore(gameResult:Object = null, mods:Boolean = true, modsReplay:Boolean = true, score:Boolean = true, replay:Boolean = true):Boolean
+        /**
+         * Handles all UI events, both mouse and keyboard.
+         * @param e
+         */
+        private function eventHandler(e:* = null):void
         {
-            if (gameResult == null)
-                gameResult = songResults[songResults.length - 1];
-            var ret:Object = false;
-            ret ||= mods && !gameResult.options.isScoreUpdated(true, false);
-            ret ||= modsReplay && !gameResult.options.isScoreUpdated(false, true);
-            ret ||= score && (_gvars.flashvars.replay || gameResult.replay.length <= 0 || gameResult.score <= 0 || (gameResult.options.replay && gameResult.options.replay.isEdited) || gameResult.user.id != _gvars.playerUser.id)
-            ret ||= replay && (gameResult.user.id <= 2 || gameResult.song.engine != null);
-            return !ret;
-        }
+            var target:DisplayObject = e.target;
 
-        private function saveReplay():void
-        {
-            var result:Object = songResults[songResults.length - 1];
-
-            if (!canSendScore(result, true, false, true, false))
+            // Don't do anything with popups open.
+            if (_gvars.gameMain.current_popup != null)
                 return;
 
-            var nR:Replay = new Replay(_gvars.gameIndex);
-            nR.user = _gvars.playerUser;
-            nR.level = result.song.level;
-            nR.settings = result.options.settingsEncode();
-            if (result.song.engine)
-                nR.settings.arc_engine = _avars.legacyEncode(result.song);
-            nR.score = result.score;
-            nR.perfect = (result.amazing + result.perfect);
-            nR.good = result.good;
-            nR.average = result.average;
-            nR.miss = result.miss;
-            nR.boo = result.boo;
-            nR.maxcombo = result.maxcombo;
-            nR.replay_bin = result.replay_bin;
-            nR.replay = result.replay;
-            nR.timestamp = int(new Date().getTime() / 1000);
-            _gvars.replayHistory.unshift(nR);
-            if (!Flags.VALUES[Flags.F2_REPLAYS])
+            // Handle Key events and click in the same function
+            if (e.type == "keyDown" && !_mp.gameplayPlayingStatusResults())
             {
-                _gvars.gameMain.addAlert("Replay saved to History. (Press F2)", 90);
-                Flags.VALUES[Flags.F2_REPLAYS] = true;
+                target = null;
+                var keyCode:int = e.keyCode;
+                if ((keyCode == _gvars.playerUser.keyLeft || keyCode == Keyboard.LEFT) && navPrev.visible)
+                {
+                    target = navPrev;
+                }
+                else if ((keyCode == _gvars.playerUser.keyRight || keyCode == Keyboard.RIGHT) && navNext.visible)
+                {
+                    target = navNext;
+                }
+                else if (keyCode == _gvars.playerUser.keyRestart)
+                {
+                    target = navReplay;
+                }
+                else if (keyCode == _gvars.playerUser.keyQuit)
+                {
+                    target = navMenu;
+                    stage.removeEventListener(KeyboardEvent.KEY_DOWN, eventHandler);
+                }
             }
 
-            if (_gvars.air_autoSaveLocalReplays)
+            if (!target)
+                return;
+
+            // Based on target
+            if (target == navSaveReplay && navSaveReplay.enabled)
             {
-                try
+                saveServerReplay();
+            }
+            else if (target == navScreenShot && navScreenShot.enabled)
+            {
+                var ext:String = "";
+                if (resultIndex >= 0)
                 {
-                    var path:String = AirContext.getReplayPath(result.songFile);
-                    path += (result.songFile.entry.levelid != null ? result.songFile.entry.levelid : result.songFile.id.toString())
-                    path += "_" + (new Date().getTime())
-                    path += "_" + ((result.amazing + result.perfect) + "-" + result.good + "-" + result.average + "-" + result.miss + "-" + result.boo + "-" + result.maxcombo);
+                    ext = songResults[resultIndex].screenshot_path;
+                }
+                _gvars.takeScreenShot(ext);
+            }
+            else if (target == navPrev && navPrev.visible)
+            {
+                displayGameResult(resultIndex - 1);
+            }
+            else if (target == navNext && navNext.visible)
+            {
+                displayGameResult(resultIndex + 1);
+            }
+            else if (target == navReplay)
+            {
+                var skipload:Boolean = (songResults.length == 1 && songResults[0].song && songResults[0].song.isLoaded);
 
-                    var fileStream:FileStream;
+                if (!_gvars.options.replay || _gvars.flashvars.replay || _gvars.flashvars.preview_file)
+                    _gvars.options.fill();
 
-                    // Store Bin Encoded Replay
-                    if (!AirContext.doesFileExist(path + ".txt") && result.replay_bin != null)
+                if (skipload)
+                {
+                    _gvars.songRestarts++;
+                    switchTo(GameMenu.GAME_PLAY);
+                }
+                else
+                {
+                    _gvars.songQueue = _gvars.totalSongQueue.concat();
+                    switchTo(GameMenu.GAME_LOADING);
+                }
+            }
+
+            else if (target == navRandomSong && navRandomSong.enabled)
+            {
+                var songList:Array = _playlist.playList;
+                var selectedSong:Object;
+
+                //Check for filters and filter the songs list
+                if (_gvars.activeFilter != null)
+                {
+                    songList = _playlist.indexList.filter(function(item:Object, index:int, array:Array):Boolean
                     {
-                        var replayFileText:File = new File(AirContext.getAppPath(path + ".txt"));
-                        fileStream = new FileStream();
-                        fileStream.open(replayFileText, FileMode.WRITE);
-                        fileStream.writeUTFBytes(nR.getEncode());
-                        fileStream.close();
-                        trace("Saving Replay for " + result.songFile.id + ": " + replayFileText.nativePath);
-                    }
+                        return _gvars.activeFilter.process(item, _gvars.activeUser);
+                    });
                 }
-                catch (e:Error)
+
+                // Filter to only Playable Songs
+                songList = songList.filter(function(item:Object, index:int, array:Array):Boolean
                 {
+                    return _gvars.checkSongAccess(item) == GlobalVariables.SONG_ACCESS_PLAYABLE;
+                });
+
+                // Check for at least 1 possible playable song.
+                if (songList.length > 0)
+                {
+                    selectedSong = songList[Math.floor(Math.random() * (songList.length - 1))];
+                    _gvars.songQueue.push(selectedSong);
+                    _gvars.options = new GameOptions();
+                    _gvars.options.fill();
+                    switchTo(Main.GAME_PLAY_PANEL);
+                }
+            }
+
+            else if (target == navOptions)
+            {
+                addPopup(Main.POPUP_OPTIONS);
+            }
+            else if (target == navHighscores)
+            {
+                if (songResults[resultIndex])
+                {
+                    addPopup(new PopupHighscores(this, songResults[resultIndex].song_entry));
+                }
+            }
+            else if (target == navMenu)
+            {
+                switchTo(Main.GAME_MENU_PANEL);
+            }
+            else if (target == navRating)
+            {
+                if (songResults[resultIndex])
+                {
+                    _gvars.gameMain.addPopup(new PopupSongRating(this, songResults[resultIndex]["song"]));
+                }
+            }
+            else if (target == graphToggle)
+            {
+                if (resultIndex >= 0)
+                {
+                    graphType = (graphType + 1) % 2;
+                    LocalStore.setVariable("result_graph_type", graphType);
+                    drawResultGraph(songResults[resultIndex]);
                 }
             }
         }
 
-        private function sendAltEngineScore():void
+        /**
+         * Adds the event listeners for the url loader.
+         * @param completeHandler On Complete Handler
+         * @param errorHandler On Error Handler
+         */
+        private function addLoaderListeners(completeHandler:Function, errorHandler:Function):void
         {
-            // Get last score
-            var gameResult:Object = songResults[songResults.length - 1];
-
-            if (!gameResult.song.engine)
-                return;
-
-            // Loader
-            _loader = new DynamicURLLoader();
-            addLoaderListeners(false, true);
-
-            var req:URLRequest = new URLRequest(Constant.ALT_SONG_SAVE_URL);
-            var scoreSender:URLVariables = new URLVariables();
-            Constant.addDefaultRequestVariables(scoreSender);
-            var sd:Object = {"arrows": gameResult.song.arrows,
-                    "author": gameResult.song.author,
-                    "difficulty": gameResult.song.difficulty,
-                    "genre": gameResult.song.genre,
-                    "level": gameResult.song.level,
-                    "levelid": gameResult.song.levelid,
-                    "name": gameResult.song.name,
-                    "stepauthor": gameResult.song.stepauthor,
-                    "time": gameResult.song.time};
-            var rb:Replay = new Replay(0);
-            rb.replay_bin = gameResult.replay_bin;
-            var dataObject:Object = {};
-
-            // Post Game Data
-            dataObject.engine = gameResult.song.engine;
-            dataObject.song_data = sd;
-            dataObject.level = gameResult.level;
-            dataObject.rate = gameResult.options.songRate; // new
-            dataObject.restarts = gameResult.restarts; // new
-            dataObject.accuracy = gameResult.accuracy; // new
-            dataObject.amazing = gameResult.amazing;
-            dataObject.perfect = gameResult.perfect;
-            dataObject.good = gameResult.good;
-            dataObject.average = gameResult.average;
-            dataObject.miss = gameResult.miss;
-            dataObject.boo = gameResult.boo;
-            dataObject.max_combo = gameResult.maxcombo;
-            dataObject.score = gameResult.score;
-            dataObject.replay = rb.replay_bin ? rb.getEncode() : null;
-            dataObject.save_settings = gameResult.options.settingsEncode();
-            dataObject.session = _gvars.userSession;
-            dataObject.hashMap = getSaveHash(dataObject);
-            scoreSender.data = JSON.stringify(dataObject);
-            scoreSender.session = _gvars.userSession;
-
-            // Set Request
-            req.data = scoreSender;
-            req.method = URLRequestMethod.POST;
-
-            // Saving Vars
-            _loader.postData = ObjectUtil.clone(scoreSender);
-            _loader.rank_index = _gvars.gameIndex;
-            _loader.song = gameResult.song;
-            _loader.load(req);
+            _loader.addEventListener(Event.COMPLETE, completeHandler);
+            _loader.addEventListener(IOErrorEvent.IO_ERROR, errorHandler);
+            _loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, errorHandler);
         }
 
+        /**
+         * Removes the event listeners for the url loader.
+         * @param completeHandler On Complete Handler
+         * @param errorHandler On Error Handler
+         */
+        private function removeLoaderListeners(completeHandler:Function, errorHandler:Function):void
+        {
+            _loader.removeEventListener(Event.COMPLETE, completeHandler);
+            _loader.removeEventListener(IOErrorEvent.IO_ERROR, errorHandler);
+            _loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, errorHandler);
+        }
+
+        //******************************************************************************************//
+        // Score Saving
+        //******************************************************************************************//
+
+        /**
+         * Calculates if a given score is valid and can be saved on the server. Depending on the flags,
+         * this checks different criteria.
+         * @param result GameScoreSeult to check.
+         * @param valid_score Check for mods that aren't valid for highscore.
+         * @param valid_replay Check for mods that aren't valid for replays.
+         * @param check_replay Check if score was from a replay. Also checks for positive score.
+         * @param check_alt_engine Check for Alt Engine. Also checks user isn't guest.
+         * @return
+         */
+        private function canSendScore(result:GameScoreResult, valid_score:Boolean = true, valid_replay:Boolean = true, check_replay:Boolean = true, check_alt_engine:Boolean = true):Boolean
+        {
+            var ret:Boolean = false;
+            ret ||= valid_score && !result.options.isScoreValid(true, false);
+            ret ||= valid_replay && !result.options.isScoreValid(false, true);
+            ret ||= check_replay && (_gvars.flashvars.replay || result.replay.length <= 0 || result.score <= 0 || (result.options.replay && result.options.replay.isEdited) || result.user.id != _gvars.playerUser.id)
+            ret ||= check_alt_engine && (result.user.id <= 2 || result.song_entry.engine != null);
+            return !ret;
+        }
+
+        /**
+         * Calculates if a given score is valid and can be updated on the server. Depending on the flags,
+         * this checks different criteria. This slightly differents from the canSendScore as some mods
+         * are allowed to be sent to the server that aren't recorded on the highscores like rates.
+         * @param result GameScoreSeult to check.
+         * @param valid_score Check for mods that aren't valid for highscore.
+         * @param valid_replay Check for mods that aren't valid for replays.
+         * @param check_replay Check if score was from a replay. Also checks for positive score.
+         * @param check_alt_engine Check for Alt Engine. Also checks user isn't guest.
+         * @return
+         */
+        private function canUpdateScore(result:GameScoreResult, valid_score:Boolean = true, valid_replay:Boolean = true, check_replay:Boolean = true, check_alt_engine:Boolean = true):Boolean
+        {
+            var ret:Boolean = false;
+            ret ||= valid_score && !result.options.isScoreUpdated(true, false);
+            ret ||= valid_replay && !result.options.isScoreUpdated(false, true);
+            ret ||= check_replay && (_gvars.flashvars.replay || result.replay.length <= 0 || result.score <= 0 || (result.options.replay && result.options.replay.isEdited) || result.user.id != _gvars.playerUser.id)
+            ret ||= check_alt_engine && (result.user.id <= 2 || result.song_entry.engine != null);
+            return !ret;
+        }
+
+        /**
+         * Sends a post request to the last GameScoreREsult to the main highscore.
+         * Will also call the `sendAltEngineScore()` itself if the score is from an alt engine.
+         */
         private function sendScore():void
         {
             // Get last score
-            var gameResult:Object = songResults[songResults.length - 1];
+            var gameResult:GameScoreResult = songResults[songResults.length - 1];
 
-            if (gameResult.song.engine)
+            // Alt Engine Score
+            if (gameResult.song_entry.engine)
             {
-                if (((gameResult.legacyLastRank = _avars.legacyLevelRanksGet(gameResult.song)) || {score: 0}).score < gameResult.score)
-                {
-                    _avars.legacyLevelRanksSet(gameResult.song, {score: gameResult.score, rank: 0, perfect: gameResult.amazing + gameResult.perfect, good: gameResult.good, average: gameResult.average, miss: gameResult.miss, boo: gameResult.boo, maxcombo: gameResult.maxcombo, rawscore: gameResult.score, results: (gameResult.amazing + gameResult.perfect) + "-" + gameResult.good + "-" + gameResult.average + "-" + gameResult.miss + "-" + gameResult.boo + "-" + gameResult.maxcombo, arrows: gameResult.songFile.totalNotes});
-                    _avars.legacyLevelRanksSave();
-                }
                 sendAltEngineScore();
                 return;
             }
 
             if (!canSendScore(gameResult, true, true, false, false))
             {
-                _gvars.gameMain.addAlert("Score not submitted due to enabled mods", 90);
+                _gvars.gameMain.addAlert(_lang.string("game_result_error_enabled_mods"), 90, Alert.RED);
                 return;
             }
 
             // Loader
             _loader = new DynamicURLLoader();
-            addLoaderListeners();
+            addLoaderListeners(siteLoadComplete, siteLoadError);
 
             var req:URLRequest = new URLRequest(Constant.SONG_SAVE_URL);
             var scoreSender:URLVariables = new URLVariables();
@@ -1016,24 +951,24 @@ package game
 
             // Post Game Data
             scoreSender.level = gameResult.level;
-            scoreSender.update = canUpdateScore(gameResult, true, true, false, false); // new
-            scoreSender.rate = gameResult.options.songRate; // new
-            scoreSender.restarts = gameResult.restarts; // new
-            scoreSender.accuracy = gameResult.accuracy; // new
+            scoreSender.update = canUpdateScore(gameResult, true, true, false, false);
+            scoreSender.rate = gameResult.options.songRate;
+            scoreSender.restarts = gameResult.restarts;
+            scoreSender.accuracy = gameResult.accuracy_frames;
             scoreSender.amazing = gameResult.amazing;
             scoreSender.perfect = gameResult.perfect;
             scoreSender.good = gameResult.good;
             scoreSender.average = gameResult.average;
             scoreSender.miss = gameResult.miss;
             scoreSender.boo = gameResult.boo;
-            scoreSender.max_combo = gameResult.maxcombo;
+            scoreSender.max_combo = gameResult.max_combo;
             scoreSender.score = gameResult.score;
             scoreSender.replay = Replay.getReplayString(gameResult.replay);
             scoreSender.save_settings = JSON.stringify(gameResult.options.settingsEncode());
             scoreSender.restart_stats = JSON.stringify(gameResult.restart_stats);
             scoreSender.session = _gvars.userSession;
-            scoreSender.start_time = gameResult.starttime;
-            scoreSender.start_hash = gameResult.starthash;
+            scoreSender.start_time = gameResult.start_time;
+            scoreSender.start_hash = gameResult.start_hash;
             scoreSender.hashMap = getSaveHash(scoreSender);
 
             // Set Request
@@ -1043,22 +978,27 @@ package game
             // Saving Vars
             _loader.postData = ObjectUtil.clone(scoreSender);
             _loader.rank_index = _gvars.gameIndex;
-            _loader.song = gameResult.song;
+            _loader.song = gameResult.song_entry;
             _loader.resultsString = (scoreSender.amazing + scoreSender.perfect) + "-" + scoreSender.good + "-" + scoreSender.average + "-" + scoreSender.miss + "-" + scoreSender.boo + "-" + scoreSender.max_combo;
             _loader.resultsTotal = ((scoreSender.amazing + scoreSender.perfect) * 500) + (scoreSender.good * 250) + (scoreSender.average * 50) + (scoreSender.max_combo * 1000) - (scoreSender.miss * 300) - (scoreSender.boo * 15) + Math.floor(scoreSender.score);
             _loader.load(req);
         }
 
+        /**
+         * Loader Event: Site Score Save Success
+         */
         private function siteLoadComplete(e:Event):void
         {
-            removeLoaderListeners();
+            removeLoaderListeners(siteLoadComplete, siteLoadError);
+
             var result:Object = e.target.postData;
             var data:Object = JSON.parse(e.target.data);
             var song:Object = e.target.song;
             var totalScore:int = e.target.resultsTotal;
+
             if (data.result == 0)
             {
-                _gvars.gameMain.addAlert("Score Saved successfully!", 90);
+                _gvars.gameMain.addAlert(_lang.string("game_result_save_success"), 90, Alert.DARK_GREEN);
 
                 // Server Message
                 if (data.gServerMessage != null)
@@ -1087,38 +1027,42 @@ package game
                     _gvars.unlockTokenById(data.tType, data.tID);
                 }
 
-                // Check Old vs New Rankings
-                if (data.new_ranking < data.old_ranking && data.old_ranking > 0 && result.update)
+                // Valid Legal Score
+                if (result.update)
                 {
-                    _gvars.gameMain.addAlert("New Best Rank: " + data.old_ranking + "->" + data.new_ranking + " (" + ((data.old_ranking - data.new_ranking) * -1) + ")", 240);
-                }
+                    // Check Old vs New Rankings.
+                    if (data.new_ranking < data.old_ranking && data.old_ranking > 0)
+                    {
+                        _gvars.gameMain.addAlert("New Best Rank: " + data.old_ranking + "->" + data.new_ranking + " (" + ((data.old_ranking - data.new_ranking) * -1) + ")", 240, Alert.DARK_GREEN);
+                    }
 
-                // Replaced if totalScore with result.score. Row now checks raw score instead of grandtotal
-                if ((_gvars.activeUser.level_ranks[song.level] == null || result.score > _gvars.activeUser.level_ranks[song.level].score) && result.update)
-                {
-                    _gvars.activeUser.level_ranks[song.level] = {"genre": song.genre,
-                            "rank": data.new_ranking,
-                            "score": result.score,
-                            "results": e.target.resultsString,
-                            "perfect": result.amazing + result.perfect,
-                            "good": result.good,
-                            "average": result.average,
-                            "miss": result.miss,
-                            "boo": result.boo,
-                            "maxcombo": result.max_combo,
-                            "rawscore": result.score};
-                }
+                    // Check raw score vs level ranks and update.
+                    if (_gvars.activeUser.level_ranks[song.level] == null || result.score > _gvars.activeUser.level_ranks[song.level].score)
+                    {
+                        _gvars.activeUser.level_ranks[song.level] = {"genre": song.genre,
+                                "rank": data.new_ranking,
+                                "score": result.score,
+                                "results": e.target.resultsString,
+                                "perfect": result.amazing + result.perfect,
+                                "good": result.good,
+                                "average": result.average,
+                                "miss": result.miss,
+                                "boo": result.boo,
+                                "maxcombo": result.max_combo,
+                                "rawscore": result.score};
+                    }
 
-                _gvars.songResultRanks[e.target.rank_index] = {old_ranking: data.old_ranking, new_ranking: data.new_ranking};
+                    _gvars.songResultRanks[e.target.rank_index] = {old_ranking: data.old_ranking, new_ranking: data.new_ranking};
 
-                // Update Display if current game
-                var gameIndex:int = (songResults.length == 1 ? e.target.rank_index : songIndex);
-                if (e.target.rank_index == gameIndex && resultsDisplay != null && result.update)
-                {
-                    resultsDisplay.result_rank.htmlText = "<B>Rank: " + _gvars.songResultRanks[gameIndex].new_ranking;
-                    resultsDisplay.result_last_best.htmlText = "<B>Last Best: " + _gvars.songResultRanks[gameIndex].old_ranking;
+                    // Update Rank Display if current score.
+                    var gameIndex:int = (songResults.length == 1 ? e.target.rank_index : songRankIndex);
+                    if (e.target.rank_index == gameIndex && resultsDisplay != null)
+                    {
+                        resultsDisplay.result_rank.htmlText = "<B>Rank: " + _gvars.songResultRanks[gameIndex].new_ranking;
+                        resultsDisplay.result_last_best.htmlText = "<B>Last Best: " + _gvars.songResultRanks[gameIndex].old_ranking;
+                    }
                 }
-                else if (!result.update)
+                else
                 {
                     resultsDisplay.result_rank.htmlText = "Game mods enabled!";
                 }
@@ -1140,52 +1084,116 @@ package game
             else
             {
                 if (!data.ignore)
-                    _gvars.gameMain.addAlert("Failed to save results. (ERR: " + data.result + ")", 360);
+                    _gvars.gameMain.addAlert("Failed to save results. (ERR: " + data.result + ")", 360, Alert.RED);
+
                 if (resultsDisplay != null)
-                {
                     resultsDisplay.result_rank.htmlText = data.ignore ? "" : "Score save failed!";
-                }
             }
         }
 
+        /**
+         * Loader Event: Site Score Save Failure
+         */
         private function siteLoadError(e:Event = null):void
         {
-            removeLoaderListeners();
-            _gvars.gameMain.addAlert("Failed to make a connection to " + Constant.BRAND_NAME_SHORT_UPPER() + ", the server may be down...");
-            resultsDisplay.result_rank.htmlText = "Score save failed!";
+            removeLoaderListeners(siteLoadComplete, siteLoadError);
+            _gvars.gameMain.addAlert(_lang.string("error_server_connection_failure"), 120, Alert.RED);
+
+            if (resultsDisplay != null)
+                resultsDisplay.result_rank.htmlText = "Score save failed!";
         }
 
-        private function replayLoadComplete(e:Event):void
+        //******************************************************************************************//
+        // Alt Engine Score Saving
+        //******************************************************************************************//
+
+        /**
+         * Sends a post request to saves score for alt engines. This shouldn't
+         * be called directly and instead you shoulkd simple call `sendScore()`
+         * which will call this is necessary.
+         */
+        private function sendAltEngineScore():void
         {
-            removeLoaderListeners(true);
-            var data:Object = JSON.parse(e.target.data);
-            if (data.result == 0)
+            // Get last score
+            var gameResult:GameScoreResult = songResults[songResults.length - 1];
+
+            if (!gameResult.song_entry.engine)
+                return;
+
+            // Update Local Alt Engine Levelranks
+            if (((gameResult.legacyLastRank = _avars.legacyLevelRanksGet(gameResult.song_entry)) || {score: 0}).score < gameResult.score)
             {
-                _gvars.gameMain.addAlert("Replay Saved successfully!", 90, Alert.GREEN);
+                _avars.legacyLevelRanksSet(gameResult.song_entry, {score: gameResult.score,
+                        rank: 0,
+                        perfect: gameResult.amazing + gameResult.perfect,
+                        good: gameResult.good,
+                        average: gameResult.average,
+                        miss: gameResult.miss,
+                        boo: gameResult.boo,
+                        maxcombo: gameResult.max_combo,
+                        rawscore: gameResult.score,
+                        results: (gameResult.amazing + gameResult.perfect) + "-" + gameResult.good + "-" + gameResult.average + "-" + gameResult.miss + "-" + gameResult.boo + "-" + gameResult.max_combo,
+                        arrows: gameResult.song.totalNotes});
+                _avars.legacyLevelRanksSave();
             }
-            else if (data.result == 2)
-            {
-                _gvars.gameMain.addAlert("Error: Max replays reached!", 90, Alert.RED);
-            }
-            else if (data.result == 3)
-            {
-                _gvars.gameMain.addAlert("Error: Replay already Saved!", 90, Alert.RED);
-            }
-            else
-            {
-                _gvars.gameMain.addAlert("Error: Failed to save this replay", 120, Alert.RED);
-            }
+
+            // Loader
+            _loader = new DynamicURLLoader();
+            addLoaderListeners(altSiteLoadComplete, altSiteLoadError);
+
+            var req:URLRequest = new URLRequest(Constant.ALT_SONG_SAVE_URL);
+            var scoreSender:URLVariables = new URLVariables();
+            Constant.addDefaultRequestVariables(scoreSender);
+            var sd:Object = {"arrows": gameResult.song.chart.Notes.length, // Playlist XML often lies.
+                    "author": gameResult.song_entry.author,
+                    "difficulty": gameResult.song_entry.difficulty,
+                    "genre": gameResult.song_entry.genre,
+                    "level": gameResult.song_entry.level,
+                    "levelid": gameResult.song_entry.levelid,
+                    "name": gameResult.song_entry.name,
+                    "stepauthor": gameResult.song_entry.stepauthor,
+                    "time": gameResult.song_entry.time};
+
+            // Post Game Data
+            var dataObject:Object = {};
+            dataObject.engine = gameResult.song_entry.engine;
+            dataObject.song_data = sd;
+            dataObject.level = gameResult.level;
+            dataObject.rate = gameResult.options.songRate;
+            dataObject.restarts = gameResult.restarts;
+            dataObject.accuracy = gameResult.accuracy_frames;
+            dataObject.amazing = gameResult.amazing;
+            dataObject.perfect = gameResult.perfect;
+            dataObject.good = gameResult.good;
+            dataObject.average = gameResult.average;
+            dataObject.miss = gameResult.miss;
+            dataObject.boo = gameResult.boo;
+            dataObject.max_combo = gameResult.max_combo;
+            dataObject.score = gameResult.score;
+            dataObject.replay = gameResult.replay_bin_encoded;
+            dataObject.save_settings = gameResult.options.settingsEncode();
+            dataObject.session = _gvars.userSession;
+            dataObject.hashMap = getSaveHash(dataObject);
+            scoreSender.data = JSON.stringify(dataObject);
+            scoreSender.session = _gvars.userSession;
+
+            // Set Request
+            req.data = scoreSender;
+            req.method = URLRequestMethod.POST;
+
+            // Saving Vars
+            _loader.postData = ObjectUtil.clone(scoreSender);
+            _loader.rank_index = _gvars.gameIndex;
+            _loader.song = gameResult.song_entry;
+            _loader.load(req);
         }
 
-        private function replayLoadError(e:Event = null):void
-        {
-            removeLoaderListeners(true);
-            _gvars.gameMain.addAlert("Failed to make a connection to " + Constant.BRAND_NAME_SHORT_UPPER() + ", the server may be down...");
-        }
-
+        /**
+         * Loader Event: Alt Engine Score Save Success
+         */
         private function altSiteLoadComplete(e:Event):void
         {
-            removeLoaderListeners(false, true);
+            removeLoaderListeners(altSiteLoadComplete, altSiteLoadError);
             try
             {
                 var result:Object = JSON.parse(e.target.postData.data);
@@ -1232,259 +1240,148 @@ package game
             }
         }
 
-        private function updateJudgeOffset(result:Object):void
-        {
-            if (_gvars.activeUser.AUTO_JUDGE_OFFSET && // Auto Judge Offset enabled 
-                (result.amazing + result.perfect + result.good + result.average >= 50) && // Accuracy data is reliable
-                result.accuracy !== 0)
-            {
-                _gvars.activeUser.JUDGE_OFFSET = result.accuracy.toFixed(3);
-                // Save settings
-                _gvars.activeUser.saveLocal();
-                _gvars.activeUser.save();
-            }
-        }
-
+        /**
+         * Loader Event: Alt Engine Score Save Failure
+         */
         private function altSiteLoadError(e:Event = null):void
         {
-            removeLoaderListeners(false, true);
+            removeLoaderListeners(altSiteLoadComplete, altSiteLoadError);
         }
 
-        private function getSaveHash(result:Object):String
-        {
-            var dataSerial:String = "";
-            dataSerial += "amazing:" + result.amazing + ",";
-            dataSerial += "perfect:" + result.perfect + ",";
-            dataSerial += "good:" + result.good + ",";
-            dataSerial += "average:" + result.average + ",";
-            dataSerial += "miss:" + result.miss + ",";
-            dataSerial += "boo:" + result.boo + ",";
-            dataSerial += "max_combo:" + result.max_combo + ",";
-            dataSerial += "score:" + result.score + ",";
-            dataSerial += "replay:" + result.replay + ",";
-            dataSerial += "level:" + result.level + ",";
-            dataSerial += "session:" + result.session + ",";
-            dataSerial += "uid:" + _gvars.activeUser.id + ",";
-            dataSerial += "ses:" + _gvars.activeUser.hash + ",";
-            dataSerial += R3::HASH_STRING;
-            return SHA1.hash(dataSerial);
-        }
+        //******************************************************************************************//
+        // Replay Saving
+        //******************************************************************************************//
 
-        private function eventHandler(e:* = null):void
+        /**
+         * Saves a local replays to the session replays in the F2 menu.
+         * This will also record the replay into a .txt file if
+         * `Auto-Save Replays` is enabled in the settings screen.
+         */
+        private function saveLocalReplay():void
         {
-            var target:DisplayObject = e.target;
+            var result:GameScoreResult = songResults[songResults.length - 1];
 
-            // Don't do anything with popups open.
-            if (_gvars.gameMain.current_popup != null)
+            if (!canSendScore(result, true, false, true, false))
                 return;
 
-            // Handle Key events and click in the same function
-            if (e.type == "keyDown" && !_mp.gameplayPlayingStatusResults())
+            var nR:Replay = new Replay(_gvars.gameIndex);
+            nR.user = _gvars.playerUser;
+            nR.level = result.song_entry.level;
+            nR.settings = result.options.settingsEncode();
+            if (result.song_entry.engine)
+                nR.settings.arc_engine = _avars.legacyEncode(result.song_entry);
+            nR.score = result.score;
+            nR.perfect = (result.amazing + result.perfect);
+            nR.good = result.good;
+            nR.average = result.average;
+            nR.miss = result.miss;
+            nR.boo = result.boo;
+            nR.maxcombo = result.max_combo;
+            nR.replay = result.replay;
+            nR.replay_bin = result.replay_bin;
+            nR.timestamp = int(new Date().getTime() / 1000);
+            _gvars.replayHistory.unshift(nR);
+
+            // Display F2 Shortcut key only once per session.
+            if (!Flags.VALUES[Flags.F2_REPLAYS])
             {
-                target = null;
-                var keyCode:int = e.keyCode;
-                if ((keyCode == _gvars.playerUser.keyLeft || keyCode == Keyboard.LEFT) && navPrev.visible)
-                {
-                    target = navPrev;
-                }
-                else if ((keyCode == _gvars.playerUser.keyRight || keyCode == Keyboard.RIGHT) && navNext.visible)
-                {
-                    target = navNext;
-                }
-                else if (keyCode == _gvars.playerUser.keyRestart)
-                {
-                    target = navReplay;
-                }
-                else if (keyCode == _gvars.playerUser.keyQuit)
-                {
-                    target = navMenu;
-                    stage.removeEventListener(KeyboardEvent.KEY_DOWN, eventHandler);
-                }
+                _gvars.gameMain.addAlert("Replay saved to History. (Press F2)", 150);
+                Flags.VALUES[Flags.F2_REPLAYS] = true;
             }
 
-            if (!target)
-                return;
-
-            // Based on target
-            if (target == navSaveReplay && navSaveReplay.visible && navSaveReplay.enabled)
+            // Write Local txt Replay Encode
+            if (_gvars.air_autoSaveLocalReplays && result.replay_bin != null)
             {
-                var gameResult:Object = songResults[resultIndex];
-
-                // Loader
-                _loader = new DynamicURLLoader();
-                addLoaderListeners(true);
-
-                var req:URLRequest = new URLRequest(Constant.USER_REPLAY_URL);
-                var scoreSender:URLVariables = new URLVariables();
-                Constant.addDefaultRequestVariables(scoreSender);
-
-                // Post Game Data
-                scoreSender.level = gameResult.level;
-                scoreSender.update = canUpdateScore(gameResult, true, true, false, false); // new
-                scoreSender.rate = gameResult.options.songRate; // new
-                scoreSender.restarts = gameResult.restarts; // new
-                scoreSender.accuracy = gameResult.accuracy;
-                scoreSender.amazing = gameResult.amazing;
-                scoreSender.perfect = gameResult.perfect;
-                scoreSender.good = gameResult.good;
-                scoreSender.average = gameResult.average;
-                scoreSender.miss = gameResult.miss;
-                scoreSender.boo = gameResult.boo;
-                scoreSender.max_combo = gameResult.maxcombo;
-                scoreSender.score = gameResult.score;
-                scoreSender.replay = Replay.getReplayString(gameResult.replay);
-                scoreSender.save_settings = JSON.stringify(gameResult.options.settingsEncode());
-                scoreSender.session = _gvars.userSession;
-                scoreSender.start_time = gameResult.starttime;
-                scoreSender.start_hash = gameResult.starthash;
-                scoreSender.hash = SHA1.hash(scoreSender.replay + _gvars.activeUser.id);
-
-                // Set Request
-                req.data = scoreSender;
-                req.method = URLRequestMethod.POST;
-
-                // Saving Vars
-                _loader.load(req);
-            }
-            else if (target == navScreenShot && navScreenShot.visible)
-            {
-                var ext:String = "";
-                if (resultIndex >= 0)
+                try
                 {
-                    var gRP:Object = songResults[resultIndex];
-                    var grS:Array = gRP.song;
-                    var rateString:String = gRP.options.songRate != 1 ? " (" + gRP.options.songRate + "x Rate)" : "";
+                    var path:String = AirContext.getReplayPath(result.song);
+                    path += (result.song.entry.levelid != null ? result.song.entry.levelid : result.song.id.toString())
+                    path += "_" + (new Date().getTime())
+                    path += "_" + (result.pa_string + "-" + result.max_combo);
 
-                    ext = "R^3 - " + grS.name + rateString + " - " + gRP.score + " - " + (gRP.perfect + gRP.amazing) + "-" + gRP.good + "-" + gRP.average + "-" + gRP.miss + "-" + gRP.boo;
-                }
-                _gvars.takeScreenShot(ext);
-            }
-            else if (target == navPrev && navPrev.visible)
-            {
-                displayGameResult(resultIndex - 1);
-            }
-            else if (target == navNext && navNext.visible)
-            {
-                displayGameResult(resultIndex + 1);
-            }
-            else if (target == navReplay)
-            {
-                var skipload:Boolean = (songResults.length == 1 && songResults[0].songFile && songResults[0].songFile.isLoaded);
-                if (!_gvars.options.replay || _gvars.flashvars.replay || _gvars.flashvars.preview_file)
-                    _gvars.options.fill();
-                if (skipload)
-                {
-                    _gvars.songRestarts++;
-                    switchTo(GameMenu.GAME_PLAY);
-                }
-                else
-                {
-                    _gvars.songQueue = _gvars.totalSongQueue.concat();
-                    switchTo(GameMenu.GAME_LOADING);
-                }
-            }
+                    var fileStream:FileStream;
 
-            else if (target == navRandomSong && navRandomSong.visible)
-            {
-                var songList:Array = _playlist.playList;
-                var selectedSong:Object;
-
-                //Check for filters and filter the songs list
-                if (_gvars.activeFilter != null)
-                {
-                    songList = _playlist.indexList.filter(function(item:Object, index:int, array:Array):Boolean
+                    // Store Bin Encoded Replay
+                    if (!AirContext.doesFileExist(path + ".txt"))
                     {
-                        return _gvars.activeFilter.process(item, _gvars.activeUser);
-                    });
+                        var replayFileText:File = new File(AirContext.getAppPath(path + ".txt"));
+                        fileStream = new FileStream();
+                        fileStream.open(replayFileText, FileMode.WRITE);
+                        fileStream.writeUTFBytes(nR.getEncode());
+                        fileStream.close();
+                    }
                 }
-
-                // Filter to only Playable Songs
-                songList = songList.filter(function(item:Object, index:int, array:Array):Boolean
+                catch (e:Error)
                 {
-                    return _gvars.checkSongAccess(item) == GlobalVariables.SONG_ACCESS_PLAYABLE;
-                });
-
-                // Check for at least 1 possible playable song.
-                if (songList.length > 0)
-                {
-                    selectedSong = songList[Math.floor(Math.random() * (songList.length - 1))];
-                    _gvars.songQueue.push(selectedSong);
-                    _gvars.options = new GameOptions();
-                    _gvars.options.fill();
-                    switchTo(Main.GAME_PLAY_PANEL);
                 }
-            }
-
-
-            else if (target == navOptions)
-            {
-                addPopup(Main.POPUP_OPTIONS);
-            }
-            else if (target == navHighscores)
-            {
-                addPopup(new PopupHighscores(this, songResults[resultIndex].song));
-            }
-            else if (target == navMenu)
-            {
-                switchTo(Main.GAME_MENU_PANEL);
-            }
-            else if (target == navRating)
-            {
-                if (songResults[resultIndex])
-                {
-                    _gvars.gameMain.addPopup(new PopupSongRating(this, songResults[resultIndex]["song"]));
-                }
-            }
-            else if (target == graphToggle)
-            {
-                graphType = (graphType + 1) % 2;
-                LocalStore.setVariable("result_graph_type", graphType);
-                drawResultGraph();
             }
         }
 
-        private function addLoaderListeners(isReplay:Boolean = false, isAltEngine:Boolean = false):void
+        /**
+         * Sends a post for the replay of selected GameScoreResult.
+         */
+        private function saveServerReplay():void
         {
-            if (isAltEngine)
-            {
-                _loader.addEventListener(Event.COMPLETE, altSiteLoadComplete);
-                _loader.addEventListener(IOErrorEvent.IO_ERROR, altSiteLoadError);
-                _loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, altSiteLoadError);
-            }
-            else if (isReplay)
-            {
-                _loader.addEventListener(Event.COMPLETE, replayLoadComplete);
-                _loader.addEventListener(IOErrorEvent.IO_ERROR, replayLoadError);
-                _loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, replayLoadError);
-            }
-            else
-            {
-                _loader.addEventListener(Event.COMPLETE, siteLoadComplete);
-                _loader.addEventListener(IOErrorEvent.IO_ERROR, siteLoadError);
-                _loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, siteLoadError);
-            }
+            var gameResult:GameScoreResult = songResults[resultIndex];
+
+            // Loader
+            _loader = new DynamicURLLoader();
+            addLoaderListeners(replayLoadComplete, replayLoadError);
+
+            var req:URLRequest = new URLRequest(Constant.USER_REPLAY_URL);
+            var scoreSender:URLVariables = new URLVariables();
+            Constant.addDefaultRequestVariables(scoreSender);
+
+            // Post Game Data
+            scoreSender.level = gameResult.level;
+            scoreSender.update = canUpdateScore(gameResult, true, true, false, false);
+            scoreSender.rate = gameResult.options.songRate;
+            scoreSender.restarts = gameResult.restarts;
+            scoreSender.accuracy = gameResult.accuracy_frames;
+            scoreSender.amazing = gameResult.amazing;
+            scoreSender.perfect = gameResult.perfect;
+            scoreSender.good = gameResult.good;
+            scoreSender.average = gameResult.average;
+            scoreSender.miss = gameResult.miss;
+            scoreSender.boo = gameResult.boo;
+            scoreSender.max_combo = gameResult.max_combo;
+            scoreSender.score = gameResult.score;
+            scoreSender.replay = Replay.getReplayString(gameResult.replay);
+            scoreSender.replay_bin = gameResult.replay_bin_encoded;
+            scoreSender.save_settings = JSON.stringify(gameResult.options.settingsEncode());
+            scoreSender.session = _gvars.userSession;
+            scoreSender.start_time = gameResult.start_time;
+            scoreSender.start_hash = gameResult.start_hash;
+            scoreSender.hash = SHA1.hash(scoreSender.replay + _gvars.activeUser.id);
+
+            // Set Request
+            req.data = scoreSender;
+            req.method = URLRequestMethod.POST;
+
+            // Saving Vars
+            _loader.load(req);
         }
 
-        private function removeLoaderListeners(isReplay:Boolean = false, isAltEngine:Boolean = false):void
+        /**
+         * Loader Event: Replay Save Success
+         */
+        private function replayLoadComplete(e:Event):void
         {
-            if (isAltEngine)
-            {
-                _loader.removeEventListener(Event.COMPLETE, altSiteLoadComplete);
-                _loader.removeEventListener(IOErrorEvent.IO_ERROR, altSiteLoadError);
-                _loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, altSiteLoadError);
-            }
-            else if (isReplay)
-            {
-                _loader.removeEventListener(Event.COMPLETE, replayLoadComplete);
-                _loader.removeEventListener(IOErrorEvent.IO_ERROR, replayLoadError);
-                _loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, replayLoadError);
-            }
-            else
-            {
-                _loader.removeEventListener(Event.COMPLETE, siteLoadComplete);
-                _loader.removeEventListener(IOErrorEvent.IO_ERROR, siteLoadError);
-                _loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, siteLoadError);
-            }
+            removeLoaderListeners(replayLoadComplete, replayLoadError);
+
+            var data:Object = JSON.parse(e.target.data);
+
+            _gvars.gameMain.addAlert(_lang.string("replay_save_status_" + data.result), 90, (data.result == 0 ? Alert.GREEN : Alert.RED));
         }
+
+        /**
+         * Loader Event: Replay Save Failure
+         */
+        private function replayLoadError(e:Event = null):void
+        {
+            removeLoaderListeners(replayLoadComplete, replayLoadError);
+            _gvars.gameMain.addAlert(_lang.string("error_server_connection_failure"), 120, Alert.RED);
+        }
+
     }
 }

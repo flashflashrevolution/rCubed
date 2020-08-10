@@ -24,6 +24,7 @@ package arc.mp
     import it.gotoandplay.smartfoxserver.SFSEvent;
 
     import com.bit101.components.TextArea;
+    import game.GameScoreResult;
 
     public class MultiplayerSingleton extends Object
     {
@@ -438,7 +439,7 @@ package arc.mp
                     boo: event.params.hitBoo});
         }
 
-        public function gameplayResults(gameResults:MenuPanel, songResults:Array):void
+        public function gameplayResults(gameResults:MenuPanel, songResults:Vector.<GameScoreResult>):void
         {
             var room:Object = _gvars.options.multiplayer;
 
@@ -451,9 +452,9 @@ package arc.mp
 
             var replay:Replay = null;
             var results:Object = null;
-            for each (var result:Object in songResults)
+            for each (var result:GameScoreResult in songResults)
             {
-                if (result.song == currentSong)
+                if (result.song_entry == currentSong)
                 {
                     results = result;
                     break;

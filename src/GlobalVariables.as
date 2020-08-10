@@ -39,6 +39,7 @@ package
     import flash.utils.ByteArray;
 
     import game.GameOptions;
+    import game.GameScoreResult;
 
     public class GlobalVariables extends EventDispatcher
     {
@@ -92,10 +93,9 @@ package
         public var totalSongQueue:Array = [];
         public var gameIndex:int = 0;
         public var replayHistory:Array = [];
-        public var songResults:Array = [];
+        public var songResults:Vector.<GameScoreResult> = new <GameScoreResult>[];
         public var songResultRanks:Array = [];
         public var songRestarts:int;
-        public var CUR_GAME_INDEX:int = -1;
         public var activeFilter:EngineLevelFilter;
 
         ///- Session Stats

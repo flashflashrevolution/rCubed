@@ -1,6 +1,7 @@
 package classes
 {
     import classes.replay.Replay;
+    import classes.replay.ReplayNote;
 
     public class SongPreview extends Replay
     {
@@ -35,7 +36,7 @@ package classes
             this.settings.viewOffset = 0;
             this.settings.judgeOffset = 0;
 
-            this.replay = [];
+            this.replay = new <ReplayNote>[];
 
             var genNotes:Array = [];
             for (var i:int = 0; i < this.maxcombo; i++)
