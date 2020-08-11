@@ -12,6 +12,9 @@ package classes
 
         public function MouseTooltip(string:String = "", maxWidth:int = 250)
         {
+            this.mouseEnabled = false;
+            this.mouseChildren = false;
+
             super();
             msg = new TextField();
             msg.x = 5;
