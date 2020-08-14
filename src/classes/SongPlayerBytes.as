@@ -10,15 +10,15 @@ package classes
     {
         public var sound:Sound;
         public var soundChannel:SoundChannel;
-        public var _playFlag:Boolean = false;
 
         public var isPlaying:Boolean = false;
         public var userPaused:Boolean = false;
         public var userStopped:Boolean = false;
 
         private var pausePosition:int = 0;
+        private var _noRepeat:Boolean;
 
-        public function SongPlayerBytes(swfBytes:ByteArray, isMP3File:Boolean = false)
+        public function SongPlayerBytes(swfBytes:ByteArray, isMP3File:Boolean = false, noRepeat:Boolean = false)
         {
             if (swfBytes && swfBytes.length > 0)
             {
@@ -29,19 +29,14 @@ package classes
                 sound = new Sound();
                 sound.loadCompressedDataFromByteArray(swfBytes, swfBytes.length);
             }
+            _noRepeat = noRepeat;
         }
 
         public function start():void
         {
-            if (!sound)
-            {
-                _playFlag = true;
-                return;
-            }
-            if (userPaused)
+            if (!sound || userPaused)
                 return;
 
-            _playFlag = false;
             stop();
             soundChannel = sound.play(pausePosition);
             soundChannel.soundTransform = GlobalVariables.instance.menuMusicSoundTransform;
@@ -53,7 +48,10 @@ package classes
         {
             SoundChannel(e.target).removeEventListener(e.type, onComplete);
             pausePosition = 0;
-            start();
+            if (_noRepeat)
+                isPlaying = false;
+            else
+                start();
         }
 
         public function stop():void

@@ -48,6 +48,7 @@ package game
     import game.controls.Score;
     import it.gotoandplay.smartfoxserver.SFSEvent;
     import menu.MenuPanel;
+    import menu.MenuSongSelection;
     import sql.SQLSongDetails;
 
     public class GamePlay extends MenuPanel
@@ -240,6 +241,9 @@ package game
             if (_gvars.menuMusic)
                 _gvars.menuMusic.stop();
 
+            if (MenuSongSelection.previewMusic)
+                MenuSongSelection.previewMusic.stop();
+
             // var stage3D:Stage3D = stage.stage3Ds[0];
             // stage.stage3Ds[0].addEventListener(Event.CONTEXT3D_CREATE, initStage3D);
             // stage.stage3Ds[0].requestContext3D(Context3DRenderMode.AUTO, Context3DProfile.ENHANCED);
@@ -404,6 +408,11 @@ package game
 
         private function initCore():void
         {
+            // Bound Isolation Note Mod
+            if (options.isolationOffset >= song.chart.Notes.length)
+                options.isolationOffset = song.chart.Notes.length - 1;
+
+            // Song
             song.updateMusicDelay();
             legacyMode = (song.type == NoteChart.FFR || song.type == NoteChart.FFR_RAW || song.type == NoteChart.FFR_LEGACY);
             if (song.music && (legacyMode || !options.modEnabled("nobackground")))

@@ -198,11 +198,11 @@ package arc
             {
                 if (options.isolationLength > 0)
                 {
-                    return Math.min(options.isolationLength, notes.length - options.isolationOffset);
+                    return Math.min(options.isolationLength, Math.max(1, notes.length - options.isolationOffset));
                 }
                 else
                 {
-                    return notes.length - options.isolationOffset;
+                    return Math.max(1, notes.length - options.isolationOffset);
                 }
             }
             return notes.length;
@@ -222,13 +222,13 @@ package arc
 
                 if (options.isolationLength > 0)
                 {
-                    firstNote = notes[Math.min(notes.length - 1, options.isolationOffset - 1)];
+                    firstNote = notes[Math.min(notes.length - 1, options.isolationOffset)];
                     lastNote = notes[Math.min(notes.length - 1, options.isolationOffset + options.isolationLength)];
                     time = lastNote.time - firstNote.time;
                 }
                 else
                 {
-                    firstNote = notes[Math.min(notes.length - 1, options.isolationOffset - 1)];
+                    firstNote = notes[Math.min(notes.length - 1, options.isolationOffset)];
                     time = lastNote.time - firstNote.time;
                 }
             }
