@@ -16,5 +16,7 @@ package menu
 
         public var isFilter:Boolean = false;
         public var filter:Function = null;
+
+        public var queuePlaylist:Array = [];
     }
 }

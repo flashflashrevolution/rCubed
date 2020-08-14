@@ -3,8 +3,6 @@ package menu
     import classes.Text;
     import flash.display.Sprite;
     import flash.display.GradientType;
-    import flash.geom.Matrix;
-    import flash.text.StyleSheet;
     import flash.events.MouseEvent;
     import com.flashfla.utils.sprintf;
     import com.flashfla.utils.NumberUtil;
@@ -108,9 +106,8 @@ package menu
                 {
                     navigateToURL(new URLRequest(Constant.SHOP_URL), "_blank");
                 }
-                return true;
             }
-            return false;
+            return isLocked;
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -232,6 +229,12 @@ package menu
         public function get level():int
         {
             return _level;
+        }
+
+        public function set highlight(val:Boolean):void
+        {
+            _highlight = val;
+            draw();
         }
 
         public function get highlight():Boolean
