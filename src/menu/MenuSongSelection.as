@@ -18,6 +18,7 @@ package menu
     import classes.Language;
     import classes.Playlist;
     import classes.SongPlayerBytes;
+    import classes.SongPreview;
     import classes.SongQueueItem;
     import classes.StarSelector;
     import classes.Text;
@@ -148,6 +149,10 @@ package menu
 
             songItemContextMenuItem = new ContextMenuItem("Listen to Song Preview");
             songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_listenToSongPreviewContextSelect);
+            songItemContextMenu.customItems.push(songItemContextMenuItem);
+            
+            songItemContextMenuItem = new ContextMenuItem("Play Chart Preview");
+            songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_playChartPreviewContextSelect);
             songItemContextMenu.customItems.push(songItemContextMenuItem);
 
             if (_gvars.sql_connect)
@@ -341,7 +346,7 @@ package menu
         }
 
         /**
-         * Called when an Alt Engine fails to load as the default dispalyed engine.
+         * Called when an Alt Engine fails to load as the default displayed engine.
          * Reloads the song selection panel.
          * @param e
          */
@@ -514,6 +519,7 @@ package menu
             // DM_QUEUE
             if (options.activeGenre == PLAYLIST_QUEUE)
             {
+                _gvars.songQueue = options.queuePlaylist;
                 songList = _gvars.songQueue.slice(options.pageNumber * ITEM_PER_PAGE, (options.pageNumber + 1) * ITEM_PER_PAGE);
                 genreLength = _gvars.songQueue.length;
             }
@@ -773,7 +779,10 @@ package menu
             // Set Active Highlights
             songItems[index].active = true;
             if (last >= 0 && last < songItems.length)
+            {
+                songItems[last].highlight = false;
                 songItems[last].active = false;
+            }
 
             // Scroll when doScroll is set.
             if (doScroll && scrollbar.draggerVisibility)
@@ -809,7 +818,7 @@ package menu
                 }
                 else
                 {
-                    if (options.infoTab == TAB_PLAYLIST)
+                    if (!tarSongItem.isLocked && options.infoTab == TAB_PLAYLIST)
                     {
                         if (_mp.gameplayHasOpponent())
                             multiplayerLoad(tarSongItem.level);
@@ -874,6 +883,40 @@ package menu
                 }
             }
         }
+        
+        /**
+         * Song Item Context Menu: Plays the chart preview of the selected song.
+         */
+        private function e_playChartPreviewContextSelect(e:ContextMenuEvent):void
+        {
+            if (!_gvars.options)
+            {
+                _gvars.options = new GameOptions();
+                _gvars.options.fill();
+            }
+            _gvars.options.replay = new SongPreview((e.contextMenuOwner as SongItem).level);
+            _gvars.options.loadPreview = true;
+
+            if (!_gvars.options.replay.isLoaded)
+            {
+                (_gvars.options.replay as SongPreview).setupSongPreview();
+            }
+
+            if (_gvars.options.replay.isLoaded)
+            {
+                // Force no offsets on judge.
+                _gvars.options.offsetGlobal = 0;
+                _gvars.options.offsetJudge = 0;
+
+                // Setup Vars
+                _gvars.songQueue = [];
+                _gvars.songQueue.push(Playlist.instance.getSong(_gvars.options.replay.level));
+
+                // Switch to game
+                _gvars.gameMain.addAlert("Playing chart preview...");
+                switchTo(Main.GAME_PLAY_PANEL);
+            }
+        }
 
         /**
          * Song Item Context Menu: Same as for setting a song as the current menu music,
@@ -912,8 +955,18 @@ package menu
         {
             var songItem:SongItem = (e.contextMenuOwner as SongItem);
             _gvars.songQueue.removeAt(songItem.index);
+            saveQueuePlaylist();
+
             buildPlayList();
             buildInfoBox();
+        }
+
+        /**
+         * Save the queue playlist into the song selection menu options.
+         */
+        private function saveQueuePlaylist():void
+        {
+            options.queuePlaylist = _gvars.songQueue;
         }
 
         //******************************************************************************************//
@@ -1079,10 +1132,17 @@ package menu
             // Actions
             var songQueuePlay:BoxButton = new BoxButton(164, 27, _lang.string("song_selection_queue_panel_play"), 12);
             songQueuePlay.x = 5;
-            songQueuePlay.y = 192;
+            songQueuePlay.y = 160;
             songQueuePlay.action = "playQueue";
             songQueuePlay.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
             infoBox.addChild(songQueuePlay);
+
+            var songQueuePlayFromHere:BoxButton = new BoxButton(164, 27, "PLAY FROM HERE", 12);
+            songQueuePlayFromHere.x = 5;
+            songQueuePlayFromHere.y = 192;
+            songQueuePlayFromHere.action = "playQueueFromHere";
+            songQueuePlayFromHere.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+            infoBox.addChild(songQueuePlayFromHere);
 
             var songQueueRandomizer:BoxButton = new BoxButton(164, 27, _lang.string("song_selection_queue_panel_randomize"), 12);
             songQueueRandomizer.x = 5;
@@ -1332,6 +1392,7 @@ package menu
         {
             _gvars.gameMain.addAlert(sprintf(_lang.string("song_selection_add_to_queue"), {song_name: _playlist.getSong(e.target.level).name}), 90);
             _gvars.songQueue.push(_playlist.getSong(e.target.level));
+            saveQueuePlaylist();
             if (songList == _gvars.songQueue)
             {
                 options.infoTab = TAB_QUEUE;
@@ -1395,8 +1456,14 @@ package menu
         /**
          * Begins the current queue, while filtering out unplayable songs to prevent issues.
          */
-        private function playQueue():void
+        private function playQueue(queueIndex:int = 0):void
         {
+            if (queueIndex < 0)
+                return;
+
+            if (queueIndex != 0)
+                _gvars.songQueue = _gvars.songQueue.slice(queueIndex);
+
             _gvars.songQueue = _gvars.songQueue.filter(function(item:Object, index:int, array:Array):Boolean
             {
                 return (_gvars.checkSongAccess(item) == GlobalVariables.SONG_ACCESS_PLAYABLE);
@@ -1494,13 +1561,16 @@ package menu
         /**
          * Swaps the display between Queue and Playlist
          */
-        public function swapToQueue():void
+        public function swapToQueue(selectToken:Boolean = true):void
         {
+            if (selectToken || options.activeGenre != PLAYLIST_QUEUE)
+            {
+                options.pageNumber = 0;
+                options.activeIndex = -1;
+                options.activeSongID = -1;
+                options.scroll_position = 0;
+            }
             options.activeGenre = (options.infoTab == TAB_QUEUE ? PLAYLIST_QUEUE : 0);
-            options.pageNumber = 0;
-            options.activeIndex = -1;
-            options.activeSongID = -1;
-            options.scroll_position = 0;
             buildGenreList();
             buildPlayList();
             buildInfoBox();
@@ -1630,6 +1700,7 @@ package menu
                         options.activeSongID = -1;
                         options.activeIndex = -1;
                         options.pageNumber = targetPage;
+                        options.infoTab = TAB_PLAYLIST;
                         buildPlayList();
                         buildInfoBox();
                     }
@@ -1667,6 +1738,7 @@ package menu
                 options.activeGenre = 0;
                 options.activeIndex = -1;
                 options.activeSongID = -1;
+                options.infoTab = TAB_PLAYLIST;
                 buildGenreList();
                 buildPlayList();
                 buildInfoBox();
@@ -1685,6 +1757,10 @@ package menu
                 {
                     playQueue();
                 }
+                else if (clickAction == "playQueueFromHere")
+                {
+                    playQueue(options.activeIndex);
+                }
                 else if (clickAction == "doSearch")
                 {
                     doSearch(searchBox.text);
@@ -1692,7 +1768,7 @@ package menu
                 else if (clickAction == "queue")
                 {
                     options.infoTab = options.infoTab == TAB_QUEUE ? TAB_PLAYLIST : TAB_QUEUE;
-                    swapToQueue();
+                    swapToQueue(false);
                 }
                 else if (clickAction == "highscores")
                 {
@@ -1702,6 +1778,7 @@ package menu
                 else if (clickAction == "clearQueue")
                 {
                     _gvars.songQueue = [];
+                    saveQueuePlaylist();
                     buildPlayList();
                     buildInfoBox();
                 }
@@ -1711,6 +1788,7 @@ package menu
                     {
                         _gvars.songQueue = ArrayUtil.randomize(_gvars.songQueue);
                     }
+                    saveQueuePlaylist();
                     buildPlayList();
                     buildInfoBox();
                 }
@@ -1792,7 +1870,7 @@ package menu
             if (_gvars.gameMain.current_popup != null)
                 return;
 
-            if (searchBox != null && options.infoTab == 1 && searchBox.focus)
+            if (searchBox != null && options.infoTab == TAB_SEARCH && searchBox.focus)
             {
                 switch (e.keyCode)
                 {
@@ -1805,7 +1883,6 @@ package menu
 
             var newIndex:int = options.activeIndex;
             var lastIndex:int = options.activeIndex;
-            var isNavDirectionUp:Boolean = true;
             var maxGenreIndex:int = getTotalGenres() - 1;
 
             switch (e.keyCode)
@@ -1820,12 +1897,10 @@ package menu
 
                 case Keyboard.PAGE_DOWN:
                     newIndex += 11;
-                    isNavDirectionUp = false;
                     break;
 
                 case Keyboard.DOWN:
                     newIndex += 1;
-                    isNavDirectionUp = false;
                     break;
 
                 case Keyboard.TAB:
@@ -1834,6 +1909,7 @@ package menu
                     options.activeIndex = -1;
                     options.activeSongID = -1;
                     options.activeGenre = options.activeGenre + (e.ctrlKey ? -1 : 1);
+                    options.infoTab = TAB_PLAYLIST;
                     if (options.activeGenre < -1)
                         options.activeGenre = maxGenreIndex;
                     if (options.activeGenre > maxGenreIndex)
@@ -1871,28 +1947,15 @@ package menu
                 return;
 
             if (newIndex < 0)
-            {
                 newIndex = 0;
-            }
             else if (newIndex > genreLength - 1)
-            {
                 newIndex = genreLength - 1;
-            }
 
             if (newIndex != lastIndex)
             {
-                var action:int = isNavDirectionUp ? -1 : 1;
-                var limit:int = isNavDirectionUp ? newIndex : (genreLength - 1 - newIndex);
-                for (var counter:int = 0; counter <= limit; ++counter, newIndex += action)
-                {
-                    if (!songItems[newIndex].isLocked)
-                    {
-                        setActiveIndex(newIndex, lastIndex, true);
-                        buildInfoBox();
-                        stage.focus = null;
-                        break;
-                    }
-                }
+                setActiveIndex(newIndex, lastIndex, true);
+                buildInfoBox();
+                stage.focus = null;
             }
         }
 

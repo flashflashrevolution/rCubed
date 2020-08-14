@@ -397,6 +397,11 @@ package game
 
         private function initCore():void
         {
+            // Bound Isolation Note Mod
+            if (options.isolationOffset >= song.chart.Notes.length)
+                options.isolationOffset = song.chart.Notes.length - 1;
+
+            // Song
             song.updateMusicDelay();
             legacyMode = (song.type == NoteChart.FFR || song.type == NoteChart.FFR_RAW || song.type == NoteChart.FFR_LEGACY);
             if (song.music && (legacyMode || !options.modEnabled("nobackground")))
