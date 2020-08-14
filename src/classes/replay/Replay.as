@@ -1,6 +1,5 @@
 package classes.replay
 {
-
     import by.blooddy.crypto.MD5;
     import classes.User;
     import flash.events.Event;
@@ -71,6 +70,7 @@ package classes.replay
 
         private function replayLoadComplete(e:Event):void
         {
+            removeLoaderListeners();
             var site_data:Object = JSON.parse(e.target.data);
             if (site_data.result != 1)
             {
@@ -84,7 +84,7 @@ package classes.replay
 
         private function replayLoadError(e:Event):void
         {
-
+            removeLoaderListeners();
         }
 
         private function parseReplay(data:Object, loadUser:Boolean = true):void
