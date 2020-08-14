@@ -807,7 +807,7 @@ package menu
                 }
                 else
                 {
-                    if (tarSongItem.isLocked == false && options.infoTab == TAB_PLAYLIST)
+                    if (!tarSongItem.isLocked && options.infoTab == TAB_PLAYLIST)
                     {
                         if (_mp.gameplayHasOpponent())
                             multiplayerLoad(tarSongItem.level);
