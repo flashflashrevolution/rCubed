@@ -59,6 +59,8 @@ package game.graph
             hover_text.x = 30;
             hover_text.y = 270;
             hover_text.width = 300;
+            hover_text.mouseEnabled = false;
+            hover_text.mouseChildren = false;
 
             // Judge 
             var song_arrows:int = result.note_count;
@@ -66,6 +68,8 @@ package game.graph
 
             var i:int;
 
+            var pos_x:Number;
+            var pos_y:Number;
             var ratio_x:Number = graphWidth / Math.max(1, song_arrows - 1);
             var ratio_y:Number = graphHeight / result.GAP_TIME;
 
@@ -91,8 +95,6 @@ package game.graph
             var player_timings:Array = result.replay_bin_notes;
             var note_judge:Object;
 
-            var pos_x:Number;
-            var pos_y:Number;
             var timing:int;
             var draw_color:uint;
             var timing_score:int;
@@ -208,7 +210,7 @@ package game.graph
                 }
             }
 
-            if (last_nearest == nearest_cross)
+            if (last_nearest == nearest_cross || nearest_cross < 0 || nearest_cross >= cross_points.length)
             {
                 return;
             }

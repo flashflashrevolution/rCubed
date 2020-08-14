@@ -42,7 +42,7 @@ package game
     import game.graph.GraphAccuracy;
     import classes.BoxIcon;
     import assets.menu.icons.fa.iconPhoto;
-    import assets.menu.icons.fa.iconSave;
+    import assets.menu.icons.fa.iconVideo;
     import assets.menu.icons.fa.iconRandom;
 
     public class GameResults extends MenuPanel
@@ -215,8 +215,7 @@ package game
             navScreenShot.addEventListener(MouseEvent.CLICK, eventHandler);
             this.addChild(navScreenShot);
 
-
-            navSaveReplay = new BoxIcon(32, 32, new iconSave());
+            navSaveReplay = new BoxIcon(32, 32, new iconVideo());
             navSaveReplay.x = 485;
             navSaveReplay.y = 6;
             navSaveReplay.setIconColor("#E2FEFF");
@@ -232,6 +231,7 @@ package game
             navRandomSong.addEventListener(MouseEvent.CLICK, eventHandler);
             this.addChild(navRandomSong);
 
+            // Song Results - Song Queue
             navPrev = new BoxButton(90, 32, _lang.string("game_results_queue_previous"));
             navPrev.x = 18;
             navPrev.y = 62;
@@ -244,6 +244,7 @@ package game
             navNext.addEventListener(MouseEvent.CLICK, eventHandler);
             this.addChild(navNext);
 
+            // Graph
             resultsMods = new Text("---");
             resultsMods.x = 18;
             resultsMods.y = 276;
@@ -257,6 +258,8 @@ package game
             graphOverlay = new Sprite();
             graphOverlay.x = 30;
             graphOverlay.y = 298;
+            graphOverlay.mouseChildren = false;
+            graphOverlay.mouseEnabled = false;
             this.addChild(graphOverlay);
 
             graphToggle = new BoxButton(17, 19, "&gt;");
