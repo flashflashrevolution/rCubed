@@ -1,19 +1,23 @@
 package game.graph
 {
+    import classes.BoxButton;
     import classes.Language;
     import classes.Text;
     import classes.chart.Song;
     import com.flashfla.utils.sprintf;
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
+    import flash.events.MouseEvent;
     import flash.geom.Rectangle;
     import game.GameScoreResult;
+    import classes.BoxIcon;
+    import assets.menu.icons.fa.iconSmallF;
 
     public class GraphAccuracy extends GraphBase
     {
         public var _lang:Language = Language.instance;
-        public var cross_points:Vector.<GraphCrossPoint> = new <GraphCrossPoint>[];
-        public var regions:Vector.<Rectangle> = new <Rectangle>[];
+        public var cross_points:Vector.<GraphCrossPoint>;
+        public var regions:Vector.<Rectangle>;
 
         public var last_nearest:int = -1;
 
@@ -22,6 +26,8 @@ package game.graph
         public var hover_text:Text;
 
         public var buttons:Sprite;
+
+        public var flipGraph:Boolean = false;
 
         public function GraphAccuracy(target:Sprite, overlay:Sprite, result:GameScoreResult):void
         {
@@ -48,10 +54,20 @@ package game.graph
 
         override public function init():void
         {
+            flipGraph = LocalStore.getVariable("result_flip_graph", false);
+
             // Buttons
             buttons = new Sprite();
             buttons.x = overlay.x;
             buttons.y = overlay.y;
+
+            var flipGraphBtn:BoxIcon = new BoxIcon(16, 18, new iconSmallF(), true, false);
+            flipGraphBtn.x = -20;
+            flipGraphBtn.y = 98;
+            flipGraphBtn.padding = 6;
+            flipGraphBtn.setHoverText(_lang.string("game_results_flip_graph"), "right");
+            flipGraphBtn.addEventListener(MouseEvent.MOUSE_DOWN, e_flipGraph);
+            buttons.addChild(flipGraphBtn);
 
             // Hover Text
             hover_text = new Text("", 14);
@@ -62,100 +78,32 @@ package game.graph
             hover_text.mouseEnabled = false;
             hover_text.mouseChildren = false;
 
-            // Judge 
-            var song_arrows:int = result.note_count;
-            var song_file:Song = result.song;
-
-            var i:int;
-
-            var pos_x:Number;
-            var pos_y:Number;
-            var ratio_x:Number = graphWidth / Math.max(1, song_arrows - 1);
-            var ratio_y:Number = graphHeight / result.GAP_TIME;
-
-            // Draw Judge Regions
-            for (i = 0; i < result.judge.length; i++)
-            {
-                // Has Judge Region
-                var jncj:Object = result.judge[i];
-                var jnnj:Object = result.judge[i + 1] ? result.judge[i + 1] : null;
-
-                if (jncj == null || jnnj == null)
-                    break;
-
-                // Has Score for Judge
-                if (JUDGE_WINDOW_COLORS[jncj.s] == null || jncj.s == 0)
-                    continue;
-
-                // Create Region. X = Judge Color, Width = Region Score Value
-                regions[regions.length] = new Rectangle(JUDGE_WINDOW_COLORS[jncj.s], ((jncj.t * -1) - result.MIN_TIME) * ratio_y, jncj.s, (jnnj.t - jncj.t) * ratio_y);
-            }
-
-            // Draw Hit Markers
-            var player_timings:Array = result.replay_bin_notes;
-            var note_judge:Object;
-
-            var timing:int;
-            var draw_color:uint;
-            var timing_score:int;
-
-            player_timings_length = player_timings.length;
-
-            for (i = 0; i < player_timings_length; i++)
-            {
-                pos_x = i * ratio_x;
-                timing_score = 0;
-
-                // Judge Timing uses null for misses.
-                if (player_timings[i] != null)
-                {
-                    note_judge = result.getJudgeRegion(player_timings[i]);
-
-                    if (JUDGE_WINDOW_CROSS_COLORS[note_judge.s] != null && note_judge.s > 0)
-                    {
-                        pos_y = (player_timings[i] - result.MIN_TIME) * ratio_y;
-                        draw_color = JUDGE_WINDOW_CROSS_COLORS[note_judge.s];
-                        timing = player_timings[i];
-                        timing_score = note_judge.s;
-                    }
-                }
-
-                // Note Miss
-                if (timing_score == 0)
-                {
-                    pos_y = 0;
-                    timing = 0;
-                    draw_color = JUDGE_WINDOW_CROSS_COLORS["0"];
-                }
-
-                cross_points[cross_points.length] = new GraphCrossPoint(i, pos_x, pos_y, timing, draw_color, timing_score);
-            }
-
-            // Fill in Misses, Overlay uses cross point length.
-            if (result.note_count > 0)
-            {
-                while (cross_points.length < result.note_count)
-                {
-                    pos_x = cross_points.length * ratio_x;
-                    cross_points[cross_points.length] = new GraphCrossPoint(cross_points.length, pos_x, 0, 0, JUDGE_WINDOW_CROSS_COLORS["0"], 0);
-                }
-            }
+            generateGraph();
         }
 
         override public function draw():void
         {
-            for each (var region:Rectangle in regions)
+            graph.graphics.clear();
+
+            // Draw Region
+            var region:Rectangle;
+            for each (region in regions)
             {
-                // Draw Region
                 graph.graphics.lineStyle(0, 0, 0);
                 graph.graphics.beginFill(region.x, 0.25); // x contains color.
-                graph.graphics.drawRect(0, region.y - region.height, graphWidth, region.height);
+                graph.graphics.drawRect(0, region.y, graphWidth, region.height);
                 graph.graphics.endFill();
+            }
 
-                // Draw Divider
-                graph.graphics.lineStyle(1, 0x000000, 0.3);
-                graph.graphics.moveTo(0, region.y);
-                graph.graphics.lineTo(graphWidth, region.y);
+            // Draw Divider
+            var region_y:Number;
+            for (var region_index:int = 0; region_index < regions.length - 1; region_index++)
+            {
+                region = regions[region_index];
+                region_y = region.y + (flipGraph ? region.height : 0);
+                graph.graphics.lineStyle(1, 0x000000, 0.4);
+                graph.graphics.moveTo(0, region_y);
+                graph.graphics.lineTo(graphWidth, region_y);
             }
 
             for each (var point:GraphCrossPoint in cross_points)
@@ -272,5 +220,128 @@ package game.graph
             overlay.graphics.beginFill(0x033242, 0.95);
             overlay.graphics.drawRect(boxX, -32, boxWidth, 30);
         }
+
+        /**
+         * Generates the Judge Region Rectangles and the Graph Cross points.
+         */
+        private function generateGraph():void
+        {
+            regions = new <Rectangle>[];
+            cross_points = new <GraphCrossPoint>[];
+
+            // Judge 
+            var song_arrows:int = result.note_count;
+            var song_file:Song = result.song;
+
+            var i:int;
+
+            var pos_x:Number;
+            var pos_y:Number;
+            var ratio_x:Number = graphWidth / Math.max(1, song_arrows - 1);
+            var ratio_y:Number = graphHeight / result.GAP_TIME;
+
+            var jncj:Object;
+            var jnnj:Object;
+            var judge_rect:Rectangle;
+            var last_judge_height:Number = 0;
+            var last_judge_y:Number = 0;
+
+            var flip_graph_y:Number = graphHeight;
+
+            // Draw Judge Regions
+            for (i = 0; i < result.judge.length; i++)
+            {
+                // Has Judge Region
+                jncj = result.judge[i];
+                jnnj = result.judge[i + 1] ? result.judge[i + 1] : null;
+
+                if (jncj == null || jnnj == null)
+                    break;
+
+                // Has Score for Judge
+                if (JUDGE_WINDOW_COLORS[jncj.s] == null || jncj.s == 0)
+                    continue;
+
+                // Create Region. X = Judge Color, Width = Region Score Value
+                last_judge_height = (jnnj.t - jncj.t) * ratio_y;
+                judge_rect = new Rectangle(JUDGE_WINDOW_COLORS[jncj.s], last_judge_y, jncj.s, last_judge_height);
+
+                last_judge_y += last_judge_height;
+
+                // Flip Graph - Default Graph is Early = Bottom
+                if (!flipGraph)
+                {
+                    flip_graph_y -= last_judge_height;
+                    judge_rect.y = flip_graph_y;
+                }
+
+                regions[regions.length] = judge_rect;
+            }
+
+            // Draw Hit Markers
+            var player_timings:Array = result.replay_bin_notes;
+            var note_judge:Object;
+
+            var timing:int;
+            var draw_color:uint;
+            var timing_score:int;
+
+            player_timings_length = player_timings.length;
+
+            for (i = 0; i < player_timings_length; i++)
+            {
+                pos_x = i * ratio_x;
+                timing_score = 0;
+
+                // Judge Timing uses null for misses.
+                if (player_timings[i] != null)
+                {
+                    note_judge = result.getJudgeRegion(player_timings[i]);
+
+                    if (JUDGE_WINDOW_CROSS_COLORS[note_judge.s] != null && note_judge.s > 0)
+                    {
+                        pos_y = (player_timings[i] - result.MIN_TIME) * ratio_y;
+                        draw_color = JUDGE_WINDOW_CROSS_COLORS[note_judge.s];
+                        timing = player_timings[i];
+                        timing_score = note_judge.s;
+                    }
+                }
+
+                // Note Miss
+                if (timing_score == 0)
+                {
+                    pos_y = 0;
+                    timing = 0;
+                    draw_color = JUDGE_WINDOW_CROSS_COLORS["0"];
+                }
+
+                if (flipGraph)
+                    pos_y = graphHeight - pos_y;
+
+                cross_points[cross_points.length] = new GraphCrossPoint(i, pos_x, pos_y, timing, draw_color, timing_score);
+            }
+
+            // Fill in Misses, Overlay uses cross point length.
+            if (result.note_count > 0)
+            {
+                while (cross_points.length < result.note_count)
+                {
+                    pos_x = cross_points.length * ratio_x;
+                    cross_points[cross_points.length] = new GraphCrossPoint(cross_points.length, pos_x, (flipGraph ? graphHeight : 0), 0, JUDGE_WINDOW_CROSS_COLORS["0"], 0);
+                }
+            }
+        }
+
+        /**
+         * Flips the result graph.
+         */
+        private function e_flipGraph(event:MouseEvent):void
+        {
+            drawOverlay(-100, -100);
+            flipGraph = !flipGraph;
+            generateGraph();
+            draw();
+        }
+
     }
 }
