@@ -1,35 +1,27 @@
 package arc.mp
 {
-    import Main;
-    import menu.MenuPanel;
-    import classes.Text;
-    import classes.BoxButton;
-
     import arc.ArcGlobals;
     import arc.mp.ListItemDoubleClick;
-    import arc.mp.MultiplayerPrompt;
     import arc.mp.MultiplayerChat;
+    import arc.mp.MultiplayerPrompt;
     import arc.mp.MultiplayerUsers;
-    import com.flashfla.net.Multiplayer;
-
-    import flash.ui.Keyboard;
-    import flash.ui.ContextMenu;
-    import flash.ui.ContextMenuItem;
-    import flash.events.ContextMenuEvent;
-    import flash.utils.Timer;
-    import flash.events.TimerEvent;
-    import flash.events.Event;
-    import flash.events.MouseEvent;
-    import flash.display.Sprite;
-
+    import classes.BoxButton;
+    import classes.Text;
     import com.bit101.components.List;
     import com.bit101.components.PushButton;
     import com.bit101.components.Style;
     import com.bit101.components.Window;
-
     import com.flashfla.components.Throbber;
-
+    import com.flashfla.net.Multiplayer;
+    import flash.events.ContextMenuEvent;
+    import flash.events.Event;
+    import flash.events.MouseEvent;
+    import flash.events.TimerEvent;
+    import flash.ui.ContextMenu;
+    import flash.ui.ContextMenuItem;
+    import flash.utils.Timer;
     import it.gotoandplay.smartfoxserver.SFSEvent;
+    import menu.MenuPanel;
 
     public class MultiplayerPanel extends MenuPanel
     {
@@ -80,8 +72,11 @@ package arc.mp
             controlRooms.setSize(200, 350);
             controlRooms.addEventListener(MouseEvent.DOUBLE_CLICK, function(event:MouseEvent):void
             {
-                var room:Object = controlRooms.selectedItem.data;
-                joinRoom(room, room.playerCount < room.maxPlayerCount);
+                if (controlRooms.selectedItem != null && controlRooms.selectedItem.data != null)
+                {
+                    var room:Object = controlRooms.selectedItem.data;
+                    joinRoom(room, room.playerCount < room.maxPlayerCount);
+                }
             });
             window.addChild(controlRooms);
             buildContextMenu();
@@ -391,7 +386,7 @@ package arc.mp
         {
             if (button == null)
                 return;
-            
+
             if (button.parent == null && show)
                 addChild(button);
             else if (button.parent == this && !show)
