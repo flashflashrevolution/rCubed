@@ -12,6 +12,8 @@ package menu
     import assets.menu.ScrollBackground;
     import assets.menu.ScrollDragger;
     import assets.menu.SongSelectionBackground;
+    import assets.menu.icons.fa.iconLeft;
+    import assets.menu.icons.fa.iconRight;
     import classes.Alert;
     import classes.BoxButton;
     import classes.BoxText;
@@ -74,8 +76,8 @@ package menu
         private var genreDisplay:Sprite;
 
         private var GENRE_MODE_TEXT:Text;
-        private var genre_mode_prev:Sprite;
-        private var genre_mode_next:Sprite;
+        private var genre_mode_prev:iconLeft;
+        private var genre_mode_next:iconRight;
         private var SELECTED_GENRE_BACKGROUND:Sprite;
 
         private var background:SongSelectionBackground;
@@ -150,7 +152,7 @@ package menu
             songItemContextMenuItem = new ContextMenuItem("Listen to Song Preview");
             songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_listenToSongPreviewContextSelect);
             songItemContextMenu.customItems.push(songItemContextMenuItem);
-            
+
             songItemContextMenuItem = new ContextMenuItem("Play Chart Preview");
             songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_playChartPreviewContextSelect);
             songItemContextMenu.customItems.push(songItemContextMenuItem);
@@ -230,33 +232,21 @@ package menu
                 GENRE_MODE_TEXT.fontSize = 16;
                 this.addChild(GENRE_MODE_TEXT);
 
-                genre_mode_prev = new Sprite();
-                genre_mode_prev.x = 10;
-                genre_mode_prev.y = 112;
+                genre_mode_prev = new iconLeft();
+                genre_mode_prev.x = 16;
+                genre_mode_prev.y = 119;
+                genre_mode_prev.scaleX = genre_mode_prev.scaleY = 0.22;
                 genre_mode_prev.buttonMode = true;
                 genre_mode_prev.useHandCursor = true;
-                genre_mode_prev.graphics.lineStyle(1, 0xffffff, 0.85);
-                genre_mode_prev.graphics.beginFill(0xffffff, 0.5);
-                genre_mode_prev.graphics.moveTo(7, 0);
-                genre_mode_prev.graphics.lineTo(7, 12);
-                genre_mode_prev.graphics.lineTo(0, 6);
-                genre_mode_prev.graphics.lineTo(7, 0);
-                genre_mode_prev.graphics.endFill();
                 genre_mode_prev.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                 this.addChild(genre_mode_prev);
 
-                genre_mode_next = new Sprite();
-                genre_mode_next.x = 121;
-                genre_mode_next.y = 112;
+                genre_mode_next = new iconRight();
+                genre_mode_next.x = 127;
+                genre_mode_next.y = 119;
+                genre_mode_next.scaleX = genre_mode_next.scaleY = 0.22;
                 genre_mode_next.buttonMode = true;
                 genre_mode_next.useHandCursor = true;
-                genre_mode_next.graphics.lineStyle(1, 0xffffff, 0.85);
-                genre_mode_next.graphics.beginFill(0xffffff, 0.5);
-                genre_mode_next.graphics.moveTo(0, 0);
-                genre_mode_next.graphics.lineTo(8, 6);
-                genre_mode_next.graphics.lineTo(0, 13);
-                genre_mode_next.graphics.lineTo(0, 0);
-                genre_mode_next.graphics.endFill();
                 genre_mode_next.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                 this.addChild(genre_mode_next);
             }
@@ -883,7 +873,7 @@ package menu
                 }
             }
         }
-        
+
         /**
          * Song Item Context Menu: Plays the chart preview of the selected song.
          */
@@ -2037,7 +2027,7 @@ package menu
             _gvars.menuMusic.start();
             par.drawMenuMusicControls();
         }
-        
+
         /**
          * Same as playMenuMusicSong, but it plays the song preview without repeat
          * and the song controls aren't drawn.
@@ -2069,17 +2059,19 @@ package menu
 
 
 import assets.GameBackgroundColor;
+
 import classes.Text;
+
 import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
-import flash.text.TextField;
-import flash.utils.Timer;
-import flash.text.AntiAliasType;
-import flash.text.TextFieldAutoSize;
-import flash.events.MouseEvent;
-import flash.geom.Point;
-import flash.events.TimerEvent;
 import flash.events.Event;
+import flash.events.MouseEvent;
+import flash.events.TimerEvent;
+import flash.geom.Point;
+import flash.text.AntiAliasType;
+import flash.text.TextField;
+import flash.text.TextFieldAutoSize;
+import flash.utils.Timer;
 
 internal class PageBox extends Sprite
 {
