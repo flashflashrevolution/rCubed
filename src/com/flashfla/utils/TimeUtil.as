@@ -13,18 +13,7 @@ package com.flashfla.utils
 
         public static function getFormattedDate(date:Date):String
         {
-            var cHH:Number = date.hoursUTC;
-            var cAM:String = "am";
-            if (cHH > 12)
-            {
-                cHH -= 12;
-                cAM = "pm";
-            }
-            else if (cHH == 12)
-            {
-                cAM = "pm";
-            }
-            return doubleDigitFormat(cHH) + ":" + doubleDigitFormat(date.minutesUTC) + ":" + doubleDigitFormat(date.secondsUTC) + cAM + ", " + date.dateUTC + "/" + (date.monthUTC + 1) + "/" + date.fullYearUTC;
+            return date.toLocaleTimeString() + ", " + date.date + "/" + (date.month + 1) + "/" + date.fullYear;
         }
 
         public static function getTimezoneOffset():Number
