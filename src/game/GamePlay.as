@@ -1385,7 +1385,7 @@ package game
             GAME_STATE = GAME_DISPOSE;
 
             var screen:int = _gvars.activeUser.startUpScreen;
-            if (!_gvars.activeUser.isGuest == false && (screen == 0 || screen == 1) && !MultiplayerSingleton.getInstance().connection.connected)
+            if (!_gvars.activeUser.isGuest && (screen == 0 || screen == 1) && !MultiplayerSingleton.getInstance().connection.connected)
             {
                 MultiplayerSingleton.getInstance().connection.connect();
             }
