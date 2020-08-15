@@ -142,7 +142,7 @@ package game
         private var gameLife:int;
         private var gameScore:int;
         private var gameRawGoods:Number;
-        private var gameReplay:Vector.<ReplayNote>;
+        private var gameReplay:Array;
 
         /** Contains a list of scores or other flags used in replay_hit.
          * The value is either:
@@ -627,7 +627,7 @@ package game
             gameLife = 50;
             gameScore = 0;
             gameRawGoods = 0;
-            gameReplay = new Vector.<ReplayNote>;
+            gameReplay = [];
             gameReplayHit = [];
 
             binReplayNotes = [];

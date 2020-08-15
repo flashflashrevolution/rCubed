@@ -37,7 +37,7 @@ package classes.replay
         public var miss:Number;
         public var boo:Number;
         public var maxcombo:Number;
-        public var replay:Vector.<ReplayNote>;
+        public var replay:Array;
         public var timestamp:Number;
 
         public function Replay(id:Number, doLoad:Boolean = false)
@@ -172,7 +172,7 @@ package classes.replay
 
             //- Frames
             var tempReplay:String = data.replayframes;
-            replay = new <ReplayNote>[];
+            replay = [];
 
             //- Clean up
             // Legacy Replay Format ((LDUR),(FRAME)|), Handled in the Velo Converter
@@ -220,7 +220,7 @@ package classes.replay
             this.settings = data.settings;
 
             //- Replay
-            this.replay = new <ReplayNote>[];
+            this.replay = [];
             for each (var item:Object in data.rep_boos)
                 this.replay.push(new ReplayNote(item["d"], -2, item["t"]));
 

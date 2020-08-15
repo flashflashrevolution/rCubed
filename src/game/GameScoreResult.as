@@ -49,7 +49,7 @@ package game
         }
 
         // Replay v3
-        public var replay:Vector.<ReplayNote>;
+        public var replay:Array;
         public var replay_hit:Array;
 
         // Binary Replays (aka Replay v4)

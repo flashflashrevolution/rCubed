@@ -36,7 +36,7 @@ package classes
             this.settings.viewOffset = 0;
             this.settings.judgeOffset = 0;
 
-            this.replay = new <ReplayNote>[];
+            this.replay = [];
 
             var genNotes:Array = [];
             for (var i:int = 0; i < this.maxcombo; i++)
