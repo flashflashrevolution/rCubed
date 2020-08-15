@@ -44,6 +44,7 @@ package game
     import assets.menu.icons.fa.iconPhoto;
     import assets.menu.icons.fa.iconVideo;
     import assets.menu.icons.fa.iconRandom;
+    import assets.menu.icons.fa.iconRight;
 
     public class GameResults extends MenuPanel
     {
@@ -81,7 +82,7 @@ package game
 
         // Graph
         private var graphType:int = 0;
-        private var graphToggle:BoxButton;
+        private var graphToggle:BoxIcon;
         private var activeGraph:GraphBase;
         private var graphDraw:Sprite;
         private var graphOverlay:Sprite;
@@ -262,9 +263,11 @@ package game
             graphOverlay.mouseEnabled = false;
             this.addChild(graphOverlay);
 
-            graphToggle = new BoxButton(17, 19, "&gt;");
+            graphToggle = new BoxIcon(16, 18, new iconRight(), true, false);
             graphToggle.x = 10;
-            graphToggle.y = 297;
+            graphToggle.y = 298;
+            graphToggle.padding = 6;
+            graphToggle.setHoverText(_lang.string("result_next_graph_type"), "right");
             graphToggle.addEventListener(MouseEvent.CLICK, eventHandler);
             this.addChild(graphToggle);
 

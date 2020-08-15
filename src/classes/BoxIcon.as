@@ -13,11 +13,12 @@ package classes
     {
         private var _icon:UIIcon;
         private var _enabled:Boolean = true;
+        private var _iconPadding:int = 11;
 
         private var _hoverText:String;
         private var _hoverPosition:String = "top";
         private var _hoverSprite:MouseTooltip;
-        private var _hoverTimer:Timer = new Timer(650, 1);
+        private var _hoverTimer:Timer = new Timer(500, 1);
 
         public function BoxIcon(width:Number, height:Number, icon:Sprite, useHover:Boolean = true, useGradient:Boolean = false)
         {
@@ -26,7 +27,7 @@ package classes
             //- Add Icon
             _icon = new UIIcon(this, icon, width / 2 + 1, height / 2 + 1);
             _icon.icon.transform.colorTransform = new ColorTransform(0.88, 0.99, 1);
-            _icon.setSize(width - 11, height - 11);
+            _icon.setSize(width - _iconPadding, height - _iconPadding);
 
             //- Set Defaults
             this.mouseEnabled = true;
@@ -139,15 +140,21 @@ package classes
 
         ////////////////////////////////////////////////////////////////////////
         //- Getters / Setters
+        public function set padding(value:int):void
+        {
+            _iconPadding = value;
+            _icon.setSize(width - _iconPadding, height - _iconPadding);
+        }
+
         override public function set width(value:Number):void
         {
-            _icon.setSize(value - 11, height - 11);
+            _icon.setSize(value - _iconPadding, height - _iconPadding);
             super.width = value;
         }
 
         override public function set height(value:Number):void
         {
-            _icon.setSize(width - 11, value - 11);
+            _icon.setSize(width - _iconPadding, value - _iconPadding);
             super.height = value;
         }
 
