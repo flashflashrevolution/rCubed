@@ -18,7 +18,6 @@ package
     import flash.events.KeyboardEvent;
     import flash.events.MouseEvent;
     import flash.events.SecurityErrorEvent;
-    import flash.net.SharedObject;
     import flash.net.URLLoader;
     import flash.net.URLRequest;
     import flash.net.URLRequestMethod;
@@ -99,6 +98,8 @@ package
 
                     function displayAvatarComplete(e:Event):void
                     {
+                        avatarLoader.contentLoaderInfo.removeEventListener(Event.COMPLETE, displayAvatarComplete);
+
                         var userAvatar:DisplayObject = avatarLoader;
                         if (userAvatar && userAvatar.height > 0 && userAvatar.width > 0)
                         {
@@ -396,47 +397,43 @@ package
 
         public function saveLoginDetails(saveLogin:Boolean = false, session:String = ""):void
         {
-            var gameSave:SharedObject = SharedObject.getLocal(Constant.LOCAL_SO_NAME);
             if (saveLogin && session != "")
             {
-                gameSave.data.uUsername = Crypt.Encode(input_user.text);
-                gameSave.data.uSessionToken = Crypt.Encode(session);
+                LocalStore.setVariable("uUsername", Crypt.Encode(input_user.text));
+                LocalStore.setVariable("uSessionToken", Crypt.Encode(session));
             }
             else
             {
-                try
-                {
-                    delete gameSave.data.uPassword;
-                    delete gameSave.data.uUsername;
-                    delete gameSave.data.uSessionToken;
-                    delete gameSave.data.uAvatar;
+                LocalStore.deleteVariable("uPassword");
+                LocalStore.deleteVariable("uUsername");
+                LocalStore.deleteVariable("uSessionToken");
+                LocalStore.deleteVariable("uAvatar");
 
-                    gameSave.flush();
-                }
-                catch (e:Error)
-                {
-
-                }
+                LocalStore.flush();
             }
         }
 
         public function loadLoginDetails():Object
         {
-            var gameSave:SharedObject = SharedObject.getLocal(Constant.LOCAL_SO_NAME);
             var out:Object = {"state": STORED_NONE};
 
-            if (gameSave.data.uSessionToken != null)
+            var username:String = LocalStore.getVariable("uUsername", '');
+            var sessionToken:String = LocalStore.getVariable("uSessionToken", '');
+
+            if (sessionToken != '')
             {
                 out["state"] = STORED_SESSION;
-                out["username"] = (gameSave.data.uUsername ? Crypt.Decode(gameSave.data.uUsername) : '');
-                out["token"] = (gameSave.data.uSessionToken ? Crypt.Decode(gameSave.data.uSessionToken) : '');
-                out["avatar"] = (gameSave.data.uAvatar ? gameSave.data.uAvatar : null);
+                out["username"] = Crypt.Decode(username);
+                out["token"] = Crypt.Decode(sessionToken);
+                out["avatar"] = LocalStore.getVariable("uAvatar", null);
             }
-            else if (gameSave.data.uUsername != null)
+            else if (username != '')
             {
+                var password:String = LocalStore.getVariable("uPassword", '');
+
                 out["state"] = STORED_PASSWORD;
-                out["username"] = (gameSave.data.uUsername ? Crypt.Decode(gameSave.data.uUsername) : '');
-                out["password"] = (gameSave.data.uPassword ? Crypt.Decode(gameSave.data.uPassword) : '');
+                out["username"] = Crypt.Decode(username);
+                out["password"] = Crypt.Decode(password);
             }
 
             return out;
