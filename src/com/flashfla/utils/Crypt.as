@@ -15,7 +15,7 @@ package com.flashfla.utils
          */
         public static function Encode(src:String):String
         {
-            var output:String = new String("");
+            var output:String = "";
             var gLength:Number = Math.ceil(Math.random() * 8) + 1;
 
             // Base64 Encode Input
@@ -46,8 +46,11 @@ package com.flashfla.utils
          */
         public static function Decode(src:String):String
         {
-            var input:String = new String("");
-            var output:String = new String("");
+            if (src.length == 0)
+                return "";
+
+            var input:String = "";
+            var output:String = "";
 
             // Decode
             input = B64Decode(src);
@@ -77,7 +80,7 @@ package com.flashfla.utils
         public static function B64Encode(src:String):String
         {
             var i:Number = 0;
-            var output:String = new String("");
+            var output:String = "";
             var chr1:Number, chr2:Number, chr3:Number;
             var enc1:Number, enc2:Number, enc3:Number, enc4:Number;
 
@@ -106,7 +109,7 @@ package com.flashfla.utils
         public static function B64Decode(src:String):String
         {
             var i:Number = 0;
-            var output:String = new String("");
+            var output:String = "";
             var chr1:Number, chr2:Number, chr3:Number;
             var enc1:Number, enc2:Number, enc3:Number, enc4:Number;
             while (i < src.length)
@@ -149,7 +152,7 @@ package com.flashfla.utils
          */
         public static function toCharCode(s:String):String
         {
-            var output:String = new String("");
+            var output:String = "";
             for (var c:int = 0; c < s.length; c++)
             {
                 output += s.charCodeAt(c) + ",";
