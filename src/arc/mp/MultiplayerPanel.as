@@ -57,6 +57,14 @@ package arc.mp
                 connection.mode = Multiplayer.GAME_R3;
                 connection.connect();
             }
+            else
+            {
+                textLogin = new Text("Please Login or Register");
+                textLogin.x = Main.GAME_WIDTH / 2 - textLogin.width / 2;
+                textLogin.y = Main.GAME_HEIGHT / 2 - textLogin.height * 3 / 2;
+                addChild(textLogin);
+                return;
+            }
 
             Style.fontSize = ArcGlobals.instance.configMPSize;
 
@@ -185,15 +193,6 @@ package arc.mp
                 }
             });
 
-            if (GlobalVariables.instance.activeUser.isGuest || GlobalVariables.instance.activeUser.id == 2)
-            {
-                textLogin = new Text("Please Login or Register");
-                textLogin.x = Main.GAME_WIDTH / 2 - textLogin.width / 2;
-                textLogin.y = Main.GAME_HEIGHT / 2 - textLogin.height * 3 / 2;
-                addChild(textLogin);
-                return;
-            }
-
             buttonMP = new BoxButton(130, 25, "Connect");
             buttonMP.x = 5;
             buttonMP.y = Main.GAME_HEIGHT - 30;
@@ -271,7 +270,6 @@ package arc.mp
                 }
             });
         }
-
 
         public function buildContextMenu():void
         {
@@ -405,7 +403,8 @@ package arc.mp
             }
             if (textLogin != null)
                 textLogin.visible = show;
-            window.visible = show;
+            if (window != null)
+                window.visible = show;
         }
 
         private function foreachroom(foreach:Function):void
@@ -463,14 +462,20 @@ package arc.mp
 
         private function showThrobber():void
         {
-            throbber.visible = true;
-            throbber.start();
+            if (throbber != null)
+            {
+                throbber.visible = true;
+                throbber.start();
+            }
         }
 
         private function hideThrobber():void
         {
-            throbber.visible = false;
-            throbber.stop();
+            if (throbber != null)
+            {
+                throbber.visible = false;
+                throbber.stop();
+            }
         }
     }
 }
