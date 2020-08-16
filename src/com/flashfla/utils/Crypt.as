@@ -144,7 +144,7 @@ package com.flashfla.utils
                 arr[i] = src.charCodeAt(i) ^ ((mL + i * 4) % 255);
             }
 
-            return String.fromCharCode.apply(String.fromCharCode, arr);
+            return String.fromCharCode.apply(null, arr);
         }
 
         /**
