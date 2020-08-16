@@ -135,16 +135,16 @@ package com.flashfla.utils
          */
         public static function ROT255(src:String):String
         {
-            var mL:Number = src.length;
-            var output:String = "";
+            const mL:int = src.length;
+            var arr:Array = new Array(mL);
 
             // 255 XOR Wrap
-            for (var i:uint = 0; i < mL; i++)
+            for (var i:uint = 0; i < mL; ++i)
             {
-                output += String.fromCharCode(src.charCodeAt(i) ^ ((255 + (mL + i * 4)) % 255));
+                arr[i] = src.charCodeAt(i) ^ ((mL + i * 4) % 255);
             }
 
-            return output;
+            return String.fromCharCode.apply(String.fromCharCode, arr);
         }
 
         /**
