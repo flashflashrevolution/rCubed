@@ -160,6 +160,7 @@ package popups
             }
             else if (e.target.action == "reload_engine")
             {
+                MultiplayerSingleton.destroyInstance();
                 Flags.VALUES = {};
                 _gvars.gameMain.switchTo("none");
             }
