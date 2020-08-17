@@ -431,8 +431,7 @@ package game
                 navRandomSong.enabled = false;
 
             // Skill rating
-            var raw_goods:Number = zRanking.getRawGoods(result);
-            var song_weight:Number = zRanking.getSongWeight(song_entry, result);
+            var song_weight:Number = SkillRating.getSongWeight(song_entry, result);
             if (result.last_note > 0)
                 song_weight = 0;
 
@@ -456,7 +455,7 @@ package game
             resultsDisplay.result_rawscore.htmlText = "<B>" + NumberUtil.numberFormat(result.score) + "</B>";
             resultsDisplay.result_total.htmlText = "<B>" + NumberUtil.numberFormat(scoreTotal) + "</B>";
             resultsDisplay.result_credits.htmlText = "<B>" + scoreCredits + "</B>";
-            resultsDisplay.result_rawgoods.htmlText = "<B>" + NumberUtil.numberFormat(raw_goods, 1, true) + "</B>";
+            resultsDisplay.result_rawgoods.htmlText = "<B>" + NumberUtil.numberFormat(result.raw_goods, 1, true) + "</B>";
             resultsDisplay.result_equivalency.htmlText = "<B>" + NumberUtil.numberFormat(song_weight, 2, true) + "</B>";
 
             // Align Rating Star to Song Title

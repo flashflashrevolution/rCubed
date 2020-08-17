@@ -1,7 +1,7 @@
 package game
 {
 
-    public class zRanking
+    public class SkillRating
     {
 
         public static const ALPHA:Number = 9.9750396740034;
@@ -16,7 +16,7 @@ package game
 
         static public function getSongWeight(song:Object, result:GameScoreResult):Number
         {
-            var rawgoods:Number = getRawGoods(result);
+            var rawgoods:Number = result.raw_goods;
             var songweight:Number = 0;
             var delta:Number = D1 + D2 * song.difficulty + D3 * Math.pow(song.difficulty, 2) + D4 * Math.pow(song.difficulty, 3) + D5 * Math.pow(song.difficulty, 4);
             if (delta - rawgoods * LAMBDA > 0)
@@ -28,7 +28,7 @@ package game
             return songweight;
         }
 
-        static public function getRawGoods(result:GameScoreResult):Number
+        static public function getRawGoods(result:Object):Number
         {
             return (result.good) + (result.average * 1.8) + (result.miss * 2.4) + (result.boo * 0.2);
         }

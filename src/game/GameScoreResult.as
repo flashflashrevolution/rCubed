@@ -31,6 +31,10 @@ package game
         public var max_combo:int = 0;
         public var score:int = 0;
 
+        public function get raw_goods():Number
+        {
+            return good + (average * 1.8) + (miss * 2.4) + (boo * 0.2);
+        }
         public var restarts:int;
         public var restart_stats:Object;
         public var last_note:int;
