@@ -360,7 +360,7 @@ package game
                         result.replay_hit.push(tempResult.replay_hit[y]);
 
                     // Score Total
-                    scoreTotal += tempResult.total;
+                    scoreTotal += tempResult.score_total;
                 }
                 result.update(_gvars);
 
@@ -392,8 +392,8 @@ package game
                 if (song_entry.stepauthor != "")
                     songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_stepauthor"), {"value": song_entry.stepauthorwithurl}));
 
-                displayTime = result.endtime;
-                scoreTotal = result.total;
+                displayTime = result.end_time;
+                scoreTotal = result.score_total;
 
                 // Star
                 navRating.visible = false;
@@ -625,13 +625,13 @@ package game
          * passes in the site response post vars, not GameScoreResult.
          * @param result Post Vars
          */
-        private function updateJudgeOffset(result:Object):void
+        private function updateJudgeOffset(result:GameScoreResult):void
         {
             if (_gvars.activeUser.AUTO_JUDGE_OFFSET && // Auto Judge Offset enabled 
                 (result.amazing + result.perfect + result.good + result.average >= 50) && // Accuracy data is reliable
                 result.accuracy !== 0)
             {
-                _gvars.activeUser.JUDGE_OFFSET = result.accuracy.toFixed(3);
+                _gvars.activeUser.JUDGE_OFFSET = Number(result.accuracy_frames.toFixed(3));
                 // Save settings
                 _gvars.activeUser.saveLocal();
                 _gvars.activeUser.save();
@@ -969,8 +969,7 @@ package game
             _loader.postData = ObjectUtil.clone(scoreSender);
             _loader.rank_index = _gvars.gameIndex;
             _loader.song = gameResult.song_entry;
-            _loader.resultsString = (scoreSender.amazing + scoreSender.perfect) + "-" + scoreSender.good + "-" + scoreSender.average + "-" + scoreSender.miss + "-" + scoreSender.boo + "-" + scoreSender.max_combo;
-            _loader.resultsTotal = ((scoreSender.amazing + scoreSender.perfect) * 500) + (scoreSender.good * 250) + (scoreSender.average * 50) + (scoreSender.max_combo * 1000) - (scoreSender.miss * 300) - (scoreSender.boo * 15) + Math.floor(scoreSender.score);
+            _loader.results = gameResult;
             _loader.load(req);
         }
 
@@ -984,6 +983,7 @@ package game
             var result:Object = e.target.postData;
             var data:Object = JSON.parse(e.target.data);
             var song:Object = e.target.song;
+            var gameResult:GameScoreResult = e.target.results;
             var totalScore:int = e.target.resultsTotal;
 
             if (data.result == 0)
@@ -1027,19 +1027,19 @@ package game
                     }
 
                     // Check raw score vs level ranks and update.
-                    if (_gvars.activeUser.level_ranks[song.level] == null || result.score > _gvars.activeUser.level_ranks[song.level].score)
+                    if (_gvars.activeUser.level_ranks[song.level] == null || gameResult.score > _gvars.activeUser.level_ranks[song.level].score)
                     {
                         _gvars.activeUser.level_ranks[song.level] = {"genre": song.genre,
                                 "rank": data.new_ranking,
-                                "score": result.score,
-                                "results": e.target.resultsString,
-                                "perfect": result.amazing + result.perfect,
-                                "good": result.good,
-                                "average": result.average,
-                                "miss": result.miss,
-                                "boo": result.boo,
-                                "maxcombo": result.max_combo,
-                                "rawscore": result.score};
+                                "score": gameResult.score,
+                                "results": gameResult.pa_string + "-" + gameResult.max_combo,
+                                "perfect": gameResult.amazing + gameResult.perfect,
+                                "good": gameResult.good,
+                                "average": gameResult.average,
+                                "miss": gameResult.miss,
+                                "boo": gameResult.boo,
+                                "maxcombo": gameResult.max_combo,
+                                "rawscore": gameResult.score};
                     }
 
                     _gvars.songResultRanks[e.target.rank_index] = {old_ranking: data.old_ranking, new_ranking: data.new_ranking};
@@ -1057,19 +1057,17 @@ package game
                     resultsDisplay.result_rank.htmlText = "Game mods enabled!";
                 }
 
-                _gvars.activeUser.grandTotal += Math.max(0, totalScore);
+                _gvars.activeUser.grandTotal += gameResult.score_total;
                 _gvars.activeUser.credits += gameResult.credits;
 
                 Playlist.instanceCanon.updateSongAccess();
 
                 // Update Judge Offset
-                updateJudgeOffset(result);
+                updateJudgeOffset(gameResult);
 
                 // Display Popup Queue
                 if (resultsDisplay != null)
-                {
                     _gvars.gameMain.displayPopupQueue();
-                }
             }
             else
             {
@@ -1113,17 +1111,17 @@ package game
             // Update Local Alt Engine Levelranks
             if (((gameResult.legacyLastRank = _avars.legacyLevelRanksGet(gameResult.song_entry)) || {score: 0}).score < gameResult.score)
             {
-                _avars.legacyLevelRanksSet(gameResult.song_entry, {score: gameResult.score,
-                        rank: 0,
-                        perfect: gameResult.amazing + gameResult.perfect,
-                        good: gameResult.good,
-                        average: gameResult.average,
-                        miss: gameResult.miss,
-                        boo: gameResult.boo,
-                        maxcombo: gameResult.max_combo,
-                        rawscore: gameResult.score,
-                        results: (gameResult.amazing + gameResult.perfect) + "-" + gameResult.good + "-" + gameResult.average + "-" + gameResult.miss + "-" + gameResult.boo + "-" + gameResult.max_combo,
-                        arrows: gameResult.song.totalNotes});
+                _avars.legacyLevelRanksSet(gameResult.song_entry, {"score": gameResult.score,
+                        "rank": 0,
+                        "perfect": gameResult.amazing + gameResult.perfect,
+                        "good": gameResult.good,
+                        "average": gameResult.average,
+                        "miss": gameResult.miss,
+                        "boo": gameResult.boo,
+                        "maxcombo": gameResult.max_combo,
+                        "rawscore": gameResult.score,
+                        "results": gameResult.pa_string + "-" + gameResult.max_combo,
+                        "arrows": gameResult.song.totalNotes});
                 _avars.legacyLevelRanksSave();
             }
 
@@ -1175,6 +1173,7 @@ package game
             _loader.postData = ObjectUtil.clone(scoreSender);
             _loader.rank_index = _gvars.gameIndex;
             _loader.song = gameResult.song_entry;
+            _loader.results = gameResult;
             _loader.load(req);
         }
 
@@ -1190,6 +1189,7 @@ package game
                 var song:Object = e.target.song;
                 var totalScore:int = e.target.resultsTotal;
                 var data:Object = JSON.parse(e.target.data);
+                var gameResult:GameScoreResult = e.target.results;
                 if (data)
                 {
                     if (data.result == 0)
@@ -1215,7 +1215,7 @@ package game
                         }
 
                         // Update Judge Offset
-                        updateJudgeOffset(result);
+                        updateJudgeOffset(gameResult);
 
                         // Display Popup Queue
                         if (resultsDisplay != null)

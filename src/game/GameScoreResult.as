@@ -42,6 +42,7 @@ package game
         public var restart_stats:Object;
         public var last_note:int;
 
+        // Accuracy
         public var accuracy:Number;
         public var accuracy_deviation:Number;
 
@@ -84,8 +85,10 @@ package game
 
         public var start_time:String;
         public var start_hash:String;
-        public var endtime:String;
-        public var songprogress:Number;
+        public var end_time:String;
+
+        /** Ratio of Song Completion: 0 -> 1 */
+        public var song_progress:Number;
         public var playtime_secs:Number;
 
         // Judge Settings
@@ -94,6 +97,10 @@ package game
         public var GAP_TIME:int = 0;
         public var judge:Array;
 
+        /**
+         * Updates variables that need to be calculated after others are set.
+         * @param _gvars GlobalVariables reference.
+         */
         public function update(_gvars:GlobalVariables):void
         {
             this.credits = Math.max(0, Math.min(Math.floor(score_total / _gvars.SCORE_PER_CREDIT), _gvars.MAX_CREDITS));
@@ -125,27 +132,45 @@ package game
             GAP_TIME = MAX_TIME - MIN_TIME;
         }
 
+        /**
+         * Gets the judge region for the given ms difference.
+         * @param time Judge Time
+         * @return Judge Region
+         */
         public function getJudgeRegion(time:int):Object
         {
             var lastJudge:Object;
 
             for each (var j:Object in judge)
-                if ((time * -1) > j.t)
+                if (time > j.t)
                     lastJudge = j;
 
             return lastJudge;
         }
 
-        public function get total():Number
+        /**
+         * Gets the total score for the result.
+         * @return
+         */
+        public function get score_total():Number
         {
-            return ((amazing + perfect) * 500) + (good * 250) + (average * 50) + (max_combo * 1000) - (miss * 300) - (boo * 15) + score;
+            return Math.max(0, ((amazing + perfect) * 500) + (good * 250) + (average * 50) + (max_combo * 1000) - (miss * 300) - (boo * 15) + score);
         }
 
+        /**
+         * Gets the PA string displayed in several places.
+         * Example: 1653-1-0-0-0
+         * @return
+         */
         public function get pa_string():String
         {
             return (amazing + perfect) + "-" + good + "-" + average + "-" + miss + "-" + boo;
         }
 
+        /**
+         * Gets a friendly screenshot path based on the song name, score, and pa string.
+         * @return
+         */
         public function get screenshot_path():String
         {
             var rateString:String = options.songRate != 1 ? " (" + options.songRate + "x Rate)" : "";

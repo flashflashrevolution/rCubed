@@ -1281,8 +1281,8 @@ package game
                 newGameResults.restarts = options.replay ? 0 : _gvars.songRestarts;
                 newGameResults.start_time = _gvars.songStartTime;
                 newGameResults.start_hash = _gvars.songStartHash;
-                newGameResults.endtime = options.replay ? TimeUtil.getFormattedDate(new Date(options.replay.timestamp * 1000)) : TimeUtil.getCurrentDate();
-                newGameResults.songprogress = (gameProgress / gameLastNoteFrame);
+                newGameResults.end_time = options.replay ? TimeUtil.getFormattedDate(new Date(options.replay.timestamp * 1000)) : TimeUtil.getCurrentDate();
+                newGameResults.song_progress = (gameProgress / gameLastNoteFrame);
                 newGameResults.playtime_secs = ((getTimer() - msStartTime) / 1000);
                 newGameResults.update(_gvars);
                 _gvars.songResults.push(newGameResults);
