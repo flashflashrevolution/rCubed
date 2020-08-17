@@ -1058,7 +1058,7 @@ package game
                 }
 
                 _gvars.activeUser.grandTotal += Math.max(0, totalScore);
-                _gvars.activeUser.credits += calculateCredits(Math.max(0, totalScore));
+                _gvars.activeUser.credits += gameResult.credits;
 
                 Playlist.instanceCanon.updateSongAccess();
 
