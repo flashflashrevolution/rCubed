@@ -27,6 +27,9 @@ package game.graph
 
         public var buttons:Sprite;
 
+        public var judgeMinTime:Text;
+        public var judgeMaxTime:Text;
+
         public var flipGraph:Boolean = false;
 
         public function GraphAccuracy(target:Sprite, overlay:Sprite, result:GameScoreResult):void
@@ -69,6 +72,14 @@ package game.graph
             flipGraphBtn.addEventListener(MouseEvent.MOUSE_DOWN, e_flipGraph);
             buttons.addChild(flipGraphBtn);
 
+            judgeMinTime = new Text((result.MIN_TIME > 0 ? "+" : "") + (result.MIN_TIME + 1) + "ms Early"); // It's greater then, so it's off by 1.
+            judgeMinTime.alpha = 0.2;
+            buttons.addChild(judgeMinTime);
+
+            judgeMaxTime = new Text((result.MAX_TIME > 0 ? "+" : "") + result.MAX_TIME + "ms Late");
+            judgeMaxTime.alpha = 0.2;
+            buttons.addChild(judgeMaxTime);
+
             // Hover Text
             hover_text = new Text("", 14);
             hover_text.align = "center";
@@ -85,6 +96,9 @@ package game.graph
         {
             graph.graphics.clear();
 
+            judgeMinTime.y = flipGraph ? graphHeight - 18 : -2;
+            judgeMaxTime.y = flipGraph ? -2 : graphHeight - 18;
+
             // Draw Region
             var region:Rectangle;
             for each (region in regions)
@@ -100,12 +114,13 @@ package game.graph
             for (var region_index:int = 0; region_index < regions.length - 1; region_index++)
             {
                 region = regions[region_index];
-                region_y = region.y + (flipGraph ? region.height : 0);
-                graph.graphics.lineStyle(1, 0x000000, 0.4);
+                region_y = region.y + (!flipGraph ? region.height : 0);
+                graph.graphics.lineStyle(1, 0x000000, 0.35);
                 graph.graphics.moveTo(0, region_y);
                 graph.graphics.lineTo(graphWidth, region_y);
             }
 
+            // Draw Crosses
             for each (var point:GraphCrossPoint in cross_points)
             {
                 if (point.index >= player_timings_length)
@@ -269,7 +284,7 @@ package game.graph
                 last_judge_y += last_judge_height;
 
                 // Flip Graph - Default Graph is Early = Bottom
-                if (!flipGraph)
+                if (flipGraph)
                 {
                     flip_graph_y -= last_judge_height;
                     judge_rect.y = flip_graph_y;
