@@ -327,7 +327,6 @@ package game
             var songSubTitle:String = "";
 
             var scoreTotal:int = 0;
-            var scoreCredits:int = 0;
 
             // Song Results
             var result:GameScoreResult;
@@ -354,6 +353,7 @@ package game
                     result.miss += tempResult.miss;
                     result.boo += tempResult.boo;
                     result.score += tempResult.score;
+                    result.credits += tempResult.credits;
 
                     // Replay Graph
                     for (var y:int = 0; y < tempResult.replay_hit.length; y++)
@@ -361,11 +361,8 @@ package game
 
                     // Score Total
                     scoreTotal += tempResult.total;
-
-                    // Credits
-                    scoreCredits += calculateCredits(tempResult.total);
                 }
-                result.updateJudge();
+                result.update(_gvars);
 
                 result.max_combo = getMaxCombo(result);
                 songTitle = sprintf(_lang.string("game_results_total_songs"), {"total": NumberUtil.numberFormat(songResults.length)});
@@ -397,7 +394,6 @@ package game
 
                 displayTime = result.endtime;
                 scoreTotal = result.total;
-                scoreCredits += calculateCredits(scoreTotal);
 
                 // Star
                 navRating.visible = false;
@@ -454,7 +450,7 @@ package game
             resultsDisplay.result_maxcombo.htmlText = "<B>" + NumberUtil.numberFormat(result.max_combo) + "</B>";
             resultsDisplay.result_rawscore.htmlText = "<B>" + NumberUtil.numberFormat(result.score) + "</B>";
             resultsDisplay.result_total.htmlText = "<B>" + NumberUtil.numberFormat(scoreTotal) + "</B>";
-            resultsDisplay.result_credits.htmlText = "<B>" + scoreCredits + "</B>";
+            resultsDisplay.result_credits.htmlText = "<B>" + NumberUtil.numberFormat(result.credits) + "</B>";
             resultsDisplay.result_rawgoods.htmlText = "<B>" + NumberUtil.numberFormat(result.raw_goods, 1, true) + "</B>";
             resultsDisplay.result_equivalency.htmlText = "<B>" + NumberUtil.numberFormat(song_weight, 2, true) + "</B>";
 
@@ -640,17 +636,6 @@ package game
                 _gvars.activeUser.saveLocal();
                 _gvars.activeUser.save();
             }
-        }
-
-        /**
-         * Calculate the credits earned for the given total score.
-         * Caps at 0 and site provided max credits.
-         * @param total_score
-         * @return int
-         */
-        private function calculateCredits(total_score:int):int
-        {
-            return Math.max(0, Math.min(Math.floor(total_score / _gvars.SCORE_PER_CREDIT), _gvars.MAX_CREDITS));
         }
 
         /**

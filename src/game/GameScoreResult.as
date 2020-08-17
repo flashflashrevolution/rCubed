@@ -35,6 +35,9 @@ package game
         {
             return good + (average * 1.8) + (miss * 2.4) + (boo * 0.2);
         }
+
+        public var credits:int = 0;
+
         public var restarts:int;
         public var restart_stats:Object;
         public var last_note:int;
@@ -91,6 +94,16 @@ package game
         public var GAP_TIME:int = 0;
         public var judge:Array;
 
+        public function update(_gvars:GlobalVariables):void
+        {
+            this.credits = Math.max(0, Math.min(Math.floor(score_total / _gvars.SCORE_PER_CREDIT), _gvars.MAX_CREDITS));
+            updateJudge();
+        }
+
+        /**
+         * Updates Judge Region Min Time, Max Time, and Total Size
+         * either from the default judge, or a custom set judge.
+         */
         public function updateJudge():void
         {
             // Get Judge Window

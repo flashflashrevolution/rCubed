@@ -1284,7 +1284,7 @@ package game
                 newGameResults.endtime = options.replay ? TimeUtil.getFormattedDate(new Date(options.replay.timestamp * 1000)) : TimeUtil.getCurrentDate();
                 newGameResults.songprogress = (gameProgress / gameLastNoteFrame);
                 newGameResults.playtime_secs = ((getTimer() - msStartTime) / 1000);
-                newGameResults.updateJudge();
+                newGameResults.update(_gvars);
                 _gvars.songResults.push(newGameResults);
             }
 
