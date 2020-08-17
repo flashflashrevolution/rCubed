@@ -181,9 +181,9 @@ package game.graph
             {
                 hover_text_id += "hit";
                 if (noteResult.timing > 0)
-                    hover_text_id += "_early";
-                if (noteResult.timing < 0)
                     hover_text_id += "_late";
+                if (noteResult.timing < 0)
+                    hover_text_id += "_early";
             }
             else
             {
@@ -192,7 +192,7 @@ package game.graph
 
             hover_text.text = sprintf(_lang.string(hover_text_id), {"note": (nearest_cross + 1),
                     "judge": _lang.string(hover_text_judge),
-                    "time": Math.abs(noteResult.timing)});
+                    "time": noteResult.timing});
 
             // Update Hover Text - Keep on Screen
             var boxWidth:int = Math.max(150, hover_text.textfield.textWidth + 10);

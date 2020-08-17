@@ -87,7 +87,7 @@ package classes.replay
 
         static public const MAGIC:String = "FBRF";
         static public const MAJOR_VER:uint = 1;
-        static public const MINOR_VER:uint = 0;
+        static public const MINOR_VER:uint = 1;
 
         public static function pack(binNotes:Array, binBoos:Array):ByteArray
         {
@@ -436,6 +436,8 @@ package classes.replay
                 replay.checksum = ba.readUnsignedInt();
                 replay.rechecksum = checksumCheck;
                 replay.replay_bin = ba;
+
+                replay.update();
             }
             catch (e:Error)
             {
@@ -479,7 +481,7 @@ package classes.replay
                 trace("song_id failed comparison", options.song.id, test.song_id);
                 return false;
             }
-            if (options.songRate != test.song_rate)
+            if (options.songRate.toFixed(3) != test.song_rate.toFixed(3))
             {
                 trace("song_rate failed comparison", options.songRate, test.song_rate);
                 return false;
@@ -537,26 +539,29 @@ package classes.replay
                 trace("rep_boos length doesn't match", binReplayBoos.length, test.rep_boos.length);
                 return false;
             }
-            compareFailure = 0;
-            for (i = 0; i < binReplayBoos.length; i++)
-            {
-                if (binReplayBoos[i]["d"] != test.rep_boos[i]["d"])
-                {
-                    trace("rep_boos[" + i + "][d]", binReplayBoos[i]["d"], "!=", test.rep_boos[i]["d"], "(" + binReplayBoos[i]["t"], test.rep_boos[i]["t"] + ")");
-                    compareFailure++;
-                }
-                if (binReplayBoos[i]["t"] != test.rep_boos[i]["t"])
-                {
-                    trace("rep_boos[" + i + "][t]", binReplayBoos[i]["t"], "!=", test.rep_boos[i]["t"], "(" + binReplayBoos[i]["d"], test.rep_boos[i]["d"] + ")");
-                    compareFailure++;
-                }
-            }
-            if (compareFailure > 0)
-            {
-                trace("rep_boos had", compareFailure, "incorrect matchings");
-                return false;
-            }
-
+            // TODO: Boos are re-ordered when packed as they can appear in any order but are
+            // unpacked in a fixed order, causing false positives.
+            /*
+               compareFailure = 0;
+               for (i = 0; i < binReplayBoos.length; i++)
+               {
+               if (binReplayBoos[i]["d"] != test.rep_boos[i]["d"])
+               {
+               trace("rep_boos[" + i + "][d]", binReplayBoos[i]["d"], "!=", test.rep_boos[i]["d"], "(" + binReplayBoos[i]["t"], test.rep_boos[i]["t"] + ")");
+               compareFailure++;
+               }
+               if (binReplayBoos[i]["t"] != test.rep_boos[i]["t"])
+               {
+               trace("rep_boos[" + i + "][t]", binReplayBoos[i]["t"], "!=", test.rep_boos[i]["t"], "(" + binReplayBoos[i]["d"], test.rep_boos[i]["d"] + ")");
+               compareFailure++;
+               }
+               }
+               if (compareFailure > 0)
+               {
+               trace("rep_boos had", compareFailure, "incorrect matchings");
+               return false;
+               }
+             */
             return true;
         }
 

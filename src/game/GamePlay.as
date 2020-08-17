@@ -808,7 +808,7 @@ package game
                             continue;
                         }
 
-                        var diffValue:int = repCurNote.POSITION - options.replay.generationReplayNotes[repCurNote.ID];
+                        var diffValue:int = options.replay.generationReplayNotes[repCurNote.ID] - repCurNote.POSITION;
                         if ((gamePosition + readAheadTime >= diffValue) || gamePosition >= diffValue)
                         {
                             judgeScorePosition(repCurNote.DIR, diffValue);
@@ -1841,7 +1841,7 @@ package game
                 commitJudge(dir, frame + note.PROGRESS - player1JudgeOffset, score);
                 noteBox.removeNote(note.ID);
                 accuracy.addValue(note.POSITION - position);
-                binReplayNotes[note.ID] = (note.POSITION - positionJudged);
+                binReplayNotes[note.ID] = (positionJudged - note.POSITION);
             }
             else
             {
