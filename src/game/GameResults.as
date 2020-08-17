@@ -299,14 +299,10 @@ package game
             resultIndex = gameIndex;
 
             // Buttons
-            if (navScreenShot)
-                navScreenShot.enabled = false;
-            if (navSaveReplay)
-                navSaveReplay.enabled = false;
-            if (navPrev)
-                navPrev.visible = false;
-            if (navNext)
-                navNext.visible = false;
+            navScreenShot.enabled = false;
+            navSaveReplay.enabled = false;
+            navPrev.visible = false;
+            navNext.visible = false;
 
             if (songResults.length > 1)
             {
@@ -403,19 +399,16 @@ package game
                     StarSelector.drawStar(navRating.graphics, 18, 0, 0, (_gvars.playerUser.getSongRating(result.song_entry.level) != 0), 0xF2D60D, 1);
                 }
 
+                if ((result.song_progress > 0.25 || result.playtime_secs >= 30) && !result.options.replay)
+                    navRating.visible = true;
+
                 // Cached Rank Index
                 songRankIndex = result.game_index + 1;
 
                 // Save Replay Button
                 navSaveReplay.enabled = true;
                 if (!canSendScore(result, true, false, true, true) || _gvars.flashvars.preview_file)
-                {
                     navSaveReplay.enabled = false;
-                }
-
-                // Display Song Rating Popup
-                if ((result.songprogress > 0.25 || result.playtime_secs >= 30) && !result.options.replay)
-                    navRating.visible = true;
             }
 
             // Save Screenshot
