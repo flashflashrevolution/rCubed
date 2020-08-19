@@ -100,6 +100,7 @@ package menu
 
         private var songItemContextMenu:ContextMenu;
         private var songItemContextMenuItem:ContextMenuItem;
+        private var songItemSongOptionsContext:ContextMenuItem;
         private var songItemRemoveQueueContext:ContextMenuItem;
 
         public static var previewMusic:SongPlayerBytes;
@@ -112,6 +113,9 @@ package menu
 
         override public function init():Boolean
         {
+            // Listen for DB Connection
+            _gvars.addEventListener(GlobalVariables.DB_CONNECT_COMPLETE, e_sqlConnectComplete);
+
             // Load Default Alt Engine
             if (_avars.legacyDefaultEngine && !Flags.VALUES[Flags.LEGACY_ENGINE_DEFAULT_LOAD])
             {
@@ -155,12 +159,10 @@ package menu
             songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_playChartPreviewContextSelect);
             songItemContextMenu.customItems.push(songItemContextMenuItem);
 
-            if (_gvars.sql_connect)
-            {
-                songItemContextMenuItem = new ContextMenuItem("Song Options");
-                songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_songOptionsContextSelect);
-                songItemContextMenu.customItems.push(songItemContextMenuItem);
-            }
+            songItemSongOptionsContext = new ContextMenuItem("Song Options");
+            songItemSongOptionsContext.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_songOptionsContextSelect);
+            songItemSongOptionsContext.visible = _gvars.sql_connect;
+            songItemContextMenu.customItems.push(songItemSongOptionsContext);
 
             songItemRemoveQueueContext = new ContextMenuItem("Remove from Queue");
             songItemRemoveQueueContext.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_removeFromQueueContextSelect);
@@ -340,6 +342,8 @@ package menu
 
         override public function stageRemove():void
         {
+            _gvars.removeEventListener(GlobalVariables.DB_CONNECT_COMPLETE, e_sqlConnectComplete);
+
             //- Remove Listeners
             if (stage)
                 stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyHandler);
@@ -1718,6 +1722,16 @@ package menu
         //******************************************************************************************//
         // Event Handlers
         //******************************************************************************************//
+
+        /**
+         * Called when the SQL Local DB is connected.
+         * @param event
+         */
+        private function e_sqlConnectComplete(event:Object):void
+        {
+            _gvars.removeEventListener(GlobalVariables.DB_CONNECT_COMPLETE, e_sqlConnectComplete);
+            songItemSongOptionsContext.visible = _gvars.sql_connect; // Race Condition
+        }
 
         /**
          * General Click Handler for multiple objects.

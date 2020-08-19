@@ -50,6 +50,8 @@ package
         private var _loader:DynamicURLLoader;
 
         ///- Constants
+        public static const DB_CONNECT_COMPLETE:String = "DBLoadComplete";
+        public static const DB_CONNECT_ERROR:String = "DBLoadError";
         public static const LOAD_COMPLETE:String = "LoadComplete";
         public static const LOAD_ERROR:String = "LoadError";
         public static const HIGHSCORES_LOAD_COMPLETE:String = "HighscoresLoadComplete";
@@ -158,22 +160,24 @@ package
             sql_conn.addEventListener(SQLErrorEvent.ERROR, sql_errorHandler);
 
             sql_conn.openAsync(sql_db);
+        }
 
-            function sql_openHandler(event:SQLEvent):void
-            {
-                sql_connect = true;
+        private function sql_openHandler(event:SQLEvent):void
+        {
+            sql_connect = true;
 
-                trace("Database was connected successfully");
+            trace("Database was connected successfully");
 
-                SQLQueries.refreshStatements(sql_conn);
-            }
+            SQLQueries.refreshStatements(sql_conn);
+            this.dispatchEvent(new Event(DB_CONNECT_COMPLETE));
+        }
 
-            function sql_errorHandler(event:SQLErrorEvent):void
-            {
-                sql_connect = false;
-                trace("Error message:", event.error.message);
-                trace("Details:", event.error.details);
-            }
+        private function sql_errorHandler(event:SQLErrorEvent):void
+        {
+            sql_connect = false;
+            trace("Error message:", event.error.message);
+            trace("Details:", event.error.details);
+            this.dispatchEvent(new Event(DB_CONNECT_ERROR));
         }
 
         public function websocketPortNumber(type:String):uint
