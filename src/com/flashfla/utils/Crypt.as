@@ -28,7 +28,7 @@ package com.flashfla.utils
             }
 
             // Add the total characters to the beginning, and flip/reverse the string.
-            output = flipString(gLength + output);
+            // output = flipString(gLength + output);
 
             // Add garbage chars every 4 characters
             for (var g:int = 4; g < output.length; g += 5)
@@ -63,7 +63,7 @@ package com.flashfla.utils
             }
 
             // Flip the string
-            output = flipString(output);
+            // output = flipString(output);
 
             // Rip garbage data
             output = output.substr(1, (output.length - Number(output.charAt(0)) - 1));
@@ -174,7 +174,7 @@ package com.flashfla.utils
          */
         private static function flipString(s:String):String
         {
-            return s.split().reverse().join("");
+            return s.split("").reverse().join("");
         }
     }
 }
