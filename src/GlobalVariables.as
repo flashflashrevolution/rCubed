@@ -136,7 +136,12 @@ package
         {
             // Clean Up Possible Connection
             if (sql_conn != null && sql_connect)
+            {
+                sql_conn.removeEventListener(SQLEvent.OPEN, sql_openHandler);
+                sql_conn.removeEventListener(SQLErrorEvent.ERROR, sql_openErrorHandler);
+                sql_conn.removeEventListener(SQLErrorEvent.ERROR, sql_errorHandler);
                 sql_conn.close();
+            }
 
             // DB Name
             var sql_name:String = "dbinfo/" + (activeUser != null && activeUser.id > 0 ? activeUser.id : "0") + "_info.db";
@@ -157,13 +162,16 @@ package
             // Create Connection
             sql_conn = new SQLConnection();
             sql_conn.addEventListener(SQLEvent.OPEN, sql_openHandler);
-            sql_conn.addEventListener(SQLErrorEvent.ERROR, sql_errorHandler);
+            sql_conn.addEventListener(SQLErrorEvent.ERROR, sql_openErrorHandler);
 
             sql_conn.openAsync(sql_db);
         }
 
         private function sql_openHandler(event:SQLEvent):void
         {
+            sql_conn.removeEventListener(SQLEvent.OPEN, sql_openHandler);
+            sql_conn.removeEventListener(SQLErrorEvent.ERROR, sql_openErrorHandler);
+            sql_conn.addEventListener(SQLErrorEvent.ERROR, sql_errorHandler);
             sql_connect = true;
 
             trace("Database was connected successfully");
@@ -172,12 +180,24 @@ package
             this.dispatchEvent(new Event(DB_CONNECT_COMPLETE));
         }
 
-        private function sql_errorHandler(event:SQLErrorEvent):void
+        private function sql_openErrorHandler(event:SQLErrorEvent):void
         {
+            sql_conn.removeEventListener(SQLEvent.OPEN, sql_openHandler);
+            sql_conn.removeEventListener(SQLErrorEvent.ERROR, sql_openErrorHandler);
             sql_connect = false;
+
+            trace("Database failed to connect!");
             trace("Error message:", event.error.message);
             trace("Details:", event.error.details);
+
             this.dispatchEvent(new Event(DB_CONNECT_ERROR));
+        }
+
+        private function sql_errorHandler(event:SQLErrorEvent):void
+        {
+            trace("SQL Execution Error:");
+            trace("Error message:", event.error.message);
+            trace("Details:", event.error.details);
         }
 
         public function websocketPortNumber(type:String):uint
