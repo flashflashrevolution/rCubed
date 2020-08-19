@@ -5,10 +5,7 @@ package
     public class LocalStore
     {
         /** Local Shared Object, this is saved/flushed automatically when the application closes. */
-        private static var SO_OBJECT:SharedObject;
-        {
-            SO_OBJECT = SharedObject.getLocal(Constant.LOCAL_SO_NAME);
-        }
+        private static var SO_OBJECT:SharedObject = SharedObject.getLocal(Constant.LOCAL_SO_NAME);
 
         /**
          * Returns a top-level cloned object of all SharedObject variables.
@@ -42,7 +39,7 @@ package
          * Sets a value into the local store.
          * @param key Variable Key
          * @param value Value
-         * @param minSize Minimum Local Store Size
+         * @param minDiskSize Minimum Local Store Size
          */
         public static function setVariable(key:String, value:*, minDiskSize:int = 0):void
         {
@@ -50,23 +47,32 @@ package
 
             if (minDiskSize > 0)
             {
-                try
-                {
-                    SO_OBJECT.flush(minDiskSize);
-                }
-                catch (e:Error)
-                {
-                }
+                flush(minDiskSize);
             }
         }
 
         /**
-         * Deletes a varaible from the local store.
+         * Deletes a variable from the local store.
          * @param key Variable Key
          */
         public static function deleteVariable(key:String):void
         {
             delete SO_OBJECT.data[key];
+        }
+
+        /**
+         * Writes shared object to file.
+         * @param minDiskSize Minimum Local Store Size
+         */
+        public static function flush(minDiskSize:int = 0):void
+        {
+            try
+            {
+                SO_OBJECT.flush(minDiskSize);
+            }
+            catch (e:Error)
+            {
+            }
         }
     }
 }
