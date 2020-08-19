@@ -179,6 +179,17 @@ package game
         {
             options = _gvars.options;
             song = options.song;
+            if (!options.isEditor && song.chart.Notes.length == 0)
+            {
+                _gvars.gameMain.addAlert("Chart has no notes, returning to main menu...", 120, Alert.RED);
+                var screen:int = _gvars.activeUser.startUpScreen;
+                if (!_gvars.activeUser.isGuest && (screen == 0 || screen == 1) && !MultiplayerSingleton.getInstance().connection.connected)
+                {
+                    MultiplayerSingleton.getInstance().connection.connect();
+                }
+                switchTo(Main.GAME_MENU_PANEL);
+                return false;
+            }
 
             // --- Per Song Options - Super hacky, but actually solid
             if (_gvars.sql_connect && !options.isEditor && !options.replay)
@@ -435,7 +446,7 @@ package game
             noteBox.position();
             this.addChild(noteBox);
 
-            if (MultiplayerSingleton.getInstance().connection.connected && !MultiplayerSingleton.getInstance().isInRoom())
+            if (!options.isEditor && MultiplayerSingleton.getInstance().connection.connected && !MultiplayerSingleton.getInstance().isInRoom())
             {
                 var isInSoloMode:Boolean = true;
                 MultiplayerSingleton.getInstance().connection.disconnect(isInSoloMode);
@@ -1374,7 +1385,7 @@ package game
             GAME_STATE = GAME_DISPOSE;
 
             var screen:int = _gvars.activeUser.startUpScreen;
-            if (screen == 0 || screen == 1)
+            if (!_gvars.activeUser.isGuest && (screen == 0 || screen == 1) && !MultiplayerSingleton.getInstance().connection.connected)
             {
                 MultiplayerSingleton.getInstance().connection.connect();
             }
