@@ -28,6 +28,10 @@
                 "value": false
             },
             {
+                "name": "CONFIG::vsync",
+                "value": true
+            },
+            {
                 "name": "CONFIG::timeStamp",
                 "value": "\"9999-12-31\""
             },

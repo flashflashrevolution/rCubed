@@ -35,7 +35,6 @@ package
     import flash.events.Event;
     import flash.events.KeyboardEvent;
     import flash.events.MouseEvent;
-    import flash.events.VsyncStateChangeAvailabilityEvent;
     import flash.system.Capabilities;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
@@ -50,6 +49,11 @@ package
     import popups.PopupHelp;
     import popups.PopupOptions;
     import popups.PopupReplayHistory;
+
+    CONFIG::vsync
+    {
+        import flash.events.VsyncStateChangeAvailabilityEvent;
+    }
 
     public class Main extends MenuPanel
     {
@@ -107,7 +111,10 @@ package
             if (stage)
             {
                 //- Set up vSync
-                stage.addEventListener(VsyncStateChangeAvailabilityEvent.VSYNC_STATE_CHANGE_AVAILABILITY, onVsyncStateChangeAvailability);
+                CONFIG::vsync
+                {
+                    stage.addEventListener(VsyncStateChangeAvailabilityEvent.VSYNC_STATE_CHANGE_AVAILABILITY, onVsyncStateChangeAvailability);
+                }
 
                 gameInit();
             }
@@ -117,6 +124,7 @@ package
             }
         }
 
+        CONFIG::vsync
         public function onVsyncStateChangeAvailability(event:VsyncStateChangeAvailabilityEvent):void
         {
             if (event.available)
