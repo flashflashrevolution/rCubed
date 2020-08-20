@@ -1,7 +1,6 @@
 package classes
 {
     import classes.replay.Replay;
-    import classes.replay.ReplayNote;
 
     public class SongPreview extends Replay
     {
