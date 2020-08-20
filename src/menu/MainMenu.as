@@ -249,7 +249,7 @@ package menu
                 menuMusicControls.x = 7;
                 menuMusicControls.y = -1;
 
-                var spr_play:BoxIcon = new BoxIcon(25, 25, new iconPlay(), false, true);
+                var spr_play:BoxIcon = new BoxIcon(25, 25, new iconPlay());
                 spr_play.x = 5;
                 spr_play.y = 5;
                 spr_play.setHoverText("Play", "bottom");
@@ -262,7 +262,7 @@ package menu
                 });
                 menuMusicControls.addChild(spr_play);
 
-                var spr_pause:BoxIcon = new BoxIcon(25, 25, new iconPause(), false, true);
+                var spr_pause:BoxIcon = new BoxIcon(25, 25, new iconPause());
                 spr_pause.x = 35;
                 spr_pause.y = 5;
                 spr_pause.setHoverText("Pause", "bottom");
@@ -275,7 +275,7 @@ package menu
                 });
                 menuMusicControls.addChild(spr_pause);
 
-                var spr_stop:BoxIcon = new BoxIcon(25, 25, new iconStop(), false, true);
+                var spr_stop:BoxIcon = new BoxIcon(25, 25, new iconStop());
                 spr_stop.x = 65;
                 spr_stop.y = 5;
                 spr_stop.setHoverText("Stop", "bottom");
@@ -288,7 +288,7 @@ package menu
                 });
                 menuMusicControls.addChild(spr_stop);
 
-                var spr_delete:BoxIcon = new BoxIcon(25, 25, new iconDelete(), false, true);
+                var spr_delete:BoxIcon = new BoxIcon(25, 25, new iconDelete());
                 spr_delete.x = 95;
                 spr_delete.y = 5;
                 spr_delete.setHoverText("Remove", "bottom");

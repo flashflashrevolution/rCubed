@@ -265,7 +265,7 @@ package game
             graphOverlay.mouseEnabled = false;
             this.addChild(graphOverlay);
 
-            graphToggle = new BoxIcon(16, 18, new iconRight(), true, false);
+            graphToggle = new BoxIcon(16, 18, new iconRight());
             graphToggle.x = 10;
             graphToggle.y = 298;
             graphToggle.padding = 6;

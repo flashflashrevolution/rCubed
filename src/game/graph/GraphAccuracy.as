@@ -64,7 +64,7 @@ package game.graph
             buttons.x = overlay.x;
             buttons.y = overlay.y;
 
-            var flipGraphBtn:BoxIcon = new BoxIcon(16, 18, new iconSmallF(), true, false);
+            var flipGraphBtn:BoxIcon = new BoxIcon(16, 18, new iconSmallF());
             flipGraphBtn.x = -20;
             flipGraphBtn.y = 98;
             flipGraphBtn.padding = 6;
