@@ -15,6 +15,7 @@ package classes
         private var _enabled:Boolean = true;
         private var _iconPadding:int = 11;
 
+        private var _hoverDisplayed:Boolean = false;
         private var _hoverText:String;
         private var _hoverPosition:String = "top";
         private var _hoverSprite:MouseTooltip;
@@ -26,7 +27,7 @@ package classes
 
             //- Add Icon
             _icon = new UIIcon(this, icon, width / 2 + 1, height / 2 + 1);
-            _icon.icon.transform.colorTransform = new ColorTransform(0.88, 0.99, 1);
+            //_icon.icon.transform.colorTransform = new ColorTransform(0.88, 0.99, 1);
             _icon.setSize(width - _iconPadding, height - _iconPadding);
 
             //- Set Defaults
@@ -50,22 +51,54 @@ package classes
 
         public function setHoverText(hover_text:String, position:String = "top"):void
         {
-            _hoverText = hover_text;
+            if (hover_text != _hoverText)
+            {
+                // No previous text, add Roll Over Event
+                if (_hoverText == null)
+                {
+                    this.addEventListener(MouseEvent.ROLL_OVER, e_hoverRollOver);
+                }
+                // Previous Text, clean-up old.
+                else
+                {
+                    if (_hoverSprite)
+                    {
+                        if (_hoverSprite.parent)
+                            _hoverSprite.parent.removeChild(_hoverSprite);
+
+                        _hoverSprite = null;
+                    }
+
+                    this.removeEventListener(Event.ENTER_FRAME, e_onEnterFrame);
+                    _hoverTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
+                }
+
+                // New text is null, clear events.
+                if (hover_text == null)
+                {
+                    this.removeEventListener(MouseEvent.ROLL_OVER, e_hoverRollOver);
+                    this.removeEventListener(MouseEvent.ROLL_OUT, e_hoverRollOut);
+                    this.removeEventListener(Event.ENTER_FRAME, e_onEnterFrame);
+                    _hoverTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
+                }
+
+                _hoverText = hover_text;
+            }
             _hoverPosition = position;
 
-            this.addEventListener(MouseEvent.ROLL_OVER, e_hoverRollOver);
+            // Update Tooltip Instantly
+            if (_hoverDisplayed && _hoverText != null)
+            {
+                e_hoverTimerComplete();
+            }
         }
 
-        private function e_hoverRollOver(e:MouseEvent):void
+        private function e_hoverRollOver(e:MouseEvent = null):void
         {
             this.addEventListener(MouseEvent.ROLL_OUT, e_hoverRollOut);
 
             if (this.parent && this.parent.stage)
             {
-                if (_hoverSprite == null)
-                {
-                    _hoverSprite = new MouseTooltip(_hoverText, 300);
-                }
                 _hoverTimer.addEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
                 _hoverTimer.start();
             }
@@ -73,17 +106,23 @@ package classes
 
         private function e_hoverRollOut(e:MouseEvent):void
         {
+            _hoverDisplayed = false;
             _hoverTimer.stop();
             this.removeEventListener(MouseEvent.ROLL_OUT, e_hoverRollOut);
             this.removeEventListener(Event.ENTER_FRAME, e_onEnterFrame);
 
-            if (_hoverSprite.parent)
+            if (_hoverSprite && _hoverSprite.parent)
                 _hoverSprite.parent.removeChild(_hoverSprite);
         }
 
-        private function e_hoverTimerComplete(e:Event):void
+        private function e_hoverTimerComplete(e:Event = null):void
         {
             _hoverTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
+
+            if (_hoverSprite == null)
+            {
+                _hoverSprite = new MouseTooltip(_hoverText, 300);
+            }
 
             var placePoint:Point = new Point(width / 2, height / 2);
 
@@ -122,8 +161,13 @@ package classes
 
             if (this.parent && this.parent.stage)
             {
+                _hoverDisplayed = true;
                 this.parent.stage.addChild(_hoverSprite);
                 this.addEventListener(Event.ENTER_FRAME, e_onEnterFrame, false, 0, true);
+            }
+            else
+            {
+                _hoverDisplayed = false;
             }
         }
 
@@ -131,6 +175,7 @@ package classes
         {
             if (!this.parent || !this.parent.stage)
             {
+                _hoverDisplayed = false;
                 this.removeEventListener(Event.ENTER_FRAME, e_onEnterFrame);
 
                 if (_hoverSprite && _hoverSprite.parent)
@@ -144,6 +189,11 @@ package classes
         {
             _iconPadding = value;
             _icon.setSize(width - _iconPadding, height - _iconPadding);
+        }
+
+        public function set delay(value:int):void
+        {
+            _hoverTimer.delay = value;
         }
 
         override public function set width(value:Number):void

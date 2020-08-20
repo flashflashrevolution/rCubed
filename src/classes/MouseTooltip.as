@@ -44,7 +44,7 @@ package classes
             }
             this.graphics.clear();
             this.graphics.lineStyle(1, 0xffffff, 0.75);
-            this.graphics.beginFill(GameBackgroundColor.BG_POPUP, 1);
+            this.graphics.beginFill(GameBackgroundColor.BG_DARK, 0.95);
             this.graphics.drawRect(0, 0, msg.width + 10, msg.height + 2);
             this.graphics.endFill();
         }
