@@ -12,6 +12,7 @@ package popups
 
     import menu.MenuPanel;
     import arc.mp.MultiplayerSingleton;
+    import classes.Playlist;
 
     public class PopupContextMenu extends MenuPanel
     {
@@ -162,6 +163,7 @@ package popups
             {
                 MultiplayerSingleton.destroyInstance();
                 Flags.VALUES = {};
+                Playlist.clearCanon();
                 _gvars.gameMain.switchTo("none");
             }
             else if (e.target.action == "switch_profile")
@@ -169,7 +171,7 @@ package popups
                 MultiplayerSingleton.destroyInstance();
                 Flags.VALUES = {};
                 _gvars.playerUser.refreshUser();
-                _gvars.gameMain.switchTo("GameLoginPanel");
+                _gvars.gameMain.switchTo(Main.GAME_LOGIN_PANEL);
             }
         }
     }
