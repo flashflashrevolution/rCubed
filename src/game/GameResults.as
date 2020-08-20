@@ -484,7 +484,7 @@ package game
                 }
             }
             // Getting Rank / Unsendable Score
-            else if (!result.options.replay && gameIndex != -1)
+            else if (!result.options.replay && gameIndex != -1 && !result.user.isGuest)
             {
                 resultsDisplay.result_rank.htmlText = canSendScore(result, true, true, false, false) ? "Saving score..." : "Score not saved";
                 resultsDisplay.result_last_best.htmlText = "";
@@ -740,11 +740,12 @@ package game
                 return;
 
             // Based on target
-            if (target == navSaveReplay && navSaveReplay.enabled)
+            if (target == navSaveReplay)
             {
                 saveServerReplay();
             }
-            else if (target == navScreenShot && navScreenShot.enabled)
+
+            else if (target == navScreenShot)
             {
                 var ext:String = "";
                 if (resultIndex >= 0)
@@ -753,14 +754,17 @@ package game
                 }
                 _gvars.takeScreenShot(ext);
             }
-            else if (target == navPrev && navPrev.visible)
+
+            else if (target == navPrev)
             {
                 displayGameResult(resultIndex - 1);
             }
-            else if (target == navNext && navNext.visible)
+
+            else if (target == navNext)
             {
                 displayGameResult(resultIndex + 1);
             }
+
             else if (target == navReplay)
             {
                 var skipload:Boolean = (songResults.length == 1 && songResults[0].song && songResults[0].song.isLoaded);
@@ -780,7 +784,7 @@ package game
                 }
             }
 
-            else if (target == navRandomSong && navRandomSong.enabled)
+            else if (target == navRandomSong)
             {
                 var songList:Array = _playlist.playList;
                 var selectedSong:Object;
@@ -815,24 +819,28 @@ package game
             {
                 addPopup(Main.POPUP_OPTIONS);
             }
+
             else if (target == navHighscores)
             {
-                if (songResults[resultIndex])
+                if (resultIndex >= 0)
                 {
                     addPopup(new PopupHighscores(this, songResults[resultIndex].song_entry));
                 }
             }
+
             else if (target == navMenu)
             {
                 switchTo(Main.GAME_MENU_PANEL);
             }
+
             else if (target == navRating)
             {
-                if (songResults[resultIndex])
+                if (resultIndex >= 0)
                 {
                     _gvars.gameMain.addPopup(new PopupSongRating(this, songResults[resultIndex]["song"]));
                 }
             }
+
             else if (target == graphToggle)
             {
                 if (resultIndex >= 0)
