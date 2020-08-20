@@ -45,6 +45,7 @@ package game
     import assets.menu.icons.fa.iconVideo;
     import assets.menu.icons.fa.iconRandom;
     import assets.menu.icons.fa.iconRight;
+    import assets.menu.icons.fa.iconSmallT;
 
     public class GameResults extends MenuPanel
     {
@@ -83,6 +84,7 @@ package game
         // Graph
         private var graphType:int = 0;
         private var graphToggle:BoxIcon;
+        private var graphAccuracy:BoxIcon;
         private var activeGraph:GraphBase;
         private var graphDraw:Sprite;
         private var graphOverlay:Sprite;
@@ -270,6 +272,13 @@ package game
             graphToggle.setHoverText(_lang.string("result_next_graph_type"), "right");
             graphToggle.addEventListener(MouseEvent.CLICK, eventHandler);
             this.addChild(graphToggle);
+
+            graphAccuracy = new BoxIcon(16, 18, new iconSmallT());
+            graphAccuracy.x = 10;
+            graphAccuracy.y = 318;
+            graphAccuracy.padding = 6;
+            graphAccuracy.delay = 250;
+            this.addChild(graphAccuracy);
 
             // Display Game Result
             displayGameResult(songResults.length > 1 ? -1 : 0);
@@ -518,10 +527,11 @@ package game
 
             if (gameIndex != -1)
             {
-                var arcMenu:ContextMenu = new ContextMenu();
-                var arcItem:ContextMenuItem = new ContextMenuItem("Accuracy: " + (result.accuracy_frames.toFixed(3)) + " (±" + result.accuracy_deviation_frames.toFixed(3) + ")");
-                arcMenu.customItems.push(arcItem);
-                resultsMods.contextMenu = arcMenu;
+                var accuracyText:String = _lang.string("result_accuracy_deviation").split("\r").join(""); // Removes the \r from \r\n.
+                graphAccuracy.setHoverText(sprintf(accuracyText, {"acc_frame": result.accuracy_frames.toFixed(3),
+                        "acc_dev_frame": result.accuracy_deviation_frames.toFixed(3),
+                        "acc_ms": result.accuracy.toFixed(3),
+                        "acc_dev_ms": result.accuracy_deviation.toFixed(3)}), "right");
             }
 
             drawResultGraph(result);
@@ -547,6 +557,7 @@ package game
 
             // Graph Toggle
             graphToggle.visible = (result.song != null);
+            graphAccuracy.visible = (result.song != null);
 
             // Remove Old Graph
             if (activeGraph != null)
