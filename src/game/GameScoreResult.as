@@ -78,6 +78,9 @@ package game
 
         public function get replay_bin_encoded():String
         {
+            if (replay_bin == null || replay_bin.length == 0)
+                return null;
+
             var enc:Base64Encoder = new Base64Encoder();
             enc.encodeBytes(replay_bin);
             return ReplayPack.MAGIC + "|" + enc.toString();
