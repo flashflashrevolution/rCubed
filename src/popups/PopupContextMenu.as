@@ -161,17 +161,24 @@ package popups
             }
             else if (e.target.action == "reload_engine")
             {
-                MultiplayerSingleton.destroyInstance();
-                Flags.VALUES = {};
-                Playlist.clearCanon();
-                _gvars.gameMain.switchTo("none");
+                if (_gvars.gameMain.loadComplete)
+                {
+                    MultiplayerSingleton.destroyInstance();
+                    Flags.VALUES = {};
+                    Playlist.clearCanon();
+                    _gvars.gameMain.loadComplete = false;
+                    _gvars.gameMain.switchTo("none");
+                }
             }
             else if (e.target.action == "switch_profile")
             {
-                MultiplayerSingleton.destroyInstance();
-                Flags.VALUES = {};
-                _gvars.playerUser.refreshUser();
-                _gvars.gameMain.switchTo(Main.GAME_LOGIN_PANEL);
+                if (_gvars.gameMain.loadComplete)
+                {
+                    MultiplayerSingleton.destroyInstance();
+                    Flags.VALUES = {};
+                    _gvars.playerUser.refreshUser();
+                    _gvars.gameMain.switchTo(Main.GAME_LOGIN_PANEL);
+                }
             }
         }
     }
