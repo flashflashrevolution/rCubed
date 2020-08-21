@@ -28,6 +28,7 @@ package com.flashfla.utils
             }
 
             // Add the total characters to the beginning, and flip/reverse the string.
+            output = gLength + output;
             // output = flipString(gLength + output);
 
             // Add garbage chars every 4 characters
