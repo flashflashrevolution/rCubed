@@ -408,7 +408,7 @@ package game
                     StarSelector.drawStar(navRating.graphics, 18, 0, 0, (_gvars.playerUser.getSongRating(result.song_entry.level) != 0), 0xF2D60D, 1);
                 }
 
-                if ((result.song_progress > 0.25 || result.playtime_secs >= 30) && !result.options.replay)
+                if ((result.song_progress > 0.25 || result.playtime_secs >= 30) && !result.options.replay && !result.song_entry.engine)
                     navRating.visible = true;
 
                 // Cached Rank Index
