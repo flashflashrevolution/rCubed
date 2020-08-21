@@ -837,7 +837,7 @@ package game
             {
                 if (resultIndex >= 0)
                 {
-                    _gvars.gameMain.addPopup(new PopupSongRating(this, songResults[resultIndex]["song"]));
+                    _gvars.gameMain.addPopup(new PopupSongRating(this, songResults[resultIndex].song_entry));
                 }
             }
 
