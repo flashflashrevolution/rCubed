@@ -1,35 +1,27 @@
 package arc.mp
 {
-    import Main;
-    import menu.MenuPanel;
-    import classes.Text;
-    import classes.BoxButton;
-
     import arc.ArcGlobals;
     import arc.mp.ListItemDoubleClick;
-    import arc.mp.MultiplayerPrompt;
     import arc.mp.MultiplayerChat;
+    import arc.mp.MultiplayerPrompt;
     import arc.mp.MultiplayerUsers;
-    import com.flashfla.net.Multiplayer;
-
-    import flash.ui.Keyboard;
-    import flash.ui.ContextMenu;
-    import flash.ui.ContextMenuItem;
-    import flash.events.ContextMenuEvent;
-    import flash.utils.Timer;
-    import flash.events.TimerEvent;
-    import flash.events.Event;
-    import flash.events.MouseEvent;
-    import flash.display.Sprite;
-
+    import classes.BoxButton;
+    import classes.Text;
     import com.bit101.components.List;
     import com.bit101.components.PushButton;
     import com.bit101.components.Style;
     import com.bit101.components.Window;
-
     import com.flashfla.components.Throbber;
-
+    import com.flashfla.net.Multiplayer;
+    import flash.events.ContextMenuEvent;
+    import flash.events.Event;
+    import flash.events.MouseEvent;
+    import flash.events.TimerEvent;
+    import flash.ui.ContextMenu;
+    import flash.ui.ContextMenuItem;
+    import flash.utils.Timer;
     import it.gotoandplay.smartfoxserver.SFSEvent;
+    import menu.MenuPanel;
 
     public class MultiplayerPanel extends MenuPanel
     {
@@ -65,6 +57,14 @@ package arc.mp
                 connection.mode = Multiplayer.GAME_R3;
                 connection.connect();
             }
+            else
+            {
+                textLogin = new Text("Please Login or Register");
+                textLogin.x = Main.GAME_WIDTH / 2 - textLogin.width / 2;
+                textLogin.y = Main.GAME_HEIGHT / 2 - textLogin.height * 3 / 2;
+                addChild(textLogin);
+                return;
+            }
 
             Style.fontSize = ArcGlobals.instance.configMPSize;
 
@@ -80,8 +80,11 @@ package arc.mp
             controlRooms.setSize(200, 350);
             controlRooms.addEventListener(MouseEvent.DOUBLE_CLICK, function(event:MouseEvent):void
             {
-                var room:Object = controlRooms.selectedItem.data;
-                joinRoom(room, room.playerCount < room.maxPlayerCount);
+                if (controlRooms.selectedItem != null && controlRooms.selectedItem.data != null)
+                {
+                    var room:Object = controlRooms.selectedItem.data;
+                    joinRoom(room, room.playerCount < room.maxPlayerCount);
+                }
             });
             window.addChild(controlRooms);
             buildContextMenu();
@@ -190,15 +193,6 @@ package arc.mp
                 }
             });
 
-            if (GlobalVariables.instance.activeUser.isGuest || GlobalVariables.instance.activeUser.id == 2)
-            {
-                textLogin = new Text("Please Login or Register");
-                textLogin.x = Main.GAME_WIDTH / 2 - textLogin.width / 2;
-                textLogin.y = Main.GAME_HEIGHT / 2 - textLogin.height * 3 / 2;
-                addChild(textLogin);
-                return;
-            }
-
             buttonMP = new BoxButton(130, 25, "Connect");
             buttonMP.x = 5;
             buttonMP.y = Main.GAME_HEIGHT - 30;
@@ -276,7 +270,6 @@ package arc.mp
                 }
             });
         }
-
 
         public function buildContextMenu():void
         {
@@ -391,7 +384,7 @@ package arc.mp
         {
             if (button == null)
                 return;
-            
+
             if (button.parent == null && show)
                 addChild(button);
             else if (button.parent == this && !show)
@@ -410,7 +403,8 @@ package arc.mp
             }
             if (textLogin != null)
                 textLogin.visible = show;
-            window.visible = show;
+            if (window != null)
+                window.visible = show;
         }
 
         private function foreachroom(foreach:Function):void
@@ -468,14 +462,20 @@ package arc.mp
 
         private function showThrobber():void
         {
-            throbber.visible = true;
-            throbber.start();
+            if (throbber != null)
+            {
+                throbber.visible = true;
+                throbber.start();
+            }
         }
 
         private function hideThrobber():void
         {
-            throbber.visible = false;
-            throbber.stop();
+            if (throbber != null)
+            {
+                throbber.visible = false;
+                throbber.stop();
+            }
         }
     }
 }

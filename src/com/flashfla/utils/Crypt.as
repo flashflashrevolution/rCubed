@@ -15,7 +15,7 @@ package com.flashfla.utils
          */
         public static function Encode(src:String):String
         {
-            var output:String = new String("");
+            var output:String = "";
             var gLength:Number = Math.ceil(Math.random() * 8) + 1;
 
             // Base64 Encode Input
@@ -28,7 +28,7 @@ package com.flashfla.utils
             }
 
             // Add the total characters to the beginning, and flip/reverse the string.
-            output = flipString(gLength + output);
+            // output = flipString(gLength + output);
 
             // Add garbage chars every 4 characters
             for (var g:int = 4; g < output.length; g += 5)
@@ -46,8 +46,11 @@ package com.flashfla.utils
          */
         public static function Decode(src:String):String
         {
-            var input:String = new String("");
-            var output:String = new String("");
+            if (src.length == 0)
+                return "";
+
+            var input:String = "";
+            var output:String = "";
 
             // Decode
             input = B64Decode(src);
@@ -60,7 +63,7 @@ package com.flashfla.utils
             }
 
             // Flip the string
-            output = flipString(output);
+            // output = flipString(output);
 
             // Rip garbage data
             output = output.substr(1, (output.length - Number(output.charAt(0)) - 1));
@@ -77,7 +80,7 @@ package com.flashfla.utils
         public static function B64Encode(src:String):String
         {
             var i:Number = 0;
-            var output:String = new String("");
+            var output:String = "";
             var chr1:Number, chr2:Number, chr3:Number;
             var enc1:Number, enc2:Number, enc3:Number, enc4:Number;
 
@@ -106,7 +109,7 @@ package com.flashfla.utils
         public static function B64Decode(src:String):String
         {
             var i:Number = 0;
-            var output:String = new String("");
+            var output:String = "";
             var chr1:Number, chr2:Number, chr3:Number;
             var enc1:Number, enc2:Number, enc3:Number, enc4:Number;
             while (i < src.length)
@@ -132,16 +135,16 @@ package com.flashfla.utils
          */
         public static function ROT255(src:String):String
         {
-            var mL:Number = src.length;
-            var output:String = "";
+            const mL:int = src.length;
+            var arr:Array = new Array(mL);
 
             // 255 XOR Wrap
-            for (var i:uint = 0; i < mL; i++)
+            for (var i:uint = 0; i < mL; ++i)
             {
-                output += String.fromCharCode(src.charCodeAt(i) ^ ((255 + (mL + i * 4)) % 255));
+                arr[i] = src.charCodeAt(i) ^ ((mL + i * 4) % 255);
             }
 
-            return output;
+            return String.fromCharCode.apply(null, arr);
         }
 
         /**
@@ -149,7 +152,7 @@ package com.flashfla.utils
          */
         public static function toCharCode(s:String):String
         {
-            var output:String = new String("");
+            var output:String = "";
             for (var c:int = 0; c < s.length; c++)
             {
                 output += s.charCodeAt(c) + ",";
@@ -171,7 +174,7 @@ package com.flashfla.utils
          */
         private static function flipString(s:String):String
         {
-            return s.split().reverse().join("");
+            return s.split("").reverse().join("");
         }
     }
 }

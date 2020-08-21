@@ -16,7 +16,6 @@ package classes
     import flash.events.SecurityErrorEvent;
     import flash.media.SoundMixer;
     import flash.media.SoundTransform;
-    import flash.net.SharedObject;
     import flash.net.URLLoader;
     import flash.net.URLRequest;
     import flash.net.URLRequestMethod;
@@ -671,25 +670,18 @@ package classes
 
         public function saveLocal():void
         {
-            var gameSave:SharedObject = SharedObject.getLocal(Constant.LOCAL_SO_NAME);
-            gameSave.data.sEncode = JSON.stringify(save(true));
-            try
-            {
-                gameSave.flush();
-            }
-            catch (e:Error)
-            {
-            }
+            LocalStore.setVariable("sEncode", JSON.stringify(save(true)));
+            LocalStore.flush();
         }
 
         public function loadLocal():void
         {
-            var gameSave:SharedObject = SharedObject.getLocal(Constant.LOCAL_SO_NAME);
-            if (gameSave.data.sEncode != null)
+            var encodedSettings:String = LocalStore.getVariable("sEncode", null);
+            if (encodedSettings != null)
             {
                 try
                 {
-                    settings = JSON.parse(gameSave.data.sEncode);
+                    settings = JSON.parse(encodedSettings);
                 }
                 catch (e:Error)
                 {

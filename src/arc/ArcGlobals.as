@@ -3,7 +3,6 @@ package arc
     import classes.Playlist;
     import classes.chart.parse.ChartFFRLegacy;
     import flash.events.EventDispatcher;
-    import com.bit101.components.Style;
     import flash.net.SharedObject;
 
     public class ArcGlobals extends EventDispatcher
@@ -44,8 +43,8 @@ package arc
 
         public function legacyLoad():void
         {
-            var save:SharedObject = SharedObject.getLocal(Constant.LOCAL_SO_NAME);
-            for each (var engine:Object in save.data.legacyEngines)
+            var legacyEngineArray:* = LocalStore.getVariable("legacyEngines", null);
+            for each (var engine:Object in legacyEngineArray)
             {
                 ChartFFRLegacy.setEngineSync(engine);
                 if (engine.level_ranks)
@@ -60,28 +59,19 @@ package arc
 
         public function legacySave():void
         {
-            var save:SharedObject = SharedObject.getLocal(Constant.LOCAL_SO_NAME);
-            save.data.legacyEngines = legacyEngines;
-            try
-            {
-                save.flush();
-            }
-            catch (e:Error)
-            {
-            }
+            LocalStore.setVariable("legacyEngines", legacyEngines);
+            LocalStore.flush();
         }
 
         public function legacyDefaultLoad():void
         {
-            var save:SharedObject = SharedObject.getLocal(Constant.LOCAL_SO_NAME);
-            legacyDefaultEngine = save.data.legacyDefaultEngine || null;
+            legacyDefaultEngine = LocalStore.getVariable("legacyDefaultEngine", null);
         }
 
         public function legacyDefaultSave():void
         {
-            var save:SharedObject = SharedObject.getLocal(Constant.LOCAL_SO_NAME);
-            save.data.legacyDefaultEngine = legacyDefaultEngine;
-            save.flush();
+            LocalStore.setVariable("legacyDefaultEngine", legacyDefaultEngine);
+            LocalStore.flush();
         }
 
         public function legacyEncode(song:Object):Object
@@ -143,47 +133,37 @@ package arc
 
         public function interfaceLoad():void
         {
-            var save:SharedObject = SharedObject.getLocal(Constant.LOCAL_SO_NAME);
-            configInterface = save.data.arcLayout || {};
+            configInterface = LocalStore.getVariable("arcLayout", {});
         }
 
         public function interfaceSave():void
         {
-            var save:SharedObject = SharedObject.getLocal(Constant.LOCAL_SO_NAME);
-            save.data.arcLayout = configInterface;
-            save.flush();
+            LocalStore.setVariable("arcLayout", configInterface);
+            LocalStore.flush();
         }
 
         public var configMusicOffset:int = 0;
 
         public function musicOffsetLoad():void
         {
-            var save:SharedObject = SharedObject.getLocal(Constant.LOCAL_SO_NAME);
-            configMusicOffset = save.data.arcMusicOffset || 0;
+            configMusicOffset = LocalStore.getVariable("arcMusicOffset", 0);
         }
 
         public function musicOffsetSave():void
         {
-            var save:SharedObject = SharedObject.getLocal(Constant.LOCAL_SO_NAME);
-            save.data.arcMusicOffset = configMusicOffset;
-            try
-            {
-                save.flush();
-            }
-            catch (e:Error)
-            {
-            }
+            LocalStore.setVariable("arcMusicOffset", configMusicOffset);
+            LocalStore.flush();
         }
 
         public var filterLevelLow:int = 1;
         public var filterLevelHigh:int = 120;
 
         public var configMPSize:int = 10;
-        
+
         public static const divisionColor:Array = [0xC27BA0, 0x8E7CC3, 0x6D9EEB, 0x93C47D, 0xFFD966, 0xE06666, 0x919C86, 0xD2C7AC, 0xBF0000];
         public static const divisionTitle:Array = ["Novice", "Intermediate", "Advanced", "Expert", "Master", "Guru", "Legendary", "Godly", "Developer"];
         public static const divisionLevel:Array = [0, 26, 50, 59, 69, 83, 94, 101, 122];
-        
+
         public static function getDivisionColor(level:int):int
         {
             return divisionColor[getDivisionNumber(level)];
@@ -206,18 +186,16 @@ package arc
             }
             return div;
         }
-        
+
         public function mpLoad():void
         {
-            var save:SharedObject = SharedObject.getLocal(Constant.LOCAL_SO_NAME);
-            configMPSize = save.data.arcMPSize || 10;
+            configMPSize = LocalStore.getVariable("arcMPSize", 10);
         }
 
         public function mpSave():void
         {
-            var save:SharedObject = SharedObject.getLocal(Constant.LOCAL_SO_NAME);
-            save.data.arcMPSize = configMPSize;
-            save.flush();
+            LocalStore.setVariable("arcMPSize", configMPSize);
+            LocalStore.flush();
         }
 
         public var legacyLevelRanks:Object = null;
@@ -274,13 +252,13 @@ package arc
 
         public function resetSettings():void
         {
-            var save:SharedObject = SharedObject.getLocal(Constant.LOCAL_SO_NAME);
-            delete save.data.arcMPSize;
-            delete save.data.arcMPTimestamp;
-            delete save.data.arcMPMask;
-            delete save.data.arcMusicOffset;
-            delete save.data.arcLayout;
-            save.flush();
+            LocalStore.deleteVariable("arcMPSize");
+            LocalStore.deleteVariable("arcMPTimestamp");
+            LocalStore.deleteVariable("arcMPMask");
+            LocalStore.deleteVariable("arcMusicOffset");
+            LocalStore.deleteVariable("arcLayout");
+
+            LocalStore.flush();
 
             load();
             configJudge = null;
