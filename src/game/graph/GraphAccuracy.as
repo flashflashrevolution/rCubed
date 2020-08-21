@@ -357,6 +357,8 @@ package game.graph
             flipGraph = !flipGraph;
             generateGraph();
             draw();
+
+            LocalStore.setVariable("result_flip_graph", flipGraph);
         }
 
     }
