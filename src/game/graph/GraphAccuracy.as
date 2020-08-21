@@ -44,6 +44,7 @@ package game.graph
             hover_text.visible = false;
             container.addChild(buttons);
             container.addChild(hover_text);
+            last_nearest = -1;
         }
 
         override public function onStageRemove():void

@@ -568,6 +568,7 @@ package game
             activeGraph = getGraph(graph_type, result);
             activeGraph.onStage(this);
             activeGraph.draw();
+            activeGraph.drawOverlay(stage.mouseX - graphOverlay.x, stage.mouseY - graphOverlay.y);
         }
 
         /**
