@@ -1,30 +1,23 @@
 package arc.mp
 {
-    import menu.MenuPanel;
-    import menu.MainMenu;
-    import menu.MenuSongSelection;
-    import game.GamePlay;
-    import game.GameMenu;
-    import game.GameOptions;
+    import arc.mp.MultiplayerPanel;
     import classes.Playlist;
     import classes.chart.Song;
     import classes.replay.Replay;
-    import GlobalVariables;
-    import arc.ArcGlobals;
-    import arc.mp.MultiplayerPanel;
-    import flash.net.URLVariables;
+    import com.flashfla.net.Multiplayer;
+    import flash.events.Event;
+    import flash.events.TimerEvent;
     import flash.net.URLLoader;
     import flash.net.URLRequest;
     import flash.net.URLRequestMethod;
-
+    import flash.net.URLVariables;
     import flash.utils.Timer;
-    import flash.events.TimerEvent;
-    import flash.events.Event;
-    import com.flashfla.net.Multiplayer;
-    import it.gotoandplay.smartfoxserver.SFSEvent;
-
-    import com.bit101.components.TextArea;
+    import game.GameOptions;
     import game.GameScoreResult;
+    import it.gotoandplay.smartfoxserver.SFSEvent;
+    import menu.MainMenu;
+    import menu.MenuPanel;
+    import menu.MenuSongSelection;
 
     public class MultiplayerSingleton extends Object
     {
@@ -451,7 +444,7 @@ package arc.mp
             var sendingScore:Boolean = (room.match.status == Multiplayer.STATUS_RESULTS && ((connection.mode == Multiplayer.GAME_LEGACY && room.user.playerID == 1) || (connection.mode == Multiplayer.GAME_VELOCITY && room.variables["gameScoreRecorded"] != "y")));
 
             var replay:Replay = null;
-            var results:Object = null;
+            var results:GameScoreResult = null;
             for each (var result:GameScoreResult in songResults)
             {
                 if (result.song_entry == currentSong)
@@ -460,11 +453,11 @@ package arc.mp
                     break;
                 }
             }
-            if (results)
+            if (results && results.song)
             {
                 for each (var r:Replay in _gvars.replayHistory)
                 {
-                    if (r.level == results.song.level && r.score == results.score)
+                    if (r.level == results.song.id && r.score == results.score)
                     {
                         replay = r;
                         break;
@@ -473,7 +466,7 @@ package arc.mp
             }
             var data:Object = (results ? {score: results.score,
                     life: 24,
-                    maxCombo: results.maxcombo,
+                    maxCombo: results.max_combo,
                     combo: results.combo,
                     amazing: results.amazing,
                     perfect: results.perfect,
