@@ -34,13 +34,16 @@ package classes
 
         public function setSize(w:Number, h:Number):void
         {
-            icon.scaleX = icon.scaleY = Math.min(w / _sprWidth, h / _sprHeight);
+            if (icon != null)
+            {
+                icon.scaleX = icon.scaleY = Math.min(w / _sprWidth, h / _sprHeight);
 
-            this.graphics.clear();
-            this.graphics.lineStyle(1, 0, 0);
-            this.graphics.beginFill(0, 0);
-            this.graphics.drawRect(-(icon.width / 2), -(icon.height / 2), w, h);
-            this.graphics.endFill();
+                this.graphics.clear();
+                this.graphics.lineStyle(1, 0, 0);
+                this.graphics.beginFill(0, 0);
+                this.graphics.drawRect(-(icon.width / 2), -(icon.height / 2), w, h);
+                this.graphics.endFill();
+            }
         }
     }
 }
