@@ -389,7 +389,7 @@ package popups
                 _gvars.activeUser.saveLocal();
                 _gvars.activeUser.save();
             }
-            if ((_gvars.gameMain.activePanel is MainMenu) && (_gvars.gameMain.activePanel as MainMenu).panel is MenuSongSelection)
+            if (_gvars.gameMain.activePanel != null && (_gvars.gameMain.activePanel is MainMenu) && (_gvars.gameMain.activePanel as MainMenu).panel != null && (_gvars.gameMain.activePanel as MainMenu).panel is MenuSongSelection)
             {
                 ((_gvars.gameMain.activePanel as MainMenu).panel as MenuSongSelection).buildPlayList();
                 ((_gvars.gameMain.activePanel as MainMenu).panel as MenuSongSelection).buildInfoBox();
