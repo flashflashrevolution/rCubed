@@ -1107,18 +1107,21 @@ package popups
                 box.addChild(useCacheCheckbox);
                 yOff += 30;
 
-                var useVSyncCheckboxText:Text = new Text(_lang.string("air_options_use_vsync"));
-                useVSyncCheckboxText.x = xOff + 22;
-                useVSyncCheckboxText.y = yOff;
-                box.addChild(useVSyncCheckboxText);
-                yOff += 2;
+                CONFIG::vsync
+                {
+                    var useVSyncCheckboxText:Text = new Text(_lang.string("air_options_use_vsync"));
+                    useVSyncCheckboxText.x = xOff + 22;
+                    useVSyncCheckboxText.y = yOff;
+                    box.addChild(useVSyncCheckboxText);
+                    yOff += 2;
 
-                useVSyncCheckbox = new BoxCheck();
-                useVSyncCheckbox.x = xOff + 2;
-                useVSyncCheckbox.y = yOff;
-                useVSyncCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-                box.addChild(useVSyncCheckbox);
-                yOff += 30;
+                    useVSyncCheckbox = new BoxCheck();
+                    useVSyncCheckbox.x = xOff + 2;
+                    useVSyncCheckbox.y = yOff;
+                    useVSyncCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                    box.addChild(useVSyncCheckbox);
+                    yOff += 30;
+                }
 
                 var useWebsocketCheckboxText:Text = new Text(_lang.string("air_options_use_websockets"));
                 useWebsocketCheckboxText.x = xOff + 22;
@@ -1773,10 +1776,13 @@ package popups
             //- Vsync Toggle
             else if (e.target == useVSyncCheckbox)
             {
-                _gvars.air_useVSync = !_gvars.air_useVSync;
-                LocalStore.setVariable("air_useVSync", _gvars.air_useVSync);
-                stage.vsyncEnabled = _gvars.air_useVSync;
-                _gvars.gameMain.addAlert("Set VSYNC: " + stage.vsyncEnabled, 120, Alert.RED);
+                CONFIG::vsync
+                {
+                    _gvars.air_useVSync = !_gvars.air_useVSync;
+                    LocalStore.setVariable("air_useVSync", _gvars.air_useVSync);
+                    stage.vsyncEnabled = _gvars.air_useVSync;
+                    _gvars.gameMain.addAlert("Set VSYNC: " + stage.vsyncEnabled, 120, Alert.RED);
+                }
             }
 
             // Use HTTP Websockets
@@ -2082,8 +2088,12 @@ package popups
 
                 autoSaveLocalCheckbox.checked = _gvars.air_autoSaveLocalReplays;
                 useCacheCheckbox.checked = _gvars.air_useLocalFileCache;
-                useVSyncCheckbox.checked = _gvars.air_useVSync;
                 useWebsocketCheckbox.checked = _gvars.air_useWebsockets;
+
+                CONFIG::vsync
+                {
+                    useVSyncCheckbox.checked = _gvars.air_useVSync;
+                }
             }
             // Save Local
             if (_gvars.activeUser == _gvars.playerUser)

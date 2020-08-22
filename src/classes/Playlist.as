@@ -142,7 +142,7 @@ package classes
             playList = new Array();
             indexList = new Array();
 
-            if (_instanceCanon == null)
+            if (_instanceCanon == null && !legacy)
             {
                 _instanceCanon = new Playlist();
                 _instanceCanon._isLoaded = true;
