@@ -45,8 +45,10 @@ package game.graph
          */
         public function onStage(container:DisplayObjectContainer):void
         {
-            graph.graphics.clear();
-            overlay.graphics.clear();
+            if (graph)
+                graph.graphics.clear();
+            if (overlay)
+                overlay.graphics.clear();
         }
 
         /**
