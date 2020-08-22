@@ -518,6 +518,10 @@ package
 
             if (_panel == "none")
             {
+                // Make background force displayed.
+                bg.visible = true;
+                ver.visible = true;
+
                 //- Remove last panel if exist
                 if (activePanel != null)
                     TweenLite.to(activePanel, 0.5, {alpha: 0, onComplete: removeLastPanel, onCompleteParams: [activePanel]});
@@ -548,8 +552,6 @@ package
                     break;
 
                 case GAME_MENU_PANEL:
-                    bg.visible = true;
-                    ver.visible = true;
                     nextPanel = new MainMenu(this);
                     isFound = true;
 
@@ -564,6 +566,13 @@ package
                     nextPanel = new GameMenu(this);
                     isFound = true;
                     break;
+            }
+
+            // Show Background
+            if (_panel != GAME_PLAY_PANEL)
+            {
+                bg.visible = true;
+                ver.visible = true;
             }
 
             if (isFound)
@@ -758,7 +767,10 @@ package
             }
             else
             {
-                addPopup(new PopupContextMenu(this));
+                if (!disablePopups)
+                {
+                    addPopup(new PopupContextMenu(this));
+                }
             }
         }
 

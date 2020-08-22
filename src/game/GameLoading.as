@@ -90,6 +90,17 @@ package game
             this.addEventListener(Event.ENTER_FRAME, updatePreloader);
         }
 
+        override public function stageRemove():void
+        {
+            this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
+
+            if (cancelLoadButton)
+                cancelLoadButton.removeEventListener(MouseEvent.CLICK, e_cancelClick);
+
+            if (preloader)
+                preloader.removeEventListener(Event.REMOVED_FROM_STAGE, preloaderRemoved);
+        }
+
         ///- PreloaderHandlers
         private function updatePreloader(e:Event):void
         {
@@ -117,6 +128,7 @@ package game
 
             if (preloader.isComplete && song.isLoaded)
             {
+                removePopup();
                 this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
                 preloader.addEventListener(Event.REMOVED_FROM_STAGE, preloaderRemoved);
                 preloader.remove();

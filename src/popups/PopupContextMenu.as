@@ -1,7 +1,9 @@
 package popups
 {
+    import arc.mp.MultiplayerSingleton;
     import classes.Box;
     import classes.BoxButton;
+    import classes.Playlist;
     import com.flashdynamix.utils.SWFProfiler;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
@@ -9,13 +11,11 @@ package popups
     import flash.filters.BlurFilter;
     import flash.geom.Point;
     import flash.profiler.showRedrawRegions;
-
+    import game.GameMenu;
     import menu.MenuPanel;
-    import arc.mp.MultiplayerSingleton;
 
     public class PopupContextMenu extends MenuPanel
     {
-
         CONFIG::debug
         {
             private static var redrawBoolean:Boolean = false;
@@ -160,16 +160,24 @@ package popups
             }
             else if (e.target.action == "reload_engine")
             {
-                MultiplayerSingleton.destroyInstance();
-                Flags.VALUES = {};
-                _gvars.gameMain.switchTo("none");
+                if (_gvars.gameMain.loadComplete && !(_gvars.gameMain.activePanel is GameMenu))
+                {
+                    MultiplayerSingleton.destroyInstance();
+                    Flags.VALUES = {};
+                    Playlist.clearCanon();
+                    _gvars.gameMain.loadComplete = false;
+                    _gvars.gameMain.switchTo("none");
+                }
             }
             else if (e.target.action == "switch_profile")
             {
-                MultiplayerSingleton.destroyInstance();
-                Flags.VALUES = {};
-                _gvars.playerUser.refreshUser();
-                _gvars.gameMain.switchTo("GameLoginPanel");
+                if (_gvars.gameMain.loadComplete && !(_gvars.gameMain.activePanel is GameMenu))
+                {
+                    MultiplayerSingleton.destroyInstance();
+                    Flags.VALUES = {};
+                    _gvars.playerUser.refreshUser();
+                    _gvars.gameMain.switchTo(Main.GAME_LOGIN_PANEL);
+                }
             }
         }
     }
