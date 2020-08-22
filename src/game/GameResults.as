@@ -429,7 +429,7 @@ package game
                 navRandomSong.enabled = false;
 
             // Skill rating
-            var song_weight:Number = SkillRating.getSongWeight(song_entry, result);
+            var song_weight:Number = SkillRating.getSongWeight(result);
             if (result.last_note > 0)
                 song_weight = 0;
 
