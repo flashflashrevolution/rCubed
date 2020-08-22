@@ -1,17 +1,15 @@
 package game.graph
 {
-    import classes.BoxButton;
+    import assets.menu.icons.fa.iconSmallF;
+    import classes.BoxIcon;
     import classes.Language;
     import classes.Text;
-    import classes.chart.Song;
     import com.flashfla.utils.sprintf;
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.events.MouseEvent;
     import flash.geom.Rectangle;
     import game.GameScoreResult;
-    import classes.BoxIcon;
-    import assets.menu.icons.fa.iconSmallF;
 
     public class GraphAccuracy extends GraphBase
     {
@@ -42,8 +40,11 @@ package game.graph
         {
             super.onStage(container);
             hover_text.visible = false;
-            container.addChild(buttons);
-            container.addChild(hover_text);
+            if (container != null)
+            {
+                container.addChild(buttons);
+                container.addChild(hover_text);
+            }
             last_nearest = -1;
         }
 
@@ -247,7 +248,6 @@ package game.graph
 
             // Judge 
             var song_arrows:int = result.note_count;
-            var song_file:Song = result.song;
 
             var i:int;
 
@@ -355,10 +355,9 @@ package game.graph
         {
             drawOverlay(-100, -100);
             flipGraph = !flipGraph;
+            LocalStore.setVariable("result_flip_graph", flipGraph);
             generateGraph();
             draw();
-
-            LocalStore.setVariable("result_flip_graph", flipGraph);
         }
 
     }
