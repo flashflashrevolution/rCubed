@@ -94,6 +94,9 @@ package game
         {
             this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
 
+            if (cancelLoadButton)
+                cancelLoadButton.removeEventListener(MouseEvent.CLICK, e_cancelClick);
+
             if (preloader)
                 preloader.removeEventListener(Event.REMOVED_FROM_STAGE, preloaderRemoved);
         }
