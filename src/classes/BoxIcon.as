@@ -39,11 +39,12 @@ package classes
 
         public function setIconColor(color:String):void
         {
-            var newColorJ:int = parseInt("0x" + color.replace("#", ""), 16);
+            var newColorJ:Number = parseInt("0x" + color.replace("#", ""), 16);
             if (isNaN(newColorJ) || newColorJ < 0)
                 newColorJ = 0;
             var rgb:Object = ColorUtil.hexToRgb(newColorJ);
-            _icon.icon.transform.colorTransform = new ColorTransform((rgb.r / 255), (rgb.g / 255), (rgb.b / 255));
+            if (_icon.icon != null)
+                _icon.icon.transform.colorTransform = new ColorTransform((rgb.r / 255), (rgb.g / 255), (rgb.b / 255));
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -108,6 +109,7 @@ package classes
         {
             _hoverDisplayed = false;
             _hoverTimer.stop();
+            _hoverTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
             this.removeEventListener(MouseEvent.ROLL_OUT, e_hoverRollOut);
             this.removeEventListener(Event.ENTER_FRAME, e_onEnterFrame);
 
@@ -191,7 +193,7 @@ package classes
             _icon.setSize(width - _iconPadding, height - _iconPadding);
         }
 
-        public function set delay(value:int):void
+        public function set delay(value:Number):void
         {
             _hoverTimer.delay = value;
         }
