@@ -13,6 +13,8 @@ package com.flashfla.utils
 
         public static function getFormattedDate(date:Date):String
         {
+            if (date == null)
+                return "";
             return date.toLocaleTimeString() + ", " + date.date + "/" + (date.month + 1) + "/" + date.fullYear;
         }
 
@@ -36,7 +38,7 @@ package com.flashfla.utils
 
         public static function convertToHHMMSS(_seconds:Number):String
         {
-            if (_seconds < 0)
+            if (isNaN(_seconds) || _seconds < 0)
                 return "Never";
             var s:Number = _seconds % 60;
             var m:Number = Math.floor((_seconds % 3600) / 60);
