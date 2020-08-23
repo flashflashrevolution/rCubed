@@ -15,9 +15,10 @@ package game.graph
     {
         public var _lang:Language = Language.instance;
         public var cross_points:Vector.<GraphCrossPoint>;
+        public var boo_points:Vector.<GraphCrossPoint>;
         public var regions:Vector.<Rectangle>;
 
-        public var last_nearest:int = -1;
+        public var last_nearest_index:int = -1;
 
         public var player_timings_length:int = 0;
 
@@ -27,6 +28,7 @@ package game.graph
 
         public var judgeMinTime:Text;
         public var judgeMaxTime:Text;
+        public var maxNotes:Text;
 
         public var flipGraph:Boolean = false;
 
@@ -45,7 +47,7 @@ package game.graph
                 container.addChild(buttons);
                 container.addChild(hover_text);
             }
-            last_nearest = -1;
+            last_nearest_index = -1;
         }
 
         override public function onStageRemove():void
@@ -74,13 +76,20 @@ package game.graph
             flipGraphBtn.addEventListener(MouseEvent.MOUSE_DOWN, e_flipGraph);
             buttons.addChild(flipGraphBtn);
 
-            judgeMinTime = new Text((result.MIN_TIME > 0 ? "+" : "") + (result.MIN_TIME + 1) + "ms Early"); // It's greater then, so it's off by 1.
+            judgeMinTime = new Text(sprintf(_lang.string("game_results_graph_graph_early"), {"value": ((result.MIN_TIME > 0 ? "+" : "") + (result.MIN_TIME + 1))})); // It's greater then, so it's off by 1.
             judgeMinTime.alpha = 0.2;
             buttons.addChild(judgeMinTime);
 
-            judgeMaxTime = new Text((result.MAX_TIME > 0 ? "+" : "") + result.MAX_TIME + "ms Late");
+            judgeMaxTime = new Text(sprintf(_lang.string("game_results_graph_graph_late"), {"value": ((result.MAX_TIME > 0 ? "+" : "") + (result.MAX_TIME + 1))}));
             judgeMaxTime.alpha = 0.2;
             buttons.addChild(judgeMaxTime);
+
+            maxNotes = new Text(sprintf(_lang.string("game_results_graph_note_count"), {"notes": result.note_count}));
+            maxNotes.y = -3;
+            maxNotes.x = graphWidth - 2;
+            maxNotes.alpha = 0.2;
+            maxNotes.align = "right";
+            buttons.addChild(maxNotes);
 
             // Hover Text
             hover_text = new Text("", 14);
@@ -123,11 +132,22 @@ package game.graph
             }
 
             // Draw Crosses
-            for each (var point:GraphCrossPoint in cross_points)
+            var point:GraphCrossPoint;
+            for each (point in cross_points)
             {
                 if (point.index >= player_timings_length)
                     break;
 
+                graph.graphics.lineStyle(1, point.color, 1);
+                graph.graphics.moveTo(point.x - 2, point.y - 2);
+                graph.graphics.lineTo(point.x + 2, point.y + 2);
+                graph.graphics.moveTo(point.x + 2, point.y - 2);
+                graph.graphics.lineTo(point.x - 2, point.y + 2);
+            }
+
+            // Draw Crosses
+            for each (point in boo_points)
+            {
                 graph.graphics.lineStyle(1, point.color, 1);
                 graph.graphics.moveTo(point.x - 2, point.y - 2);
                 graph.graphics.lineTo(point.x + 2, point.y + 2);
@@ -144,7 +164,7 @@ package game.graph
                 if (hover_text.visible)
                 {
                     overlay.graphics.clear();
-                    last_nearest = -1;
+                    last_nearest_index = -1;
                     hover_text.visible = false;
                 }
                 return;
@@ -152,7 +172,8 @@ package game.graph
 
             hover_text.visible = true;
 
-            // Find Nearest Cross to Mouse
+            // Find Nearest Note Cross to Mouse
+            var nearest_boo:Boolean = false;
             var i:int;
             var dx:Number;
             var dy:Number;
@@ -175,16 +196,32 @@ package game.graph
                 }
             }
 
-            if (last_nearest == nearest_cross || nearest_cross < 0 || nearest_cross >= cross_points.length)
+            // Boos
+            maxCheckNote = boo_points.length;
+            for (i = 0; i < maxCheckNote; i++)
             {
-                return;
+                // Distance
+                dx = boo_points[i].x - mx;
+                dy = boo_points[i].y - my;
+                distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance <= minDistance)
+                {
+                    minDistance = distance;
+                    nearest_cross = i;
+                    nearest_boo = true;
+                }
             }
 
             // Store Current Index to prevent redraws.
-            last_nearest = nearest_cross;
+            var nearest_cross_index:int = nearest_cross + (nearest_boo ? 1000000 : 0); // Give boo a shift to prevent potential index overlaps.
+            if (last_nearest_index == nearest_cross_index)
+            {
+                return;
+            }
+            last_nearest_index = nearest_cross_index;
 
             // Get Cross 
-            var noteResult:GraphCrossPoint = cross_points[nearest_cross];
+            var noteResult:GraphCrossPoint = nearest_boo ? boo_points[nearest_cross] : cross_points[nearest_cross];
             var pos_x:Number = noteResult.x;
             var pos_y:Number = noteResult.y;
 
@@ -201,6 +238,10 @@ package game.graph
                     hover_text_id += "_late";
                 if (noteResult.timing < 0)
                     hover_text_id += "_early";
+            }
+            else if (noteResult.score == -5)
+            {
+                hover_text_id += "boo";
             }
             else
             {
@@ -245,6 +286,7 @@ package game.graph
         {
             regions = new <Rectangle>[];
             cross_points = new <GraphCrossPoint>[];
+            boo_points = new <GraphCrossPoint>[];
 
             // Judge 
             var song_arrows:int = result.note_count;
@@ -346,6 +388,16 @@ package game.graph
                     cross_points[cross_points.length] = new GraphCrossPoint(cross_points.length, pos_x, (flipGraph ? graphHeight : 0), 0, JUDGE_WINDOW_CROSS_COLORS["0"], 0);
                 }
             }
+
+            // Boos
+            var boo:Object; // Variables: d, t, i
+            ratio_x = graphWidth / result.song.getNote(Math.max(1, song_arrows - 1)).time;
+            for (i = 0; i < result.replay_bin_boos.length; i++)
+            {
+                boo = result.replay_bin_boos[i];
+                pos_x = (boo.t / 1000) * ratio_x;
+                boo_points[boo_points.length] = new GraphCrossPoint(boo_points.length, pos_x, (flipGraph ? 0 : graphHeight), Number((boo.t / 1000).toFixed(2)), JUDGE_WINDOW_CROSS_COLORS["-5"], -5);
+            }
         }
 
         /**
@@ -353,11 +405,12 @@ package game.graph
          */
         private function e_flipGraph(event:MouseEvent):void
         {
-            drawOverlay(-100, -100);
             flipGraph = !flipGraph;
             LocalStore.setVariable("result_flip_graph", flipGraph);
+            last_nearest_index = -1;
             generateGraph();
             draw();
+            drawOverlay(overlay.stage.mouseX - overlay.x, overlay.stage.mouseY - overlay.y);
         }
 
     }

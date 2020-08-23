@@ -6,11 +6,11 @@ package game.graph
         public var index:int;
         public var x:Number;
         public var y:Number;
-        public var timing:int;
+        public var timing:Number;
         public var color:uint;
         public var score:int;
 
-        public function GraphCrossPoint(index:int, pos_x:Number, pos_y:Number, timing:int, color:uint, score:int):void
+        public function GraphCrossPoint(index:int, pos_x:Number, pos_y:Number, timing:Number, color:uint, score:int):void
         {
             this.index = index;
             this.x = pos_x;

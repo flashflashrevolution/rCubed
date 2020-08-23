@@ -21,6 +21,7 @@ package classes
         public function Alert(message:String, age:int = 120, color:uint = 0x000000)
         {
             this.mouseEnabled = false;
+            this.mouseChildren = false;
 
             this.message = message;
             this.age = age;

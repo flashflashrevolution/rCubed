@@ -11,19 +11,22 @@ package game.graph
                 "50": 0x12e006,
                 "25": 0x01aa0f,
                 "5": 0xf99800,
-                "0": 0x000000};
+                "0": 0x000000,
+                "-5": 0xB06100};
 
         protected static const JUDGE_WINDOW_CROSS_COLORS:Object = {"100": 0xffffff,
                 "50": 0xd0ffd4,
                 "25": 0x76dd7e,
                 "5": 0xf99800,
-                "0": 0xff0000};
+                "0": 0xff0000,
+                "-5": 0xB06100};
 
         protected static const JUDGE_WINDOW_TEXT:Object = {"100": "game_amazing",
                 "50": "game_perfect",
                 "25": "game_good",
                 "5": "game_average",
-                "0": "game_miss"};
+                "0": "game_miss",
+                "-5": "game_boo"};
 
         protected var graphWidth:Number = GameResults.GRAPH_WIDTH;
         protected var graphHeight:Number = GameResults.GRAPH_HEIGHT;
