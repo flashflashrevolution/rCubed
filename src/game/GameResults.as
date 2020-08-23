@@ -29,8 +29,6 @@ package game
     import flash.net.URLRequest;
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
-    import flash.ui.ContextMenu;
-    import flash.ui.ContextMenuItem;
     import flash.ui.Keyboard;
     import menu.MenuPanel;
     import popups.PopupHighscores;
@@ -408,8 +406,11 @@ package game
                     StarSelector.drawStar(navRating.graphics, 18, 0, 0, (_gvars.playerUser.getSongRating(result.song_entry.level) != 0), 0xF2D60D, 1);
                 }
 
-                if ((result.song_progress > 0.25 || result.playtime_secs >= 30) && !result.options.replay && !result.song_entry.engine)
+                if ((result.song_progress > 0.25 || result.playtime_secs >= 30) && !result.options.replay && (result.song_entry && !result.song_entry.engine))
                     navRating.visible = true;
+
+                if (result.song_entry && result.song_entry.engine)
+                    navHighscores.enabled = false;
 
                 // Cached Rank Index
                 songRankIndex = result.game_index + 1;
