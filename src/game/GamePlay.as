@@ -827,7 +827,7 @@ package game
                             continue;
                         }
 
-                        var diffValue:int = options.replay.generationReplayNotes[repCurNote.ID] - repCurNote.POSITION;
+                        var diffValue:int = -(options.replay.generationReplayNotes[repCurNote.ID] - repCurNote.POSITION);
                         if ((gamePosition + readAheadTime >= diffValue) || gamePosition >= diffValue)
                         {
                             judgeScorePosition(repCurNote.DIR, diffValue);
