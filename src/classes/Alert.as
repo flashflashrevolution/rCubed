@@ -9,6 +9,7 @@ package classes
     {
         public static const RED:uint = 0x6D0E0E;
         public static const GREEN:uint = 0x116D0E;
+        public static const DARK_GREEN:uint = 0x084400;
         public static const BLUE:uint = 0x0E3F6D;
 
         public var message:String;
@@ -19,6 +20,9 @@ package classes
 
         public function Alert(message:String, age:int = 120, color:uint = 0x000000)
         {
+            this.mouseEnabled = false;
+            this.mouseChildren = false;
+
             this.message = message;
             this.age = age;
 

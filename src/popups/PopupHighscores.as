@@ -6,17 +6,16 @@ package popups
     import classes.Language;
     import classes.Text;
     import com.flashfla.components.Throbber;
+    import com.flashfla.loader.DataEvent;
     import com.flashfla.utils.NumberUtil;
+    import com.flashfla.utils.ObjectUtil;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
     import flash.display.Sprite;
-    import flash.events.Event;
     import flash.events.MouseEvent;
     import flash.filters.BlurFilter;
     import flash.geom.Point;
     import menu.MenuPanel;
-    import com.flashfla.loader.DataEvent;
-    import com.flashfla.utils.ObjectUtil;
 
     public class PopupHighscores extends MenuPanel
     {
@@ -140,14 +139,15 @@ package popups
 
         private function renderHighscores():void
         {
-            if (scorePane)
+            if (scorePane && box && box.contains(scorePane))
             {
                 box.removeChild(scorePane);
                 scorePane = null;
             }
             scorePane = new Sprite();
             scorePane.y = 50;
-            box.addChild(scorePane);
+            if (box)
+                box.addChild(scorePane);
 
             var textLine:Text;
             var urank:Text;
@@ -155,7 +155,7 @@ package popups
 
             if (throbber)
             {
-                if (box.contains(throbber))
+                if (box && box.contains(throbber))
                     box.removeChild(throbber);
                 throbber.stop();
             }
@@ -237,10 +237,14 @@ package popups
                 if (!throbber)
                 {
                     throbber = new Throbber();
-                    throbber.x = box.width / 2 - 16;
-                    throbber.y = box.height / 2 - 16;
+                    if (box)
+                    {
+                        throbber.x = box.width / 2 - 16;
+                        throbber.y = box.height / 2 - 16;
+                    }
                 }
-                box.addChild(throbber);
+                if (box)
+                    box.addChild(throbber);
                 throbber.start();
 
                 _gvars.addEventListener(GlobalVariables.HIGHSCORES_LOAD_COMPLETE, highscoresLoaded);
@@ -324,5 +328,4 @@ package popups
             }
         }
     }
-
 }

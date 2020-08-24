@@ -143,8 +143,6 @@ package popups
         private var useVSyncCheckbox:BoxCheck;
         private var useWebsocketCheckbox:BoxCheck;
 
-        private var flipGraphCheckbox:BoxCheck;
-
         public function PopupOptions(myParent:MenuPanel)
         {
             super(myParent);
@@ -1139,19 +1137,6 @@ package popups
                 box.addChild(useWebsocketCheckbox);
                 yOff += 30;
 
-                var flipGraphCheckboxText:Text = new Text(_lang.string("game_results_flip_graph"));
-                flipGraphCheckboxText.x = xOff + 22;
-                flipGraphCheckboxText.y = yOff;
-                box.addChild(flipGraphCheckboxText);
-                yOff += 2;
-
-                flipGraphCheckbox = new BoxCheck();
-                flipGraphCheckbox.x = xOff + 2;
-                flipGraphCheckbox.y = yOff;
-                flipGraphCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-                box.addChild(flipGraphCheckbox);
-                yOff += 30;
-
                 ///- Col 2
                 xOff += 176;
                 yOff = BASE_Y_POSITION;
@@ -1824,13 +1809,6 @@ package popups
                 }
             }
 
-            //- Flip Results Graph Axis
-            else if (e.target == flipGraphCheckbox)
-            {
-                var flipGraph:Boolean = LocalStore.getVariable("result_flip_graph", false);
-                LocalStore.setVariable("result_flip_graph", !flipGraph);
-            }
-
             // Set Settings
             setSettings();
 
@@ -2111,13 +2089,11 @@ package popups
                 autoSaveLocalCheckbox.checked = _gvars.air_autoSaveLocalReplays;
                 useCacheCheckbox.checked = _gvars.air_useLocalFileCache;
                 useWebsocketCheckbox.checked = _gvars.air_useWebsockets;
+
                 CONFIG::vsync
                 {
                     useVSyncCheckbox.checked = _gvars.air_useVSync;
                 }
-
-                var flipGraph:Boolean = LocalStore.getVariable("result_flip_graph", false);
-                flipGraphCheckbox.checked = flipGraph;
             }
             // Save Local
             if (_gvars.activeUser == _gvars.playerUser)

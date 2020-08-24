@@ -95,7 +95,14 @@ package
         public static const TEXT_FORMAT_CENTER:TextFormat = new TextFormat(Language.FONT_NAME, 14, 0xFFFFFF, true, null, null, null, null, TextFormatAlign.CENTER);
         public static const TEXT_FORMAT_UNICODE:TextFormat = new TextFormat(Language.UNI_FONT_NAME, 14, 0xFFFFFF, true);
         public static const TEXT_FORMAT_UNICODE_12:TextFormat = new TextFormat(Language.UNI_FONT_NAME, 12, 0xFFFFFF, true);
-        public static const JUDGE_WINDOW:Array = [{t: -118, s: 5, f: -3}, {t: -85, s: 25, f: -2}, {t: -51, s: 50, f: -1}, {t: -18, s: 100, f: 0}, {t: 17, s: 50, f: 1}, {t: 50, s: 25, f: 2}, {t: 84, s: 25, f: 3}, {t: 117, s: 0}];
+        public static const JUDGE_WINDOW:Array = [{t: -118, s: 5, f: -3},
+            {t: -85, s: 25, f: -2},
+            {t: -51, s: 50, f: -1},
+            {t: -18, s: 100, f: 0},
+            {t: 17, s: 50, f: 1},
+            {t: 50, s: 25, f: 2},
+            {t: 84, s: 25, f: 3},
+            {t: 117, s: 0}];
 
         // Static Initializer
         {

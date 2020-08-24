@@ -94,8 +94,11 @@ package classes
 
         public function set text(value:String):void
         {
-            _message = value;
-            draw();
+            if (_message != value)
+            {
+                _message = value;
+                draw();
+            }
         }
 
         public function get fontColor():String

@@ -10,12 +10,17 @@ package menu
     import assets.GameBackgroundColor;
     import assets.menu.Logo;
     import assets.menu.MainMenuBackground;
+    import assets.menu.icons.fa.iconDelete;
+    import assets.menu.icons.fa.iconPause;
+    import assets.menu.icons.fa.iconPlay;
+    import assets.menu.icons.fa.iconStop;
     import classes.Alert;
     import classes.Box;
+    import classes.BoxIcon;
     import classes.Language;
     import classes.MouseTooltip;
-    import classes.Text;
     import classes.SimpleBoxButton;
+    import classes.Text;
     import com.flashfla.components.Throbber;
     import com.flashfla.net.WebRequest;
     import com.flashfla.utils.NumberUtil;
@@ -244,22 +249,10 @@ package menu
                 menuMusicControls.x = 7;
                 menuMusicControls.y = -1;
 
-                var spr_play:Box = new Box(25, 25, true, false);
-                spr_play.borderAlpha = 0.75;
+                var spr_play:BoxIcon = new BoxIcon(25, 25, new iconPlay());
                 spr_play.x = 5;
                 spr_play.y = 5;
-                var playIcon:Sprite = new Sprite();
-                with (playIcon.graphics)
-                {
-                    lineStyle(1, 0xFFFFFF, 0);
-                    beginFill(0xFFFFFF, 0.75);
-                    moveTo(7, 6);
-                    lineTo(21, 13);
-                    lineTo(7, 19);
-                    lineTo(7, 6);
-                    endFill();
-                }
-                spr_play.addChild(playIcon);
+                spr_play.setHoverText("Play", "bottom");
                 spr_play.addEventListener(MouseEvent.CLICK, function(e:Event):void
                 {
                     if (_gvars.menuMusic && !_gvars.menuMusic.isPlaying)
@@ -269,20 +262,10 @@ package menu
                 });
                 menuMusicControls.addChild(spr_play);
 
-                var spr_pause:Box = new Box(25, 25);
-                spr_pause.borderAlpha = 0.75;
+                var spr_pause:BoxIcon = new BoxIcon(25, 25, new iconPause());
                 spr_pause.x = 35;
                 spr_pause.y = 5;
-                var pauseIcon:Sprite = new Sprite();
-                with (pauseIcon.graphics)
-                {
-                    lineStyle(1, 0xFFFFFF, 0);
-                    beginFill(0xFFFFFF, 0.75);
-                    drawRect(6, 6, 5, 15);
-                    drawRect(14, 6, 5, 15);
-                    endFill();
-                }
-                spr_pause.addChild(pauseIcon);
+                spr_pause.setHoverText("Pause", "bottom");
                 spr_pause.addEventListener(MouseEvent.CLICK, function(e:Event):void
                 {
                     if (_gvars.menuMusic && _gvars.menuMusic.isPlaying)
@@ -292,19 +275,10 @@ package menu
                 });
                 menuMusicControls.addChild(spr_pause);
 
-                var spr_stop:Box = new Box(25, 25);
-                spr_stop.borderAlpha = 0.75;
+                var spr_stop:BoxIcon = new BoxIcon(25, 25, new iconStop());
                 spr_stop.x = 65;
                 spr_stop.y = 5;
-                var stopIcon:Sprite = new Sprite();
-                with (stopIcon.graphics)
-                {
-                    lineStyle(1, 0xFFFFFF, 0);
-                    beginFill(0xFFFFFF, 0.75);
-                    drawRect(6, 6, 13, 15);
-                    endFill();
-                }
-                spr_stop.addChild(stopIcon);
+                spr_stop.setHoverText("Stop", "bottom");
                 spr_stop.addEventListener(MouseEvent.CLICK, function(e:Event):void
                 {
                     if (_gvars.menuMusic && _gvars.menuMusic.isPlaying)
@@ -314,29 +288,10 @@ package menu
                 });
                 menuMusicControls.addChild(spr_stop);
 
-                var spr_delete:Box = new Box(25, 25);
-                spr_delete.borderAlpha = 0.75;
+                var spr_delete:BoxIcon = new BoxIcon(25, 25, new iconDelete());
                 spr_delete.x = 95;
                 spr_delete.y = 5;
-                var deleteIcon:Sprite = new Sprite();
-                with (deleteIcon.graphics)
-                {
-                    lineStyle(1, 0xFFFFFF, 0);
-                    beginFill(0xFFFFFF, 0.75);
-                    moveTo(11, 5);
-                    lineTo(14, 5);
-                    lineTo(15, 7);
-                    lineTo(20, 9);
-                    lineTo(18, 10);
-                    lineTo(17, 20);
-                    lineTo(8, 20);
-                    lineTo(7, 10);
-                    lineTo(5, 9);
-                    lineTo(9, 7);
-                    lineTo(11, 5);
-                    endFill();
-                }
-                spr_delete.addChild(deleteIcon);
+                spr_delete.setHoverText("Remove", "bottom");
                 menuMusicControls.addChild(spr_delete);
                 spr_delete.addEventListener(MouseEvent.CLICK, function(e:Event):void
                 {
