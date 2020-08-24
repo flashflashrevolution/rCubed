@@ -154,7 +154,7 @@ package menu
             songItemContextMenuItem = new ContextMenuItem("Listen to Song Preview");
             songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_listenToSongPreviewContextSelect);
             songItemContextMenu.customItems.push(songItemContextMenuItem);
-            
+
             songItemContextMenuItem = new ContextMenuItem("Play Chart Preview");
             songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_playChartPreviewContextSelect);
             songItemContextMenu.customItems.push(songItemContextMenuItem);
@@ -887,7 +887,7 @@ package menu
                 }
             }
         }
-        
+
         /**
          * Song Item Context Menu: Plays the chart preview of the selected song.
          */
@@ -908,10 +908,6 @@ package menu
 
             if (_gvars.options.replay.isLoaded)
             {
-                // Force no offsets on judge.
-                _gvars.options.offsetGlobal = 0;
-                _gvars.options.offsetJudge = 0;
-
                 // Setup Vars
                 _gvars.songQueue = [];
                 _gvars.songQueue.push(Playlist.instance.getSong(_gvars.options.replay.level));
@@ -2051,7 +2047,7 @@ package menu
             _gvars.menuMusic.start();
             par.drawMenuMusicControls();
         }
-        
+
         /**
          * Same as playMenuMusicSong, but it plays the song preview without repeat
          * and the song controls aren't drawn.

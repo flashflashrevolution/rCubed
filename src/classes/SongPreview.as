@@ -32,8 +32,6 @@ package classes
             this.boo = 0;
             this.maxcombo = songData["arrows"];
             this.settings = _gvars.playerUser.settings;
-            this.settings.viewOffset = 0;
-            this.settings.judgeOffset = 0;
 
             this.replay = [];
 

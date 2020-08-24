@@ -50,6 +50,7 @@ package game
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import sql.SQLSongDetails;
+    import classes.SongPreview;
 
     public class GamePlay extends MenuPanel
     {
@@ -578,6 +579,13 @@ package game
 
         private function initPlayerVars():void
         {
+            // Force no Judge on SongPreviews
+            if (options.replay && options.replay is SongPreview)
+            {
+                options.offsetJudge = 0;
+                options.offsetGlobal = 0;
+            }
+
             reverseMod = options.modEnabled("reverse");
             sideScroll = (options.scrollDirection == "left" || options.scrollDirection == "right");
             player1JudgeOffset = Math.round(options.offsetJudge);
@@ -1799,6 +1807,12 @@ package game
          *							  |_|            |___/
            \*#########################################################################################*/
 
+        /**
+         * Judge a note score based on the current song position in ms.
+         * @param dir Note Direction
+         * @param position Time in MS.
+         * @return
+         */
         private function judgeScorePosition(dir:String, position:int):Boolean
         {
             if (position < 0)
@@ -1812,6 +1826,7 @@ package game
             {
                 if (note.DIR != dir)
                     continue;
+
                 var diff:Number = positionJudged - note.POSITION;
                 var lastJudge:Object = null;
                 for each (var j:Object in judgeSettings)
