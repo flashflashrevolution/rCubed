@@ -63,9 +63,10 @@ package menu
             pane.y = 64;
             var border:Sprite = new Sprite();
             border.graphics.lineStyle(1, 0xFFFFFF, 1, true);
-            border.graphics.lineTo(578, 0);
-            border.graphics.moveTo(0, 357);
-            border.graphics.lineTo(578, 357);
+            border.graphics.moveTo(0.3, -0.5);
+            border.graphics.lineTo(577, -0.5);
+            border.graphics.moveTo(0.3, 358.5);
+            border.graphics.lineTo(577, 358.5);
             border.alpha = 0.35;
             pane.addChild(border);
             this.addChild(pane);
