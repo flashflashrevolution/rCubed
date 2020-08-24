@@ -9,6 +9,7 @@ package game
     import classes.GameNote;
     import classes.Language;
     import classes.Noteskins;
+    import classes.SongPreview;
     import classes.chart.LevelScriptRuntime;
     import classes.chart.Note;
     import classes.chart.NoteChart;
@@ -50,7 +51,6 @@ package game
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import sql.SQLSongDetails;
-    import classes.SongPreview;
 
     public class GamePlay extends MenuPanel
     {
