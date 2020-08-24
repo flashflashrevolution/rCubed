@@ -898,10 +898,6 @@ package menu
 
             if (_gvars.options.replay.isLoaded)
             {
-                // Force no offsets on judge.
-                _gvars.options.offsetGlobal = 0;
-                _gvars.options.offsetJudge = 0;
-
                 // Setup Vars
                 _gvars.songQueue = [];
                 _gvars.songQueue.push(Playlist.instance.getSong(_gvars.options.replay.level));

@@ -9,6 +9,7 @@ package game
     import classes.GameNote;
     import classes.Language;
     import classes.Noteskins;
+    import classes.SongPreview;
     import classes.chart.LevelScriptRuntime;
     import classes.chart.Note;
     import classes.chart.NoteChart;
@@ -589,6 +590,13 @@ package game
 
         private function initPlayerVars():void
         {
+            // Force no Judge on SongPreviews
+            if (options.replay && options.replay is SongPreview)
+            {
+                options.offsetJudge = 0;
+                options.offsetGlobal = 0;
+            }
+
             reverseMod = options.modEnabled("reverse");
             sideScroll = (options.scrollDirection == "left" || options.scrollDirection == "right");
             player1JudgeOffset = Math.round(options.offsetJudge);
@@ -819,7 +827,7 @@ package game
                             continue;
                         }
 
-                        var diffValue:int = options.replay.generationReplayNotes[repCurNote.ID] - repCurNote.POSITION;
+                        var diffValue:int = options.replay.generationReplayNotes[repCurNote.ID] + repCurNote.POSITION;
                         if ((gamePosition + readAheadTime >= diffValue) || gamePosition >= diffValue)
                         {
                             judgeScorePosition(repCurNote.DIR, diffValue);
@@ -1813,6 +1821,12 @@ package game
          *							  |_|            |___/
            \*#########################################################################################*/
 
+        /**
+         * Judge a note score based on the current song position in ms.
+         * @param dir Note Direction
+         * @param position Time in MS.
+         * @return
+         */
         private function judgeScorePosition(dir:String, position:int):Boolean
         {
             if (position < 0)
@@ -1826,6 +1840,7 @@ package game
             {
                 if (note.DIR != dir)
                     continue;
+
                 var diff:Number = positionJudged - note.POSITION;
                 var lastJudge:Object = null;
                 for each (var j:Object in judgeSettings)
