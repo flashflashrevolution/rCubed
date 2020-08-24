@@ -590,11 +590,13 @@ package game
 
         private function initPlayerVars():void
         {
-            // Force no Judge on SongPreviews
+            // Force no judge, global and isolation offsets on SongPreviews
             if (options.replay && options.replay is SongPreview)
             {
                 options.offsetJudge = 0;
                 options.offsetGlobal = 0;
+                options.isolationLength = 0;
+                options.isolationOffset = 0;
             }
 
             reverseMod = options.modEnabled("reverse");
