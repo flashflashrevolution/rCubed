@@ -59,6 +59,7 @@ package classes
             _enabled = value;
             this.mouseEnabled = value;
             this.useHandCursor = value;
+            this.alpha = value ? 1 : 0.5;
             setHoverStatus(value);
         }
 

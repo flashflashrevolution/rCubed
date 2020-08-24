@@ -730,7 +730,7 @@ internal class ReplayBox extends Sprite
         _gvars.options.fillFromReplay();
         _gvars.options.fillFromArcGlobals();
 
-        _gvars.songResults = [];
+        _gvars.songResults.length = 0;
         _gvars.songQueue = [song];
 
         _gvars.gameMain.removePopup();

@@ -142,11 +142,22 @@ package game
         private var gameLife:int;
         private var gameScore:int;
         private var gameRawGoods:Number;
-        private var gameReplay:Array; // Vector.<ReplayNote>;
-        private var gameReplayHit:Array; // Vector.<int>;
+        private var gameReplay:Array;
 
-        private var _binReplayNotes:Array;
-        private var _binReplayBoos:Array;
+        /** Contains a list of scores or other flags used in replay_hit.
+         * The value is either:
+         * [100]  Amazing
+         * [50]   Perfect
+         * [25]   Good
+         * [5]    Average
+         * [0]    Miss & Boo
+         * [-5]   Missed Note After End Game
+         * [-10]  End of Replay Hit Tag
+         */
+        private var gameReplayHit:Array;
+
+        private var binReplayNotes:Array;
+        private var binReplayBoos:Array;
 
         private var replayPressCount:Number = 0;
 
@@ -627,11 +638,11 @@ package game
             gameLife = 50;
             gameScore = 0;
             gameRawGoods = 0;
-            gameReplay = []; // new Vector.<ReplayNote>;
-            gameReplayHit = []; // new Vector.<int>;
+            gameReplay = [];
+            gameReplayHit = [];
 
-            _binReplayNotes = [];
-            _binReplayBoos = [];
+            binReplayNotes = [];
+            binReplayBoos = [];
 
             replayPressCount = 0;
 
@@ -780,7 +791,7 @@ package game
                 // Remove Old note
                 if (gameProgress - curNote.PROGRESS + player1JudgeOffset >= 6)
                 {
-                    _binReplayNotes[curNote.ID] = null;
+                    binReplayNotes[curNote.ID] = null;
                     commitJudge(curNote.DIR, gameProgress, -10);
                     noteBox.removeNote(curNote.ID);
                     n--;
@@ -808,7 +819,7 @@ package game
                             continue;
                         }
 
-                        var diffValue:int = repCurNote.POSITION - options.replay.generationReplayNotes[repCurNote.ID];
+                        var diffValue:int = options.replay.generationReplayNotes[repCurNote.ID] - repCurNote.POSITION;
                         if ((gamePosition + readAheadTime >= diffValue) || gamePosition >= diffValue)
                         {
                             judgeScorePosition(repCurNote.DIR, diffValue);
@@ -1246,45 +1257,48 @@ package game
                 }
             }
             gameReplayHit.push(-10);
-            gameReplay.sortOn("frame", Array.NUMERIC);
+            gameReplay.sort(ReplayNote.sortFunction)
 
             var noteCount:int = hitAmazing + hitPerfect + hitGood + hitAverage + hitMiss;
 
             // Save results for display
             if (!mpSpectate && !options.isEditor)
             {
-                var judgementsEncode:String = JSON.stringify({"amazing": hitAmazing, "perfect": hitPerfect, "good": hitGood, "average": hitAverage, "boo": hitBoo, "miss": hitMiss, "maxcombo": hitMaxCombo});
-                _gvars.songResults.push({"game_index": _gvars.gameIndex++,
-                        "level": song.id,
-                        "songFile": song,
-                        "song": song.entry,
-                        "amazing": hitAmazing,
-                        "perfect": hitPerfect,
-                        "good": hitGood,
-                        "average": hitAverage,
-                        "boo": hitBoo,
-                        "miss": hitMiss,
-                        "combo": hitCombo,
-                        "maxcombo": hitMaxCombo,
-                        "score": gameScore,
-                        "lastNote": noteCount < song.totalNotes ? noteCount : 0,
-                        "accuracy": 30 * accuracy.value / 1000,
-                        "accuracyDeviation": 30 * accuracy.deviation / 1000,
-                        "options": this.options,
-                        "restart_stats": _gvars.songStats.data,
-                        "replay": gameReplay.concat(),
-                        "replay_hit": gameReplayHit.concat(),
-                        "replay_bin": ReplayPack.writeReplay(_gvars.activeUser, options, judgementsEncode, _binReplayNotes, _binReplayBoos),
-                        "_binReplayNotes": _binReplayNotes,
-                        "_binReplayBoos": _binReplayBoos,
-                        "user": options.replay ? options.replay.user : _gvars.activeUser,
-                        "restarts": options.replay ? 0 : _gvars.songRestarts,
-                        "starttime": _gvars.songStartTime,
-                        "starthash": _gvars.songStartHash,
-                        "endtime": options.replay ? TimeUtil.getFormattedDate(new Date(options.replay.timestamp * 1000)) : TimeUtil.getCurrentDate(),
-                        "songprogress": (gameProgress / gameLastNoteFrame),
-                        "playtime_secs": ((getTimer() - msStartTime) / 1000)});
+                var newGameResults:GameScoreResult = new GameScoreResult();
+                newGameResults.game_index = _gvars.gameIndex++;
+                newGameResults.level = song.id;
+                newGameResults.song = song;
+                newGameResults.song_entry = song.entry;
+                newGameResults.note_count = song.totalNotes;
+                newGameResults.amazing = hitAmazing;
+                newGameResults.perfect = hitPerfect;
+                newGameResults.good = hitGood;
+                newGameResults.average = hitAverage;
+                newGameResults.boo = hitBoo;
+                newGameResults.miss = hitMiss;
+                newGameResults.combo = hitCombo;
+                newGameResults.max_combo = hitMaxCombo;
+                newGameResults.score = gameScore;
+                newGameResults.last_note = noteCount < song.totalNotes ? noteCount : 0;
+                newGameResults.accuracy = accuracy.value;
+                newGameResults.accuracy_deviation = accuracy.deviation;
+                newGameResults.options = this.options;
+                newGameResults.restart_stats = _gvars.songStats.data;
+                newGameResults.replay = gameReplay.concat();
+                newGameResults.replay_hit = gameReplayHit.concat();
+                newGameResults.replay_bin_notes = binReplayNotes;
+                newGameResults.replay_bin_boos = binReplayBoos;
+                newGameResults.user = options.replay ? options.replay.user : _gvars.activeUser;
+                newGameResults.restarts = options.replay ? 0 : _gvars.songRestarts;
+                newGameResults.start_time = _gvars.songStartTime;
+                newGameResults.start_hash = _gvars.songStartHash;
+                newGameResults.end_time = options.replay ? TimeUtil.getFormattedDate(new Date(options.replay.timestamp * 1000)) : TimeUtil.getCurrentDate();
+                newGameResults.song_progress = (gameProgress / gameLastNoteFrame);
+                newGameResults.playtime_secs = ((getTimer() - msStartTime) / 1000);
+                newGameResults.update(_gvars);
+                _gvars.songResults.push(newGameResults);
             }
+
             _gvars.sessionStats.addFromStats(_gvars.songStats);
             _gvars.songStats.reset();
 
@@ -1838,7 +1852,7 @@ package game
                 commitJudge(dir, frame + note.PROGRESS - player1JudgeOffset, score);
                 noteBox.removeNote(note.ID);
                 accuracy.addValue(note.POSITION - position);
-                _binReplayNotes[note.ID] = (note.POSITION - positionJudged);
+                binReplayNotes[note.ID] = (positionJudged - note.POSITION);
             }
             else
             {
@@ -1858,7 +1872,7 @@ package game
                     }
                 }
                 if (booFrame >= gameFirstNoteFrame)
-                    _binReplayBoos.push({"d": dir, "t": position, "i": _binReplayBoos.length});
+                    binReplayBoos.push({"d": dir, "t": position, "i": binReplayBoos.length});
                 commitJudge(dir, booFrame, -5);
             }
 

@@ -20,6 +20,23 @@ package classes.replay
         public var checksum:uint;
         public var rechecksum:uint;
         public var replay_bin:ByteArray;
-    }
 
+        public function update():void
+        {
+            var i:int;
+
+            // 1.0 -> 1.1:
+            // Judge ms Inversion
+            if (MAJOR_VER == 1 && MINOR_VER == 0)
+            {
+                for (i = 0; i < rep_notes.length; i++)
+                {
+                    rep_notes[i] = rep_notes[i] * -1;
+                }
+
+                MAJOR_VER = 1;
+                MINOR_VER = 1;
+            }
+        }
+    }
 }

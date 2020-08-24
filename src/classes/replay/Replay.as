@@ -327,7 +327,7 @@ package classes.replay
             return replay[index];
         }
 
-        public function getEncode():String
+        public function getEncode(onlyBinReplay:Boolean = false):String
         {
             if (replay_bin != null)
             {
@@ -335,7 +335,8 @@ package classes.replay
                 enc.encodeBytes(replay_bin);
                 return ReplayPack.MAGIC + "|" + enc.toString();
             }
-            else
+
+            if (!onlyBinReplay)
             {
                 var sT:Number = (perfect * 550) + (good * 275) + (average * 55) + (maxcombo * 1000) - (miss * 310) - (boo * 20);
                 var o:Object = {};
@@ -350,6 +351,8 @@ package classes.replay
                 var outJson:String = JSON.stringify(o);
                 return (outJson + "|" + MD5.hash(outJson + "|" + MD5.hash(outJson)));
             }
+
+            return null;
         }
 
         public function parseEncode(str:String, loadUser:Boolean = true):void
