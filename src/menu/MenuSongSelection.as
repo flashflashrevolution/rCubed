@@ -292,10 +292,10 @@ package menu
                 pane.x = 155; // 332
                 pane.y = 64;
                 pane.graphics.lineStyle(1, 0xFFFFFF, 0.35, false);
-                pane.graphics.moveTo(0, 0);
-                pane.graphics.lineTo(401, 0);
-                pane.graphics.moveTo(0, 350);
-                pane.graphics.lineTo(401, 350);
+                pane.graphics.moveTo(0.2, -0.5);
+                pane.graphics.lineTo(399, -0.5);
+                pane.graphics.moveTo(0.2, 351.5);
+                pane.graphics.lineTo(399, 351.5);
                 pane.addEventListener(MouseEvent.CLICK, songItemClicked, false, 0, true);
                 pane.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, false, 0, true);
                 this.addChild(pane);
