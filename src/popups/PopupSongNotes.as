@@ -64,15 +64,7 @@ package popups
             sObject = song;
 
             songRatingValue = _gvars.playerUser.getSongRating(sObject["level"]);
-
-            SQLQueries.getSongDetails(_gvars.sql_conn, {"engine": (song.engine != null ? song.engine : Constant.BRAND_NAME_SHORT_LOWER()), "song_id": song.level}, function(result:Vector.<SQLSongDetails>):void
-            {
-                if (result != null && result.length > 0)
-                {
-                    sDetails = result[0];
-                    refreshFields();
-                }
-            });
+            sDetails = SQLQueries.getSongDetailsSafe((song.engine != null ? song.engine.id : Constant.BRAND_NAME_SHORT_LOWER()), song.level);
         }
 
         override public function stageAdd():void
@@ -295,14 +287,12 @@ package popups
 
         private function saveDetails():void
         {
-            var params:Object = {"engine": (sObject["engine"] != null ? sObject["engine"] : Constant.BRAND_NAME_SHORT_LOWER()),
-                    "song_id": sObject["level"],
-                    "offset_music": verifyFloat(optionMusicOffset.text, 0),
-                    "offset_judge": verifyFloat(optionJudgeOffset.text, 0),
-                    "set_mirror_invert": (setMirrorInvert.checked ? 1 : 0),
-                    "set_custom_offsets": (setCustomOffsets.checked ? 1 : 0),
-                    "notes": notesField.text};
-            SQLQueries.saveSongDetails(_gvars.sql_conn, params);
+            sDetails.offset_music = verifyFloat(optionMusicOffset.text, 0);
+            sDetails.offset_judge = verifyFloat(optionJudgeOffset.text, 0);
+            sDetails.set_mirror_invert = setMirrorInvert.checked;
+            sDetails.set_custom_offsets = setCustomOffsets.checked;
+            sDetails.notes = notesField.text;
+            _gvars.writeUserSongData();
         }
 
         private function verifyFloat(text:String, default_val:Number):Number

@@ -5,153 +5,202 @@ package
     import flash.events.Event;
     import flash.events.SQLErrorEvent;
     import flash.events.SQLEvent;
-    import classes.chart.Song;
     import sql.SQLSongDetails;
     import flash.data.SQLResult;
+    import flash.filesystem.File;
+    import com.flashfla.utils.ObjectUtil;
 
     public class SQLQueries
     {
+        public static var sql_data:Object = getTemplate();
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /**
-         * Refresh created statments to use a new sql connection, if previously created.
-         * @param	conn new SQL connection
+         * Get default JSON template as a new object.
+         * @return
          */
-        public static function refreshStatements(conn:SQLConnection):void
+        public static function getTemplate():Object
         {
-            refreshStatement(conn, sqlState_getSongDetails);
-            refreshStatement(conn, sqlState_saveSongDetails);
-        }
-
-        private static function refreshStatement(conn:SQLConnection, stat:SQLStatement):void
-        {
-            if (stat != null)
-                stat.sqlConnection = conn;
-        }
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        public static function getSongDetailsFromSong(conn:SQLConnection, song:Song, callback:Function = null):void
-        {
-            var params:Object = {"engine": (song.entry.engine != null ? song.entry.engine : Constant.BRAND_NAME_SHORT_LOWER()), "song_id": song.entry.level};
-            getSongDetails(conn, params, callback);
+            return {"db_info": {
+                        "version": 1
+                    },
+                    "song_details": {}};
         }
 
         /**
-         * Gets stored song details using the following params structure:
-           {
-           "engine": Constant.BRAND_NAME_SHORT_LOWER(), 			// Engine ID - String [250]
-           "song_id": 1,				// Song ID - String [250]
-           }
-         *
-         * @param	conn
-         * @param	params See Structure
+         * Load a parsed JSON object into the song details.
+         * @param obj Source Object
          */
-        public static function getSongDetails(conn:SQLConnection, params:Object, callback:Function = null):void
+        public static function loadFromObject(obj:Object):void
         {
-            if (!conn.connected)
+            if (obj == null)
+            {
+                sql_data = getTemplate();
                 return;
-
-            if (!sqlState_getSongDetails)
-            {
-                sqlState_getSongDetails = new SQLStatement();
-                sqlState_getSongDetails.sqlConnection = conn;
-                sqlState_getSongDetails.text = "SELECT * FROM song_details WHERE `engine` = :engine AND `song_id` = :song_id;";
             }
-            sqlState_getSongDetails.addEventListener(SQLEvent.RESULT, resultHandler);
-            sqlState_getSongDetails.addEventListener(SQLErrorEvent.ERROR, errorHandler);
 
-            sqlState_getSongDetails.clearParameters();
+            var parsed_data:Object = getTemplate();
 
-            for (var key:String in params)
-                sqlState_getSongDetails.parameters[":" + key] = params[key];
-
-            sqlState_getSongDetails.execute();
-
-            // Statement Events
-            function resultHandler(event:SQLEvent):void
+            // DB Info
+            if (obj.db_info != null)
             {
-                sqlState_getSongDetails.removeEventListener(SQLEvent.RESULT, resultHandler);
-                sqlState_getSongDetails.removeEventListener(SQLErrorEvent.ERROR, errorHandler);
-
-                if (callback != null)
+                for (var info_key:String in obj.db_info)
                 {
-                    var tmp:SQLResult = sqlState_getSongDetails.getResult();
-                    var len:int = 0;
-                    var results:Vector.<SQLSongDetails>;
-                    if (tmp.data != null)
-                    {
-                        len = tmp.data.length;
-                        results = new Vector.<SQLSongDetails>(true, len);
-                        for (var i:int = 0; i < len; i++)
-                        {
-                            results[i] = new SQLSongDetails(tmp.data[i]);
-                        }
-                    }
-                    callback(results);
+                    parsed_data.db_info[info_key] = obj.db_info[info_key];
                 }
             }
 
-            function errorHandler(event:SQLErrorEvent):void
+            // Song Details
+            if (obj.song_details != null)
             {
-                sqlState_getSongDetails.removeEventListener(SQLEvent.RESULT, resultHandler);
-                sqlState_getSongDetails.removeEventListener(SQLErrorEvent.ERROR, errorHandler);
-
-                if (callback != null)
-                    callback(null);
+                for (var engine_id:String in obj.song_details)
+                {
+                    parsed_data.song_details[engine_id] = {};
+                    var engine:Object = obj.song_details[engine_id];
+                    for (var level_id:String in engine)
+                    {
+                        if (engine[level_id] != null && ObjectUtil.count(engine[level_id]) > 0)
+                            parsed_data.song_details[engine_id][level_id] = new SQLSongDetails(engine[level_id]);
+                    }
+                }
             }
+
+            sql_data = parsed_data;
         }
-        private static var sqlState_getSongDetails:SQLStatement;
+
+        /**
+         * Gets a songs details or null if none found.
+         * @param engine_id
+         * @param level_id
+         * @return
+         */
+        public static function getSongDetails(engine_id:String, level_id:String):SQLSongDetails
+        {
+            if (sql_data.song_details[engine_id] == null || sql_data.song_details[engine_id][level_id] == null)
+                return null;
+
+            return (sql_data.song_details[engine_id][level_id] as SQLSongDetails);
+        }
+
+        /**
+         * Safe version of the getSongDetails that only returns a SQLSongDetails.
+         * This also creates the entires in in the song details and engine objects.
+         * @param engine_id
+         * @param level_id
+         * @return
+         */
+        public static function getSongDetailsSafe(engine_id:String, level_id:String):SQLSongDetails
+        {
+            if (sql_data.song_details[engine_id] == null)
+                sql_data.song_details[engine_id] = {};
+
+            if (sql_data.song_details[engine_id][level_id] == null)
+                sql_data.song_details[engine_id][level_id] = new SQLSongDetails(null);
+
+            return (sql_data.song_details[engine_id][level_id] as SQLSongDetails);
+        }
+
+        /**
+         * Writes the Song Details DB into a JSON file.
+         * @param db_file
+         */
+        public static function writeFile(db_file:File):void
+        {
+            var my_data:Object = sql_data;
+            AirContext.writeTextFile(db_file, JSON.stringify(sql_data, null, 2));
+        }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         /**
-         * Updates a stored song details using the following params structure:
-           {
-           "engine": Constant.BRAND_NAME_SHORT_LOWER(), 			// Engine ID - String [250]
-           "song_id": 1,				// Song ID - String [250]
-           "offset_music": 1,			// Music Offset - Number
-           "offset_judge": 1,			// Judge Offset - Number
-           "set_mirror_invert": 0,		// Mirror Invert - Boolean (0 / 1)
-           "set_custom_offsets": 1,	// Custom Offsets - Boolean (0 / 1)
-           "notes": "testing"			// Song Notes - String
-           }
-         *
-         * @param	conn
-         * @param	params See Structure
+         * Helper function to convert the SQL style Song Details into the new JSON style.
+         * This will be removed in 1.4.0
+         * @param db_file SQLite DB File
+         * @param callback
          */
-        public static function saveSongDetails(conn:SQLConnection, params:Object, callback:Function = null):void
+        public static function exportToJSON(db_file:File, callback:Function):void
         {
-            if (!conn.connected)
-                return;
+            var out:Object = getTemplate();
 
-            if (!sqlState_saveSongDetails)
+            // Create Connection
+            var sql_conn:SQLConnection = new SQLConnection();
+            sql_conn.addEventListener(SQLEvent.OPEN, sql_openHandler);
+            sql_conn.addEventListener(SQLErrorEvent.ERROR, sql_openErrorHandler);
+
+            sql_conn.openAsync(db_file);
+
+            function sql_openHandler(event:SQLEvent):void
             {
-                sqlState_saveSongDetails = new SQLStatement();
-                sqlState_saveSongDetails.sqlConnection = conn;
-                sqlState_saveSongDetails.text = "INSERT OR REPLACE INTO `song_details` " + "	(`engine`, `song_id`, `offset_music`, `offset_judge`, `set_mirror_invert`, `set_custom_offsets`, `notes`) " + "VALUES " + "	(:engine, :song_id, :offset_music, :offset_judge, :set_mirror_invert, :set_custom_offsets, :notes)";
+                sql_conn.removeEventListener(SQLEvent.OPEN, sql_openHandler);
+                sql_conn.removeEventListener(SQLErrorEvent.ERROR, sql_openErrorHandler);
+
+                trace("Database was connected successfully");
+
+                doQuery(sql_conn);
             }
-            sqlState_saveSongDetails.addEventListener(SQLEvent.RESULT, resultHandler);
-            sqlState_saveSongDetails.addEventListener(SQLErrorEvent.ERROR, resultHandler);
 
-            sqlState_saveSongDetails.clearParameters();
+            function sql_openErrorHandler(event:SQLErrorEvent):void
+            {
+                sql_conn.removeEventListener(SQLEvent.OPEN, sql_openHandler);
+                sql_conn.removeEventListener(SQLErrorEvent.ERROR, sql_openErrorHandler);
+                trace("Database failed to connect!");
+                trace("Error message:", event.error.message);
+                trace("Details:", event.error.details);
+            }
 
-            for (var key:String in params)
-                sqlState_saveSongDetails.parameters[":" + key] = params[key];
+            // Export db_info:
+            function doQuery(conn:SQLConnection):void
+            {
+                var state:SQLStatement = new SQLStatement();
+                state.sqlConnection = conn;
+                state.text = "SELECT * FROM 'song_details'";
+                state.addEventListener(SQLEvent.RESULT, resultHandler);
+                state.addEventListener(SQLErrorEvent.ERROR, resultHandler);
+                state.execute();
+            }
 
-            sqlState_saveSongDetails.execute();
-
-            // Statement Events
             function resultHandler(event:Event):void
             {
-                sqlState_saveSongDetails.removeEventListener(SQLEvent.RESULT, resultHandler);
-                sqlState_saveSongDetails.removeEventListener(SQLErrorEvent.ERROR, resultHandler);
+                var state:SQLStatement = (event.target as SQLStatement);
+                state.removeEventListener(SQLEvent.RESULT, resultHandler);
+                state.removeEventListener(SQLErrorEvent.ERROR, resultHandler);
 
-                if (callback != null)
-                    callback(event);
+                if (event.type == SQLEvent.RESULT)
+                {
+                    var results:SQLResult = state.getResult();
+                    if (results.data != null && results.data.length > 0)
+                    {
+                        var res_data:Array = results.data;
+                        var res_count:int = res_data.length;
+
+                        // Dump Data
+                        for (var index:int = 0; index < res_count; index++)
+                        {
+                            var row:Object = res_data[index];
+                            var eid:* = row["engine"];
+                            var sid:String = row["song_id"];
+                            if (row["engine"] != Constant.BRAND_NAME_SHORT_LOWER())
+                            {
+                                eid = row["engine"]["id"];
+                            }
+
+                            delete row["song_id"];
+                            delete row["engine"];
+
+                            if (out["song_details"][eid] == null)
+                                out["song_details"][eid] = {};
+
+                            out["song_details"][eid][sid] = row;
+                        }
+                    }
+                }
+                else
+                {
+                    trace("Error dumping song details table");
+                }
+
+                sql_conn.close();
+                callback(out);
             }
         }
-        private static var sqlState_saveSongDetails:SQLStatement;
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
 }

@@ -456,7 +456,7 @@ package
                     this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
                     _playlist.updateSongAccess();
                     _playlist.updatePublicSongsCount();
-                    _gvars.initSQLConnection();
+                    _gvars.loadUserSongData();
                     switchTo(_gvars.activeUser.isGuest || _gvars.flashvars["__forceLogin"] ? GAME_LOGIN_PANEL : GAME_MENU_PANEL);
                 }
             }

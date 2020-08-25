@@ -18,14 +18,11 @@ package
     import com.flashfla.loader.DataEvent;
     import com.flashfla.net.DynamicURLLoader;
     import com.flashfla.utils.DateUtil;
-    import flash.data.SQLConnection;
     import flash.display.BitmapData;
     import flash.display.StageDisplayState;
     import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.events.IOErrorEvent;
-    import flash.events.SQLErrorEvent;
-    import flash.events.SQLEvent;
     import flash.events.SecurityErrorEvent;
     import flash.filesystem.File;
     import flash.media.SoundTransform;
@@ -37,22 +34,16 @@ package
     import flash.net.URLVariables;
     import flash.system.Capabilities;
     import flash.utils.ByteArray;
-
     import game.GameOptions;
     import game.GameScoreResult;
 
     public class GlobalVariables extends EventDispatcher
     {
-        [Embed(source = "sql/template.db", mimeType = "application/octet-stream")]
-        private static const SQL_DB_TEMPLATE:Class;
-
         ///- Singleton Instance
         private static var _instance:GlobalVariables = null;
         private var _loader:DynamicURLLoader;
 
         ///- Constants
-        public static const DB_CONNECT_COMPLETE:String = "DBLoadComplete";
-        public static const DB_CONNECT_ERROR:String = "DBLoadError";
         public static const LOAD_COMPLETE:String = "LoadComplete";
         public static const LOAD_ERROR:String = "LoadError";
         public static const HIGHSCORES_LOAD_COMPLETE:String = "HighscoresLoadComplete";
@@ -114,10 +105,6 @@ package
         public var air_useVSync:Boolean = true;
         public var air_useWebsockets:Boolean = false;
 
-        public var sql_connect:Boolean = false;
-        public var sql_conn:SQLConnection;
-        public var sql_db:File;
-
         private var websocket_server:AIRServer;
         private static var websocket_message:Message = new Message();
 
@@ -132,72 +119,46 @@ package
                 initWebsocketServer();
         }
 
-        public function initSQLConnection():void
+        public function loadUserSongData():void
         {
-            // Clean Up Possible Connection
-            if (sql_conn != null && sql_connect)
+            // Export SQL to JSON
+            var db_name:String = "dbinfo/" + (activeUser != null && activeUser.id > 0 ? activeUser.id : "0") + "_info.";
+            var sql_file:File = new File(AirContext.getAppPath(db_name + "db"));
+            var json_file:File = new File(AirContext.getAppPath(db_name + "json"));
+
+            if (sql_file.exists)
             {
-                sql_conn.removeEventListener(SQLEvent.OPEN, sql_openHandler);
-                sql_conn.removeEventListener(SQLErrorEvent.ERROR, sql_openErrorHandler);
-                sql_conn.removeEventListener(SQLErrorEvent.ERROR, sql_errorHandler);
-                sql_conn.close();
+                SQLQueries.exportToJSON(sql_file, function(data:Object):void
+                {
+                    SQLQueries.loadFromObject(data);
+                    writeUserSongData();
+                    sql_file.moveToAsync(new File(AirContext.getAppPath(db_name + "db.bak")));
+                });
             }
 
-            // DB Name
-            var sql_name:String = "dbinfo/" + (activeUser != null && activeUser.id > 0 ? activeUser.id : "0") + "_info.db";
-
-            sql_db = new File(AirContext.getAppPath(sql_name));
-
-            // Copy Template
-            if (!sql_db.exists)
+            // Using JSON File
+            else if (json_file.exists)
             {
-                sql_db = AirContext.writeFile(AirContext.getAppPath(sql_name), new SQL_DB_TEMPLATE as ByteArray);
-                if (!sql_db.exists)
+                var json_str:String = AirContext.readTextFile(json_file);
+                if (json_str != null)
                 {
-                    trace("Missing DB Template File @", sql_db.nativePath)
-                    return;
+                    try
+                    {
+                        SQLQueries.loadFromObject(JSON.parse(json_str));
+                    }
+                    catch (e:Error)
+                    {
+
+                    }
                 }
             }
-
-            // Create Connection
-            sql_conn = new SQLConnection();
-            sql_conn.addEventListener(SQLEvent.OPEN, sql_openHandler);
-            sql_conn.addEventListener(SQLErrorEvent.ERROR, sql_openErrorHandler);
-
-            sql_conn.openAsync(sql_db);
         }
 
-        private function sql_openHandler(event:SQLEvent):void
+        public function writeUserSongData():void
         {
-            sql_conn.removeEventListener(SQLEvent.OPEN, sql_openHandler);
-            sql_conn.removeEventListener(SQLErrorEvent.ERROR, sql_openErrorHandler);
-            sql_conn.addEventListener(SQLErrorEvent.ERROR, sql_errorHandler);
-            sql_connect = true;
-
-            trace("Database was connected successfully");
-
-            SQLQueries.refreshStatements(sql_conn);
-            this.dispatchEvent(new Event(DB_CONNECT_COMPLETE));
-        }
-
-        private function sql_openErrorHandler(event:SQLErrorEvent):void
-        {
-            sql_conn.removeEventListener(SQLEvent.OPEN, sql_openHandler);
-            sql_conn.removeEventListener(SQLErrorEvent.ERROR, sql_openErrorHandler);
-            sql_connect = false;
-
-            trace("Database failed to connect!");
-            trace("Error message:", event.error.message);
-            trace("Details:", event.error.details);
-
-            this.dispatchEvent(new Event(DB_CONNECT_ERROR));
-        }
-
-        private function sql_errorHandler(event:SQLErrorEvent):void
-        {
-            trace("SQL Execution Error:");
-            trace("Error message:", event.error.message);
-            trace("Details:", event.error.details);
+            var db_name:String = "dbinfo/" + (activeUser != null && activeUser.id > 0 ? activeUser.id : "0") + "_info.";
+            var json_file:File = new File(AirContext.getAppPath(db_name + "json"));
+            SQLQueries.writeFile(json_file);
         }
 
         public function websocketPortNumber(type:String):uint
