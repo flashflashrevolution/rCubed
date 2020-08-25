@@ -828,11 +828,6 @@ package menu
          */
         private function e_songOptionsContextSelect(e:ContextMenuEvent):void
         {
-            if (!_gvars.options)
-            {
-                _gvars.options = new GameOptions();
-                _gvars.options.fill();
-            }
             var songItem:SongItem = (e.contextMenuOwner as SongItem);
             var songData:Object = _playlist.getSong(songItem.level);
             if (songData.error == null)
@@ -849,11 +844,6 @@ package menu
          */
         private function e_setAsMenuMusicContextSelect(e:ContextMenuEvent):void
         {
-            if (!_gvars.options)
-            {
-                _gvars.options = new GameOptions();
-                _gvars.options.fill();
-            }
             var songItem:SongItem = (e.contextMenuOwner as SongItem);
             var songData:Object = _playlist.getSong(songItem.level);
             if (songData.error == null)
@@ -909,11 +899,6 @@ package menu
          */
         private function e_listenToSongPreviewContextSelect(e:ContextMenuEvent):void
         {
-            if (!_gvars.options)
-            {
-                _gvars.options = new GameOptions();
-                _gvars.options.fill();
-            }
             var songItem:SongItem = (e.contextMenuOwner as SongItem);
             var songData:Object = _playlist.getSong(songItem.level);
             if (songData.error == null)
