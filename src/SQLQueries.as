@@ -68,7 +68,7 @@ package
         }
 
         /**
-         * Gets a songs details or null if none found.
+         * Returns the Song Details for the given song and engine, or null if missing.
          * @param engine_id
          * @param level_id
          * @return
@@ -83,7 +83,7 @@ package
 
         /**
          * Safe version of the getSongDetails that only returns a SQLSongDetails.
-         * This also creates the entires in in the song details and engine objects.
+         * This also creates the entries in the song details and engine objects.
          * @param engine_id
          * @param level_id
          * @return
