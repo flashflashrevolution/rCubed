@@ -105,8 +105,6 @@ package menu
         public static var options:MenuSongSelectionOptions = new MenuSongSelectionOptions();
 
         private var songItemContextMenu:ContextMenu;
-        private var songItemContextMenuItem:ContextMenuItem;
-        private var songItemSongOptionsContext:ContextMenuItem;
         private var songItemRemoveQueueContext:ContextMenuItem;
 
         public static var previewMusic:SongPlayerBytes;
@@ -149,24 +147,26 @@ package menu
             GENRE_MODE = LocalStore.getVariable("genre_mode", GENRE_DIFFICULTIES);
 
             // Menu Music Context Menu
+            var songItemContextMenuItem:ContextMenuItem;
+
             songItemContextMenu = new ContextMenu();
-            songItemContextMenuItem = new ContextMenuItem("Set as Menu Music");
+            songItemContextMenuItem = new ContextMenuItem(_lang.stringSimple("song_selection_context_menu_music"));
             songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_setAsMenuMusicContextSelect);
             songItemContextMenu.customItems.push(songItemContextMenuItem);
 
-            songItemContextMenuItem = new ContextMenuItem("Listen to Song Preview");
+            songItemContextMenuItem = new ContextMenuItem(_lang.stringSimple("song_selection_context_song_preview"), true);
             songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_listenToSongPreviewContextSelect);
             songItemContextMenu.customItems.push(songItemContextMenuItem);
 
-            songItemContextMenuItem = new ContextMenuItem("Play Chart Preview");
+            songItemContextMenuItem = new ContextMenuItem(_lang.stringSimple("song_selection_context_chart_preview"));
             songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_playChartPreviewContextSelect);
             songItemContextMenu.customItems.push(songItemContextMenuItem);
 
-            songItemSongOptionsContext = new ContextMenuItem("Song Options");
-            songItemSongOptionsContext.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_songOptionsContextSelect);
-            songItemContextMenu.customItems.push(songItemSongOptionsContext);
+            songItemContextMenuItem = new ContextMenuItem(_lang.stringSimple("song_selection_context_song_options"));
+            songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_songOptionsContextSelect);
+            songItemContextMenu.customItems.push(songItemContextMenuItem);
 
-            songItemRemoveQueueContext = new ContextMenuItem("Remove from Queue");
+            songItemRemoveQueueContext = new ContextMenuItem(_lang.stringSimple("song_selection_context_remove_from_queue"), true);
             songItemRemoveQueueContext.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_removeFromQueueContextSelect);
             songItemContextMenu.customItems.push(songItemRemoveQueueContext);
 
@@ -1315,7 +1315,7 @@ package menu
                 songQueueButton.x = 5;
                 songQueueButton.y = 256;
                 songQueueButton.level = songDetails.level;
-                songQueueButton.setHoverText(_lang.string("song_selection_song_panel_queue"));
+                songQueueButton.setHoverText(_lang.string("song_selection_song_panel_hover_queue"));
                 songQueueButton.addEventListener(MouseEvent.CLICK, songQueueClick, false, 0, true);
                 infoBox.addChild(songQueueButton);
 
@@ -1326,7 +1326,7 @@ package menu
                     songHighscoresButton.y = 256;
                     songHighscoresButton.level = songDetails.level;
                     songHighscoresButton.action = "highscores";
-                    songHighscoresButton.setHoverText((options.infoTab == TAB_HIGHSCORES ? _lang.string("song_selection_song_panel_info") : _lang.string("song_selection_song_panel_scores")));
+                    songHighscoresButton.setHoverText((options.infoTab == TAB_HIGHSCORES ? _lang.string("song_selection_song_panel_hover_info") : _lang.string("song_selection_song_panel_hover_scores")));
                     songHighscoresButton.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                     infoBox.addChild(songHighscoresButton);
                 }
@@ -1336,7 +1336,7 @@ package menu
                 songOptionsButton.y = 256;
                 songOptionsButton.level = songDetails.level;
                 songOptionsButton.action = "songOptions";
-                songOptionsButton.setHoverText("Song Options");
+                songOptionsButton.setHoverText(_lang.string("song_selection_song_panel_hover_song_options"));
                 songOptionsButton.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                 infoBox.addChild(songOptionsButton);
 
