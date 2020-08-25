@@ -48,6 +48,10 @@ package menu
     import popups.PopupFilterManager;
     import popups.PopupQueueManager;
     import popups.PopupSongNotes;
+    import classes.BoxIcon;
+    import assets.menu.icons.fa.iconList;
+    import assets.menu.icons.fa.iconTrophy;
+    import assets.menu.icons.fa.iconGear;
 
     public class MenuSongSelection extends MenuPanel
     {
@@ -1304,30 +1308,42 @@ package menu
             if (accessLevel == GlobalVariables.SONG_ACCESS_PLAYABLE)
             {
                 var hasHighscores:Boolean = !songDetails.engine;
+                var buttonWidth:int = hasHighscores ? 51.5 : 79.5;
 
                 //- Make Display
-                var songQueueButton:BoxButton = new BoxButton(hasHighscores ? 79.5 : 164, 27, _lang.string("song_selection_song_panel_queue"), 12);
+                var songQueueButton:BoxIcon = new BoxIcon(buttonWidth, 27, new iconList());
                 songQueueButton.x = 5;
                 songQueueButton.y = 256;
                 songQueueButton.level = songDetails.level;
+                songQueueButton.setHoverText(_lang.string("song_selection_song_panel_queue"));
                 songQueueButton.addEventListener(MouseEvent.CLICK, songQueueClick, false, 0, true);
                 infoBox.addChild(songQueueButton);
 
                 if (hasHighscores)
                 {
-                    var songHighscoresButton:BoxButton = new BoxButton(79.5, 27, (options.infoTab == TAB_HIGHSCORES ? _lang.string("song_selection_song_panel_info") : _lang.string("song_selection_song_panel_scores")), 12);
-                    songHighscoresButton.x = 89.5;
+                    var songHighscoresButton:BoxIcon = new BoxIcon(buttonWidth, 27, new iconTrophy());
+                    songHighscoresButton.x = 5 + buttonWidth + 5;
                     songHighscoresButton.y = 256;
                     songHighscoresButton.level = songDetails.level;
                     songHighscoresButton.action = "highscores";
+                    songHighscoresButton.setHoverText((options.infoTab == TAB_HIGHSCORES ? _lang.string("song_selection_song_panel_info") : _lang.string("song_selection_song_panel_scores")));
                     songHighscoresButton.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                     infoBox.addChild(songHighscoresButton);
                 }
 
-                var songStartWidth:Number = 164;
+                var songOptionsButton:BoxIcon = new BoxIcon(buttonWidth, 27, new iconGear());
+                songOptionsButton.x = 5 + buttonWidth + 6 + (hasHighscores ? (buttonWidth + 5) : 0);
+                songOptionsButton.y = 256;
+                songOptionsButton.level = songDetails.level;
+                songOptionsButton.action = "songOptions";
+                songOptionsButton.setHoverText("Song Options");
+                songOptionsButton.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                infoBox.addChild(songOptionsButton);
+
+                buttonWidth = 164;
                 if (_mp.gameplayCanPick())
                 {
-                    songStartWidth = 79.5;
+                    buttonWidth = 79.5;
                     var songLoadButton:BoxButton = new BoxButton(79.5, 27, _lang.string("song_selection_song_panel_mp_load"), 14);
                     songLoadButton.x = 89.5;
                     songLoadButton.y = 288;
@@ -1335,7 +1351,7 @@ package menu
                     songLoadButton.addEventListener(MouseEvent.CLICK, songLoadClick, false, 0, true);
                     infoBox.addChild(songLoadButton);
                 }
-                var songStartButton:BoxButton = new BoxButton(songStartWidth, 27, _lang.string("song_selection_song_panel_play"), 14);
+                var songStartButton:BoxButton = new BoxButton(buttonWidth, 27, _lang.string("song_selection_song_panel_play"), 14);
                 songStartButton.x = 5;
                 songStartButton.y = 288;
                 songStartButton.level = songDetails.level;
@@ -1743,6 +1759,14 @@ package menu
                 {
                     options.infoTab = (options.infoTab == TAB_PLAYLIST ? TAB_HIGHSCORES : TAB_PLAYLIST);
                     buildInfoBox();
+                }
+                else if (clickAction == "songOptions")
+                {
+                    var songData:Object = _playlist.getSong(e.target.level);
+                    if (songData.error == null)
+                    {
+                        _gvars.gameMain.addPopup(new PopupSongNotes(this, songData));
+                    }
                 }
                 else if (clickAction == "clearQueue")
                 {
