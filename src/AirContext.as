@@ -146,6 +146,37 @@ package
             return null;
         }
 
+        static public function readTextFile(file:File, errorCallback:Function = null):String
+        {
+            if (file.exists)
+            {
+                var fileStream:FileStream = new FileStream();
+                fileStream.addEventListener(SecurityErrorEvent.SECURITY_ERROR, (errorCallback != null ? errorCallback : e_fileError));
+                fileStream.addEventListener(IOErrorEvent.IO_ERROR, (errorCallback != null ? errorCallback : e_fileError));
+                fileStream.open(file, FileMode.READ);
+                var data:String = fileStream.readUTFBytes(fileStream.bytesAvailable);
+                fileStream.close();
+
+                return data;
+            }
+            return null;
+        }
+
+        static public function writeTextFile(file:File, data:String, errorCallback:Function = null):File
+        {
+            if (data == null || data.length == 0)
+                return file;
+
+            var fileStream:FileStream = new FileStream();
+            fileStream.addEventListener(SecurityErrorEvent.SECURITY_ERROR, (errorCallback != null ? errorCallback : e_fileError));
+            fileStream.addEventListener(IOErrorEvent.IO_ERROR, (errorCallback != null ? errorCallback : e_fileError));
+            fileStream.open(file, FileMode.WRITE);
+            fileStream.writeUTFBytes(data);
+            fileStream.close();
+
+            return file;
+        }
+
         static public function deleteFile(appPath:String):Boolean
         {
             var cacheFile:File = new File(appPath);
