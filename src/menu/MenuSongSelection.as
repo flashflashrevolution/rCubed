@@ -1275,7 +1275,8 @@ package menu
                 ratingDisplay.y = 5;
                 ratingDisplay.value = songDetails['song_rating'];
                 ratingDisplay.rotation = 90;
-                ratingDisplay.scaleX = ratingDisplay.scaleY = 0.60;
+                ratingDisplay.scaleX = ratingDisplay.scaleY = 0.50;
+                ratingDisplay.alpha = 0.2;
                 infoBox.addChild(ratingDisplay);
             }
             for (var item:String in infoDisplay)
