@@ -173,6 +173,11 @@ package menu
             }
         }
 
+        /**
+         * TimerEvent.TIMER_COMPLETE For the hover / active timer.
+         * Displays the song note sprite when the timer completes.
+         * @param e
+         */
         private function e_hoverTimerComplete(e:Event = null):void
         {
             _hoverTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
@@ -190,6 +195,12 @@ package menu
             }
         }
 
+        /**
+         * Event.ENTER_FRAME For note position on stage.
+         * This updates the note position every 5 frames so the message
+         * is supposedly visible when scrolled to high or low.
+         * @param e
+         */
         private function e_positionHoverSprite(e:Event):void
         {
             // Only check 12 times per second instead of 60.
@@ -226,6 +237,9 @@ package menu
             }
         }
 
+        /**
+         * Updates the note text, or displays the new note if previously empty.
+         */
         public function updateOrShow():void
         {
             if (_hoverSprite != null)
@@ -234,6 +248,9 @@ package menu
                 showHoverMessage(true);
         }
 
+        /**
+         * Update the note sprite message.
+         */
         public function update():void
         {
             if (_hoverSprite != null)
