@@ -226,6 +226,14 @@ package menu
             }
         }
 
+        public function updateOrShow():void
+        {
+            if (_hoverSprite != null)
+                update();
+            else
+                showHoverMessage(true);
+        }
+
         public function update():void
         {
             if (_hoverSprite != null)

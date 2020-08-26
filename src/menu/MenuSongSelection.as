@@ -791,6 +791,18 @@ package menu
                 _mp.gameplayPicking(_playlist.getSong(options.activeSongID));
         }
 
+        public function updateSongItemNote(level:int):void
+        {
+            for (var i:int = 0; i < songItems.length; i++)
+            {
+                if (options.activeSongID == songItems[i].level)
+                {
+                    songItems[i].updateOrShow();
+                    break;
+                }
+            }
+        }
+
         /**
          * Called from the playlist scroll pane when a song item is clicked.
          * When a new song is selected, sets the active index and draws the info box for the new song information.

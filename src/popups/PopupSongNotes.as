@@ -24,7 +24,9 @@ package popups
     import flash.net.URLVariables;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
+    import menu.MainMenu;
     import menu.MenuPanel;
+    import menu.MenuSongSelection;
     import sql.SQLSongDetails;
 
     public class PopupSongNotes extends MenuPanel
@@ -275,6 +277,18 @@ package popups
                 saveRatings();
                 saveDetails();
                 removePopup();
+
+                // Update the Note Hover Directly
+                if (_gvars.gameMain.activePanel != null && _gvars.gameMain.activePanel is MainMenu)
+                {
+                    var mmmenu:MainMenu = (_gvars.gameMain.activePanel as MainMenu);
+                    if (mmmenu != null && (mmmenu.panel is MenuSongSelection))
+                    {
+                        var msmenu:MenuSongSelection = (mmmenu.panel as MenuSongSelection);
+                        msmenu.updateSongItemNote(sObject.level);
+                    }
+                }
+
                 return;
             }
             //- Close
