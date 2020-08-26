@@ -70,6 +70,7 @@ package classes
 
         public var DISPLAY_LEGACY_SONGS:Boolean = false;
         public var DISPLAY_SONG_FLAG:Boolean = true;
+        public var DISPLAY_SONG_NOTE:Boolean = true;
 
         //- Game Data
         public var GLOBAL_OFFSET:Number = 0;
@@ -444,6 +445,8 @@ package classes
                 this.AUTO_JUDGE_OFFSET = _settings.autoJudgeOffset;
             if (_settings.viewSongFlag != null)
                 this.DISPLAY_SONG_FLAG = _settings.viewSongFlag;
+            if (_settings.viewSongNote != null)
+                this.DISPLAY_SONG_NOTE = _settings.viewSongNote;
             if (_settings.viewJudge != null)
                 this.DISPLAY_JUDGE = _settings.viewJudge;
             if (_settings.viewJudgeAnimations != null)
@@ -583,6 +586,7 @@ package classes
             gameSave.judgeOffset = this.JUDGE_OFFSET;
             gameSave.autoJudgeOffset = this.AUTO_JUDGE_OFFSET;
             gameSave.viewSongFlag = this.DISPLAY_SONG_FLAG;
+            gameSave.viewSongNote = this.DISPLAY_SONG_NOTE;
             gameSave.viewJudge = this.DISPLAY_JUDGE;
             gameSave.viewHealth = this.DISPLAY_HEALTH;
             gameSave.viewJudgeAnimations = this.DISPLAY_JUDGE_ANIMATIONS;

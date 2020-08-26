@@ -56,6 +56,7 @@ package menu
         public var isLocked:Boolean = false;
 
         // Hover Data
+        private var _hoverEnabled:Boolean = true;
         private var _hoverTimer:Timer;
         private var _hoverSprite:MouseTooltip;
         private var _hoverTick:int = 0;
@@ -134,7 +135,7 @@ package menu
             // `enabled` accounts for both `active` and `highlight`.
             if (enabled)
             {
-                if (highlight)
+                if (highlight && _hoverEnabled)
                 {
                     // Check for Changes
                     if (_songDetails == null)
@@ -181,7 +182,7 @@ package menu
                 if (_hoverSprite == null)
                     _hoverSprite = new MouseTooltip("", _width - 1);
 
-                _hoverSprite.message = "<font face=\"" + Language.UNI_FONT_NAME + "\" >" + _songDetails.notes + "</font>";
+                update();
                 positionHoverSprite();
                 this.parent.addChild(_hoverSprite);
                 _hoverSprite.visible = true; // Adding a child to the ScrollPane makes it invisible until a scroll update is sent.
@@ -222,6 +223,14 @@ package menu
                     _hoverSprite.y = this.y + _height + 2;
 
                 _hoverSprite.x = this.x;
+            }
+        }
+
+        public function update():void
+        {
+            if (_hoverSprite != null)
+            {
+                _hoverSprite.message = "<font face=\"" + Language.UNI_FONT_NAME + "\" >" + _songDetails.notes + "</font>";
             }
         }
 
@@ -381,6 +390,16 @@ package menu
         override public function get height():Number
         {
             return _height;
+        }
+
+        public function get noteEnabled():Boolean
+        {
+            return _hoverEnabled;
+        }
+
+        public function set noteEnabled(val:Boolean):void
+        {
+            _hoverEnabled = val;
         }
     }
 }

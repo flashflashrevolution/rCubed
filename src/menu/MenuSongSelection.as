@@ -613,6 +613,7 @@ package menu
                 song = songList[sX];
                 sI = new SongItem();
                 sI.setData(song, _gvars.activeUser.getLevelRank(song));
+                sI.noteEnabled = _gvars.activeUser.DISPLAY_SONG_NOTE;
                 sI.setContextMenu(songItemContextMenu);
                 sI.y = yOffset;
                 sI.index = sX;
