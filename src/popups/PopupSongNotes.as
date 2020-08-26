@@ -282,7 +282,7 @@ package popups
                 if (_gvars.gameMain.activePanel != null && _gvars.gameMain.activePanel is MainMenu)
                 {
                     var mmmenu:MainMenu = (_gvars.gameMain.activePanel as MainMenu);
-                    if (mmmenu != null && (mmmenu.panel is MenuSongSelection))
+                    if (mmmenu.panel != null && (mmmenu.panel is MenuSongSelection))
                     {
                         var msmenu:MenuSongSelection = (mmmenu.panel as MenuSongSelection);
                         msmenu.updateSongItemNote(sObject.level);
