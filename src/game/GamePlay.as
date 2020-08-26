@@ -595,8 +595,6 @@ package game
             {
                 options.offsetJudge = 0;
                 options.offsetGlobal = 0;
-                options.isolationLength = 0;
-                options.isolationOffset = 0;
             }
 
             reverseMod = options.modEnabled("reverse");
