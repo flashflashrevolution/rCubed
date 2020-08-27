@@ -199,7 +199,8 @@ package
                 }
 
                 sql_conn.close();
-                callback(out);
+                if (callback != null)
+                    callback(out);
             }
         }
     }
