@@ -132,7 +132,22 @@ package
                 {
                     SQLQueries.loadFromObject(data);
                     writeUserSongData();
-                    sql_file.moveToAsync(new File(AirContext.getAppPath(db_name + "db.bak")));
+
+                    // Create Backup File
+                    var backupFile:File = new File(AirContext.getAppPath(db_name + "db.bak"));
+                    for (var i:int = 0; i < 10; i++)
+                    {
+                        if (!backupFile.exists)
+                        {
+                            sql_file.moveToAsync(backupFile);
+                            break;
+                        }
+                        else
+                        {
+                            backupFile = new File(AirContext.getAppPath(db_name + "db.bak" + i));
+                            continue;
+                        }
+                    }
                 });
             }
 
