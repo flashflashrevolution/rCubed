@@ -590,7 +590,7 @@ package game
 
         private function initPlayerVars():void
         {
-            // Force no judge, global and isolation offsets on SongPreviews
+            // Force no Judge on SongPreviews
             if (options.replay && options.replay is SongPreview)
             {
                 options.offsetJudge = 0;
