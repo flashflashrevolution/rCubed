@@ -87,6 +87,7 @@ package classes
             else if (totalNoteskins == 0)
             {
                 _loadError = true;
+                this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
             }
         }
 
@@ -336,10 +337,11 @@ package classes
             imgLoader.ID = noteID;
             totalNoteskins++;
 
+            imgLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, e_bitmapFail);
+            imgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, e_bitmapLoad);
+
             try
             {
-                imgLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, e_bitmapFail);
-                imgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, e_bitmapLoad);
                 imgLoader.loadBytes(Base64.decode(mbpString), AirContext.getLoaderContext());
             }
             catch (e:Error)
@@ -357,6 +359,9 @@ package classes
         private function e_bitmapLoad(e:Event):void
         {
             var loader:DynamicLoader = e.currentTarget.loader;
+            loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, e_bitmapFail);
+            loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, e_bitmapLoad);
+
             var noteID:String = loader.ID;
             var noteskin_struct:Object = null;
 
@@ -428,7 +433,11 @@ package classes
          */
         private function e_bitmapFail(e:Event):void
         {
-            var noteID:String = e.currentTarget.loader.ID;
+            var loader:DynamicLoader = e.currentTarget.loader;
+            loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, e_bitmapFail);
+            loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, e_bitmapLoad);
+
+            var noteID:String = loader.ID;
 
             //- Remove From List
             totalNoteskins--;
