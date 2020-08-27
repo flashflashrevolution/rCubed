@@ -1340,7 +1340,7 @@ package menu
 
                 if (hasHighscores)
                 {
-                    var songHighscoresButton:BoxIcon = new BoxIcon(buttonWidth, 27, new iconTrophy());
+                    var songHighscoresButton:BoxIcon = new BoxIcon(buttonWidth + 1, 27, new iconTrophy());
                     songHighscoresButton.x = 5 + buttonWidth + 5;
                     songHighscoresButton.y = 256;
                     songHighscoresButton.level = songDetails.level;
