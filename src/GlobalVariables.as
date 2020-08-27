@@ -126,7 +126,24 @@ package
             var sql_file:File = new File(AirContext.getAppPath(db_name + "db"));
             var json_file:File = new File(AirContext.getAppPath(db_name + "json"));
 
-            if (sql_file.exists)
+            // Use JSON first
+            if (json_file.exists)
+            {
+                var json_str:String = AirContext.readTextFile(json_file);
+                if (json_str != null)
+                {
+                    try
+                    {
+                        SQLQueries.loadFromObject(JSON.parse(json_str));
+                    }
+                    catch (e:Error)
+                    {
+
+                    }
+                }
+            }
+            // Fallback to SQL
+            else if (sql_file.exists)
             {
                 SQLQueries.exportToJSON(sql_file, function(data:Object):void
                 {
@@ -149,23 +166,6 @@ package
                         }
                     }
                 });
-            }
-
-            // Using JSON File
-            else if (json_file.exists)
-            {
-                var json_str:String = AirContext.readTextFile(json_file);
-                if (json_str != null)
-                {
-                    try
-                    {
-                        SQLQueries.loadFromObject(JSON.parse(json_str));
-                    }
-                    catch (e:Error)
-                    {
-
-                    }
-                }
             }
         }
 
