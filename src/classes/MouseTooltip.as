@@ -15,7 +15,6 @@ package classes
             this.mouseEnabled = false;
             this.mouseChildren = false;
 
-            super();
             msg = new TextField();
             msg.x = 5;
             msg.selectable = false;
@@ -33,22 +32,33 @@ package classes
 
         public function set message(value:String):void
         {
-            msg.wordWrap = false;
-            msg.multiline = false;
-            msg.htmlText = value;
-            if (msg.width > maxWidth)
+            if (value != msg.htmlText)
             {
-                msg.wordWrap = true;
-                msg.multiline = true;
-                msg.width = maxWidth;
+                msg.wordWrap = false;
+                msg.multiline = false;
+                msg.htmlText = value;
+                if (msg.width > maxWidth)
+                {
+                    msg.wordWrap = true;
+                    msg.multiline = true;
+                    msg.width = maxWidth - 10;
+                }
+
+                this.graphics.clear();
+
+                if (msg.textWidth > 0)
+                {
+                    this.graphics.lineStyle(1, 0xffffff, 0.75);
+                    this.graphics.beginFill(GameBackgroundColor.BG_DARK, 0.95);
+                    this.graphics.drawRect(0, 0, msg.width + 10, msg.height + 2);
+                    this.graphics.endFill();
+                }
             }
-            this.graphics.clear();
-            this.graphics.lineStyle(1, 0xffffff, 0.75);
-            this.graphics.beginFill(GameBackgroundColor.BG_DARK, 0.95);
-            this.graphics.drawRect(0, 0, msg.width + 10, msg.height + 2);
-            this.graphics.endFill();
         }
 
+        public function get message():String
+        {
+            return msg.htmlText;
+        }
     }
-
 }

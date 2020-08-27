@@ -48,6 +48,10 @@ package menu
     import popups.PopupFilterManager;
     import popups.PopupQueueManager;
     import popups.PopupSongNotes;
+    import classes.BoxIcon;
+    import assets.menu.icons.fa.iconList;
+    import assets.menu.icons.fa.iconTrophy;
+    import assets.menu.icons.fa.iconGear;
 
     public class MenuSongSelection extends MenuPanel
     {
@@ -101,8 +105,6 @@ package menu
         public static var options:MenuSongSelectionOptions = new MenuSongSelectionOptions();
 
         private var songItemContextMenu:ContextMenu;
-        private var songItemContextMenuItem:ContextMenuItem;
-        private var songItemSongOptionsContext:ContextMenuItem;
         private var songItemRemoveQueueContext:ContextMenuItem;
 
         public static var previewMusic:SongPlayerBytes;
@@ -115,9 +117,6 @@ package menu
 
         override public function init():Boolean
         {
-            // Listen for DB Connection
-            _gvars.addEventListener(GlobalVariables.DB_CONNECT_COMPLETE, e_sqlConnectComplete);
-
             // Load Default Alt Engine
             if (_avars.legacyDefaultEngine && !Flags.VALUES[Flags.LEGACY_ENGINE_DEFAULT_LOAD])
             {
@@ -148,25 +147,26 @@ package menu
             GENRE_MODE = LocalStore.getVariable("genre_mode", GENRE_DIFFICULTIES);
 
             // Menu Music Context Menu
+            var songItemContextMenuItem:ContextMenuItem;
+
             songItemContextMenu = new ContextMenu();
-            songItemContextMenuItem = new ContextMenuItem("Set as Menu Music");
+            songItemContextMenuItem = new ContextMenuItem(_lang.stringSimple("song_selection_context_menu_music"));
             songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_setAsMenuMusicContextSelect);
             songItemContextMenu.customItems.push(songItemContextMenuItem);
 
-            songItemContextMenuItem = new ContextMenuItem("Listen to Song Preview");
+            songItemContextMenuItem = new ContextMenuItem(_lang.stringSimple("song_selection_context_song_preview"), true);
             songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_listenToSongPreviewContextSelect);
             songItemContextMenu.customItems.push(songItemContextMenuItem);
 
-            songItemContextMenuItem = new ContextMenuItem("Play Chart Preview");
+            songItemContextMenuItem = new ContextMenuItem(_lang.stringSimple("song_selection_context_chart_preview"));
             songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_playChartPreviewContextSelect);
             songItemContextMenu.customItems.push(songItemContextMenuItem);
 
-            songItemSongOptionsContext = new ContextMenuItem("Song Options");
-            songItemSongOptionsContext.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_songOptionsContextSelect);
-            songItemSongOptionsContext.visible = _gvars.sql_connect;
-            songItemContextMenu.customItems.push(songItemSongOptionsContext);
+            songItemContextMenuItem = new ContextMenuItem(_lang.stringSimple("song_selection_context_song_options"));
+            songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_songOptionsContextSelect);
+            songItemContextMenu.customItems.push(songItemContextMenuItem);
 
-            songItemRemoveQueueContext = new ContextMenuItem("Remove from Queue");
+            songItemRemoveQueueContext = new ContextMenuItem(_lang.stringSimple("song_selection_context_remove_from_queue"), true);
             songItemRemoveQueueContext.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_removeFromQueueContextSelect);
             songItemContextMenu.customItems.push(songItemRemoveQueueContext);
 
@@ -332,8 +332,6 @@ package menu
 
         override public function stageRemove():void
         {
-            _gvars.removeEventListener(GlobalVariables.DB_CONNECT_COMPLETE, e_sqlConnectComplete);
-
             //- Remove Listeners
             if (stage)
                 stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyHandler);
@@ -615,6 +613,7 @@ package menu
                 song = songList[sX];
                 sI = new SongItem();
                 sI.setData(song, _gvars.activeUser.getLevelRank(song));
+                sI.noteEnabled = _gvars.activeUser.DISPLAY_SONG_NOTE;
                 sI.setContextMenu(songItemContextMenu);
                 sI.y = yOffset;
                 sI.index = sX;
@@ -834,11 +833,6 @@ package menu
          */
         private function e_songOptionsContextSelect(e:ContextMenuEvent):void
         {
-            if (!_gvars.options)
-            {
-                _gvars.options = new GameOptions();
-                _gvars.options.fill();
-            }
             var songItem:SongItem = (e.contextMenuOwner as SongItem);
             var songData:Object = _playlist.getSong(songItem.level);
             if (songData.error == null)
@@ -855,11 +849,6 @@ package menu
          */
         private function e_setAsMenuMusicContextSelect(e:ContextMenuEvent):void
         {
-            if (!_gvars.options)
-            {
-                _gvars.options = new GameOptions();
-                _gvars.options.fill();
-            }
             var songItem:SongItem = (e.contextMenuOwner as SongItem);
             var songData:Object = _playlist.getSong(songItem.level);
             if (songData.error == null)
@@ -915,11 +904,6 @@ package menu
          */
         private function e_listenToSongPreviewContextSelect(e:ContextMenuEvent):void
         {
-            if (!_gvars.options)
-            {
-                _gvars.options = new GameOptions();
-                _gvars.options.fill();
-            }
             var songItem:SongItem = (e.contextMenuOwner as SongItem);
             var songData:Object = _playlist.getSong(songItem.level);
             if (songData.error == null)
@@ -958,6 +942,23 @@ package menu
         {
             options.queuePlaylist = _gvars.songQueue;
         }
+
+        /**
+         * Updates the displayed song note for the given level.
+         * @param level
+         */
+        public function updateSongItemNote(level:int):void
+        {
+            for (var i:int = 0; i < songItems.length; i++)
+            {
+                if (options.activeSongID == songItems[i].level)
+                {
+                    songItems[i].updateOrShow();
+                    break;
+                }
+            }
+        }
+
 
         //******************************************************************************************//
         // Info Box Logic
@@ -1292,7 +1293,8 @@ package menu
                 ratingDisplay.y = 5;
                 ratingDisplay.value = songDetails['song_rating'];
                 ratingDisplay.rotation = 90;
-                ratingDisplay.scaleX = ratingDisplay.scaleY = 0.60;
+                ratingDisplay.scaleX = ratingDisplay.scaleY = 0.50;
+                ratingDisplay.alpha = 0.2;
                 infoBox.addChild(ratingDisplay);
             }
             for (var item:String in infoDisplay)
@@ -1325,30 +1327,42 @@ package menu
             if (accessLevel == GlobalVariables.SONG_ACCESS_PLAYABLE)
             {
                 var hasHighscores:Boolean = !songDetails.engine;
+                var buttonWidth:int = hasHighscores ? 51.5 : 79.5;
 
                 //- Make Display
-                var songQueueButton:BoxButton = new BoxButton(hasHighscores ? 79.5 : 164, 27, _lang.string("song_selection_song_panel_queue"), 12);
+                var songQueueButton:BoxIcon = new BoxIcon(buttonWidth, 27, new iconList());
                 songQueueButton.x = 5;
                 songQueueButton.y = 256;
                 songQueueButton.level = songDetails.level;
+                songQueueButton.setHoverText(_lang.string("song_selection_song_panel_hover_queue"));
                 songQueueButton.addEventListener(MouseEvent.CLICK, songQueueClick, false, 0, true);
                 infoBox.addChild(songQueueButton);
 
                 if (hasHighscores)
                 {
-                    var songHighscoresButton:BoxButton = new BoxButton(79.5, 27, (options.infoTab == TAB_HIGHSCORES ? _lang.string("song_selection_song_panel_info") : _lang.string("song_selection_song_panel_scores")), 12);
-                    songHighscoresButton.x = 89.5;
+                    var songHighscoresButton:BoxIcon = new BoxIcon(buttonWidth + 1, 27, new iconTrophy());
+                    songHighscoresButton.x = 5 + buttonWidth + 5;
                     songHighscoresButton.y = 256;
                     songHighscoresButton.level = songDetails.level;
                     songHighscoresButton.action = "highscores";
+                    songHighscoresButton.setHoverText((options.infoTab == TAB_HIGHSCORES ? _lang.string("song_selection_song_panel_hover_info") : _lang.string("song_selection_song_panel_hover_scores")));
                     songHighscoresButton.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                     infoBox.addChild(songHighscoresButton);
                 }
 
-                var songStartWidth:Number = 164;
+                var songOptionsButton:BoxIcon = new BoxIcon(buttonWidth, 27, new iconGear());
+                songOptionsButton.x = 5 + buttonWidth + 6 + (hasHighscores ? (buttonWidth + 5) : 0);
+                songOptionsButton.y = 256;
+                songOptionsButton.level = songDetails.level;
+                songOptionsButton.action = "songOptions";
+                songOptionsButton.setHoverText(_lang.string("song_selection_song_panel_hover_song_options"));
+                songOptionsButton.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                infoBox.addChild(songOptionsButton);
+
+                buttonWidth = 164;
                 if (_mp.gameplayCanPick())
                 {
-                    songStartWidth = 79.5;
+                    buttonWidth = 79.5;
                     var songLoadButton:BoxButton = new BoxButton(79.5, 27, _lang.string("song_selection_song_panel_mp_load"), 14);
                     songLoadButton.x = 89.5;
                     songLoadButton.y = 288;
@@ -1356,7 +1370,7 @@ package menu
                     songLoadButton.addEventListener(MouseEvent.CLICK, songLoadClick, false, 0, true);
                     infoBox.addChild(songLoadButton);
                 }
-                var songStartButton:BoxButton = new BoxButton(songStartWidth, 27, _lang.string("song_selection_song_panel_play"), 14);
+                var songStartButton:BoxButton = new BoxButton(buttonWidth, 27, _lang.string("song_selection_song_panel_play"), 14);
                 songStartButton.x = 5;
                 songStartButton.y = 288;
                 songStartButton.level = songDetails.level;
@@ -1710,16 +1724,6 @@ package menu
         //******************************************************************************************//
 
         /**
-         * Called when the SQL Local DB is connected.
-         * @param event
-         */
-        private function e_sqlConnectComplete(event:Object):void
-        {
-            _gvars.removeEventListener(GlobalVariables.DB_CONNECT_COMPLETE, e_sqlConnectComplete);
-            songItemSongOptionsContext.visible = _gvars.sql_connect; // Race Condition
-        }
-
-        /**
          * General Click Handler for multiple objects.
          * @param e
          */
@@ -1774,6 +1778,14 @@ package menu
                 {
                     options.infoTab = (options.infoTab == TAB_PLAYLIST ? TAB_HIGHSCORES : TAB_PLAYLIST);
                     buildInfoBox();
+                }
+                else if (clickAction == "songOptions")
+                {
+                    var songData:Object = _playlist.getSong(e.target.level);
+                    if (songData.error == null)
+                    {
+                        _gvars.gameMain.addPopup(new PopupSongNotes(this, songData));
+                    }
                 }
                 else if (clickAction == "clearQueue")
                 {

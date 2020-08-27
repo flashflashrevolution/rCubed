@@ -389,17 +389,15 @@ package popups
                 _gvars.activeUser.saveLocal();
                 _gvars.activeUser.save();
             }
-            if (_gvars.gameMain.activePanel != null && (_gvars.gameMain.activePanel is MainMenu) && (_gvars.gameMain.activePanel as MainMenu).panel != null && (_gvars.gameMain.activePanel as MainMenu).panel is MenuSongSelection)
+
+            if (_gvars.gameMain.activePanel != null && _gvars.gameMain.activePanel is MainMenu)
             {
-                var main_menu:MainMenu = (_gvars.gameMain.activePanel as MainMenu);
-                if (main_menu != null)
+                var mmmenu:MainMenu = (_gvars.gameMain.activePanel as MainMenu);
+                if (mmmenu.panel != null && (mmmenu.panel is MenuSongSelection))
                 {
-                    var song_selection_menu:MenuSongSelection = (main_menu.panel as MenuSongSelection);
-                    if (song_selection_menu != null)
-                    {
-                        song_selection_menu.buildPlayList();
-                        song_selection_menu.buildInfoBox();
-                    }
+                    var msmenu:MenuSongSelection = (mmmenu.panel as MenuSongSelection);
+                    msmenu.buildPlayList();
+                    msmenu.buildInfoBox();
                 }
             }
         }

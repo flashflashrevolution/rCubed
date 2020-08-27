@@ -1,22 +1,28 @@
 package menu
 {
-    import classes.Text;
-    import flash.display.Sprite;
-    import flash.display.GradientType;
-    import flash.events.MouseEvent;
-    import com.flashfla.utils.sprintf;
-    import com.flashfla.utils.NumberUtil;
     import classes.Language;
-    import flash.net.navigateToURL;
+    import classes.MouseTooltip;
+    import classes.Text;
+    import com.flashfla.utils.NumberUtil;
+    import com.flashfla.utils.sprintf;
+    import flash.display.GradientType;
+    import flash.display.Sprite;
+    import flash.events.Event;
+    import flash.events.MouseEvent;
+    import flash.events.TimerEvent;
+    import flash.geom.Point;
     import flash.net.URLRequest;
-    import flash.text.TextField;
+    import flash.net.navigateToURL;
     import flash.text.AntiAliasType;
+    import flash.text.TextField;
     import flash.text.TextFieldAutoSize;
     import flash.ui.ContextMenu;
-    import flash.events.Event;
+    import flash.utils.Timer;
+    import sql.SQLSongDetails;
 
     public class SongItem extends Sprite
     {
+        private static const HOVER_POINT_GLOBAL:Point = new Point();
         private static const GRADIENT_COLORS:Array = [0xFFFFFF, 0xFFFFFF];
         private static const GRADIENT_ALPHA_HIGHLIGHT:Array = [0.35, 0.1225];
         private static const GRADIENT_ALPHA:Array = [0.2, 0.04];
@@ -45,8 +51,16 @@ package menu
 
         // Song Data
         private var _songData:Object;
+        private var _songDetails:SQLSongDetails;
         private var _level:int = 0;
         public var isLocked:Boolean = false;
+
+        // Hover Data
+        private var _hoverEnabled:Boolean = true;
+        private var _hoverTimer:Timer;
+        private var _hoverSprite:MouseTooltip;
+        private var _hoverTick:int = 0;
+        private var _hoverPoint:Point;
 
         public function SongItem()
         {
@@ -83,6 +97,7 @@ package menu
         {
             _highlight = true;
             draw();
+            showHoverMessage(true);
             this.addEventListener(MouseEvent.ROLL_OUT, e_onHoverOut);
         }
 
@@ -90,6 +105,7 @@ package menu
         {
             _highlight = false;
             draw();
+            showHoverMessage(false);
             this.removeEventListener(MouseEvent.ROLL_OUT, e_onHoverOut);
         }
 
@@ -110,6 +126,139 @@ package menu
             return isLocked;
         }
 
+        /**
+         * Displays or hides the note hover for the song item.
+         * @param enabled
+         */
+        public function showHoverMessage(enabled:Boolean):void
+        {
+            // `enabled` accounts for both `active` and `highlight`.
+            if (enabled)
+            {
+                if (highlight && _hoverEnabled)
+                {
+                    // Check for Changes
+                    if (_songDetails == null)
+                        _songDetails = SQLQueries.getSongDetails((songData.engine != null ? songData.engine.id : Constant.BRAND_NAME_SHORT_LOWER()), songData.level);
+
+                    // Have a song note, show note.
+                    if (_songDetails != null && _songDetails.notes.length > 0)
+                    {
+                        if (!_hoverTimer)
+                            _hoverTimer = new Timer(500, 1);
+
+                        if (!_hoverTimer.running && (_hoverSprite == null || _hoverSprite.parent == null))
+                        {
+                            _hoverTimer.addEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
+                            _hoverTimer.start();
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (!highlight)
+                {
+                    if (_hoverTimer && _hoverTimer.running)
+                    {
+                        _hoverTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
+                        _hoverTimer.stop();
+                    }
+                    if (_hoverSprite && _hoverSprite.parent)
+                    {
+                        this.removeEventListener(Event.ENTER_FRAME, e_positionHoverSprite);
+                        _hoverSprite.parent.removeChild(_hoverSprite);
+                    }
+                }
+            }
+        }
+
+        /**
+         * TimerEvent.TIMER_COMPLETE For the hover / active timer.
+         * Displays the song note sprite when the timer completes.
+         * @param e
+         */
+        private function e_hoverTimerComplete(e:Event = null):void
+        {
+            _hoverTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
+
+            if (this.parent != null)
+            {
+                if (_hoverSprite == null)
+                    _hoverSprite = new MouseTooltip("", _width - 1);
+
+                update();
+                positionHoverSprite();
+                this.parent.addChild(_hoverSprite);
+                _hoverSprite.visible = true; // Adding a child to the ScrollPane makes it invisible until a scroll update is sent.
+                this.addEventListener(Event.ENTER_FRAME, e_positionHoverSprite);
+            }
+        }
+
+        /**
+         * Event.ENTER_FRAME For note position on stage.
+         * This updates the note position every 5 frames so the message
+         * is supposedly visible when scrolled to high or low.
+         * @param e
+         */
+        private function e_positionHoverSprite(e:Event):void
+        {
+            // Only check 12 times per second instead of 60.
+            if (++_hoverTick > 5)
+            {
+                if (_hoverSprite != null && _hoverSprite.parent != null)
+                {
+                    positionHoverSprite();
+                    _hoverTick = 0;
+                }
+                else
+                {
+                    this.removeEventListener(Event.ENTER_FRAME, e_positionHoverSprite);
+                }
+            }
+        }
+
+        /**
+         * Updates the Notes hover sprite to be above or below the item
+         * depending on the position on screen.
+         */
+        private function positionHoverSprite():void
+        {
+            if (_hoverSprite)
+            {
+                _hoverPoint = this.localToGlobal(HOVER_POINT_GLOBAL);
+
+                if (_hoverPoint.y > Main.GAME_HEIGHT / 2)
+                    _hoverSprite.y = this.y - _hoverSprite.height - 2;
+                else
+                    _hoverSprite.y = this.y + _height + 2;
+
+                _hoverSprite.x = this.x;
+            }
+        }
+
+        /**
+         * Updates the note text, or displays the new note if previously empty.
+         */
+        public function updateOrShow():void
+        {
+            if (_hoverSprite != null)
+                update();
+            else
+                showHoverMessage(true);
+        }
+
+        /**
+         * Update the note sprite message.
+         */
+        public function update():void
+        {
+            if (_hoverSprite != null)
+            {
+                _hoverSprite.message = "<font face=\"" + Language.UNI_FONT_NAME + "\" >" + _songDetails.notes + "</font>";
+            }
+        }
+
         ////////////////////////////////////////////////////////////////////////
         //- Getters / Setters
         public function setData(song:Object, rank:Object):void
@@ -120,8 +269,10 @@ package menu
 
             // Song Name
             var songname:String = song["name"];
+
             if (!song["engine"] && song["genre"] == Constant.LEGACY_GENRE)
                 songname = '<font color="#004587">[L]</font> ' + songname;
+
             _lblSongName = new Text(songname, 14);
             this.addChild(_lblSongName);
 
@@ -186,6 +337,7 @@ package menu
                 _height = 27;
             }
 
+            showHoverMessage(false);
             draw();
         }
 
@@ -235,6 +387,7 @@ package menu
         {
             _highlight = val;
             draw();
+            showHoverMessage(val);
         }
 
         public function get highlight():Boolean
@@ -246,6 +399,7 @@ package menu
         {
             _active = val;
             draw();
+            showHoverMessage(val);
         }
 
         public function get active():Boolean
@@ -261,6 +415,16 @@ package menu
         override public function get height():Number
         {
             return _height;
+        }
+
+        public function get noteEnabled():Boolean
+        {
+            return _hoverEnabled;
+        }
+
+        public function set noteEnabled(val:Boolean):void
+        {
+            _hoverEnabled = val;
         }
     }
 }

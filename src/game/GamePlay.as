@@ -203,39 +203,27 @@ package game
                 return false;
             }
 
-            // --- Per Song Options - Super hacky, but actually solid
-            if (_gvars.sql_connect && !options.isEditor && !options.replay)
+            // --- Per Song Options
+            var perSongOptions:SQLSongDetails = SQLQueries.getSongDetails((song.entry.engine != null ? song.entry.engine.id : Constant.BRAND_NAME_SHORT_LOWER()), song.entry.level);
+            if (perSongOptions != null && !options.isEditor && !options.replay)
             {
                 options.fill(); // Reset
-                SQLQueries.getSongDetails(_gvars.sql_conn, {"engine": (song.entry.engine != null ? song.entry.engine : Constant.BRAND_NAME_SHORT_LOWER()), "song_id": song.entry.level}, function(results:Vector.<SQLSongDetails>):void
+
+                // Custom Offsets
+                if (perSongOptions.set_custom_offsets)
                 {
-                    //trace("Delay Gameplay init for:", song.entry.level);
-                    if (results != null && results.length > 0)
-                    {
-                        var result:SQLSongDetails = results[0];
+                    options.offsetJudge = perSongOptions.offset_judge;
+                    options.offsetGlobal = perSongOptions.offset_music;
+                }
 
-                        // Custom Offsets
-                        if (result.set_custom_offsets)
-                        {
-                            options.offsetJudge = result.offset_judge;
-                            options.offsetGlobal = result.offset_music;
-                        }
-
-                        // Invert Mirror Mod
-                        if (result.set_mirror_invert)
-                        {
-                            if (options.modEnabled("mirror"))
-                                delete options.modCache["mirror"];
-                            else
-                                options.modCache["mirror"] = true;
-                        }
-                    }
-
-                    stageAdd(); // This is cancelled by returning false below.
-                });
-
-                initBackground();
-                return false; // Cancel stageAdd, will be called when callback is complete.
+                // Invert Mirror Mod
+                if (perSongOptions.set_mirror_invert)
+                {
+                    if (options.modEnabled("mirror"))
+                        delete options.modCache["mirror"];
+                    else
+                        options.modCache["mirror"] = true;
+                }
             }
             // --- End Per Song Settings
 
