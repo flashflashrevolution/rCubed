@@ -87,7 +87,7 @@ package menu
             if (!isLocked)
             {
                 this.graphics.moveTo(32, 0);
-                this.graphics.lineTo(32, height);
+                this.graphics.lineTo(32, height - 1);
             }
         }
 

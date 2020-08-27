@@ -391,7 +391,7 @@ package game.graph
 
             // Boos
             var boo:Object; // Variables: d, t, i
-            ratio_x = graphWidth / result.song.getNote(Math.max(1, song_arrows - 1)).time;
+            ratio_x = graphWidth / result.song.getNote(Math.max(0, song_arrows - 1)).time;
             for (i = 0; i < result.replay_bin_boos.length; i++)
             {
                 boo = result.replay_bin_boos[i];
@@ -412,6 +412,5 @@ package game.graph
             draw();
             drawOverlay(overlay.stage.mouseX - overlay.x, overlay.stage.mouseY - overlay.y);
         }
-
     }
 }
