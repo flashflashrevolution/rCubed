@@ -126,18 +126,8 @@ package
             var sql_file:File = new File(AirContext.getAppPath(db_name + "db"));
             var json_file:File = new File(AirContext.getAppPath(db_name + "json"));
 
-            if (sql_file.exists)
-            {
-                SQLQueries.exportToJSON(sql_file, function(data:Object):void
-                {
-                    SQLQueries.loadFromObject(data);
-                    writeUserSongData();
-                    sql_file.moveToAsync(new File(AirContext.getAppPath(db_name + "db.bak")));
-                });
-            }
-
-            // Using JSON File
-            else if (json_file.exists)
+            // Use JSON first
+            if (json_file.exists)
             {
                 var json_str:String = AirContext.readTextFile(json_file);
                 if (json_str != null)
@@ -151,6 +141,28 @@ package
 
                     }
                 }
+            }
+            // Fallback to SQL
+            else if (sql_file.exists)
+            {
+                SQLQueries.exportToJSON(sql_file, function(data:Object):void
+                {
+                    SQLQueries.loadFromObject(data);
+                    writeUserSongData();
+
+                    // Create Backup File
+                    var backupFile:File = new File(AirContext.getAppPath(db_name + "db.bak"));
+                    for (var i:int = 0; i < 10; i++)
+                    {
+                        if (!backupFile.exists)
+                        {
+                            sql_file.moveToAsync(backupFile);
+                            break;
+                        }
+
+                        backupFile = new File(AirContext.getAppPath(db_name + "db.bak" + i));
+                    }
+                });
             }
         }
 
