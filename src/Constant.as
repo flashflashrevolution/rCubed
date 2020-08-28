@@ -42,6 +42,8 @@ package
         public static const USER_SMALL_INFO_URL:String = ROOT_URL + "game/r3/r3-userSmallInfo.php";
         static public const ALT_SONG_SAVE_URL:String = ROOT_URL + "game/r3/r3-songSaveOther.php";
 
+        static public const WEBSOCKET_OVERLAY_URL:String = "https://github.com/flashflashrevolution/web-stream-overlay";
+
         public static const LEGACY_GENRE:int = 13;
 
         public static const MENU_MUSIC_PATH:String = "menu_music.swf";

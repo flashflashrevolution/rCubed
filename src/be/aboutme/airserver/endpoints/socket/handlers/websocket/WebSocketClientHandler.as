@@ -103,6 +103,26 @@ package be.aboutme.airserver.endpoints.socket.handlers.websocket
                                 }
                             }
                         }
+
+                        //check for any fields stating websocket
+                        var isWebsocket:Boolean = (fields["Upgrade"] != null && fields["Upgrade"] == "websocket");
+                        if (!isWebsocket)
+                        {
+                            for (var field_name:String in fields)
+                            {
+                                if (field_name.toLowerCase().indexOf("websocket") >= 0)
+                                {
+                                    isWebsocket = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (!isWebsocket)
+                        {
+                            return;
+                        }
+
                         //check the websocket version
                         if (fields["Sec-WebSocket-Version"] != null)
                         {

@@ -39,6 +39,8 @@ package popups
     import flash.geom.Point;
     import flash.media.SoundMixer;
     import flash.media.SoundTransform;
+    import flash.net.URLRequest;
+    import flash.net.navigateToURL;
     import flash.text.TextFieldAutoSize;
     import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
@@ -142,6 +144,7 @@ package popups
         private var autoSaveLocalCheckbox:BoxCheck;
         private var useVSyncCheckbox:BoxCheck;
         private var useWebsocketCheckbox:BoxCheck;
+        private var openWebsocketOverlay:BoxButton;
 
         public function PopupOptions(myParent:MenuPanel)
         {
@@ -1137,6 +1140,14 @@ package popups
                 box.addChild(useWebsocketCheckbox);
                 yOff += 30;
 
+                // https://github.com/flashflashrevolution/web-stream-overlay
+                openWebsocketOverlay = new BoxButton(150, 27, _lang.string("options_overlay_instructions"));
+                openWebsocketOverlay.x = xOff;
+                openWebsocketOverlay.y = yOff;
+                openWebsocketOverlay.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                box.addChild(openWebsocketOverlay);
+                yOff += 30;
+
                 ///- Col 2
                 xOff += 176;
                 yOff = BASE_Y_POSITION;
@@ -1807,6 +1818,13 @@ package popups
                         _gvars.gameMain.addAlert(_lang.string("air_options_unable_to_start_websockets"), 120, Alert.RED);
                     }
                 }
+            }
+
+            // HTTP Websockets Instructions
+            else if (e.target == openWebsocketOverlay)
+            {
+                navigateToURL(new URLRequest(Constant.WEBSOCKET_OVERLAY_URL), "_blank");
+                return;
             }
 
             // Set Settings
