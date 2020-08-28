@@ -1120,11 +1120,15 @@ package menu
                 tY += 23;
             }
 
+            var isQueueNotEmpty:Boolean = (options.queuePlaylist.length > 0);
+            var isQueueNotAlone:Boolean = (options.queuePlaylist.length > 1);
+
             // Actions
             var songQueuePlay:BoxButton = new BoxButton(164, 27, _lang.string("song_selection_queue_panel_play"), 12);
             songQueuePlay.x = 5;
             songQueuePlay.y = 160;
             songQueuePlay.action = "playQueue";
+            songQueuePlay.enabled = isQueueNotEmpty;
             songQueuePlay.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
             infoBox.addChild(songQueuePlay);
 
@@ -1132,6 +1136,7 @@ package menu
             songQueuePlayFromHere.x = 5;
             songQueuePlayFromHere.y = 192;
             songQueuePlayFromHere.action = "playQueueFromHere";
+            songQueuePlayFromHere.enabled = isQueueNotAlone;
             songQueuePlayFromHere.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
             infoBox.addChild(songQueuePlayFromHere);
 
@@ -1139,6 +1144,7 @@ package menu
             songQueueRandomizer.x = 5;
             songQueueRandomizer.y = 224;
             songQueueRandomizer.action = "queueRandomize";
+            songQueueRandomizer.enabled = isQueueNotAlone;
             songQueueRandomizer.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
             infoBox.addChild(songQueueRandomizer);
 
@@ -1153,6 +1159,7 @@ package menu
             songQueueSave.x = 5;
             songQueueSave.y = 288;
             songQueueSave.action = "queueSave";
+            songQueueSave.enabled = isQueueNotEmpty;
             songQueueSave.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
             infoBox.addChild(songQueueSave);
 
@@ -1160,6 +1167,7 @@ package menu
             songQueueClear.x = 89.5;
             songQueueClear.y = 288;
             songQueueClear.action = "clearQueue";
+            songQueueClear.enabled = isQueueNotEmpty;
             songQueueClear.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
             infoBox.addChild(songQueueClear);
         }
