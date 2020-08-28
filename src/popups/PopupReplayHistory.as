@@ -699,7 +699,7 @@ internal class ReplayBox extends Sprite
         var success:Boolean = SystemUtil.setClipboard(replayString);
         if (success)
         {
-            _gvars.gameMain.addAlert(_lang.stringSimple("clipboard_success"), 120, Alert.GREEN);
+            _gvars.gameMain.addAlert(_lang.string("clipboard_success"), 120, Alert.GREEN);
         }
         else
         {
