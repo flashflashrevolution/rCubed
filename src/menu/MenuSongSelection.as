@@ -872,11 +872,8 @@ package menu
          */
         private function e_playChartPreviewContextSelect(e:ContextMenuEvent):void
         {
-            if (!_gvars.options)
-            {
-                _gvars.options = new GameOptions();
-                _gvars.options.fill();
-            }
+            _gvars.options = new GameOptions();
+            _gvars.options.fill();
             _gvars.options.replay = new SongPreview((e.contextMenuOwner as SongItem).level);
             _gvars.options.loadPreview = true;
 
