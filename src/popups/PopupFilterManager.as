@@ -223,11 +223,11 @@ package popups
             var success:Boolean = SystemUtil.setClipboard(filterString);
             if (success)
             {
-                _gvars.gameMain.addAlert(_lang.stringSimple("clipboard_success"), 120, Alert.GREEN);
+                _gvars.gameMain.addAlert(_lang.string("clipboard_success"), 120, Alert.GREEN);
             }
             else
             {
-                _gvars.gameMain.addAlert(_lang.stringSimple("clipboard_failure"), 120, Alert.RED);
+                _gvars.gameMain.addAlert(_lang.string("clipboard_failure"), 120, Alert.RED);
             }
         }
 
