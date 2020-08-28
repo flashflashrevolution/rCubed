@@ -703,7 +703,7 @@ internal class ReplayBox extends Sprite
         }
         else
         {
-            _gvars.gameMain.addAlert("Error Copying Replay", 120, Alert.RED);
+            _gvars.gameMain.addAlert(_lang.string("clipboard_failure"), 120, Alert.RED);
         }
     }
 
