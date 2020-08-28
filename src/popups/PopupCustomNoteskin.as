@@ -291,9 +291,9 @@ package popups
         {
             var success:Boolean = SystemUtil.setClipboard(noteskinsString());
             if (success)
-                GlobalVariables.instance.gameMain.addAlert(_lang.stringSimple("clipboard_success"), 120, Alert.GREEN);
+                GlobalVariables.instance.gameMain.addAlert(_lang.string("clipboard_success"), 120, Alert.GREEN);
             else
-                GlobalVariables.instance.gameMain.addAlert(_lang.stringSimple("clipboard_failure"), 120, Alert.RED);
+                GlobalVariables.instance.gameMain.addAlert(_lang.string("clipboard_failure"), 120, Alert.RED);
         }
 
         private function updateImage():void
