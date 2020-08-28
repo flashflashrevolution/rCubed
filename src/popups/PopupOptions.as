@@ -443,7 +443,8 @@ package popups
                 optionNoteScale = new BoxSlider(100, 10);
                 optionNoteScale.x = xOff;
                 optionNoteScale.y = yOff;
-                optionNoteScale.maxValue = 1;
+                optionNoteScale.minValue = 0.1;
+                optionNoteScale.maxValue = 1.5;
                 optionNoteScale.addEventListener(Event.CHANGE, changeHandler);
                 box.addChild(optionNoteScale);
                 yOff += 10;
@@ -1317,14 +1318,16 @@ package popups
             }
             else if (e.target == optionNoteScale)
             {
-                var snapValue:int = Math.floor(optionNoteScale.slideValue * 100 / 5) * 5;
-                _gvars.activeUser.noteScale = snapValue / 100;
-                if (isNaN(_gvars.activeUser.noteScale))
-                {
-                    _gvars.activeUser.noteScale = 1;
-                }
-                _gvars.activeUser.noteScale = Math.max(Math.min(_gvars.activeUser.noteScale, optionNoteScale.maxValue), 0.2);
-                noteScaleValueDisplay.text = Math.round(_gvars.activeUser.noteScale * 100) + "%";
+                var sliderValue:int = Math.round(Math.max(Math.min(optionNoteScale.slideValue, optionNoteScale.maxValue), optionNoteScale.minValue) * 100);
+
+                // Snap to larger value when close.
+                var snapTarget:int = 25;
+                var snapValue:int = sliderValue % snapTarget;
+                if (snapValue <= 1 || snapValue >= snapTarget - 1)
+                    sliderValue = Math.round(sliderValue / snapTarget) * snapTarget;
+
+                _gvars.activeUser.noteScale = sliderValue / 100;
+                noteScaleValueDisplay.text = sliderValue + "%";
             }
             else if (e.target == optionGameVolume)
             {
