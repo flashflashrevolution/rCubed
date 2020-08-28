@@ -12,10 +12,8 @@ package popups
     import classes.Text;
     import classes.replay.Base64Decoder;
     import classes.replay.Base64Encoder;
-    import com.bit101.components.ColorChooser;
     import com.flashfla.components.ScrollPane;
     import com.flashfla.utils.ObjectUtil;
-    import com.flashfla.utils.StringUtil;
     import com.flashfla.utils.SystemUtil;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
@@ -293,9 +291,9 @@ package popups
         {
             var success:Boolean = SystemUtil.setClipboard(noteskinsString());
             if (success)
-                GlobalVariables.instance.gameMain.addAlert(_lang.stringSimple("clipboard_success"), 90, Alert.GREEN);
+                GlobalVariables.instance.gameMain.addAlert(_lang.stringSimple("clipboard_success"), 120, Alert.GREEN);
             else
-                GlobalVariables.instance.gameMain.addAlert(_lang.stringSimple("clipboard_failure"), 90, Alert.RED);
+                GlobalVariables.instance.gameMain.addAlert(_lang.stringSimple("clipboard_failure"), 120, Alert.RED);
         }
 
         private function updateImage():void
