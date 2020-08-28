@@ -159,11 +159,8 @@ package
                             sql_file.moveToAsync(backupFile);
                             break;
                         }
-                        else
-                        {
-                            backupFile = new File(AirContext.getAppPath(db_name + "db.bak" + i));
-                            continue;
-                        }
+
+                        backupFile = new File(AirContext.getAppPath(db_name + "db.bak" + i));
                     }
                 });
             }
