@@ -430,6 +430,10 @@ internal class QueueBox extends Sprite
         }
 
         popup.removePopup();
+
+        if (newSongQueue.length <= 0)
+            return;
+
         _gvars.songQueue = newSongQueue;
         MenuSongSelection.options.queuePlaylist = newSongQueue;
         if (_gvars.gameMain.activePanel != null && _gvars.gameMain.activePanel is MainMenu)
