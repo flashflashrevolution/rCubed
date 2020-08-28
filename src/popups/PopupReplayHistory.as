@@ -1,11 +1,14 @@
 package popups
 {
+    import arc.ArcGlobals;
     import arc.mp.MultiplayerPrompt;
     import assets.GameBackgroundColor;
     import classes.Box;
     import classes.BoxButton;
+    import classes.BoxText;
     import classes.FileTracker;
     import classes.Language;
+    import classes.Playlist;
     import classes.Text;
     import classes.replay.Replay;
     import com.flashfla.components.ScrollBar;
@@ -21,9 +24,6 @@ package popups
     import flash.geom.Point;
     import flash.utils.getTimer;
     import menu.MenuPanel;
-    import classes.BoxText;
-    import arc.ArcGlobals;
-    import classes.Playlist;
 
     public class PopupReplayHistory extends MenuPanel
     {
@@ -695,15 +695,15 @@ internal class ReplayBox extends Sprite
 
     private function copyReplay():void
     {
-        var success:Boolean = SystemUtil.setClipboard(this.replay.getEncode());
-
+        var replayString:String = this.replay.getEncode();
+        var success:Boolean = SystemUtil.setClipboard(replayString);
         if (success)
         {
-            _gvars.gameMain.addAlert("Copied to Clipboard!", 120, Alert.GREEN);
+            _gvars.gameMain.addAlert(_lang.string("clipboard_success"), 120, Alert.GREEN);
         }
         else
         {
-            _gvars.gameMain.addAlert("Error Copying Replay", 120, Alert.RED);
+            _gvars.gameMain.addAlert(_lang.string("clipboard_failure"), 120, Alert.RED);
         }
     }
 
