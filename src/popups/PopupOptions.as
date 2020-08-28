@@ -1319,6 +1319,10 @@ package popups
             else if (e.target == optionNoteScale)
             {
                 var sliderValue:int = Math.round(Math.max(Math.min(optionNoteScale.slideValue, optionNoteScale.maxValue), optionNoteScale.minValue) * 100);
+                if (isNaN(sliderValue))
+                {
+                    sliderValue = 100;
+                }
 
                 // Snap to larger value when close.
                 var snapTarget:int = 25;
