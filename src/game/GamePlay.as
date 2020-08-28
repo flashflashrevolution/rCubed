@@ -15,7 +15,6 @@ package game
     import classes.chart.NoteChart;
     import classes.chart.Song;
     import classes.replay.ReplayNote;
-    import classes.replay.ReplayPack;
     import com.flashfla.components.ProgressBar;
     import com.flashfla.net.Multiplayer;
     import com.flashfla.utils.Average;
@@ -579,10 +578,11 @@ package game
         private function initPlayerVars():void
         {
             // Force no Judge on SongPreviews
-            if (options.replay && options.replay is SongPreview)
+            if (options.replay && options.replay.isPreview)
             {
                 options.offsetJudge = 0;
                 options.offsetGlobal = 0;
+                options.isAutoplay = true;
             }
 
             reverseMod = options.modEnabled("reverse");
@@ -795,7 +795,7 @@ package game
             }
 
             // Replays
-            if (options.replay)
+            if (options.replay && !options.replay.isPreview)
             {
                 var newPress:ReplayNote = options.replay.getPress(replayPressCount);
                 if (options.replay.needsBeatboxGeneration)
@@ -1291,6 +1291,15 @@ package game
                 newGameResults.end_time = options.replay ? TimeUtil.getFormattedDate(new Date(options.replay.timestamp * 1000)) : TimeUtil.getCurrentDate();
                 newGameResults.song_progress = (gameProgress / gameLastNoteFrame);
                 newGameResults.playtime_secs = ((getTimer() - msStartTime) / 1000);
+
+                // Set Note Counts for Preview Songs
+                if (options.replay && options.replay.isPreview)
+                {
+                    newGameResults.score = song.totalNotes * 50;
+                    newGameResults.amazing = song.totalNotes;
+                    newGameResults.max_combo = song.totalNotes;
+                }
+
                 newGameResults.update(_gvars);
                 _gvars.songResults.push(newGameResults);
             }

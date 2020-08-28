@@ -505,7 +505,7 @@ package game
             }
 
             // Song Preview
-            if (_gvars.flashvars.preview_file)
+            if (_gvars.flashvars.preview_file || (result.options.replay && result.options.replay.isPreview))
             {
                 resultsDisplay.results_username.htmlText = "<B>Song Preview:</B>";
                 resultsDisplay.result_credits.htmlText = "<B>0</B>";
