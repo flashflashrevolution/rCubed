@@ -6,7 +6,6 @@ package popups
     import classes.BoxButton;
     import classes.Language;
     import classes.Playlist;
-    import classes.replay.Replay;
     import classes.SongQueueItem;
     import classes.Text;
     import com.flashfla.components.ScrollBar;
@@ -284,17 +283,17 @@ package popups
 }
 
 import arc.mp.MultiplayerPrompt;
+import classes.Alert;
 import classes.Box;
 import classes.BoxButton;
+import classes.Language;
 import classes.Playlist;
 import classes.SongQueueItem;
 import classes.Text;
+import com.flashfla.utils.SystemUtil;
 import com.flashfla.utils.TimeUtil;
-import flash.desktop.Clipboard;
-import flash.desktop.ClipboardFormats;
 import flash.display.Sprite;
 import flash.events.MouseEvent;
-import flash.system.System;
 import menu.MainMenu;
 import menu.MenuSongSelection;
 import popups.PopupQueueManager;
@@ -302,6 +301,7 @@ import popups.PopupQueueManager;
 internal class QueueBox extends Sprite
 {
     private var _gvars:GlobalVariables = GlobalVariables.instance;
+    private var _lang:Language = Language.instance;
     private var _playlist:Playlist = Playlist.instanceCanon;
 
     //- Song Details
@@ -396,13 +396,15 @@ internal class QueueBox extends Sprite
 
     private function copyQueue():void
     {
-        try
+        var queueString:String = this.queueItem.toString();
+        var success:Boolean = SystemUtil.setClipboard(queueString);
+        if (success)
         {
-            System.setClipboard(this.queueItem.toString());
-            Clipboard.generalClipboard.setData(ClipboardFormats.TEXT_FORMAT, this.queueItem.toString());
+            _gvars.gameMain.addAlert(_lang.stringSimple("clipboard_success"), 120, Alert.GREEN);
         }
-        catch (e:Error)
+        else
         {
+            _gvars.gameMain.addAlert(_lang.stringSimple("clipboard_failure"), 120, Alert.RED);
         }
     }
 
