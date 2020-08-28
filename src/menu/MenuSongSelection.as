@@ -849,6 +849,8 @@ package menu
          */
         private function e_setAsMenuMusicContextSelect(e:ContextMenuEvent):void
         {
+            _gvars.options = new GameOptions();
+            _gvars.options.fill();
             var songItem:SongItem = (e.contextMenuOwner as SongItem);
             var songData:Object = _playlist.getSong(songItem.level);
             if (songData.error == null)
@@ -874,12 +876,11 @@ package menu
         {
             _gvars.options = new GameOptions();
             _gvars.options.fill();
-            _gvars.options.replay = new SongPreview((e.contextMenuOwner as SongItem).level);
-            _gvars.options.loadPreview = true;
+            _gvars.options.replay = new SongPreview(0);
 
             if (!_gvars.options.replay.isLoaded)
             {
-                (_gvars.options.replay as SongPreview).setupSongPreview();
+                (_gvars.options.replay as SongPreview).setupSongPreview((e.contextMenuOwner as SongItem).songData);
             }
 
             if (_gvars.options.replay.isLoaded)
