@@ -301,18 +301,7 @@ package classes
             setupPermissions();
 
             // Load Avatar
-            this.avatar = new Loader();
-            if (isActiveUser && this.id > 2)
-            {
-                this.avatar.contentLoaderInfo.addEventListener(Event.COMPLETE, avatarLoadComplete);
-
-                function avatarLoadComplete(e:Event):void
-                {
-                    LocalStore.setVariable("uAvatar", LoaderInfo(e.target).bytes);
-                    avatar.removeEventListener(Event.COMPLETE, avatarLoadComplete);
-                }
-            }
-            this.avatar.load(new URLRequest(Constant.USER_AVATAR_URL + "?uid=" + this.id + "&cHeight=99&cWidth=99"));
+            loadAvatar();
 
             // Setup Settings from server or local
             if (_data["settings"] != null && !this.isGuest)
@@ -361,6 +350,22 @@ package classes
             this.isMultiModerator = ArrayUtil.in_array(this.groups, [MULTI_MOD_ID, ADMIN_ID]);
             this.isMusician = ArrayUtil.in_array(this.groups, [MUSIC_PRODUCER_ID]);
             this.isSimArtist = ArrayUtil.in_array(this.groups, [SIM_AUTHOR_ID]);
+        }
+
+        public function loadAvatar():void
+        {
+            this.avatar = new Loader();
+            if (isActiveUser && this.id > 2)
+            {
+                this.avatar.contentLoaderInfo.addEventListener(Event.COMPLETE, avatarLoadComplete);
+
+                function avatarLoadComplete(e:Event):void
+                {
+                    LocalStore.setVariable("uAvatar", LoaderInfo(e.target).bytes);
+                    avatar.removeEventListener(Event.COMPLETE, avatarLoadComplete);
+                }
+            }
+            this.avatar.load(new URLRequest(Constant.USER_AVATAR_URL + "?uid=" + this.id + "&cHeight=99&cWidth=99"));
         }
 
         ///- Level Ranks
