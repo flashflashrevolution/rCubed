@@ -415,7 +415,7 @@ internal class QueueBox extends Sprite
 
     private function playQueue():void
     {
-        _gvars.songQueue = [];
+        var newSongQueue:Array = [];
         for each (var songid:int in queueItem.items)
         {
             var songData:Object = _playlist.playList[songid];
@@ -424,15 +424,23 @@ internal class QueueBox extends Sprite
                 var access:int = _gvars.checkSongAccess(songData);
                 if (access == GlobalVariables.SONG_ACCESS_PLAYABLE)
                 {
-                    _gvars.songQueue.push(songData);
+                    newSongQueue.push(songData);
                 }
             }
         }
 
         popup.removePopup();
-        var panel:MenuSongSelection = ((_gvars.gameMain.activePanel as MainMenu).panel as MenuSongSelection);
-        panel.buildPlayList();
-        panel.buildInfoBox();
+        MenuSongSelection.options.queuePlaylist = newSongQueue;
+        if (_gvars.gameMain.activePanel != null && _gvars.gameMain.activePanel is MainMenu)
+        {
+            var mmmenu:MainMenu = (_gvars.gameMain.activePanel as MainMenu);
+            if (mmmenu.panel != null && (mmmenu.panel is MenuSongSelection))
+            {
+                var msmenu:MenuSongSelection = (mmmenu.panel as MenuSongSelection);
+                msmenu.buildPlayList();
+                msmenu.buildInfoBox();
+            }
+        }
     }
 
     private function renameQueue():void
