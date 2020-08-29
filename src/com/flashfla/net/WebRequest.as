@@ -5,10 +5,9 @@ package com.flashfla.net
     import flash.events.SecurityErrorEvent;
     import flash.net.URLLoader;
     import flash.net.URLRequest;
-    import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
 
-    public class WebRequest
+    dynamic public class WebRequest
     {
         private var _loader:URLLoader;
 
@@ -49,6 +48,11 @@ package com.flashfla.net
             }
 
             _loader.load(req);
+        }
+
+        public function get loader():URLLoader
+        {
+            return _loader;
         }
 
         protected function e_loadComplete(e:Event):void

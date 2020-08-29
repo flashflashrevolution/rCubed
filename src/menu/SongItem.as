@@ -110,23 +110,6 @@ package menu
         }
 
         /**
-         * This is called by MenuSongSelection
-         * @param e
-         * @return Boolean | If the mouse event was captured and used to open the shop.
-         */
-        public function e_onClick(e:Event = null):Boolean
-        {
-            if (isLocked)
-            {
-                if (songData["access"] == GlobalVariables.SONG_ACCESS_PURCHASED)
-                {
-                    navigateToURL(new URLRequest(Constant.SHOP_URL), "_blank");
-                }
-            }
-            return isLocked;
-        }
-
-        /**
          * Displays or hides the note hover for the song item.
          * @param enabled
          */
