@@ -119,7 +119,7 @@ package popups
                 messageDisplay.wordWrap = true;
                 messageDisplay.defaultTextFormat = Constant.TEXT_FORMAT_CENTER;
                 messageDisplay.autoSize = TextFieldAutoSize.CENTER;
-                messageDisplay.htmlText = tObject.info.split("\r").join("");
+                messageDisplay.htmlText = tObject.info.replace(/\r\n/gi, "\n");
                 th.addChild(messageDisplay);
                 yOff = messageDisplay.y + messageDisplay.height + 15;
             }

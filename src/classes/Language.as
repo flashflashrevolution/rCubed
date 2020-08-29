@@ -179,7 +179,7 @@ package classes
                 var langNodes:XMLList = xmlChildren[a].children();
                 for (var c:uint = 0; c < langNodes.length(); c++)
                 {
-                    data[lang][langNodes[c].attribute("id").toString()] = langNodes[c].children()[0].toString();
+                    data[lang][langNodes[c].attribute("id").toString()] = langNodes[c].children()[0].toString().replace(/\r\n/gi, "\n");
                 }
                 indexed[data[lang]["_index"]] = lang;
             }

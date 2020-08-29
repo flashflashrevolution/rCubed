@@ -528,8 +528,7 @@ package game
 
             if (gameIndex != -1)
             {
-                var accuracyText:String = _lang.string("result_accuracy_deviation").split("\r").join(""); // Removes the \r from \r\n.
-                graphAccuracy.setHoverText(sprintf(accuracyText, {"acc_frame": result.accuracy_frames.toFixed(3),
+                graphAccuracy.setHoverText(sprintf(_lang.string("result_accuracy_deviation"), {"acc_frame": result.accuracy_frames.toFixed(3),
                         "acc_dev_frame": result.accuracy_deviation_frames.toFixed(3),
                         "acc_ms": result.accuracy.toFixed(3),
                         "acc_dev_ms": result.accuracy_deviation.toFixed(3)}), "right");
