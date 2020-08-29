@@ -120,6 +120,7 @@ package be.aboutme.airserver.endpoints.socket.handlers.websocket
 
                         if (!isWebsocket)
                         {
+                            printInvalidConnectionMessage();
                             return;
                         }
 
@@ -148,6 +149,11 @@ package be.aboutme.airserver.endpoints.socket.handlers.websocket
                                 close();
                                 break;
                         }
+                        return;
+                    }
+                    else
+                    {
+                        close();
                         return;
                     }
                 }

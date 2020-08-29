@@ -84,6 +84,18 @@ package be.aboutme.airserver.endpoints.socket.handlers
             //override this method in the inheriting classes
         }
 
+        public function printInvalidConnectionMessage():void
+        {
+            var response:String = "HTTP/1.0 200 OK\nContent-Type: text/html\n\nPlease use <a href=\"" + Constant.WEBSOCKET_OVERLAY_URL + "\">" + Constant.WEBSOCKET_OVERLAY_URL + "</a> to access overlay features.";
+            var responseBytes:ByteArray = new ByteArray();
+            responseBytes.writeUTFBytes(response);
+            responseBytes.position = 0;
+            socket.writeBytes(responseBytes);
+            socket.flush();
+            socketBytes.clear();
+            this.close();
+        }
+
         protected function socketCloseHandler(event:Event):void
         {
             close();
