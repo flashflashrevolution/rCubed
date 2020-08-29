@@ -14,6 +14,8 @@ package game
         public var song_entry:Object;
         public var note_count:int;
 
+        public var is_preview:Boolean = false;
+
         public var legacyLastRank:Object;
 
         public var user:User;

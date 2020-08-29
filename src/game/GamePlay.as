@@ -1295,6 +1295,7 @@ package game
                 // Set Note Counts for Preview Songs
                 if (options.replay && options.replay.isPreview)
                 {
+                    newGameResults.is_preview = true;
                     newGameResults.score = song.totalNotes * 50;
                     newGameResults.amazing = song.totalNotes;
                     newGameResults.max_combo = song.totalNotes;
