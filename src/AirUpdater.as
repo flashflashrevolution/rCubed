@@ -341,7 +341,7 @@ package
                                     var changeBytes:ByteArray = reader.unzip(entry);
                                     outputText.htmlText = "<BODY><FONT face=\"" + Language.FONT_NAME + "\">";
                                     outputText.htmlText += getUpdateCheckText();
-                                    outputText.htmlText += changeBytes.toString().split("\r").join("") + "\n</FONT></BODY>";
+                                    outputText.htmlText += changeBytes.toString().replace(/\r\n/gi, "\n") + "\n</FONT></BODY>";
                                     haveChangeLog = true;
                                 }
                                 catch (e:Error)
@@ -365,7 +365,7 @@ package
                         LocalStore.setVariable("air_update_checks", update_checks + 1);
                         reader.close();
                         air_file.deleteFile();
-                        appendText("<B><FONT COLOR=\"#ffa0a0\">" + _lang.string("air_unpack_error").split("\r").join("") + "</FONT></B>");
+                        appendText("<B><FONT COLOR=\"#ffa0a0\">" + _lang.string("air_unpack_error").replace(/\r\n/gi, "\n") + "</FONT></B>");
                     }
                     catch (fe:Error)
                     {
@@ -422,7 +422,7 @@ package
 
                     }
                 }
-                appendText(_lang.string("air_manual_restart").split("\r").join(""));
+                appendText(_lang.string("air_manual_restart").replace(/\r\n/gi, "\n"));
                 actionButton.text = _lang.string("air_start_update_2");
                 actionButtonState(false);
             }
