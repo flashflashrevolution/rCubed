@@ -294,7 +294,7 @@ package menu
                 _lblMessageText.width = 395;
                 _lblMessageText.wordWrap = true;
                 _lblMessageText.autoSize = TextFieldAutoSize.LEFT;
-                _lblMessageText.htmlText = "<font face=\"" + Language.UNI_FONT_NAME + "\" color=\"#FFFFFF\" size=\"10\"><b>" + _message.split("\r").join("") + "</b></font>";
+                _lblMessageText.htmlText = "<font face=\"" + Language.UNI_FONT_NAME + "\" color=\"#FFFFFF\" size=\"10\"><b>" + _message + "</b></font>";
                 this.addChild(_lblMessageText);
 
                 _lblSongName.x = 5;

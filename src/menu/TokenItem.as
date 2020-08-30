@@ -38,7 +38,7 @@ package menu
             this.useHandCursor = true;
 
             //- Message
-            var messageString:String = token_info['info'].split("\r").join("");
+            var messageString:String = token_info['info'].replace(/\r\n/gi, "\n");
 
             // Token Levels
             token_levels = (token_info['sources'] as String).split(",");

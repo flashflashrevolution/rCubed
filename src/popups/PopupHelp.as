@@ -82,7 +82,7 @@ package popups
             messageDisplay.width = box.width - 10;
             messageDisplay.wordWrap = true;
             messageDisplay.autoSize = TextFieldAutoSize.LEFT;
-            messageDisplay.htmlText = "<BODY>" + _lang.string("popup_help_text").split("\r").join("") + "</BODY>";
+            messageDisplay.htmlText = "<BODY>" + _lang.string("popup_help_text") + "</BODY>";
 
             box.addChild(messageDisplay);
 
