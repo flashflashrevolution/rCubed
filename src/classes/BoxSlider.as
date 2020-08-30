@@ -49,7 +49,7 @@ package classes
 
         private function e_dragMove(e:MouseEvent):void
         {
-            _slideValue = (_slider.x / (_width - _slider.width)) * (_maxValue - _minValue) + _minValue;
+            _slideValue = (_slider.x / (_width - _slider.width)) * valueRange + _minValue;
 
             this.dispatchEvent(new Event(Event.CHANGE));
         }
@@ -59,19 +59,24 @@ package classes
             _slider.stopDrag();
             stage.removeEventListener(MouseEvent.MOUSE_MOVE, e_dragMove);
             stage.removeEventListener(MouseEvent.MOUSE_UP, e_stopDrag);
-            _slideValue = (_slider.x / (_width - _slider.width)) * (_maxValue - _minValue) + _minValue;
+            _slideValue = (_slider.x / (_width - _slider.width)) * valueRange + _minValue;
         }
 
         public function get slideValue():Number
         {
-            return Math.max(Math.min(_slideValue, _maxValue), _minValue) + _minValue;
+            return Math.max(Math.min(_slideValue, _maxValue), _minValue);
         }
 
         public function set slideValue(value:Number):void
         {
             _slideValue = value;
-            var moveVal:Number = Math.max(Math.min(value, _maxValue), _minValue) / (_maxValue - _minValue);
+            var moveVal:Number = (slideValue - minValue) / valueRange;
             _slider.x = (_width - _slider.width) * moveVal;
+        }
+
+        public function get valueRange():Number
+        {
+            return _maxValue - _minValue;
         }
 
         public function get minValue():Number
