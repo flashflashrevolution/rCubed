@@ -1444,14 +1444,8 @@ package menu
             _gvars.gameMain.addAlert(sprintf(_lang.string("song_selection_add_to_queue"), {song_name: _playlist.getSong(e.target.level).name}), 90);
             _gvars.songQueue.push(_playlist.getSong(e.target.level));
             saveQueuePlaylist();
-            buildPlayList();
-            if (songList == _gvars.songQueue)
-            {
-                options.infoTab = TAB_QUEUE;
+            if (options.activeGenre == PLAYLIST_QUEUE)
                 buildPlayList();
-                options.infoTab = TAB_PLAYLIST;
-                buildInfoBox();
-            }
         }
 
         /**
