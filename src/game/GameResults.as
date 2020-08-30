@@ -417,16 +417,16 @@ package game
 
                 // Save Replay Button
                 navSaveReplay.enabled = true;
-                if (!canSendScore(result, true, false, true, true) || _gvars.flashvars.preview_file)
+                if (!canSendScore(result, true, false, true, true) || result.is_preview)
                     navSaveReplay.enabled = false;
             }
 
             // Save Screenshot
-            if (!_gvars.flashvars.preview_file)
+            if (!result.is_preview)
                 navScreenShot.enabled = true;
 
             // Random Song Button
-            if (result.options.replay || _gvars.flashvars.preview_file || _mp.gameplayPlayingStatus())
+            if (result.options.replay || result.is_preview || _mp.gameplayPlayingStatus())
                 navRandomSong.enabled = false;
 
             // Skill rating
@@ -505,7 +505,7 @@ package game
             }
 
             // Song Preview
-            if (_gvars.flashvars.preview_file)
+            if (result.is_preview)
             {
                 resultsDisplay.results_username.htmlText = "<B>Song Preview:</B>";
                 resultsDisplay.result_credits.htmlText = "<B>0</B>";

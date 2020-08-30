@@ -23,6 +23,7 @@ package classes.replay
 
         public var isLoaded:Boolean = false;
         public var isEdited:Boolean = false;
+        public var isPreview:Boolean = false;
         public var generationReplayNotes:Array;
         public var needsBeatboxGeneration:Boolean = false;
 
