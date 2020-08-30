@@ -20,8 +20,7 @@ package classes
             if (!songData)
                 return;
 
-            if (songData)
-                this.level = songData.level;
+            this.level = songData.level;
 
             this.user = new User(false, false, 1743546);
             this.user.id = 1743546;
