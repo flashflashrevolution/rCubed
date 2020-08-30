@@ -39,6 +39,8 @@ package popups
     import flash.geom.Point;
     import flash.media.SoundMixer;
     import flash.media.SoundTransform;
+    import flash.net.URLRequest;
+    import flash.net.navigateToURL;
     import flash.text.TextFieldAutoSize;
     import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
@@ -142,6 +144,7 @@ package popups
         private var autoSaveLocalCheckbox:BoxCheck;
         private var useVSyncCheckbox:BoxCheck;
         private var useWebsocketCheckbox:BoxCheck;
+        private var openWebsocketOverlay:BoxButton;
 
         public function PopupOptions(myParent:MenuPanel)
         {
@@ -1083,26 +1086,26 @@ package popups
                 yOff += 30;
 
                 var autoSaveLocalCheckboxText:Text = new Text(_lang.string("air_options_save_local_replays"));
-                autoSaveLocalCheckboxText.x = xOff + 22;
+                autoSaveLocalCheckboxText.x = xOff + 20;
                 autoSaveLocalCheckboxText.y = yOff;
                 box.addChild(autoSaveLocalCheckboxText);
                 yOff += 2;
 
                 autoSaveLocalCheckbox = new BoxCheck();
-                autoSaveLocalCheckbox.x = xOff + 2;
+                autoSaveLocalCheckbox.x = xOff;
                 autoSaveLocalCheckbox.y = yOff;
                 autoSaveLocalCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                 box.addChild(autoSaveLocalCheckbox);
                 yOff += 30;
 
                 var useCacheCheckboxText:Text = new Text(_lang.string("air_options_use_cache"));
-                useCacheCheckboxText.x = xOff + 22;
+                useCacheCheckboxText.x = xOff + 20;
                 useCacheCheckboxText.y = yOff;
                 box.addChild(useCacheCheckboxText);
                 yOff += 2;
 
                 useCacheCheckbox = new BoxCheck();
-                useCacheCheckbox.x = xOff + 2;
+                useCacheCheckbox.x = xOff;
                 useCacheCheckbox.y = yOff;
                 useCacheCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                 box.addChild(useCacheCheckbox);
@@ -1111,13 +1114,13 @@ package popups
                 CONFIG::vsync
                 {
                     var useVSyncCheckboxText:Text = new Text(_lang.string("air_options_use_vsync"));
-                    useVSyncCheckboxText.x = xOff + 22;
+                    useVSyncCheckboxText.x = xOff + 20;
                     useVSyncCheckboxText.y = yOff;
                     box.addChild(useVSyncCheckboxText);
                     yOff += 2;
 
                     useVSyncCheckbox = new BoxCheck();
-                    useVSyncCheckbox.x = xOff + 2;
+                    useVSyncCheckbox.x = xOff;
                     useVSyncCheckbox.y = yOff;
                     useVSyncCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                     box.addChild(useVSyncCheckbox);
@@ -1125,17 +1128,25 @@ package popups
                 }
 
                 var useWebsocketCheckboxText:Text = new Text(_lang.string("air_options_use_websockets"));
-                useWebsocketCheckboxText.x = xOff + 22;
+                useWebsocketCheckboxText.x = xOff + 20;
                 useWebsocketCheckboxText.y = yOff;
                 box.addChild(useWebsocketCheckboxText);
                 yOff += 2;
 
                 useWebsocketCheckbox = new BoxCheck();
-                useWebsocketCheckbox.x = xOff + 2;
+                useWebsocketCheckbox.x = xOff;
                 useWebsocketCheckbox.y = yOff;
                 useWebsocketCheckbox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                 useWebsocketCheckbox.addEventListener(MouseEvent.MOUSE_OVER, e_websocketMouseOver, false, 0, true);
                 box.addChild(useWebsocketCheckbox);
+                yOff += 30;
+
+                // https://github.com/flashflashrevolution/web-stream-overlay
+                openWebsocketOverlay = new BoxButton(150, 27, _lang.string("options_overlay_instructions"));
+                openWebsocketOverlay.x = xOff;
+                openWebsocketOverlay.y = yOff;
+                openWebsocketOverlay.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                box.addChild(openWebsocketOverlay);
                 yOff += 30;
 
                 ///- Col 2
@@ -1810,6 +1821,13 @@ package popups
                         _gvars.gameMain.addAlert(_lang.string("air_options_unable_to_start_websockets"), 120, Alert.RED);
                     }
                 }
+            }
+
+            // HTTP Websockets Instructions
+            else if (e.target == openWebsocketOverlay)
+            {
+                navigateToURL(new URLRequest(Constant.WEBSOCKET_OVERLAY_URL), "_blank");
+                return;
             }
 
             // Set Settings
