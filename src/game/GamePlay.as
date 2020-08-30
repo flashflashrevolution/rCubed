@@ -392,6 +392,9 @@ package game
 
             _gvars.gameMain.disablePopups = false;
 
+            // Disable Editor mode when leaving editor.
+            options.isEditor = false;
+
             Mouse.show();
         }
 
@@ -1411,9 +1414,6 @@ package game
 
             // Go to results
             switchTo((options.isEditor || mpSpectate) ? Main.GAME_MENU_PANEL : GameMenu.GAME_RESULTS);
-
-            // Disable Editor mode when leaving editor.
-            options.isEditor = false;
         }
 
         private function restartGame():void
