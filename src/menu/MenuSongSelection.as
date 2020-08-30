@@ -1407,10 +1407,10 @@ package menu
                             break;
                         }
                     }
+
                     // Display message if not enough credits
                     if (_gvars.activeUser.credits < songDetails.price)
                     {
-
                         var infoPAHover:HoverPABox = new HoverPABox(5, 256, sprintf(_lang.string("song_selection_song_panel_purchase_not_enough"), {"credits": _gvars.activeUser.credits, "price": songDetails.price}));
                         infoPAHover.delay = 50;
                         infoBox.addChild(infoPAHover);
