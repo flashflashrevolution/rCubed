@@ -1392,27 +1392,32 @@ package menu
                     var song_price:Number = songDetails.price;
                     if (!isNaN(song_price) && song_price >= 0)
                     {
+                        var hasEnoughCredits:Boolean = (_gvars.activeUser.credits >= song_price);
+
                         var purchasedSongButtonLocked:BoxButton = new BoxButton(164, 27, sprintf(_lang.string("song_selection_song_panel_purchase"), {"song_price": song_price}), 12);
                         purchasedSongButtonLocked.x = 5;
                         purchasedSongButtonLocked.y = 256;
                         purchasedSongButtonLocked.song_details = songDetails;
                         purchasedSongButtonLocked.action = "purchase";
-                        purchasedSongButtonLocked.enabled = (_gvars.activeUser.credits >= song_price);
+                        purchasedSongButtonLocked.enabled = hasEnoughCredits;
                         purchasedSongButtonLocked.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                         infoBox.addChild(purchasedSongButtonLocked);
 
                         // Check for existing purchased web request
-                        for each (var request:WebRequest in purchasedWebRequests)
+                        if (purchasedSongButtonLocked.enabled == true)
                         {
-                            if (request.level == songDetails.level)
+                            for each (var request:WebRequest in purchasedWebRequests)
                             {
-                                purchasedSongButtonLocked.enabled = false;
-                                break;
+                                if (request.level == songDetails.level)
+                                {
+                                    purchasedSongButtonLocked.enabled = false;
+                                    break;
+                                }
                             }
                         }
 
                         // Display message if not enough credits
-                        if (_gvars.activeUser.credits < song_price)
+                        if (hasEnoughCredits == false)
                         {
                             var infoPAHover:HoverPABox = new HoverPABox(5, 256, sprintf(_lang.string("song_selection_song_panel_purchase_not_enough"), {"credits": _gvars.activeUser.credits, "price": song_price}));
                             infoPAHover.delay = 50;
