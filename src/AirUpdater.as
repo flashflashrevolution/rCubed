@@ -365,7 +365,7 @@ package
                         LocalStore.setVariable("air_update_checks", update_checks + 1);
                         reader.close();
                         air_file.deleteFile();
-                        appendText("<B><FONT COLOR=\"#ffa0a0\">" + _lang.string("air_unpack_error").replace(/\r\n/gi, "\n") + "</FONT></B>");
+                        appendText("<B><FONT COLOR=\"#ffa0a0\">" + _lang.string("air_unpack_error") + "</FONT></B>");
                     }
                     catch (fe:Error)
                     {
@@ -422,7 +422,7 @@ package
 
                     }
                 }
-                appendText(_lang.string("air_manual_restart").replace(/\r\n/gi, "\n"));
+                appendText(_lang.string("air_manual_restart"));
                 actionButton.text = _lang.string("air_start_update_2");
                 actionButtonState(false);
             }
