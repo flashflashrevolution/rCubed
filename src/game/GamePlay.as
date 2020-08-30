@@ -1414,10 +1414,7 @@ package game
             switchTo((options.isEditor || mpSpectate) ? Main.GAME_MENU_PANEL : GameMenu.GAME_RESULTS);
 
             // Disable Editor mode when leaving editor.
-            if (options.isEditor)
-            {
-                options.isEditor = false;
-            }
+            options.isEditor = false;
         }
 
         private function restartGame():void
