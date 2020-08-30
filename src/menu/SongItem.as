@@ -11,8 +11,6 @@ package menu
     import flash.events.MouseEvent;
     import flash.events.TimerEvent;
     import flash.geom.Point;
-    import flash.net.URLRequest;
-    import flash.net.navigateToURL;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
     import flash.text.TextFieldAutoSize;
