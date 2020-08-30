@@ -1404,7 +1404,7 @@ package menu
                         infoBox.addChild(purchasedSongButtonLocked);
 
                         // Check for existing purchased web request
-                        if (purchasedSongButtonLocked.enabled == true)
+                        if (purchasedSongButtonLocked.enabled)
                         {
                             for each (var request:WebRequest in purchasedWebRequests)
                             {
@@ -1417,7 +1417,7 @@ package menu
                         }
 
                         // Display message if not enough credits
-                        if (hasEnoughCredits == false)
+                        if (!hasEnoughCredits)
                         {
                             var infoPAHover:HoverPABox = new HoverPABox(5, 256, sprintf(_lang.string("song_selection_song_panel_purchase_not_enough"), {"credits": _gvars.activeUser.credits, "price": song_price}));
                             infoPAHover.delay = 50;
