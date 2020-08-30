@@ -32,6 +32,7 @@ package
         public static const SONG_RATING_URL:String = ROOT_URL + "game/r3/r3-songRating.php";
         public static const SONG_SAVE_URL:String = ROOT_URL + "game/r3/r3-songSave.php";
         public static const SONG_START_URL:String = ROOT_URL + "game/r3/r3-songStart.php";
+        public static const SONG_PURCHASE_URL:String = ROOT_URL + "game/r3/r3-songPurchase.php";
         public static const USER_AVATAR_URL:String = ROOT_URL + "avatar_imgembedded.php";
         public static const USER_FRIENDS_URL:String = ROOT_URL + "game/r3/r3-userFriends.php";
         public static const USER_INFO_URL:String = ROOT_URL + "game/r3/r3-userInfo.php";

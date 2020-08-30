@@ -12,10 +12,14 @@ package menu
     import assets.menu.ScrollBackground;
     import assets.menu.ScrollDragger;
     import assets.menu.SongSelectionBackground;
+    import assets.menu.icons.fa.iconGear;
     import assets.menu.icons.fa.iconLeft;
+    import assets.menu.icons.fa.iconList;
     import assets.menu.icons.fa.iconRight;
+    import assets.menu.icons.fa.iconTrophy;
     import classes.Alert;
     import classes.BoxButton;
+    import classes.BoxIcon;
     import classes.BoxText;
     import classes.Language;
     import classes.Playlist;
@@ -30,6 +34,7 @@ package menu
     import com.flashfla.components.ScrollBar;
     import com.flashfla.components.ScrollPane;
     import com.flashfla.components.Throbber;
+    import com.flashfla.net.WebRequest;
     import com.flashfla.utils.ArrayUtil;
     import com.flashfla.utils.NumberUtil;
     import com.flashfla.utils.TimeUtil;
@@ -48,10 +53,6 @@ package menu
     import popups.PopupFilterManager;
     import popups.PopupQueueManager;
     import popups.PopupSongNotes;
-    import classes.BoxIcon;
-    import assets.menu.icons.fa.iconList;
-    import assets.menu.icons.fa.iconTrophy;
-    import assets.menu.icons.fa.iconGear;
 
     public class MenuSongSelection extends MenuPanel
     {
@@ -101,6 +102,7 @@ package menu
         // Info Page
         private var searchBox:BoxText;
         private var searchTypeBox:ComboBox;
+        private static var purchasedWebRequests:Vector.<WebRequest> = new <WebRequest>[];
 
         public static var options:MenuSongSelectionOptions = new MenuSongSelectionOptions();
 
@@ -802,7 +804,6 @@ package menu
             if (e.target is SongItem)
             {
                 var tarSongItem:SongItem = (e.target as SongItem);
-                tarSongItem.e_onClick(e);
                 if (tarSongItem.index != options.activeIndex)
                 {
                     options.infoTab = TAB_PLAYLIST;
@@ -1329,11 +1330,10 @@ package menu
         public function buildInfoBoxSongActionButtons(songDetails:Object):void
         {
             var accessLevel:int = _gvars.checkSongAccess(songDetails);
-
+            var isCanonEngine:Boolean = !songDetails.engine;
             if (accessLevel == GlobalVariables.SONG_ACCESS_PLAYABLE)
             {
-                var hasHighscores:Boolean = !songDetails.engine;
-                var buttonWidth:int = hasHighscores ? 51.5 : 79.5;
+                var buttonWidth:int = isCanonEngine ? 51.5 : 79.5;
 
                 //- Make Display
                 var songQueueButton:BoxIcon = new BoxIcon(buttonWidth, 27, new iconList());
@@ -1344,7 +1344,7 @@ package menu
                 songQueueButton.addEventListener(MouseEvent.CLICK, songQueueClick, false, 0, true);
                 infoBox.addChild(songQueueButton);
 
-                if (hasHighscores)
+                if (isCanonEngine)
                 {
                     var songHighscoresButton:BoxIcon = new BoxIcon(buttonWidth + 1, 27, new iconTrophy());
                     songHighscoresButton.x = 5 + buttonWidth + 5;
@@ -1357,7 +1357,7 @@ package menu
                 }
 
                 var songOptionsButton:BoxIcon = new BoxIcon(buttonWidth, 27, new iconGear());
-                songOptionsButton.x = 5 + buttonWidth + 6 + (hasHighscores ? (buttonWidth + 5) : 0);
+                songOptionsButton.x = 5 + buttonWidth + 6 + (isCanonEngine ? (buttonWidth + 5) : 0);
                 songOptionsButton.y = 256;
                 songOptionsButton.level = songDetails.level;
                 songOptionsButton.action = "songOptions";
@@ -1385,13 +1385,52 @@ package menu
             }
             else
             {
-                var songHighscoresButtonLocked:BoxButton = new BoxButton(164, 27, (options.infoTab == TAB_HIGHSCORES ? _lang.string("song_selection_song_panel_info") : _lang.string("song_selection_song_panel_scores")), 12);
-                songHighscoresButtonLocked.x = 5;
-                songHighscoresButtonLocked.y = 288;
-                songHighscoresButtonLocked.level = songDetails.level;
-                songHighscoresButtonLocked.action = "highscores";
-                songHighscoresButtonLocked.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-                infoBox.addChild(songHighscoresButtonLocked);
+                if (isCanonEngine)
+                {
+                    var song_price:Number = songDetails.price;
+                    if (!isNaN(song_price) && song_price >= 0)
+                    {
+                        var hasEnoughCredits:Boolean = (_gvars.activeUser.credits >= song_price);
+
+                        var purchasedSongButtonLocked:BoxButton = new BoxButton(164, 27, sprintf(_lang.string("song_selection_song_panel_purchase"), {"song_price": song_price}), 12);
+                        purchasedSongButtonLocked.x = 5;
+                        purchasedSongButtonLocked.y = 256;
+                        purchasedSongButtonLocked.song_details = songDetails;
+                        purchasedSongButtonLocked.action = "purchase";
+                        purchasedSongButtonLocked.enabled = hasEnoughCredits;
+                        purchasedSongButtonLocked.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                        infoBox.addChild(purchasedSongButtonLocked);
+
+                        // Check for existing purchased web request
+                        if (purchasedSongButtonLocked.enabled)
+                        {
+                            for each (var request:WebRequest in purchasedWebRequests)
+                            {
+                                if (request.level == songDetails.level)
+                                {
+                                    purchasedSongButtonLocked.enabled = false;
+                                    break;
+                                }
+                            }
+                        }
+
+                        // Display message if not enough credits
+                        if (!hasEnoughCredits)
+                        {
+                            var infoPAHover:HoverPABox = new HoverPABox(5, 256, sprintf(_lang.string("song_selection_song_panel_purchase_not_enough"), {"credits": _gvars.activeUser.credits, "price": song_price}));
+                            infoPAHover.delay = 50;
+                            infoBox.addChild(infoPAHover);
+                        }
+                    }
+
+                    var songHighscoresButtonLocked:BoxButton = new BoxButton(164, 27, (options.infoTab == TAB_HIGHSCORES ? _lang.string("song_selection_song_panel_info") : _lang.string("song_selection_song_panel_scores")), 12);
+                    songHighscoresButtonLocked.x = 5;
+                    songHighscoresButtonLocked.y = 288;
+                    songHighscoresButtonLocked.level = songDetails.level;
+                    songHighscoresButtonLocked.action = "highscores";
+                    songHighscoresButtonLocked.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                    infoBox.addChild(songHighscoresButtonLocked);
+                }
             }
         }
 
@@ -1403,14 +1442,8 @@ package menu
             _gvars.gameMain.addAlert(sprintf(_lang.string("song_selection_add_to_queue"), {song_name: _playlist.getSong(e.target.level).name}), 90);
             _gvars.songQueue.push(_playlist.getSong(e.target.level));
             saveQueuePlaylist();
-            buildPlayList();
-            if (songList == _gvars.songQueue)
-            {
-                options.infoTab = TAB_QUEUE;
+            if (options.activeGenre == PLAYLIST_QUEUE)
                 buildPlayList();
-                options.infoTab = TAB_PLAYLIST;
-                buildInfoBox();
-            }
         }
 
         /**
@@ -1729,7 +1762,6 @@ package menu
         //******************************************************************************************//
         // Event Handlers
         //******************************************************************************************//
-
         /**
          * General Click Handler for multiple objects.
          * @param e
@@ -1785,6 +1817,16 @@ package menu
                 {
                     options.infoTab = (options.infoTab == TAB_PLAYLIST ? TAB_HIGHSCORES : TAB_PLAYLIST);
                     buildInfoBox();
+                }
+                else if (clickAction == "purchase")
+                {
+                    var songDetails:Object = e.target.song_details;
+                    var purchaseRequest:WebRequest = new WebRequest(Constant.SONG_PURCHASE_URL, e_purchaseSongComplete, e_purchaseSongFailure);
+                    purchaseRequest.level = songDetails.level;
+                    purchaseRequest.load({"level": songDetails.level, "session": _gvars.userSession});
+                    purchasedWebRequests.push(purchaseRequest);
+
+                    e.target.enabled = false;
                 }
                 else if (clickAction == "songOptions")
                 {
@@ -1848,35 +1890,6 @@ package menu
                 }
             }
             stage.focus = stage;
-        }
-
-        /**
-         * Callback for saving a song queue.
-         * @param subevent
-         */
-        private function e_saveSongQueue(subevent:Object):void
-        {
-            if (subevent.params.value.length > 0)
-            {
-                var songArray:Array = [];
-                for (var songQueueI:int = 0; songQueueI < _gvars.songQueue.length; songQueueI++)
-                {
-                    songArray[songArray.length] = _gvars.songQueue[songQueueI].level;
-                }
-                _gvars.playerUser.songQueues.push(new SongQueueItem(subevent.params.value, songArray));
-                _gvars.playerUser.save();
-            }
-        }
-
-        /**
-         * Callback for closing the prompt for saving a song queue.
-         * @param e
-         */
-        private function e_closeSongQueuePrompt(e:Event):void
-        {
-            var prompt:MultiplayerPrompt = (e.target as MultiplayerPrompt);
-            prompt.removeEventListener(MultiplayerPrompt.EVENT_SEND, e_saveSongQueue);
-            prompt.removeEventListener(Event.CLOSE, e_closeSongQueuePrompt);
         }
 
         /**
@@ -2004,6 +2017,100 @@ package menu
         {
             options.scroll_position = e.target.scroll;
             pane.scrollTo(e.target.scroll);
+        }
+
+        /**
+         * Callback for saving a song queue.
+         * @param subevent
+         */
+        private function e_saveSongQueue(subevent:Object):void
+        {
+            if (subevent.params.value.length > 0)
+            {
+                var songArray:Array = [];
+                for (var songQueueI:int = 0; songQueueI < _gvars.songQueue.length; songQueueI++)
+                {
+                    songArray[songArray.length] = _gvars.songQueue[songQueueI].level;
+                }
+                _gvars.playerUser.songQueues.push(new SongQueueItem(subevent.params.value, songArray));
+                _gvars.playerUser.save();
+            }
+        }
+
+        /**
+         * Callback for closing the prompt for saving a song queue.
+         * @param e
+         */
+        private function e_closeSongQueuePrompt(e:Event):void
+        {
+            var prompt:MultiplayerPrompt = (e.target as MultiplayerPrompt);
+            prompt.removeEventListener(MultiplayerPrompt.EVENT_SEND, e_saveSongQueue);
+            prompt.removeEventListener(Event.CLOSE, e_closeSongQueuePrompt);
+        }
+
+        /**
+         * Called when a song purchase completes.
+         * @param e
+         */
+        private function e_purchaseSongComplete(e:Event):void
+        {
+            var level_id:int;
+
+            // Remove Loader and get Level Info
+            for each (var pur_loader:WebRequest in purchasedWebRequests)
+            {
+                if (pur_loader.loader == e.target)
+                {
+                    level_id = pur_loader.level;
+                    purchasedWebRequests.removeAt(purchasedWebRequests.indexOf(pur_loader));
+                    break;
+                }
+            }
+
+            var response:Object = JSON.parse(e.target.data);
+
+            if (response["status"] == 0)
+            {
+                var songDetails:Object = _playlist.getSong(level_id);
+                if (songDetails != null && songDetails.error == null)
+                    _gvars.gameMain.addAlert(sprintf(_lang.string("song_purchase_complete"), {"name": songDetails.name}), 120, Alert.DARK_GREEN);
+
+                _gvars.activeUser.setPurchasedString(response["purchased"]);
+                _gvars.activeUser.credits = response["credits"];
+                _playlist.updateSongAccess();
+
+                buildPlayList();
+            }
+            else
+            {
+                _gvars.gameMain.addAlert(_lang.string("song_purchase_error_" + response["status"]), 120, Alert.RED);
+            }
+
+            if (options.activeSongID == level_id && options.infoTab == TAB_PLAYLIST)
+            {
+                buildInfoBox();
+            }
+        }
+
+        /**
+         * Called when a song purchase fails.
+         * @param e
+         */
+        private function e_purchaseSongFailure(e:Event):void
+        {
+            // Remove Loader and refresh Info Box if active song.
+            for each (var pur_loader:WebRequest in purchasedWebRequests)
+            {
+                if (pur_loader.loader == e.target)
+                {
+                    if (options.activeSongID == pur_loader.level && options.infoTab == TAB_PLAYLIST)
+                    {
+                        buildInfoBox();
+                    }
+                    purchasedWebRequests.removeAt(purchasedWebRequests.indexOf(pur_loader));
+                    break;
+                }
+            }
         }
 
         //******************************************************************************************//
@@ -2165,7 +2272,7 @@ internal class HoverPABox extends Sprite
     private var _hoverText:String;
     private var _hoverSprite:Sprite;
     private var _hoverSpriteText:TextField;
-    private var _hoverTimer:Timer = new Timer(650, 1);
+    private var _hoverTimer:Timer = new Timer(500, 1);
 
     public function HoverPABox(xpos:Number, ypos:Number, text:String, width:Number = 165, height:Number = 38)
     {
@@ -2187,6 +2294,11 @@ internal class HoverPABox extends Sprite
         this.graphics.endFill();
 
         this.addEventListener(MouseEvent.ROLL_OVER, e_hoverRollOver);
+    }
+
+    public function set delay(val:int):void
+    {
+        _hoverTimer.delay = val;
     }
 
 

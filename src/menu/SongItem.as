@@ -11,8 +11,6 @@ package menu
     import flash.events.MouseEvent;
     import flash.events.TimerEvent;
     import flash.geom.Point;
-    import flash.net.URLRequest;
-    import flash.net.navigateToURL;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
     import flash.text.TextFieldAutoSize;
@@ -107,23 +105,6 @@ package menu
             draw();
             showHoverMessage(false);
             this.removeEventListener(MouseEvent.ROLL_OUT, e_onHoverOut);
-        }
-
-        /**
-         * This is called by MenuSongSelection
-         * @param e
-         * @return Boolean | If the mouse event was captured and used to open the shop.
-         */
-        public function e_onClick(e:Event = null):Boolean
-        {
-            if (isLocked)
-            {
-                if (songData["access"] == GlobalVariables.SONG_ACCESS_PURCHASED)
-                {
-                    navigateToURL(new URLRequest(Constant.SHOP_URL), "_blank");
-                }
-            }
-            return isLocked;
         }
 
         /**

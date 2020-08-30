@@ -278,11 +278,7 @@ package classes
             {
                 this.hash = _data.hash;
                 this.credits = _data.credits;
-                this.purchased = [];
-                for (var x:int = 1; x < _data["purchased"].length; x++)
-                {
-                    this.purchased.push(_data["purchased"].charAt(x));
-                }
+                setPurchasedString(_data["purchased"]);
                 if (_data["song_ratings"] != null)
                     this.songRatings = _data["song_ratings"];
             }
@@ -311,6 +307,15 @@ package classes
             else
             {
                 loadLocal();
+            }
+        }
+
+        public function setPurchasedString(str:String):void
+        {
+            this.purchased = [];
+            for (var x:int = 1; x < str.length; x++)
+            {
+                this.purchased.push(str.charAt(x));
             }
         }
 
