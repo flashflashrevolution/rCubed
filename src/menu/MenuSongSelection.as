@@ -1389,31 +1389,35 @@ package menu
             {
                 if (isCanonEngine)
                 {
-                    var purchasedSongButtonLocked:BoxButton = new BoxButton(164, 27, sprintf(_lang.string("song_selection_song_panel_purchase"), {"song_price": songDetails.price}), 12);
-                    purchasedSongButtonLocked.x = 5;
-                    purchasedSongButtonLocked.y = 256;
-                    purchasedSongButtonLocked.song_details = songDetails;
-                    purchasedSongButtonLocked.action = "purchase";
-                    purchasedSongButtonLocked.enabled = (_gvars.activeUser.credits >= songDetails.price);
-                    purchasedSongButtonLocked.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-                    infoBox.addChild(purchasedSongButtonLocked);
-
-                    // Check for existing purchased web request
-                    for each (var request:WebRequest in purchasedWebRequests)
+                    var song_price:Number = songDetails.price;
+                    if (!isNaN(song_price) && song_price >= 0)
                     {
-                        if (request.level == songDetails.level)
+                        var purchasedSongButtonLocked:BoxButton = new BoxButton(164, 27, sprintf(_lang.string("song_selection_song_panel_purchase"), {"song_price": song_price}), 12);
+                        purchasedSongButtonLocked.x = 5;
+                        purchasedSongButtonLocked.y = 256;
+                        purchasedSongButtonLocked.song_details = songDetails;
+                        purchasedSongButtonLocked.action = "purchase";
+                        purchasedSongButtonLocked.enabled = (_gvars.activeUser.credits >= song_price);
+                        purchasedSongButtonLocked.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                        infoBox.addChild(purchasedSongButtonLocked);
+
+                        // Check for existing purchased web request
+                        for each (var request:WebRequest in purchasedWebRequests)
                         {
-                            purchasedSongButtonLocked.enabled = false;
-                            break;
+                            if (request.level == songDetails.level)
+                            {
+                                purchasedSongButtonLocked.enabled = false;
+                                break;
+                            }
                         }
-                    }
 
-                    // Display message if not enough credits
-                    if (_gvars.activeUser.credits < songDetails.price)
-                    {
-                        var infoPAHover:HoverPABox = new HoverPABox(5, 256, sprintf(_lang.string("song_selection_song_panel_purchase_not_enough"), {"credits": _gvars.activeUser.credits, "price": songDetails.price}));
-                        infoPAHover.delay = 50;
-                        infoBox.addChild(infoPAHover);
+                        // Display message if not enough credits
+                        if (_gvars.activeUser.credits < song_price)
+                        {
+                            var infoPAHover:HoverPABox = new HoverPABox(5, 256, sprintf(_lang.string("song_selection_song_panel_purchase_not_enough"), {"credits": _gvars.activeUser.credits, "price": song_price}));
+                            infoPAHover.delay = 50;
+                            infoBox.addChild(infoPAHover);
+                        }
                     }
 
                     var songHighscoresButtonLocked:BoxButton = new BoxButton(164, 27, (options.infoTab == TAB_HIGHSCORES ? _lang.string("song_selection_song_panel_info") : _lang.string("song_selection_song_panel_scores")), 12);
@@ -2071,7 +2075,7 @@ package menu
             if (response["status"] == 0)
             {
                 var songDetails:Object = _playlist.getSong(level_id);
-                if (songDetails.error == null)
+                if (songDetails != null && songDetails.error == null)
                     _gvars.gameMain.addAlert(sprintf(_lang.string("song_purchase_complete"), {"name": songDetails.name}), 120, Alert.DARK_GREEN);
 
                 _gvars.activeUser.setPurchasedString(response["purchased"]);
@@ -2079,18 +2083,15 @@ package menu
                 _playlist.updateSongAccess();
 
                 buildPlayList();
-                if (options.activeSongID == level_id && options.infoTab == TAB_PLAYLIST)
-                {
-                    buildInfoBox();
-                }
             }
             else
             {
                 _gvars.gameMain.addAlert(_lang.string("song_purchase_error_" + response["status"]), 120, Alert.RED);
-                if (options.activeSongID == level_id && options.infoTab == TAB_PLAYLIST)
-                {
-                    buildInfoBox();
-                }
+            }
+
+            if (options.activeSongID == level_id && options.infoTab == TAB_PLAYLIST)
+            {
+                buildInfoBox();
             }
         }
 
