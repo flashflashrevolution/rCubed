@@ -4,9 +4,9 @@ package classes
 
     dynamic public class ValidatedText extends BoxText
     {
-        public static const PARSE_COLOR:uint = 2;
-        public static const PARSE_FLOAT:uint = 1;
-        public static const PARSE_INT:uint = 0;
+        private static const PARSE_COLOR:uint = 2;
+        private static const PARSE_FLOAT:uint = 1;
+        private static const PARSE_INT:uint = 0;
 
         public static const R_FLOAT_P:uint = 0;
         public static const R_FLOAT:uint = 1;
@@ -15,6 +15,7 @@ package classes
         public static const R_COLOR:uint = 4;
         public static const R_ALL:uint = 5;
 
+        private var m_parseMode:uint = PARSE_INT;
         private var m_validator:RegExp;
 
         /**
@@ -38,21 +39,26 @@ package classes
             {
                 case R_FLOAT_P:
                     this.restrict = "0-9.";
+                    m_parseMode = PARSE_FLOAT;
                     m_validator = /^\d*\.?\d*$/;
                     break;
                 case R_FLOAT:
                     this.restrict = "\\-0-9.";
+                    m_parseMode = PARSE_FLOAT;
                     m_validator = /^-?\d*\.?\d*$/;
                     break;
                 case R_INT_P:
                     this.restrict = "0-9";
+                    m_parseMode = PARSE_INT;
                     break;
                 case R_INT:
                     this.restrict = "\\-0-9";
+                    m_parseMode = PARSE_INT;
                     m_validator = /^-?\d+$/;
                     break;
                 case R_COLOR:
                     this.restrict = "#0-9a-f";
+                    m_parseMode = PARSE_COLOR;
                     m_validator = /^#[0-9a-f]{6}$/;
                     break;
             }
@@ -71,26 +77,21 @@ package classes
         }
 
         /**
-         * Called to validate the text of a ValidatedText in different modes.
-         * Modes include the following:
-         * --> PARSE_INT: Parses the text as an integer.
-         * --> PARSE_FLOAT: Parses the text as a float.
-         * --> PARSE_COLOR: Parses the text as a color (hexadecimal integer).
+         * Called to validate the text of a ValidatedText according to the restricted character set.
          * First, the text is checked if it passes a regex test.
          * Then, the parsed number is checked to see if it's not NaN and it's within the bounds supplied by the users of this function.
          * If the text is valid:
          * --> The BoxText is rendered to display its default colours; otherwise, it turns red.
          * --> The parsed number is returned; otherwise, the default value is returned.
-         * @param mode Parsing mode
          * @param default_value Value returned if validation fails
          * @param lower_bound Lower bound of valid region
          * @param upper_bound Upper bound of valid region
          * @return Number The parsed number if validation succeeds; the default value if validation fails
          */
-        public function validate(mode:uint, default_value:Number, lower_bound:Number = NaN, upper_bound:Number = NaN):Number
+        public function validate(default_value:Number, lower_bound:Number = NaN, upper_bound:Number = NaN):Number
         {
-            var parse_color:Boolean = Boolean(mode & PARSE_COLOR);
-            var parse_float:Boolean = !parse_color && Boolean(mode & PARSE_FLOAT);
+            var parse_color:Boolean = (m_parseMode == PARSE_COLOR);
+            var parse_float:Boolean = (m_parseMode == PARSE_FLOAT);
             var radix:int = parse_color ? 16 : 0;
 
             var testString:String = this.text;
