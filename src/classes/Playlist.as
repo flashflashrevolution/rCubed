@@ -105,7 +105,7 @@ package classes
             else
             {
                 engine = null;
-                var req:URLRequest = new URLRequest(Constant.PLAYLIST_URL + "?d=" + time);
+                var req:URLRequest = new URLRequest(Constant.SONG_PLAYLIST_URL + "?d=" + time);
                 var requestVars:URLVariables = new URLVariables();
                 Constant.addDefaultRequestVariables(requestVars);
                 requestVars.session = _gvars.userSession;
