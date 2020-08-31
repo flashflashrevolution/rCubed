@@ -15,6 +15,8 @@ package classes
         public static const R_COLOR:uint = 4;
         public static const R_ALL:uint = 5;
 
+        private var m_validator:RegExp;
+
         /**
          * The ValidatedText constructor.
          * restrict_mode determines what characters could be entered into the textfield:
@@ -36,18 +38,22 @@ package classes
             {
                 case R_FLOAT_P:
                     this.restrict = "0-9.";
+                    m_validator = /^\d*\.?\d*$/;
                     break;
                 case R_FLOAT:
                     this.restrict = "\\-0-9.";
+                    m_validator = /^-?\d*\.?\d*$/;
                     break;
                 case R_INT_P:
                     this.restrict = "0-9";
                     break;
                 case R_INT:
                     this.restrict = "\\-0-9";
+                    m_validator = /^-?\d+$/;
                     break;
                 case R_COLOR:
                     this.restrict = "#0-9a-f";
+                    m_validator = /^#[0-9a-f]{6}$/;
                     break;
             }
         }
@@ -87,11 +93,12 @@ package classes
             var radix:int = parse_color ? 16 : 0;
 
             var testString:String = this.text;
+            var regex_passed:Boolean = (m_validator != null) ? m_validator.test(testString) : true;
             if (parse_color)
                 testString = "0x" + testString.replace("#", "");
 
             var to_test:Number = (parse_float) ? parseFloat(testString) : parseInt(testString, radix);
-            var valid:Boolean = !(isNaN(to_test) || (!isNaN(lower_bound) && to_test < lower_bound) || (!isNaN(upper_bound) && to_test > upper_bound));
+            var valid:Boolean = !(!regex_passed || isNaN(to_test) || (!isNaN(lower_bound) && to_test < lower_bound) || (!isNaN(upper_bound) && to_test > upper_bound));
             if (valid)
             {
                 renderValid();
