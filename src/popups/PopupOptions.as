@@ -1272,19 +1272,19 @@ package popups
         {
             if (e.target == optionGameSpeed)
             {
-                _gvars.activeUser.gameSpeed = optionGameSpeed.validate(ValidatedText.PARSE_FLOAT, 1, 0.1);
+                _gvars.activeUser.gameSpeed = optionGameSpeed.validate(1, 0.1);
             }
             else if (e.target == optionOffset)
             {
-                _gvars.activeUser.GLOBAL_OFFSET = optionOffset.validate(ValidatedText.PARSE_FLOAT, 0);
+                _gvars.activeUser.GLOBAL_OFFSET = optionOffset.validate(0);
             }
             else if (e.target == optionJudgeOffset)
             {
-                _gvars.activeUser.JUDGE_OFFSET = optionJudgeOffset.validate(ValidatedText.PARSE_FLOAT, 0);
+                _gvars.activeUser.JUDGE_OFFSET = optionJudgeOffset.validate(0);
             }
             else if (e.target == optionReceptorSpacing)
             {
-                _gvars.activeUser.receptorGap = optionReceptorSpacing.validate(ValidatedText.PARSE_INT, 80);
+                _gvars.activeUser.receptorGap = optionReceptorSpacing.validate(80);
             }
             else if (e.target == optionNoteScale)
             {
@@ -1309,52 +1309,52 @@ package popups
             }
             else if (e.target == optionFPS)
             {
-                _gvars.activeUser.frameRate = optionFPS.validate(ValidatedText.PARSE_INT, 60);
+                _gvars.activeUser.frameRate = optionFPS.validate(60);
                 _gvars.activeUser.frameRate = Math.max(Math.min(_gvars.activeUser.frameRate, 250), 10);
                 forceJudgeCheck.visible = gameForceJudgeMode.visible = (_gvars.activeUser.frameRate <= 30);
                 _gvars.removeSongFiles();
             }
             else if (e.target == optionRate)
             {
-                _gvars.activeUser.songRate = optionRate.validate(ValidatedText.PARSE_FLOAT, 1, 0.1);
+                _gvars.activeUser.songRate = optionRate.validate(1, 0.1);
                 _gvars.removeSongFiles();
             }
             else if (e.target == isolationText)
             {
-                _avars.configIsolationStart = isolationText.validate(ValidatedText.PARSE_INT, 1, 1) - 1;
+                _avars.configIsolationStart = isolationText.validate(1, 1) - 1;
                 _avars.configIsolation = _avars.configIsolationStart > 0 || _avars.configIsolationLength > 0;
             }
             else if (e.target == isolationTotalText)
             {
-                _avars.configIsolationLength = isolationTotalText.validate(ValidatedText.PARSE_INT, 0);
+                _avars.configIsolationLength = isolationTotalText.validate(0);
                 _avars.configIsolation = _avars.configIsolationStart > 0 || _avars.configIsolationLength > 0;
             }
             else if (e.target == optionMPSize)
             {
-                Style.fontSize = _avars.configMPSize = optionMPSize.validate(ValidatedText.PARSE_INT, 10);
+                Style.fontSize = _avars.configMPSize = optionMPSize.validate(10);
                 _avars.mpSave();
             }
             else if (e.target.hasOwnProperty("autofail"))
             {
                 var autofail:String = StringUtil.upperCase(e.target.autofail);
-                _gvars.activeUser["autofail" + autofail] = e.target.validate(ValidatedText.PARSE_INT, 0, 0);
+                _gvars.activeUser["autofail" + autofail] = e.target.validate(0, 0);
             }
             else if (e.target.hasOwnProperty("judge_color_id"))
             {
                 var jid:int = e.target.judge_color_id;
-                _gvars.activeUser.judgeColours[jid] = e.target.validate(ValidatedText.PARSE_COLOR, 0, 0);
+                _gvars.activeUser.judgeColours[jid] = e.target.validate(0, 0);
                 optionJudgeColors[jid]["display"].color = _gvars.activeUser.judgeColours[jid];
             }
             else if (e.target.hasOwnProperty("combo_color_id"))
             {
                 var cid:int = e.target.combo_color_id;
-                _gvars.activeUser.comboColours[cid] = e.target.validate(ValidatedText.PARSE_COLOR, 0, 0);
+                _gvars.activeUser.comboColours[cid] = e.target.validate(0, 0);
                 optionComboColors[cid]["display"].color = _gvars.activeUser.comboColours[cid];
             }
             else if (e.target.hasOwnProperty("game_color_id"))
             {
                 var gid:int = e.target.game_color_id;
-                var newColorG:Number = e.target.validate(ValidatedText.PARSE_COLOR, 0, 0);
+                var newColorG:Number = e.target.validate(0, 0);
                 _gvars.activeUser.gameColours[gid] = newColorG;
 
                 if (gid == 0)
