@@ -1,12 +1,14 @@
 package classes.filter
 {
     import assets.GameBackgroundColor;
+    import classes.Alert;
     import classes.Box;
     import classes.BoxButton;
     import classes.BoxCheck;
     import classes.Language;
     import classes.Text;
     import com.flashfla.utils.ArrayUtil;
+    import com.flashfla.utils.SystemUtil;
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.events.Event;
@@ -68,7 +70,27 @@ package classes.filter
             exportButton = new BoxButton(100, 23, _lang.string("popup_filter_filter_single_export"));
             exportButton.x = editButton.x - 105;
             exportButton.y = 5;
+            exportButton.addEventListener(MouseEvent.CLICK, e_exportClick);
             addChild(exportButton);
+        }
+
+        override public function dispose():void
+        {
+            defaultCheckbox.removeEventListener(MouseEvent.CLICK, e_defaultClick);
+            defaultCheckbox.removeEventListener(MouseEvent.MOUSE_OVER, e_defaultMouseOver);
+
+            filterName.dispose();
+
+            deleteButton.removeEventListener(MouseEvent.CLICK, e_deleteClick);
+            deleteButton.dispose();
+
+            editButton.addEventListener(MouseEvent.CLICK, e_editClick);
+            editButton.dispose();
+
+            exportButton.addEventListener(MouseEvent.CLICK, e_exportClick);
+            exportButton.dispose();
+
+            super.dispose();
         }
 
         private function e_defaultMouseOver(e:Event):void
@@ -121,6 +143,20 @@ package classes.filter
         {
             if (ArrayUtil.remove(filter, _gvars.activeUser.filters))
                 updater.draw();
+        }
+
+        private function e_exportClick(e:Event):void
+        {
+            var filterString:String = JSON.stringify(filter.export());
+            var success:Boolean = SystemUtil.setClipboard(filterString);
+            if (success)
+            {
+                _gvars.gameMain.addAlert(_lang.string("clipboard_success"), 120, Alert.GREEN);
+            }
+            else
+            {
+                _gvars.gameMain.addAlert(_lang.string("clipboard_failure"), 120, Alert.RED);
+            }
         }
     }
 }
