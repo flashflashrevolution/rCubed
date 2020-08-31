@@ -20,17 +20,16 @@ package
 
         // Site URLs
         public static const SITE_DATA_URL:String = ROOT_URL + "game/r3/r3-siteData.v2.php";
+        public static const SITE_PLAYLIST_URL:String = ROOT_URL + "game/r3/r3-playlist.php";
         public static const SITE_LANGUAGE_URL:String = ROOT_URL + "game/r3/r3-language.php";
         public static const SITE_HISCORES_URL:String = ROOT_URL + "game/r3/r3-hiscores.php";
         public static const LEVEL_STATS_URL:String = ROOT_URL + "levelstats.php?level=";
-        public static const SITE_LOGIN_URL:String = ROOT_URL + "game/r3/r3-siteLogin.php";
 
         // Song & Gameplay URLs
-        public static const SONG_PLAYLIST_URL:String = ROOT_URL + "game/r3/r3-playlist.php";
-        public static const SONG_RATING_URL:String = ROOT_URL + "game/r3/r3-songRating.php";
         public static const SONG_DATA_URL:String = ROOT_URL + "game/r3/r3-songLoad.php";
         public static const SONG_START_URL:String = ROOT_URL + "game/r3/r3-songStart.php";
         public static const SONG_SAVE_URL:String = ROOT_URL + "game/r3/r3-songSave.php";
+        public static const SONG_RATING_URL:String = ROOT_URL + "game/r3/r3-songRating.php";
         public static const SONG_PURCHASE_URL:String = ROOT_URL + "game/r3/r3-songPurchase.php";
         static public const ALT_SONG_SAVE_URL:String = ROOT_URL + "game/r3/r3-songSaveOther.php";
         public static const MULTIPLAYER_SUBMIT_URL:String = ROOT_URL + "game/ffr-legacy_multiplayer.php";
@@ -38,11 +37,12 @@ package
 
         // User URLs
         static public const USER_REGISTER_URL:String = ROOT_URL + "vbz/register.php";
+        public static const USER_LOGIN_URL:String = ROOT_URL + "game/r3/r3-siteLogin.php";
         public static const USER_INFO_URL:String = ROOT_URL + "game/r3/r3-userInfo.php";
         public static const USER_INFO_LITE_URL:String = ROOT_URL + "game/r3/r3-userSmallInfo.php";
         public static const USER_AVATAR_URL:String = ROOT_URL + "avatar_imgembedded.php";
-        public static const USER_RANKS_UPDATE_URL:String = ROOT_URL + "game/r3/r3-userRankUpdate.php";
         public static const USER_RANKS_URL:String = ROOT_URL + "game/r3/r3-userRanks.php";
+        public static const USER_RANKS_UPDATE_URL:String = ROOT_URL + "game/r3/r3-userRankUpdate.php";
         public static const USER_FRIENDS_URL:String = ROOT_URL + "game/r3/r3-userFriends.php";
         public static const USER_SAVE_REPLAY_URL:String = ROOT_URL + "game/r3/r3-userReplay.php";
         public static const USER_LOAD_REPLAY_URL:String = ROOT_URL + "game/r3/r3-siteReplay.php";

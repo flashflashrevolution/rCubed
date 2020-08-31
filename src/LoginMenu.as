@@ -261,7 +261,7 @@ package
             _loader = new URLLoader();
             addLoaderListeners();
 
-            var req:URLRequest = new URLRequest(Constant.SITE_LOGIN_URL);
+            var req:URLRequest = new URLRequest(Constant.USER_LOGIN_URL);
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.username = savedInfos.username;
@@ -281,7 +281,7 @@ package
             _loader = new URLLoader();
             addLoaderListeners();
 
-            var req:URLRequest = new URLRequest(Constant.SITE_LOGIN_URL);
+            var req:URLRequest = new URLRequest(Constant.USER_LOGIN_URL);
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.username = input_user.text;
