@@ -49,10 +49,7 @@ package
         public static const USER_SAVE_SETTINGS_URL:String = ROOT_URL + "game/r3/r3-userSettings.php";
 
         // Unused URLs
-        public static const FONT_SWF_URL:String = ROOT_URL + "game/r3/fonts/";
-        public static const FONT_URL:String = ROOT_URL + "game/r3/r3-fonts.json";
         public static const SHOP_URL:String = ROOT_URL + "tools/ffrshop.php";
-        public static const SCREENSHOT_URL:String = ROOT_URL + "game/r3/r3-screenshot.php";
         public static const NOTESKIN_SWF_URL:String = ROOT_URL + "game/r3/noteskins/";
         public static const NOTESKIN_URL:String = ROOT_URL + "game/r3/r3-noteSkins.xml";
 
