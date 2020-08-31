@@ -78,16 +78,17 @@ package classes.filter
         {
             defaultCheckbox.removeEventListener(MouseEvent.CLICK, e_defaultClick);
             defaultCheckbox.removeEventListener(MouseEvent.MOUSE_OVER, e_defaultMouseOver);
+            defaultCheckbox.removeEventListener(MouseEvent.MOUSE_OUT, e_defaultMouseOut);
 
             filterName.dispose();
 
             deleteButton.removeEventListener(MouseEvent.CLICK, e_deleteClick);
             deleteButton.dispose();
 
-            editButton.addEventListener(MouseEvent.CLICK, e_editClick);
+            editButton.removeEventListener(MouseEvent.CLICK, e_editClick);
             editButton.dispose();
 
-            exportButton.addEventListener(MouseEvent.CLICK, e_exportClick);
+            exportButton.removeEventListener(MouseEvent.CLICK, e_exportClick);
             exportButton.dispose();
 
             super.dispose();
