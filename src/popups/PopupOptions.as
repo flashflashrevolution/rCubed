@@ -1603,12 +1603,14 @@ package popups
             else if (e.target.hasOwnProperty("judge_color_reset_id"))
             {
                 _gvars.activeUser.judgeColours[e.target.judge_color_reset_id] = DEFAULT_OPTIONS.judgeColours[e.target.judge_color_reset_id];
+                renderOptions();
             }
 
             // Combo Color Reset
             else if (e.target.hasOwnProperty("combo_color_reset_id"))
             {
                 _gvars.activeUser.comboColours[e.target.combo_color_reset_id] = DEFAULT_OPTIONS.comboColours[e.target.combo_color_reset_id];
+                renderOptions();
             }
 
             // Combo Color Enable/Disable
@@ -1626,6 +1628,7 @@ package popups
                     _gvars.activeUser.gameColours[2] = ColorUtil.darkenColor(DEFAULT_OPTIONS.gameColours[gid], 0.27);
                 if (gid == 1)
                     _gvars.activeUser.gameColours[3] = ColorUtil.brightenColor(DEFAULT_OPTIONS.gameColours[gid], 0.08);
+                renderOptions();
             }
             //- Editor
             else if (e.target.hasOwnProperty("editor_multiplayer"))
