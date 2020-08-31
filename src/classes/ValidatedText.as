@@ -8,9 +8,48 @@ package classes
         public static const PARSE_FLOAT:uint = 1;
         public static const PARSE_INT:uint = 0;
 
-        public function ValidatedText(width:int = 100, height:int = 20, textformat:TextFormat = null)
+        public static const R_FLOAT_P:uint = 0;
+        public static const R_FLOAT:uint = 1;
+        public static const R_INT_P:uint = 2;
+        public static const R_INT:uint = 3;
+        public static const R_COLOR:uint = 4;
+        public static const R_ALL:uint = 5;
+
+        /**
+         * The ValidatedText constructor.
+         * restrict_mode determines what characters could be entered into the textfield:
+         * --> R_FLOAT_P: A positive decimal.
+         * --> R_FLOAT: A decimal.
+         * --> R_INT_P: A positive integer.
+         * --> R_INT: An integer.
+         * --> R_COLOR: A hex string, including the pound ('#') sign.
+         * --> R_ALL: No restriction.
+         * @param width Width of the textfield
+         * @param height Height of the textfield
+         * @param restrict_mode Which restricted character set to be used
+         * @param textformat TextFormat of the textfield
+         */
+        public function ValidatedText(width:int, height:int, restrict_mode:uint, textformat:TextFormat = null)
         {
             super(width, height, textformat);
+            switch (restrict_mode)
+            {
+                case R_FLOAT_P:
+                    this.restrict = "0-9.";
+                    break;
+                case R_FLOAT:
+                    this.restrict = "\\-0-9.";
+                    break;
+                case R_INT_P:
+                    this.restrict = "0-9";
+                    break;
+                case R_INT:
+                    this.restrict = "\\-0-9";
+                    break;
+                case R_COLOR:
+                    this.restrict = "#0-9a-f";
+                    break;
+            }
         }
 
         private function renderValid():void
@@ -26,7 +65,7 @@ package classes
         }
 
         /**
-         * Called to validate this class's text under a parsing mode.
+         * Called to validate the text of a ValidatedText in different modes.
          * Modes include the following:
          * --> PARSE_INT: Parses the text as an integer.
          * --> PARSE_FLOAT: Parses the text as a float.
