@@ -22,6 +22,7 @@ package classes.filter
         private var updater:PopupFilterManager;
         public var filter:EngineLevelFilter;
         public var filterName:Text;
+        public var exportButton:BoxButton;
         public var editButton:BoxButton;
         public var deleteButton:BoxButton;
         public var defaultCheckbox:BoxCheck;
@@ -63,6 +64,11 @@ package classes.filter
             editButton.y = 5;
             editButton.addEventListener(MouseEvent.CLICK, e_editClick);
             addChild(editButton);
+
+            exportButton = new BoxButton(100, 23, _lang.string("popup_filter_filter_single_export"));
+            exportButton.x = editButton.x - 105;
+            exportButton.y = 5;
+            addChild(exportButton);
         }
 
         private function e_defaultMouseOver(e:Event):void
@@ -116,6 +122,5 @@ package classes.filter
             if (ArrayUtil.remove(filter, _gvars.activeUser.filters))
                 updater.draw();
         }
-
     }
 }
