@@ -450,7 +450,7 @@ package
             _loader = new DynamicURLLoader();
             addLoaderListeners();
 
-            var req:URLRequest = new URLRequest(Constant.HISCORES_URL + "?d=" + new Date().getTime());
+            var req:URLRequest = new URLRequest(Constant.SITE_HISCORES_URL + "?d=" + new Date().getTime());
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.session = this.userSession;
@@ -537,7 +537,7 @@ package
             }
 
             var _debugLoader:URLLoader = new URLLoader();
-            var req:URLRequest = new URLRequest(Constant.ROOT_URL + "game/r3/r3-debugLog.php");
+            var req:URLRequest = new URLRequest(Constant.DEBUG_LOG_URL);
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.session = userSession;

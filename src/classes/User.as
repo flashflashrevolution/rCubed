@@ -234,7 +234,7 @@ package classes
             _loader = new URLLoader();
             addLoaderListeners();
 
-            var req:URLRequest = new URLRequest(Constant.USER_SMALL_INFO_URL + "?d=" + new Date().getTime());
+            var req:URLRequest = new URLRequest(Constant.USER_INFO_LITE_URL + "?d=" + new Date().getTime());
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.userid = userid;
@@ -642,7 +642,7 @@ package classes
             _loader = new URLLoader();
             addLoaderSaveListeners();
 
-            var req:URLRequest = new URLRequest(Constant.USER_SETTINGS_URL);
+            var req:URLRequest = new URLRequest(Constant.USER_SAVE_SETTINGS_URL);
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.session = _gvars.userSession;

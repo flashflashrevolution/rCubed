@@ -54,7 +54,7 @@ package classes.replay
             _loader = new URLLoader();
             addLoaderListeners();
 
-            var req:URLRequest = new URLRequest(Constant.SITE_REPLAY_URL);
+            var req:URLRequest = new URLRequest(Constant.USER_LOAD_REPLAY_URL);
             var urlVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(urlVars);
 
@@ -119,7 +119,7 @@ package classes.replay
 
             // Legacy / Velo
             var mirrorIndex:int = -1;
-            if (data.replayversion == Constant.BRAND_NAME_SHORT_UPPER())
+            if (data.replayversion == "FFR")
             {
                 tempSettings = tempSettings.split("|");
                 jsonSettings = _gvars.playerUser.isGuest ? new User().settings : _gvars.playerUser.settings;

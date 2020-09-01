@@ -1331,7 +1331,7 @@ package game
             _loader = new DynamicURLLoader();
             addLoaderListeners(replayLoadComplete, replayLoadError);
 
-            var req:URLRequest = new URLRequest(Constant.USER_REPLAY_URL);
+            var req:URLRequest = new URLRequest(Constant.USER_SAVE_REPLAY_URL);
             var scoreSender:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(scoreSender);
 
