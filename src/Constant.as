@@ -1,11 +1,11 @@
 package
 {
-    import flash.net.URLVariables;
-    import flash.text.TextFormat;
-    import flash.text.TextFormatAlign;
     import classes.Language;
     import flash.geom.Matrix;
+    import flash.net.URLVariables;
     import flash.text.StyleSheet;
+    import flash.text.TextFormat;
+    import flash.text.TextFormatAlign;
 
     public class Constant
     {
@@ -24,6 +24,7 @@ package
         public static const SITE_LANGUAGE_URL:String = ROOT_URL + "game/r3/r3-language.php";
         public static const SITE_HISCORES_URL:String = ROOT_URL + "game/r3/r3-hiscores.php";
         public static const LEVEL_STATS_URL:String = ROOT_URL + "levelstats.php?level=";
+        public static const DEBUG_LOG_URL:String = ROOT_URL + "game/r3/r3-debugLog.php";
 
         // Song & Gameplay URLs
         public static const SONG_DATA_URL:String = ROOT_URL + "game/r3/r3-songLoad.php";
@@ -31,12 +32,11 @@ package
         public static const SONG_SAVE_URL:String = ROOT_URL + "game/r3/r3-songSave.php";
         public static const SONG_RATING_URL:String = ROOT_URL + "game/r3/r3-songRating.php";
         public static const SONG_PURCHASE_URL:String = ROOT_URL + "game/r3/r3-songPurchase.php";
-        static public const ALT_SONG_SAVE_URL:String = ROOT_URL + "game/r3/r3-songSaveOther.php";
+        public static const ALT_SONG_SAVE_URL:String = ROOT_URL + "game/r3/r3-songSaveOther.php";
         public static const MULTIPLAYER_SUBMIT_URL:String = ROOT_URL + "game/ffr-legacy_multiplayer.php";
         public static const MULTIPLAYER_SUBMIT_URL_VELOCITY:String = ROOT_URL + "game/ffr-velocity_multiplayer.php";
 
         // User URLs
-        static public const USER_REGISTER_URL:String = ROOT_URL + "vbz/register.php";
         public static const USER_LOGIN_URL:String = ROOT_URL + "game/r3/r3-siteLogin.php";
         public static const USER_INFO_URL:String = ROOT_URL + "game/r3/r3-userInfo.php";
         public static const USER_INFO_LITE_URL:String = ROOT_URL + "game/r3/r3-userSmallInfo.php";
@@ -49,6 +49,7 @@ package
         public static const USER_SAVE_SETTINGS_URL:String = ROOT_URL + "game/r3/r3-userSettings.php";
 
         // Unused URLs
+        public static const USER_REGISTER_URL:String = ROOT_URL + "vbz/register.php";
         public static const SHOP_URL:String = ROOT_URL + "tools/ffrshop.php";
         public static const NOTESKIN_SWF_URL:String = ROOT_URL + "game/r3/noteskins/";
         public static const NOTESKIN_URL:String = ROOT_URL + "game/r3/r3-noteSkins.xml";
@@ -74,7 +75,6 @@ package
         public static const TEXT_FORMAT_12:TextFormat = new TextFormat(Language.FONT_NAME, 12, 0xFFFFFF, true);
         public static const TEXT_FORMAT_CENTER:TextFormat = new TextFormat(Language.FONT_NAME, 14, 0xFFFFFF, true, null, null, null, null, TextFormatAlign.CENTER);
         public static const TEXT_FORMAT_UNICODE:TextFormat = new TextFormat(Language.UNI_FONT_NAME, 14, 0xFFFFFF, true);
-        public static const TEXT_FORMAT_UNICODE_12:TextFormat = new TextFormat(Language.UNI_FONT_NAME, 12, 0xFFFFFF, true);
 
         // Engine Brand Name
         public static function BRAND_NAME():String
