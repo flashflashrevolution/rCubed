@@ -16,6 +16,7 @@ package popups
     import classes.Playlist;
     import classes.Text;
     import classes.User;
+    import classes.ValidatedText;
     import classes.chart.Song;
     import classes.chart.parse.ChartFFRLegacy;
     import com.bit101.components.ComboBox;
@@ -95,18 +96,18 @@ package popups
         private var hover_message:MouseTooltip;
 
         //- Options
-        private var optionGameSpeed:BoxText;
-        private var optionOffset:BoxText;
-        private var optionJudgeOffset:BoxText;
-        private var gameJudgeOffset:Text
+        private var optionGameSpeed:ValidatedText;
+        private var optionOffset:ValidatedText;
+        private var optionJudgeOffset:ValidatedText;
+        private var gameJudgeOffset:Text;
         private var autoJudgeOffsetCheck:BoxCheck;
         private var gameAutoJudgeOffset:Text;
-        private var optionReceptorSpacing:BoxText;
+        private var optionReceptorSpacing:ValidatedText;
         private var optionNoteScale:BoxSlider;
         private var optionGameVolume:BoxSlider;
         private var gameVolumeValueDisplay:Text;
-        private var optionFPS:BoxText;
-        private var optionRate:BoxText;
+        private var optionFPS:ValidatedText;
+        private var optionRate:ValidatedText;
         private var forceJudgeCheck:BoxCheck;
         private var gameForceJudgeMode:Text;
         private var optionScrollDirections:Vector.<BoxCheck>;
@@ -129,9 +130,9 @@ package popups
         private var optionGameColors:Array;
         private var optionNoteColors:Array;
 
-        private var isolationText:BoxText;
-        private var isolationTotalText:BoxText;
-        private var optionMPSize:BoxText;
+        private var isolationText:ValidatedText;
+        private var isolationTotalText:ValidatedText;
+        private var optionMPSize:ValidatedText;
         private var timestampCheck:BoxCheck;
         private var startUpScreenCombo:ComboBox;
         private var optionGameLanguages:Array;
@@ -368,10 +369,9 @@ package popups
                 box.addChild(gameSpeed);
                 yOff += 20;
 
-                optionGameSpeed = new BoxText(100, 20);
+                optionGameSpeed = new ValidatedText(100, 20, ValidatedText.R_FLOAT_P);
                 optionGameSpeed.x = xOff;
                 optionGameSpeed.y = yOff;
-                optionGameSpeed.restrict = "0-9.";
                 optionGameSpeed.addEventListener(Event.CHANGE, changeHandler);
                 box.addChild(optionGameSpeed);
                 yOff += 30;
@@ -383,10 +383,9 @@ package popups
                 box.addChild(gameOffset);
                 yOff += 20;
 
-                optionOffset = new BoxText(100, 20);
+                optionOffset = new ValidatedText(100, 20, ValidatedText.R_FLOAT);
                 optionOffset.x = xOff;
                 optionOffset.y = yOff;
-                optionOffset.restrict = "-0-9";
                 optionOffset.addEventListener(Event.CHANGE, changeHandler);
                 box.addChild(optionOffset);
                 yOff += 30;
@@ -398,10 +397,9 @@ package popups
                 box.addChild(gameJudgeOffset);
                 yOff += 20;
 
-                optionJudgeOffset = new BoxText(100, 20);
+                optionJudgeOffset = new ValidatedText(100, 20, ValidatedText.R_FLOAT);
                 optionJudgeOffset.x = xOff;
                 optionJudgeOffset.y = yOff;
-                optionJudgeOffset.restrict = "-0-9";
                 optionJudgeOffset.addEventListener(Event.CHANGE, changeHandler);
                 optionJudgeOffset.contextMenu = arcJudgeMenu();
                 box.addChild(optionJudgeOffset);
@@ -428,10 +426,9 @@ package popups
                 box.addChild(gameReceptorSpacing);
                 yOff += 20;
 
-                optionReceptorSpacing = new BoxText(100, 20);
+                optionReceptorSpacing = new ValidatedText(100, 20, ValidatedText.R_INT);
                 optionReceptorSpacing.x = xOff;
                 optionReceptorSpacing.y = yOff;
-                optionReceptorSpacing.restrict = "-0-9";
                 optionReceptorSpacing.addEventListener(Event.CHANGE, changeHandler);
                 box.addChild(optionReceptorSpacing);
                 yOff += 30;
@@ -465,10 +462,9 @@ package popups
                 box.addChild(gameFPS);
                 yOff += 20;
 
-                optionFPS = new BoxText(100, 20);
+                optionFPS = new ValidatedText(100, 20, ValidatedText.R_INT_P);
                 optionFPS.x = xOff;
                 optionFPS.y = yOff;
-                optionFPS.restrict = "0-9";
                 optionFPS.addEventListener(Event.CHANGE, changeHandler);
                 box.addChild(optionFPS);
                 yOff += 30;
@@ -480,10 +476,9 @@ package popups
                 box.addChild(gameRate);
                 yOff += 20;
 
-                optionRate = new BoxText(100, 20);
+                optionRate = new ValidatedText(100, 20, ValidatedText.R_FLOAT_P);
                 optionRate.x = xOff;
                 optionRate.y = yOff;
-                optionRate.restrict = ".0-9";
                 optionRate.addEventListener(Event.CHANGE, changeHandler);
                 box.addChild(optionRate);
                 yOff += 40;
@@ -625,11 +620,10 @@ package popups
                     optionAutofailText.y = yOff - 1;
                     box.addChild(optionAutofailText);
 
-                    var optionAutofailInput:BoxText = new BoxText(70, 20);
+                    var optionAutofailInput:ValidatedText = new ValidatedText(70, 20, ValidatedText.R_INT_P);
                     optionAutofailInput.x = xOff;
                     optionAutofailInput.y = yOff;
                     optionAutofailInput.autofail = judgeTitles[i];
-                    optionAutofailInput.restrict = "0-9";
                     optionAutofailInput.field.maxChars = 5;
                     optionAutofailInput.addEventListener(Event.CHANGE, changeHandler);
                     box.addChild(optionAutofailInput);
@@ -642,11 +636,10 @@ package popups
                 optionAutofailText.y = yOff - 1;
                 box.addChild(optionAutofailText);
 
-                optionAutofailInput = new BoxText(70, 20);
+                optionAutofailInput = new ValidatedText(70, 20, ValidatedText.R_FLOAT_P);
                 optionAutofailInput.x = xOff;
                 optionAutofailInput.y = yOff;
                 optionAutofailInput.autofail = "rawGoods";
-                optionAutofailInput.restrict = ".0-9";
                 optionAutofailInput.field.maxChars = 6;
                 optionAutofailInput.addEventListener(Event.CHANGE, changeHandler);
                 box.addChild(optionAutofailInput);
@@ -863,11 +856,10 @@ package popups
                     gameJudgeColor.align = Text.RIGHT;
                     box.addChild(gameJudgeColor);
 
-                    var optionJudgeColor:BoxText = new BoxText(70, 20);
+                    var optionJudgeColor:ValidatedText = new ValidatedText(70, 20, ValidatedText.R_COLOR);
                     optionJudgeColor.x = xOff + 75;
                     optionJudgeColor.y = yOff;
                     optionJudgeColor.judge_color_id = i;
-                    optionJudgeColor.restrict = "#0-9a-f";
                     optionJudgeColor.field.maxChars = 7;
                     optionJudgeColor.addEventListener(Event.CHANGE, changeHandler);
                     box.addChild(optionJudgeColor);
@@ -913,11 +905,10 @@ package popups
                     gameGameColor.align = Text.RIGHT;
                     box.addChild(gameGameColor);
 
-                    var optionGameColor:BoxText = new BoxText(70, 20);
+                    var optionGameColor:ValidatedText = new ValidatedText(70, 20, ValidatedText.R_COLOR);
                     optionGameColor.x = xOff + 75;
                     optionGameColor.y = yOff;
                     optionGameColor.game_color_id = i;
-                    optionGameColor.restrict = "#0-9a-f";
                     optionGameColor.field.maxChars = 7;
                     optionGameColor.addEventListener(Event.CHANGE, changeHandler);
                     box.addChild(optionGameColor);
@@ -963,11 +954,10 @@ package popups
                     gameComboColor.align = Text.RIGHT;
                     box.addChild(gameComboColor);
 
-                    var optionComboColor:BoxText = new BoxText(70, 20);
+                    var optionComboColor:ValidatedText = new ValidatedText(70, 20, ValidatedText.R_COLOR);
                     optionComboColor.x = xOff + 75;
                     optionComboColor.y = yOff;
                     optionComboColor.combo_color_id = i;
-                    optionComboColor.restrict = "#0-9a-f";
                     optionComboColor.field.maxChars = 7;
                     optionComboColor.addEventListener(Event.CHANGE, changeHandler);
                     box.addChild(optionComboColor);
@@ -1056,10 +1046,9 @@ package popups
                 box.addChild(gameIsolationStart);
                 yOff += 20;
 
-                isolationText = new BoxText(100, 20);
+                isolationText = new ValidatedText(100, 20, ValidatedText.R_INT_P);
                 isolationText.x = xOff;
                 isolationText.y = yOff;
-                isolationText.restrict = "0-9";
                 isolationText.addEventListener(Event.CHANGE, changeHandler);
                 box.addChild(isolationText);
                 yOff += 30;
@@ -1070,10 +1059,9 @@ package popups
                 box.addChild(gameIsolationtotal);
                 yOff += 20;
 
-                isolationTotalText = new BoxText(100, 20);
+                isolationTotalText = new ValidatedText(100, 20, ValidatedText.R_INT_P);
                 isolationTotalText.x = xOff;
                 isolationTotalText.y = yOff;
-                isolationTotalText.restrict = "0-9";
                 isolationTotalText.addEventListener(Event.CHANGE, changeHandler);
                 box.addChild(isolationTotalText);
                 yOff += 80;
@@ -1160,10 +1148,9 @@ package popups
                 box.addChild(gameMPTextSize);
                 yOff += 20;
 
-                optionMPSize = new BoxText(100, 20);
+                optionMPSize = new ValidatedText(100, 20, ValidatedText.R_INT_P);
                 optionMPSize.x = xOff;
                 optionMPSize.y = yOff;
-                optionMPSize.restrict = "0-9";
                 optionMPSize.text = "10";
                 optionMPSize.addEventListener(Event.CHANGE, changeHandler);
                 box.addChild(optionMPSize);
@@ -1297,35 +1284,19 @@ package popups
         {
             if (e.target == optionGameSpeed)
             {
-                _gvars.activeUser.gameSpeed = parseFloat(optionGameSpeed.text);
-                if (isNaN(_gvars.activeUser.gameSpeed) || _gvars.activeUser.gameSpeed <= 0.1)
-                {
-                    _gvars.activeUser.gameSpeed = 1;
-                }
+                _gvars.activeUser.gameSpeed = optionGameSpeed.validate(1, 0.1);
             }
             else if (e.target == optionOffset)
             {
-                _gvars.activeUser.GLOBAL_OFFSET = parseFloat(optionOffset.text);
-                if (isNaN(_gvars.activeUser.GLOBAL_OFFSET))
-                {
-                    _gvars.activeUser.GLOBAL_OFFSET = 0;
-                }
+                _gvars.activeUser.GLOBAL_OFFSET = optionOffset.validate(0);
             }
             else if (e.target == optionJudgeOffset)
             {
-                _gvars.activeUser.JUDGE_OFFSET = parseFloat(optionJudgeOffset.text);
-                if (isNaN(_gvars.activeUser.JUDGE_OFFSET))
-                {
-                    _gvars.activeUser.JUDGE_OFFSET = 0;
-                }
+                _gvars.activeUser.JUDGE_OFFSET = optionJudgeOffset.validate(0);
             }
             else if (e.target == optionReceptorSpacing)
             {
-                _gvars.activeUser.receptorGap = parseInt(optionReceptorSpacing.text);
-                if (isNaN(_gvars.activeUser.receptorGap))
-                {
-                    _gvars.activeUser.receptorGap = 80;
-                }
+                _gvars.activeUser.receptorGap = optionReceptorSpacing.validate(80);
             }
             else if (e.target == optionNoteScale)
             {
@@ -1352,70 +1323,52 @@ package popups
             }
             else if (e.target == optionFPS)
             {
-                _gvars.activeUser.frameRate = parseInt(optionFPS.text);
-                if (isNaN(_gvars.activeUser.frameRate))
-                    _gvars.activeUser.frameRate = 60;
+                _gvars.activeUser.frameRate = optionFPS.validate(60);
                 _gvars.activeUser.frameRate = Math.max(Math.min(_gvars.activeUser.frameRate, 250), 10);
                 forceJudgeCheck.visible = gameForceJudgeMode.visible = (_gvars.activeUser.frameRate <= 30);
                 _gvars.removeSongFiles();
             }
             else if (e.target == optionRate)
             {
-                _gvars.activeUser.songRate = parseFloat(optionRate.text);
-                if (isNaN(_gvars.activeUser.songRate) || _gvars.activeUser.songRate < 0.1)
-                    _gvars.activeUser.songRate = 1;
+                _gvars.activeUser.songRate = optionRate.validate(1, 0.1);
                 _gvars.removeSongFiles();
             }
             else if (e.target == isolationText)
             {
-                _avars.configIsolationStart = Math.max(parseInt(isolationText.text) - 1, 0);
+                _avars.configIsolationStart = isolationText.validate(1, 1) - 1;
                 _avars.configIsolation = _avars.configIsolationStart > 0 || _avars.configIsolationLength > 0;
             }
             else if (e.target == isolationTotalText)
             {
-                _avars.configIsolationLength = Math.max(parseInt(isolationTotalText.text), 0);
+                _avars.configIsolationLength = isolationTotalText.validate(0);
                 _avars.configIsolation = _avars.configIsolationStart > 0 || _avars.configIsolationLength > 0;
             }
             else if (e.target == optionMPSize)
             {
-                _avars.configMPSize = parseInt(optionMPSize.text);
-                if (isNaN(_avars.configMPSize))
-                    _avars.configMPSize = 10;
-                Style.fontSize = _avars.configMPSize;
+                Style.fontSize = _avars.configMPSize = optionMPSize.validate(10);
                 _avars.mpSave();
             }
             else if (e.target.hasOwnProperty("autofail"))
             {
-                var t:BoxText = e.target as BoxText;
-                var autofail:String = StringUtil.upperCase(t.autofail);
-                _gvars.activeUser["autofail" + autofail] = parseInt(t.text);
-                if (isNaN(_gvars.activeUser["autofail" + autofail]) || _gvars.activeUser["autofail" + autofail] < 0)
-                    _gvars.activeUser["autofail" + autofail] = 0;
+                var autofail:String = StringUtil.upperCase(e.target.autofail);
+                _gvars.activeUser["autofail" + autofail] = e.target.validate(0, 0);
             }
             else if (e.target.hasOwnProperty("judge_color_id"))
             {
                 var jid:int = e.target.judge_color_id;
-                var newColorJ:int = parseInt("0x" + e.target.text.replace("#", ""), 16);
-                if (isNaN(newColorJ) || newColorJ < 0)
-                    newColorJ = 0;
-                _gvars.activeUser.judgeColours[jid] = newColorJ;
+                _gvars.activeUser.judgeColours[jid] = e.target.validate(0, 0);
                 optionJudgeColors[jid]["display"].color = _gvars.activeUser.judgeColours[jid];
             }
             else if (e.target.hasOwnProperty("combo_color_id"))
             {
                 var cid:int = e.target.combo_color_id;
-                var newColorC:int = parseInt("0x" + e.target.text.replace("#", ""), 16);
-                if (isNaN(newColorC) || newColorC < 0)
-                    newColorC = 0;
-                _gvars.activeUser.comboColours[cid] = newColorC;
+                _gvars.activeUser.comboColours[cid] = e.target.validate(0, 0);
                 optionComboColors[cid]["display"].color = _gvars.activeUser.comboColours[cid];
             }
             else if (e.target.hasOwnProperty("game_color_id"))
             {
                 var gid:int = e.target.game_color_id;
-                var newColorG:int = parseInt("0x" + e.target.text.replace("#", ""), 16);
-                if (isNaN(newColorG) || newColorG < 0)
-                    newColorG = 0;
+                var newColorG:Number = e.target.validate(0, 0);
                 _gvars.activeUser.gameColours[gid] = newColorG;
 
                 if (gid == 0)
@@ -1664,12 +1617,14 @@ package popups
             else if (e.target.hasOwnProperty("judge_color_reset_id"))
             {
                 _gvars.activeUser.judgeColours[e.target.judge_color_reset_id] = DEFAULT_OPTIONS.judgeColours[e.target.judge_color_reset_id];
+                renderOptions();
             }
 
             // Combo Color Reset
             else if (e.target.hasOwnProperty("combo_color_reset_id"))
             {
                 _gvars.activeUser.comboColours[e.target.combo_color_reset_id] = DEFAULT_OPTIONS.comboColours[e.target.combo_color_reset_id];
+                renderOptions();
             }
 
             // Combo Color Enable/Disable
@@ -1687,6 +1642,7 @@ package popups
                     _gvars.activeUser.gameColours[2] = ColorUtil.darkenColor(DEFAULT_OPTIONS.gameColours[gid], 0.27);
                 if (gid == 1)
                     _gvars.activeUser.gameColours[3] = ColorUtil.brightenColor(DEFAULT_OPTIONS.gameColours[gid], 0.08);
+                renderOptions();
             }
             //- Editor
             else if (e.target.hasOwnProperty("editor_multiplayer"))
