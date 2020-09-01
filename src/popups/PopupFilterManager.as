@@ -2,7 +2,6 @@ package popups
 {
     import arc.mp.MultiplayerPrompt;
     import assets.GameBackgroundColor;
-    import classes.Alert;
     import classes.Box;
     import classes.BoxButton;
     import classes.BoxText;
@@ -13,18 +12,14 @@ package popups
     import com.flashfla.components.ScrollBar;
     import com.flashfla.components.ScrollPane;
     import com.flashfla.utils.ArrayUtil;
-    import com.flashfla.utils.SystemUtil;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
     import flash.display.Graphics;
     import flash.display.Sprite;
-    import flash.events.ContextMenuEvent;
     import flash.events.Event;
     import flash.events.MouseEvent;
     import flash.filters.BlurFilter;
     import flash.geom.Point;
-    import flash.ui.ContextMenu;
-    import flash.ui.ContextMenuItem;
     import menu.MainMenu;
     import menu.MenuPanel;
     import menu.MenuSongSelection;
@@ -46,6 +41,7 @@ package popups
         private var tabLabel:Text;
         private var filterNameInput:BoxText;
 
+        private var importFilterButton:BoxButton;
         private var addSavedFilterButton:BoxButton;
         private var clearFilterButton:BoxButton;
         private var filterListButton:BoxButton;
@@ -54,12 +50,7 @@ package popups
         private var scrollpane:ScrollPane;
         private var scrollbar:ScrollBar;
 
-        private var filterButtons:Array;
-
         private var typeSelector:Sprite;
-
-        private var _contextExport:ContextMenu;
-        private var _contextImport:ContextMenu;
 
         private var SELECTED_FILTER:EngineLevelFilter;
 
@@ -93,17 +84,6 @@ package popups
             box.activeAlpha = 0.4;
             this.addChild(box);
 
-            // Context Menus
-            _contextExport = new ContextMenu();
-            var expFilterExport:ContextMenuItem = new ContextMenuItem(_lang.stringSimple("popup_filter_filter_single_export"));
-            expFilterExport.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_contextFilterExport);
-            _contextExport.customItems.push(expFilterExport);
-
-            _contextImport = new ContextMenu();
-            var expFilterImport:ContextMenuItem = new ContextMenuItem(_lang.stringSimple("popup_filter_filter_single_import"));
-            expFilterImport.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_contextFilterImport);
-            _contextImport.customItems.push(expFilterImport);
-
             // Tab Label
             tabLabel = new Text("", 20);
             tabLabel.x = 10;
@@ -136,12 +116,17 @@ package popups
             addSavedFilterButton = new BoxButton(100, 31, _lang.string("popup_filter_add_filter"));
             addSavedFilterButton.x = filterListButton.x - 105;
             addSavedFilterButton.y = 5;
-            addSavedFilterButton.contextMenu = _contextImport;
             addSavedFilterButton.addEventListener(MouseEvent.CLICK, e_addSavedFilterButton);
             box.addChild(addSavedFilterButton);
 
+            importFilterButton = new BoxButton(100, 31, _lang.string("popup_filter_filter_single_import"));
+            importFilterButton.x = addSavedFilterButton.x - 105;
+            importFilterButton.y = 5;
+            importFilterButton.addEventListener(MouseEvent.CLICK, e_importFilterButton);
+            box.addChild(importFilterButton);
+
             // Filter Name Input
-            filterNameInput = new BoxText(clearFilterButton.x - 10, 31);
+            filterNameInput = new BoxText(clearFilterButton.x - 11, 30);
             filterNameInput.x = 5;
             filterNameInput.y = 5;
             filterNameInput.addEventListener(Event.CHANGE, e_filterNameUpdate);
@@ -196,53 +181,18 @@ package popups
             return true;
         }
 
-        private function e_contextFilterImport(e:ContextMenuEvent):void
-        {
-            var prompt:MultiplayerPrompt = new MultiplayerPrompt(box.parent, _lang.stringSimple("popup_filter_filter_single_import"));
-            prompt.addEventListener(MultiplayerPrompt.EVENT_SEND, function(subevent:Object):void
-            {
-                try
-                {
-                    var item:Object = JSON.parse(subevent.params.value);
-                    var filter:EngineLevelFilter = new EngineLevelFilter();
-                    filter.setup(item);
-                    filter.is_default = false;
-                    _gvars.activeUser.filters.push(filter);
-                    draw();
-                }
-                catch (e:Error)
-                {
-
-                }
-            });
-        }
-
-        private function e_contextFilterExport(e:ContextMenuEvent):void
-        {
-            var filterString:String = JSON.stringify((e.contextMenuOwner.parent as SavedFilterButton).filter.export());
-            var success:Boolean = SystemUtil.setClipboard(filterString);
-            if (success)
-            {
-                _gvars.gameMain.addAlert(_lang.string("clipboard_success"), 120, Alert.GREEN);
-            }
-            else
-            {
-                _gvars.gameMain.addAlert(_lang.string("clipboard_failure"), 120, Alert.RED);
-            }
-        }
-
         override public function draw():void
         {
             scrollbar.reset();
             scrollpane.clear();
 
             pG.clear();
-            filterButtons = [];
 
             // Active Filter Editor
             if (DRAW_TAB == TAB_FILTER)
             {
                 filterListButton.text = _lang.string("popup_filter_saved_filters");
+                importFilterButton.visible = false;
                 if (_gvars.activeFilter != null)
                 {
                     addSavedFilterButton.visible = tabLabel.visible = false;
@@ -265,13 +215,12 @@ package popups
                 filterListButton.text = _lang.string("popup_filter_active_filter");
                 filterNameInput.visible = clearFilterButton.visible = false;
                 addSavedFilterButton.visible = tabLabel.visible = true;
+                importFilterButton.visible = true;
                 var yPos:Number = -40;
                 var savedFilterButton:SavedFilterButton;
                 for each (var item:EngineLevelFilter in _gvars.activeUser.filters)
                 {
                     savedFilterButton = new SavedFilterButton(scrollpane.content, 0, yPos += 40, item, this);
-                    savedFilterButton.editButton.contextMenu = _contextExport;
-                    filterButtons.push(savedFilterButton);
                 }
             }
 
@@ -422,6 +371,38 @@ package popups
                 _gvars.activeFilter = _gvars.activeUser.filters[_gvars.activeUser.filters.length - 1];
 
             draw();
+        }
+
+        private function e_importFilterButton(e:Event):void
+        {
+            var prompt:MultiplayerPrompt = new MultiplayerPrompt(box.parent, _lang.stringSimple("popup_filter_filter_single_import"));
+            prompt.move(Main.GAME_WIDTH / 2 - prompt.width / 2, Main.GAME_HEIGHT / 2 - prompt.height / 2);
+            prompt.addEventListener(MultiplayerPrompt.EVENT_SEND, e_importFilter);
+            prompt.addEventListener(Event.CLOSE, e_closeImportFilterPrompt);
+        }
+
+        private function e_importFilter(subevent:Object):void
+        {
+            try
+            {
+                var item:Object = JSON.parse(subevent.params.value);
+                var filter:EngineLevelFilter = new EngineLevelFilter();
+                filter.setup(item);
+                filter.is_default = false;
+                _gvars.activeUser.filters.push(filter);
+                draw();
+            }
+            catch (e:Error)
+            {
+
+            }
+        }
+
+        private function e_closeImportFilterPrompt(e:Event):void
+        {
+            var prompt:MultiplayerPrompt = (e.target as MultiplayerPrompt);
+            prompt.removeEventListener(MultiplayerPrompt.EVENT_SEND, e_importFilter);
+            prompt.removeEventListener(Event.CLOSE, e_closeImportFilterPrompt);
         }
 
         private function e_addFilter(e:Event):void

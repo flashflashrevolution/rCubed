@@ -1,12 +1,14 @@
 package classes.filter
 {
     import assets.GameBackgroundColor;
+    import classes.Alert;
     import classes.Box;
     import classes.BoxButton;
     import classes.BoxCheck;
     import classes.Language;
     import classes.Text;
     import com.flashfla.utils.ArrayUtil;
+    import com.flashfla.utils.SystemUtil;
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.events.Event;
@@ -22,6 +24,7 @@ package classes.filter
         private var updater:PopupFilterManager;
         public var filter:EngineLevelFilter;
         public var filterName:Text;
+        public var exportButton:BoxButton;
         public var editButton:BoxButton;
         public var deleteButton:BoxButton;
         public var defaultCheckbox:BoxCheck;
@@ -63,6 +66,32 @@ package classes.filter
             editButton.y = 5;
             editButton.addEventListener(MouseEvent.CLICK, e_editClick);
             addChild(editButton);
+
+            exportButton = new BoxButton(100, 23, _lang.string("popup_filter_filter_single_export"));
+            exportButton.x = editButton.x - 105;
+            exportButton.y = 5;
+            exportButton.addEventListener(MouseEvent.CLICK, e_exportClick);
+            addChild(exportButton);
+        }
+
+        override public function dispose():void
+        {
+            defaultCheckbox.removeEventListener(MouseEvent.CLICK, e_defaultClick);
+            defaultCheckbox.removeEventListener(MouseEvent.MOUSE_OVER, e_defaultMouseOver);
+            defaultCheckbox.removeEventListener(MouseEvent.MOUSE_OUT, e_defaultMouseOut);
+
+            filterName.dispose();
+
+            deleteButton.removeEventListener(MouseEvent.CLICK, e_deleteClick);
+            deleteButton.dispose();
+
+            editButton.removeEventListener(MouseEvent.CLICK, e_editClick);
+            editButton.dispose();
+
+            exportButton.removeEventListener(MouseEvent.CLICK, e_exportClick);
+            exportButton.dispose();
+
+            super.dispose();
         }
 
         private function e_defaultMouseOver(e:Event):void
@@ -117,5 +146,18 @@ package classes.filter
                 updater.draw();
         }
 
+        private function e_exportClick(e:Event):void
+        {
+            var filterString:String = JSON.stringify(filter.export());
+            var success:Boolean = SystemUtil.setClipboard(filterString);
+            if (success)
+            {
+                _gvars.gameMain.addAlert(_lang.string("clipboard_success"), 120, Alert.GREEN);
+            }
+            else
+            {
+                _gvars.gameMain.addAlert(_lang.string("clipboard_failure"), 120, Alert.RED);
+            }
+        }
     }
 }
