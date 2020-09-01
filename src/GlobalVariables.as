@@ -537,7 +537,7 @@ package
             }
 
             var _debugLoader:URLLoader = new URLLoader();
-            var req:URLRequest = new URLRequest(Constant.ROOT_URL + "game/r3/r3-debugLog.php");
+            var req:URLRequest = new URLRequest(Constant.DEBUG_LOG_URL);
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.session = userSession;
