@@ -41,7 +41,7 @@ package
         public static const USER_INFO_URL:String = ROOT_URL + "game/r3/r3-userInfo.php";
         public static const USER_INFO_LITE_URL:String = ROOT_URL + "game/r3/r3-userSmallInfo.php";
         public static const USER_AVATAR_URL:String = ROOT_URL + "avatar_imgembedded.php";
-        public static const USER_RANKS_URL:String = ROOT_URL + "game/r3/r3-userRanks.php";
+        public static const USER_RANKS_URL:String = ROOT_URL + "game/r3/r3-userRanks.v2.php";
         public static const USER_RANKS_UPDATE_URL:String = ROOT_URL + "game/r3/r3-userRankUpdate.php";
         public static const USER_FRIENDS_URL:String = ROOT_URL + "game/r3/r3-userFriends.php";
         public static const USER_SAVE_REPLAY_URL:String = ROOT_URL + "game/r3/r3-userReplay.php";
