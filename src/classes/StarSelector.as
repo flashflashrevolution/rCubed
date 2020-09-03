@@ -83,7 +83,7 @@ package classes
         {
             var posX:Number = ((e.localX + 8) / outlineSprite.width);
             var val:Number = Math.round((((MAX_VALUE - MIN_VALUE) * posX) + MIN_VALUE) * 2) / 2;
-            if (val != _hovervalue && val >= 1)
+            if (val != _hovervalue && val >= 0.5)
             {
                 _hovervalue = val;
                 drawFill();
@@ -106,6 +106,15 @@ package classes
             }
         }
 
+        public function addBackgroundStars():void
+        {
+            var bgStars:Sprite = new Sprite();
+            for (var i:int = 0; i < 5; i++)
+                drawStar(bgStars.graphics, 28, i * 32, 0, true, 0xFFFFFF, 0, false);
+            bgStars.alpha = 0.2;
+            addChildAt(bgStars, 0);
+        }
+
         public function get value():Number
         {
             return _value;
@@ -115,6 +124,11 @@ package classes
         {
             _value = val;
             drawFill();
+        }
+
+        public function set outline(val:Boolean):void
+        {
+            outlineSprite.visible = val;
         }
 
         public static function drawStar(grph:Graphics, size:Number, _x:Number = 0, _y:Number = 0, _fill:Boolean = false, _fillColor:uint = 0xffffff, _borderThickness:int = 2, _isMask:Boolean = false):void

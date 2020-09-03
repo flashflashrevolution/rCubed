@@ -1293,17 +1293,22 @@ package menu
                 ["style", songDetails['style']],
                 ["best", (infoRanks.score > 0 ? "\n" + NumberUtil.numberFormat(infoRanks.score) + "\n" + infoRanks.results : _lang.string("song_selection_song_panel_unplayed"))]];
 
-            if (songDetails['song_rating'])
+            // Get User Star Rating
+            var starRating:Number = _gvars.playerUser.getSongRating(songDetails);
+            if (starRating > 0)
             {
                 var ratingDisplay:StarSelector = new StarSelector(false);
-                ratingDisplay.x = 169;
+                ratingDisplay.x = 109;
                 ratingDisplay.y = 5;
-                ratingDisplay.value = songDetails['song_rating'];
-                ratingDisplay.rotation = 90;
-                ratingDisplay.scaleX = ratingDisplay.scaleY = 0.50;
-                ratingDisplay.alpha = 0.2;
+                ratingDisplay.value = starRating;
+                ratingDisplay.scaleX = ratingDisplay.scaleY = 0.4;
+                ratingDisplay.alpha = 0.8;
+                ratingDisplay.outline = false;
+                ratingDisplay.addBackgroundStars();
                 infoBox.addChild(ratingDisplay);
             }
+
+            // Print Song Info
             for (var item:String in infoDisplay)
             {
                 // Info Title
