@@ -953,6 +953,8 @@ package menu
                 if (options.activeSongID == songItems[i].level)
                 {
                     songItems[i].updateOrShow();
+                    if (options.infoTab == TAB_PLAYLIST)
+                        buildInfoBox();
                     break;
                 }
             }

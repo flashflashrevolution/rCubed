@@ -28,6 +28,7 @@ package popups
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import sql.SQLSongDetails;
+    import classes.HeartSelector;
 
     public class PopupSongNotes extends MenuPanel
     {
@@ -45,6 +46,7 @@ package popups
         private var sDetails:SQLSongDetails;
 
         private var sRating:StarSelector;
+        private var sFavorite:HeartSelector;
 
         private var notesLength:Text;
         private var notesField:TextField;
@@ -65,8 +67,10 @@ package popups
             super(myParent);
             sObject = song;
 
-            songRatingValue = _gvars.playerUser.getSongRating(sObject["level"]);
-            sDetails = SQLQueries.getSongDetailsSafe((song.engine != null ? song.engine.id : Constant.BRAND_NAME_SHORT_LOWER()), song.level);
+            var engine_id:String = song.engine != null ? song.engine.id : Constant.BRAND_NAME_SHORT_LOWER();
+            sDetails = SQLQueries.getSongDetailsSafe(engine_id, song.level);
+
+            songRatingValue = _gvars.playerUser.getSongRating(sObject);
         }
 
         override public function stageAdd():void
@@ -104,17 +108,28 @@ package popups
             box.graphics.lineTo(box.width - 10, 65);
 
             var lblSongRating:Text = new Text(_lang.string("song_rating_label"), 14);
-            lblSongRating.x = 5;
-            lblSongRating.y = 85;
+            lblSongRating.x = 20;
+            lblSongRating.y = 69;
             lblSongRating.width = 145;
-            lblSongRating.align = Text.RIGHT;
+            lblSongRating.align = Text.LEFT;
             box.addChild(lblSongRating);
 
             sRating = new StarSelector();
-            sRating.x = 160;
-            sRating.y = 83;
-            sRating.value = songRatingValue;
+            sRating.x = 22;
+            sRating.y = 95;
             box.addChild(sRating);
+
+            var lblSongFavorite:Text = new Text(_lang.string("song_favorite_label"), 14);
+            lblSongFavorite.x = box.width - 165;
+            lblSongFavorite.y = 68;
+            lblSongFavorite.width = 145;
+            lblSongFavorite.align = Text.RIGHT;
+            box.addChild(lblSongFavorite);
+
+            sFavorite = new HeartSelector();
+            sFavorite.x = box.width - 52;
+            sFavorite.y = 93
+            box.addChild(sFavorite);
 
             // Divider
             box.graphics.lineStyle(1, 0xffffff);
@@ -242,6 +257,8 @@ package popups
         {
             if (bmd != null && sDetails != null)
             {
+                sRating.value = songRatingValue;
+                sFavorite.checked = sDetails.song_favorite;
                 notesField.text = sDetails.notes;
                 notesLength.text = "(" + notesField.length + " / 250)";
                 setMirrorInvert.checked = sDetails.set_mirror_invert;
@@ -301,11 +318,19 @@ package popups
 
         private function saveDetails():void
         {
+            sDetails.song_favorite = sFavorite.checked;
             sDetails.offset_music = verifyFloat(optionMusicOffset.text, 0);
             sDetails.offset_judge = verifyFloat(optionJudgeOffset.text, 0);
             sDetails.set_mirror_invert = setMirrorInvert.checked;
             sDetails.set_custom_offsets = setCustomOffsets.checked;
             sDetails.notes = notesField.text;
+
+            // Song Rating
+            if (sDetails.engine != Constant.BRAND_NAME_SHORT_LOWER())
+                sDetails.song_rating = sRating.value;
+            else
+                _gvars.playerUser.songRatings[sObject["level"]] = sRating.value;
+
             _gvars.writeUserSongData();
         }
 
@@ -320,7 +345,7 @@ package popups
 
         private function saveRatings():void
         {
-            if (!sRating || (sRating && sRating.value == songRatingValue))
+            if (sRating.value == songRatingValue || sDetails.engine != Constant.BRAND_NAME_SHORT_LOWER())
                 return;
 
             _loader = new URLLoader();
@@ -354,7 +379,7 @@ package popups
                 if (_data["result"] && _data["result"] == "success")
                 {
                     _gvars.playerUser.songRatings[sObject["level"]] = sRating.value;
-                    _gvars.gameMain.addAlert("Saved rating for " + sObject["name"] + "!", 120, Alert.GREEN);
+                    //_gvars.gameMain.addAlert("Saved rating for " + sObject["name"] + "!", 120, Alert.GREEN);
                     if (_data["type"] && _data["type"] == 1)
                     {
                         _playlist.playList[sObject["level"]]["song_rating"] = _data["new_value"];
@@ -362,7 +387,7 @@ package popups
                 }
                 else
                 {
-                    _gvars.gameMain.addAlert("Failed to save song rating.", 120, Alert.RED);
+                    //_gvars.gameMain.addAlert("Failed to save song rating.", 120, Alert.RED);
                 }
             }
             catch (e:Error)

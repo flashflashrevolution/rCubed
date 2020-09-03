@@ -2,6 +2,7 @@ package classes.filter
 {
     import classes.Language;
     import classes.User;
+    import sql.SQLSongDetails;
 
     public class EngineLevelFilter
     {
@@ -29,12 +30,13 @@ package classes.filter
         public static const FILTER_SONG_ACCESS:String = "song_access";
         public static const FILTER_SONG_TYPE:String = "song_type";
         public static const FILTER_SONG_GENRE:String = "song_genre";
+        public static const FILTER_FAVORITE:String = "song_favorite";
 
 
         public static const FILTERS:Array = [FILTER_AND, FILTER_OR, FILTER_ARTIST, FILTER_STEPARTIST,
             FILTER_STYLE, FILTER_TIME, FILTER_DIFFICULTY, FILTER_ARROWCOUNT, FILTER_MIN_NPS, FILTER_MAX_NPS,
             FILTER_RANK, FILTER_SCORE, FILTER_STATS, FILTER_SONG_FLAGS, FILTER_SONG_ACCESS, FILTER_SONG_TYPE,
-            FILTER_SONG_RATING, FILTER_PERSONAL_SONG_RATING, FILTER_SONG_GENRE];
+            FILTER_SONG_RATING, FILTER_PERSONAL_SONG_RATING, FILTER_SONG_GENRE, FILTER_FAVORITE];
         public static const FILTERS_STAT:Array = ["perfect", "good", "average", "miss", "boo", "combo"];
         public static const FILTERS_NUMBER:Array = ["=", "!=", "<=", ">=", "<", ">"];
         public static const FILTERS_STRING:Array = ["equal", "start_with", "end_with", "contains"];
@@ -158,29 +160,28 @@ package classes.filter
                     return compareNumber(songData.song_rating, input_number);
 
                 case FILTER_PERSONAL_SONG_RATING:
-                    return compareNumber(userData.getSongRating(songData.level), input_number);
+                    return compareNumber(userData.getSongRating(songData), input_number);
 
                 case FILTER_SONG_FLAGS:
                     return compareSongFlag(GlobalVariables.getSongIconIndexBitmask(songData, userData.getLevelRank(songData)), (Math.pow(2, input_number) / 2));
 
                 case FILTER_SONG_ACCESS:
-                    return compareBoolean(songData.access, input_number);
+                    return compareNumberEqual(songData.access, input_number);
 
                 case FILTER_SONG_TYPE:
                     return compareSongType(songData, input_number);
 
                 case FILTER_SONG_GENRE:
-                    return compareBoolean(songData.genre, input_number + 1);
+                    return compareNumberEqual(songData.genre, input_number + 1);
+
+                case FILTER_FAVORITE:
+                    var details:SQLSongDetails = SQLQueries.getSongDetailsEntry(songData);
+                    if (details)
+                        return compareNumberEqual(details.song_favorite ? 0 : 1, input_number);
+                    return compareNumberEqual(1, input_number);
             }
             return true;
         }
-
-        private function compareBoolean(value1:Number, value2:Number):Boolean
-        {
-            var out:Boolean = value1 == value2;
-            return inverse ? !out : out;
-        }
-
 
         private function compareSongType(songData:Object, value:Number):Boolean
         {
@@ -246,6 +247,12 @@ package classes.filter
                     return value1 > value2;
             }
             return false;
+        }
+
+        private function compareNumberEqual(value1:Number, value2:Number):Boolean
+        {
+            var out:Boolean = value1 == value2;
+            return inverse ? !out : out;
         }
 
         /**

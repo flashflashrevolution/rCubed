@@ -52,6 +52,7 @@ package menu
         private var _songDetails:SQLSongDetails;
         private var _level:int = 0;
         public var isLocked:Boolean = false;
+        public var isFavorite:Boolean = false;
 
         // Hover Data
         private var _hoverEnabled:Boolean = true;
@@ -86,6 +87,17 @@ package menu
             {
                 this.graphics.moveTo(32, 0);
                 this.graphics.lineTo(32, height - 1);
+
+                if (isFavorite)
+                {
+                    this.graphics.lineStyle(0, 0, 0);
+                    this.graphics.beginFill(0xf7b9e4, 1);
+                    this.graphics.moveTo(1, 1);
+                    this.graphics.lineTo(8, 1);
+                    this.graphics.lineTo(1, 8);
+                    this.graphics.lineTo(1, 1);
+                    this.graphics.endFill();
+                }
             }
         }
 
@@ -118,10 +130,6 @@ package menu
             {
                 if (highlight && _hoverEnabled)
                 {
-                    // Check for Changes
-                    if (_songDetails == null)
-                        _songDetails = SQLQueries.getSongDetails((songData.engine != null ? songData.engine.id : Constant.BRAND_NAME_SHORT_LOWER()), songData.level);
-
                     // Have a song note, show note.
                     if (_songDetails != null && _songDetails.notes.length > 0)
                     {
@@ -220,9 +228,20 @@ package menu
 
         /**
          * Updates the note text, or displays the new note if previously empty.
+         * This is called when closing PopupSongNotes.
          */
         public function updateOrShow():void
         {
+            // Check for Changes
+            if (_songDetails == null)
+                _songDetails = SQLQueries.getSongDetailsEntry(songData);
+
+            // Update Favorite
+            isFavorite = (_songDetails != null && _songDetails.song_favorite);
+            _lblSongDifficulty.text = getDifficultyText();
+            draw();
+
+            // Update Note
             if (_hoverSprite != null)
                 update();
             else
@@ -247,6 +266,10 @@ package menu
             _songData = song;
             _level = song.level;
             isLocked = !(!song["access"] || song["access"] == GlobalVariables.SONG_ACCESS_PLAYABLE);
+
+            // Song Details
+            _songDetails = SQLQueries.getSongDetailsEntry(song);
+            isFavorite = (_songDetails != null && _songDetails.song_favorite);
 
             // Song Name
             var songname:String = song["name"];
@@ -294,7 +317,7 @@ package menu
                 _lblSongName.x = 36;
 
                 // Song Difficulty
-                _lblSongDifficulty = new Text(song["difficulty"], 14);
+                _lblSongDifficulty = new Text(getDifficultyText(), 14);
                 _lblSongDifficulty.x = 1;
                 _lblSongDifficulty.setAreaParams(30, 27, Text.CENTER);
                 this.addChild(_lblSongDifficulty);
@@ -328,6 +351,11 @@ package menu
             {
                 this.contextMenu = val;
             }
+        }
+
+        public function getDifficultyText():String
+        {
+            return isFavorite ? '<font color="#f7b9e4">' + _songData["difficulty"] + '</font>' : _songData["difficulty"];
         }
 
         public function getSongLockText():String

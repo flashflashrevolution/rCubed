@@ -202,7 +202,7 @@ package game
             }
 
             // --- Per Song Options
-            var perSongOptions:SQLSongDetails = SQLQueries.getSongDetails((song.entry.engine != null ? song.entry.engine.id : Constant.BRAND_NAME_SHORT_LOWER()), song.entry.level);
+            var perSongOptions:SQLSongDetails = SQLQueries.getSongDetailsEntry(song.entry);
             if (perSongOptions != null && !options.isEditor && !options.replay)
             {
                 options.fill(); // Reset

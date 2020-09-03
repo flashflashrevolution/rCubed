@@ -21,6 +21,7 @@ package classes
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
     import flash.ui.Keyboard;
+    import sql.SQLSongDetails;
 
     public class User extends EventDispatcher
     {
@@ -741,9 +742,17 @@ package classes
             return level_ranks[song.level];
         }
 
-        public function getSongRating(levelid:int):Number
+        public function getSongRating(song_entry:Object):Number
         {
-            return songRatings[levelid] != null ? songRatings[levelid] : 0;
+            if (song_entry.engine != null)
+            {
+                var sDetails:SQLSongDetails = SQLQueries.getSongDetails(song_entry.engine.id, song_entry.level);
+                if (sDetails)
+                    return sDetails.song_rating;
+
+                return 0;
+            }
+            return songRatings[song_entry.level] != null ? songRatings[song_entry.level] : 0;
         }
 
 

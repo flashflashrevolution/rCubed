@@ -59,7 +59,7 @@ package
                     for (var level_id:String in engine)
                     {
                         if (engine[level_id] != null && ObjectUtil.count(engine[level_id]) > 0)
-                            parsed_data.song_details[engine_id][level_id] = new SQLSongDetails(engine[level_id]);
+                            parsed_data.song_details[engine_id][level_id] = new SQLSongDetails(engine_id, level_id, engine[level_id]);
                     }
                 }
             }
@@ -102,7 +102,7 @@ package
                 sql_data.song_details[engine_id] = {};
 
             if (sql_data.song_details[engine_id][level_id] == null)
-                sql_data.song_details[engine_id][level_id] = new SQLSongDetails(null);
+                sql_data.song_details[engine_id][level_id] = new SQLSongDetails(engine_id, level_id, null);
 
             return (sql_data.song_details[engine_id][level_id] as SQLSongDetails);
         }
