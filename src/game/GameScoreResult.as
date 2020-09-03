@@ -31,6 +31,16 @@ package game
         public var max_combo:int = 0;
         public var score:int = 0;
 
+        public function get is_aaa():Boolean
+        {
+            return (((amazing + perfect) == note_count) && max_combo == note_count && good == 0 && average == 0 && boo == 0 && miss == 0);
+        }
+
+        public function get is_fc():Boolean
+        {
+            return (max_combo == note_count && miss == 0);
+        }
+
         public function get raw_goods():Number
         {
             return good + (average * 1.8) + (miss * 2.4) + (boo * 0.2);

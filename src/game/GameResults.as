@@ -1033,19 +1033,41 @@ package game
                     }
 
                     // Check raw score vs level ranks and update.
-                    if (_gvars.activeUser.level_ranks[song.level] == null || gameResult.score > _gvars.activeUser.level_ranks[song.level].score)
+                    var previousLevelRanks:Object = _gvars.activeUser.level_ranks[song.level];
+                    var newLevelRanks:Object = {"genre": song.genre,
+                            "rank": data.new_ranking,
+                            "score": gameResult.score,
+                            "results": gameResult.pa_string + "-" + gameResult.max_combo,
+                            "perfect": gameResult.amazing + gameResult.perfect,
+                            "plays": 1,
+                            "aaas": int(gameResult.is_aaa),
+                            "fcs": int(gameResult.is_fc),
+                            "good": gameResult.good,
+                            "average": gameResult.average,
+                            "miss": gameResult.miss,
+                            "boo": gameResult.boo,
+                            "maxcombo": gameResult.max_combo,
+                            "rawscore": gameResult.score};
+
+                    // Update Level Ranks is missing or better.
+                    if (previousLevelRanks == null || gameResult.score > previousLevelRanks.score)
                     {
-                        _gvars.activeUser.level_ranks[song.level] = {"genre": song.genre,
-                                "rank": data.new_ranking,
-                                "score": gameResult.score,
-                                "results": gameResult.pa_string + "-" + gameResult.max_combo,
-                                "perfect": gameResult.amazing + gameResult.perfect,
-                                "good": gameResult.good,
-                                "average": gameResult.average,
-                                "miss": gameResult.miss,
-                                "boo": gameResult.boo,
-                                "maxcombo": gameResult.max_combo,
-                                "rawscore": gameResult.score};
+                        // Update Counts for Play, FC, AAA from previous.
+                        if (previousLevelRanks != null)
+                        {
+                            newLevelRanks["plays"] += previousLevelRanks["plays"];
+                            newLevelRanks["aaas"] += previousLevelRanks["aaas"];
+                            newLevelRanks["fcs"] += previousLevelRanks["fcs"];
+                        }
+                        _gvars.activeUser.level_ranks[song.level] = newLevelRanks;
+                    }
+
+                    // Update Counters
+                    else
+                    {
+                        previousLevelRanks["plays"] += newLevelRanks["plays"];
+                        previousLevelRanks["aaas"] += newLevelRanks["aaas"];
+                        previousLevelRanks["fcs"] += newLevelRanks["fcs"];
                     }
 
                     _gvars.songResultRanks[e.target.rank_index] = {old_ranking: data.old_ranking, new_ranking: data.new_ranking};
