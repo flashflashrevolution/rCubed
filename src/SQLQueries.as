@@ -72,7 +72,7 @@ package
             if (entry.engine != null)
                 return getSongDetails(entry.engine.id, entry.level);
 
-            return getSongDetails(Constant.BRAND_NAME_SHORT_LOWER(), entry.level);
+            return getSongDetails(Constant.BRAND_NAME_SHORT_LOWER, entry.level);
         }
 
         /**
@@ -186,7 +186,7 @@ package
                             var row:Object = res_data[index];
                             var eid:* = row["engine"];
                             var sid:String = row["song_id"];
-                            if (row["engine"] != Constant.BRAND_NAME_SHORT_LOWER())
+                            if (row["engine"] != Constant.BRAND_NAME_SHORT_LOWER)
                             {
                                 eid = row["engine"]["id"];
                             }

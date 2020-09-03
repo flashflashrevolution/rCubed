@@ -9,14 +9,20 @@ package
 
     public class Constant
     {
-        private static const BRAND_NAME_LONG:String = R3::BRAND_NAME_LONG;
-        private static const BRAND_NAME_SHORT:String = R3::BRAND_NAME_SHORT;
-        public static const ROOT_URL:String = "http://" + R3::ROOT_URL + "/";
+        // Engine Brand Name
+        public static const BRAND_NAME_LONG:String = R3::BRAND_NAME_LONG;
+        public static const BRAND_NAME_SHORT:String = R3::BRAND_NAME_SHORT;
+        public static var BRAND_NAME_LONG_UPPER:String = BRAND_NAME_LONG.toLocaleUpperCase();
+        public static var BRAND_NAME_LONG_LOWER:String = BRAND_NAME_LONG.toLocaleLowerCase();
+        public static var BRAND_NAME_SHORT_UPPER:String = BRAND_NAME_SHORT.toLocaleUpperCase();
+        public static var BRAND_NAME_SHORT_LOWER:String = BRAND_NAME_SHORT.toLocaleLowerCase();
 
         public static const AIR_VERSION:String = R3::VERSION;
         public static const AIR_WINDOW_TITLE:String = R3::BRAND_NAME_SHORT + " R^3 [" + AIR_VERSION + "]";
         public static const LOCAL_SO_NAME:String = "90579262-509d-4370-9c2e-564667e511d7";
         public static const ENGINE_VERSION:int = 3;
+
+        public static const ROOT_URL:String = "http://" + R3::ROOT_URL + "/";
 
         // Site URLs
         public static const SITE_DATA_URL:String = ROOT_URL + "game/r3/r3-siteData.v2.php";
@@ -75,32 +81,6 @@ package
         public static const TEXT_FORMAT_12:TextFormat = new TextFormat(Language.FONT_NAME, 12, 0xFFFFFF, true);
         public static const TEXT_FORMAT_CENTER:TextFormat = new TextFormat(Language.FONT_NAME, 14, 0xFFFFFF, true, null, null, null, null, TextFormatAlign.CENTER);
         public static const TEXT_FORMAT_UNICODE:TextFormat = new TextFormat(Language.UNI_FONT_NAME, 14, 0xFFFFFF, true);
-
-        // Engine Brand Name
-        public static function BRAND_NAME():String
-        {
-            return BRAND_NAME_LONG;
-        }
-
-        public static function BRAND_NAME_LONG_UPPER():String
-        {
-            return BRAND_NAME_LONG.toLocaleUpperCase();
-        }
-
-        public static function BRAND_NAME_LONG_LOWER():String
-        {
-            return BRAND_NAME_LONG.toLocaleLowerCase();
-        }
-
-        public static function BRAND_NAME_SHORT_UPPER():String
-        {
-            return BRAND_NAME_SHORT.toLocaleUpperCase();
-        }
-
-        public static function BRAND_NAME_SHORT_LOWER():String
-        {
-            return BRAND_NAME_SHORT.toLocaleLowerCase();
-        }
 
         // Other
         public static const WEBSOCKET_OVERLAY_URL:String = "https://github.com/flashflashrevolution/web-stream-overlay";

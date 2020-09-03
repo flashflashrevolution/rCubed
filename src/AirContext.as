@@ -71,7 +71,7 @@ package
 
         static public function getReplayPath(song:Song):String
         {
-            return Constant.REPLAY_PATH + (song.entry.engine ? createFileName(song.entry.engine.id) : Constant.BRAND_NAME_SHORT_LOWER()) + "/";
+            return Constant.REPLAY_PATH + (song.entry.engine ? createFileName(song.entry.engine.id) : Constant.BRAND_NAME_SHORT_LOWER) + "/";
         }
 
         static public function encodeData(rawData:ByteArray, key:uint = 0):ByteArray

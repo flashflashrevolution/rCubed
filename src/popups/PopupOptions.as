@@ -1882,8 +1882,8 @@ package popups
             // engine Playlist Select
             engineCombo.removeAll();
             engineDefaultCombo.removeAll();
-            engineCombo.addItem({label: Constant.BRAND_NAME(), data: null});
-            engineDefaultCombo.addItem({label: Constant.BRAND_NAME(), data: null});
+            engineCombo.addItem({label: Constant.BRAND_NAME_LONG, data: null});
+            engineDefaultCombo.addItem({label: Constant.BRAND_NAME_LONG, data: null});
             engineCombo.selectedIndex = 0;
             engineDefaultCombo.selectedIndex = 0;
             for each (var engine:Object in _avars.legacyEngines)
