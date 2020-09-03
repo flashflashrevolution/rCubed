@@ -6,17 +6,17 @@ package popups
 {
     import classes.Box;
     import classes.BoxButton;
+    import classes.Language;
+    import com.greensock.TweenLite;
+    import com.greensock.easing.BackIn;
+    import com.greensock.easing.BackOut;
+    import flash.display.DisplayObjectContainer;
+    import flash.display.Sprite;
     import flash.events.Event;
     import flash.events.MouseEvent;
-    import menu.MenuPanel;
-    import com.greensock.TweenLite;
-    import com.greensock.easing.BackOut;
-    import com.greensock.easing.BackIn;
-    import flash.display.Sprite;
-    import flash.text.TextField;
     import flash.text.AntiAliasType;
-    import classes.Language;
-    import flash.display.DisplayObjectContainer;
+    import flash.text.TextField;
+    import menu.MenuPanel;
 
     public class PopupSkillRankUpdate extends MenuPanel
     {
@@ -78,7 +78,6 @@ package popups
                 }
             }
         }
-
 
         private function renderMessages(target:Sprite, offetY:Number, messages:Array, color:uint = 0xFFFFFF):Number
         {
