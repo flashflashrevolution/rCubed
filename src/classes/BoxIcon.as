@@ -39,12 +39,10 @@ package classes
 
         public function setIconColor(color:String):void
         {
-            var newColorJ:Number = parseInt("0x" + color.replace("#", ""), 16);
-            if (isNaN(newColorJ) || newColorJ < 0)
-                newColorJ = 0;
-            var rgb:Object = ColorUtil.hexToRgb(newColorJ);
-            if (_icon.icon != null)
-                _icon.icon.transform.colorTransform = new ColorTransform((rgb.r / 255), (rgb.g / 255), (rgb.b / 255));
+            if (_icon != null)
+            {
+                _icon.setColor(color);
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////
