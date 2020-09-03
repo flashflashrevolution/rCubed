@@ -87,7 +87,7 @@ package popups
             box.addChild(messageDisplay);
 
             //- Close
-            closeOptions = new BoxButton(79.5, 27, "CLOSE");
+            closeOptions = new BoxButton(79.5, 27, _lang.string("popup_help_close"));
             closeOptions.x = box.width - 94.5;
             closeOptions.y = box.height - 42;
             closeOptions.addEventListener(MouseEvent.CLICK, clickHandler);
