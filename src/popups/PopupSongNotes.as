@@ -67,7 +67,7 @@ package popups
             super(myParent);
             sObject = song;
 
-            var engine_id:String = song.engine != null ? song.engine.id : Constant.BRAND_NAME_SHORT_LOWER();
+            var engine_id:String = song.engine != null ? song.engine.id : Constant.BRAND_NAME_SHORT_LOWER;
             sDetails = SQLQueries.getSongDetailsSafe(engine_id, song.level);
 
             songRatingValue = _gvars.playerUser.getSongRating(sObject);
@@ -326,7 +326,7 @@ package popups
             sDetails.notes = notesField.text;
 
             // Song Rating
-            if (sDetails.engine != Constant.BRAND_NAME_SHORT_LOWER())
+            if (sDetails.engine != Constant.BRAND_NAME_SHORT_LOWER)
                 sDetails.song_rating = sRating.value;
             else
                 _gvars.playerUser.songRatings[sObject["level"]] = sRating.value;
@@ -345,7 +345,7 @@ package popups
 
         private function saveRatings():void
         {
-            if (sRating.value == songRatingValue || sDetails.engine != Constant.BRAND_NAME_SHORT_LOWER())
+            if (sRating.value == songRatingValue || sDetails.engine != Constant.BRAND_NAME_SHORT_LOWER)
                 return;
 
             _loader = new URLLoader();
