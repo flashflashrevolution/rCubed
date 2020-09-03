@@ -67,6 +67,14 @@ package
             sql_data = parsed_data;
         }
 
+        public static function getSongDetailsEntry(entry:Object):SQLSongDetails
+        {
+            if (entry.engine != null)
+                return getSongDetails(entry.engine.id, entry.level);
+
+            return getSongDetails(Constant.BRAND_NAME_SHORT_LOWER(), entry.level);
+        }
+
         /**
          * Returns the Song Details for the given song and engine, or null if missing.
          * @param engine_id
