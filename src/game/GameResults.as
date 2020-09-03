@@ -2,10 +2,16 @@ package game
 {
     import arc.ArcGlobals;
     import arc.mp.MultiplayerSingleton;
+    import assets.menu.icons.fa.iconPhoto;
+    import assets.menu.icons.fa.iconRandom;
+    import assets.menu.icons.fa.iconRight;
+    import assets.menu.icons.fa.iconSmallT;
+    import assets.menu.icons.fa.iconVideo;
     import assets.results.ResultsBackground;
     import by.blooddy.crypto.SHA1;
     import classes.Alert;
     import classes.BoxButton;
+    import classes.BoxIcon;
     import classes.Language;
     import classes.Playlist;
     import classes.StarSelector;
@@ -30,20 +36,14 @@ package game
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
     import flash.ui.Keyboard;
+    import game.graph.GraphAccuracy;
+    import game.graph.GraphBase;
+    import game.graph.GraphCombo;
     import menu.MenuPanel;
     import popups.PopupHighscores;
     import popups.PopupMessage;
-    import popups.PopupSongRating;
+    import popups.PopupSongNotes;
     import popups.PopupTokenUnlock;
-    import game.graph.GraphBase;
-    import game.graph.GraphCombo;
-    import game.graph.GraphAccuracy;
-    import classes.BoxIcon;
-    import assets.menu.icons.fa.iconPhoto;
-    import assets.menu.icons.fa.iconVideo;
-    import assets.menu.icons.fa.iconRandom;
-    import assets.menu.icons.fa.iconRight;
-    import assets.menu.icons.fa.iconSmallT;
 
     public class GameResults extends MenuPanel
     {
@@ -200,11 +200,12 @@ package game
                 buttonMenuItems[bx].x = BUTTON_WIDTH * bx + BUTTON_GAP * bx;
             }
 
-            // Star Rating Button
+            // Song Notes / Star Rating Button
             navRating = new Sprite();
             navRating.buttonMode = true;
             navRating.mouseChildren = false;
             navRating.addEventListener(MouseEvent.CLICK, eventHandler);
+            StarSelector.drawStar(navRating.graphics, 18, 0, 0, true, 0xF2D60D, 1);
             resultsDisplay.addChild(navRating);
 
             // Song Results Buttons
@@ -398,17 +399,10 @@ package game
                 displayTime = result.end_time;
                 scoreTotal = result.score_total;
 
-                // Star
-                navRating.visible = false;
-                if (resultIndex >= 0)
-                {
-                    navRating.graphics.clear();
-                    StarSelector.drawStar(navRating.graphics, 18, 0, 0, (_gvars.playerUser.getSongRating(result.song_entry.level) != 0), 0xF2D60D, 1);
-                }
+                // Song Notes / Star
+                navRating.visible = (result.song_entry != null);
 
-                if ((result.song_progress > 0.25 || result.playtime_secs >= 30) && !result.options.replay && (result.song_entry && !result.song_entry.engine))
-                    navRating.visible = true;
-
+                // Highscores
                 if (result.song_entry && result.song_entry.engine)
                     navHighscores.enabled = false;
 
@@ -509,7 +503,6 @@ package game
             {
                 resultsDisplay.results_username.htmlText = "<B>Song Preview:</B>";
                 resultsDisplay.result_credits.htmlText = "<B>0</B>";
-                navRating.visible = false;
             }
 
             // Mod Text
@@ -838,7 +831,7 @@ package game
             {
                 if (resultIndex >= 0)
                 {
-                    _gvars.gameMain.addPopup(new PopupSongRating(this, songResults[resultIndex].song_entry));
+                    _gvars.gameMain.addPopup(new PopupSongNotes(this, songResults[resultIndex].song_entry));
                 }
             }
 
