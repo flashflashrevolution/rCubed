@@ -37,6 +37,7 @@ package
         public static const MULTIPLAYER_SUBMIT_URL_VELOCITY:String = ROOT_URL + "game/ffr-velocity_multiplayer.php";
 
         // User URLs
+        public static const USER_REGISTER_URL:String = ROOT_URL + "vbz/register.php";
         public static const USER_LOGIN_URL:String = ROOT_URL + "game/r3/r3-siteLogin.php";
         public static const USER_INFO_URL:String = ROOT_URL + "game/r3/r3-userInfo.php";
         public static const USER_INFO_LITE_URL:String = ROOT_URL + "game/r3/r3-userSmallInfo.php";
@@ -49,7 +50,6 @@ package
         public static const USER_SAVE_SETTINGS_URL:String = ROOT_URL + "game/r3/r3-userSettings.php";
 
         // Unused URLs
-        public static const USER_REGISTER_URL:String = ROOT_URL + "vbz/register.php";
         public static const SHOP_URL:String = ROOT_URL + "tools/ffrshop.php";
         public static const NOTESKIN_SWF_URL:String = ROOT_URL + "game/r3/noteskins/";
         public static const NOTESKIN_URL:String = ROOT_URL + "game/r3/r3-noteSkins.xml";

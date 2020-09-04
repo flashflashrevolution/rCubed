@@ -22,6 +22,7 @@ package
     import flash.net.URLRequest;
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
+    import flash.net.navigateToURL;
     import flash.ui.Keyboard;
     import menu.MenuPanel;
 
@@ -70,6 +71,13 @@ package
             box.x = (Main.GAME_WIDTH / 2) - (box.width / 2);
             box.y = (Main.GAME_HEIGHT / 2) - (box.height / 2);
             this.addChild(box);
+
+            // Register Button
+            var register_online_btn:BoxButton = new BoxButton(300, 30, _lang.string("register_online"), 12);
+            register_online_btn.x = box.x;
+            register_online_btn.y = box.y + box.height + 10;
+            register_online_btn.addEventListener(MouseEvent.CLICK, registerOnline);
+            this.addChild(register_online_btn);
 
             /// 
             panel_session = new Sprite();
@@ -235,6 +243,11 @@ package
         public function playAsGuest(e:Event = null):void
         {
             switchTo(Main.GAME_MENU_PANEL);
+        }
+
+        public function registerOnline(e:Event = null):void
+        {
+            navigateToURL(new URLRequest(Constant.USER_REGISTER_URL), "_blank");
         }
 
         private function changeUserEvent(e:Event):void
