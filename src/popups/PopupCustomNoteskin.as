@@ -284,7 +284,7 @@ package popups
         {
             LocalStore.setVariable("custom_noteskin", noteskinsString(), 20971520); // 20MB Mins size requested.
             Noteskins.instance.loadCustomNoteskin();
-            GlobalVariables.instance.gameMain.addAlert(_lang.stringSimple("popup_noteskin_saved"), 90, Alert.GREEN);
+            GlobalVariables.instance.gameMain.addAlert(_lang.string("popup_noteskin_saved"), 90, Alert.GREEN);
         }
 
         private function exportNoteskin():void
