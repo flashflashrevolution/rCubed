@@ -185,7 +185,7 @@ package popups
             box.addChild(new Bitmap(textbmd));
 
             //- Close
-            closeOptions = new BoxButton(box.width - 30, 27, _lang.string("popup_token_close"));
+            closeOptions = new BoxButton(box.width - 30, 27, _lang.string("menu_close"));
             closeOptions.x = 15;
             closeOptions.y = box.height - 42;
             closeOptions.addEventListener(MouseEvent.CLICK, clickHandler);
