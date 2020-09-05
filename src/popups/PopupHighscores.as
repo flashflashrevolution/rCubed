@@ -121,7 +121,7 @@ package popups
             box.addChild(nextBtn);
 
             //- Close
-            closeBtn = new BoxButton(79.5, 27, _lang.string("popup_highscores_close"));
+            closeBtn = new BoxButton(79.5, 27, _lang.string("menu_close"));
             closeBtn.x = box.width - 94.5;
             closeBtn.y = box.height - 42;
             closeBtn.addEventListener(MouseEvent.CLICK, clickHandler);
