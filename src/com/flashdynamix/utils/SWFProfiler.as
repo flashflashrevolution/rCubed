@@ -1,5 +1,6 @@
 package com.flashdynamix.utils
 {
+    import classes.Language;
     import flash.display.*;
     import flash.events.*;
     import flash.net.LocalConnection;
@@ -52,7 +53,11 @@ package com.flashdynamix.utils
 
             // Add Item to Context Menu
 
-            ci = new ContextMenuItem("Show Profiler", true);
+            var str_show_profiler:String = Language.instance.stringSimple("show_profiler");
+            if (str_show_profiler == "show_profiler")
+                str_show_profiler = "Show Profiler";
+
+            ci = new ContextMenuItem(str_show_profiler, true);
             addEvent(ci, ContextMenuEvent.MENU_ITEM_SELECT, onSelect);
             if (context.contextMenu == null)
                 context.contextMenu = new ContextMenu();
@@ -131,7 +136,11 @@ package com.flashdynamix.utils
 
         private static function show():void
         {
-            ci.caption = "Hide Profiler";
+            var str_hide_profiler:String = Language.instance.stringSimple("hide_profiler");
+            if (str_hide_profiler == "hide_profiler")
+                str_hide_profiler = "Hide Profiler";
+
+            ci.caption = str_hide_profiler;
             displayed = true;
             addEvent(stage, Event.RESIZE, resize);
             addEvent(frame, Event.ENTER_FRAME, draw);
@@ -141,7 +150,11 @@ package com.flashdynamix.utils
 
         private static function hide():void
         {
-            ci.caption = "Show Profiler";
+            var str_show_profiler:String = Language.instance.stringSimple("show_profiler");
+            if (str_show_profiler == "show_profiler")
+                str_show_profiler = "Show Profiler";
+
+            ci.caption = str_show_profiler;
             displayed = false;
             removeEvent(stage, Event.RESIZE, resize);
             removeEvent(frame, Event.ENTER_FRAME, draw);
@@ -216,6 +229,7 @@ package com.flashdynamix.utils
     }
 }
 
+import classes.Language;
 import flash.display.*;
 import flash.events.Event;
 import flash.text.*;
@@ -300,7 +314,18 @@ internal class ProfilerContent extends Sprite
             maxMemTxtBx.text = maxMem.toFixed(3) + " Mb";
         }
 
-        infoTxtBx.text = "Current Fps " + currentFps.toFixed(3) + "   |   Average Fps " + averageFps.toFixed(3) + "   |   Memory Used " + currentMem.toFixed(3) + " Mb";
+        var str_current_fps:String = Language.instance.stringSimple("profiler_current_fps");
+        var str_average_fps:String = Language.instance.stringSimple("profiler_average_fps");
+        var str_memory_used:String = Language.instance.stringSimple("profiler_memory_used");
+
+        if (str_current_fps == "profiler_current_fps")
+            str_current_fps = "Current Fps";
+        if (str_average_fps == "profiler_average_fps")
+            str_average_fps = "Average Fps";
+        if (str_memory_used == "profiler_memory_used")
+            str_memory_used = "Memory Used";
+
+        infoTxtBx.text = str_current_fps + " " + currentFps.toFixed(3) + "   |   " + str_average_fps + " " + averageFps.toFixed(3) + "   |   " + str_memory_used + " " + currentMem.toFixed(3) + " Mb";
         infoTxtBx.x = stage.stageWidth - infoTxtBx.width - 20;
 
         var vec:Graphics = fps.graphics;
