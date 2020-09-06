@@ -62,12 +62,8 @@ package com.flashdynamix.utils
 
         private static function buildContextMenu(context:InteractiveObject):void
         {
-            var str_show_profiler:String = Language.instance.stringSimple("show_profiler");
-            var str_hide_profiler:String = Language.instance.stringSimple("hide_profiler");
-            if (str_show_profiler == "show_profiler")
-                str_show_profiler = "Show Profiler";
-            if (str_hide_profiler == "hide_profiler")
-                str_hide_profiler = "Hide Profiler";
+            var str_show_profiler:String = Language.instance.stringSimple("show_profiler", "Show Profiler");
+            var str_hide_profiler:String = Language.instance.stringSimple("hide_profiler", "Hide Profiler");
 
             ci = new ContextMenuItem(displayed ? str_hide_profiler : str_show_profiler, true);
             addEvent(ci, ContextMenuEvent.MENU_ITEM_SELECT, onSelect);
@@ -144,11 +140,7 @@ package com.flashdynamix.utils
 
         private static function show():void
         {
-            var str_hide_profiler:String = Language.instance.stringSimple("hide_profiler");
-            if (str_hide_profiler == "hide_profiler")
-                str_hide_profiler = "Hide Profiler";
-
-            ci.caption = str_hide_profiler;
+            ci.caption = Language.instance.stringSimple("hide_profiler", "Hide Profiler");
             displayed = true;
             addEvent(stage, Event.RESIZE, resize);
             addEvent(frame, Event.ENTER_FRAME, draw);
@@ -158,11 +150,7 @@ package com.flashdynamix.utils
 
         private static function hide():void
         {
-            var str_show_profiler:String = Language.instance.stringSimple("show_profiler");
-            if (str_show_profiler == "show_profiler")
-                str_show_profiler = "Show Profiler";
-
-            ci.caption = str_show_profiler;
+            ci.caption = Language.instance.stringSimple("show_profiler", "Show Profiler");
             displayed = false;
             removeEvent(stage, Event.RESIZE, resize);
             removeEvent(frame, Event.ENTER_FRAME, draw);
@@ -322,16 +310,9 @@ internal class ProfilerContent extends Sprite
             maxMemTxtBx.text = maxMem.toFixed(3) + " Mb";
         }
 
-        var str_current_fps:String = Language.instance.stringSimple("profiler_current_fps");
-        var str_average_fps:String = Language.instance.stringSimple("profiler_average_fps");
-        var str_memory_used:String = Language.instance.stringSimple("profiler_memory_used");
-
-        if (str_current_fps == "profiler_current_fps")
-            str_current_fps = "Current Fps";
-        if (str_average_fps == "profiler_average_fps")
-            str_average_fps = "Average Fps";
-        if (str_memory_used == "profiler_memory_used")
-            str_memory_used = "Memory Used";
+        var str_current_fps:String = Language.instance.stringSimple("profiler_current_fps", "Current Fps");
+        var str_average_fps:String = Language.instance.stringSimple("profiler_average_fps", "Average Fps");
+        var str_memory_used:String = Language.instance.stringSimple("profiler_memory_used", "Memory Used");
 
         infoTxtBx.text = str_current_fps + " " + currentFps.toFixed(3) + "   |   " + str_average_fps + " " + averageFps.toFixed(3) + "   |   " + str_memory_used + " " + currentMem.toFixed(3) + " Mb";
         infoTxtBx.x = stage.stageWidth - infoTxtBx.width - 20;
