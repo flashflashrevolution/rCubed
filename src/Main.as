@@ -257,13 +257,8 @@ package
             //- Backup Menu incase
             var cm:ContextMenu = new ContextMenu();
 
-            //- Context menu string
-            var str_cm:String = _lang.stringSimple("show_menu");
-            if (str_cm == "show_menu")
-                str_cm = "Show Menu";
-
             //- Toggle Fullscreen
-            var fscmi:ContextMenuItem = new ContextMenuItem(str_cm);
+            var fscmi:ContextMenuItem = new ContextMenuItem(_lang.stringSimple("show_menu", "Show Menu"));
             fscmi.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, toggleContextPopup);
             cm.customItems.push(fscmi);
 
