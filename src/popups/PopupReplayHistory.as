@@ -606,6 +606,7 @@ import classes.Language;
 import classes.Text;
 import classes.replay.Replay;
 import com.flashfla.utils.NumberUtil;
+import com.flashfla.utils.sprintf;
 import com.flashfla.utils.SystemUtil;
 import flash.display.Sprite;
 import flash.events.MouseEvent;
@@ -648,7 +649,7 @@ internal class ReplayBox extends Sprite
         box.addChild(nameText);
 
         //- Score
-        scoreText = new Text("Score: " + NumberUtil.numberFormat(r.score), 14);
+        scoreText = new Text(sprintf(_lang.string("popup_replay_score"), {"score": NumberUtil.numberFormat(r.score)}), 14);
         scoreText.x = box.width - 217;
         scoreText.setAreaParams(213, 27, "right");
         scoreText.mouseEnabled = false;
@@ -717,7 +718,7 @@ internal class ReplayBox extends Sprite
     {
         if (song.error != null)
         {
-            _gvars.gameMain.addAlert("Missing song data");
+            _gvars.gameMain.addAlert(_lang.string("popup_replay_missing_song_data"));
             return;
         }
         if (!replay.user.isLoaded())
