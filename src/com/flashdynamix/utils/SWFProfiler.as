@@ -38,7 +38,10 @@ package com.flashdynamix.utils
         public static function init(swf:Stage, context:InteractiveObject):void
         {
             if (inited)
+            {
+                buildContextMenu(context);
                 return;
+            }
 
             inited = true;
             stage = swf;
@@ -52,18 +55,23 @@ package com.flashdynamix.utils
             maxMem = Number.MIN_VALUE;
 
             // Add Item to Context Menu
-
-            var str_show_profiler:String = Language.instance.stringSimple("show_profiler");
-            if (str_show_profiler == "show_profiler")
-                str_show_profiler = "Show Profiler";
-
-            ci = new ContextMenuItem(str_show_profiler, true);
-            addEvent(ci, ContextMenuEvent.MENU_ITEM_SELECT, onSelect);
-            if (context.contextMenu == null)
-                context.contextMenu = new ContextMenu();
-            (context.contextMenu as ContextMenu).customItems.push(ci);
+            buildContextMenu(context);
 
             start();
+        }
+
+        private static function buildContextMenu(context:InteractiveObject):void
+        {
+            var str_show_profiler:String = Language.instance.stringSimple("show_profiler");
+            var str_hide_profiler:String = Language.instance.stringSimple("hide_profiler");
+            if (str_show_profiler == "show_profiler")
+                str_show_profiler = "Show Profiler";
+            if (str_hide_profiler == "hide_profiler")
+                str_hide_profiler = "Hide Profiler";
+
+            ci = new ContextMenuItem(displayed ? str_hide_profiler : str_show_profiler, true);
+            addEvent(ci, ContextMenuEvent.MENU_ITEM_SELECT, onSelect);
+            (context.contextMenu as ContextMenu).customItems.push(ci);
         }
 
         public static function start():void
