@@ -203,14 +203,6 @@ package
             if (d.getMonth() == 10 && d.getDate() == 6)
                 ver.text = "Happy Birthday Velocity! - " + ver.text;
 
-            // Backup Menu incase
-            var cm:ContextMenu = new ContextMenu();
-
-            //- Toggle Fullscreen
-            var fscmi:ContextMenuItem = new ContextMenuItem("Show Menu");
-            fscmi.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, toggleContextPopup);
-            cm.customItems.push(fscmi);
-
             CONFIG::release
             {
                 cm.hideBuiltInItems();
@@ -222,11 +214,8 @@ package
                 stage.nativeWindow.y = (Capabilities.screenResolutionY - stage.nativeWindow.height) * 0.5;
             }
 
-            // Assign Menu Context
-            this.contextMenu = cm;
-
-            //- Profiler
-            SWFProfiler.init(stage, this);
+            //- Build global right-click context menu
+            buildContextMenu();
 
             //- Build Preloader
             buildPreloader();
@@ -266,6 +255,28 @@ package
             {
                 addAlert("Development Build - " + CONFIG::timeStamp + " - NOT FOR RELEASE", 120, Alert.RED);
             }
+        }
+
+        public function buildContextMenu():void
+        {
+            //- Backup Menu incase
+            var cm:ContextMenu = new ContextMenu();
+
+            //- Context menu string
+            var str_cm:String = _lang.stringSimple("show_menu");
+            if (str_cm == "show_menu")
+                str_cm = "Show Menu";
+
+            //- Toggle Fullscreen
+            var fscmi:ContextMenuItem = new ContextMenuItem(str_cm);
+            fscmi.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, toggleContextPopup);
+            cm.customItems.push(fscmi);
+
+            //- Assign Menu Context
+            this.contextMenu = cm;
+
+            //- Profiler
+            SWFProfiler.init(stage, this);
         }
 
         ///- Preloader
@@ -393,6 +404,8 @@ package
                     retryLoadButton.removeEventListener(MouseEvent.CLICK, e_retryClick);
                     retryLoadButton = null;
                 }
+
+                buildContextMenu();
 
                 CONFIG::release
                 {
