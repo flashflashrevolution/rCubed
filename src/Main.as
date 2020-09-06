@@ -203,11 +203,6 @@ package
             if (d.getMonth() == 10 && d.getDate() == 6)
                 ver.text = "Happy Birthday Velocity! - " + ver.text;
 
-            CONFIG::release
-            {
-                cm.hideBuiltInItems();
-            }
-
             CONFIG::debug
             {
                 stage.nativeWindow.x = (Capabilities.screenResolutionX - stage.nativeWindow.width) * 0.5;
@@ -277,6 +272,11 @@ package
 
             //- Profiler
             SWFProfiler.init(stage, this);
+
+            CONFIG::release
+            {
+                cm.hideBuiltInItems();
+            }
         }
 
         ///- Preloader
