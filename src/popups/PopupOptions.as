@@ -1574,6 +1574,7 @@ package popups
             {
                 _gvars.activeUser.language = e.target.languageID;
                 _gvars.gameMain.activePanel.draw();
+                _gvars.gameMain.buildContextMenu();
                 renderOptions();
             }
 
