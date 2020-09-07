@@ -1,13 +1,11 @@
 package classes
 {
     import flash.display.Sprite;
-    import flash.geom.ColorTransform;
-    import com.flashfla.utils.ColorUtil;
+    import flash.events.Event;
     import flash.events.MouseEvent;
     import flash.events.TimerEvent;
-    import flash.utils.Timer;
-    import flash.events.Event;
     import flash.geom.Point;
+    import flash.utils.Timer;
 
     dynamic public class BoxIcon extends Box
     {
