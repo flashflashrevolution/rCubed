@@ -17,7 +17,6 @@ package classes
 
         public function UIIcon(parent:DisplayObjectContainer = null, sprite:DisplayObject = null, xpos:Number = 0, ypos:Number = 0)
         {
-
             mouseChildren = false;
 
             if (sprite)
