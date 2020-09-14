@@ -379,7 +379,7 @@ package menu
                 case GlobalVariables.SONG_ACCESS_BANNED:
                     return _lang.string("song_selection_banned_invalid");
             }
-            return "Unknown Lock Reason (" + songData["access"] + ") - This shouldn't appear, message Velocity";
+            return sprintf(_lang.string("song_selection_banned_unknown"), {"access": songData["access"]});
         }
 
         public function get songData():Object
