@@ -129,7 +129,7 @@ package menu
 
                 Flags.VALUES[Flags.LEGACY_ENGINE_DEFAULT_LOAD_SKIP] = true;
 
-                var loadTextEngine:Text = new Text("Loading Default Engine, please wait...");
+                var loadTextEngine:Text = new Text(_lang.string("song_selection_load_default_engine"));
                 loadTextEngine.setAreaParams(Main.GAME_WIDTH, 30, Text.CENTER);
                 loadTextEngine.y = Main.GAME_HEIGHT / 2 - 15;
                 addChild(loadTextEngine);
@@ -228,7 +228,7 @@ package menu
 
                 SELECTED_GENRE_BACKGROUND = new GenreSelection();
 
-                GENRE_MODE_TEXT = new Text("Song Flags");
+                GENRE_MODE_TEXT = new Text(_lang.string("genre_mode_" + GENRE_SONGFLAGS));
                 GENRE_MODE_TEXT.x = 17;
                 GENRE_MODE_TEXT.y = 106;
                 GENRE_MODE_TEXT.align = Text.CENTER;
@@ -421,7 +421,7 @@ package menu
                 return _lang.string("difficulty_title_" + gindex);
 
             if (gindex == 1)
-                return "PLAYED";
+                return _lang.string("song_selection_played");
 
             return GlobalVariables.SONG_ICON_TEXT[gindex];
         }
@@ -864,7 +864,7 @@ package menu
                 }
                 else
                 {
-                    _gvars.gameMain.addAlert("Loading Music for \"" + songData["name"] + "\"", 90);
+                    _gvars.gameMain.addAlert(sprintf(_lang.stringSimple("song_selection_load_music_for"), {"name": songData["name"]}), 90);
                     song.addEventListener(Event.COMPLETE, e_menuMusicConvertSongLoad);
                 }
             }
@@ -891,7 +891,7 @@ package menu
                 _gvars.songQueue.push(Playlist.instance.getSong(_gvars.options.replay.level));
 
                 // Switch to game
-                _gvars.gameMain.addAlert("Playing chart preview...");
+                _gvars.gameMain.addAlert(_lang.string("song_selection_load_play_chart_preview"));
                 switchTo(Main.GAME_PLAY_PANEL);
             }
         }
@@ -903,6 +903,9 @@ package menu
          */
         private function e_listenToSongPreviewContextSelect(e:ContextMenuEvent):void
         {
+            _gvars.options = new GameOptions();
+            _gvars.options.fill();
+
             var songItem:SongItem = (e.contextMenuOwner as SongItem);
             var songData:Object = _playlist.getSong(songItem.level);
             if (songData.error == null)
@@ -914,7 +917,7 @@ package menu
                 }
                 else
                 {
-                    _gvars.gameMain.addAlert("Loading Music for \"" + songData["name"] + "\"", 90);
+                    _gvars.gameMain.addAlert(sprintf(_lang.stringSimple("song_selection_load_music_for"), {"name": songData["name"]}), 90);
                     song.addEventListener(Event.COMPLETE, e_songPreviewConvertSongLoad);
                 }
             }
@@ -1030,7 +1033,7 @@ package menu
             // Search Type
             if (searchTypeBox == null)
             {
-                searchTypeBox = new ComboBox(null, 5, 37, "", [{label: "Song Name", data: "name"}, {label: "Author", data: "author"}, {label: "Stepauthor", data: "stepauthor"}, {label: "Style", data: "style"}]);
+                searchTypeBox = new ComboBox(null, 5, 37, "", [{label: _lang.stringSimple("song_selection_search_song_name"), data: "name"}, {label: _lang.stringSimple("song_selection_search_author"), data: "author"}, {label: _lang.stringSimple("song_selection_search_stepauthor"), data: "stepauthor"}, {label: _lang.stringSimple("song_selection_search_style"), data: "style"}]);
                 searchTypeBox.setSize(164, 25);
                 searchTypeBox.selectedIndex = 0;
                 searchTypeBox.fontSize = 11;
@@ -1133,7 +1136,7 @@ package menu
             songQueuePlay.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
             infoBox.addChild(songQueuePlay);
 
-            var songQueuePlayFromHere:BoxButton = new BoxButton(164, 27, "PLAY FROM HERE", 12);
+            var songQueuePlayFromHere:BoxButton = new BoxButton(164, 27, _lang.string("song_selection_queue_panel_play_from_here"), 12);
             songQueuePlayFromHere.x = 5;
             songQueuePlayFromHere.y = 192;
             songQueuePlayFromHere.action = "playQueueFromHere";
@@ -1862,7 +1865,7 @@ package menu
                 }
                 else if (clickAction == "queueSave")
                 {
-                    var prompt:MultiplayerPrompt = new MultiplayerPrompt(this, "Song Queue Name");
+                    var prompt:MultiplayerPrompt = new MultiplayerPrompt(this, _lang.stringSimple("song_selection_song_queue_name_prompt"));
                     prompt.move(Main.GAME_WIDTH / 2 - prompt.width / 2, Main.GAME_HEIGHT / 2 - prompt.height / 2);
                     prompt.addEventListener(MultiplayerPrompt.EVENT_SEND, e_saveSongQueue);
                     prompt.addEventListener(Event.CLOSE, e_closeSongQueuePrompt);
@@ -1892,7 +1895,7 @@ package menu
                     }
                     else
                     {
-                        _gvars.gameMain.addAlert("No possible songs to choose from...", 120, Alert.RED);
+                        _gvars.gameMain.addAlert(_lang.string("song_selection_no_songs_random"), 120, Alert.RED);
                     }
                 }
             }
@@ -2153,12 +2156,12 @@ package menu
          */
         private function playMenuMusicSong(song:Song):void
         {
-            _gvars.gameMain.addAlert("Playing menu music...");
+            _gvars.gameMain.addAlert(_lang.string("song_selection_playing_menu_music"));
 
             LocalStore.setVariable("menu_music", song.entry.name);
             var par:MainMenu = ((this.my_Parent) as MainMenu);
             if (par.menuMusicControls)
-                ((par.menuMusicControls.contextMenu as ContextMenu).customItems[0] as ContextMenuItem).caption = "Now Playing: " + song.entry.name;
+                ((par.menuMusicControls.contextMenu as ContextMenu).customItems[0] as ContextMenuItem).caption = sprintf(_lang.stringSimple("song_selection_now_playing"), {"name": song.entry.name});
 
             if (_gvars.menuMusic)
                 _gvars.menuMusic.stop();
@@ -2177,7 +2180,7 @@ package menu
          */
         private function playSongPreview(song:Song):void
         {
-            _gvars.gameMain.addAlert("Playing song preview...");
+            _gvars.gameMain.addAlert(_lang.string("song_selection_playing_song_preview"));
 
             if (_gvars.menuMusic)
                 _gvars.menuMusic.stop();
