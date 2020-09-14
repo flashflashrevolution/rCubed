@@ -252,7 +252,7 @@ package menu
                 var spr_play:BoxIcon = new BoxIcon(25, 25, new iconPlay());
                 spr_play.x = 5;
                 spr_play.y = 5;
-                spr_play.setHoverText("Play", "bottom");
+                spr_play.setHoverText(_lang.string("main_menu_music_play"), "bottom");
                 spr_play.addEventListener(MouseEvent.CLICK, function(e:Event):void
                 {
                     if (_gvars.menuMusic && !_gvars.menuMusic.isPlaying)
@@ -265,7 +265,7 @@ package menu
                 var spr_pause:BoxIcon = new BoxIcon(25, 25, new iconPause());
                 spr_pause.x = 35;
                 spr_pause.y = 5;
-                spr_pause.setHoverText("Pause", "bottom");
+                spr_pause.setHoverText(_lang.string("main_menu_music_pause"), "bottom");
                 spr_pause.addEventListener(MouseEvent.CLICK, function(e:Event):void
                 {
                     if (_gvars.menuMusic && _gvars.menuMusic.isPlaying)
@@ -278,7 +278,7 @@ package menu
                 var spr_stop:BoxIcon = new BoxIcon(25, 25, new iconStop());
                 spr_stop.x = 65;
                 spr_stop.y = 5;
-                spr_stop.setHoverText("Stop", "bottom");
+                spr_stop.setHoverText(_lang.string("main_menu_music_stop"), "bottom");
                 spr_stop.addEventListener(MouseEvent.CLICK, function(e:Event):void
                 {
                     if (_gvars.menuMusic && _gvars.menuMusic.isPlaying)
@@ -291,7 +291,7 @@ package menu
                 var spr_delete:BoxIcon = new BoxIcon(25, 25, new iconDelete());
                 spr_delete.x = 95;
                 spr_delete.y = 5;
-                spr_delete.setHoverText("Remove", "bottom");
+                spr_delete.setHoverText(_lang.string("main_menu_music_remove"), "bottom");
                 menuMusicControls.addChild(spr_delete);
                 spr_delete.addEventListener(MouseEvent.CLICK, function(e:Event):void
                 {
@@ -308,7 +308,7 @@ package menu
 
                 // Context Menu Display song Playing
                 var musicContextMenu:ContextMenu = new ContextMenu();
-                var musicContextMenuPlaying:ContextMenuItem = new ContextMenuItem("Now Playing: " + LocalStore.getVariable("menu_music", "Unknown"), false, false);
+                var musicContextMenuPlaying:ContextMenuItem = new ContextMenuItem(sprintf(_lang.stringSimple("main_menu_now_playing"), {"music_name": LocalStore.getVariable("menu_music", "Unknown")}), false, false);
                 musicContextMenu.customItems.push(musicContextMenuPlaying);
                 menuMusicControls.contextMenu = musicContextMenu;
 
