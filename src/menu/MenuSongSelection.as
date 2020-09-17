@@ -148,30 +148,6 @@ package menu
 
             GENRE_MODE = LocalStore.getVariable("genre_mode", GENRE_DIFFICULTIES);
 
-            // Menu Music Context Menu
-            var songItemContextMenuItem:ContextMenuItem;
-
-            songItemContextMenu = new ContextMenu();
-            songItemContextMenuItem = new ContextMenuItem(_lang.stringSimple("song_selection_context_menu_music"));
-            songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_setAsMenuMusicContextSelect);
-            songItemContextMenu.customItems.push(songItemContextMenuItem);
-
-            songItemContextMenuItem = new ContextMenuItem(_lang.stringSimple("song_selection_context_song_preview"), true);
-            songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_listenToSongPreviewContextSelect);
-            songItemContextMenu.customItems.push(songItemContextMenuItem);
-
-            songItemContextMenuItem = new ContextMenuItem(_lang.stringSimple("song_selection_context_chart_preview"));
-            songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_playChartPreviewContextSelect);
-            songItemContextMenu.customItems.push(songItemContextMenuItem);
-
-            songItemContextMenuItem = new ContextMenuItem(_lang.stringSimple("song_selection_context_song_options"));
-            songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_songOptionsContextSelect);
-            songItemContextMenu.customItems.push(songItemContextMenuItem);
-
-            songItemRemoveQueueContext = new ContextMenuItem(_lang.stringSimple("song_selection_context_remove_from_queue"), true);
-            songItemRemoveQueueContext.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_removeFromQueueContextSelect);
-            songItemContextMenu.customItems.push(songItemRemoveQueueContext);
-
             draw();
 
             return true;
@@ -213,6 +189,30 @@ package menu
 
         override public function draw():void
         {
+            // Menu Music Context Menu
+            var songItemContextMenuItem:ContextMenuItem;
+
+            songItemContextMenu = new ContextMenu();
+            songItemContextMenuItem = new ContextMenuItem(_lang.stringSimple("song_selection_context_menu_music"));
+            songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_setAsMenuMusicContextSelect);
+            songItemContextMenu.customItems.push(songItemContextMenuItem);
+
+            songItemContextMenuItem = new ContextMenuItem(_lang.stringSimple("song_selection_context_song_preview"), true);
+            songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_listenToSongPreviewContextSelect);
+            songItemContextMenu.customItems.push(songItemContextMenuItem);
+
+            songItemContextMenuItem = new ContextMenuItem(_lang.stringSimple("song_selection_context_chart_preview"));
+            songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_playChartPreviewContextSelect);
+            songItemContextMenu.customItems.push(songItemContextMenuItem);
+
+            songItemContextMenuItem = new ContextMenuItem(_lang.stringSimple("song_selection_context_song_options"));
+            songItemContextMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_songOptionsContextSelect);
+            songItemContextMenu.customItems.push(songItemContextMenuItem);
+
+            songItemRemoveQueueContext = new ContextMenuItem(_lang.stringSimple("song_selection_context_remove_from_queue"), true);
+            songItemRemoveQueueContext.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, e_removeFromQueueContextSelect);
+            songItemContextMenu.customItems.push(songItemRemoveQueueContext);
+
             //- Build Genre Holder
             if (genreDisplay == null)
             {
@@ -256,22 +256,28 @@ package menu
             }
 
             //- Add Info Box Tabs
-            if (optionsBox == null)
+            if (optionsBox != null)
             {
-                optionsBox = new Sprite();
-                optionsBox.x = 559; // 155
-                optionsBox.y = 64;
-                this.addChild(optionsBox);
-
-                var optionsTexts:Array = [[_lang.string("song_selection_menu_search"), "search"], [_lang.string("song_selection_search"), "queue"]]
-                for (var i:int = 0; i < optionsTexts.length; i++)
+                for (var i:int = 0; i < optionsBox.numChildren; ++i)
                 {
-                    var optionActionBox:BoxButton = new BoxButton(85.5, 27, optionsTexts[i][0], 11);
-                    optionActionBox.x = (i * 88.5);
-                    optionActionBox.action = optionsTexts[i][1];
-                    optionActionBox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-                    optionsBox.addChild(optionActionBox);
+                    optionsBox.getChildAt(i).removeEventListener(MouseEvent.CLICK, clickHandler, false);
                 }
+                optionsBox.removeChildren();
+            }
+
+            optionsBox = new Sprite();
+            optionsBox.x = 559; // 155
+            optionsBox.y = 64;
+            this.addChild(optionsBox);
+
+            var optionsTexts:Array = [[_lang.string("song_selection_menu_search"), "search"], [_lang.string("song_selection_search"), "queue"]]
+            for (i = 0; i < optionsTexts.length; i++)
+            {
+                var optionActionBox:BoxButton = new BoxButton(85.5, 27, optionsTexts[i][0], 11);
+                optionActionBox.x = (i * 88.5);
+                optionActionBox.action = optionsTexts[i][1];
+                optionActionBox.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                optionsBox.addChild(optionActionBox);
             }
 
             //- Add Song Info Box
@@ -864,7 +870,7 @@ package menu
                 }
                 else
                 {
-                    _gvars.gameMain.addAlert(sprintf(_lang.stringSimple("song_selection_load_music_for"), {"name": songData["name"]}), 90);
+                    _gvars.gameMain.addAlert(sprintf(_lang.string("song_selection_load_music_for"), {"name": songData["name"]}), 90);
                     song.addEventListener(Event.COMPLETE, e_menuMusicConvertSongLoad);
                 }
             }
@@ -917,7 +923,7 @@ package menu
                 }
                 else
                 {
-                    _gvars.gameMain.addAlert(sprintf(_lang.stringSimple("song_selection_load_music_for"), {"name": songData["name"]}), 90);
+                    _gvars.gameMain.addAlert(sprintf(_lang.string("song_selection_load_music_for"), {"name": songData["name"]}), 90);
                     song.addEventListener(Event.COMPLETE, e_songPreviewConvertSongLoad);
                 }
             }
@@ -990,7 +996,7 @@ package menu
             //- Build Info Box
             // Song Search
             if (options.infoTab == TAB_SEARCH)
-                buildInfoBoxSearch()
+                buildInfoBoxSearch();
 
             // Playlist Queue
             else if (options.infoTab == TAB_QUEUE)
@@ -1031,13 +1037,15 @@ package menu
             infoBox.addChild(searchBox);
 
             // Search Type
-            if (searchTypeBox == null)
+            var searchTypeBoxItems:Array = [{label: _lang.stringSimple("song_selection_search_song_name"), data: "name"}, {label: _lang.stringSimple("song_selection_search_author"), data: "author"}, {label: _lang.stringSimple("song_selection_search_stepauthor"), data: "stepauthor"}, {label: _lang.stringSimple("song_selection_search_style"), data: "style"}];
+            if (searchTypeBox != null)
             {
-                searchTypeBox = new ComboBox(null, 5, 37, "", [{label: _lang.stringSimple("song_selection_search_song_name"), data: "name"}, {label: _lang.stringSimple("song_selection_search_author"), data: "author"}, {label: _lang.stringSimple("song_selection_search_stepauthor"), data: "stepauthor"}, {label: _lang.stringSimple("song_selection_search_style"), data: "style"}]);
-                searchTypeBox.setSize(164, 25);
-                searchTypeBox.selectedIndex = 0;
-                searchTypeBox.fontSize = 11;
+                searchTypeBox.removeEventListener(Event.SELECT, searchTypeSelect);
             }
+            searchTypeBox = new ComboBox(null, 5, 37, "", searchTypeBoxItems);
+            searchTypeBox.setSize(164, 25);
+            searchTypeBox.fontSize = 11;
+            searchTypeBox.addEventListener(Event.SELECT, searchTypeSelect);
             infoBox.addChild(searchTypeBox);
 
             // Save Search Parameters
@@ -1052,7 +1060,10 @@ package menu
             if (options.last_search_type != null)
             {
                 searchTypeBox.selectedItemByData = options.last_search_type;
-                options.last_search_type = null;
+            }
+            else if (searchTypeBox.selectedIndex == -1)
+            {
+                searchTypeBox.selectedIndex = 0;
             }
 
             var searchBtn:BoxButton = new BoxButton(164, 27, _lang.string("song_selection_search_panel_search"));
@@ -1554,6 +1565,11 @@ package menu
 
             buildGenreList();
             buildPlayList();
+        }
+
+        private function searchTypeSelect(e:Event):void
+        {
+            options.last_search_type = e.target.selectedItem["data"];
         }
 
         /**
@@ -2160,8 +2176,8 @@ package menu
 
             LocalStore.setVariable("menu_music", song.entry.name);
             var par:MainMenu = ((this.my_Parent) as MainMenu);
-            if (par.menuMusicControls)
-                ((par.menuMusicControls.contextMenu as ContextMenu).customItems[0] as ContextMenuItem).caption = sprintf(_lang.stringSimple("song_selection_now_playing"), {"name": song.entry.name});
+            par.drawMenuMusicControls();
+            par.updateMenuMusicControls();
 
             if (_gvars.menuMusic)
                 _gvars.menuMusic.stop();
@@ -2171,7 +2187,6 @@ package menu
 
             _gvars.menuMusic = new SongPlayerBytes(song.bytesSWF);
             _gvars.menuMusic.start();
-            par.drawMenuMusicControls();
         }
 
         /**
