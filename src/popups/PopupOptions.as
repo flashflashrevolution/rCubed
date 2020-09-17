@@ -1575,6 +1575,12 @@ package popups
                 _gvars.activeUser.language = e.target.languageID;
                 _gvars.gameMain.activePanel.draw();
                 renderOptions();
+
+                if (_gvars.gameMain.activePanel is MainMenu)
+                {
+                    var mmpanel:MainMenu = (_gvars.gameMain.activePanel as MainMenu);
+                    mmpanel.updateMenuMusicControls();
+                }
             }
 
             //- Displays
