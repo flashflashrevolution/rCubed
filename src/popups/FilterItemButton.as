@@ -5,6 +5,7 @@ package popups
     import classes.BoxText;
     import classes.Language;
     import classes.Text;
+    import classes.ValidatedText;
     import classes.filter.EngineLevelFilter;
     import com.bit101.components.ComboBox;
     import com.flashfla.utils.ArrayUtil;
@@ -61,7 +62,7 @@ package popups
                     combo_compare.selectedItemByData = filter.comparison;
                     combo_compare.fontSize = 11;
 
-                    input_box = new BoxText(107, 23);
+                    input_box = new ValidatedText(107, 23, ValidatedText.R_FLOAT);
                     input_box.text = filter.input_number.toString();
                     input_box.x = 215;
                     input_box.y = 5;
@@ -147,7 +148,7 @@ package popups
                     combo_compare.selectedItemByData = filter.comparison;
                     combo_compare.fontSize = 11;
 
-                    input_box = new BoxText(107, 23);
+                    input_box = new ValidatedText(107, 23, ValidatedText.R_FLOAT);
                     input_box.text = filter.input_number.toString();
                     input_box.x = 215;
                     input_box.y = 5;
@@ -267,10 +268,7 @@ package popups
 
         private function e_valueNumberChange(e:Event):void
         {
-            var newNumber:Number = Number(input_box.text)
-            if (isNaN(newNumber))
-                newNumber = 0;
-            filter.input_number = newNumber;
+            filter.input_number = (input_box as ValidatedText).validate(0);
         }
 
         private function e_clickRemovefilter(e:Event):void
@@ -279,5 +277,4 @@ package popups
                 updater.draw();
         }
     }
-
 }
