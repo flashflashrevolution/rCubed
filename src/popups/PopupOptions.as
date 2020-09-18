@@ -13,12 +13,15 @@ package popups
     import classes.Language;
     import classes.MouseTooltip;
     import classes.Noteskins;
+    import classes.NoteskinsStruct;
     import classes.Playlist;
     import classes.Text;
     import classes.User;
     import classes.ValidatedText;
     import classes.chart.Song;
     import classes.chart.parse.ChartFFRLegacy;
+    import classes.replay.Base64Decoder;
+    import classes.replay.Base64Encoder;
     import com.bit101.components.ComboBox;
     import com.bit101.components.Style;
     import com.bit101.components.Window;
@@ -26,6 +29,7 @@ package popups
     import com.flashfla.net.Multiplayer;
     import com.flashfla.utils.ArrayUtil;
     import com.flashfla.utils.ColorUtil;
+    import com.flashfla.utils.ObjectUtil;
     import com.flashfla.utils.StringUtil;
     import com.flashfla.utils.SystemUtil;
     import com.flashfla.utils.sprintf;
@@ -45,6 +49,7 @@ package popups
     import flash.text.TextFieldAutoSize;
     import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
+    import flash.utils.ByteArray;
     import game.GameOptions;
     import menu.MainMenu;
     import menu.MenuPanel;
@@ -122,7 +127,12 @@ package popups
         private var optionGameMods:Array;
         private var optionNoteskins:Array;
         private var optionNoteskinPreview:GameNote;
-        private var optionNoteskinsCustom:BoxButton;
+
+        private var optionOpenCustomNoteskinEditor:BoxButton;
+        private var optionImportCustomNoteskin:BoxButton;
+        private var optionCopyCustomNoteskin:BoxButton;
+        private var noteskin_struct:Object = NoteskinsStruct.getDefaultStruct();
+        private var fileData:ByteArray;
 
         private var optionJudgeColors:Array;
         private var optionComboColors:Array;
@@ -823,12 +833,25 @@ package popups
                     yOff += 20;
                 }
 
-                optionNoteskinsCustom = new BoxButton(179, 23, _lang.string("options_noteskins_edit_custom"));
-                optionNoteskinsCustom.x = xOff + 3;
-                optionNoteskinsCustom.y = yOff + 1;
-                optionNoteskinsCustom.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-                box.addChild(optionNoteskinsCustom);
+                optionOpenCustomNoteskinEditor = new BoxButton(179, 23, "Open noteskin editor");
+                optionOpenCustomNoteskinEditor.x = xOff + 3;
+                optionOpenCustomNoteskinEditor.y = yOff + 1;
+                optionOpenCustomNoteskinEditor.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                box.addChild(optionOpenCustomNoteskinEditor);
+                yOff += 25;
 
+                optionImportCustomNoteskin = new BoxButton(179, 23, "Import noteskin JSON");
+                optionImportCustomNoteskin.x = xOff + 3;
+                optionImportCustomNoteskin.y = yOff + 1;
+                optionImportCustomNoteskin.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                box.addChild(optionImportCustomNoteskin);
+                yOff += 25;
+
+                optionCopyCustomNoteskin = new BoxButton(179, 23, "Copy noteskin data");
+                optionCopyCustomNoteskin.x = xOff + 3;
+                optionCopyCustomNoteskin.y = yOff + 1;
+                optionCopyCustomNoteskin.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                box.addChild(optionCopyCustomNoteskin);
             }
             else if (CURRENT_TAB == TAB_COLORS)
             {
@@ -1564,9 +1587,50 @@ package popups
             }
 
             //- Custom Notekin
-            else if (e.target == optionNoteskinsCustom)
+            else if (e.target == optionOpenCustomNoteskinEditor)
             {
-                _gvars.gameMain.addPopup(new PopupCustomNoteskin(_gvars.gameMain), true);
+                navigateToURL(new URLRequest("http://www.flashflashrevolution.com/~velocity/ffrjs/noteskin/"), "_blank");
+                return;
+            }
+
+            //- Custom Notekin
+            else if (e.target == optionImportCustomNoteskin)
+            {
+                var prompt:MultiplayerPrompt = new MultiplayerPrompt(box.parent, _lang.stringSimple("popup_noteskin_import_json")); // "Import JSON"
+                prompt.move(Main.GAME_WIDTH / 2 - prompt.width / 2, Main.GAME_HEIGHT / 2 - prompt.height / 2);
+                prompt.addEventListener(MultiplayerPrompt.EVENT_SEND, function(subevent:Object):void
+                {
+                    try
+                    {
+                        var json:Object = JSON.parse(subevent.params.value);
+                        if (json["rects"] != null && json["data"] != null)
+                        {
+                            // Update Structs
+                            ObjectUtil.merge(noteskin_struct, json["rects"]);
+
+                            var imageDecoder:Base64Decoder = new Base64Decoder();
+                            imageDecoder.decode(json["data"]);
+                            fileData = imageDecoder.toByteArray();
+                        }
+                        LocalStore.setVariable("custom_noteskin", noteskinsString(), 20971520); // 20MB Mins size requested.
+                        Noteskins.instance.loadCustomNoteskin();
+                        GlobalVariables.instance.gameMain.addAlert(_lang.string("popup_noteskin_saved"), 90, Alert.GREEN);
+                    }
+                    catch (e:Error)
+                    {
+                    }
+                });
+            }
+
+            //- Custom Notekin
+            else if (e.target == optionCopyCustomNoteskin)
+            {
+                var success:Boolean = SystemUtil.setClipboard(noteskinsString());
+                if (success)
+                    GlobalVariables.instance.gameMain.addAlert(_lang.string("clipboard_success"), 120, Alert.GREEN);
+                else
+                    GlobalVariables.instance.gameMain.addAlert(_lang.string("clipboard_failure"), 120, Alert.RED);
+                return;
             }
 
             //- Language
@@ -1908,6 +1972,38 @@ package popups
             if (_avars.legacyEngines.length > 0 && engineCombo.items.length > 2)
                 engineCombo.addItem({label: "Clear Engines", data: engineCombo});
             engineComboIgnore = false;
+        }
+
+        private function noteskinsString():String
+        {
+            if (fileData == null)
+            {
+                try
+                {
+                    var json:Object = JSON.parse(LocalStore.getVariable("custom_noteskin", null));
+                    var imgDecode:Base64Decoder = new Base64Decoder();
+                    imgDecode.decode(json["data"]);
+                    fileData = imgDecode.toByteArray();
+
+                    ObjectUtil.merge(noteskin_struct, json["rects"]);
+                }
+                catch (e:Error)
+                {
+                }
+            }
+
+            if (fileData == null)
+                return null;
+
+            // Base64 Encode Image
+            var imgEncode:Base64Encoder = new Base64Encoder();
+            imgEncode.encodeBytes(fileData);
+
+            var export_json:Object = {"name": GlobalVariables.instance.activeUser.name + " - Custom Export",
+                    "data": imgEncode.toString(),
+                    "rects": ObjectUtil.differences(NoteskinsStruct.getDefaultStruct(), noteskin_struct)}
+
+            return JSON.stringify(export_json);
         }
 
         public function setSettings():void
