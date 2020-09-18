@@ -1589,11 +1589,11 @@ package popups
             //- Custom Noteskin
             else if (e.target == optionOpenCustomNoteskinEditor)
             {
-                navigateToURL(new URLRequest("http://www.flashflashrevolution.com/~velocity/ffrjs/noteskin/"), "_blank");
+                navigateToURL(new URLRequest(Constant.NOTESKIN_EDITOR_URL), "_blank");
                 return;
             }
 
-            //- Custom Notekin
+            //- Custom Noteskin
             else if (e.target == optionImportCustomNoteskin)
             {
                 var prompt:MultiplayerPrompt = new MultiplayerPrompt(box.parent, _lang.stringSimple("popup_noteskin_import_json")); // "Import JSON"
@@ -1605,7 +1605,6 @@ package popups
                         var json:Object = JSON.parse(subevent.params.value);
                         if (json["rects"] != null && json["data"] != null)
                         {
-                            // Update Structs
                             ObjectUtil.merge(noteskin_struct, json["rects"]);
 
                             var imageDecoder:Base64Decoder = new Base64Decoder();
@@ -1622,7 +1621,7 @@ package popups
                 });
             }
 
-            //- Custom Notekin
+            //- Custom Noteskin
             else if (e.target == optionCopyCustomNoteskin)
             {
                 var success:Boolean = SystemUtil.setClipboard(noteskinsString());
