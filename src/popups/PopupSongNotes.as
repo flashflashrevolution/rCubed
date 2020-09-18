@@ -1,15 +1,15 @@
 package popups
 {
     import assets.GameBackgroundColor;
-    import classes.Alert;
     import classes.Box;
     import classes.BoxButton;
     import classes.BoxCheck;
-    import classes.BoxText;
+    import classes.HeartSelector;
     import classes.Language;
     import classes.Playlist;
     import classes.StarSelector;
     import classes.Text;
+    import classes.ValidatedText;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
     import flash.events.Event;
@@ -45,14 +45,15 @@ package popups
         private var sDetails:SQLSongDetails;
 
         private var sRating:StarSelector;
+        private var sFavorite:HeartSelector;
 
         private var notesLength:Text;
         private var notesField:TextField;
         private var setMirrorInvert:BoxCheck;
         private var setCustomOffsets:BoxCheck;
 
-        private var optionMusicOffset:BoxText;
-        private var optionJudgeOffset:BoxText;
+        private var optionMusicOffset:ValidatedText;
+        private var optionJudgeOffset:ValidatedText;
 
         private var revertOptions:BoxButton;
         private var confirmOptions:BoxButton;
@@ -65,8 +66,10 @@ package popups
             super(myParent);
             sObject = song;
 
-            songRatingValue = _gvars.playerUser.getSongRating(sObject["level"]);
-            sDetails = SQLQueries.getSongDetailsSafe((song.engine != null ? song.engine.id : Constant.BRAND_NAME_SHORT_LOWER()), song.level);
+            var engine_id:String = song.engine != null ? song.engine.id : Constant.BRAND_NAME_SHORT_LOWER;
+            sDetails = SQLQueries.getSongDetailsSafe(engine_id, song.level);
+
+            songRatingValue = _gvars.playerUser.getSongRating(sObject);
         }
 
         override public function stageAdd():void
@@ -104,17 +107,28 @@ package popups
             box.graphics.lineTo(box.width - 10, 65);
 
             var lblSongRating:Text = new Text(_lang.string("song_rating_label"), 14);
-            lblSongRating.x = 5;
-            lblSongRating.y = 85;
+            lblSongRating.x = 20;
+            lblSongRating.y = 69;
             lblSongRating.width = 145;
-            lblSongRating.align = Text.RIGHT;
+            lblSongRating.align = Text.LEFT;
             box.addChild(lblSongRating);
 
             sRating = new StarSelector();
-            sRating.x = 160;
-            sRating.y = 83;
-            sRating.value = songRatingValue;
+            sRating.x = 22;
+            sRating.y = 95;
             box.addChild(sRating);
+
+            var lblSongFavorite:Text = new Text(_lang.string("song_favorite_label"), 14);
+            lblSongFavorite.x = box.width - 165;
+            lblSongFavorite.y = 68;
+            lblSongFavorite.width = 145;
+            lblSongFavorite.align = Text.RIGHT;
+            box.addChild(lblSongFavorite);
+
+            sFavorite = new HeartSelector();
+            sFavorite.x = box.width - 52;
+            sFavorite.y = 93
+            box.addChild(sFavorite);
 
             // Divider
             box.graphics.lineStyle(1, 0xffffff);
@@ -190,11 +204,11 @@ package popups
             box.addChild(gameOffset);
             yOff += 20;
 
-            optionMusicOffset = new BoxText(100, 20);
+            optionMusicOffset = new ValidatedText(100, 20, ValidatedText.R_FLOAT);
             optionMusicOffset.x = xOff;
             optionMusicOffset.y = yOff;
-            optionMusicOffset.restrict = "-0-9";
             optionMusicOffset.text = "0";
+            optionMusicOffset.addEventListener(Event.CHANGE, changeHandler);
             box.addChild(optionMusicOffset);
             yOff += 30;
 
@@ -205,13 +219,12 @@ package popups
             box.addChild(gameJudgeOffset);
             yOff += 20;
 
-            optionJudgeOffset = new BoxText(100, 20);
+            optionJudgeOffset = new ValidatedText(100, 20, ValidatedText.R_FLOAT);
             optionJudgeOffset.x = xOff;
             optionJudgeOffset.y = yOff;
-            optionJudgeOffset.restrict = "-0-9";
             optionJudgeOffset.text = "0";
+            optionJudgeOffset.addEventListener(Event.CHANGE, changeHandler);
             box.addChild(optionJudgeOffset);
-
 
             //- Revert
             revertOptions = new BoxButton(80, 27, _lang.string("menu_revert"));
@@ -230,7 +243,7 @@ package popups
 
             //- Confirm
             confirmOptions = new BoxButton(80, 27, _lang.string("menu_confirm"));
-            confirmOptions.x = closeOptions.x - 95
+            confirmOptions.x = closeOptions.x - 95;
             confirmOptions.y = box.height - 42;
             confirmOptions.addEventListener(MouseEvent.CLICK, clickHandler);
             box.addChild(confirmOptions);
@@ -242,6 +255,8 @@ package popups
         {
             if (bmd != null && sDetails != null)
             {
+                sRating.value = songRatingValue;
+                sFavorite.checked = sDetails.song_favorite;
                 notesField.text = sDetails.notes;
                 notesLength.text = "(" + notesField.length + " / 250)";
                 setMirrorInvert.checked = sDetails.set_mirror_invert;
@@ -258,15 +273,37 @@ package popups
 
         override public function stageRemove():void
         {
+            notesField.removeEventListener(Event.CHANGE, e_notesFieldChange);
+            setMirrorInvert.removeEventListener(MouseEvent.CLICK, clickHandler);
+            setCustomOffsets.removeEventListener(MouseEvent.CLICK, clickHandler);
+            revertOptions.removeEventListener(MouseEvent.CLICK, clickHandler);
+            closeOptions.removeEventListener(MouseEvent.CLICK, clickHandler);
+            confirmOptions.removeEventListener(MouseEvent.CLICK, clickHandler);
+            optionJudgeOffset.removeEventListener(Event.CHANGE, changeHandler);
+            optionMusicOffset.removeEventListener(Event.CHANGE, changeHandler);
+
+            notesLength.dispose();
+            optionJudgeOffset.dispose();
+            optionMusicOffset.dispose();
+            revertOptions.dispose();
+            closeOptions.dispose();
+            confirmOptions.dispose();
+
             box.dispose();
             bmp = null;
             box = null;
         }
 
+        private function changeHandler(e:Event):void
+        {
+            if (e.target is ValidatedText)
+                (e.target as ValidatedText).validate(0);
+        }
+
         private function clickHandler(e:MouseEvent):void
         {
             if (e.target == setMirrorInvert)
-                setMirrorInvert.checked = !setMirrorInvert.checked
+                setMirrorInvert.checked = !setMirrorInvert.checked;
 
             else if (e.target == setCustomOffsets)
                 setCustomOffsets.checked = !setCustomOffsets.checked;
@@ -301,26 +338,25 @@ package popups
 
         private function saveDetails():void
         {
-            sDetails.offset_music = verifyFloat(optionMusicOffset.text, 0);
-            sDetails.offset_judge = verifyFloat(optionJudgeOffset.text, 0);
+            sDetails.song_favorite = sFavorite.checked;
+            sDetails.offset_music = optionMusicOffset.validate(0);
+            sDetails.offset_judge = optionJudgeOffset.validate(0);
             sDetails.set_mirror_invert = setMirrorInvert.checked;
             sDetails.set_custom_offsets = setCustomOffsets.checked;
             sDetails.notes = notesField.text;
+
+            // Song Rating
+            if (sDetails.engine != Constant.BRAND_NAME_SHORT_LOWER)
+                sDetails.song_rating = sRating.value;
+            else
+                _gvars.playerUser.songRatings[sObject["level"]] = sRating.value;
+
             _gvars.writeUserSongData();
-        }
-
-        private function verifyFloat(text:String, default_val:Number):Number
-        {
-            var temp:Number = parseFloat(text);
-            if (isNaN(temp))
-                return default_val;
-
-            return temp;
         }
 
         private function saveRatings():void
         {
-            if (!sRating || (sRating && sRating.value == songRatingValue))
+            if (sRating.value == songRatingValue || sDetails.engine != Constant.BRAND_NAME_SHORT_LOWER)
                 return;
 
             _loader = new URLLoader();
@@ -354,7 +390,7 @@ package popups
                 if (_data["result"] && _data["result"] == "success")
                 {
                     _gvars.playerUser.songRatings[sObject["level"]] = sRating.value;
-                    _gvars.gameMain.addAlert("Saved rating for " + sObject["name"] + "!", 120, Alert.GREEN);
+                    //_gvars.gameMain.addAlert("Saved rating for " + sObject["name"] + "!", 120, Alert.GREEN);
                     if (_data["type"] && _data["type"] == 1)
                     {
                         _playlist.playList[sObject["level"]]["song_rating"] = _data["new_value"];
@@ -362,7 +398,7 @@ package popups
                 }
                 else
                 {
-                    _gvars.gameMain.addAlert("Failed to save song rating.", 120, Alert.RED);
+                    //_gvars.gameMain.addAlert("Failed to save song rating.", 120, Alert.RED);
                 }
             }
             catch (e:Error)
@@ -382,5 +418,4 @@ package popups
             removeLoaderListeners();
         }
     }
-
 }

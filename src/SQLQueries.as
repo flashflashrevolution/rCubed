@@ -59,12 +59,20 @@ package
                     for (var level_id:String in engine)
                     {
                         if (engine[level_id] != null && ObjectUtil.count(engine[level_id]) > 0)
-                            parsed_data.song_details[engine_id][level_id] = new SQLSongDetails(engine[level_id]);
+                            parsed_data.song_details[engine_id][level_id] = new SQLSongDetails(engine_id, level_id, engine[level_id]);
                     }
                 }
             }
 
             sql_data = parsed_data;
+        }
+
+        public static function getSongDetailsEntry(entry:Object):SQLSongDetails
+        {
+            if (entry.engine != null)
+                return getSongDetails(entry.engine.id, entry.level);
+
+            return getSongDetails(Constant.BRAND_NAME_SHORT_LOWER, entry.level);
         }
 
         /**
@@ -94,7 +102,7 @@ package
                 sql_data.song_details[engine_id] = {};
 
             if (sql_data.song_details[engine_id][level_id] == null)
-                sql_data.song_details[engine_id][level_id] = new SQLSongDetails(null);
+                sql_data.song_details[engine_id][level_id] = new SQLSongDetails(engine_id, level_id, null);
 
             return (sql_data.song_details[engine_id][level_id] as SQLSongDetails);
         }
@@ -178,7 +186,7 @@ package
                             var row:Object = res_data[index];
                             var eid:* = row["engine"];
                             var sid:String = row["song_id"];
-                            if (row["engine"] != Constant.BRAND_NAME_SHORT_LOWER())
+                            if (row["engine"] != Constant.BRAND_NAME_SHORT_LOWER)
                             {
                                 eid = row["engine"]["id"];
                             }

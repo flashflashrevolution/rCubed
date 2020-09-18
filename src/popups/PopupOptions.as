@@ -1576,6 +1576,12 @@ package popups
                 _gvars.gameMain.activePanel.draw();
                 _gvars.gameMain.buildContextMenu();
                 renderOptions();
+
+                if (_gvars.gameMain.activePanel is MainMenu)
+                {
+                    var mmpanel:MainMenu = (_gvars.gameMain.activePanel as MainMenu);
+                    mmpanel.updateMenuMusicControls();
+                }
             }
 
             //- Displays
@@ -1883,8 +1889,8 @@ package popups
             // engine Playlist Select
             engineCombo.removeAll();
             engineDefaultCombo.removeAll();
-            engineCombo.addItem({label: Constant.BRAND_NAME(), data: null});
-            engineDefaultCombo.addItem({label: Constant.BRAND_NAME(), data: null});
+            engineCombo.addItem({label: Constant.BRAND_NAME_LONG, data: null});
+            engineDefaultCombo.addItem({label: Constant.BRAND_NAME_LONG, data: null});
             engineCombo.selectedIndex = 0;
             engineDefaultCombo.selectedIndex = 0;
             for each (var engine:Object in _avars.legacyEngines)

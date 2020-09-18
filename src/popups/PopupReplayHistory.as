@@ -203,7 +203,7 @@ package popups
             {
                 if (r.isValid())
                 {
-                    var engineID:String = (r.settings.arc_engine ? r.settings.arc_engine.engineID : Constant.BRAND_NAME_SHORT_LOWER());
+                    var engineID:String = (r.settings.arc_engine ? r.settings.arc_engine.engineID : Constant.BRAND_NAME_SHORT_LOWER);
                     if (INTERNAL_REPLAYS[engineID] == null)
                     {
                         INTERNAL_REPLAYS_LIST.push(engineID);
@@ -238,7 +238,7 @@ package popups
                 r.fileReplay = true;
                 if (r.isValid())
                 {
-                    var engineID:String = (r.settings.arc_engine ? r.settings.arc_engine.engineID : Constant.BRAND_NAME_SHORT_LOWER());
+                    var engineID:String = (r.settings.arc_engine ? r.settings.arc_engine.engineID : Constant.BRAND_NAME_SHORT_LOWER);
                     if (EXTERNAL_REPLAYS[engineID] == null)
                     {
                         EXTERNAL_REPLAYS_LIST.push(engineID);
@@ -387,7 +387,7 @@ package popups
                     if (r.isValid())
                     {
                         _gvars.replayHistory.unshift(r);
-                        var engineID:String = (r.settings.arc_engine ? r.settings.arc_engine.engineID : Constant.BRAND_NAME_SHORT_LOWER());
+                        var engineID:String = (r.settings.arc_engine ? r.settings.arc_engine.engineID : Constant.BRAND_NAME_SHORT_LOWER);
                         if (INTERNAL_REPLAYS[engineID] == null)
                         {
                             INTERNAL_REPLAYS_LIST.push(engineID);
@@ -425,10 +425,10 @@ package popups
 
                 // Move R3 to the top.
                 r3Index = -1;
-                if ((r3Index = EXTERNAL_REPLAYS_LIST.indexOf(Constant.BRAND_NAME_SHORT_LOWER())) >= 1)
+                if ((r3Index = EXTERNAL_REPLAYS_LIST.indexOf(Constant.BRAND_NAME_SHORT_LOWER)) >= 1)
                 {
                     EXTERNAL_REPLAYS_LIST.splice(r3Index, 1);
-                    EXTERNAL_REPLAYS_LIST.unshift(Constant.BRAND_NAME_SHORT_LOWER());
+                    EXTERNAL_REPLAYS_LIST.unshift(Constant.BRAND_NAME_SHORT_LOWER);
                 }
             }
             else
@@ -440,10 +440,10 @@ package popups
 
                 // Move R3 to the top.
                 r3Index = -1;
-                if ((r3Index = INTERNAL_REPLAYS_LIST.indexOf(Constant.BRAND_NAME_SHORT_LOWER())) >= 2)
+                if ((r3Index = INTERNAL_REPLAYS_LIST.indexOf(Constant.BRAND_NAME_SHORT_LOWER)) >= 2)
                 {
                     INTERNAL_REPLAYS_LIST.splice(r3Index, 1);
-                    INTERNAL_REPLAYS_LIST.insertAt(1, Constant.BRAND_NAME_SHORT_LOWER());
+                    INTERNAL_REPLAYS_LIST.insertAt(1, Constant.BRAND_NAME_SHORT_LOWER);
                 }
             }
 
@@ -576,7 +576,7 @@ package popups
 
             for each (var r:Replay in _gvars.replayHistory)
             {
-                var engineID:String = (r.settings.arc_engine ? r.settings.arc_engine.engineID : Constant.BRAND_NAME_SHORT_LOWER());
+                var engineID:String = (r.settings.arc_engine ? r.settings.arc_engine.engineID : Constant.BRAND_NAME_SHORT_LOWER);
                 if (ENGINE_RECENT_ID != "all" && ENGINE_RECENT_ID != engineID)
                     continue;
 

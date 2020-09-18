@@ -350,6 +350,10 @@ package
                 if (_rank.score > 0)
                     songIcon = 1;
 
+                // FC* - When current score isn't FC but a FC has been achieved before.
+                if (_rank.fcs > 0)
+                    songIcon = 7;
+
                 // FC
                 if (_rank.perfect + _rank.good + _rank.average == arrows && _rank.miss == 0 && _rank.maxcombo == arrows)
                     songIcon = 2;
@@ -390,6 +394,10 @@ package
                 if (_rank.score > 0)
                     songIcon |= (1 << 0);
 
+                // FC* - When current score isn't FC but a FC has been achieved before.
+                if (_rank.fcs > 0)
+                    songIcon |= (1 << 7);
+
                 // FC
                 if (_rank.perfect + _rank.good + _rank.average == arrows && _rank.miss == 0 && _rank.maxcombo == arrows)
                     songIcon |= (1 << 1);
@@ -415,10 +423,10 @@ package
 
         public static const SONG_ICON_TEXT:Array = ["<font color=\"#9C9C9C\">UNPLAYED</font>", "", "<font color=\"#00FF00\">FC</font>",
             "<font color=\"#f2a254\">SDG</font>", "<font color=\"#2C2C2C\">BLACKFLAG</font>",
-            "<font color=\"#473218\">BOOFLAG</font>", "<font color=\"#FFFF38\">AAA</font>"];
+            "<font color=\"#473218\">BOOFLAG</font>", "<font color=\"#FFFF38\">AAA</font>", "<font color=\"#00FF00\">FC*</font>"];
 
         public static const SONG_ICON_TEXT_FLAG:Array = ["Unplayed", "Played", "Full Combo",
-            "Single Digit Good", "Blackflag", "Booflag", "AAA"];
+            "Single Digit Good", "Blackflag", "Booflag", "AAA", "Full Combo*"];
 
         public static function getSongIcon(_song:Object, _rank:Object):String
         {

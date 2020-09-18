@@ -5,6 +5,7 @@ package popups
     import classes.BoxText;
     import classes.Language;
     import classes.Text;
+    import classes.ValidatedText;
     import classes.filter.EngineLevelFilter;
     import com.bit101.components.ComboBox;
     import com.flashfla.utils.ArrayUtil;
@@ -61,7 +62,7 @@ package popups
                     combo_compare.selectedItemByData = filter.comparison;
                     combo_compare.fontSize = 11;
 
-                    input_box = new BoxText(107, 23);
+                    input_box = new ValidatedText(107, 23, ValidatedText.R_FLOAT);
                     input_box.text = filter.input_number.toString();
                     input_box.x = 215;
                     input_box.y = 5;
@@ -147,7 +148,7 @@ package popups
                     combo_compare.selectedItemByData = filter.comparison;
                     combo_compare.fontSize = 11;
 
-                    input_box = new BoxText(107, 23);
+                    input_box = new ValidatedText(107, 23, ValidatedText.R_FLOAT);
                     input_box.text = filter.input_number.toString();
                     input_box.x = 215;
                     input_box.y = 5;
@@ -178,6 +179,7 @@ package popups
                     input_box.addEventListener(Event.CHANGE, e_valueStringChange);
                     addChild(input_box);
                     break;
+
                 case EngineLevelFilter.FILTER_SONG_GENRE:
                     typeText = new Text(_lang.string("filter_type_" + filter.type));
                     typeText.x = 5;
@@ -195,6 +197,19 @@ package popups
                     combo_stat.setSize(107, 25);
                     combo_stat.selectedItemByData = filter.input_number;
                     combo_stat.fontSize = 11;
+                    break;
+
+                case EngineLevelFilter.FILTER_FAVORITE:
+                    typeText = new Text(_lang.string("filter_type_" + filter.type));
+                    typeText.x = 5;
+                    typeText.y = 6;
+                    addChild(typeText);
+
+                    combo_compare = new ComboBox(this, 152, 4, "", EngineLevelFilter.createIndexOptions(EngineLevelFilter.FILTERS_BOOLEAN, "compare_boolean"));
+                    combo_compare.addEventListener(Event.SELECT, e_valueBooleanCompareChange);
+                    combo_compare.setSize(170, 25);
+                    combo_compare.selectedItemByData = filter.inverse ? 1 : 0;
+                    combo_compare.fontSize = 11;
                     break;
 
                 default:
@@ -253,10 +268,7 @@ package popups
 
         private function e_valueNumberChange(e:Event):void
         {
-            var newNumber:Number = Number(input_box.text)
-            if (isNaN(newNumber))
-                newNumber = 0;
-            filter.input_number = newNumber;
+            filter.input_number = (input_box as ValidatedText).validate(0);
         }
 
         private function e_clickRemovefilter(e:Event):void
@@ -265,5 +277,4 @@ package popups
                 updater.draw();
         }
     }
-
 }

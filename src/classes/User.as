@@ -21,6 +21,7 @@ package classes
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
     import flash.ui.Keyboard;
+    import sql.SQLSongDetails;
 
     public class User extends EventDispatcher
     {
@@ -400,7 +401,7 @@ package classes
                 var rankLength:int = ranksTemp.length;
                 for (var x:int = 0; x < rankLength; x++)
                 {
-                    // [0] = Level ID : [1] = Rank : [2] = Score : [3] = Genre : [4] = Results
+                    // [0] = Level ID : [1] = Rank : [2] = Score : [3] = Genre : [4] = Results : [5] = Play Count : [6] = AAA Count : [7] = FC Count
                     var rankSplit:Array = ranksTemp[x].split(":");
 
                     // [0]'perfect' - [1]'good' - [2]'average' - [3]'miss' - [4]'boo' - [5]'maxcombo'
@@ -408,7 +409,20 @@ package classes
                     for (var s:String in scoreResults)
                         scoreResults[s] = Number(scoreResults[s]);
 
-                    level_ranks[Number(rankSplit[0])] = {genre: Number(rankSplit[3]), rank: Number(rankSplit[1]), score: Number(rankSplit[2]), results: rankSplit[4], perfect: scoreResults[0], good: scoreResults[1], average: scoreResults[2], miss: scoreResults[3], boo: scoreResults[4], maxcombo: scoreResults[5], rawscore: ((scoreResults[0] * 50) + (scoreResults[1] * 25) + (scoreResults[2] * 5) - (scoreResults[3] * 10) - (scoreResults[4] * 5))};
+                    level_ranks[Number(rankSplit[0])] = {"genre": Number(rankSplit[3]),
+                            "rank": Number(rankSplit[1]),
+                            "score": Number(rankSplit[2]),
+                            "results": rankSplit[4],
+                            "plays": Number(rankSplit[5]),
+                            "aaas": Number(rankSplit[6]),
+                            "fcs": Number(rankSplit[7]),
+                            "perfect": scoreResults[0],
+                            "good": scoreResults[1],
+                            "average": scoreResults[2],
+                            "miss": scoreResults[3],
+                            "boo": scoreResults[4],
+                            "maxcombo": scoreResults[5],
+                            "rawscore": ((scoreResults[0] * 50) + (scoreResults[1] * 25) + (scoreResults[2] * 5) - (scoreResults[3] * 10) - (scoreResults[4] * 5))};
                 }
             }
             _isLoaded = true;
@@ -710,14 +724,35 @@ package classes
                 return ArcGlobals.instance.legacyLevelRanksGet(song);
 
             if (level_ranks[song.level] == null)
-                return {genre: 23, perfect: 0, good: 0, average: 0, miss: 0, boo: 0, maxcombo: 0, rank: 1, score: 0, rawscore: 0, results: "0-0-0-0-0-0"};
+                return {"genre": 23,
+                        "rank": 1,
+                        "score": 0,
+                        "results": "0-0-0-0-0-0",
+                        "plays": 0,
+                        "aaas": 0,
+                        "fcs": 0,
+                        "perfect": 0,
+                        "good": 0,
+                        "average": 0,
+                        "miss": 0,
+                        "boo": 0,
+                        "maxcombo": 0,
+                        "rawscore": 0};
 
             return level_ranks[song.level];
         }
 
-        public function getSongRating(levelid:int):Number
+        public function getSongRating(song_entry:Object):Number
         {
-            return songRatings[levelid] != null ? songRatings[levelid] : 0;
+            if (song_entry.engine != null)
+            {
+                var sDetails:SQLSongDetails = SQLQueries.getSongDetails(song_entry.engine.id, song_entry.level);
+                if (sDetails)
+                    return sDetails.song_rating;
+
+                return 0;
+            }
+            return songRatings[song_entry.level] != null ? songRatings[song_entry.level] : 0;
         }
 
 

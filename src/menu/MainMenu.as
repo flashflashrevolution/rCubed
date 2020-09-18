@@ -57,7 +57,12 @@ package menu
         private var user_text:Text;
         private var menuItemBox:Sprite;
         private var logo:Logo;
+
         public var menuMusicControls:Box;
+        private const mmc_icons:Array = new Array(new iconPlay(), new iconPause(), new iconStop(), new iconDelete());
+        private const mmc_functions:Array = new Array(playMusic, pauseMusic, stopMusic, deleteMusic);
+        private var mmc_buttons:Array = new Array(4);
+        private const mmc_strings:Array = ["play", "pause", "stop", "remove"];
 
         private var statUpdaterBtn:SimpleBoxButton;
         private var rankUpdateThrobber:Throbber;
@@ -93,6 +98,15 @@ package menu
 
             //- Add Menu to Stage
             buildMenuItems();
+
+            for (var i:int = 0; i < mmc_strings.length; ++i)
+            {
+                var menu_music_button:BoxIcon = new BoxIcon(25, 25, mmc_icons[i]);
+                menu_music_button.x = 5 + 30 * i;
+                menu_music_button.y = 5;
+                menu_music_button.addEventListener(MouseEvent.CLICK, mmc_functions[i]);
+                mmc_buttons[i] = menu_music_button;
+            }
 
             //- Add Menu Music to Stage
             if (_gvars.menuMusic)
@@ -249,72 +263,74 @@ package menu
                 menuMusicControls.x = 7;
                 menuMusicControls.y = -1;
 
-                var spr_play:BoxIcon = new BoxIcon(25, 25, new iconPlay());
-                spr_play.x = 5;
-                spr_play.y = 5;
-                spr_play.setHoverText("Play", "bottom");
-                spr_play.addEventListener(MouseEvent.CLICK, function(e:Event):void
+                for (var i:int = 0; i < mmc_strings.length; ++i)
                 {
-                    if (_gvars.menuMusic && !_gvars.menuMusic.isPlaying)
-                    {
-                        _gvars.menuMusic.userStart();
-                    }
-                });
-                menuMusicControls.addChild(spr_play);
+                    menuMusicControls.addChildAt(mmc_buttons[i], i);
+                }
 
-                var spr_pause:BoxIcon = new BoxIcon(25, 25, new iconPause());
-                spr_pause.x = 35;
-                spr_pause.y = 5;
-                spr_pause.setHoverText("Pause", "bottom");
-                spr_pause.addEventListener(MouseEvent.CLICK, function(e:Event):void
-                {
-                    if (_gvars.menuMusic && _gvars.menuMusic.isPlaying)
-                    {
-                        _gvars.menuMusic.userPause();
-                    }
-                });
-                menuMusicControls.addChild(spr_pause);
-
-                var spr_stop:BoxIcon = new BoxIcon(25, 25, new iconStop());
-                spr_stop.x = 65;
-                spr_stop.y = 5;
-                spr_stop.setHoverText("Stop", "bottom");
-                spr_stop.addEventListener(MouseEvent.CLICK, function(e:Event):void
-                {
-                    if (_gvars.menuMusic && _gvars.menuMusic.isPlaying)
-                    {
-                        _gvars.menuMusic.userStop();
-                    }
-                });
-                menuMusicControls.addChild(spr_stop);
-
-                var spr_delete:BoxIcon = new BoxIcon(25, 25, new iconDelete());
-                spr_delete.x = 95;
-                spr_delete.y = 5;
-                spr_delete.setHoverText("Remove", "bottom");
-                menuMusicControls.addChild(spr_delete);
-                spr_delete.addEventListener(MouseEvent.CLICK, function(e:Event):void
-                {
-                    if (_gvars.menuMusic)
-                    {
-                        _gvars.menuMusic.userStop();
-                        _gvars.menuMusic = null;
-                        menuMusicControls.parent.removeChild(menuMusicControls);
-
-                        AirContext.deleteFile(AirContext.getAppPath(Constant.MENU_MUSIC_PATH));
-                    }
-                });
-                this.addChild(menuMusicControls);
-
-                // Context Menu Display song Playing
-                var musicContextMenu:ContextMenu = new ContextMenu();
-                var musicContextMenuPlaying:ContextMenuItem = new ContextMenuItem("Now Playing: " + LocalStore.getVariable("menu_music", "Unknown"), false, false);
-                musicContextMenu.customItems.push(musicContextMenuPlaying);
-                menuMusicControls.contextMenu = musicContextMenu;
-
+                updateMenuMusicControls();
             }
+
             if (!contains(menuMusicControls))
                 addChild(menuMusicControls);
+        }
+
+        public function updateMenuMusicControls():void
+        {
+            if (menuMusicControls)
+            {
+                for (var i:int = 0; i < mmc_strings.length; ++i)
+                {
+                    (menuMusicControls.getChildAt(i) as BoxIcon).setHoverText(_lang.string("main_menu_music_" + mmc_strings[i]), "bottom");
+                }
+
+                buildMenuMusicControlsContextMenu();
+            }
+        }
+
+        private function buildMenuMusicControlsContextMenu():void
+        {
+            // Context Menu Display song Playing
+            var musicContextMenu:ContextMenu = new ContextMenu();
+            var musicContextMenuPlaying:ContextMenuItem = new ContextMenuItem(sprintf(_lang.stringSimple("main_menu_now_playing"), {"music_name": LocalStore.getVariable("menu_music", "Unknown")}), false, false);
+            musicContextMenu.customItems.push(musicContextMenuPlaying);
+            menuMusicControls.contextMenu = musicContextMenu;
+        }
+
+        private function playMusic(e:Event):void
+        {
+            if (_gvars.menuMusic && !_gvars.menuMusic.isPlaying)
+            {
+                _gvars.menuMusic.userStart();
+            }
+        }
+
+        private function pauseMusic(e:Event):void
+        {
+            if (_gvars.menuMusic && _gvars.menuMusic.isPlaying)
+            {
+                _gvars.menuMusic.userPause();
+            }
+        }
+
+        private function stopMusic(e:Event):void
+        {
+            if (_gvars.menuMusic && _gvars.menuMusic.isPlaying)
+            {
+                _gvars.menuMusic.userStop();
+            }
+        }
+
+        private function deleteMusic(e:Event):void
+        {
+            if (_gvars.menuMusic)
+            {
+                _gvars.menuMusic.userStop();
+                _gvars.menuMusic = null;
+                menuMusicControls.parent.removeChild(menuMusicControls);
+
+                AirContext.deleteFile(AirContext.getAppPath(Constant.MENU_MUSIC_PATH));
+            }
         }
 
         override public function switchTo(_panel:String, useNew:Boolean = false):Boolean
