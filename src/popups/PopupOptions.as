@@ -1586,7 +1586,7 @@ package popups
                 _gvars.activeUser.activeNoteskin = e.target.skin;
             }
 
-            //- Custom Notekin
+            //- Custom Noteskin
             else if (e.target == optionOpenCustomNoteskinEditor)
             {
                 navigateToURL(new URLRequest("http://www.flashflashrevolution.com/~velocity/ffrjs/noteskin/"), "_blank");
