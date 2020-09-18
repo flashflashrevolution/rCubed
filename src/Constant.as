@@ -103,6 +103,7 @@ package
         }
 
         // Other
+        public static const NOTESKIN_EDITOR_URL:String = "http://www.flashflashrevolution.com/~velocity/ffrjs/noteskin";
         public static const WEBSOCKET_OVERLAY_URL:String = "https://github.com/flashflashrevolution/web-stream-overlay";
         public static const LEGACY_GENRE:int = 13;
         public static const JUDGE_WINDOW:Array = [{t: -118, s: 5, f: -3},
