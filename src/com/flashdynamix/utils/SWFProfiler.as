@@ -1,5 +1,6 @@
 package com.flashdynamix.utils
 {
+    import classes.Language;
     import flash.display.*;
     import flash.events.*;
     import flash.net.LocalConnection;
@@ -37,7 +38,10 @@ package com.flashdynamix.utils
         public static function init(swf:Stage, context:InteractiveObject):void
         {
             if (inited)
+            {
+                buildContextMenu(context);
                 return;
+            }
 
             inited = true;
             stage = swf;
@@ -51,14 +55,19 @@ package com.flashdynamix.utils
             maxMem = Number.MIN_VALUE;
 
             // Add Item to Context Menu
-
-            ci = new ContextMenuItem("Show Profiler", true);
-            addEvent(ci, ContextMenuEvent.MENU_ITEM_SELECT, onSelect);
-            if (context.contextMenu == null)
-                context.contextMenu = new ContextMenu();
-            (context.contextMenu as ContextMenu).customItems.push(ci);
+            buildContextMenu(context);
 
             start();
+        }
+
+        private static function buildContextMenu(context:InteractiveObject):void
+        {
+            var str_show_profiler:String = Language.instance.stringSimple("show_profiler", "Show Profiler");
+            var str_hide_profiler:String = Language.instance.stringSimple("hide_profiler", "Hide Profiler");
+
+            ci = new ContextMenuItem(displayed ? str_hide_profiler : str_show_profiler, true);
+            addEvent(ci, ContextMenuEvent.MENU_ITEM_SELECT, onSelect);
+            (context.contextMenu as ContextMenu).customItems.push(ci);
         }
 
         public static function start():void
@@ -131,7 +140,7 @@ package com.flashdynamix.utils
 
         private static function show():void
         {
-            ci.caption = "Hide Profiler";
+            ci.caption = Language.instance.stringSimple("hide_profiler", "Hide Profiler");
             displayed = true;
             addEvent(stage, Event.RESIZE, resize);
             addEvent(frame, Event.ENTER_FRAME, draw);
@@ -141,7 +150,7 @@ package com.flashdynamix.utils
 
         private static function hide():void
         {
-            ci.caption = "Show Profiler";
+            ci.caption = Language.instance.stringSimple("show_profiler", "Show Profiler");
             displayed = false;
             removeEvent(stage, Event.RESIZE, resize);
             removeEvent(frame, Event.ENTER_FRAME, draw);
@@ -216,6 +225,7 @@ package com.flashdynamix.utils
     }
 }
 
+import classes.Language;
 import flash.display.*;
 import flash.events.Event;
 import flash.text.*;
@@ -300,7 +310,11 @@ internal class ProfilerContent extends Sprite
             maxMemTxtBx.text = maxMem.toFixed(3) + " Mb";
         }
 
-        infoTxtBx.text = "Current Fps " + currentFps.toFixed(3) + "   |   Average Fps " + averageFps.toFixed(3) + "   |   Memory Used " + currentMem.toFixed(3) + " Mb";
+        var str_current_fps:String = Language.instance.stringSimple("profiler_current_fps", "Current Fps");
+        var str_average_fps:String = Language.instance.stringSimple("profiler_average_fps", "Average Fps");
+        var str_memory_used:String = Language.instance.stringSimple("profiler_memory_used", "Memory Used");
+
+        infoTxtBx.text = str_current_fps + " " + currentFps.toFixed(3) + "   |   " + str_average_fps + " " + averageFps.toFixed(3) + "   |   " + str_memory_used + " " + currentMem.toFixed(3) + " Mb";
         infoTxtBx.x = stage.stageWidth - infoTxtBx.width - 20;
 
         var vec:Graphics = fps.graphics;

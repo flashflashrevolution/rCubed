@@ -3,6 +3,7 @@ package popups
     import arc.mp.MultiplayerSingleton;
     import classes.Box;
     import classes.BoxButton;
+    import classes.Language;
     import classes.Playlist;
     import com.flashdynamix.utils.SWFProfiler;
     import flash.display.Bitmap;
@@ -22,6 +23,7 @@ package popups
         }
 
         public var _gvars:GlobalVariables = GlobalVariables.instance;
+        private var _lang:Language = Language.instance;
 
         //- Background
         private var box:Box;
@@ -77,7 +79,7 @@ package popups
             }
 
             //- Reload Engine
-            cButton = new BoxButton(box.width - 10, cButtonHeight, "Reload Engine / User");
+            cButton = new BoxButton(box.width - 10, cButtonHeight, _lang.string("popup_cm_reload_engine_user", "Reload Engine / User"));
             cButton.x = 5;
             cButton.y = yOff;
             cButton.action = "reload_engine";
@@ -86,7 +88,7 @@ package popups
             yOff += cButtonHeight + 5;
 
             //- Screenshot - Local
-            cButton = new BoxButton(box.width - 10, cButtonHeight, "Save ScreenShot - Local");
+            cButton = new BoxButton(box.width - 10, cButtonHeight, _lang.string("popup_cm_save_screenshot", "Save ScreenShot - Local"));
             cButton.x = 5;
             cButton.y = yOff;
             cButton.action = "screenshot_local";
@@ -95,7 +97,7 @@ package popups
             yOff += cButtonHeight + 5;
 
             //- Fullscreen
-            cButton = new BoxButton(box.width - 10, cButtonHeight, "Full Screen");
+            cButton = new BoxButton(box.width - 10, cButtonHeight, _lang.string("popup_cm_full_screen", "Full Screen"));
             cButton.x = 5;
             cButton.y = yOff;
             cButton.action = "fullscreen";
@@ -104,7 +106,7 @@ package popups
             yOff += cButtonHeight + 5;
 
             //- Switch Profile
-            cButton = new BoxButton(box.width - 10, cButtonHeight, "Switch Profile");
+            cButton = new BoxButton(box.width - 10, cButtonHeight, _lang.string("popup_cm_switch_profile", "Switch Profile"));
             cButton.x = 5;
             cButton.y = yOff;
             cButton.action = "switch_profile";
@@ -113,7 +115,7 @@ package popups
             yOff += cButtonHeight + 5;
 
             //- Close
-            cButton = new BoxButton(box.width - 10, 27, "CLOSE");
+            cButton = new BoxButton(box.width - 10, 27, _lang.string("menu_close", "CLOSE"));
             cButton.x = 5;
             cButton.y = box.height - cButton.height - 5;
             cButton.action = "close";
@@ -181,5 +183,4 @@ package popups
             }
         }
     }
-
 }

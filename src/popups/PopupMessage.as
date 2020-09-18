@@ -3,6 +3,7 @@ package popups
     import assets.GameBackgroundColor;
     import classes.Box;
     import classes.BoxButton;
+    import classes.Language;
     import classes.Text;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
@@ -21,8 +22,10 @@ package popups
         private var titleDisplay:Text;
         private var messageDisplay:Text;
 
+        private var _lang:Language = Language.instance;
+
         private var displayTitle:String = "";
-        private var dislayText:String = "<Missing Error Text>";
+        private var dislayText:String = _lang.string("popup_message_missing_error_text");
         private var closeOptions:BoxButton;
 
         public function PopupMessage(myParent:MenuPanel, dislayText:String, displayTitle:String = "")
@@ -70,7 +73,7 @@ package popups
             box.addChild(messageDisplay);
 
             //- Close
-            closeOptions = new BoxButton(79.5, 27, "CLOSE");
+            closeOptions = new BoxButton(79.5, 27, _lang.string("menu_close"));
             closeOptions.x = box.width - 94.5;
             closeOptions.y = box.height - 42;
             closeOptions.addEventListener(MouseEvent.CLICK, clickHandler);
@@ -79,6 +82,7 @@ package popups
 
         override public function stageRemove():void
         {
+            closeOptions.dispose();
             box.dispose();
             titleDisplay.dispose();
             messageDisplay.dispose();
@@ -99,5 +103,4 @@ package popups
             }
         }
     }
-
 }

@@ -9,6 +9,7 @@ package popups
     import com.flashfla.loader.DataEvent;
     import com.flashfla.utils.NumberUtil;
     import com.flashfla.utils.ObjectUtil;
+    import com.flashfla.utils.sprintf;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
     import flash.display.Sprite;
@@ -78,7 +79,7 @@ package popups
             titleDisplay.align = Text.CENTER;
             box.addChild(titleDisplay);
 
-            pageText = new Text("Page " + (page + 1));
+            pageText = new Text(sprintf(_lang.string("popup_highscores_page_number"), {"page": page + 1}));
             pageText.x = 200;
             pageText.y = box.height - 42;
             box.addChild(pageText);
@@ -106,28 +107,28 @@ package popups
             box.addChild(myAVText);
 
             //- Previous
-            prevBtn = new BoxButton(79.5, 27, "PREVIOUS");
+            prevBtn = new BoxButton(79.5, 27, _lang.string("popup_highscores_previous"));
             prevBtn.x = 10;
             prevBtn.y = box.height - 42;
             prevBtn.addEventListener(MouseEvent.CLICK, clickHandler);
             box.addChild(prevBtn);
 
             //- Next
-            nextBtn = new BoxButton(79.5, 27, "NEXT");
+            nextBtn = new BoxButton(79.5, 27, _lang.string("popup_highscores_next"));
             nextBtn.x = 100;
             nextBtn.y = box.height - 42;
             nextBtn.addEventListener(MouseEvent.CLICK, clickHandler);
             box.addChild(nextBtn);
 
             //- Close
-            closeBtn = new BoxButton(79.5, 27, "CLOSE");
+            closeBtn = new BoxButton(79.5, 27, _lang.string("menu_close"));
             closeBtn.x = box.width - 94.5;
             closeBtn.y = box.height - 42;
             closeBtn.addEventListener(MouseEvent.CLICK, clickHandler);
             box.addChild(closeBtn);
 
             //- Refresh
-            refreshBtn = new BoxButton(79.5, 27, "REFRESH");
+            refreshBtn = new BoxButton(79.5, 27, _lang.string("popup_highscores_refresh"));
             refreshBtn.x = box.width - 184.5;
             refreshBtn.y = box.height - 42;
             refreshBtn.addEventListener(MouseEvent.CLICK, clickHandler);
@@ -167,21 +168,21 @@ package popups
             if (highscores && (highscores[(10 * page) + 1] != null))
             {
                 // Username
-                textLine = new Text("Username:", 16, "#C6F0FF");
+                textLine = new Text(_lang.string("popup_highscores_username"), 16, "#C6F0FF");
                 textLine.x = 25;
                 textLine.y = tY;
                 textLine.width = 200;
                 scorePane.addChild(textLine);
 
                 // Score
-                textLine = new Text("Score:", 15, "#C6F0FF");
+                textLine = new Text(_lang.string("popup_highscores_score"), 15, "#C6F0FF");
                 textLine.x = 360;
                 textLine.y = tY;
                 textLine.width = 150;
                 scorePane.addChild(textLine);
 
                 // AV
-                textLine = new Text("PA Spread:", 15, "#C6F0FF");
+                textLine = new Text(_lang.string("popup_highscores_pa_spread"), 15, "#C6F0FF");
                 textLine.x = 545;
                 textLine.y = tY;
                 textLine.width = 200;
@@ -250,7 +251,7 @@ package popups
                 _gvars.addEventListener(GlobalVariables.HIGHSCORES_LOAD_COMPLETE, highscoresLoaded);
                 _gvars.loadHighscores(songDetails.level, page * 10);
             }
-            pageText.text = "Page " + (page + 1);
+            pageText.text = sprintf(_lang.string("popup_highscores_page_number"), {"page": page + 1});
 
             prevBtn.enabled = page == 0 ? false : true;
             prevBtn.alpha = page == 0 ? 0.5 : 1;

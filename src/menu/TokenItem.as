@@ -5,23 +5,19 @@
 package menu
 {
     import classes.Box;
+    import classes.Language;
     import classes.Playlist;
     import classes.Text;
-    import com.flashfla.utils.NumberUtil;
     import com.greensock.TweenLite;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
-    import flash.display.DisplayObject;
     import flash.display.Sprite;
-    import flash.events.Event;
-    import flash.events.MouseEvent;
     import flash.filters.ColorMatrixFilter;
     import flash.geom.Point;
     import flash.text.AntiAliasType;
     import flash.text.StyleSheet;
     import flash.text.TextField;
     import flash.text.TextFieldAutoSize;
-    import classes.Language;
 
     public class TokenItem extends Sprite
     {
@@ -29,6 +25,8 @@ package menu
         public var token_info:Object;
         public var token_image:Sprite;
         public var token_levels:Array;
+
+        private var _lang:Language = Language.instance;
 
         public function TokenItem(token_data:Object):void
         {
@@ -50,10 +48,10 @@ package menu
             if (token_levels.length > 1)
             {
                 if (token_levels[0] == 0)
-                    messageString += "\rUnlockable under certain levels or certain conditions.";
+                    messageString += "\r" + _lang.string("menu_tokens_unknown_unlock_condition");
                 else
                 {
-                    messageString += "\r\rUnlock by Playing:";
+                    messageString += "\r\r" + _lang.string("menu_tokens_unlock_by_playing");
                     for each (var item:int in token_levels)
                     {
                         messageString += "\r&gt; " + Playlist.instanceCanon.playList[item]['name'];
@@ -115,7 +113,7 @@ package menu
                 TweenLite.to(token_image, 1.25, {"alpha": token_info['unlock'] ? 1 : 0.7});
             }
             else
-                token_image.alpha = token_info['unlock'] ? 1 : 0.7
+                token_image.alpha = token_info['unlock'] ? 1 : 0.7;
         }
     }
 }

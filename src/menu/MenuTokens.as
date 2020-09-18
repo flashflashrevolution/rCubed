@@ -6,6 +6,7 @@ package menu
     import by.blooddy.crypto.MD5;
     import classes.BoxButton;
     import classes.BoxCheck;
+    import classes.Language;
     import classes.Playlist;
     import classes.Text;
     import com.flashfla.components.ScrollBar;
@@ -30,6 +31,8 @@ package menu
         private var normalTokenButton:BoxButton;
         private var skillTokenButton:BoxButton;
         private var hideCompleteCheck:BoxCheck;
+
+        private var _lang:Language = Language.instance;
 
         public var options:Object;
         public var isLoading:Boolean = false;
@@ -78,19 +81,20 @@ package menu
             this.addChild(scrollbar);
 
             // Menu Left
-            normalTokenButton = new BoxButton(124, 29, "Normal Tokens");
+            normalTokenButton = new BoxButton(124, 29, _lang.string("menu_tokens_normal"));
             normalTokenButton.x = 5;
             normalTokenButton.y = 130;
             normalTokenButton.addEventListener(MouseEvent.CLICK, onNormalSelect);
             this.addChild(normalTokenButton);
 
-            skillTokenButton = new BoxButton(124, 29, "Skill Tokens");
+            skillTokenButton = new BoxButton(124, 29, _lang.string("menu_tokens_skill"));
             skillTokenButton.x = 5;
             skillTokenButton.y = 164;
+            skillTokenButton.active = true;
             skillTokenButton.addEventListener(MouseEvent.CLICK, onSkillSelect);
             this.addChild(skillTokenButton);
 
-            var hideLabel:Text = new Text("Hide Complete:");
+            var hideLabel:Text = new Text(_lang.string("menu_tokens_hide_complete"));
             hideLabel.x = 10;
             hideLabel.y = 230;
             addChild(hideLabel);
@@ -119,6 +123,8 @@ package menu
             if (options.active_type != 'has')
             {
                 options.active_type = 'has';
+                normalTokenButton.active = true;
+                skillTokenButton.active = false;
                 buildTokens();
             }
         }
@@ -128,6 +134,8 @@ package menu
             if (options.active_type != 'ski')
             {
                 options.active_type = 'ski';
+                normalTokenButton.active = false;
+                skillTokenButton.active = true;
                 buildTokens();
             }
         }

@@ -109,14 +109,14 @@ package popups
             renderQueues();
 
             //- importBtn
-            importBtn = new BoxButton(79.5, 27, "IMPORT");
+            importBtn = new BoxButton(79.5, 27, _lang.string("popup_queue_import"));
             importBtn.x = box.width - 180;
             importBtn.y = box.height - 42;
             importBtn.addEventListener(MouseEvent.CLICK, clickHandler);
             box.addChild(importBtn);
 
             //- Close
-            closeBtn = new BoxButton(79.5, 27, "CLOSE");
+            closeBtn = new BoxButton(79.5, 27, _lang.string("menu_close"));
             closeBtn.x = box.width - 94.5;
             closeBtn.y = box.height - 42;
             closeBtn.addEventListener(MouseEvent.CLICK, clickHandler);
@@ -220,7 +220,7 @@ package popups
         {
             if (e.target == importBtn)
             {
-                var prompt:MultiplayerPrompt = new MultiplayerPrompt(box.parent, "Import Song Queue");
+                var prompt:MultiplayerPrompt = new MultiplayerPrompt(box.parent, _lang.stringSimple("popup_queue_import_song_queue"));
                 prompt.move(Main.GAME_WIDTH / 2 - prompt.width / 2, Main.GAME_HEIGHT / 2 - prompt.height / 2);
                 prompt.addEventListener(MultiplayerPrompt.EVENT_SEND, function(subevent:Object):void
                 {
@@ -355,26 +355,26 @@ internal class QueueBox extends Sprite
         if (!premade)
         {
             //- Copy Button
-            copyBtn = new BoxButton(70, 25, "COPY");
+            copyBtn = new BoxButton(70, 25, _lang.string("popup_queue_copy"));
             copyBtn.x = box.width - 75;
             copyBtn.y = 5;
             box.addChild(copyBtn);
 
             //- Delete Button
-            deleteBtn = new BoxButton(70, 25, "DELETE");
+            deleteBtn = new BoxButton(70, 25, _lang.string("popup_queue_delete"));
             deleteBtn.x = copyBtn.x - 75;
             deleteBtn.y = 5;
             box.addChild(deleteBtn);
 
             //- Rename Button
-            renameBtn = new BoxButton(70, 25, "RENAME");
+            renameBtn = new BoxButton(70, 25, _lang.string("popup_queue_rename"));
             renameBtn.x = deleteBtn.x - 75;
             renameBtn.y = 5;
             box.addChild(renameBtn);
         }
 
         //- PLAY Button
-        playBtn = new BoxButton(70, 25, "PLAY");
+        playBtn = new BoxButton(70, 25, _lang.string("popup_queue_play"));
         playBtn.x = (renameBtn ? renameBtn.x - 75 : box.width - 75);
         playBtn.y = 5;
         box.addChild(playBtn);
@@ -452,7 +452,7 @@ internal class QueueBox extends Sprite
 
     private function renameQueue():void
     {
-        var prompt:MultiplayerPrompt = new MultiplayerPrompt(this.popup, "Rename");
+        var prompt:MultiplayerPrompt = new MultiplayerPrompt(this.popup, _lang.stringSimple("popup_queue_rename_no_caps"));
         prompt.move(Main.GAME_WIDTH / 2 - prompt.width / 2, Main.GAME_HEIGHT / 2 - prompt.height / 2);
         prompt.addEventListener(MultiplayerPrompt.EVENT_SEND, function(subevent:Object):void
         {

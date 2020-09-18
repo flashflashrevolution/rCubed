@@ -4,15 +4,12 @@
 
 package classes
 {
-    import arc.ArcGlobals;
-    import flash.display.Loader;
     import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.events.IOErrorEvent;
     import flash.events.SecurityErrorEvent;
     import flash.net.URLLoader;
     import flash.net.URLRequest;
-    import flash.text.Font;
 
     public class Language extends EventDispatcher
     {
@@ -67,9 +64,12 @@ package classes
             return "<font face=\"" + font(text) + "\">" + text + "</font>";
         }
 
-        public function string(id:String):String
+        public function string(id:String, defaultValue:String = null):String
         {
-            return string2(id, _gvars.playerUser ? _gvars.playerUser.language : "us");
+            var lang_str:String = string2(id, _gvars.playerUser ? _gvars.playerUser.language : "us");
+            if (defaultValue != null && lang_str.indexOf(id) != -1)
+                lang_str = lang_str.replace(id, defaultValue);
+            return lang_str;
         }
 
         public function string2(id:String, lang:String):String
@@ -93,9 +93,12 @@ package classes
             return wrapFont(text);
         }
 
-        public function stringSimple(id:String):String
+        public function stringSimple(id:String, defaultValue:String = null):String
         {
-            return string2Simple(id, _gvars.playerUser ? _gvars.playerUser.language : "us");
+            var lang_str:String = string2Simple(id, _gvars.playerUser ? _gvars.playerUser.language : "us");
+            if (defaultValue != null && lang_str == id)
+                lang_str = defaultValue;
+            return lang_str;
         }
 
         public function string2Simple(id:String, lang:String):String

@@ -4,9 +4,8 @@ package popups
     import classes.Box;
     import classes.BoxButton;
     import classes.Language;
-    import classes.Text;
-    import com.greensock.easing.Back;
     import com.greensock.TweenLite;
+    import com.greensock.easing.Back;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
     import flash.display.DisplayObject;
@@ -15,10 +14,8 @@ package popups
     import flash.filters.BlurFilter;
     import flash.geom.Point;
     import flash.text.AntiAliasType;
-    import flash.text.StyleSheet;
     import flash.text.TextField;
     import flash.text.TextFieldAutoSize;
-    import flash.text.TextFormat;
     import menu.MenuPanel;
 
     public class PopupTokenUnlock extends MenuPanel
@@ -188,7 +185,7 @@ package popups
             box.addChild(new Bitmap(textbmd));
 
             //- Close
-            closeOptions = new BoxButton(box.width - 30, 27, "CLOSE");
+            closeOptions = new BoxButton(box.width - 30, 27, _lang.string("menu_close"));
             closeOptions.x = 15;
             closeOptions.y = box.height - 42;
             closeOptions.addEventListener(MouseEvent.CLICK, clickHandler);
@@ -215,5 +212,4 @@ package popups
             }
         }
     }
-
 }
