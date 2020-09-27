@@ -6,7 +6,6 @@ on:
       - "v*.*.*"
     branches: 
       - feat/workflow
-      - feat/32-bit-releases
     paths-ignore:
       - 'README.md'
       - 'docs/**'
@@ -136,7 +135,7 @@ jobs:
         shell: bash
         id: tagFileName
         run: echo ::set-output name=name::-${{ steps.versionNumber.outputs.tag }}-${{ github.sha }}
-        
+
       - name: Generate Filename from branch push
         if: startsWith(github.ref, 'refs/heads')
         shell: bash
@@ -177,7 +176,7 @@ jobs:
 
       - name: Set Bitness for 32-bit Release
         run: xml ed --inplace -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:architecture" -v 32 application.xml
-      
+
       - name: Build Embedded Fonts Library (Windows) (32-bit)
         if: matrix.os == 'windows-latest'
         shell: cmd
