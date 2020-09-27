@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - feat/workflow
+      - feat/32-bit-releases
   pull_request:
     branches:
       - main
