@@ -6,6 +6,7 @@ on:
       - "v*.*.*"
     branches: 
       - feat/workflow
+      - feat/32-bit-releases
     paths-ignore:
       - 'README.md'
       - 'docs/**'
