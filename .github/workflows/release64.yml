@@ -159,27 +159,26 @@ jobs:
         id: branchFileName
         run: echo ::set-output name=name::-${{ github.sha }}
 
-      - name: Generate Filename from bitness
-        if: startsWith(github.ref, 'refs/heads')
-        shell: bash
-        id: bitnessFileName
-        run: echo ::set-output name=name::"-64bit"
-
       - name: Build Filename from Generated Names
         shell: bash
         id: packageFilename
         run: echo ::set-output name=name::rCubed${{ steps.tagFileName.outputs.name }}${{ steps.branchFileName.outputs.name }}
+
+      - name: Append Bitness to End of Filename
+        shell: bash
+        id: bitnessFileName
+        run: echo ::set-output name=name::-64bit
       
       - name: Package Build in Self-Extracting Archive
-        run: 7z.exe a -t7z -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}.exe ${{ github.workspace }}/dist/R3Release -sfx
+        run: 7z.exe a -t7z -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}-64bit.exe ${{ github.workspace }}/dist/R3Release -sfx
 
       - name: Package Build in Zip
-        run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}.zip ${{ github.workspace }}/dist/R3Release
+        run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}-64bit.zip ${{ github.workspace }}/dist/R3Release
 
       - name: Sign Build Packages
         run: |
           $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("${{ github.workspace }}\certs\7z-cert.p12", "${{ secrets.CODESIGN_CERT_PASS }}");
-          Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
+          Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}-64bit.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
 
       - name: Create Release
         id: create_release
@@ -199,8 +198,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}.exe
-          asset_name: ${{ steps.packageFilename.outputs.name }}.exe
+          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}-64bit.exe
+          asset_name: ${{ steps.packageFilename.outputs.name }}-64bit.exe
           asset_content_type: application/executable
 
       - name: Upload ZIP
@@ -210,6 +209,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}.zip
-          asset_name: ${{ steps.packageFilename.outputs.name }}.zip
+          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}-64bit.zip
+          asset_name: ${{ steps.packageFilename.outputs.name }}-64bit.zip
           asset_content_type: application/executable
