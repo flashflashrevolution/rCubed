@@ -168,8 +168,7 @@ jobs:
         id: packageFilename
         run: echo ::set-output name=name::rCubed${{ steps.tagFileName.outputs.name }}${{ steps.branchFileName.outputs.name }}
 
-      - name: Generate Filename from bitness
-        if: startsWith(github.ref, 'refs/heads')
+      - name: Append Bitness to End of Filename
         shell: bash
         id: bitnessFileName
         run: echo ::set-output name=name::-32bit
