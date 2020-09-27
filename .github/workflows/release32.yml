@@ -163,16 +163,16 @@ jobs:
         id: branchFileName
         run: echo ::set-output name=name::-${{ github.sha }}
 
-      - name: Generate Filename from bitness
-        if: startsWith(github.ref, 'refs/heads')
-        shell: bash
-        id: bitnessFileName
-        run: echo ::set-output name=name::"-32bit"
-
       - name: Build Filename from Generated Names
         shell: bash
         id: packageFilename
         run: echo ::set-output name=name::rCubed${{ steps.tagFileName.outputs.name }}${{ steps.branchFileName.outputs.name }}
+
+      - name: Generate Filename from bitness
+        if: startsWith(github.ref, 'refs/heads')
+        shell: bash
+        id: bitnessFileName
+        run: echo ::set-output name=name::-32bit
       
       - name: Package Build in Self-Extracting Archive
         run: 7z.exe a -t7z -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}.exe ${{ github.workspace }}/dist/R3Release -sfx
