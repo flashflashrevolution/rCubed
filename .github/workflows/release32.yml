@@ -60,10 +60,14 @@ jobs:
       - name: Version Number Substition
         if: startsWith(github.ref, 'refs/tags')
         run: xml ed --inplace -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:versionNumber" -v ${{ steps.versionNumber.outputs.tag }} application.xml
-      
+
       - name: Version Number Substition (Debug)
         if: startsWith(github.ref, 'refs/tags')
         run: xml ed -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:versionNumber" -v ${{ steps.versionNumber.outputs.tag }} application.xml
+
+      - name: Setting the bitness
+        if: startsWith(github.ref, 'refs/tags')
+        run: xml ed -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:architecture" -v 32 application.xml
 
       - name: Token Replace in asconfig
         if: startsWith(github.ref, 'refs/tags')
@@ -157,6 +161,12 @@ jobs:
         shell: bash
         id: branchFileName
         run: echo ::set-output name=name::-${{ github.sha }}
+
+      - name: Generate Filename from bitness
+        if: startsWith(github.ref, 'refs/heads')
+        shell: bash
+        id: bitnessFileName
+        run: echo ::set-output name=name::"-32bit"
 
       - name: Build Filename from Generated Names
         shell: bash
