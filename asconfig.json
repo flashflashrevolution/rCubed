@@ -5,6 +5,8 @@
     "compilerOptions": {
         "verbose-stacktraces": true,
         "advanced-telemetry": true,
+        "warnings": true,
+        "strict": true,
         "use-direct-blit": true,
         "source-path": [
             "src"
@@ -63,6 +65,7 @@
         "default-frame-rate": 60,
         "default-background-color": "#000000",
         "debug": true,
+        "omit-trace-statements": false,
         "swf-version": 43,
         "target-player": "32.0",
         "locale": [

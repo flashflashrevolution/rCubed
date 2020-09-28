@@ -60,7 +60,7 @@ jobs:
       - name: Version Number Substition
         if: startsWith(github.ref, 'refs/tags')
         run: xml ed --inplace -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:versionNumber" -v ${{ steps.versionNumber.outputs.tag }} application.xml
-      
+
       - name: Version Number Substition (Debug)
         if: startsWith(github.ref, 'refs/tags')
         run: xml ed -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:versionNumber" -v ${{ steps.versionNumber.outputs.tag }} application.xml
@@ -130,28 +130,12 @@ jobs:
       - name: Install Dependencies
         run: npm install asconfigc
 
-      - name: Build Embedded Fonts Library (Windows)
-        if: matrix.os == 'windows-latest'
-        shell: cmd
-        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project ${{ github.workspace }}/fonts/asconfig.embed-fonts.json --verbose
-
-      - name: Build the Game (Windows)
-        if: matrix.os == 'windows-latest'
-        shell: cmd
-        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.release.json --air windows --storepass ${{ secrets.CODESIGN_CERT_PASS }} --verbose
-
-      - name: Sign Game Executable
-        run: |
-          $VerbosePreference = "continue";
-          $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("${{ github.workspace }}\certs\7z-cert.p12", "${{ secrets.CODESIGN_CERT_PASS }}");
-          Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\dist\R3Release\R3.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
-
       - name: Generate Filename from tag push
         if: startsWith(github.ref, 'refs/tags')
         shell: bash
         id: tagFileName
         run: echo ::set-output name=name::-${{ steps.versionNumber.outputs.tag }}-${{ github.sha }}
-        
+
       - name: Generate Filename from branch push
         if: startsWith(github.ref, 'refs/heads')
         shell: bash
@@ -162,17 +146,63 @@ jobs:
         shell: bash
         id: packageFilename
         run: echo ::set-output name=name::rCubed${{ steps.tagFileName.outputs.name }}${{ steps.branchFileName.outputs.name }}
-      
-      - name: Package Build in Self-Extracting Archive
-        run: 7z.exe a -t7z -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}.exe ${{ github.workspace }}/dist/R3Release -sfx
 
-      - name: Package Build in Zip
-        run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}.zip ${{ github.workspace }}/dist/R3Release
+      - name: Build Embedded Fonts Library (Windows) (64-bit)
+        if: matrix.os == 'windows-latest'
+        shell: cmd
+        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project ${{ github.workspace }}/fonts/asconfig.embed-fonts.json --verbose
 
-      - name: Sign Build Packages
+      - name: Build the Game (Windows) (64-bit)
+        if: matrix.os == 'windows-latest'
+        shell: cmd
+        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.release.json --air windows --storepass ${{ secrets.CODESIGN_CERT_PASS }} --verbose
+
+      - name: Sign Game Executable (64-bit)
+        run: |
+          $VerbosePreference = "continue";
+          $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("${{ github.workspace }}\certs\7z-cert.p12", "${{ secrets.CODESIGN_CERT_PASS }}");
+          Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\dist\R3Release\R3.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
+
+      - name: Package Build in Self-Extracting Archive (64-bit)
+        run: 7z.exe a -t7z -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}-64bit.exe ${{ github.workspace }}/dist/R3Release -sfx
+
+      - name: Package Build in Zip (64-bit)
+        run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}-64bit.zip ${{ github.workspace }}/dist/R3Release
+
+      - name: Sign Build Packages (64-bit)
         run: |
           $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("${{ github.workspace }}\certs\7z-cert.p12", "${{ secrets.CODESIGN_CERT_PASS }}");
-          Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
+          Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}-64bit.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
+
+      - name: Set Bitness for building 32-bit Release
+        run: xml ed --inplace -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:architecture" -v 32 application.xml
+
+      - name: Build Embedded Fonts Library (Windows) (32-bit)
+        if: matrix.os == 'windows-latest'
+        shell: cmd
+        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project ${{ github.workspace }}/fonts/asconfig.embed-fonts.json --verbose
+
+      - name: Build the Game (Windows) (32-bit)
+        if: matrix.os == 'windows-latest'
+        shell: cmd
+        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.release.json --air windows --storepass ${{ secrets.CODESIGN_CERT_PASS }} --verbose
+
+      - name: Sign Game Executable (32-bit)
+        run: |
+          $VerbosePreference = "continue";
+          $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("${{ github.workspace }}\certs\7z-cert.p12", "${{ secrets.CODESIGN_CERT_PASS }}");
+          Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\dist\R3Release\R3.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
+
+      - name: Package Build in Self-Extracting Archive (32-bit)
+        run: 7z.exe a -t7z -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}-32bit.exe ${{ github.workspace }}/dist/R3Release -sfx
+
+      - name: Package Build in Zip (32-bit)
+        run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}-32bit.zip ${{ github.workspace }}/dist/R3Release
+
+      - name: Sign Build Packages (32-bit)
+        run: |
+          $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("${{ github.workspace }}\certs\7z-cert.p12", "${{ secrets.CODESIGN_CERT_PASS }}");
+          Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}-32bit.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
 
       - name: Create Release
         id: create_release
@@ -185,24 +215,46 @@ jobs:
           draft: true
           prerelease: true
 
-      - name: Upload SFX
+      - name: Upload SFX (64-bit)
         id: upload-sfx-release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}.exe
-          asset_name: ${{ steps.packageFilename.outputs.name }}.exe
+          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}-64bit.exe
+          asset_name: ${{ steps.packageFilename.outputs.name }}-64bit.exe
           asset_content_type: application/executable
 
-      - name: Upload ZIP
+      - name: Upload SFX (32-bit)
+        id: upload-sfx-release-32
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}-32bit.exe
+          asset_name: ${{ steps.packageFilename.outputs.name }}-32bit.exe
+          asset_content_type: application/executable
+
+      - name: Upload ZIP (64-bit)
         id: upload-zip-release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}.zip
-          asset_name: ${{ steps.packageFilename.outputs.name }}.zip
+          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}-64bit.zip
+          asset_name: ${{ steps.packageFilename.outputs.name }}-64bit.zip
+          asset_content_type: application/executable
+
+      - name: Upload ZIP (32-bit)
+        id: upload-zip-release-32
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}-32bit.zip
+          asset_name: ${{ steps.packageFilename.outputs.name }}-32bit.zip
           asset_content_type: application/executable

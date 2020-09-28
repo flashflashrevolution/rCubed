@@ -3,6 +3,7 @@
     "compilerOptions": {
         "verbose-stacktraces": false,
         "advanced-telemetry": false,
+        "optimize": true,
         "output": "bin/release/R3Air.swf",
         "define": [
             {
@@ -27,6 +28,7 @@
             }
         ],
         "debug": false,
+        "omit-trace-statements": true,
         // Overrides left here for alternate builds.
         "swf-version": 43,
         "target-player": "32.0"
