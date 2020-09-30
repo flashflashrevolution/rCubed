@@ -1,3 +1,51 @@
+R^3 (v1.3.0) [2020-10-01]
+---------------------------------------------------------------------
+@Psycast
+- Massive MenuSongSelection refactor. (#179)
+- Refactor Song Results (#203)
+- Rewrite UI Box Components (#180)
+- Rewrite Song Options (#208)
+- Rewrite Noteskins to use Embedded Data instead of network (#209)
+- Add Song Purchase (#217)
+- Song Favorites, Song Ratings, FC Tracking and More. (#222)
+- Add Reload Engine / User to global context menu. (#177)
+- Add Register Online button to login screen. (#223)
+- Add option to make judge animations static (#151)
+- Expand Notescale range to 10% - 150% (#213)
+- Multiple Fixes for Song Preview and Editor (#214)
+- Fix receptor layer position. (#175)
+- Reverse Fix (#176)
+- Update RollingAverage to use Vector.int (#123)
+- Websocket Fixes and Optimizations (#181)
+- Rewrite LocalStore to use a static reference. (#198)
+- Remove config blocks for air and not_air. (#110)
+- Fix #54: Tokens tab shows incorrect Token graphics for Normal tokens (#113)
+- Fix #50: Black background in song loading screens (#114)
+- Fix #58: Build info string shown in gameplay background (#114)
+- Fix #82: Game freezes when playing with custom noteskin without noteskin data. (#115)
+
+@G-Flat
+- Massive MenuSongSelection refactor. (#179) - Co-Author
+- Rewrite UI Box Components (#180) - Co-Author
+- Enable playing song previews in song selection menu (#194)
+- Enable playing chart previews in song selection menu (#197)
+- Turn input boxes red for invalid settings (#218)
+- Show import and export filter buttons in filter manager (#219)
+- Use vector typing for ObjectPool (#128)
+- Remove old Flash version checks (#119)
+- Display foreign fonts correctly (#221)
+- Make most hardcoded strings translatable (#224) 
+- Reduce login loading time (#159)
+- Song selection menu improvements (#172)
+- Refactor takeScreenShot (#178)
+- Refactor clipboard code (#211)
+
+@Xyr00
+- Add Additional Combo Color Options (#111)
+
+@Sploder12
+- Add Profile Change in context menu. (#183) 
+
 R^3 (v1.2.4) [2020-06-22]
 ---------------------------------------------------------------------
 - Flip result graph when switching graph type. (Fix) (#107) - @G-flat
