@@ -81,18 +81,12 @@ package menu
             this.addChild(scrollbar);
 
             // Menu Left
-            normalTokenButton = new BoxButton(124, 29, _lang.string("menu_tokens_normal"));
-            normalTokenButton.x = 5;
-            normalTokenButton.y = 130;
+            normalTokenButton = new BoxButton(this, 5, 130, 124, 29, _lang.string("menu_tokens_normal"));
             normalTokenButton.addEventListener(MouseEvent.CLICK, onNormalSelect);
-            this.addChild(normalTokenButton);
 
-            skillTokenButton = new BoxButton(124, 29, _lang.string("menu_tokens_skill"));
-            skillTokenButton.x = 5;
-            skillTokenButton.y = 164;
+            skillTokenButton = new BoxButton(this, 5, 164, 124, 29, _lang.string("menu_tokens_skill"));
             skillTokenButton.active = true;
             skillTokenButton.addEventListener(MouseEvent.CLICK, onSkillSelect);
-            this.addChild(skillTokenButton);
 
             var hideLabel:Text = new Text(_lang.string("menu_tokens_hide_complete"));
             hideLabel.x = 10;

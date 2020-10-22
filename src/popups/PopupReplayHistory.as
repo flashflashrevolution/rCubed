@@ -111,19 +111,15 @@ package popups
 
             this.addChild(bmp);
 
-            var bgbox:Box = new Box(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40, false, false);
-            bgbox.x = 20;
-            bgbox.y = 20;
+            var bgbox:Box = new Box(this, 20, 20, false, false);
+            bgbox.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             bgbox.color = GameBackgroundColor.BG_POPUP;
             bgbox.normalAlpha = 0.5;
             bgbox.activeAlpha = 1;
-            this.addChild(bgbox);
 
-            box = new Box(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40, false, false);
-            box.x = 20;
-            box.y = 20;
+            box = new Box(this, 20, 20, false, false);
+            box.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             box.activeAlpha = 0.4;
-            this.addChild(box);
 
             titleDisplay = new Text(_lang.string("popup_replay_history"), 20);
             titleDisplay.x = 5;
@@ -142,11 +138,8 @@ package popups
             box.addChild(itemDisplay);
 
             //- replay search
-            engine_search = new BoxText(150, 20);
-            engine_search.x = 10;
-            engine_search.y = 10;
+            engine_search = new BoxText(box, 10, 10, 150, 20);
             engine_search.addEventListener(Event.CHANGE, e_searchChange);
-            box.addChild(engine_search);
 
             //- engine list
             engine_list_mask = new Sprite();
@@ -178,25 +171,16 @@ package popups
             box.addChild(scrollbar);
 
             //- importBtn
-            importBtn = new BoxButton(79.5, 27, _lang.string("popup_replay_import"));
-            importBtn.x = box.width - 180;
-            importBtn.y = box.height - 42;
+            importBtn = new BoxButton(box, box.width - 180, box.height - 42, 79.5, 27, _lang.string("popup_replay_import"));
             importBtn.addEventListener(MouseEvent.CLICK, e_boxClickHandler);
-            box.addChild(importBtn);
 
             //- Close
-            closeBtn = new BoxButton(79.5, 27, _lang.string("menu_close"));
-            closeBtn.x = box.width - 94.5;
-            closeBtn.y = box.height - 42;
+            closeBtn = new BoxButton(box, box.width - 94.5, box.height - 42, 79.5, 27, _lang.string("menu_close"));
             closeBtn.addEventListener(MouseEvent.CLICK, e_boxClickHandler);
-            box.addChild(closeBtn);
 
             //- Recent/External Swap
-            sourceBtn = new BoxButton(79.5, 27, _lang.string("popup_replay_external"));
-            sourceBtn.x = 20;
-            sourceBtn.y = box.height - 42;
+            sourceBtn = new BoxButton(box, 20, box.height - 42, 79.5, 27, _lang.string("popup_replay_external"));
             sourceBtn.addEventListener(MouseEvent.CLICK, e_boxClickHandler);
-            box.addChild(sourceBtn);
 
             //- Build Recent Engine List
             for each (var r:Replay in _gvars.replayHistory)
@@ -473,11 +457,8 @@ package popups
             for (var i:int = 0; i < list.length; i++)
             {
                 engineID = list[i];
-                var engineBox:BoxButton = new BoxButton(133, 27, engineID.toUpperCase() + " (" + (DRAW_EXTERNAL ? EXTERNAL_REPLAYS[engineID].length : INTERNAL_REPLAYS[engineID]) + ")", 12);
-                engineBox.x = i * 138 + xOffset;
+                var engineBox:BoxButton = new BoxButton(engine_list, i * 138 + xOffset, 0, 133, 27, engineID.toUpperCase() + " (" + (DRAW_EXTERNAL ? EXTERNAL_REPLAYS[engineID].length : INTERNAL_REPLAYS[engineID]) + ")", 12);
                 engineBox.engine_id = engineID;
-                engine_list.addChild(engineBox);
-
                 engineBox.alpha = engineID == selectedID ? 1 : 0.5;
             }
 
@@ -637,7 +618,8 @@ internal class ReplayBox extends Sprite
         this.song = s;
 
         //- Make Display
-        box = new Box(690, 52, false);
+        box = new Box(this, 0, 0, false);
+        box.setSize(690, 52);
         if (replay.isEdited)
             box.color = 0xff0000;
 
@@ -664,19 +646,10 @@ internal class ReplayBox extends Sprite
         box.addChild(resultsText);
 
         //- Copy Button
-        copyBtn = new BoxButton(70, 20, _lang.string("popup_replay_copy"));
-        copyBtn.x = box.width - 75;
-        copyBtn.y = 27;
-        box.addChild(copyBtn);
+        copyBtn = new BoxButton(box, box.width - 75, 27, 70, 20, _lang.string("popup_replay_copy"));
 
         //- Delete Button
-        deleteBtn = new BoxButton(70, 20, _lang.string("popup_replay_delete"));
-        deleteBtn.x = copyBtn.x - 75;
-        deleteBtn.y = copyBtn.y;
-        if (!r.fileReplay)
-            box.addChild(deleteBtn);
-
-        this.addChild(box);
+        deleteBtn = new BoxButton((!r.fileReplay) ? box : null, copyBtn.x - 75, copyBtn.y, 70, 20, _lang.string("popup_replay_delete"));
 
         this.buttonMode = true;
         this.useHandCursor = true;

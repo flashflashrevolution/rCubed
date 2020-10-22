@@ -1,5 +1,6 @@
 package classes
 {
+    import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.events.Event;
     import flash.events.MouseEvent;
@@ -19,9 +20,10 @@ package classes
         private var _hoverSprite:MouseTooltip;
         private var _hoverTimer:Timer = new Timer(500, 1);
 
-        public function BoxIcon(width:Number, height:Number, icon:Sprite, useHover:Boolean = true, useGradient:Boolean = false)
+        public function BoxIcon(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:Number = 0, height:Number = 0, icon:Sprite = null, useHover:Boolean = true, useGradient:Boolean = false)
         {
-            super(width, height, useHover, useGradient);
+            super(parent, xpos, ypos, useHover, useGradient);
+            super.setSize(width, height);
 
             //- Add Icon
             _icon = new UIIcon(this, icon, width / 2 + 1, height / 2 + 1);
@@ -197,13 +199,13 @@ package classes
         override public function set width(value:Number):void
         {
             _icon.setSize(value - _iconPadding, height - _iconPadding);
-            super.width = value;
+            super.setSize(value, super.height);
         }
 
         override public function set height(value:Number):void
         {
             _icon.setSize(width - _iconPadding, value - _iconPadding);
-            super.height = value;
+            super.setSize(super.width, value);
         }
 
         override public function get highlight():Boolean

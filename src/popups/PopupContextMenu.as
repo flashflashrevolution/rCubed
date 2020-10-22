@@ -1,6 +1,7 @@
 package popups
 {
     import arc.mp.MultiplayerSingleton;
+    import assets.GameBackgroundColor;
     import classes.Box;
     import classes.BoxButton;
     import classes.Language;
@@ -44,11 +45,15 @@ package popups
 
             this.addChild(bmp);
 
-            box = new Box(230, Main.GAME_HEIGHT - 40, false, false);
-            box.x = (Main.GAME_WIDTH / 2) - box.width / 2;
-            box.y = 20;
+            var bgbox:Box = new Box(this, (Main.GAME_WIDTH - 230) / 2, 20, false, false);
+            bgbox.setSize(230, Main.GAME_HEIGHT - 40);
+            bgbox.color = GameBackgroundColor.BG_POPUP;
+            bgbox.normalAlpha = 0.5;
+            bgbox.activeAlpha = 1;
+
+            box = new Box(this, (Main.GAME_WIDTH - 230) / 2, 20, false, false);
+            box.setSize(230, Main.GAME_HEIGHT - 40);
             box.activeAlpha = 0.4;
-            this.addChild(box);
 
             var cButton:BoxButton;
             var cButtonHeight:Number = 39;
@@ -58,69 +63,48 @@ package popups
             CONFIG::debug
             {
                 //- Profiler
-                cButton = new BoxButton(box.width - 10, cButtonHeight, "Toggle Profiler");
-                cButton.x = 5;
-                cButton.y = yOff;
+                cButton = new BoxButton(this, 5, yOff, box.width - 10, cButtonHeight, "Toggle Profiler");
                 cButton.action = "debug_profiler";
-                cButton.boxColor = 0x222222;
+                cButton.boxColor = GameBackgroundColor.BG_POPUP;
                 cButton.addEventListener(MouseEvent.CLICK, clickHandler);
-                this.addChild(cButton);
                 yOff += cButtonHeight + 5;
 
                 //- Redraw
-                cButton = new BoxButton(box.width - 10, cButtonHeight, "Toggle ReDraw Regions");
-                cButton.x = 5;
-                cButton.y = yOff;
+                cButton = new BoxButton(this, 5, yOff, box.width - 10, cButtonHeight, "Toggle ReDraw Regions");
                 cButton.action = "redraw_regions";
-                cButton.boxColor = 0x222222;
+                cButton.boxColor = GameBackgroundColor.BG_POPUP;
                 cButton.addEventListener(MouseEvent.CLICK, clickHandler);
-                this.addChild(cButton);
                 yOff = 5;
             }
 
             //- Reload Engine
-            cButton = new BoxButton(box.width - 10, cButtonHeight, _lang.string("popup_cm_reload_engine_user", "Reload Engine / User"));
-            cButton.x = 5;
-            cButton.y = yOff;
+            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_reload_engine_user", "Reload Engine / User"));
             cButton.action = "reload_engine";
             cButton.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(cButton);
             yOff += cButtonHeight + 5;
 
             //- Screenshot - Local
-            cButton = new BoxButton(box.width - 10, cButtonHeight, _lang.string("popup_cm_save_screenshot", "Save ScreenShot - Local"));
-            cButton.x = 5;
-            cButton.y = yOff;
+            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_save_screenshot", "Save ScreenShot - Local"));
             cButton.action = "screenshot_local";
             cButton.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(cButton);
             yOff += cButtonHeight + 5;
 
             //- Fullscreen
-            cButton = new BoxButton(box.width - 10, cButtonHeight, _lang.string("popup_cm_full_screen", "Full Screen"));
-            cButton.x = 5;
-            cButton.y = yOff;
+            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_full_screen", "Full Screen"));
             cButton.action = "fullscreen";
             cButton.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(cButton);
             yOff += cButtonHeight + 5;
 
             //- Switch Profile
-            cButton = new BoxButton(box.width - 10, cButtonHeight, _lang.string("popup_cm_switch_profile", "Switch Profile"));
-            cButton.x = 5;
-            cButton.y = yOff;
+            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_switch_profile", "Switch Profile"));
             cButton.action = "switch_profile";
             cButton.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(cButton);
             yOff += cButtonHeight + 5;
 
             //- Close
-            cButton = new BoxButton(box.width - 10, 27, _lang.string("menu_close", "CLOSE"));
-            cButton.x = 5;
-            cButton.y = box.height - cButton.height - 5;
+            cButton = new BoxButton(box, 5, box.height - 27 - 5, box.width - 10, 27, _lang.string("menu_close", "CLOSE"));
             cButton.action = "close";
             cButton.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(cButton);
         }
 
         override public function stageRemove():void

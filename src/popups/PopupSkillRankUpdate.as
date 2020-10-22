@@ -40,22 +40,17 @@ package popups
             yOffset += renderMessages(renderPlane, yOffset, results["negative"], 0xff0000);
             yOffset += renderMessages(renderPlane, yOffset, results["neutral"], 0x0000ff);
 
-            box = new Box(Main.GAME_WIDTH - 20, renderPlane.height + 50, false, false);
-            box.x = 9;
-            box.y = Main.GAME_HEIGHT + 2;
+            box = new Box(this, 9, Main.GAME_HEIGHT + 2, false, false);
+            box.setSize(Main.GAME_WIDTH - 20, renderPlane.height + 50);
             box.color = 0x1187AB;
             box.activeAlpha = 1;
             box.normalAlpha = 0.8;
-            this.addChild(box);
             box.addChild(renderPlane);
 
-            closeBox = new BoxButton(72, 35, _lang.string("menu_close"));
-            closeBox.x = 682;
-            closeBox.y = 7;
+            closeBox = new BoxButton(box, 682, 7, 72, 35, _lang.string("menu_close"));
             closeBox.buttonMode = true;
             closeBox.mouseChildren = false;
             closeBox.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(closeBox);
 
             TweenLite.to(box, 0.5, {"y": Main.GAME_HEIGHT - (box.height - 40), "ease": BackOut.ease});
         }

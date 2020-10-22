@@ -58,19 +58,15 @@ package popups
 
             this.addChild(bmp);
 
-            var bgbox:Box = new Box(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40, false, false);
-            bgbox.x = 20;
-            bgbox.y = 20;
+            var bgbox:Box = new Box(this, 20, 20, false, false);
+            bgbox.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             bgbox.color = GameBackgroundColor.BG_POPUP;
             bgbox.normalAlpha = 0.5;
             bgbox.activeAlpha = 1;
-            this.addChild(bgbox);
 
-            box = new Box(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40, false, false);
-            box.x = 20;
-            box.y = 20;
+            box = new Box(this, 20, 20, false, false);
+            box.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             box.activeAlpha = 0.4;
-            this.addChild(box);
 
             var titleDisplay:Text = new Text(_lang.string("popup_queue_manager"), 20);
             titleDisplay.x = 10;
@@ -78,19 +74,13 @@ package popups
             titleDisplay.width = box.width - 10;
             box.addChild(titleDisplay);
 
-            menuMain = new BoxButton(125, 25, _lang.string("options_queue_saved"));
-            menuMain.x = box.width - menuMain.width * 2 - 30;
-            menuMain.y = 8;
+            menuMain = new BoxButton(box, box.width - 125 * 2 - 30, 8, 125, 25, _lang.string("options_queue_saved"));
             menuMain.menu_select = TAB_MAIN;
             menuMain.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(menuMain);
 
-            menuPregen = new BoxButton(125, 25, _lang.string("options_queue_premade"));
-            menuPregen.x = box.width - menuMain.width - 15;
-            menuPregen.y = 8;
+            menuPregen = new BoxButton(box, box.width - menuMain.width - 15, 8, 125, 25, _lang.string("options_queue_premade"));
             menuPregen.menu_select = TAB_PREGEN;
             menuPregen.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(menuPregen);
 
             //- content
             scrollpane = new ScrollPane(box.width - 45, 341);
@@ -109,18 +99,12 @@ package popups
             renderQueues();
 
             //- importBtn
-            importBtn = new BoxButton(79.5, 27, _lang.string("popup_queue_import"));
-            importBtn.x = box.width - 180;
-            importBtn.y = box.height - 42;
+            importBtn = new BoxButton(box, box.width - 180, box.height - 42, 79.5, 27, _lang.string("popup_queue_import"));
             importBtn.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(importBtn);
 
             //- Close
-            closeBtn = new BoxButton(79.5, 27, _lang.string("menu_close"));
-            closeBtn.x = box.width - 94.5;
-            closeBtn.y = box.height - 42;
+            closeBtn = new BoxButton(box, box.width - 94.5, box.height - 42, 79.5, 27, _lang.string("menu_close"));
             closeBtn.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(closeBtn);
         }
 
         private function scrollBarMoved(e:Event):void
@@ -323,8 +307,8 @@ internal class QueueBox extends Sprite
         var yOffset:int = 25;
 
         // Draw Box
-        box = new Box(690, (!longview ? 35 : queueItem.items.length * 20 + 30), false);
-        this.addChild(box);
+        box = new Box(this, 0, 0, false);
+        box.setSize(690, (!longview ? 35 : queueItem.items.length * 20 + 30));
 
         // Add Song Names
         var totalTime:int = 0;
@@ -355,29 +339,17 @@ internal class QueueBox extends Sprite
         if (!premade)
         {
             //- Copy Button
-            copyBtn = new BoxButton(70, 25, _lang.string("popup_queue_copy"));
-            copyBtn.x = box.width - 75;
-            copyBtn.y = 5;
-            box.addChild(copyBtn);
+            copyBtn = new BoxButton(box, box.width - 75, 5, 70, 25, _lang.string("popup_queue_copy"));
 
             //- Delete Button
-            deleteBtn = new BoxButton(70, 25, _lang.string("popup_queue_delete"));
-            deleteBtn.x = copyBtn.x - 75;
-            deleteBtn.y = 5;
-            box.addChild(deleteBtn);
+            deleteBtn = new BoxButton(box, copyBtn.x - 75, 5, 70, 25, _lang.string("popup_queue_delete"));
 
             //- Rename Button
-            renameBtn = new BoxButton(70, 25, _lang.string("popup_queue_rename"));
-            renameBtn.x = deleteBtn.x - 75;
-            renameBtn.y = 5;
-            box.addChild(renameBtn);
+            renameBtn = new BoxButton(box, deleteBtn.x - 75, 5, 70, 25, _lang.string("popup_queue_rename"));
         }
 
         //- PLAY Button
-        playBtn = new BoxButton(70, 25, _lang.string("popup_queue_play"));
-        playBtn.x = (renameBtn ? renameBtn.x - 75 : box.width - 75);
-        playBtn.y = 5;
-        box.addChild(playBtn);
+        playBtn = new BoxButton(box, (renameBtn ? renameBtn.x - 75 : box.width - 75), 5, 70, 25, _lang.string("popup_queue_play"));
 
         this.addEventListener(MouseEvent.CLICK, clickEvent);
     }

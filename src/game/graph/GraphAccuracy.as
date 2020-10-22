@@ -68,13 +68,10 @@ package game.graph
             buttons.x = overlay.x;
             buttons.y = overlay.y;
 
-            var flipGraphBtn:BoxIcon = new BoxIcon(16, 18, new iconSmallF());
-            flipGraphBtn.x = -20;
-            flipGraphBtn.y = 98;
+            var flipGraphBtn:BoxIcon = new BoxIcon(buttons, -20, 98, 16, 18, new iconSmallF());
             flipGraphBtn.padding = 6;
             flipGraphBtn.setHoverText(_lang.string("game_results_flip_graph"), "right");
             flipGraphBtn.addEventListener(MouseEvent.MOUSE_DOWN, e_flipGraph);
-            buttons.addChild(flipGraphBtn);
 
             judgeMinTime = new Text(sprintf(_lang.string("game_results_graph_graph_early"), {"value": ((result.MIN_TIME > 0 ? "+" : "") + (result.MIN_TIME + 1))})); // It's greater then, so it's off by 1.
             judgeMinTime.alpha = 0.2;

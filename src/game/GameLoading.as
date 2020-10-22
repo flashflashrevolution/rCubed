@@ -110,11 +110,8 @@ package game
 
             if ((loadTimer >= 60 || song.loadFail) && !cancelLoadButton && !_gvars.flashvars.replay)
             {
-                cancelLoadButton = new BoxButton(75, 25, "Cancel");
-                cancelLoadButton.x = Main.GAME_WIDTH - 85;
-                cancelLoadButton.y = preloader.y - 35;
+                cancelLoadButton = new BoxButton(this, Main.GAME_WIDTH - 85, preloader.y - 35, 75, 25, "Cancel");
                 cancelLoadButton.addEventListener(MouseEvent.CLICK, e_cancelClick);
-                addChild(cancelLoadButton);
             }
 
             if (song.loadFail)

@@ -101,9 +101,7 @@ package menu
 
             for (var i:int = 0; i < mmc_strings.length; ++i)
             {
-                var menu_music_button:BoxIcon = new BoxIcon(25, 25, mmc_icons[i]);
-                menu_music_button.x = 5 + 30 * i;
-                menu_music_button.y = 5;
+                var menu_music_button:BoxIcon = new BoxIcon(null, 5 + 30 * i, 5, 25, 25, mmc_icons[i]);
                 menu_music_button.addEventListener(MouseEvent.CLICK, mmc_functions[i]);
                 mmc_buttons[i] = menu_music_button;
             }
@@ -240,14 +238,12 @@ package menu
             //- Add Menu Buttons
             for (var item:String in menuItems)
             {
-                var menuItem:MenuButton = new MenuButton(_lang.string(menuItems[item][0]), item == options.activePanel);
-                menuItem.x = Number(item) * 122;
+                var menuItem:MenuButton = new MenuButton(menuItemBox, Number(item) * 122, 0, _lang.string(menuItems[item][0]), item == options.activePanel);
                 menuItem.panel = menuItems[item][1];
                 menuItem.mouseChildren = false;
                 menuItem.useHandCursor = true;
                 menuItem.buttonMode = true;
                 menuItem.addEventListener(MouseEvent.CLICK, menuItemClick);
-                menuItemBox.addChild(menuItem);
             }
 
             this.addChild(menuItemBox);
@@ -257,11 +253,10 @@ package menu
         {
             if (!menuMusicControls)
             {
-                menuMusicControls = new Box(125, 35, false, false);
+                menuMusicControls = new Box(null, 7, -1, false, false);
+                menuMusicControls.setSize(125, 35);
                 menuMusicControls.normalAlpha = 1;
                 menuMusicControls.color = GameBackgroundColor.BG_STATIC;
-                menuMusicControls.x = 7;
-                menuMusicControls.y = -1;
 
                 for (var i:int = 0; i < mmc_strings.length; ++i)
                 {

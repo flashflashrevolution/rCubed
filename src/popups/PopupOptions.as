@@ -164,19 +164,15 @@ package popups
 
             this.addChild(bmp);
 
-            var bgbox:Box = new Box(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40, false, false);
-            bgbox.x = 20;
-            bgbox.y = 20;
+            var bgbox:Box = new Box(this, 20, 20, false, false);
+            bgbox.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             bgbox.color = GameBackgroundColor.BG_POPUP;
             bgbox.normalAlpha = 0.5;
             bgbox.activeAlpha = 1;
-            this.addChild(bgbox);
 
-            box = new Box(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40, false, false);
-            box.x = 20;
-            box.y = 20;
+            box = new Box(this, 20, 20, false, false);
+            box.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             box.activeAlpha = 0.4;
-            this.addChild(box);
 
             // Import / Export Context Menu
             _contextImportExport = new ContextMenu();
@@ -228,57 +224,39 @@ package popups
         private function renderMenu():void
         {
             var tab_width:int = 170;
-            menuMain = new BoxButton(tab_width, 25, _lang.string("options_menu_main"));
-            menuMain.x = 15;
-            menuMain.y = 15;
+            menuMain = new BoxButton(box, 15, 15, tab_width, 25, _lang.string("options_menu_main"));
             menuMain.menu_select = TAB_MAIN;
 
-            menuVisualMods = new BoxButton(tab_width, 25, _lang.string("options_menu_visual_mods"));
-            menuVisualMods.x = menuMain.x + tab_width + 10;
-            menuVisualMods.y = 15;
+            menuVisualMods = new BoxButton(box, menuMain.x + tab_width + 10, 15, tab_width, 25, _lang.string("options_menu_visual_mods"));
             menuVisualMods.menu_select = TAB_VISUAL_MODS;
 
-            menuGameColors = new BoxButton(tab_width, 25, _lang.string("options_menu_game_colors"));
-            menuGameColors.x = menuVisualMods.x + tab_width + 10;
-            menuGameColors.y = 15;
+            menuGameColors = new BoxButton(box, menuVisualMods.x + tab_width + 10, 15, tab_width, 25, _lang.string("options_menu_game_colors"));
             menuGameColors.menu_select = TAB_COLORS;
 
-            menuOther = new BoxButton(tab_width, 25, _lang.string("options_menu_other"));
-            menuOther.x = menuGameColors.x + tab_width + 10;
-            menuOther.y = 15;
+            menuOther = new BoxButton(box, menuGameColors.x + tab_width + 10, 15, tab_width, 25, _lang.string("options_menu_other"));
             menuOther.menu_select = TAB_OTHER;
 
             //- Close
-            closeOptions = new BoxButton(80, 27, _lang.string("menu_close"));
-            closeOptions.x = box.width - 95;
-            closeOptions.y = box.height - 42;
+            closeOptions = new BoxButton(box, box.width - 95, box.height - 42, 80, 27, _lang.string("menu_close"));
             closeOptions.contextMenu = _contextImportExport;
 
             //- Reset
-            resetOptions = new BoxButton(80, 27, _lang.string("menu_reset"));
-            resetOptions.x = box.width - 180;
-            resetOptions.y = box.height - 42;
+            resetOptions = new BoxButton(box, box.width - 180, box.height - 42, 80, 27, _lang.string("menu_reset"));
             resetOptions.color = 0xff0000;
 
             //- Editor
-            editorOptions = new BoxButton(80, 27, _lang.string("menu_editor"));
-            editorOptions.x = box.width - 265;
-            editorOptions.y = box.height - 42;
+            editorOptions = new BoxButton(null, box.width - 265, box.height - 42, 80, 27, _lang.string("menu_editor"));
             editorOptions.editor_multiplayer = null;
 
             //- Editor - MP
-            editorOptionsMP = new BoxButton(130, 27, _lang.string("menu_editor_mp"));
-            editorOptionsMP.x = editorOptions.x - editorOptionsMP.width - 5;
-            editorOptionsMP.y = editorOptions.y;
+            editorOptionsMP = new BoxButton(null, editorOptions.x - 130 - 5, editorOptions.y, 130, 27, _lang.string("menu_editor_mp"));
             editorOptionsMP.editor_multiplayer = {playerCount: 2,
                     connection: {mode: Multiplayer.GAME_R3, currentUser: {userID: 1}},
                     user: {userID: 1, playerID: 1, isPlayer: true},
                     players: [{playerID: 1, userID: 1830376, userName: "arcnmx"}, {playerID: 2, userID: 249481, userName: "Velocity"}]};
 
             //- Editor - MP Spectate
-            editorOptionsMPSpec = new BoxButton(130, 27, _lang.string("menu_editor_mp_spec"));
-            editorOptionsMPSpec.x = editorOptionsMP.x - editorOptionsMPSpec.width - 5;
-            editorOptionsMPSpec.y = editorOptionsMP.y;
+            editorOptionsMPSpec = new BoxButton(null, editorOptionsMP.x - 130 - 5, editorOptionsMP.y, 130, 27, _lang.string("menu_editor_mp_spec"));
             editorOptionsMPSpec.editor_multiplayer = {playerCount: 2,
                     connection: {mode: Multiplayer.GAME_R3, currentUser: {userID: 0}},
                     user: {userID: 0, playerID: -1, isPlayer: false},
@@ -292,15 +270,9 @@ package popups
             menuVisualMods.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
             menuGameColors.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
             menuOther.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-            box.addChild(menuMain);
-            box.addChild(menuVisualMods);
-            box.addChild(menuGameColors);
-            box.addChild(menuOther);
 
             closeOptions.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
             resetOptions.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-            box.addChild(closeOptions);
-            box.addChild(resetOptions);
 
             if (!_gvars.flashvars.replay && !_gvars.flashvars.preview_file)
             {
@@ -369,11 +341,8 @@ package popups
                 box.addChild(gameSpeed);
                 yOff += 20;
 
-                optionGameSpeed = new ValidatedText(100, 20, ValidatedText.R_FLOAT_P);
-                optionGameSpeed.x = xOff;
-                optionGameSpeed.y = yOff;
+                optionGameSpeed = new ValidatedText(box, xOff, yOff, 100, 20, ValidatedText.R_FLOAT_P);
                 optionGameSpeed.addEventListener(Event.CHANGE, changeHandler);
-                box.addChild(optionGameSpeed);
                 yOff += 30;
 
                 //- Global Offset
@@ -383,11 +352,8 @@ package popups
                 box.addChild(gameOffset);
                 yOff += 20;
 
-                optionOffset = new ValidatedText(100, 20, ValidatedText.R_FLOAT);
-                optionOffset.x = xOff;
-                optionOffset.y = yOff;
+                optionOffset = new ValidatedText(box, xOff, yOff, 100, 20, ValidatedText.R_FLOAT);
                 optionOffset.addEventListener(Event.CHANGE, changeHandler);
-                box.addChild(optionOffset);
                 yOff += 30;
 
                 //- Judge Offset
@@ -397,12 +363,9 @@ package popups
                 box.addChild(gameJudgeOffset);
                 yOff += 20;
 
-                optionJudgeOffset = new ValidatedText(100, 20, ValidatedText.R_FLOAT);
-                optionJudgeOffset.x = xOff;
-                optionJudgeOffset.y = yOff;
+                optionJudgeOffset = new ValidatedText(box, xOff, yOff, 100, 20, ValidatedText.R_FLOAT);
                 optionJudgeOffset.addEventListener(Event.CHANGE, changeHandler);
                 optionJudgeOffset.contextMenu = arcJudgeMenu();
-                box.addChild(optionJudgeOffset);
 
                 //- Auto Judge Offset
                 xOff += 105;
@@ -426,11 +389,8 @@ package popups
                 box.addChild(gameReceptorSpacing);
                 yOff += 20;
 
-                optionReceptorSpacing = new ValidatedText(100, 20, ValidatedText.R_INT);
-                optionReceptorSpacing.x = xOff;
-                optionReceptorSpacing.y = yOff;
+                optionReceptorSpacing = new ValidatedText(box, xOff, yOff, 100, 20, ValidatedText.R_INT);
                 optionReceptorSpacing.addEventListener(Event.CHANGE, changeHandler);
-                box.addChild(optionReceptorSpacing);
                 yOff += 30;
 
                 //- Note Scale
@@ -462,11 +422,8 @@ package popups
                 box.addChild(gameFPS);
                 yOff += 20;
 
-                optionFPS = new ValidatedText(100, 20, ValidatedText.R_INT_P);
-                optionFPS.x = xOff;
-                optionFPS.y = yOff;
+                optionFPS = new ValidatedText(box, xOff, yOff, 100, 20, ValidatedText.R_INT_P);
                 optionFPS.addEventListener(Event.CHANGE, changeHandler);
-                box.addChild(optionFPS);
                 yOff += 30;
 
                 // Song Rate
@@ -476,11 +433,8 @@ package popups
                 box.addChild(gameRate);
                 yOff += 20;
 
-                optionRate = new ValidatedText(100, 20, ValidatedText.R_FLOAT_P);
-                optionRate.x = xOff;
-                optionRate.y = yOff;
+                optionRate = new ValidatedText(box, xOff, yOff, 100, 20, ValidatedText.R_FLOAT_P);
                 optionRate.addEventListener(Event.CHANGE, changeHandler);
-                box.addChild(optionRate);
                 yOff += 40;
 
                 // Force engine Judge Mode
@@ -588,15 +542,12 @@ package popups
                     gameKeyText.y = yOff - 1;
                     box.addChild(gameKeyText);
 
-                    var gameKeyInput:BoxText = new BoxText(50, 20);
-                    gameKeyInput.x = xOff;
-                    gameKeyInput.y = yOff;
+                    var gameKeyInput:BoxText = new BoxText(box, xOff, yOff, 50, 20);
                     gameKeyInput.autoSize = TextFieldAutoSize.CENTER;
                     gameKeyInput.selectable = false;
                     gameKeyInput.mouseChildren = false;
                     gameKeyInput.key = keyInputs[i];
                     gameKeyInput.addEventListener(MouseEvent.CLICK, clickHandler);
-                    box.addChild(gameKeyInput);
                     optionKeyInputs.push(gameKeyInput);
                     yOff += 25;
                 }
@@ -620,13 +571,10 @@ package popups
                     optionAutofailText.y = yOff - 1;
                     box.addChild(optionAutofailText);
 
-                    var optionAutofailInput:ValidatedText = new ValidatedText(70, 20, ValidatedText.R_INT_P);
-                    optionAutofailInput.x = xOff;
-                    optionAutofailInput.y = yOff;
+                    var optionAutofailInput:ValidatedText = new ValidatedText(box, xOff, yOff, 70, 20, ValidatedText.R_INT_P);
                     optionAutofailInput.autofail = judgeTitles[i];
                     optionAutofailInput.field.maxChars = 5;
                     optionAutofailInput.addEventListener(Event.CHANGE, changeHandler);
-                    box.addChild(optionAutofailInput);
                     optionAutofail.push(optionAutofailInput);
                     yOff += 25;
                 }
@@ -636,13 +584,10 @@ package popups
                 optionAutofailText.y = yOff - 1;
                 box.addChild(optionAutofailText);
 
-                optionAutofailInput = new ValidatedText(70, 20, ValidatedText.R_FLOAT_P);
-                optionAutofailInput.x = xOff;
-                optionAutofailInput.y = yOff;
+                optionAutofailInput = new ValidatedText(box, xOff, yOff, 70, 20, ValidatedText.R_FLOAT_P);
                 optionAutofailInput.autofail = "rawGoods";
                 optionAutofailInput.field.maxChars = 6;
                 optionAutofailInput.addEventListener(Event.CHANGE, changeHandler);
-                box.addChild(optionAutofailInput);
                 optionAutofail.push(optionAutofailInput);
                 yOff += 25;
             }
@@ -823,11 +768,8 @@ package popups
                     yOff += 20;
                 }
 
-                optionNoteskinsCustom = new BoxButton(179, 23, _lang.string("options_noteskins_edit_custom"));
-                optionNoteskinsCustom.x = xOff + 3;
-                optionNoteskinsCustom.y = yOff + 1;
+                optionNoteskinsCustom = new BoxButton(box, xOff + 3, yOff + 1, 179, 23, _lang.string("options_noteskins_edit_custom"));
                 optionNoteskinsCustom.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-                box.addChild(optionNoteskinsCustom);
 
             }
             else if (CURRENT_TAB == TAB_COLORS)
@@ -856,13 +798,10 @@ package popups
                     gameJudgeColor.align = Text.RIGHT;
                     box.addChild(gameJudgeColor);
 
-                    var optionJudgeColor:ValidatedText = new ValidatedText(70, 20, ValidatedText.R_COLOR);
-                    optionJudgeColor.x = xOff + 75;
-                    optionJudgeColor.y = yOff;
+                    var optionJudgeColor:ValidatedText = new ValidatedText(box, xOff + 75, yOff, 70, 20, ValidatedText.R_COLOR);
                     optionJudgeColor.judge_color_id = i;
                     optionJudgeColor.field.maxChars = 7;
                     optionJudgeColor.addEventListener(Event.CHANGE, changeHandler);
-                    box.addChild(optionJudgeColor);
 
                     var gameJudgeColorDisplay:ColorField = new ColorField(0, 45, 20);
                     gameJudgeColorDisplay.x = xOff + 150;
@@ -871,13 +810,10 @@ package popups
                     gameJudgeColorDisplay.addEventListener(Event.CHANGE, changeHandler);
                     box.addChild(gameJudgeColorDisplay);
 
-                    var optionJudgeColorReset:BoxButton = new BoxButton(20, 20, "R");
-                    optionJudgeColorReset.x = xOff + 200;
-                    optionJudgeColorReset.y = yOff;
+                    var optionJudgeColorReset:BoxButton = new BoxButton(box, xOff + 200, yOff, 20, 20, "R");
                     optionJudgeColorReset.judge_color_reset_id = i;
                     optionJudgeColorReset.color = 0xff0000;
                     optionJudgeColorReset.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-                    box.addChild(optionJudgeColorReset);
                     optionJudgeColors.push({"text": optionJudgeColor, "display": gameJudgeColorDisplay, "reset": optionJudgeColorReset});
 
                     yOff += 25;
@@ -905,13 +841,10 @@ package popups
                     gameGameColor.align = Text.RIGHT;
                     box.addChild(gameGameColor);
 
-                    var optionGameColor:ValidatedText = new ValidatedText(70, 20, ValidatedText.R_COLOR);
-                    optionGameColor.x = xOff + 75;
-                    optionGameColor.y = yOff;
+                    var optionGameColor:ValidatedText = new ValidatedText(box, xOff + 75, yOff, 70, 20, ValidatedText.R_COLOR);
                     optionGameColor.game_color_id = i;
                     optionGameColor.field.maxChars = 7;
                     optionGameColor.addEventListener(Event.CHANGE, changeHandler);
-                    box.addChild(optionGameColor);
 
                     var gameGameColorDisplay:ColorField = new ColorField(0, 45, 20);
                     gameGameColorDisplay.x = xOff + 150;
@@ -920,13 +853,10 @@ package popups
                     gameGameColorDisplay.addEventListener(Event.CHANGE, changeHandler);
                     box.addChild(gameGameColorDisplay);
 
-                    var optionGameColorReset:BoxButton = new BoxButton(20, 20, "R");
-                    optionGameColorReset.x = xOff + 200;
-                    optionGameColorReset.y = yOff;
+                    var optionGameColorReset:BoxButton = new BoxButton(box, xOff + 200, yOff, 20, 20, "R");
                     optionGameColorReset.game_color_reset_id = i;
                     optionGameColorReset.color = 0xff0000;
                     optionGameColorReset.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-                    box.addChild(optionGameColorReset);
                     optionGameColors.push({"text": optionGameColor, "display": gameGameColorDisplay, "reset": optionGameColorReset});
 
                     yOff += 25;
@@ -954,13 +884,10 @@ package popups
                     gameComboColor.align = Text.RIGHT;
                     box.addChild(gameComboColor);
 
-                    var optionComboColor:ValidatedText = new ValidatedText(70, 20, ValidatedText.R_COLOR);
-                    optionComboColor.x = xOff + 75;
-                    optionComboColor.y = yOff;
+                    var optionComboColor:ValidatedText = new ValidatedText(box, xOff + 75, yOff, 70, 20, ValidatedText.R_COLOR);
                     optionComboColor.combo_color_id = i;
                     optionComboColor.field.maxChars = 7;
                     optionComboColor.addEventListener(Event.CHANGE, changeHandler);
-                    box.addChild(optionComboColor);
 
                     var gameComboColorDisplay:ColorField = new ColorField(0, 45, 20);
                     gameComboColorDisplay.x = xOff + 150;
@@ -969,13 +896,10 @@ package popups
                     gameComboColorDisplay.addEventListener(Event.CHANGE, changeHandler);
                     box.addChild(gameComboColorDisplay);
 
-                    var optionComboColorReset:BoxButton = new BoxButton(20, 20, "R");
-                    optionComboColorReset.x = xOff + 200;
-                    optionComboColorReset.y = yOff;
+                    var optionComboColorReset:BoxButton = new BoxButton(box, xOff + 200, yOff, 20, 20, "R");
                     optionComboColorReset.combo_color_reset_id = i;
                     optionComboColorReset.color = 0xff0000;
                     optionComboColorReset.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-                    box.addChild(optionComboColorReset);
 
                     if (i > 0)
                     {
@@ -1046,11 +970,8 @@ package popups
                 box.addChild(gameIsolationStart);
                 yOff += 20;
 
-                isolationText = new ValidatedText(100, 20, ValidatedText.R_INT_P);
-                isolationText.x = xOff;
-                isolationText.y = yOff;
+                isolationText = new ValidatedText(box, xOff, yOff, 100, 20, ValidatedText.R_INT_P);
                 isolationText.addEventListener(Event.CHANGE, changeHandler);
-                box.addChild(isolationText);
                 yOff += 30;
 
                 var gameIsolationtotal:Text = new Text(_lang.string("options_isolation_notes"));
@@ -1059,11 +980,8 @@ package popups
                 box.addChild(gameIsolationtotal);
                 yOff += 20;
 
-                isolationTotalText = new ValidatedText(100, 20, ValidatedText.R_INT_P);
-                isolationTotalText.x = xOff;
-                isolationTotalText.y = yOff;
+                isolationTotalText = new ValidatedText(box, xOff, yOff, 100, 20, ValidatedText.R_INT_P);
                 isolationTotalText.addEventListener(Event.CHANGE, changeHandler);
-                box.addChild(isolationTotalText);
                 yOff += 80;
 
                 //- Air Options
@@ -1130,11 +1048,8 @@ package popups
                 yOff += 30;
 
                 // https://github.com/flashflashrevolution/web-stream-overlay
-                openWebsocketOverlay = new BoxButton(150, 27, _lang.string("options_overlay_instructions"));
-                openWebsocketOverlay.x = xOff;
-                openWebsocketOverlay.y = yOff;
+                openWebsocketOverlay = new BoxButton(box, xOff, yOff, 150, 27, _lang.string("options_overlay_instructions"));
                 openWebsocketOverlay.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-                box.addChild(openWebsocketOverlay);
                 yOff += 30;
 
                 ///- Col 2
@@ -1148,12 +1063,9 @@ package popups
                 box.addChild(gameMPTextSize);
                 yOff += 20;
 
-                optionMPSize = new ValidatedText(100, 20, ValidatedText.R_INT_P);
-                optionMPSize.x = xOff;
-                optionMPSize.y = yOff;
+                optionMPSize = new ValidatedText(box, xOff, yOff, 100, 20, ValidatedText.R_INT_P);
                 optionMPSize.text = "10";
                 optionMPSize.addEventListener(Event.CHANGE, changeHandler);
-                box.addChild(optionMPSize);
                 yOff += 30;
 
                 // Multiplayer - Timestamps
@@ -1675,11 +1587,8 @@ package popups
                 confirmP.y = (box.height / 2 - confirmP.height / 2);
                 box.addChild(confirmP);
 
-                var resB:BoxButton = new BoxButton(100, 35, "RESET", 12, "#990000");
-                resB.x = 5;
-                resB.y = 5;
+                var resB:BoxButton = new BoxButton(confirmP, 5, 5, 100, 35, "RESET", 12, "#990000");
                 resB.color = 0x330000;
-                confirmP.addChild(resB);
                 resB.addEventListener(MouseEvent.CLICK, function(e:Event):void
                 {
                     box.removeChild(confirmP);
@@ -1691,11 +1600,8 @@ package popups
                     renderOptions();
                 });
 
-                var conB:BoxButton = new BoxButton(100, 35, "Close", 12, "#000000");
-                conB.x = 5;
-                conB.y = 45;
+                var conB:BoxButton = new BoxButton(confirmP, 5, 45, 100, 35, "Close", 12, "#000000");
                 conB.color = 0;
-                confirmP.addChild(conB);
                 conB.addEventListener(MouseEvent.CLICK, function(e:Event):void
                 {
                     box.removeChild(confirmP);

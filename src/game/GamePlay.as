@@ -550,9 +550,7 @@ package game
                 gameplayUI.mouseChildren = false;
                 gameplayUI.mouseEnabled = false;
 
-                exitEditor = new BoxButton(75, 30, _lang.string("menu_close"));
-                exitEditor.x = (Main.GAME_WIDTH / 2) - (exitEditor.width / 2);
-                exitEditor.y = (Main.GAME_HEIGHT / 2) - (exitEditor.height / 2);
+                exitEditor = new BoxButton(this, (Main.GAME_WIDTH - 75) / 2, (Main.GAME_HEIGHT - 30) / 2, 75, 30, _lang.string("menu_close"));
                 exitEditor.addEventListener(MouseEvent.CLICK, function(e:MouseEvent):void
                 {
                     GAME_STATE = GAME_END;
@@ -562,10 +560,8 @@ package game
                         _gvars.activeUser.save();
                     }
                 });
-                this.addChild(exitEditor);
-                resetEditor = new BoxButton(75, 30, _lang.string("menu_reset"));
-                resetEditor.x = exitEditor.x;
-                resetEditor.y = exitEditor.y + 35;
+
+                resetEditor = new BoxButton(this, exitEditor.x, exitEditor.y + 35, 75, 30, _lang.string("menu_reset"));
                 resetEditor.addEventListener(MouseEvent.CLICK, function(e:MouseEvent):void
                 {
                     for (var key:String in options.layout)
@@ -573,7 +569,6 @@ package game
                     _avars.interfaceSave();
                     interfaceSetup();
                 });
-                this.addChild(resetEditor);
             }
         }
 

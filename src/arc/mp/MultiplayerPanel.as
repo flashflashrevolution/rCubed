@@ -193,9 +193,7 @@ package arc.mp
                 }
             });
 
-            buttonMP = new BoxButton(130, 25, "Connect");
-            buttonMP.x = 5;
-            buttonMP.y = Main.GAME_HEIGHT - 30;
+            buttonMP = new BoxButton(this, 5, Main.GAME_HEIGHT - 30, 130, 25, "Connect");
             buttonMP.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void
             {
                 if (connection.connected)
@@ -204,12 +202,9 @@ package arc.mp
                 connection.connect();
                 showThrobber();
             });
-            addChild(buttonMP);
             showButton(buttonMP, false);
 
-            buttonLegacy = new BoxButton(140, 40, "Connect to Legacy");
-            buttonLegacy.x = buttonMP.x;
-            buttonLegacy.y = buttonMP.y + buttonMP.height + 10;
+            buttonLegacy = new BoxButton(this, buttonMP.x, buttonMP.y + buttonMP.height + 10, 140, 40, "Connect to Legacy");
             buttonLegacy.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void
             {
                 if (connection.connected)
@@ -218,12 +213,9 @@ package arc.mp
                 connection.connect();
                 showThrobber();
             });
-            addChild(buttonLegacy);
             showButton(buttonLegacy, false);
 
-            buttonVelocity = new BoxButton(buttonLegacy.width, buttonLegacy.height, "Connect to Velocity");
-            buttonVelocity.x = buttonLegacy.x;
-            buttonVelocity.y = buttonLegacy.y + buttonLegacy.height + 10;
+            buttonVelocity = new BoxButton(this, buttonLegacy.x, buttonLegacy.y + buttonLegacy.height + 10, buttonLegacy.width, buttonLegacy.height, "Connect to Velocity");
             buttonVelocity.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void
             {
                 if (connection.connected)
@@ -232,21 +224,16 @@ package arc.mp
                 connection.connect();
                 showThrobber();
             });
-            addChild(buttonVelocity);
             showButton(buttonVelocity, false);
 
-            buttonDisconnect = new BoxButton(buttonMP.width, buttonMP.height, "Disconnect");
-            buttonDisconnect.x = buttonMP.x;
-            buttonDisconnect.y = buttonMP.y;
+            buttonDisconnect = new BoxButton(null, buttonMP.x, buttonMP.y, buttonMP.width, buttonMP.height, "Disconnect");
             buttonDisconnect.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void
             {
                 if (connection.connected)
                     connection.disconnect();
             });
 
-            buttonLobby = new BoxButton(buttonLegacy.width, buttonLegacy.height, "Join Lobby");
-            buttonLobby.x = buttonDisconnect.x;
-            buttonLobby.y = buttonDisconnect.y + buttonDisconnect.height + 10;
+            buttonLobby = new BoxButton(null, buttonDisconnect.x, buttonDisconnect.y + buttonDisconnect.height + 10, buttonLegacy.width, buttonLegacy.height, "Join Lobby");
             buttonLobby.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void
             {
                 connection.joinLobby();

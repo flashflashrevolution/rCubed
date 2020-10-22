@@ -28,23 +28,18 @@ package popups
 
         public function FilterItemButton(parent:DisplayObjectContainer, xpos:Number, ypos:Number, filter:EngineLevelFilter, updater:PopupFilterManager)
         {
-            parent.addChild(this);
-            this.x = xpos;
-            this.y = ypos;
             this.filter = filter;
             this.updater = updater;
-            super(327, 33, false, false);
+            super(parent, xpos, ypos, false, false);
+            super.setSize(327, 33);
+
+            init();
         }
 
-        override protected function init():void
+        protected function init():void
         {
-            super.init();
-
-            remove_button = new BoxButton(23, height, "X");
-            remove_button.x = width;
-            remove_button.y = 0;
+            remove_button = new BoxButton(this, width, 0, 23, height, "X");
             remove_button.addEventListener(MouseEvent.CLICK, e_clickRemovefilter);
-            addChild(remove_button);
 
             var typeText:Text;
             switch (filter.type)
@@ -62,12 +57,9 @@ package popups
                     combo_compare.selectedItemByData = filter.comparison;
                     combo_compare.fontSize = 11;
 
-                    input_box = new ValidatedText(107, 23, ValidatedText.R_FLOAT);
+                    input_box = new ValidatedText(this, 215, 5, 107, 23, ValidatedText.R_FLOAT);
                     input_box.text = filter.input_number.toString();
-                    input_box.x = 215;
-                    input_box.y = 5;
                     input_box.addEventListener(Event.CHANGE, e_valueNumberChange);
-                    addChild(input_box);
                     break;
 
                 case EngineLevelFilter.FILTER_SONG_FLAGS:
@@ -148,12 +140,9 @@ package popups
                     combo_compare.selectedItemByData = filter.comparison;
                     combo_compare.fontSize = 11;
 
-                    input_box = new ValidatedText(107, 23, ValidatedText.R_FLOAT);
+                    input_box = new ValidatedText(this, 215, 5, 107, 23, ValidatedText.R_FLOAT);
                     input_box.text = filter.input_number.toString();
-                    input_box.x = 215;
-                    input_box.y = 5;
                     input_box.addEventListener(Event.CHANGE, e_valueNumberChange);
-                    addChild(input_box);
                     break;
 
                 case EngineLevelFilter.FILTER_ID:
@@ -172,12 +161,9 @@ package popups
                     combo_compare.selectedItemByData = filter.comparison;
                     combo_compare.fontSize = 11;
 
-                    input_box = new BoxText(107, 23);
+                    input_box = new BoxText(this, 215, 5, 107, 23);
                     input_box.text = filter.input_string;
-                    input_box.x = 215;
-                    input_box.y = 5;
                     input_box.addEventListener(Event.CHANGE, e_valueStringChange);
-                    addChild(input_box);
                     break;
 
                 case EngineLevelFilter.FILTER_SONG_GENRE:

@@ -67,17 +67,12 @@ package
             stage.addEventListener(KeyboardEvent.KEY_DOWN, loginKeyDown);
 
             //- BG
-            box = new Box(300, 140, false);
-            box.x = (Main.GAME_WIDTH / 2) - (box.width / 2);
-            box.y = (Main.GAME_HEIGHT / 2) - (box.height / 2);
-            this.addChild(box);
+            box = new Box(this, (Main.GAME_WIDTH - 300) / 2, (Main.GAME_HEIGHT - 140) / 2, false);
+            box.setSize(300, 140);
 
             // Register Button
-            var register_online_btn:BoxButton = new BoxButton(300, 30, _lang.string("register_online"), 12);
-            register_online_btn.x = box.x;
-            register_online_btn.y = box.y + box.height + 10;
+            var register_online_btn:BoxButton = new BoxButton(this, box.x, box.y + box.height + 10, 300, 30, _lang.string("register_online"), 12);
             register_online_btn.addEventListener(MouseEvent.CLICK, registerOnline);
-            this.addChild(register_online_btn);
 
             /// 
             panel_session = new Sprite();
@@ -140,18 +135,11 @@ package
             session_continueAsbtn.addEventListener(MouseEvent.CLICK, attemptLoginSession);
             panel_session.addChild(session_continueAsbtn);
 
-            var session_guestbtn:BoxButton = new BoxButton(120, 30, _lang.string("login_guest"), 12);
-            session_guestbtn.x = 6;
-            session_guestbtn.y = box.height - 36;
+            var session_guestbtn:BoxButton = new BoxButton(panel_session, 6, box.height - 36, 120, 30, _lang.string("login_guest"), 12);
             session_guestbtn.addEventListener(MouseEvent.CLICK, playAsGuest);
-            panel_session.addChild(session_guestbtn);
 
-            var session_changeusertbtn:BoxButton = new BoxButton(120, 30, _lang.string("login_change_user"), 12);
-            session_changeusertbtn.x = box.width - 126;
-            session_changeusertbtn.y = box.height - 36;
+            var session_changeusertbtn:BoxButton = new BoxButton(panel_session, box.width - 126, box.height - 36, 120, 30, _lang.string("login_change_user"), 12);
             session_changeusertbtn.addEventListener(MouseEvent.CLICK, changeUserEvent);
-            panel_session.addChild(session_changeusertbtn);
-
 
             /// Login Screen
             panel_login = new Sprite();
@@ -163,10 +151,7 @@ package
             txt_user.y = 5;
             panel_login.addChild(txt_user);
 
-            input_user = new BoxText(290, 20);
-            input_user.x = 5;
-            input_user.y = 25;
-            panel_login.addChild(input_user);
+            input_user = new BoxText(panel_login, 5, 25, 290, 20);
 
             // Password
             var txt_pass:Text = new Text(_lang.string("login_pass"));
@@ -174,11 +159,8 @@ package
             txt_pass.y = 55
             panel_login.addChild(txt_pass);
 
-            input_pass = new BoxText(290, 20);
-            input_pass.x = 5;
-            input_pass.y = 75;
+            input_pass = new BoxText(panel_login, 5, 75, 290, 20);
             input_pass.displayAsPassword = true;
-            panel_login.addChild(input_pass);
 
             saveDetails = new BoxCheck();
             saveDetails.x = 92;
@@ -192,17 +174,11 @@ package
             panel_login.addChild(txt_save);
 
             //- Buttons
-            var login_guestbtn:BoxButton = new BoxButton(75, 30, _lang.string("login_guest"), 12);
-            login_guestbtn.x = 6;
-            login_guestbtn.y = box.height - 36;
+            var login_guestbtn:BoxButton = new BoxButton(panel_login, 6, box.height - 36, 75, 30, _lang.string("login_guest"), 12);
             login_guestbtn.addEventListener(MouseEvent.CLICK, playAsGuest);
-            panel_login.addChild(login_guestbtn);
 
-            var loginbtn:BoxButton = new BoxButton(75, 30, _lang.string("login_text"), 12);
-            loginbtn.x = box.width - 81;
-            loginbtn.y = box.height - 36;
+            var loginbtn:BoxButton = new BoxButton(panel_login, box.width - 81, box.height - 36, 75, 30, _lang.string("login_text"), 12);
             loginbtn.addEventListener(MouseEvent.CLICK, attemptLogin);
-            panel_login.addChild(loginbtn);
 
             // Set Values
             if (savedInfos.state == STORED_SESSION)

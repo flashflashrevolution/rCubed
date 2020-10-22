@@ -67,19 +67,15 @@ package popups
             bh.alpha = 0;
             this.addChild(bh);
 
-            var bgbox:Box = new Box(Main.GAME_WIDTH / 2, Main.GAME_HEIGHT - 40, false, false);
-            bgbox.x = -((Main.GAME_WIDTH / 2) / 2);
-            bgbox.y = -((Main.GAME_HEIGHT - 40) / 2);
+            var bgbox:Box = new Box(bh, -((Main.GAME_WIDTH / 2) / 2), -((Main.GAME_HEIGHT - 40) / 2), false, false);
+            bgbox.setSize(Main.GAME_WIDTH / 2, Main.GAME_HEIGHT - 40);
             bgbox.color = GameBackgroundColor.BG_POPUP;
             bgbox.normalAlpha = 0.5;
             bgbox.activeAlpha = 1;
-            bh.addChild(bgbox);
 
-            box = new Box(Main.GAME_WIDTH / 2, Main.GAME_HEIGHT - 40, false, false);
-            box.x = -((Main.GAME_WIDTH / 2) / 2);
-            box.y = -((Main.GAME_HEIGHT - 40) / 2);
+            box = new Box(bh, -((Main.GAME_WIDTH / 2) / 2), -((Main.GAME_HEIGHT - 40) / 2), false, false);
+            box.setSize(Main.GAME_WIDTH / 2, Main.GAME_HEIGHT - 40);
             box.activeAlpha = 0.4;
-            bh.addChild(box);
 
             var th:Sprite = new Sprite();
             var textbmd:BitmapData = new BitmapData(box.width, box.height, true, 0x000000);
@@ -185,11 +181,8 @@ package popups
             box.addChild(new Bitmap(textbmd));
 
             //- Close
-            closeOptions = new BoxButton(box.width - 30, 27, _lang.string("menu_close"));
-            closeOptions.x = 15;
-            closeOptions.y = box.height - 42;
+            closeOptions = new BoxButton(box, 15, box.height - 42, box.width - 30, 27, _lang.string("menu_close"));
             closeOptions.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(closeOptions);
 
             TweenLite.to(bmp, 1, {alpha: 1});
             TweenLite.to(bh, 1, {alpha: 1, scaleX: 1, scaleY: 1, ease: Back.easeOut});

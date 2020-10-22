@@ -80,19 +80,15 @@ package popups
             bmp = new Bitmap(bmd);
             this.addChild(bmp);
 
-            var bgbox:Box = new Box(390, Main.GAME_HEIGHT + 2, false, false);
-            bgbox.x = (Main.GAME_WIDTH - 390) / 2;
-            bgbox.y = -1;
+            var bgbox:Box = new Box(this, (Main.GAME_WIDTH - 390) / 2, -1, false, false);
+            bgbox.setSize(390, Main.GAME_HEIGHT + 2);
             bgbox.color = GameBackgroundColor.BG_POPUP;
             bgbox.normalAlpha = 0.5;
             bgbox.activeAlpha = 1;
-            this.addChild(bgbox);
 
-            box = new Box(bgbox.width, bgbox.height, false, false);
-            box.x = bgbox.x;
-            box.y = -1;
+            box = new Box(this, bgbox.x, -1, false, false);
+            box.setSize(bgbox.width, bgbox.height);
             box.activeAlpha = 0.4;
-            this.addChild(box);
 
             var titleDisplay:Text = new Text("- " + sObject["name"] + " -", 20);
             titleDisplay.x = 5;
@@ -204,12 +200,9 @@ package popups
             box.addChild(gameOffset);
             yOff += 20;
 
-            optionMusicOffset = new ValidatedText(100, 20, ValidatedText.R_FLOAT);
-            optionMusicOffset.x = xOff;
-            optionMusicOffset.y = yOff;
+            optionMusicOffset = new ValidatedText(box, xOff, yOff, 100, 20, ValidatedText.R_FLOAT);
             optionMusicOffset.text = "0";
             optionMusicOffset.addEventListener(Event.CHANGE, changeHandler);
-            box.addChild(optionMusicOffset);
             yOff += 30;
 
             //- Judge Offset
@@ -219,34 +212,22 @@ package popups
             box.addChild(gameJudgeOffset);
             yOff += 20;
 
-            optionJudgeOffset = new ValidatedText(100, 20, ValidatedText.R_FLOAT);
-            optionJudgeOffset.x = xOff;
-            optionJudgeOffset.y = yOff;
+            optionJudgeOffset = new ValidatedText(box, xOff, yOff, 100, 20, ValidatedText.R_FLOAT);
             optionJudgeOffset.text = "0";
             optionJudgeOffset.addEventListener(Event.CHANGE, changeHandler);
-            box.addChild(optionJudgeOffset);
 
             //- Revert
-            revertOptions = new BoxButton(80, 27, _lang.string("menu_revert"));
-            revertOptions.x = 20;
-            revertOptions.y = box.height - 42;
+            revertOptions = new BoxButton(box, 20, box.height - 42, 80, 27, _lang.string("menu_revert"));
             revertOptions.color = 0xff0000;
             revertOptions.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(revertOptions);
 
             //- Close
-            closeOptions = new BoxButton(80, 27, _lang.string("menu_close"));
-            closeOptions.x = box.width - 100;
-            closeOptions.y = box.height - 42;
+            closeOptions = new BoxButton(box, box.width - 100, box.height - 42, 80, 27, _lang.string("menu_close"));
             closeOptions.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(closeOptions);
 
             //- Confirm
-            confirmOptions = new BoxButton(80, 27, _lang.string("menu_confirm"));
-            confirmOptions.x = closeOptions.x - 95;
-            confirmOptions.y = box.height - 42;
+            confirmOptions = new BoxButton(box, closeOptions.x - 95, box.height - 42, 80, 27, _lang.string("menu_confirm"));
             confirmOptions.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(confirmOptions);
 
             refreshFields();
         }

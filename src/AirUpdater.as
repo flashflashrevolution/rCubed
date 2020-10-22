@@ -74,17 +74,12 @@ package
             messageDisplay.align = Text.CENTER;
             addChild(messageDisplay);
 
-            actionButton = new BoxButton(Main.GAME_WIDTH - 50, 25, "---");
-            actionButton.x = 25;
-            actionButton.y = Main.GAME_HEIGHT - actionButton.height - 25;
+            actionButton = new BoxButton(this, 25, Main.GAME_HEIGHT - 25 - 25, Main.GAME_WIDTH - 50, 25, "---");
             actionButton.addEventListener(MouseEvent.CLICK, e_actionButton);
             actionButtonState(false);
-            addChild(actionButton);
 
-            var box:Box = new Box(Main.GAME_WIDTH - 50, 300, false, false);
-            box.x = 25;
-            box.y = 115;
-            addChild(box);
+            var box:Box = new Box(this, 25, 115, false, false);
+            box.setSize(Main.GAME_WIDTH - 50, 300);
 
             var style:StyleSheet = new StyleSheet();
             style.setStyle("BODY", {color: "#FFFFFF", fontSize: 14});

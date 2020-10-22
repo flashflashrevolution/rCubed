@@ -1,5 +1,6 @@
 package classes
 {
+    import flash.display.DisplayObjectContainer;
 
     dynamic public class BoxButton extends Box
     {
@@ -7,9 +8,10 @@ package classes
 
         private var _enabled:Boolean = true;
 
-        public function BoxButton(width:Number, height:Number, text:String, size:int = 12, color:String = "#FFFFFF", useHover:Boolean = true, useGradient:Boolean = false)
+        public function BoxButton(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:Number = 0, height:Number = 0, text:String = "", size:int = 12, color:String = "#FFFFFF", useHover:Boolean = true, useGradient:Boolean = false)
         {
-            super(width, height, useHover, useGradient);
+            super(parent, xpos, ypos, useHover, useGradient);
+            super.setSize(width, height);
 
             //- Add Text
             _text = new Text(text, size, color);
@@ -40,13 +42,13 @@ package classes
         override public function set width(value:Number):void
         {
             _text.width = value;
-            super.width = value;
+            super.setSize(value, super.height);
         }
 
         override public function set height(value:Number):void
         {
             _text.height = value;
-            super.height = value;
+            super.setSize(super.width, value);
         }
 
         override public function get highlight():Boolean

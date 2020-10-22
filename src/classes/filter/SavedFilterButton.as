@@ -31,17 +31,16 @@ package classes.filter
 
         public function SavedFilterButton(parent:DisplayObjectContainer, xpos:Number, ypos:Number, filter:EngineLevelFilter, updater:PopupFilterManager)
         {
-            parent.addChild(this);
-            this.x = xpos;
-            this.y = ypos;
             this.filter = filter;
             this.updater = updater;
-            super(704, 35, false, false);
+            super(parent, xpos, ypos, false, false);
+            super.setSize(704, 35);
+
+            init();
         }
 
-        override protected function init():void
+        protected function init():void
         {
-            super.init();
             defaultCheckbox = new BoxCheck();
             defaultCheckbox.x = 7;
             defaultCheckbox.y = 11;
@@ -55,23 +54,14 @@ package classes.filter
             filterName.height = 35;
             addChild(filterName);
 
-            deleteButton = new BoxButton(100, 23, _lang.string("filter_editor_delete"));
-            deleteButton.x = width - 105;
-            deleteButton.y = 5;
+            deleteButton = new BoxButton(this, width - 105, 5, 100, 23, _lang.string("filter_editor_delete"));
             deleteButton.addEventListener(MouseEvent.CLICK, e_deleteClick);
-            addChild(deleteButton);
 
-            editButton = new BoxButton(100, 23, _lang.string("filter_editor_select_edit"));
-            editButton.x = deleteButton.x - 105;
-            editButton.y = 5;
+            editButton = new BoxButton(this, deleteButton.x - 105, 5, 100, 23, _lang.string("filter_editor_select_edit"));
             editButton.addEventListener(MouseEvent.CLICK, e_editClick);
-            addChild(editButton);
 
-            exportButton = new BoxButton(100, 23, _lang.string("popup_filter_filter_single_export"));
-            exportButton.x = editButton.x - 105;
-            exportButton.y = 5;
+            exportButton = new BoxButton(this, editButton.x - 105, 5, 100, 23, _lang.string("popup_filter_filter_single_export"));
             exportButton.addEventListener(MouseEvent.CLICK, e_exportClick);
-            addChild(exportButton);
         }
 
         override public function dispose():void

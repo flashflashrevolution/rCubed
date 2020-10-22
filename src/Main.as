@@ -383,11 +383,8 @@ package
             preloader.update(Math.round((loadScripts / loadTotal) * 100));
             if (loadTimer >= 300 && !retryLoadButton)
             {
-                retryLoadButton = new BoxButton(75, 25, "RELOAD");
-                retryLoadButton.x = Main.GAME_WIDTH - 85;
-                retryLoadButton.y = preloader.y - 35;
+                retryLoadButton = new BoxButton(this, Main.GAME_WIDTH - 85, preloader.y - 35, 75, 25, "RELOAD");
                 retryLoadButton.addEventListener(MouseEvent.CLICK, e_retryClick);
-                addChild(retryLoadButton);
             }
 
             if (preloader.isComplete)

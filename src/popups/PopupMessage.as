@@ -44,19 +44,15 @@ package popups
 
             this.addChild(bmp);
 
-            var bgbox:Box = new Box(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40, false, false);
-            bgbox.x = 20;
-            bgbox.y = 20;
+            var bgbox:Box = new Box(this, 20, 20, false, false);
+            bgbox.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             bgbox.color = GameBackgroundColor.BG_POPUP;
             bgbox.normalAlpha = 0.5;
             bgbox.activeAlpha = 1;
-            this.addChild(bgbox);
 
-            box = new Box(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40, false, false);
-            box.x = 20;
-            box.y = 20;
+            box = new Box(this, 20, 20, false, false);
+            box.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             box.activeAlpha = 0.4;
-            this.addChild(box);
 
             titleDisplay = new Text(displayTitle, 20);
             titleDisplay.x = 5;
@@ -73,11 +69,8 @@ package popups
             box.addChild(messageDisplay);
 
             //- Close
-            closeOptions = new BoxButton(79.5, 27, _lang.string("menu_close"));
-            closeOptions.x = box.width - 94.5;
-            closeOptions.y = box.height - 42;
+            closeOptions = new BoxButton(box, box.width - 94.5, box.height - 42, 79.5, 27, _lang.string("menu_close"));
             closeOptions.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(closeOptions);
         }
 
         override public function stageRemove():void

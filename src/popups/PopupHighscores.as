@@ -58,19 +58,15 @@ package popups
 
             this.addChild(bmp);
 
-            var bgbox:Box = new Box(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40, false, false);
-            bgbox.x = 20;
-            bgbox.y = 20;
+            var bgbox:Box = new Box(this, 20, 20, false, false);
+            bgbox.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             bgbox.color = GameBackgroundColor.BG_POPUP;
             bgbox.normalAlpha = 0.5;
             bgbox.activeAlpha = 1;
-            this.addChild(bgbox);
 
-            box = new Box(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40, false, false);
-            box.x = 20;
-            box.y = 20;
+            box = new Box(this, 20, 20, false, false);
+            box.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             box.activeAlpha = 0.4;
-            this.addChild(box);
 
             var titleDisplay:Text = new Text(songDetails.name, 20);
             titleDisplay.x = 5;
@@ -107,32 +103,20 @@ package popups
             box.addChild(myAVText);
 
             //- Previous
-            prevBtn = new BoxButton(79.5, 27, _lang.string("popup_highscores_previous"));
-            prevBtn.x = 10;
-            prevBtn.y = box.height - 42;
+            prevBtn = new BoxButton(box, 10, box.height - 42, 79.5, 27, _lang.string("popup_highscores_previous"));
             prevBtn.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(prevBtn);
 
             //- Next
-            nextBtn = new BoxButton(79.5, 27, _lang.string("popup_highscores_next"));
-            nextBtn.x = 100;
-            nextBtn.y = box.height - 42;
+            nextBtn = new BoxButton(box, 100, box.height - 42, 79.5, 27, _lang.string("popup_highscores_next"));
             nextBtn.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(nextBtn);
 
             //- Close
-            closeBtn = new BoxButton(79.5, 27, _lang.string("menu_close"));
-            closeBtn.x = box.width - 94.5;
-            closeBtn.y = box.height - 42;
+            closeBtn = new BoxButton(box, box.width - 94.5, box.height - 42, 79.5, 27, _lang.string("menu_close"));
             closeBtn.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(closeBtn);
 
             //- Refresh
-            refreshBtn = new BoxButton(79.5, 27, _lang.string("popup_highscores_refresh"));
-            refreshBtn.x = box.width - 184.5;
-            refreshBtn.y = box.height - 42;
+            refreshBtn = new BoxButton(box, box.width - 184.5, box.height - 42, 79.5, 27, _lang.string("popup_highscores_refresh"));
             refreshBtn.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(refreshBtn);
 
             //- Render List
             renderHighscores();
