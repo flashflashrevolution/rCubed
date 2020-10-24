@@ -7,17 +7,15 @@ package com.flashfla.utils
 
     public class SystemUtil
     {
+        public static var versionArray:Array;
         public static var OS:String;
         public static var flashMajorVersion:int;
         public static var flashMinorVersion:int;
         public static var flashBuildVersion:int;
 
-        private static var isLoaded:Boolean = false;
-
-        public static function init():void
         {
             // Get the player’s version by using the flash.system.Capabilities class.
-            var versionArray:Array = StringUtil.splitMultiple(Capabilities.version, [" ", ","]);
+            versionArray = StringUtil.splitMultiple(Capabilities.version, [" ", ","]);
 
             //versionArray = ["WIN", 9, 0, 0];
 
@@ -25,51 +23,11 @@ package com.flashfla.utils
             flashMajorVersion = parseInt(versionArray[1]);
             flashMinorVersion = parseInt(versionArray[2]);
             flashBuildVersion = parseInt(versionArray[3]);
-            isLoaded = true;
-        }
-
-        public static function getMajorVersion():int
-        {
-            return flashMajorVersion;
-        }
-
-        public static function getMinorVersion():int
-        {
-            return flashMinorVersion;
-        }
-
-        public static function getBuildVersion():int
-        {
-            return flashBuildVersion;
-        }
-
-        public static function getOS():String
-        {
-            return OS;
         }
 
         public static function getFlashVersion():Object
         {
-            return {os: OS, major: flashMajorVersion, minor: flashMinorVersion, build: flashBuildVersion};
-        }
-
-        public static function isFlashNewerThan(major:int, minor:int = 0, build:int = 0):Boolean
-        {
-            if (flashMajorVersion > major)
-                return true;
-            if (flashMajorVersion < major)
-                return false;
-
-            if (minor <= 0)
-                return true;
-            if (flashMinorVersion < minor)
-                return false;
-            if (build <= 0)
-                return true;
-            if (flashBuildVersion >= build)
-                return true;
-
-            return false;
+            return {"os": OS, "major": flashMajorVersion, "minor": flashMinorVersion, "build": flashBuildVersion};
         }
 
         public static function gc():void
