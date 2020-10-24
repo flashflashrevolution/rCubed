@@ -174,11 +174,7 @@ package popups
             setMirrorInvertText.y = yOff;
             box.addChild(setMirrorInvertText);
 
-            setMirrorInvert = new BoxCheck();
-            setMirrorInvert.x = xOff + 2;
-            setMirrorInvert.y = yOff + 2;
-            setMirrorInvert.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(setMirrorInvert);
+            setMirrorInvert = new BoxCheck(box, xOff + 2, yOff + 2, clickHandler);
             yOff += 30;
 
             var setCustomOffsetsText:Text = new Text(_lang.string("song_notes_setting_custom_offsets"));
@@ -186,11 +182,7 @@ package popups
             setCustomOffsetsText.y = yOff;
             box.addChild(setCustomOffsetsText);
 
-            setCustomOffsets = new BoxCheck();
-            setCustomOffsets.x = xOff + 2;
-            setCustomOffsets.y = yOff + 2;
-            setCustomOffsets.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(setCustomOffsets);
+            setCustomOffsets = new BoxCheck(box, xOff + 2, yOff + 2, clickHandler);
             yOff += 30;
 
             //- Global Offset
@@ -252,8 +244,8 @@ package popups
         override public function stageRemove():void
         {
             notesField.removeEventListener(Event.CHANGE, e_notesFieldChange);
-            setMirrorInvert.removeEventListener(MouseEvent.CLICK, clickHandler);
-            setCustomOffsets.removeEventListener(MouseEvent.CLICK, clickHandler);
+            setMirrorInvert.dispose();
+            setCustomOffsets.dispose();
             optionJudgeOffset.removeEventListener(Event.CHANGE, changeHandler);
             optionMusicOffset.removeEventListener(Event.CHANGE, changeHandler);
 

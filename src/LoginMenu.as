@@ -59,6 +59,7 @@ package
         {
             if (stage)
                 stage.removeEventListener(KeyboardEvent.KEY_DOWN, loginKeyDown);
+            saveDetails.dispose();
             super.stageRemove();
         }
 
@@ -158,11 +159,7 @@ package
             input_pass = new BoxText(panel_login, 5, 75, 290, 20);
             input_pass.displayAsPassword = true;
 
-            saveDetails = new BoxCheck();
-            saveDetails.x = 92;
-            saveDetails.y = 113;
-            saveDetails.addEventListener(MouseEvent.CLICK, toggleDetailsSave);
-            panel_login.addChild(saveDetails);
+            saveDetails = new BoxCheck(panel_login, 92, 113, toggleDetailsSave);
 
             var txt_save:Text = new Text(_lang.string("login_remember"));
             txt_save.x = 110;

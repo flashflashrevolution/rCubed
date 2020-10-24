@@ -41,13 +41,9 @@ package classes.filter
 
         protected function init():void
         {
-            defaultCheckbox = new BoxCheck();
-            defaultCheckbox.x = 7;
-            defaultCheckbox.y = 11;
+            defaultCheckbox = new BoxCheck(this, 7, 11, e_defaultClick);
             defaultCheckbox.checked = filter.is_default;
-            defaultCheckbox.addEventListener(MouseEvent.CLICK, e_defaultClick);
             defaultCheckbox.addEventListener(MouseEvent.MOUSE_OVER, e_defaultMouseOver);
-            addChild(defaultCheckbox);
 
             filterName = new Text(filter.name);
             filterName.x = 25;
@@ -61,9 +57,9 @@ package classes.filter
 
         override public function dispose():void
         {
-            defaultCheckbox.removeEventListener(MouseEvent.CLICK, e_defaultClick);
             defaultCheckbox.removeEventListener(MouseEvent.MOUSE_OVER, e_defaultMouseOver);
             defaultCheckbox.removeEventListener(MouseEvent.MOUSE_OUT, e_defaultMouseOut);
+            defaultCheckbox.dispose();
 
             filterName.dispose();
 

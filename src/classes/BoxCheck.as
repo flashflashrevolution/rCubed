@@ -1,7 +1,9 @@
 package classes
 {
     import assets.GameBackgroundColor;
+    import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
+    import flash.events.MouseEvent;
 
     dynamic public class BoxCheck extends Sprite
     {
@@ -11,21 +13,45 @@ package classes
         private var _highlight:Boolean = false;
         private var _active:Boolean = false;
 
-        public function BoxCheck():void
+        private var _listener:Function = null;
+        private var _useCapture:Boolean = false;
+
+        public function BoxCheck(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, listener:Function = null, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void
         {
+            if (parent)
+                parent.addChild(this);
+
             //- Set Button Mode
             this.mouseChildren = false;
             this.useHandCursor = true;
             this.buttonMode = true;
 
+            //- Set position
+            this.x = xpos;
+            this.y = ypos;
+
+            //- Set click event listener
+            if (listener != null)
+            {
+                this._listener = listener;
+                this._useCapture = useCapture;
+                this.addEventListener(MouseEvent.CLICK, listener, useCapture, priority, useWeakReference);
+            }
+
             draw();
+        }
+
+        public function dispose():void
+        {
+            if (_listener != null)
+                this.removeEventListener(MouseEvent.CLICK, _listener, _useCapture);
         }
 
         public function draw():void
         {
             this.graphics.clear();
             this.graphics.lineStyle(1, 0xFFFFFF, 0.75, true);
-            this.graphics.beginFill((highlight ? GameBackgroundColor.BG_LIGHT : 0xFFFFFF), (highlight ? 1 : 0.25))
+            this.graphics.beginFill((highlight ? GameBackgroundColor.BG_LIGHT : 0xFFFFFF), (highlight ? 1 : 0.25));
             this.graphics.drawRect(0, 0, width, height);
             this.graphics.endFill();
 

@@ -91,11 +91,7 @@ package menu
             hideLabel.y = 230;
             addChild(hideLabel);
 
-            hideCompleteCheck = new BoxCheck();
-            hideCompleteCheck.x = 106;
-            hideCompleteCheck.y = 233;
-            hideCompleteCheck.addEventListener(MouseEvent.CLICK, hideCompleteClick);
-            addChild(hideCompleteCheck);
+            hideCompleteCheck = new BoxCheck(this, 106, 233, hideCompleteClick);
 
             //- Add Content
             buildTokens();
