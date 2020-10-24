@@ -81,10 +81,8 @@ package menu
             box.setSize(577, Math.max(54, (32 + (messageText.numLines * 17))));
 
             //- Name
-            var nameText:Text = new Text(token_info["name"], 14);
-            nameText.x = 5;
+            var nameText:Text = new Text(box, 5, 0, token_info["name"], 14);
             nameText.setAreaParams(350, 27);
-            box.addChild(nameText);
             box.addChild(messageText);
         }
 

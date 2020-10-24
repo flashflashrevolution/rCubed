@@ -1,5 +1,6 @@
 package classes
 {
+    import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
@@ -23,8 +24,14 @@ package classes
         private var _isUnicode:Boolean = false;
 
         ///- Constructor
-        public function Text(message:*, fontSize:int = 12, fontColor:String = "#FFFFFF")
+        public function Text(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, message:* = "", fontSize:int = 12, fontColor:String = "#FFFFFF")
         {
+            if (parent)
+                parent.addChild(this);
+
+            this.x = xpos;
+            this.y = ypos;
+
             this._message = message.toString();
             this._fontSize = fontSize;
             this._fontColor = fontColor;

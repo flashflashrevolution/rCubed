@@ -45,10 +45,8 @@ package classes.filter
             defaultCheckbox.checked = filter.is_default;
             defaultCheckbox.addEventListener(MouseEvent.MOUSE_OVER, e_defaultMouseOver);
 
-            filterName = new Text(filter.name);
-            filterName.x = 25;
+            filterName = new Text(this, 25, 0, filter.name);
             filterName.height = 35;
-            addChild(filterName);
 
             deleteButton = new BoxButton(this, width - 105, 5, 100, 23, _lang.string("filter_editor_delete"), 12, e_deleteClick);
             editButton = new BoxButton(this, deleteButton.x - 105, 5, 100, 23, _lang.string("filter_editor_select_edit"), 12, e_editClick);
@@ -76,9 +74,8 @@ package classes.filter
             if (!hover_message)
             {
                 hover_message = new Sprite();
-                var msg:Text = new Text(_lang.string("popup_filter_default_filter"));
+                var msg:Text = new Text(null, 5, 0, _lang.string("popup_filter_default_filter"));
                 msg.height = 23;
-                msg.x = 5;
                 hover_message.graphics.lineStyle(1, 0xffffff, 0.75);
                 hover_message.graphics.beginFill(GameBackgroundColor.BG_POPUP, 1);
                 hover_message.graphics.drawRect(0, 0, msg.width + 10, 23);

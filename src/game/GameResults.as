@@ -218,10 +218,7 @@ package game
             navNext = new BoxButton(this, 672, 62, 90, 32, _lang.string("game_results_queue_next"), 12, eventHandler);
 
             // Graph
-            resultsMods = new Text("---");
-            resultsMods.x = 18;
-            resultsMods.y = 276;
-            this.addChild(resultsMods);
+            resultsMods = new Text(this, 18, 276, "---");
 
             graphDraw = new Sprite();
             graphDraw.x = 30;

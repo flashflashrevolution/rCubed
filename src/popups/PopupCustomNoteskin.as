@@ -117,11 +117,8 @@ package popups
             btn_importJSON = new BoxButton(box, xPos, yPos, sidebar_width - 20, 25, _lang.string("popup_noteskin_import_json"), 12, clickHandler); // "Import JSON"
             yPos += 30;
 
-            var cellDescText:Text = new Text(_lang.string("popup_noteskin_grid_rotation")); // "Grid & Rotation:"
-            cellDescText.x = xPos;
-            cellDescText.y = yPos;
+            var cellDescText:Text = new Text(box, xPos, yPos, _lang.string("popup_noteskin_grid_rotation")); // "Grid & Rotation:"
             cellDescText.width = sidebar_width - 20;
-            box.addChild(cellDescText);
             yPos += 25;
 
             input_cellDims = new BoxText(box, xPos, yPos, (sidebar_width - 25) / 2, 20);
@@ -153,11 +150,8 @@ package popups
             {
                 xOff = 0;
                 // Direction Text
-                var note_dir:Text = new Text(DEFAULT_OPTIONS.noteDirections[n] + " Cell:");
-                note_dir.x = xPos + 43;
-                note_dir.y = yPos;
+                var note_dir:Text = new Text(box, xPos + 43, yPos, DEFAULT_OPTIONS.noteDirections[n] + " Cell:");
                 note_dir.align = "right";
-                box.addChild(note_dir);
                 xOff += 44; //21
 
                 var btn_width:int = (sidebar_width - 64); // / 2;
@@ -298,10 +292,7 @@ package popups
                         cell_overlay.graphics.drawRect(n_x * cell_width, n_y * cell_height, cell_width, cell_height);
                         cell_overlay.graphics.endFill();
 
-                        var cell_post:Text = new Text(n_x + "," + n_y);
-                        cell_post.x = cell_overlay.x + n_x * cell_width + 3;
-                        cell_post.y = cell_overlay.y + n_y * cell_height;
-                        image_holder.content.addChild(cell_post);
+                        var cell_post:Text = new Text(image_holder.content, cell_overlay.x + n_x * cell_width + 3, cell_overlay.y + n_y * cell_height, n_x + "," + n_y);
 
                         cell_overlay.graphics.beginFill(0, 0.75);
                         cell_overlay.graphics.drawRect(n_x * cell_width, n_y * cell_height, cell_post.width + 6, 20);

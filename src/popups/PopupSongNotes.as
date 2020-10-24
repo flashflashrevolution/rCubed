@@ -90,36 +90,27 @@ package popups
             box.setSize(bgbox.width, bgbox.height);
             box.activeAlpha = 0.4;
 
-            var titleDisplay:Text = new Text("- " + sObject["name"] + " -", 20);
-            titleDisplay.x = 5;
-            titleDisplay.y = 20;
+            var titleDisplay:Text = new Text(box, 5, 20, "- " + sObject["name"] + " -", 20);
             titleDisplay.width = box.width - 10;
             titleDisplay.align = Text.CENTER;
-            box.addChild(titleDisplay);
 
             // Divider
             box.graphics.lineStyle(1, 0xffffff);
             box.graphics.moveTo(10, 65);
             box.graphics.lineTo(box.width - 10, 65);
 
-            var lblSongRating:Text = new Text(_lang.string("song_rating_label"), 14);
-            lblSongRating.x = 20;
-            lblSongRating.y = 69;
+            var lblSongRating:Text = new Text(box, 20, 69, _lang.string("song_rating_label"), 14);
             lblSongRating.width = 145;
             lblSongRating.align = Text.LEFT;
-            box.addChild(lblSongRating);
 
             sRating = new StarSelector();
             sRating.x = 22;
             sRating.y = 95;
             box.addChild(sRating);
 
-            var lblSongFavorite:Text = new Text(_lang.string("song_favorite_label"), 14);
-            lblSongFavorite.x = box.width - 165;
-            lblSongFavorite.y = 68;
+            var lblSongFavorite:Text = new Text(box, box.width - 165, 68, _lang.string("song_favorite_label"), 14);
             lblSongFavorite.width = 145;
             lblSongFavorite.align = Text.RIGHT;
-            box.addChild(lblSongFavorite);
 
             sFavorite = new HeartSelector();
             sFavorite.x = box.width - 52;
@@ -135,16 +126,10 @@ package popups
             var yOff:int = 140;
 
             //- Notes Field
-            var notesLabel:Text = new Text(_lang.string("song_notes"));
-            notesLabel.x = xOff;
-            notesLabel.y = yOff;
-            box.addChild(notesLabel);
+            var notesLabel:Text = new Text(box, xOff, yOff, _lang.string("song_notes"));
 
-            notesLength = new Text("0 / 250");
-            notesLength.x = box.width - xOff;
-            notesLength.y = yOff;
+            notesLength = new Text(box, box.width - xOff, yOff, "0 / 250");
             notesLength.align = "right";
-            box.addChild(notesLength);
             yOff += 20;
 
             box.graphics.lineStyle(1, 0xffffff, 0.5);
@@ -169,44 +154,28 @@ package popups
             yOff += 90;
 
             // Settings
-            var setMirrorInvertText:Text = new Text(_lang.string("song_notes_setting_mirror_invert"));
-            setMirrorInvertText.x = xOff + 22;
-            setMirrorInvertText.y = yOff;
-            box.addChild(setMirrorInvertText);
-
+            var setMirrorInvertText:Text = new Text(box, xOff + 22, yOff, _lang.string("song_notes_setting_mirror_invert"));
             setMirrorInvert = new BoxCheck(box, xOff + 2, yOff + 2, clickHandler);
             yOff += 30;
 
-            var setCustomOffsetsText:Text = new Text(_lang.string("song_notes_setting_custom_offsets"));
-            setCustomOffsetsText.x = xOff + 22;
-            setCustomOffsetsText.y = yOff;
-            box.addChild(setCustomOffsetsText);
-
+            var setCustomOffsetsText:Text = new Text(box, xOff + 22, yOff, _lang.string("song_notes_setting_custom_offsets"));
             setCustomOffsets = new BoxCheck(box, xOff + 2, yOff + 2, clickHandler);
             yOff += 30;
 
             //- Global Offset
-            var gameOffset:Text = new Text(_lang.string("options_global_offset"));
-            gameOffset.x = xOff;
-            gameOffset.y = yOff;
-            box.addChild(gameOffset);
+            var gameOffset:Text = new Text(box, xOff, yOff, _lang.string("options_global_offset"));
             yOff += 20;
 
-            optionMusicOffset = new ValidatedText(box, xOff, yOff, 100, 20, ValidatedText.R_FLOAT);
+            optionMusicOffset = new ValidatedText(box, xOff, yOff, 100, 20, ValidatedText.R_FLOAT, changeHandler);
             optionMusicOffset.text = "0";
-            optionMusicOffset.addEventListener(Event.CHANGE, changeHandler);
             yOff += 30;
 
             //- Judge Offset
-            var gameJudgeOffset:Text = new Text(_lang.string("options_judge_offset"));
-            gameJudgeOffset.x = xOff;
-            gameJudgeOffset.y = yOff;
-            box.addChild(gameJudgeOffset);
+            var gameJudgeOffset:Text = new Text(box, xOff, yOff, _lang.string("options_judge_offset"));
             yOff += 20;
 
-            optionJudgeOffset = new ValidatedText(box, xOff, yOff, 100, 20, ValidatedText.R_FLOAT);
+            optionJudgeOffset = new ValidatedText(box, xOff, yOff, 100, 20, ValidatedText.R_FLOAT, changeHandler);
             optionJudgeOffset.text = "0";
-            optionJudgeOffset.addEventListener(Event.CHANGE, changeHandler);
 
             //- Revert
             revertOptions = new BoxButton(box, 20, box.height - 42, 80, 27, _lang.string("menu_revert"), 12, clickHandler);

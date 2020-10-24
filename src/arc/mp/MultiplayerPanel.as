@@ -59,10 +59,9 @@ package arc.mp
             }
             else
             {
-                textLogin = new Text("Please Login or Register");
+                textLogin = new Text(this, 0, 0, "Please Login or Register");
                 textLogin.x = Main.GAME_WIDTH / 2 - textLogin.width / 2;
                 textLogin.y = Main.GAME_HEIGHT / 2 - textLogin.height * 3 / 2;
-                addChild(textLogin);
                 return;
             }
 

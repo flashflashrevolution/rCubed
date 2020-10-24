@@ -182,14 +182,11 @@ package
             TweenMax.to(epilepsyWarning, 1, {alpha: 0.6, ease: SineInOut, yoyo: true, repeat: -1});
 
             //- Add Debug Tracking
-            ver = new Text(Capabilities.version.replace(/,/g, ".") + " - Build " + CONFIG::timeStamp + " - " + Constant.AIR_VERSION);
+            ver = new Text(this, stage.width - 5, 2, Capabilities.version.replace(/,/g, ".") + " - Build " + CONFIG::timeStamp + " - " + Constant.AIR_VERSION);
             ver.alpha = 0.15;
-            ver.x = stage.width - 5;
-            ver.y = 2;
             ver.align = Text.RIGHT;
             ver.mouseEnabled = false;
             ver.cacheAsBitmap = true;
-            this.addChild(ver);
 
             // Holidays!
             var d:Date = new Date();

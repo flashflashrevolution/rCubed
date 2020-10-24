@@ -59,19 +59,13 @@ package
         override public function stageAdd():void
         {
 
-            titleDisplay = new Text(_lang.string("air_game_update"), 20);
-            titleDisplay.x = 5;
-            titleDisplay.y = 35;
+            titleDisplay = new Text(this, 5, 35, _lang.string("air_game_update"), 20);
             titleDisplay.width = Main.GAME_WIDTH - 10;
             titleDisplay.align = Text.CENTER;
-            addChild(titleDisplay);
 
-            messageDisplay = new Text(Constant.AIR_VERSION + " -> " + _site.data["game_r3air_version"], 14);
-            messageDisplay.x = 5;
-            messageDisplay.y = 65;
+            messageDisplay = new Text(this, 5, 65, Constant.AIR_VERSION + " -> " + _site.data["game_r3air_version"], 14);
             messageDisplay.width = Main.GAME_WIDTH - 10;
             messageDisplay.align = Text.CENTER;
-            addChild(messageDisplay);
 
             actionButton = new BoxButton(this, 25, Main.GAME_HEIGHT - 25 - 25, Main.GAME_WIDTH - 50, 25, "---", 12, e_actionButton);
             actionButtonState(false);

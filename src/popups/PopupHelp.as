@@ -56,12 +56,9 @@ package popups
             box.mouseChildren = true;
             box.mouseEnabled = true;
 
-            titleDisplay = new Text(_lang.string("popup_help_title"), 20);
-            titleDisplay.x = 5;
-            titleDisplay.y = 5;
+            titleDisplay = new Text(box, 5, 5, _lang.string("popup_help_title"), 20);
             titleDisplay.width = box.width - 10;
             titleDisplay.align = Text.CENTER;
-            box.addChild(titleDisplay);
 
             //- Message
             var style:StyleSheet = new StyleSheet();

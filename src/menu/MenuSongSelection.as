@@ -129,10 +129,8 @@ package menu
 
                 Flags.VALUES[Flags.LEGACY_ENGINE_DEFAULT_LOAD_SKIP] = true;
 
-                var loadTextEngine:Text = new Text(_lang.string("song_selection_load_default_engine"));
+                var loadTextEngine:Text = new Text(this, 0, Main.GAME_HEIGHT / 2 - 15, _lang.string("song_selection_load_default_engine"));
                 loadTextEngine.setAreaParams(Main.GAME_WIDTH, 30, Text.CENTER);
-                loadTextEngine.y = Main.GAME_HEIGHT / 2 - 15;
-                addChild(loadTextEngine);
             }
 
             Flags.VALUES[Flags.LEGACY_ENGINE_DEFAULT_LOAD] = true;
@@ -228,13 +226,10 @@ package menu
 
                 SELECTED_GENRE_BACKGROUND = new GenreSelection();
 
-                GENRE_MODE_TEXT = new Text(_lang.string("genre_mode_" + GENRE_SONGFLAGS));
-                GENRE_MODE_TEXT.x = 17;
-                GENRE_MODE_TEXT.y = 106;
+                GENRE_MODE_TEXT = new Text(this, 17, 106, _lang.string("genre_mode_" + GENRE_SONGFLAGS));
                 GENRE_MODE_TEXT.align = Text.CENTER;
                 GENRE_MODE_TEXT.width = 109;
                 GENRE_MODE_TEXT.fontSize = 16;
-                this.addChild(GENRE_MODE_TEXT);
 
                 genre_mode_prev = new iconLeft();
                 genre_mode_prev.x = 16;
@@ -455,15 +450,13 @@ package menu
          */
         private function buildGenreEntry(text:String, isActiveGenre:Boolean, y:Number, gindex:int):void
         {
-            var songGenre:Text = new Text(text, (isActiveGenre ? 18 : 14));
+            var songGenre:Text = new Text(genreDisplay, 0, y, text, (isActiveGenre ? 18 : 14));
             songGenre.height = 22.6;
             songGenre.width = 130.75;
-            songGenre.y = y;
             songGenre.mouseChildren = false;
             songGenre.useHandCursor = true;
             songGenre.buttonMode = true;
             songGenre.index = gindex;
-            genreDisplay.addChild(songGenre);
         }
 
         /**
@@ -1090,11 +1083,8 @@ package menu
                 songTotalLength += _gvars.songQueue[qS].timeSecs;
             }
 
-            infoTitle = new Text(_lang.string("song_selection_queue_panel_title"), 14, "#DDDDDD");
-            infoTitle.x = 5;
-            infoTitle.y = tY;
+            infoTitle = new Text(infoBox, 5, tY, _lang.string("song_selection_queue_panel_title"), 14, "#DDDDDD");
             infoTitle.width = 164;
-            infoBox.addChild(infoTitle);
             tY += 32;
 
             var queueDisplay:Array = [[_lang.string("song_selection_queue_panel_total_songs"), NumberUtil.numberFormat(_gvars.songQueue.length)], [_lang.string("song_selection_queue_panel_total_length"), TimeUtil.convertToHHMMSS(songTotalLength)]];
@@ -1102,19 +1092,13 @@ package menu
             for (var queueItem:String in queueDisplay)
             {
                 // Info Title
-                infoTitle = new Text(queueDisplay[queueItem][0], 14, "#DDDDDD");
-                infoTitle.x = 5;
-                infoTitle.y = tY;
+                infoTitle = new Text(infoBox, 5, tY, queueDisplay[queueItem][0], 14, "#DDDDDD");
                 infoTitle.width = 164;
-                infoBox.addChild(infoTitle);
                 tY += 16;
 
                 // Info Display
-                infoDetails = new Text(queueDisplay[queueItem][1]);
-                infoDetails.x = 5;
-                infoDetails.y = tY;
+                infoDetails = new Text(infoBox, 5, tY, queueDisplay[queueItem][1]);
                 infoDetails.width = 164;
-                infoBox.addChild(infoDetails);
                 tY += 23;
             }
 
@@ -1157,11 +1141,8 @@ package menu
             var infoPAHover:HoverPABox;
             var tY:int = 0;
 
-            infoTitle = new Text(_lang.string("song_selection_song_panel_highscores"), 14, "#DDDDDD");
-            infoTitle.x = 5;
-            infoTitle.y = tY;
+            infoTitle = new Text(infoBox, 5, tY, _lang.string("song_selection_song_panel_highscores"), 14, "#DDDDDD");
             infoTitle.width = 164;
-            infoBox.addChild(infoTitle);
 
             // Refresh button
             var refreshBtn:BoxButton = new BoxButton(infoBox, infoBox.width - 19 - 2, 2, 19, 19, "R", 12, refreshHighscoresClick, false, 0, true);
@@ -1190,21 +1171,15 @@ package menu
                         infoPAHover = new HoverPABox(5, tY, highscores[r]['av']);
 
                         // Username
-                        infoTitle = new Text("#" + lastRank + ": " + username, 14);
-                        infoTitle.x = 5;
-                        infoTitle.y = tY;
+                        infoTitle = new Text(infoBox, 5, tY, "#" + lastRank + ": " + username, 14);
                         infoTitle.width = 164;
                         infoTitle.fontColor = isMyPB ? "#D9FF9E" : "#FFFFFF";
-                        infoBox.addChild(infoTitle);
                         tY += 16;
 
                         // Rank
-                        infoDetails = new Text(NumberUtil.numberFormat(score), 12);
-                        infoDetails.x = 5;
-                        infoDetails.y = tY;
+                        infoDetails = new Text(infoBox, 5, tY, NumberUtil.numberFormat(score), 12);
                         infoDetails.width = 164;
                         infoDetails.fontColor = isMyPB ? "#B8D8B3" : "#DDDDDD";
-                        infoBox.addChild(infoDetails);
                         tY += 23;
 
                         // PA Hover Box
@@ -1215,19 +1190,13 @@ package menu
                 infoPAHover = new HoverPABox(5, tY, infoRanks.results);
 
                 // Username
-                infoTitle = new Text("#" + infoRanks.rank + ": " + _gvars.activeUser.name, 14, "#D9FF9E");
-                infoTitle.x = 5;
-                infoTitle.y = tY;
+                infoTitle = new Text(infoBox, 5, tY, "#" + infoRanks.rank + ": " + _gvars.activeUser.name, 14, "#D9FF9E");
                 infoTitle.width = 164;
-                infoBox.addChild(infoTitle);
                 tY += 16;
 
                 // Rank
-                infoDetails = new Text(NumberUtil.numberFormat(infoRanks.rawscore), 12, "#B8D8B3");
-                infoDetails.x = 5;
-                infoDetails.y = tY;
+                infoDetails = new Text(infoBox, 5, tY, NumberUtil.numberFormat(infoRanks.rawscore), 12, "#B8D8B3");
                 infoDetails.width = 164;
-                infoBox.addChild(infoDetails);
                 tY += 23;
 
                 // PA Hover Box
@@ -1283,19 +1252,13 @@ package menu
             for (var item:String in infoDisplay)
             {
                 // Info Title
-                infoTitle = new Text(_lang.string("song_selection_song_panel_" + infoDisplay[item][0]), 14, "#DDDDDD");
-                infoTitle.x = 5;
-                infoTitle.y = tY;
+                infoTitle = new Text(infoBox, 5, tY, _lang.string("song_selection_song_panel_" + infoDisplay[item][0]), 14, "#DDDDDD");
                 infoTitle.width = 164;
-                infoBox.addChild(infoTitle);
                 tY += 16;
 
                 // Info Display
-                infoDetails = new Text(infoDisplay[item][1]);
-                infoDetails.x = 5;
-                infoDetails.y = tY;
+                infoDetails = new Text(infoBox, 5, tY, infoDisplay[item][1]);
                 infoDetails.width = 164;
-                infoBox.addChild(infoDetails);
                 tY += 23;
             }
         }
@@ -2203,11 +2166,10 @@ internal class PageBox extends Sprite
     {
         if (page_text == null)
         {
-            page_text = new Text(str, draw_height - 4);
+            page_text = new Text(this, 0, 0, str, draw_height - 4);
             page_text.width = draw_width;
             page_text.height = draw_height;
             page_text.align = Text.CENTER;
-            this.addChild(page_text);
         }
         else
         {

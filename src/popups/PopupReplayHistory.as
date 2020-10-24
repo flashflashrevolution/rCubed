@@ -61,7 +61,7 @@ package popups
         private var importBtn:BoxButton;
         private var closeBtn:BoxButton;
 
-        private var loadNumberText:Text = new Text("0/0");
+        private var loadNumberText:Text;
 
         private var FILE_TRACK:FileTracker;
 
@@ -69,8 +69,7 @@ package popups
         {
             super(myParent);
 
-            loadNumberText.x = 10;
-            loadNumberText.y = 165;
+            loadNumberText = new Text(null, 10, 165, "0/0");
             loadNumberText.setAreaParams(670, 20, "center");
 
             engine_list_left = new Sprite();
@@ -121,21 +120,15 @@ package popups
             box.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             box.activeAlpha = 0.4;
 
-            titleDisplay = new Text(_lang.string("popup_replay_history"), 20);
-            titleDisplay.x = 5;
-            titleDisplay.y = 8;
+            titleDisplay = new Text(box, 5, 8, _lang.string("popup_replay_history"), 20);
             titleDisplay.width = box.width - 10;
             titleDisplay.align = Text.CENTER;
-            box.addChild(titleDisplay);
 
             //- replay count / file size
-            itemDisplay = new Text(_lang.string("popup_replay_count"), 14);
-            itemDisplay.x = 5;
-            itemDisplay.y = 8;
+            itemDisplay = new Text(box, 5, 8, _lang.string("popup_replay_count"), 14);
             itemDisplay.width = box.width - 10;
             itemDisplay.align = Text.RIGHT;
             itemDisplay.visible = false;
-            box.addChild(itemDisplay);
 
             //- replay search
             engine_search = new BoxText(box, 10, 10, 150, 20);
@@ -625,26 +618,19 @@ internal class ReplayBox extends Sprite
             box.color = 0xff0000;
 
         //- Name
-        nameText = new Text((replay.user && replay.user.id != _gvars.playerUser.id && replay.user.name ? replay.user.name + " - " : "") + (song["engine"] && !replay.fileReplay ? song["engine"]["name"] + ": " : "") + song["name"], 14);
+        nameText = new Text(box, 5, 0, (replay.user && replay.user.id != _gvars.playerUser.id && replay.user.name ? replay.user.name + " - " : "") + (song["engine"] && !replay.fileReplay ? song["engine"]["name"] + ": " : "") + song["name"], 14);
         nameText.setAreaParams(525, 27);
-        nameText.x = 5;
         nameText.mouseEnabled = false;
-        box.addChild(nameText);
 
         //- Score
-        scoreText = new Text(sprintf(_lang.string("popup_replay_score"), {"score": NumberUtil.numberFormat(r.score)}), 14);
-        scoreText.x = box.width - 217;
+        scoreText = new Text(box, box.width - 217, 0, sprintf(_lang.string("popup_replay_score"), {"score": NumberUtil.numberFormat(r.score)}), 14);
         scoreText.setAreaParams(213, 27, "right");
         scoreText.mouseEnabled = false;
-        box.addChild(scoreText);
 
         //- Results
-        resultsText = new Text(r.perfect + " - " + r.good + " - " + r.average + " - " + r.miss + " - " + r.boo + " - " + r.maxcombo, 12);
-        resultsText.x = 5;
-        resultsText.y = 27;
+        resultsText = new Text(box, 5, 27, r.perfect + " - " + r.good + " - " + r.average + " - " + r.miss + " - " + r.boo + " - " + r.maxcombo, 12);
         resultsText.setAreaParams(350, 27);
         resultsText.mouseEnabled = false;
-        box.addChild(resultsText);
 
         //- Copy Button
         copyBtn = new BoxButton(box, box.width - 75, 27, 70, 20, _lang.string("popup_replay_copy"));

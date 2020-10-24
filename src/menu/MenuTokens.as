@@ -86,11 +86,7 @@ package menu
             skillTokenButton = new BoxButton(this, 5, 164, 124, 29, _lang.string("menu_tokens_skill"), 12, onSkillSelect);
             skillTokenButton.active = true;
 
-            var hideLabel:Text = new Text(_lang.string("menu_tokens_hide_complete"));
-            hideLabel.x = 10;
-            hideLabel.y = 230;
-            addChild(hideLabel);
-
+            var hideLabel:Text = new Text(this, 10, 230, _lang.string("menu_tokens_hide_complete"));
             hideCompleteCheck = new BoxCheck(this, 106, 233, hideCompleteClick);
 
             //- Add Content

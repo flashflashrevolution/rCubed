@@ -17,11 +17,10 @@ package classes
             super.setSize(width, height);
 
             //- Add Text
-            _text = new Text(text, size, "#FFFFFF");
+            _text = new Text(this, 0, 0, text, size, "#FFFFFF");
             _text.height = height + 1;
             _text.width = width;
             _text.align = Text.CENTER;
-            this.addChild(_text);
 
             //- Set Defaults
             this.mouseEnabled = true;

@@ -68,39 +68,24 @@ package popups
             box.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             box.activeAlpha = 0.4;
 
-            var titleDisplay:Text = new Text(songDetails.name, 20);
-            titleDisplay.x = 5;
-            titleDisplay.y = 8;
+            var titleDisplay:Text = new Text(box, 5, 8, songDetails.name, 20);
             titleDisplay.width = box.width - 10;
             titleDisplay.align = Text.CENTER;
-            box.addChild(titleDisplay);
 
-            pageText = new Text(sprintf(_lang.string("popup_highscores_page_number"), {"page": page + 1}));
-            pageText.x = 200;
-            pageText.y = box.height - 42;
-            box.addChild(pageText);
+            pageText = new Text(box, 200, box.height - 42, sprintf(_lang.string("popup_highscores_page_number"), {"page": page + 1}));
 
             var infoRanks:Object = _gvars.activeUser.getLevelRank(songDetails);
             // Username
-            myUsernameText = new Text("#" + infoRanks.rank + ": " + _gvars.activeUser.name, 16, "#D9FF9E");
-            myUsernameText.x = 25;
-            myUsernameText.y = 345;
+            myUsernameText = new Text(box, 25, 345, "#" + infoRanks.rank + ": " + _gvars.activeUser.name, 16, "#D9FF9E");
             myUsernameText.width = 164;
-            box.addChild(myUsernameText);
 
             // Score
-            myScoreText = new Text(NumberUtil.numberFormat(infoRanks.rawscore), 15, "#B8D8B3");
-            myScoreText.x = 360;
-            myScoreText.y = 345;
+            myScoreText = new Text(box, 360, 345, NumberUtil.numberFormat(infoRanks.rawscore), 15, "#B8D8B3");
             myScoreText.width = 150;
-            box.addChild(myScoreText);
 
             // AV
-            myAVText = new Text(infoRanks.results, 15, "#99B793");
-            myAVText.x = 545;
-            myAVText.y = 345;
+            myAVText = new Text(box, 545, 345, infoRanks.results, 15, "#99B793");
             myAVText.width = 200;
-            box.addChild(myAVText);
 
             //- Previous
             prevBtn = new BoxButton(box, 10, box.height - 42, 79.5, 27, _lang.string("popup_highscores_previous"), 12, clickHandler);
@@ -148,25 +133,16 @@ package popups
             if (highscores && (highscores[(10 * page) + 1] != null))
             {
                 // Username
-                textLine = new Text(_lang.string("popup_highscores_username"), 16, "#C6F0FF");
-                textLine.x = 25;
-                textLine.y = tY;
+                textLine = new Text(scorePane, 25, tY, _lang.string("popup_highscores_username"), 16, "#C6F0FF");
                 textLine.width = 200;
-                scorePane.addChild(textLine);
 
                 // Score
-                textLine = new Text(_lang.string("popup_highscores_score"), 15, "#C6F0FF");
-                textLine.x = 360;
-                textLine.y = tY;
+                textLine = new Text(scorePane, 360, tY, _lang.string("popup_highscores_score"), 15, "#C6F0FF");
                 textLine.width = 150;
-                scorePane.addChild(textLine);
 
                 // AV
-                textLine = new Text(_lang.string("popup_highscores_pa_spread"), 15, "#C6F0FF");
-                textLine.x = 545;
-                textLine.y = tY;
+                textLine = new Text(scorePane, 545, tY, _lang.string("popup_highscores_pa_spread"), 15, "#C6F0FF");
                 textLine.width = 200;
-                scorePane.addChild(textLine);
                 tY += 30;
 
                 var lastRank:int = 0;
@@ -182,28 +158,19 @@ package popups
                         var isMyPB:Boolean = (!_gvars.activeUser.isGuest) && (_gvars.activeUser.name == username);
 
                         // Username
-                        textLine = new Text("#" + r + ": " + username, 16);
-                        textLine.x = 25;
-                        textLine.y = tY;
+                        textLine = new Text(scorePane, 25, tY, "#" + r + ": " + username, 16);
                         textLine.width = 200;
                         textLine.fontColor = isMyPB ? "#D9FF9E" : "#FFFFFF";
-                        scorePane.addChild(textLine);
 
                         // Score
-                        textLine = new Text(NumberUtil.numberFormat(score), 15);
-                        textLine.x = 360;
-                        textLine.y = tY;
+                        textLine = new Text(scorePane, 360, tY, NumberUtil.numberFormat(score), 15);
                         textLine.width = 150;
                         textLine.fontColor = isMyPB ? "#B8D8B3" : "#DDDDDD";
-                        scorePane.addChild(textLine);
 
                         // AV
-                        textLine = new Text(av, 15);
-                        textLine.x = 545;
-                        textLine.y = tY;
+                        textLine = new Text(scorePane, 545, tY, av, 15);
                         textLine.width = 200;
                         textLine.fontColor = isMyPB ? "#99B793" : "#BBBBBB";
-                        scorePane.addChild(textLine);
                         tY += 25;
                     }
                     else

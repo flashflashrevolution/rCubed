@@ -55,16 +55,12 @@ package popups
                     combo_compare.selectedItemByData = filter.comparison;
                     combo_compare.fontSize = 11;
 
-                    input_box = new ValidatedText(this, 215, 5, 107, 23, ValidatedText.R_FLOAT);
+                    input_box = new ValidatedText(this, 215, 5, 107, 23, ValidatedText.R_FLOAT, e_valueNumberChange);
                     input_box.text = filter.input_number.toString();
-                    input_box.addEventListener(Event.CHANGE, e_valueNumberChange);
                     break;
 
                 case EngineLevelFilter.FILTER_SONG_FLAGS:
-                    typeText = new Text(_lang.string("filter_type_" + filter.type));
-                    typeText.x = 5;
-                    typeText.y = 6;
-                    addChild(typeText);
+                    typeText = new Text(this, 5, 6, _lang.string("filter_type_" + filter.type));
 
                     combo_compare = new ComboBox(this, 100, 4, "", EngineLevelFilter.createOptions(EngineLevelFilter.FILTERS_FLAGS, "compare_flags"));
                     combo_compare.addEventListener(Event.SELECT, e_valueCompareChange);
@@ -80,10 +76,7 @@ package popups
                     break;
 
                 case EngineLevelFilter.FILTER_SONG_ACCESS:
-                    typeText = new Text(_lang.string("filter_type_" + filter.type));
-                    typeText.x = 5;
-                    typeText.y = 6;
-                    addChild(typeText);
+                    typeText = new Text(this, 5, 6, _lang.string("filter_type_" + filter.type));
 
                     combo_compare = new ComboBox(this, 100, 4, "", EngineLevelFilter.createIndexOptions(EngineLevelFilter.FILTERS_BOOLEAN, "compare_boolean"));
                     combo_compare.addEventListener(Event.SELECT, e_valueBooleanCompareChange);
@@ -91,17 +84,11 @@ package popups
                     combo_compare.selectedItemByData = filter.inverse ? 1 : 0;
                     combo_compare.fontSize = 11;
 
-                    var playableText:Text = new Text(_lang.string("filter_setting_playable"));
-                    playableText.x = 215;
-                    playableText.y = 6;
-                    addChild(playableText);
+                    var playableText:Text = new Text(this, 215, 6, _lang.string("filter_setting_playable"));
                     break;
 
                 case EngineLevelFilter.FILTER_SONG_TYPE:
-                    typeText = new Text(_lang.string("filter_type_" + filter.type));
-                    typeText.x = 5;
-                    typeText.y = 6;
-                    addChild(typeText);
+                    typeText = new Text(this, 5, 6, _lang.string("filter_type_" + filter.type));
 
                     combo_compare = new ComboBox(this, 100, 4, "", EngineLevelFilter.createIndexOptions(EngineLevelFilter.FILTERS_BOOLEAN, "compare_boolean"));
                     combo_compare.addEventListener(Event.SELECT, e_valueBooleanCompareChange);
@@ -127,10 +114,7 @@ package popups
                 case EngineLevelFilter.FILTER_TIME:
                 case EngineLevelFilter.FILTER_SONG_RATING:
                 case EngineLevelFilter.FILTER_PERSONAL_SONG_RATING:
-                    typeText = new Text(_lang.string("filter_type_" + filter.type));
-                    typeText.x = 5;
-                    typeText.y = 6;
-                    addChild(typeText);
+                    typeText = new Text(this, 5, 6, _lang.string("filter_type_" + filter.type));
 
                     combo_compare = new ComboBox(this, 100, 4, "", EngineLevelFilter.FILTERS_NUMBER);
                     combo_compare.addEventListener(Event.SELECT, e_valueCompareChange);
@@ -138,9 +122,8 @@ package popups
                     combo_compare.selectedItemByData = filter.comparison;
                     combo_compare.fontSize = 11;
 
-                    input_box = new ValidatedText(this, 215, 5, 107, 23, ValidatedText.R_FLOAT);
+                    input_box = new ValidatedText(this, 215, 5, 107, 23, ValidatedText.R_FLOAT, e_valueNumberChange);
                     input_box.text = filter.input_number.toString();
-                    input_box.addEventListener(Event.CHANGE, e_valueNumberChange);
                     break;
 
                 case EngineLevelFilter.FILTER_ID:
@@ -148,10 +131,7 @@ package popups
                 case EngineLevelFilter.FILTER_STYLE:
                 case EngineLevelFilter.FILTER_ARTIST:
                 case EngineLevelFilter.FILTER_STEPARTIST:
-                    typeText = new Text(_lang.string("filter_type_" + filter.type));
-                    typeText.x = 5;
-                    typeText.y = 6;
-                    addChild(typeText);
+                    typeText = new Text(this, 5, 6, _lang.string("filter_type_" + filter.type));
 
                     combo_compare = new ComboBox(this, 100, 4, "", EngineLevelFilter.createOptions(EngineLevelFilter.FILTERS_STRING, "compare_string"));
                     combo_compare.addEventListener(Event.SELECT, e_valueCompareChange);
@@ -165,10 +145,7 @@ package popups
                     break;
 
                 case EngineLevelFilter.FILTER_SONG_GENRE:
-                    typeText = new Text(_lang.string("filter_type_" + filter.type));
-                    typeText.x = 5;
-                    typeText.y = 6;
-                    addChild(typeText);
+                    typeText = new Text(this, 5, 6, _lang.string("filter_type_" + filter.type));
 
                     combo_compare = new ComboBox(this, 100, 4, "", EngineLevelFilter.createIndexOptions(EngineLevelFilter.FILTERS_BOOLEAN, "compare_boolean"));
                     combo_compare.addEventListener(Event.SELECT, e_valueBooleanCompareChange);
@@ -184,10 +161,7 @@ package popups
                     break;
 
                 case EngineLevelFilter.FILTER_FAVORITE:
-                    typeText = new Text(_lang.string("filter_type_" + filter.type));
-                    typeText.x = 5;
-                    typeText.y = 6;
-                    addChild(typeText);
+                    typeText = new Text(this, 5, 6, _lang.string("filter_type_" + filter.type));
 
                     combo_compare = new ComboBox(this, 152, 4, "", EngineLevelFilter.createIndexOptions(EngineLevelFilter.FILTERS_BOOLEAN, "compare_boolean"));
                     combo_compare.addEventListener(Event.SELECT, e_valueBooleanCompareChange);
@@ -197,10 +171,7 @@ package popups
                     break;
 
                 default:
-                    typeText = new Text(filter.type);
-                    typeText.x = 5;
-                    typeText.y = 6;
-                    addChild(typeText);
+                    typeText = new Text(this, 5, 6, filter.type);
                     break;
             }
         }

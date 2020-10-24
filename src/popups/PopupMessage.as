@@ -54,19 +54,14 @@ package popups
             box.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             box.activeAlpha = 0.4;
 
-            titleDisplay = new Text(displayTitle, 20);
-            titleDisplay.x = 5;
-            titleDisplay.y = 5;
+            titleDisplay = new Text(box, 5, 5, displayTitle, 20);
             titleDisplay.width = box.width - 10;
             titleDisplay.align = Text.CENTER;
-            box.addChild(titleDisplay);
 
-            messageDisplay = new Text(dislayText, 14);
-            messageDisplay.x = 5;
+            messageDisplay = new Text(box, 5, 0, dislayText, 14);
             messageDisplay.height = box.height;
             messageDisplay.width = box.width - 10;
             messageDisplay.align = Text.CENTER;
-            box.addChild(messageDisplay);
 
             //- Close
             closeOptions = new BoxButton(box, box.width - 94.5, box.height - 42, 79.5, 27, _lang.string("menu_close"), 12, clickHandler);

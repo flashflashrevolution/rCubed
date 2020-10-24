@@ -206,19 +206,16 @@ package menu
 
             //- User Info Display
             _gvars.activeUser.calculateAverageRank();
-            user_text = new Text(sprintf(_lang.string("main_menu_userbar"), {"player_name": _gvars.activeUser.name,
+            user_text = new Text(this, 153, 452, sprintf(_lang.string("main_menu_userbar"), {"player_name": _gvars.activeUser.name,
                     "games_played": NumberUtil.numberFormat(_gvars.activeUser.gamesPlayed),
                     "grand_total": NumberUtil.numberFormat(_gvars.activeUser.grandTotal),
                     "rank": NumberUtil.numberFormat(_gvars.activeUser.gameRank),
                     "skill_level": _gvars.activeUser.skillLevel,
                     "skill_rating": NumberUtil.numberFormat(_gvars.activeUser.skillRating, 2),
                     "avg_rank": NumberUtil.numberFormat(_gvars.activeUser.averageRank, 3, true)}));
-            user_text.x = 153;
-            user_text.y = 452;
             user_text.width = 594;
             user_text.height = 28;
             user_text.align = Text.CENTER;
-            this.addChild(user_text);
 
             if (!_gvars.activeUser.isGuest)
             {

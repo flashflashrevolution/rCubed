@@ -81,11 +81,8 @@ package popups
             box.activeAlpha = 0.4;
 
             // Tab Label
-            tabLabel = new Text("", 20);
-            tabLabel.x = 10;
-            tabLabel.y = 8;
+            tabLabel = new Text(box, 10, 8, "", 20);
             tabLabel.width = box.width - 10;
-            box.addChild(tabLabel);
 
             //- Closed
             closeButton = new BoxButton(box, box.width - 105, 5, 100, 31, _lang.string("popup_close"), 12, e_closeButton);
@@ -131,12 +128,9 @@ package popups
             typeSelector.graphics.drawRect(Main.GAME_WIDTH / 2 - 200, -1, 400, Main.GAME_HEIGHT + 2);
             typeSelector.graphics.endFill();
 
-            var typeSelectorTitle:Text = new Text(_lang.string("filter_editor_add_filter"));
-            typeSelectorTitle.x = Main.GAME_WIDTH / 2 - 200;
-            typeSelectorTitle.y = 5;
+            var typeSelectorTitle:Text = new Text(typeSelector, Main.GAME_WIDTH / 2 - 200, 5, _lang.string("filter_editor_add_filter"));
             typeSelectorTitle.width = 400;
             typeSelectorTitle.align = Text.CENTER;
-            typeSelector.addChild(typeSelectorTitle);
 
             var typeButton:BoxButton;
             var typeOptions:Array = EngineLevelFilter.createOptions(EngineLevelFilter.FILTERS, "type");
@@ -221,10 +215,7 @@ package popups
                         pG.lineTo(xPos - INDENT_GAP + 10, yPos + 14);
 
                         // AND / OR Label
-                        var type_text:Text = new Text(_lang.string("filter_type_" + filter.type));
-                        type_text.x = xPos;
-                        type_text.y = yPos + 2;
-                        scrollpane.content.addChild(type_text);
+                        var type_text:Text = new Text(scrollpane.content, xPos, yPos + 2, _lang.string("filter_type_" + filter.type));
 
                         // Remove Filter Button
                         var removeFilter:BoxButton = new BoxButton(scrollpane.content, xPos + INDENT_GAP + 327, yPos, 23, 23, "X", 12, e_removeFilter);

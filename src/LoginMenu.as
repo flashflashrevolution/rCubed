@@ -120,15 +120,8 @@ package
             }
 
             // Username
-            var session_label_user:Text = new Text(_lang.string("login_continue_as"));
-            session_label_user.x = 100;
-            session_label_user.y = 30;
-            panel_session.addChild(session_label_user);
-
-            var session_txt_username:Text = new Text(savedInfos.username ? savedInfos.username : "----", 16, "#F3FAFF");
-            session_txt_username.x = 100;
-            session_txt_username.y = 50;
-            panel_session.addChild(session_txt_username);
+            var session_label_user:Text = new Text(panel_session, 100, 30, _lang.string("login_continue_as"));
+            var session_txt_username:Text = new Text(panel_session, 100, 50, savedInfos.username ? savedInfos.username : "----", 16, "#F3FAFF");
 
             //- Buttons
             var session_continueAsbtn:SimpleBoxButton = new SimpleBoxButton(box.width, 98);
@@ -143,28 +136,17 @@ package
 
             //- Text
             // Username
-            var txt_user:Text = new Text(_lang.string("login_name"));
-            txt_user.x = 5;
-            txt_user.y = 5;
-            panel_login.addChild(txt_user);
-
+            var txt_user:Text = new Text(panel_login, 5, 5, _lang.string("login_name"));
             input_user = new BoxText(panel_login, 5, 25, 290, 20);
 
             // Password
-            var txt_pass:Text = new Text(_lang.string("login_pass"));
-            txt_pass.x = 5;
-            txt_pass.y = 55
-            panel_login.addChild(txt_pass);
-
+            var txt_pass:Text = new Text(panel_login, 5, 55, _lang.string("login_pass"));
             input_pass = new BoxText(panel_login, 5, 75, 290, 20);
             input_pass.displayAsPassword = true;
 
+            // Save Details
             saveDetails = new BoxCheck(panel_login, 92, 113, toggleDetailsSave);
-
-            var txt_save:Text = new Text(_lang.string("login_remember"));
-            txt_save.x = 110;
-            txt_save.y = 111;
-            panel_login.addChild(txt_save);
+            var txt_save:Text = new Text(panel_login, 110, 111, _lang.string("login_remember"));
 
             //- Buttons
             var login_guestbtn:BoxButton = new BoxButton(panel_login, 6, box.height - 36, 75, 30, _lang.string("login_guest"), 12, playAsGuest);

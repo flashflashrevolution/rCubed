@@ -1,6 +1,7 @@
 package classes
 {
     import flash.display.DisplayObjectContainer;
+    import flash.events.Event;
     import flash.text.TextFormat;
 
     dynamic public class ValidatedText extends BoxText
@@ -33,7 +34,7 @@ package classes
          * @param restrict_mode Which restricted character set to be used
          * @param textformat TextFormat of the textfield
          */
-        public function ValidatedText(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:int = 0, height:int = 0, restrict_mode:uint = 0, textformat:TextFormat = null)
+        public function ValidatedText(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:int = 0, height:int = 0, restrict_mode:uint = 0, listener:Function = null, textformat:TextFormat = null)
         {
             super(parent, xpos, ypos, width, height, textformat);
             switch (restrict_mode)
@@ -63,6 +64,9 @@ package classes
                     m_validator = /^#[0-9a-f]{6}$/;
                     break;
             }
+
+            if (listener)
+                this.addEventListener(Event.CHANGE, listener);
         }
 
         private function renderValid():void

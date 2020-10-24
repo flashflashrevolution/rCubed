@@ -68,11 +68,8 @@ package popups
             box.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             box.activeAlpha = 0.4;
 
-            var titleDisplay:Text = new Text(_lang.string("popup_queue_manager"), 20);
-            titleDisplay.x = 10;
-            titleDisplay.y = 8;
+            var titleDisplay:Text = new Text(box, 10, 8, _lang.string("popup_queue_manager"), 20);
             titleDisplay.width = box.width - 10;
-            box.addChild(titleDisplay);
 
             menuMain = new BoxButton(box, box.width - 125 * 2 - 30, 8, 125, 25, _lang.string("options_queue_saved"), 12, clickHandler);
             menuMain.menu_select = TAB_MAIN;
@@ -163,11 +160,8 @@ package popups
                 }
                 else
                 {
-                    var noSavedDisplay:Text = new Text(_lang.string("popup_queue_no_queues"));
-                    noSavedDisplay.x = 10;
-                    noSavedDisplay.y = 8;
+                    var noSavedDisplay:Text = new Text(scrollpane.content, 10, 8, _lang.string("popup_queue_no_queues"));
                     noSavedDisplay.width = box.width - 10;
-                    scrollpane.content.addChild(noSavedDisplay);
                 }
             }
             else if (CURRENT_TAB == TAB_PREGEN)
@@ -321,10 +315,7 @@ internal class QueueBox extends Sprite
                 if (longview)
                 {
                     var access:int = _gvars.checkSongAccess(songData);
-                    var songName:Text = new Text(" - " + songData["name"] + " [" + songData["time"] + "]", 12, access == GlobalVariables.SONG_ACCESS_PLAYABLE ? "#FFFFFF" : "#FF9797");
-                    songName.x = 5;
-                    songName.y = yOffset;
-                    box.addChild(songName);
+                    var songName:Text = new Text(box, 5, yOffset, " - " + songData["name"] + " [" + songData["time"] + "]", 12, access == GlobalVariables.SONG_ACCESS_PLAYABLE ? "#FFFFFF" : "#FF9797");
                     yOffset += 20;
                 }
                 totalTime += songData["timeSecs"];
@@ -332,10 +323,7 @@ internal class QueueBox extends Sprite
         }
 
         // Add Queue Names + Info
-        var queueName:Text = new Text(queueItem.name + " [" + TimeUtil.convertToHHMMSS(totalTime) + "]", 14);
-        queueName.x = 5;
-        queueName.y = 5;
-        box.addChild(queueName);
+        var queueName:Text = new Text(box, 5, 5, queueItem.name + " [" + TimeUtil.convertToHHMMSS(totalTime) + "]", 14);
 
         if (!premade)
         {

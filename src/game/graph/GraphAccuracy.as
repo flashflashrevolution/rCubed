@@ -72,26 +72,19 @@ package game.graph
             flipGraphBtn.padding = 6;
             flipGraphBtn.setHoverText(_lang.string("game_results_flip_graph"), "right");
 
-            judgeMinTime = new Text(sprintf(_lang.string("game_results_graph_graph_early"), {"value": ((result.MIN_TIME > 0 ? "+" : "") + (result.MIN_TIME + 1))})); // It's greater then, so it's off by 1.
+            judgeMinTime = new Text(buttons, 0, 0, sprintf(_lang.string("game_results_graph_graph_early"), {"value": ((result.MIN_TIME > 0 ? "+" : "") + (result.MIN_TIME + 1))})); // It's greater then, so it's off by 1.
             judgeMinTime.alpha = 0.2;
-            buttons.addChild(judgeMinTime);
 
-            judgeMaxTime = new Text(sprintf(_lang.string("game_results_graph_graph_late"), {"value": ((result.MAX_TIME > 0 ? "+" : "") + (result.MAX_TIME + 1))}));
+            judgeMaxTime = new Text(buttons, 0, 0, sprintf(_lang.string("game_results_graph_graph_late"), {"value": ((result.MAX_TIME > 0 ? "+" : "") + (result.MAX_TIME + 1))}));
             judgeMaxTime.alpha = 0.2;
-            buttons.addChild(judgeMaxTime);
 
-            maxNotes = new Text(sprintf(_lang.string("game_results_graph_note_count"), {"notes": result.note_count}));
-            maxNotes.y = -3;
-            maxNotes.x = graphWidth - 2;
+            maxNotes = new Text(buttons, graphWidth - 2, -3, sprintf(_lang.string("game_results_graph_note_count"), {"notes": result.note_count}));
             maxNotes.alpha = 0.2;
             maxNotes.align = "right";
-            buttons.addChild(maxNotes);
 
             // Hover Text
-            hover_text = new Text("", 14);
+            hover_text = new Text(null, 30, 270, "", 14);
             hover_text.align = "center";
-            hover_text.x = 30;
-            hover_text.y = 270;
             hover_text.width = 300;
             hover_text.mouseEnabled = false;
             hover_text.mouseChildren = false;

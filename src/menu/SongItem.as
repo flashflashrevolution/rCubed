@@ -277,8 +277,7 @@ package menu
             if (!song["engine"] && song["genre"] == Constant.LEGACY_GENRE)
                 songname = '<font color="#004587">[L]</font> ' + songname;
 
-            _lblSongName = new Text(songname, 14);
-            this.addChild(_lblSongName);
+            _lblSongName = new Text(this, 0, 0, songname, 14);
 
             // Locked Song Item, basically anything but playable songs.
             if (isLocked)
@@ -317,19 +316,15 @@ package menu
                 _lblSongName.x = 36;
 
                 // Song Difficulty
-                _lblSongDifficulty = new Text(getDifficultyText(), 14);
-                _lblSongDifficulty.x = 1;
+                _lblSongDifficulty = new Text(this, 1, 0, getDifficultyText(), 14);
                 _lblSongDifficulty.setAreaParams(30, 27, Text.CENTER);
-                this.addChild(_lblSongDifficulty);
 
                 // Song Flag
                 var FLAG_TEXT:String = GlobalVariables.getSongIcon(_songData, rank);
                 if (FLAG_TEXT != "")
                 {
-                    _lblSongFlag = new Text(GlobalVariables.getSongIcon(_songData, rank), 14);
-                    _lblSongFlag.x = 296;
+                    _lblSongFlag = new Text(this, 296, 0, GlobalVariables.getSongIcon(_songData, rank), 14);
                     _lblSongFlag.setAreaParams(100, 27, Text.RIGHT);
-                    this.addChild(_lblSongFlag);
 
                     // Adjust Song Name to not overlap song flag.
                     _lblSongName.setAreaParams(347 - _lblSongFlag.textfield.textWidth, 27);
