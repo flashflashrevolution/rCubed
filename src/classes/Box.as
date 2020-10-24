@@ -116,9 +116,19 @@ package classes
             return _width;
         }
 
+        override public function set width(val:Number):void
+        {
+            this.setSize(val, _height);
+        }
+
         override public function get height():Number
         {
             return _height;
+        }
+
+        override public function set height(val:Number):void
+        {
+            this.setSize(_width, val);
         }
 
         public function get highlight():Boolean

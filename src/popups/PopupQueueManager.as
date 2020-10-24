@@ -74,13 +74,11 @@ package popups
             titleDisplay.width = box.width - 10;
             box.addChild(titleDisplay);
 
-            menuMain = new BoxButton(box, box.width - 125 * 2 - 30, 8, 125, 25, _lang.string("options_queue_saved"));
+            menuMain = new BoxButton(box, box.width - 125 * 2 - 30, 8, 125, 25, _lang.string("options_queue_saved"), 12, clickHandler);
             menuMain.menu_select = TAB_MAIN;
-            menuMain.addEventListener(MouseEvent.CLICK, clickHandler);
 
-            menuPregen = new BoxButton(box, box.width - menuMain.width - 15, 8, 125, 25, _lang.string("options_queue_premade"));
+            menuPregen = new BoxButton(box, box.width - menuMain.width - 15, 8, 125, 25, _lang.string("options_queue_premade"), 12, clickHandler);
             menuPregen.menu_select = TAB_PREGEN;
-            menuPregen.addEventListener(MouseEvent.CLICK, clickHandler);
 
             //- content
             scrollpane = new ScrollPane(box.width - 45, 341);
@@ -99,12 +97,10 @@ package popups
             renderQueues();
 
             //- importBtn
-            importBtn = new BoxButton(box, box.width - 180, box.height - 42, 79.5, 27, _lang.string("popup_queue_import"));
-            importBtn.addEventListener(MouseEvent.CLICK, clickHandler);
+            importBtn = new BoxButton(box, box.width - 180, box.height - 42, 79.5, 27, _lang.string("popup_queue_import"), 12, clickHandler);
 
             //- Close
-            closeBtn = new BoxButton(box, box.width - 94.5, box.height - 42, 79.5, 27, _lang.string("menu_close"));
-            closeBtn.addEventListener(MouseEvent.CLICK, clickHandler);
+            closeBtn = new BoxButton(box, box.width - 94.5, box.height - 42, 79.5, 27, _lang.string("menu_close"), 12, clickHandler);
         }
 
         private function scrollBarMoved(e:Event):void
@@ -121,6 +117,11 @@ package popups
 
         override public function stageRemove():void
         {
+            menuMain.dispose();
+            menuPregen.dispose();
+            importBtn.dispose();
+            closeBtn.dispose();
+
             box.dispose();
             this.removeChild(box);
             this.removeChild(bmp);
@@ -439,6 +440,11 @@ internal class QueueBox extends Sprite
         //- Remove is already existed.
         if (box != null)
         {
+            copyBtn.dispose();
+            deleteBtn.dispose();
+            playBtn.dispose();
+            renameBtn.dispose();
+
             box.dispose();
             this.removeChild(box);
             box = null;

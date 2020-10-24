@@ -181,8 +181,7 @@ package popups
             box.addChild(new Bitmap(textbmd));
 
             //- Close
-            closeOptions = new BoxButton(box, 15, box.height - 42, box.width - 30, 27, _lang.string("menu_close"));
-            closeOptions.addEventListener(MouseEvent.CLICK, clickHandler);
+            closeOptions = new BoxButton(box, 15, box.height - 42, box.width - 30, 27, _lang.string("menu_close"), 12, clickHandler);
 
             TweenLite.to(bmp, 1, {alpha: 1});
             TweenLite.to(bh, 1, {alpha: 1, scaleX: 1, scaleY: 1, ease: Back.easeOut});
@@ -190,6 +189,8 @@ package popups
 
         override public function stageRemove():void
         {
+            closeOptions.dispose();
+
             box.dispose();
             bmp = null;
             box = null;

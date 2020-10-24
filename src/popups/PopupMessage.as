@@ -69,8 +69,7 @@ package popups
             box.addChild(messageDisplay);
 
             //- Close
-            closeOptions = new BoxButton(box, box.width - 94.5, box.height - 42, 79.5, 27, _lang.string("menu_close"));
-            closeOptions.addEventListener(MouseEvent.CLICK, clickHandler);
+            closeOptions = new BoxButton(box, box.width - 94.5, box.height - 42, 79.5, 27, _lang.string("menu_close"), 12, clickHandler);
         }
 
         override public function stageRemove():void

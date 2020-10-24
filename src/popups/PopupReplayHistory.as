@@ -171,16 +171,13 @@ package popups
             box.addChild(scrollbar);
 
             //- importBtn
-            importBtn = new BoxButton(box, box.width - 180, box.height - 42, 79.5, 27, _lang.string("popup_replay_import"));
-            importBtn.addEventListener(MouseEvent.CLICK, e_boxClickHandler);
+            importBtn = new BoxButton(box, box.width - 180, box.height - 42, 79.5, 27, _lang.string("popup_replay_import"), 12, e_boxClickHandler);
 
             //- Close
-            closeBtn = new BoxButton(box, box.width - 94.5, box.height - 42, 79.5, 27, _lang.string("menu_close"));
-            closeBtn.addEventListener(MouseEvent.CLICK, e_boxClickHandler);
+            closeBtn = new BoxButton(box, box.width - 94.5, box.height - 42, 79.5, 27, _lang.string("menu_close"), 12, e_boxClickHandler);
 
             //- Recent/External Swap
-            sourceBtn = new BoxButton(box, 20, box.height - 42, 79.5, 27, _lang.string("popup_replay_external"));
-            sourceBtn.addEventListener(MouseEvent.CLICK, e_boxClickHandler);
+            sourceBtn = new BoxButton(box, 20, box.height - 42, 79.5, 27, _lang.string("popup_replay_external"), 12, e_boxClickHandler);
 
             //- Build Recent Engine List
             for each (var r:Replay in _gvars.replayHistory)
@@ -284,6 +281,10 @@ package popups
             EXTERNAL_REPLAYS_LIST = [];
 
             scrollpane.clear();
+
+            sourceBtn.dispose();
+            importBtn.dispose();
+            closeBtn.dispose();
 
             box.dispose();
             this.removeChild(box);
@@ -726,6 +727,10 @@ internal class ReplayBox extends Sprite
             resultsText.dispose();
             box.removeChild(resultsText);
             resultsText = null;
+
+            copyBtn.dispose();
+            deleteBtn.dispose();
+
             box.dispose();
             this.removeChild(box);
             box = null;

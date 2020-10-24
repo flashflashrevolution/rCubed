@@ -81,12 +81,10 @@ package menu
             this.addChild(scrollbar);
 
             // Menu Left
-            normalTokenButton = new BoxButton(this, 5, 130, 124, 29, _lang.string("menu_tokens_normal"));
-            normalTokenButton.addEventListener(MouseEvent.CLICK, onNormalSelect);
+            normalTokenButton = new BoxButton(this, 5, 130, 124, 29, _lang.string("menu_tokens_normal"), 12, onNormalSelect);
 
-            skillTokenButton = new BoxButton(this, 5, 164, 124, 29, _lang.string("menu_tokens_skill"));
+            skillTokenButton = new BoxButton(this, 5, 164, 124, 29, _lang.string("menu_tokens_skill"), 12, onSkillSelect);
             skillTokenButton.active = true;
-            skillTokenButton.addEventListener(MouseEvent.CLICK, onSkillSelect);
 
             var hideLabel:Text = new Text(_lang.string("menu_tokens_hide_complete"));
             hideLabel.x = 10;
@@ -142,6 +140,10 @@ package menu
                 this.removeChild(pane);
                 pane = null;
             }
+
+            normalTokenButton.dispose();
+            skillTokenButton.dispose();
+
             super.dispose();
         }
 

@@ -224,24 +224,24 @@ package popups
         private function renderMenu():void
         {
             var tab_width:int = 170;
-            menuMain = new BoxButton(box, 15, 15, tab_width, 25, _lang.string("options_menu_main"));
+            menuMain = new BoxButton(box, 15, 15, tab_width, 25, _lang.string("options_menu_main"), 12, clickHandler, false, 0, true);
             menuMain.menu_select = TAB_MAIN;
 
-            menuVisualMods = new BoxButton(box, menuMain.x + tab_width + 10, 15, tab_width, 25, _lang.string("options_menu_visual_mods"));
+            menuVisualMods = new BoxButton(box, menuMain.x + tab_width + 10, 15, tab_width, 25, _lang.string("options_menu_visual_mods"), 12, clickHandler, false, 0, true);
             menuVisualMods.menu_select = TAB_VISUAL_MODS;
 
-            menuGameColors = new BoxButton(box, menuVisualMods.x + tab_width + 10, 15, tab_width, 25, _lang.string("options_menu_game_colors"));
+            menuGameColors = new BoxButton(box, menuVisualMods.x + tab_width + 10, 15, tab_width, 25, _lang.string("options_menu_game_colors"), 12, clickHandler, false, 0, true);
             menuGameColors.menu_select = TAB_COLORS;
 
-            menuOther = new BoxButton(box, menuGameColors.x + tab_width + 10, 15, tab_width, 25, _lang.string("options_menu_other"));
+            menuOther = new BoxButton(box, menuGameColors.x + tab_width + 10, 15, tab_width, 25, _lang.string("options_menu_other"), 12, clickHandler, false, 0, true);
             menuOther.menu_select = TAB_OTHER;
 
             //- Close
-            closeOptions = new BoxButton(box, box.width - 95, box.height - 42, 80, 27, _lang.string("menu_close"));
+            closeOptions = new BoxButton(box, box.width - 95, box.height - 42, 80, 27, _lang.string("menu_close"), 12, clickHandler, false, 0, true);
             closeOptions.contextMenu = _contextImportExport;
 
             //- Reset
-            resetOptions = new BoxButton(box, box.width - 180, box.height - 42, 80, 27, _lang.string("menu_reset"));
+            resetOptions = new BoxButton(box, box.width - 180, box.height - 42, 80, 27, _lang.string("menu_reset"), 12, clickHandler, false, 0, true);
             resetOptions.color = 0xff0000;
 
             //- Editor
@@ -265,14 +265,6 @@ package popups
             warningOptions = new Text(_lang.string("options_warning_save"), 14, "#f06868");
             warningOptions.x = editorOptions.x;
             warningOptions.y = editorOptions.y - 25;
-
-            menuMain.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-            menuVisualMods.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-            menuGameColors.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-            menuOther.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-
-            closeOptions.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-            resetOptions.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
 
             if (!_gvars.flashvars.replay && !_gvars.flashvars.preview_file)
             {
@@ -768,9 +760,7 @@ package popups
                     yOff += 20;
                 }
 
-                optionNoteskinsCustom = new BoxButton(box, xOff + 3, yOff + 1, 179, 23, _lang.string("options_noteskins_edit_custom"));
-                optionNoteskinsCustom.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
-
+                optionNoteskinsCustom = new BoxButton(box, xOff + 3, yOff + 1, 179, 23, _lang.string("options_noteskins_edit_custom"), 12, clickHandler, false, 0, true);
             }
             else if (CURRENT_TAB == TAB_COLORS)
             {
@@ -810,10 +800,9 @@ package popups
                     gameJudgeColorDisplay.addEventListener(Event.CHANGE, changeHandler);
                     box.addChild(gameJudgeColorDisplay);
 
-                    var optionJudgeColorReset:BoxButton = new BoxButton(box, xOff + 200, yOff, 20, 20, "R");
+                    var optionJudgeColorReset:BoxButton = new BoxButton(box, xOff + 200, yOff, 20, 20, "R", 12, clickHandler, false, 0, true);
                     optionJudgeColorReset.judge_color_reset_id = i;
                     optionJudgeColorReset.color = 0xff0000;
-                    optionJudgeColorReset.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                     optionJudgeColors.push({"text": optionJudgeColor, "display": gameJudgeColorDisplay, "reset": optionJudgeColorReset});
 
                     yOff += 25;
@@ -853,10 +842,9 @@ package popups
                     gameGameColorDisplay.addEventListener(Event.CHANGE, changeHandler);
                     box.addChild(gameGameColorDisplay);
 
-                    var optionGameColorReset:BoxButton = new BoxButton(box, xOff + 200, yOff, 20, 20, "R");
+                    var optionGameColorReset:BoxButton = new BoxButton(box, xOff + 200, yOff, 20, 20, "R", 12, clickHandler, false, 0, true);
                     optionGameColorReset.game_color_reset_id = i;
                     optionGameColorReset.color = 0xff0000;
-                    optionGameColorReset.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
                     optionGameColors.push({"text": optionGameColor, "display": gameGameColorDisplay, "reset": optionGameColorReset});
 
                     yOff += 25;
@@ -896,10 +884,9 @@ package popups
                     gameComboColorDisplay.addEventListener(Event.CHANGE, changeHandler);
                     box.addChild(gameComboColorDisplay);
 
-                    var optionComboColorReset:BoxButton = new BoxButton(box, xOff + 200, yOff, 20, 20, "R");
+                    var optionComboColorReset:BoxButton = new BoxButton(box, xOff + 200, yOff, 20, 20, "R", 12, clickHandler, false, 0, true);
                     optionComboColorReset.combo_color_reset_id = i;
                     optionComboColorReset.color = 0xff0000;
-                    optionComboColorReset.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
 
                     if (i > 0)
                     {
@@ -1048,8 +1035,7 @@ package popups
                 yOff += 30;
 
                 // https://github.com/flashflashrevolution/web-stream-overlay
-                openWebsocketOverlay = new BoxButton(box, xOff, yOff, 150, 27, _lang.string("options_overlay_instructions"));
-                openWebsocketOverlay.addEventListener(MouseEvent.CLICK, clickHandler, false, 0, true);
+                openWebsocketOverlay = new BoxButton(box, xOff, yOff, 150, 27, _lang.string("options_overlay_instructions"), 12, clickHandler, false, 0, true);
                 yOff += 30;
 
                 ///- Col 2
@@ -1587,9 +1573,7 @@ package popups
                 confirmP.y = (box.height / 2 - confirmP.height / 2);
                 box.addChild(confirmP);
 
-                var resB:BoxButton = new BoxButton(confirmP, 5, 5, 100, 35, "RESET", 12, "#990000");
-                resB.color = 0x330000;
-                resB.addEventListener(MouseEvent.CLICK, function(e:Event):void
+                function doReset(e:Event):void
                 {
                     box.removeChild(confirmP);
                     if (_gvars.activeUser == _gvars.playerUser)
@@ -1598,14 +1582,20 @@ package popups
                         _avars.resetSettings();
                     }
                     renderOptions();
-                });
+                }
 
-                var conB:BoxButton = new BoxButton(confirmP, 5, 45, 100, 35, "Close", 12, "#000000");
-                conB.color = 0;
-                conB.addEventListener(MouseEvent.CLICK, function(e:Event):void
+                function closeReset(e:Event):void
                 {
                     box.removeChild(confirmP);
-                });
+                }
+
+                var resB:BoxButton = new BoxButton(confirmP, 5, 5, 100, 35, "RESET", 12, doReset);
+                resB.color = 0x330000;
+                resB.textColor = "#990000";
+
+                var conB:BoxButton = new BoxButton(confirmP, 5, 45, 100, 35, "Close", 12, closeReset);
+                conB.color = 0;
+                conB.textColor = "#000000";
             }
 
             //- Close

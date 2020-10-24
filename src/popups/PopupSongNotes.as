@@ -217,17 +217,14 @@ package popups
             optionJudgeOffset.addEventListener(Event.CHANGE, changeHandler);
 
             //- Revert
-            revertOptions = new BoxButton(box, 20, box.height - 42, 80, 27, _lang.string("menu_revert"));
+            revertOptions = new BoxButton(box, 20, box.height - 42, 80, 27, _lang.string("menu_revert"), 12, clickHandler);
             revertOptions.color = 0xff0000;
-            revertOptions.addEventListener(MouseEvent.CLICK, clickHandler);
 
             //- Close
-            closeOptions = new BoxButton(box, box.width - 100, box.height - 42, 80, 27, _lang.string("menu_close"));
-            closeOptions.addEventListener(MouseEvent.CLICK, clickHandler);
+            closeOptions = new BoxButton(box, box.width - 100, box.height - 42, 80, 27, _lang.string("menu_close"), 12, clickHandler);
 
             //- Confirm
-            confirmOptions = new BoxButton(box, closeOptions.x - 95, box.height - 42, 80, 27, _lang.string("menu_confirm"));
-            confirmOptions.addEventListener(MouseEvent.CLICK, clickHandler);
+            confirmOptions = new BoxButton(box, closeOptions.x - 95, box.height - 42, 80, 27, _lang.string("menu_confirm"), 12, clickHandler);
 
             refreshFields();
         }
@@ -257,9 +254,6 @@ package popups
             notesField.removeEventListener(Event.CHANGE, e_notesFieldChange);
             setMirrorInvert.removeEventListener(MouseEvent.CLICK, clickHandler);
             setCustomOffsets.removeEventListener(MouseEvent.CLICK, clickHandler);
-            revertOptions.removeEventListener(MouseEvent.CLICK, clickHandler);
-            closeOptions.removeEventListener(MouseEvent.CLICK, clickHandler);
-            confirmOptions.removeEventListener(MouseEvent.CLICK, clickHandler);
             optionJudgeOffset.removeEventListener(Event.CHANGE, changeHandler);
             optionMusicOffset.removeEventListener(Event.CHANGE, changeHandler);
 

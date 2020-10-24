@@ -1,9 +1,7 @@
 package classes
 {
-    import flash.display.Sprite;
     import assets.GameBackgroundColor;
-    import flash.display.CapsStyle;
-    import flash.display.JointStyle;
+    import flash.display.Sprite;
 
     dynamic public class BoxCheck extends Sprite
     {

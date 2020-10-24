@@ -103,20 +103,16 @@ package popups
             box.addChild(myAVText);
 
             //- Previous
-            prevBtn = new BoxButton(box, 10, box.height - 42, 79.5, 27, _lang.string("popup_highscores_previous"));
-            prevBtn.addEventListener(MouseEvent.CLICK, clickHandler);
+            prevBtn = new BoxButton(box, 10, box.height - 42, 79.5, 27, _lang.string("popup_highscores_previous"), 12, clickHandler);
 
             //- Next
-            nextBtn = new BoxButton(box, 100, box.height - 42, 79.5, 27, _lang.string("popup_highscores_next"));
-            nextBtn.addEventListener(MouseEvent.CLICK, clickHandler);
+            nextBtn = new BoxButton(box, 100, box.height - 42, 79.5, 27, _lang.string("popup_highscores_next"), 12, clickHandler);
 
             //- Close
-            closeBtn = new BoxButton(box, box.width - 94.5, box.height - 42, 79.5, 27, _lang.string("menu_close"));
-            closeBtn.addEventListener(MouseEvent.CLICK, clickHandler);
+            closeBtn = new BoxButton(box, box.width - 94.5, box.height - 42, 79.5, 27, _lang.string("menu_close"), 12, clickHandler);
 
             //- Refresh
-            refreshBtn = new BoxButton(box, box.width - 184.5, box.height - 42, 79.5, 27, _lang.string("popup_highscores_refresh"));
-            refreshBtn.addEventListener(MouseEvent.CLICK, clickHandler);
+            refreshBtn = new BoxButton(box, box.width - 184.5, box.height - 42, 79.5, 27, _lang.string("popup_highscores_refresh"), 12, clickHandler);
 
             //- Render List
             renderHighscores();
@@ -274,6 +270,11 @@ package popups
 
         override public function stageRemove():void
         {
+            prevBtn.dispose();
+            nextBtn.dispose();
+            closeBtn.dispose();
+            refreshBtn.dispose();
+
             box.dispose();
             this.removeChild(box);
             this.removeChild(bmp);

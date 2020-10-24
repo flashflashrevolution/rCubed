@@ -166,25 +166,21 @@ package game
             this.addChild(buttonMenu);
 
             // Main Bavigation Buttons
-            navOptions = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_options"), 17);
-            navOptions.addEventListener(MouseEvent.CLICK, eventHandler);
+            navOptions = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_options"), 17, eventHandler);
             buttonMenuItems.push(navOptions);
 
-            navHighscores = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_highscores"), 17);
-            navHighscores.addEventListener(MouseEvent.CLICK, eventHandler);
+            navHighscores = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_highscores"), 17, eventHandler);
             buttonMenuItems.push(navHighscores);
 
             if (!_mp.gameplayPlayingStatus())
             {
-                navReplay = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_replay_song"), 17);
-                navReplay.addEventListener(MouseEvent.CLICK, eventHandler);
+                navReplay = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_replay_song"), 17, eventHandler);
                 buttonMenuItems.push(navReplay);
             }
 
             if (!_gvars.flashvars.replay && !_gvars.flashvars.preview_file)
             {
-                navMenu = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_exit_menu"), 17);
-                navMenu.addEventListener(MouseEvent.CLICK, eventHandler);
+                navMenu = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_exit_menu"), 17, eventHandler);
                 buttonMenuItems.push(navMenu);
             }
 
@@ -205,27 +201,21 @@ package game
             resultsDisplay.addChild(navRating);
 
             // Song Results Buttons
-            navScreenShot = new BoxIcon(this, 522, 6, 32, 32, new iconPhoto());
+            navScreenShot = new BoxIcon(this, 522, 6, 32, 32, new iconPhoto(), eventHandler);
             navScreenShot.setIconColor("#E2FEFF");
             navScreenShot.setHoverText(_lang.string("game_results_queue_save_screenshot"), "bottom");
-            navScreenShot.addEventListener(MouseEvent.CLICK, eventHandler);
 
-            navSaveReplay = new BoxIcon(this, 485, 6, 32, 32, new iconVideo());
+            navSaveReplay = new BoxIcon(this, 485, 6, 32, 32, new iconVideo(), eventHandler);
             navSaveReplay.setIconColor("#E2FEFF");
             navSaveReplay.setHoverText(_lang.string("game_results_queue_save_replay"), "bottom");
-            navSaveReplay.addEventListener(MouseEvent.CLICK, eventHandler);
 
-            navRandomSong = new BoxIcon(this, 448, 6, 32, 32, new iconRandom());
+            navRandomSong = new BoxIcon(this, 448, 6, 32, 32, new iconRandom(), eventHandler);
             navRandomSong.setIconColor("#E2FEFF");
             navRandomSong.setHoverText(_lang.string("game_results_play_random_song"), "bottom");
-            navRandomSong.addEventListener(MouseEvent.CLICK, eventHandler);
 
             // Song Results - Song Queue
-            navPrev = new BoxButton(this, 18, 62, 90, 32, _lang.string("game_results_queue_previous"));
-            navPrev.addEventListener(MouseEvent.CLICK, eventHandler);
-
-            navNext = new BoxButton(this, 672, 62, 90, 32, _lang.string("game_results_queue_next"));
-            navNext.addEventListener(MouseEvent.CLICK, eventHandler);
+            navPrev = new BoxButton(this, 18, 62, 90, 32, _lang.string("game_results_queue_previous"), 12, eventHandler);
+            navNext = new BoxButton(this, 672, 62, 90, 32, _lang.string("game_results_queue_next"), 12, eventHandler);
 
             // Graph
             resultsMods = new Text("---");
@@ -245,10 +235,9 @@ package game
             graphOverlay.mouseEnabled = false;
             this.addChild(graphOverlay);
 
-            graphToggle = new BoxIcon(this, 10, 298, 16, 18, new iconRight());
+            graphToggle = new BoxIcon(this, 10, 298, 16, 18, new iconRight(), eventHandler);
             graphToggle.padding = 6;
             graphToggle.setHoverText(_lang.string("result_next_graph_type"), "right");
-            graphToggle.addEventListener(MouseEvent.CLICK, eventHandler);
 
             graphAccuracy = new BoxIcon(this, 10, 318, 16, 18, new iconSmallT());
             graphAccuracy.padding = 6;

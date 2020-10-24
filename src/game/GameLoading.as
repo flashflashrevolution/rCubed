@@ -1,15 +1,14 @@
 package game
 {
     import classes.BoxButton;
-    import classes.chart.Song;
     import classes.Language;
     import classes.Playlist;
+    import classes.chart.Song;
     import com.flashfla.components.ProgressBar;
     import com.flashfla.utils.NumberUtil;
     import com.greensock.TweenLite;
     import flash.display.Sprite;
     import flash.events.Event;
-    import flash.events.MouseEvent;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
     import flash.text.TextFormat;
@@ -95,7 +94,7 @@ package game
             this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
 
             if (cancelLoadButton)
-                cancelLoadButton.removeEventListener(MouseEvent.CLICK, e_cancelClick);
+                cancelLoadButton.dispose();
 
             if (preloader)
                 preloader.removeEventListener(Event.REMOVED_FROM_STAGE, preloaderRemoved);
@@ -110,8 +109,7 @@ package game
 
             if ((loadTimer >= 60 || song.loadFail) && !cancelLoadButton && !_gvars.flashvars.replay)
             {
-                cancelLoadButton = new BoxButton(this, Main.GAME_WIDTH - 85, preloader.y - 35, 75, 25, "Cancel");
-                cancelLoadButton.addEventListener(MouseEvent.CLICK, e_cancelClick);
+                cancelLoadButton = new BoxButton(this, Main.GAME_WIDTH - 85, preloader.y - 35, 75, 25, "Cancel", 12, e_cancelClick);
             }
 
             if (song.loadFail)

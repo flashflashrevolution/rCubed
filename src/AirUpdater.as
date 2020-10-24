@@ -11,7 +11,6 @@ package
     import com.flashfla.utils.sprintf;
     import flash.events.Event;
     import flash.events.IOErrorEvent;
-    import flash.events.MouseEvent;
     import flash.events.ProgressEvent;
     import flash.filesystem.File;
     import flash.filesystem.FileMode;
@@ -74,8 +73,7 @@ package
             messageDisplay.align = Text.CENTER;
             addChild(messageDisplay);
 
-            actionButton = new BoxButton(this, 25, Main.GAME_HEIGHT - 25 - 25, Main.GAME_WIDTH - 50, 25, "---");
-            actionButton.addEventListener(MouseEvent.CLICK, e_actionButton);
+            actionButton = new BoxButton(this, 25, Main.GAME_HEIGHT - 25 - 25, Main.GAME_WIDTH - 50, 25, "---", 12, e_actionButton);
             actionButtonState(false);
 
             var box:Box = new Box(this, 25, 115, false, false);

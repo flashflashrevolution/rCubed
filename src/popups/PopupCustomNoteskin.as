@@ -111,12 +111,10 @@ package popups
             var xOff:int = 0;
 
 
-            btn_importImage = new BoxButton(box, xPos, yPos, sidebar_width - 20, 25, _lang.string("popup_noteskin_import_image")); // "Import Image"
-            btn_importImage.addEventListener(MouseEvent.CLICK, clickHandler);
+            btn_importImage = new BoxButton(box, xPos, yPos, sidebar_width - 20, 25, _lang.string("popup_noteskin_import_image"), 12, clickHandler); // "Import Image"
             yPos += 30;
 
-            btn_importJSON = new BoxButton(box, xPos, yPos, sidebar_width - 20, 25, _lang.string("popup_noteskin_import_json")); // "Import JSON"
-            btn_importJSON.addEventListener(MouseEvent.CLICK, clickHandler);
+            btn_importJSON = new BoxButton(box, xPos, yPos, sidebar_width - 20, 25, _lang.string("popup_noteskin_import_json"), 12, clickHandler); // "Import JSON"
             yPos += 30;
 
             var cellDescText:Text = new Text(_lang.string("popup_noteskin_grid_rotation")); // "Grid & Rotation:"
@@ -140,14 +138,13 @@ package popups
             var btn_note_color_input:BoxButton;
             for (var n:int = 0; n < DEFAULT_OPTIONS.noteColors.length; n++)
             {
-                btn_note_color_input = new BoxButton(box, (n % 2 == 0 ? xPos : xPos + ((sidebar_width - 25) / 2) + 5), yPos, (sidebar_width - 25) / 2, 20, _lang.string("note_colors_" + DEFAULT_OPTIONS.noteColors[n]));
+                btn_note_color_input = new BoxButton(box, (n % 2 == 0 ? xPos : xPos + ((sidebar_width - 25) / 2) + 5), yPos, (sidebar_width - 25) / 2, 20, _lang.string("note_colors_" + DEFAULT_OPTIONS.noteColors[n]), 12, clickHandler);
                 btn_note_color_input.alpha = 0.75;
                 btn_note_color_input.note_color = DEFAULT_OPTIONS.noteColors[n];
 
                 if (n % 2 == 1)
                     yPos += 25;
 
-                btn_note_color_input.addEventListener(MouseEvent.CLICK, clickHandler);
                 note_colors_btns.push(btn_note_color_input);
             }
 
@@ -187,16 +184,13 @@ package popups
             updateDirections();
 
             //- Export
-            exportOptions = new BoxButton(box, xPos, box.height - 95, sidebar_width - 20, 25, _lang.string("menu_copy_to_clipboard"));
-            exportOptions.addEventListener(MouseEvent.CLICK, clickHandler);
+            exportOptions = new BoxButton(box, xPos, box.height - 95, sidebar_width - 20, 25, _lang.string("menu_copy_to_clipboard"), 12, clickHandler);
 
             //- Save
-            saveOptions = new BoxButton(box, xPos, box.height - 65, sidebar_width - 20, 25, _lang.string("menu_save"));
-            saveOptions.addEventListener(MouseEvent.CLICK, clickHandler);
+            saveOptions = new BoxButton(box, xPos, box.height - 65, sidebar_width - 20, 25, _lang.string("menu_save"), 12, clickHandler);
 
             //- Close
-            closeOptions = new BoxButton(box, xPos, box.height - 35, sidebar_width - 20, 25, _lang.string("menu_close"));
-            closeOptions.addEventListener(MouseEvent.CLICK, clickHandler);
+            closeOptions = new BoxButton(box, xPos, box.height - 35, sidebar_width - 20, 25, _lang.string("menu_close"), 12, clickHandler);
         }
 
         override public function stageRemove():void

@@ -88,23 +88,19 @@ package popups
             box.addChild(tabLabel);
 
             //- Closed
-            closeButton = new BoxButton(box, box.width - 105, 5, 100, 31, _lang.string("popup_close"));
-            closeButton.addEventListener(MouseEvent.CLICK, e_closeButton);
+            closeButton = new BoxButton(box, box.width - 105, 5, 100, 31, _lang.string("popup_close"), 12, e_closeButton);
 
             //- Saved 
-            filterListButton = new BoxButton(box, closeButton.x - 105, 5, 100, 31, _lang.string("popup_filter_saved_filters"));
-            filterListButton.addEventListener(MouseEvent.CLICK, e_toggleTabButton);
+            filterListButton = new BoxButton(box, closeButton.x - 105, 5, 100, 31, _lang.string("popup_filter_saved_filters"), 12, e_toggleTabButton);
 
             //- Clear
-            clearFilterButton = new BoxButton(box, filterListButton.x - 105, 5, 100, 31, _lang.string("popup_filter_clear_filter"));
-            clearFilterButton.addEventListener(MouseEvent.CLICK, e_clearFilterButton);
+            clearFilterButton = new BoxButton(box, filterListButton.x - 105, 5, 100, 31, _lang.string("popup_filter_clear_filter"), 12, e_clearFilterButton);
 
             //- Add
-            addSavedFilterButton = new BoxButton(box, filterListButton.x - 105, 5, 100, 31, _lang.string("popup_filter_add_filter"));
-            addSavedFilterButton.addEventListener(MouseEvent.CLICK, e_addSavedFilterButton);
+            addSavedFilterButton = new BoxButton(box, filterListButton.x - 105, 5, 100, 31, _lang.string("popup_filter_add_filter"), 12, e_addSavedFilterButton);
 
-            importFilterButton = new BoxButton(box, addSavedFilterButton.x - 105, 5, 100, 31, _lang.string("popup_filter_filter_single_import"));
-            importFilterButton.addEventListener(MouseEvent.CLICK, e_importFilterButton);
+            //- Import Filter
+            importFilterButton = new BoxButton(box, addSavedFilterButton.x - 105, 5, 100, 31, _lang.string("popup_filter_filter_single_import"), 12, e_importFilterButton);
 
             // Filter Name Input
             filterNameInput = new BoxText(box, 5, 5, clearFilterButton.x - 11, 30);
@@ -146,9 +142,8 @@ package popups
             var typeOptions:Array = EngineLevelFilter.createOptions(EngineLevelFilter.FILTERS, "type");
             for (var i:int = 0; i < typeOptions.length; i++)
             {
-                typeButton = new BoxButton(typeSelector, (Main.GAME_WIDTH / 2 - 200) + 10 + (195 * (i % 2)), 30 + (Math.floor(i / 2) * 35), 185, 25, typeOptions[i]["label"]);
+                typeButton = new BoxButton(typeSelector, (Main.GAME_WIDTH / 2 - 200) + 10 + (195 * (i % 2)), 30 + (Math.floor(i / 2) * 35), 185, 25, typeOptions[i]["label"], 12, e_addFilterSelection);
                 typeButton.tag = typeOptions[i]["data"];
-                typeButton.addEventListener(MouseEvent.CLICK, e_addFilterSelection);
             }
 
             draw();
@@ -232,8 +227,7 @@ package popups
                         scrollpane.content.addChild(type_text);
 
                         // Remove Filter Button
-                        var removeFilter:BoxButton = new BoxButton(scrollpane.content, xPos + INDENT_GAP + 327, yPos, 23, 23, "X");
-                        removeFilter.addEventListener(MouseEvent.CLICK, e_removeFilter);
+                        var removeFilter:BoxButton = new BoxButton(scrollpane.content, xPos + INDENT_GAP + 327, yPos, 23, 23, "X", 12, e_removeFilter);
                         removeFilter.tag = filter;
 
                         yPos -= 8;
@@ -255,8 +249,7 @@ package popups
                     pG.moveTo(xPos + INDENT_GAP - 4, yPos + 57);
                     pG.lineTo(xPos + 10, yPos + 57);
 
-                    var addFilter:BoxButton = new BoxButton(scrollpane.content, xPos + INDENT_GAP, yPos += 44, 23, 23, "+");
-                    addFilter.addEventListener(MouseEvent.CLICK, e_addFilter);
+                    var addFilter:BoxButton = new BoxButton(scrollpane.content, xPos + INDENT_GAP, yPos += 44, 23, 23, "+", 12, e_addFilter);
                     addFilter.tag = filter;
                     pG.drawRect(addFilter.x, addFilter.y, 23, 23);
 

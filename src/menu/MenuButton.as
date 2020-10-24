@@ -14,7 +14,7 @@ package menu
 
         public function MenuButton(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, message:String = "", isActive:Boolean = false):void
         {
-            super(parent, xpos, ypos, 115, 28, message, 12, "#FFFFFF", true, true);
+            super(parent, xpos, ypos, 115, 28, message, 12);
             super.active = isActive;
         }
     }

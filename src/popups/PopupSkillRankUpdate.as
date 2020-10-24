@@ -13,7 +13,6 @@ package popups
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.events.Event;
-    import flash.events.MouseEvent;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
     import menu.MenuPanel;
@@ -47,17 +46,19 @@ package popups
             box.normalAlpha = 0.8;
             box.addChild(renderPlane);
 
-            closeBox = new BoxButton(box, 682, 7, 72, 35, _lang.string("menu_close"));
+            closeBox = new BoxButton(box, 682, 7, 72, 35, _lang.string("menu_close"), 12, clickHandler);
             closeBox.buttonMode = true;
             closeBox.mouseChildren = false;
-            closeBox.addEventListener(MouseEvent.CLICK, clickHandler);
 
             TweenLite.to(box, 0.5, {"y": Main.GAME_HEIGHT - (box.height - 40), "ease": BackOut.ease});
         }
 
         override public function stageRemove():void
         {
-            closeBox.removeEventListener(MouseEvent.CLICK, clickHandler);
+            closeBox.dispose();
+
+            box.dispose();
+            box = null;
         }
 
         private function clickHandler(e:Event):void

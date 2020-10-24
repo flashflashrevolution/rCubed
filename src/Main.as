@@ -34,7 +34,6 @@ package
     import flash.events.ContextMenuEvent;
     import flash.events.Event;
     import flash.events.KeyboardEvent;
-    import flash.events.MouseEvent;
     import flash.system.Capabilities;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
@@ -383,8 +382,7 @@ package
             preloader.update(Math.round((loadScripts / loadTotal) * 100));
             if (loadTimer >= 300 && !retryLoadButton)
             {
-                retryLoadButton = new BoxButton(this, Main.GAME_WIDTH - 85, preloader.y - 35, 75, 25, "RELOAD");
-                retryLoadButton.addEventListener(MouseEvent.CLICK, e_retryClick);
+                retryLoadButton = new BoxButton(this, Main.GAME_WIDTH - 85, preloader.y - 35, 75, 25, "RELOAD", 12, e_retryClick);
             }
 
             if (preloader.isComplete)
@@ -393,8 +391,7 @@ package
                 if (retryLoadButton)
                 {
                     removeChild(retryLoadButton);
-                    retryLoadButton.removeEventListener(MouseEvent.CLICK, e_retryClick);
-                    retryLoadButton = null;
+                    retryLoadButton.dispose();
                 }
 
                 buildContextMenu();

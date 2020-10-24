@@ -101,8 +101,7 @@ package menu
 
             for (var i:int = 0; i < mmc_strings.length; ++i)
             {
-                var menu_music_button:BoxIcon = new BoxIcon(null, 5 + 30 * i, 5, 25, 25, mmc_icons[i]);
-                menu_music_button.addEventListener(MouseEvent.CLICK, mmc_functions[i]);
+                var menu_music_button:BoxIcon = new BoxIcon(null, 5 + 30 * i, 5, 25, 25, mmc_icons[i], mmc_functions[i]);
                 mmc_buttons[i] = menu_music_button;
             }
 

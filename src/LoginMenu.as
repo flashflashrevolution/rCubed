@@ -71,8 +71,7 @@ package
             box.setSize(300, 140);
 
             // Register Button
-            var register_online_btn:BoxButton = new BoxButton(this, box.x, box.y + box.height + 10, 300, 30, _lang.string("register_online"), 12);
-            register_online_btn.addEventListener(MouseEvent.CLICK, registerOnline);
+            var register_online_btn:BoxButton = new BoxButton(this, box.x, box.y + box.height + 10, 300, 30, _lang.string("register_online"), 12, registerOnline);
 
             /// 
             panel_session = new Sprite();
@@ -135,11 +134,8 @@ package
             session_continueAsbtn.addEventListener(MouseEvent.CLICK, attemptLoginSession);
             panel_session.addChild(session_continueAsbtn);
 
-            var session_guestbtn:BoxButton = new BoxButton(panel_session, 6, box.height - 36, 120, 30, _lang.string("login_guest"), 12);
-            session_guestbtn.addEventListener(MouseEvent.CLICK, playAsGuest);
-
-            var session_changeusertbtn:BoxButton = new BoxButton(panel_session, box.width - 126, box.height - 36, 120, 30, _lang.string("login_change_user"), 12);
-            session_changeusertbtn.addEventListener(MouseEvent.CLICK, changeUserEvent);
+            var session_guestbtn:BoxButton = new BoxButton(panel_session, 6, box.height - 36, 120, 30, _lang.string("login_guest"), 12, playAsGuest);
+            var session_changeusertbtn:BoxButton = new BoxButton(panel_session, box.width - 126, box.height - 36, 120, 30, _lang.string("login_change_user"), 12, changeUserEvent);
 
             /// Login Screen
             panel_login = new Sprite();
@@ -174,11 +170,8 @@ package
             panel_login.addChild(txt_save);
 
             //- Buttons
-            var login_guestbtn:BoxButton = new BoxButton(panel_login, 6, box.height - 36, 75, 30, _lang.string("login_guest"), 12);
-            login_guestbtn.addEventListener(MouseEvent.CLICK, playAsGuest);
-
-            var loginbtn:BoxButton = new BoxButton(panel_login, box.width - 81, box.height - 36, 75, 30, _lang.string("login_text"), 12);
-            loginbtn.addEventListener(MouseEvent.CLICK, attemptLogin);
+            var login_guestbtn:BoxButton = new BoxButton(panel_login, 6, box.height - 36, 75, 30, _lang.string("login_guest"), 12, playAsGuest);
+            var loginbtn:BoxButton = new BoxButton(panel_login, box.width - 81, box.height - 36, 75, 30, _lang.string("login_text"), 12, attemptLogin);
 
             // Set Values
             if (savedInfos.state == STORED_SESSION)

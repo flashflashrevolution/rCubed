@@ -63,48 +63,41 @@ package popups
             CONFIG::debug
             {
                 //- Profiler
-                cButton = new BoxButton(this, 5, yOff, box.width - 10, cButtonHeight, "Toggle Profiler");
+                cButton = new BoxButton(this, 5, yOff, box.width - 10, cButtonHeight, "Toggle Profiler", 12, clickHandler);
                 cButton.action = "debug_profiler";
                 cButton.boxColor = GameBackgroundColor.BG_POPUP;
-                cButton.addEventListener(MouseEvent.CLICK, clickHandler);
                 yOff += cButtonHeight + 5;
 
                 //- Redraw
-                cButton = new BoxButton(this, 5, yOff, box.width - 10, cButtonHeight, "Toggle ReDraw Regions");
+                cButton = new BoxButton(this, 5, yOff, box.width - 10, cButtonHeight, "Toggle ReDraw Regions", 12, clickHandler);
                 cButton.action = "redraw_regions";
                 cButton.boxColor = GameBackgroundColor.BG_POPUP;
-                cButton.addEventListener(MouseEvent.CLICK, clickHandler);
                 yOff = 5;
             }
 
             //- Reload Engine
-            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_reload_engine_user", "Reload Engine / User"));
+            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_reload_engine_user", "Reload Engine / User"), 12, clickHandler);
             cButton.action = "reload_engine";
-            cButton.addEventListener(MouseEvent.CLICK, clickHandler);
             yOff += cButtonHeight + 5;
 
             //- Screenshot - Local
-            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_save_screenshot", "Save ScreenShot - Local"));
+            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_save_screenshot", "Save ScreenShot - Local"), 12, clickHandler);
             cButton.action = "screenshot_local";
-            cButton.addEventListener(MouseEvent.CLICK, clickHandler);
             yOff += cButtonHeight + 5;
 
             //- Fullscreen
-            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_full_screen", "Full Screen"));
+            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_full_screen", "Full Screen"), 12, clickHandler);
             cButton.action = "fullscreen";
-            cButton.addEventListener(MouseEvent.CLICK, clickHandler);
             yOff += cButtonHeight + 5;
 
             //- Switch Profile
-            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_switch_profile", "Switch Profile"));
+            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_switch_profile", "Switch Profile"), 12, clickHandler);
             cButton.action = "switch_profile";
-            cButton.addEventListener(MouseEvent.CLICK, clickHandler);
             yOff += cButtonHeight + 5;
 
             //- Close
-            cButton = new BoxButton(box, 5, box.height - 27 - 5, box.width - 10, 27, _lang.string("menu_close", "CLOSE"));
+            cButton = new BoxButton(box, 5, box.height - 27 - 5, box.width - 10, 27, _lang.string("menu_close", "CLOSE"), 12, clickHandler);
             cButton.action = "close";
-            cButton.addEventListener(MouseEvent.CLICK, clickHandler);
         }
 
         override public function stageRemove():void

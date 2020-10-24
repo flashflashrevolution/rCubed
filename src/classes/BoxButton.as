@@ -1,20 +1,23 @@
 package classes
 {
     import flash.display.DisplayObjectContainer;
+    import flash.events.MouseEvent;
 
     dynamic public class BoxButton extends Box
     {
         private var _text:Text;
-
         private var _enabled:Boolean = true;
 
-        public function BoxButton(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:Number = 0, height:Number = 0, text:String = "", size:int = 12, color:String = "#FFFFFF", useHover:Boolean = true, useGradient:Boolean = false)
+        private var _listener:Function = null;
+        private var _useCapture:Boolean = false;
+
+        public function BoxButton(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:Number = 0, height:Number = 0, text:String = "", size:int = 12, listener:Function = null, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false)
         {
-            super(parent, xpos, ypos, useHover, useGradient);
+            super(parent, xpos, ypos, true, false);
             super.setSize(width, height);
 
             //- Add Text
-            _text = new Text(text, size, color);
+            _text = new Text(text, size, "#FFFFFF");
             _text.height = height + 1;
             _text.width = width;
             _text.align = Text.CENTER;
@@ -25,10 +28,21 @@ package classes
             this.mouseChildren = false;
             this.useHandCursor = true;
             this.buttonMode = true;
+
+            //- Set click event listener
+            if (listener != null)
+            {
+                this._listener = listener;
+                this._useCapture = useCapture;
+                this.addEventListener(MouseEvent.CLICK, listener, useCapture, priority, useWeakReference);
+            }
         }
 
         override public function dispose():void
         {
+            if (_listener != null)
+                this.removeEventListener(MouseEvent.CLICK, _listener, _useCapture);
+
             super.dispose();
 
             if (_text != null)
@@ -78,6 +92,11 @@ package classes
         public function set text(value:String):void
         {
             _text.text = value;
+        }
+
+        public function set textColor(color:String):void
+        {
+            _text.fontColor = color;
         }
     }
 }

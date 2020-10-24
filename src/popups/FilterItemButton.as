@@ -11,7 +11,6 @@ package popups
     import com.flashfla.utils.ArrayUtil;
     import flash.display.DisplayObjectContainer;
     import flash.events.Event;
-    import flash.events.MouseEvent;
 
     public class FilterItemButton extends Box
     {
@@ -38,8 +37,7 @@ package popups
 
         protected function init():void
         {
-            remove_button = new BoxButton(this, width, 0, 23, height, "X");
-            remove_button.addEventListener(MouseEvent.CLICK, e_clickRemovefilter);
+            remove_button = new BoxButton(this, width, 0, 23, height, "X", 12, e_clickRemovefilter);
 
             var typeText:Text;
             switch (filter.type)

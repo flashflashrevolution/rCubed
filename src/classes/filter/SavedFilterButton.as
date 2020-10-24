@@ -54,14 +54,9 @@ package classes.filter
             filterName.height = 35;
             addChild(filterName);
 
-            deleteButton = new BoxButton(this, width - 105, 5, 100, 23, _lang.string("filter_editor_delete"));
-            deleteButton.addEventListener(MouseEvent.CLICK, e_deleteClick);
-
-            editButton = new BoxButton(this, deleteButton.x - 105, 5, 100, 23, _lang.string("filter_editor_select_edit"));
-            editButton.addEventListener(MouseEvent.CLICK, e_editClick);
-
-            exportButton = new BoxButton(this, editButton.x - 105, 5, 100, 23, _lang.string("popup_filter_filter_single_export"));
-            exportButton.addEventListener(MouseEvent.CLICK, e_exportClick);
+            deleteButton = new BoxButton(this, width - 105, 5, 100, 23, _lang.string("filter_editor_delete"), 12, e_deleteClick);
+            editButton = new BoxButton(this, deleteButton.x - 105, 5, 100, 23, _lang.string("filter_editor_select_edit"), 12, e_editClick);
+            exportButton = new BoxButton(this, editButton.x - 105, 5, 100, 23, _lang.string("popup_filter_filter_single_export"), 12, e_exportClick);
         }
 
         override public function dispose():void
@@ -72,13 +67,8 @@ package classes.filter
 
             filterName.dispose();
 
-            deleteButton.removeEventListener(MouseEvent.CLICK, e_deleteClick);
             deleteButton.dispose();
-
-            editButton.removeEventListener(MouseEvent.CLICK, e_editClick);
             editButton.dispose();
-
-            exportButton.removeEventListener(MouseEvent.CLICK, e_exportClick);
             exportButton.dispose();
 
             super.dispose();
