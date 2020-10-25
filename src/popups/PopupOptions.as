@@ -136,6 +136,8 @@ package popups
         private var timestampCheck:BoxCheck;
         private var startUpScreenCombo:ComboBox;
         private var optionGameLanguages:Array;
+        private var languageCombo:ComboBox;
+        private var languageComboIgnore:Boolean;
         private var engineCombo:ComboBox;
         private var engineDefaultCombo:ComboBox;
         private var engineComboIgnore:Boolean;
@@ -848,17 +850,26 @@ package popups
                 var gameLanguageLabel:Text = new Text(box, xOff, yOff, _lang.string("options_game_language"));
                 yOff += 20;
 
+                var selectedLanguage:String = "";
                 for (var id:String in _lang.indexed)
                 {
                     var lang:String = _lang.indexed[id];
-                    var gameLanguageOptionText:Text = new Text(box, xOff + 22, yOff, _lang.string2("_real_name", lang) + (_lang.data[lang]['_en_name'] != _lang.data[lang]['_real_name'] ? (' / ' + _lang.string2("_en_name", lang)) : ''));
-                    yOff += 2;
-
-                    var optionLanguageCheck:BoxCheck = new BoxCheck(box, xOff + 2, yOff, clickHandler, false, 0, true);
-                    optionLanguageCheck.languageID = lang;
-                    optionGameLanguages.push(optionLanguageCheck);
-                    yOff += 20;
+                    var lang_name:String = _lang.string2Simple("_real_name", lang) + (_lang.data[lang]['_en_name'] != _lang.data[lang]['_real_name'] ? (' / ' + _lang.string2Simple("_en_name", lang)) : '');
+                    optionGameLanguages.push({"label": lang_name, "data": lang});
+                    if (lang == _gvars.activeUser.language)
+                    {
+                        selectedLanguage = lang_name;
+                    }
                 }
+
+                languageCombo = new ComboBox(box, xOff, yOff, selectedLanguage, optionGameLanguages);
+                languageCombo.x = xOff;
+                languageCombo.y = yOff;
+                languageCombo.width = 135;
+                languageCombo.openPosition = ComboBox.BOTTOM;
+                languageCombo.fontSize = 11;
+                languageCombo.addEventListener(Event.SELECT, languageSelect);
+                setLanguage();
 
                 ///- Col 4
                 xOff += 176;
@@ -892,7 +903,6 @@ package popups
                 box.addChild(engineDefaultCombo);
                 engineRefresh();
                 yOff += 30;
-
 
                 // Legacy Song Display
                 legacySongsCheck = new BoxCheck(box, xOff + 3, yOff, clickHandler, false, 0, true);
@@ -1194,21 +1204,6 @@ package popups
                 _gvars.gameMain.addPopup(new PopupCustomNoteskin(_gvars.gameMain), true);
             }
 
-            //- Language
-            else if (e.target.hasOwnProperty("languageID"))
-            {
-                _gvars.activeUser.language = e.target.languageID;
-                _gvars.gameMain.activePanel.draw();
-                _gvars.gameMain.buildContextMenu();
-                renderOptions();
-
-                if (_gvars.gameMain.activePanel is MainMenu)
-                {
-                    var mmpanel:MainMenu = (_gvars.gameMain.activePanel as MainMenu);
-                    mmpanel.updateMenuMusicControls();
-                }
-            }
-
             //- Displays
             else if (e.target.hasOwnProperty("display"))
             {
@@ -1449,6 +1444,32 @@ package popups
             _gvars.activeUser.startUpScreen = e.target.selectedItem.data as int;
         }
 
+        private function setLanguage():void
+        {
+            languageComboIgnore = true;
+            languageCombo.selectedItemByData = _gvars.activeUser.language;
+            languageComboIgnore = false;
+        }
+
+        private function languageSelect(e:Event):void
+        {
+            if (!languageComboIgnore)
+            {
+                _gvars.activeUser.language = e.target.selectedItem.data as String;
+                _gvars.gameMain.activePanel.draw();
+                _gvars.gameMain.buildContextMenu();
+                renderOptions();
+
+                if (_gvars.gameMain.activePanel is MainMenu)
+                {
+                    var mmpanel:MainMenu = (_gvars.gameMain.activePanel as MainMenu);
+                    mmpanel.updateMenuMusicControls();
+                }
+
+                stage.focus = this.stage;
+            }
+        }
+
         private function engineDefaultSelect(e:Event):void
         {
             if (!engineComboIgnore)
@@ -1687,11 +1708,7 @@ package popups
                 optionMPSize.text = _avars.configMPSize.toString();
                 startUpScreenCombo.selectedIndex = _gvars.activeUser.startUpScreen;
 
-                // Set Language
-                for each (item in optionGameLanguages)
-                {
-                    item.checked = (item.languageID == _gvars.activeUser.language);
-                }
+                setLanguage();
 
                 autoSaveLocalCheckbox.checked = _gvars.air_autoSaveLocalReplays;
                 useCacheCheckbox.checked = _gvars.air_useLocalFileCache;

@@ -382,7 +382,7 @@ package
             if (preloader.isComplete)
             {
                 loadComplete = true;
-                if (retryLoadButton)
+                if (retryLoadButton && this.contains(retryLoadButton))
                 {
                     removeChild(retryLoadButton);
                     retryLoadButton.dispose();

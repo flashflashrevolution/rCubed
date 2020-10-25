@@ -209,8 +209,8 @@ package popups
             notesField.removeEventListener(Event.CHANGE, e_notesFieldChange);
             setMirrorInvert.dispose();
             setCustomOffsets.dispose();
-            optionJudgeOffset.removeEventListener(Event.CHANGE, changeHandler);
-            optionMusicOffset.removeEventListener(Event.CHANGE, changeHandler);
+            optionJudgeOffset.dispose();
+            optionMusicOffset.dispose();
 
             notesLength.dispose();
             optionJudgeOffset.dispose();

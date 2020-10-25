@@ -20,6 +20,8 @@ package classes
         private var m_parseMode:uint = PARSE_INT;
         private var m_validator:RegExp;
 
+        private var _listener:Function = null;
+
         /**
          * The ValidatedText constructor.
          * restrict_mode determines what characters could be entered into the textfield:
@@ -66,7 +68,17 @@ package classes
             }
 
             if (listener)
+            {
+                this._listener = listener;
                 this.addEventListener(Event.CHANGE, listener);
+            }
+        }
+
+        override public function dispose():void
+        {
+            if (this._listener != null)
+                this.removeEventListener(Event.CHANGE, this._listener);
+            super.dispose();
         }
 
         private function renderValid():void
