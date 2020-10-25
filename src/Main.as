@@ -106,8 +106,6 @@ package
             //- Set GlobalVariables Stage
             _gvars.gameMain = this;
 
-            SystemUtil.init();
-
             if (stage)
             {
                 //- Set up vSync

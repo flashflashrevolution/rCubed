@@ -3,6 +3,7 @@ package
     import by.blooddy.crypto.MD5;
     import classes.FileTracker;
     import classes.chart.Song;
+    import com.flashfla.utils.SystemUtil;
     import flash.events.Event;
     import flash.events.IOErrorEvent;
     import flash.events.SecurityErrorEvent;
@@ -18,6 +19,14 @@ package
      */
     public class AirContext
     {
+        // Windows will store files in the current folder, other OS will use the application storage folder.
+        public static var STORAGE_PATH:File = File.applicationDirectory;
+        {
+            if (SystemUtil.OS.toLowerCase().indexOf("win") == -1)
+            {
+                STORAGE_PATH = File.applicationStorageDirectory;
+            }
+        }
 
         static public function serverVersionHigher(serverVersionString:String):int
         {
@@ -100,19 +109,17 @@ package
 
         static public function getAppFile(path:String):File
         {
-            return new File("app:/" + path);
+            return STORAGE_PATH.resolvePath(path);
         }
 
         static public function getAppPath(path:String):String
         {
-            var tf:File = new File("app:/" + path);
-            return tf.nativePath;
+            return STORAGE_PATH.resolvePath(path).nativePath;
         }
 
         static public function doesFileExist(path:String):Boolean
         {
-            var tf:File = new File("app:/" + path);
-            return tf.exists;
+            return STORAGE_PATH.resolvePath(path).exists;
         }
 
         static public function writeFile(appPath:String, bytes:ByteArray, key:uint = 0, errorCallback:Function = null):File
