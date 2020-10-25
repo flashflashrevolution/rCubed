@@ -865,7 +865,7 @@ package popups
                 languageCombo = new ComboBox(box, xOff, yOff, selectedLanguage, optionGameLanguages);
                 languageCombo.x = xOff;
                 languageCombo.y = yOff;
-                languageCombo.width = 135;
+                languageCombo.width = 165;
                 languageCombo.openPosition = ComboBox.BOTTOM;
                 languageCombo.fontSize = 11;
                 languageCombo.addEventListener(Event.SELECT, languageSelect);
