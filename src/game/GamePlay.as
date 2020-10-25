@@ -527,10 +527,7 @@ package game
 
             if (options.displaySongProgress || options.replay)
             {
-                progressDisplay = new ProgressBar(458, 20, 4, 0x545454, 0.1);
-                progressDisplay.x = 161;
-                progressDisplay.y = 9.35;
-                gameplayUI.addChild(progressDisplay);
+                progressDisplay = new ProgressBar(gameplayUI, 161, 9.35, 458, 20, 4, 0x545454, 0.1);
 
                 if (options.replay)
                     progressDisplay.addEventListener(MouseEvent.CLICK, progressMouseClick);

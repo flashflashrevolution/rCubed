@@ -167,7 +167,6 @@ package menu
             if (pane)
             {
                 pane.removeEventListener(MouseEvent.CLICK, songItemClicked);
-                pane.removeEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler);
                 pane.dispose();
                 pane = null;
             }
@@ -288,27 +287,19 @@ package menu
             //- Add ScrollPane
             if (pane == null)
             {
-                pane = new ScrollPane(401, 351);
-                pane.x = 155; // 332
-                pane.y = 64;
+                pane = new ScrollPane(this, 155, 64, 401, 351, mouseWheelHandler, false, 0, true);
                 pane.graphics.lineStyle(1, 0xFFFFFF, 0.35, false);
                 pane.graphics.moveTo(0.2, -0.5);
                 pane.graphics.lineTo(399, -0.5);
                 pane.graphics.moveTo(0.2, 351.5);
                 pane.graphics.lineTo(399, 351.5);
                 pane.addEventListener(MouseEvent.CLICK, songItemClicked, false, 0, true);
-                pane.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, false, 0, true);
-                this.addChild(pane);
             }
 
             //- Add ScrollBar
             if (scrollbar == null)
             {
-                scrollbar = new ScrollBar(21, 325, new ScrollDragger(), new ScrollBackground());
-                scrollbar.x = 744;
-                scrollbar.y = 81;
-                scrollbar.addEventListener(Event.CHANGE, scrollBarMoved, false, 0, true);
-                this.addChild(scrollbar);
+                scrollbar = new ScrollBar(this, 744, 81, 21, 325, new ScrollDragger(), new ScrollBackground(), scrollBarMoved, false, 0, true);
             }
 
             //- Build Content
@@ -1237,15 +1228,12 @@ package menu
             var starRating:Number = _gvars.playerUser.getSongRating(songDetails);
             if (starRating > 0)
             {
-                var ratingDisplay:StarSelector = new StarSelector(false);
-                ratingDisplay.x = 109;
-                ratingDisplay.y = 5;
+                var ratingDisplay:StarSelector = new StarSelector(infoBox, 109, 5, false);
                 ratingDisplay.value = starRating;
                 ratingDisplay.scaleX = ratingDisplay.scaleY = 0.4;
                 ratingDisplay.alpha = 0.8;
                 ratingDisplay.outline = false;
                 ratingDisplay.addBackgroundStars();
-                infoBox.addChild(ratingDisplay);
             }
 
             // Print Song Info

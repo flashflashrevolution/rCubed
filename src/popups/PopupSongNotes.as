@@ -103,19 +103,13 @@ package popups
             lblSongRating.width = 145;
             lblSongRating.align = Text.LEFT;
 
-            sRating = new StarSelector();
-            sRating.x = 22;
-            sRating.y = 95;
-            box.addChild(sRating);
+            sRating = new StarSelector(box, 22, 95);
 
             var lblSongFavorite:Text = new Text(box, box.width - 165, 68, _lang.string("song_favorite_label"), 14);
             lblSongFavorite.width = 145;
             lblSongFavorite.align = Text.RIGHT;
 
-            sFavorite = new HeartSelector();
-            sFavorite.x = box.width - 52;
-            sFavorite.y = 93
-            box.addChild(sFavorite);
+            sFavorite = new HeartSelector(box, box.width - 52, 93);
 
             // Divider
             box.graphics.lineStyle(1, 0xffffff);

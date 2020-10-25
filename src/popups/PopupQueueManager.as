@@ -78,18 +78,10 @@ package popups
             menuPregen.menu_select = TAB_PREGEN;
 
             //- content
-            scrollpane = new ScrollPane(box.width - 45, 341);
-            scrollpane.x = 10;
-            scrollpane.y = 42;
+            scrollpane = new ScrollPane(box, 10, 42, box.width - 45, 341, mouseWheelHandler);
             scrollpane.graphics.lineStyle(1, 0x64A4B8, 0.25, true);
             scrollpane.graphics.drawRect(0, 0, scrollpane.width - 1, scrollpane.height - 1);
-            scrollpane.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler);
-            box.addChild(scrollpane);
-            scrollbar = new ScrollBar(20, 341);
-            scrollbar.x = 10 + scrollpane.width;
-            scrollbar.y = 42;
-            scrollbar.addEventListener(Event.CHANGE, scrollBarMoved);
-            box.addChild(scrollbar);
+            scrollbar = new ScrollBar(box, 10 + scrollpane.width, 42, 20, 341, null, null, scrollBarMoved);
 
             renderQueues();
 

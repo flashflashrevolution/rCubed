@@ -100,10 +100,7 @@ package popups
             box.graphics.moveTo(box.width - sidebar_width, 0); // Sidebar border
             box.graphics.lineTo(box.width - sidebar_width, box.height);
 
-            image_holder = new ScrollPane(box.width - sidebar_width - 2, box.height - 2);
-            image_holder.x = 1;
-            image_holder.y = 1;
-            box.addChild(image_holder);
+            image_holder = new ScrollPane(box, 1, 1, box.width - sidebar_width - 2, box.height - 2);
 
             //---------------------------------------------------------------------------------------------------------//
             var xPos:int = box.width - sidebar_width + 10;

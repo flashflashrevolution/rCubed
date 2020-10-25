@@ -150,18 +150,10 @@ package popups
             engine_list_mask.x = 15;
 
             //- content
-            scrollpane = new ScrollPane(box.width - 45, 311);
-            scrollpane.x = 10;
-            scrollpane.y = 72;
+            scrollpane = new ScrollPane(box, 10, 72, box.width - 45, 311, mouseWheelHandler);
             scrollpane.graphics.lineStyle(1, 0x64A4B8, 0.25, true);
             scrollpane.graphics.drawRect(0, 0, scrollpane.width - 1, scrollpane.height - 1);
-            scrollpane.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler);
-            box.addChild(scrollpane);
-            scrollbar = new ScrollBar(20, 311);
-            scrollbar.x = 10 + scrollpane.width;
-            scrollbar.y = 72;
-            scrollbar.addEventListener(Event.CHANGE, scrollBarMoved);
-            box.addChild(scrollbar);
+            scrollbar = new ScrollBar(box, 10 + scrollpane.width, 72, 20, 311, null, null, scrollBarMoved);
 
             //- importBtn
             importBtn = new BoxButton(box, box.width - 180, box.height - 42, 79.5, 27, _lang.string("popup_replay_import"), 12, e_boxClickHandler);

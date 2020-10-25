@@ -364,13 +364,9 @@ package popups
                 var gameNoteScale:Text = new Text(box, xOff, yOff, _lang.string("options_note_scale"));
                 yOff += 20;
 
-                optionNoteScale = new BoxSlider(100, 10);
-                optionNoteScale.x = xOff;
-                optionNoteScale.y = yOff;
+                optionNoteScale = new BoxSlider(box, xOff, yOff, 100, 10, changeHandler);
                 optionNoteScale.minValue = 0.1;
                 optionNoteScale.maxValue = 1.5;
-                optionNoteScale.addEventListener(Event.CHANGE, changeHandler);
-                box.addChild(optionNoteScale);
                 yOff += 10;
 
                 noteScaleValueDisplay = new Text(box, xOff, yOff, Math.round(_gvars.activeUser.noteScale * 100) + "%");
@@ -420,12 +416,8 @@ package popups
                 var gameVolume:Text = new Text(box, xOff, yOff, _lang.string("options_volume"));
                 yOff += 20;
 
-                optionGameVolume = new BoxSlider(100, 10);
-                optionGameVolume.x = xOff;
-                optionGameVolume.y = yOff;
+                optionGameVolume = new BoxSlider(box, xOff, yOff, 100, 10, changeHandler);
                 optionGameVolume.maxValue = 1.25;
-                optionGameVolume.addEventListener(Event.CHANGE, changeHandler);
-                box.addChild(optionGameVolume);
                 yOff += 10;
 
                 gameVolumeValueDisplay = new Text(box, xOff, yOff, Math.round(_gvars.activeUser.gameVolume * 100) + "%");
@@ -435,12 +427,8 @@ package popups
                 var menuVolume:Text = new Text(box, xOff, yOff, _lang.string("air_options_menu_volume"));
                 yOff += 20;
 
-                optionMenuVolume = new BoxSlider(100, 10);
-                optionMenuVolume.x = xOff;
-                optionMenuVolume.y = yOff;
+                optionMenuVolume = new BoxSlider(box, xOff, yOff, 100, 10, changeHandler);
                 optionMenuVolume.maxValue = 1.25;
-                optionMenuVolume.addEventListener(Event.CHANGE, changeHandler);
-                box.addChild(optionMenuVolume);
                 yOff += 10;
 
                 menuVolumeValueDisplay = new Text(box, xOff, yOff, Math.round(_gvars.menuMusicSoundVolume * 100) + "%");
@@ -644,12 +632,8 @@ package popups
                     optionJudgeColor.judge_color_id = i;
                     optionJudgeColor.field.maxChars = 7;
 
-                    var gameJudgeColorDisplay:ColorField = new ColorField(0, 45, 20);
-                    gameJudgeColorDisplay.x = xOff + 150;
-                    gameJudgeColorDisplay.y = yOff;
+                    var gameJudgeColorDisplay:ColorField = new ColorField(box, xOff + 150, yOff, 0, 45, 20, changeHandler);
                     gameJudgeColorDisplay.key_name = "optionJudgeColor";
-                    gameJudgeColorDisplay.addEventListener(Event.CHANGE, changeHandler);
-                    box.addChild(gameJudgeColorDisplay);
 
                     var optionJudgeColorReset:BoxButton = new BoxButton(box, xOff + 200, yOff, 20, 20, "R", 12, clickHandler, false, 0, true);
                     optionJudgeColorReset.judge_color_reset_id = i;
@@ -679,12 +663,8 @@ package popups
                     optionGameColor.game_color_id = i;
                     optionGameColor.field.maxChars = 7;
 
-                    var gameGameColorDisplay:ColorField = new ColorField(0, 45, 20);
-                    gameGameColorDisplay.x = xOff + 150;
-                    gameGameColorDisplay.y = yOff;
+                    var gameGameColorDisplay:ColorField = new ColorField(box, xOff + 150, yOff, 0, 45, 20, changeHandler);
                     gameGameColorDisplay.key_name = "gameGameColorDisplay";
-                    gameGameColorDisplay.addEventListener(Event.CHANGE, changeHandler);
-                    box.addChild(gameGameColorDisplay);
 
                     var optionGameColorReset:BoxButton = new BoxButton(box, xOff + 200, yOff, 20, 20, "R", 12, clickHandler, false, 0, true);
                     optionGameColorReset.game_color_reset_id = i;
@@ -714,12 +694,8 @@ package popups
                     optionComboColor.combo_color_id = i;
                     optionComboColor.field.maxChars = 7;
 
-                    var gameComboColorDisplay:ColorField = new ColorField(0, 45, 20);
-                    gameComboColorDisplay.x = xOff + 150;
-                    gameComboColorDisplay.y = yOff;
+                    var gameComboColorDisplay:ColorField = new ColorField(box, xOff + 150, yOff, 0, 45, 20, changeHandler);
                     gameComboColorDisplay.key_name = "gameComboColorDisplay";
-                    gameComboColorDisplay.addEventListener(Event.CHANGE, changeHandler);
-                    box.addChild(gameComboColorDisplay);
 
                     var optionComboColorReset:BoxButton = new BoxButton(box, xOff + 200, yOff, 20, 20, "R", 12, clickHandler, false, 0, true);
                     optionComboColorReset.combo_color_reset_id = i;

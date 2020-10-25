@@ -1,5 +1,6 @@
 package classes
 {
+    import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.events.Event;
     import flash.events.MouseEvent;
@@ -14,12 +15,26 @@ package classes
         private var _minValue:Number = 0;
         private var _maxValue:Number = 1;
 
-        public function BoxSlider(width:int, height:int)
+        private var _listener:Function = null;
+
+        public function BoxSlider(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:int = 0, height:int = 0, listener:Function = null)
         {
+            if (parent)
+                parent.addChild(this);
+
+            this.x = xpos;
+            this.y = ypos;
+
             this._width = width;
             this._height = height;
 
             init();
+
+            if (listener != null)
+            {
+                this._listener = listener;
+                this.addEventListener(Event.CHANGE, listener);
+            }
         }
 
         protected function init():void

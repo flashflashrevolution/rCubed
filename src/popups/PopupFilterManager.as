@@ -104,16 +104,8 @@ package popups
             filterNameInput.addEventListener(Event.CHANGE, e_filterNameUpdate);
 
             //- content
-            scrollpane = new ScrollPane(box.width - 35, box.height - 46);
-            scrollpane.x = 5;
-            scrollpane.y = 41;
-            scrollpane.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler);
-            box.addChild(scrollpane);
-            scrollbar = new ScrollBar(20, scrollpane.height);
-            scrollbar.x = 10 + scrollpane.width;
-            scrollbar.y = 41;
-            scrollbar.addEventListener(Event.CHANGE, e_scrollBarMoved);
-            box.addChild(scrollbar);
+            scrollpane = new ScrollPane(box, 5, 41, box.width - 35, box.height - 46, mouseWheelHandler);
+            scrollbar = new ScrollBar(box, 10 + scrollpane.width, 41, 20, scrollpane.height, null, null, e_scrollBarMoved);
 
             // new type selector
             typeSelector = new Sprite();

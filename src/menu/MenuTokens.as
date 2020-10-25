@@ -61,9 +61,7 @@ package menu
             this.addChild(background);
 
             //- Add ScrollPane
-            pane = new ScrollPane(578, 358);
-            pane.x = 155; // 332
-            pane.y = 64;
+            pane = new ScrollPane(this, 155, 64, 578, 358);
             var border:Sprite = new Sprite();
             border.graphics.lineStyle(1, 0xFFFFFF, 1, true);
             border.graphics.moveTo(0.3, -0.5);
@@ -72,13 +70,9 @@ package menu
             border.graphics.lineTo(577, 358.5);
             border.alpha = 0.35;
             pane.addChild(border);
-            this.addChild(pane);
 
             //- Add ScrollBar
-            scrollbar = new ScrollBar(21, 325, new ScrollDragger(), new ScrollBackground());
-            scrollbar.x = 744;
-            scrollbar.y = 81;
-            this.addChild(scrollbar);
+            scrollbar = new ScrollBar(this, 744, 81, 21, 325, new ScrollDragger(), new ScrollBackground());
 
             // Menu Left
             normalTokenButton = new BoxButton(this, 5, 130, 124, 29, _lang.string("menu_tokens_normal"), 12, onNormalSelect);

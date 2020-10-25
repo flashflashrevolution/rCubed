@@ -68,10 +68,7 @@ package game
             songName = _lang.wrapFont(song.entry.name ? song.entry.name : "Invalid Song / Replay");
 
             //- Preloader Display
-            preloader = new ProgressBar(Main.GAME_WIDTH - 20, 20);
-            preloader.x = 10;
-            preloader.y = Main.GAME_HEIGHT - 30;
-            this.addChild(preloader);
+            preloader = new ProgressBar(this, 10, Main.GAME_HEIGHT - 30, Main.GAME_WIDTH - 20, 20);
 
             //- Song Name Display
             namedisplay = new TextField();

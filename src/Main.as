@@ -286,10 +286,7 @@ package
             this.addChild(loadStatus);
 
             //- Preloader Display
-            preloader = new ProgressBar(GAME_WIDTH - 20, 20);
-            preloader.x = 10;
-            preloader.y = GAME_HEIGHT - 30;
-            this.addChild(preloader);
+            preloader = new ProgressBar(this, 10, GAME_HEIGHT - 30, GAME_WIDTH - 20, 20);
 
             //- Frame Listener
             this.addEventListener(Event.ENTER_FRAME, updatePreloader);

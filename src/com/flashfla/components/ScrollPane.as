@@ -5,9 +5,9 @@
 package com.flashfla.components
 {
     import com.greensock.TweenLite;
-    import flash.display.DisplayObject;
+    import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
-    import flash.events.Event;
+    import flash.events.MouseEvent;
 
     public class ScrollPane extends Sprite
     {
@@ -18,8 +18,17 @@ package com.flashfla.components
 
         public var content:ScrollPaneContent;
 
-        public function ScrollPane(width:int, height:int):void
+        private var _listener:Function = null;
+        private var _useCapture:Boolean = false;
+
+        public function ScrollPane(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:int = 0, height:int = 0, listener:Function = null, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void
         {
+            if (parent)
+                parent.addChild(this);
+
+            this.x = xpos;
+            this.y = ypos;
+
             this._width = width;
             this._height = height;
 
@@ -43,10 +52,21 @@ package com.flashfla.components
 
             //- Add Content Pane
             this.addChild(content);
+
+            //- Set click event listener
+            if (listener != null)
+            {
+                this._listener = listener;
+                this._useCapture = useCapture;
+                this.addEventListener(MouseEvent.MOUSE_WHEEL, listener, useCapture, priority, useWeakReference);
+            }
         }
 
         public function dispose():void
         {
+            if (_listener != null)
+                this.removeEventListener(MouseEvent.MOUSE_WHEEL, _listener, _useCapture);
+
             if (_mask)
             {
                 this.removeChild(_mask);
