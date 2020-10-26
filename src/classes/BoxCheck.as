@@ -14,9 +14,8 @@ package classes
         private var _active:Boolean = false;
 
         private var _listener:Function = null;
-        private var _useCapture:Boolean = false;
 
-        public function BoxCheck(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, listener:Function = null, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void
+        public function BoxCheck(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, listener:Function = null, useWeakReference:Boolean = false):void
         {
             if (parent)
                 parent.addChild(this);
@@ -34,8 +33,7 @@ package classes
             if (listener != null)
             {
                 this._listener = listener;
-                this._useCapture = useCapture;
-                this.addEventListener(MouseEvent.CLICK, listener, useCapture, priority, useWeakReference);
+                this.addEventListener(MouseEvent.CLICK, listener, false, 0, useWeakReference);
             }
 
             draw();
@@ -44,7 +42,7 @@ package classes
         public function dispose():void
         {
             if (_listener != null)
-                this.removeEventListener(MouseEvent.CLICK, _listener, _useCapture);
+                this.removeEventListener(MouseEvent.CLICK, _listener);
         }
 
         public function draw():void

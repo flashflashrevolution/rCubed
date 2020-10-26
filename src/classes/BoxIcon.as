@@ -21,9 +21,8 @@ package classes
         private var _hoverTimer:Timer = new Timer(500, 1);
 
         private var _listener:Function = null;
-        private var _useCapture:Boolean = false;
 
-        public function BoxIcon(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:Number = 0, height:Number = 0, icon:Sprite = null, listener:Function = null, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false)
+        public function BoxIcon(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:Number = 0, height:Number = 0, icon:Sprite = null, listener:Function = null, useWeakReference:Boolean = false)
         {
             super(parent, xpos, ypos, true, false);
             super.setSize(width, height);
@@ -43,15 +42,14 @@ package classes
             if (listener != null)
             {
                 this._listener = listener;
-                this._useCapture = useCapture;
-                this.addEventListener(MouseEvent.CLICK, listener, useCapture, priority, useWeakReference);
+                this.addEventListener(MouseEvent.CLICK, listener, false, 0, useWeakReference);
             }
         }
 
         override public function dispose():void
         {
             if (_listener != null)
-                this.removeEventListener(MouseEvent.CLICK, _listener, _useCapture);
+                this.removeEventListener(MouseEvent.CLICK, _listener);
 
             super.dispose();
         }

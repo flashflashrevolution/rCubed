@@ -19,9 +19,8 @@ package com.flashfla.components
         public var content:ScrollPaneContent;
 
         private var _listener:Function = null;
-        private var _useCapture:Boolean = false;
 
-        public function ScrollPane(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:int = 0, height:int = 0, listener:Function = null, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void
+        public function ScrollPane(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:int = 0, height:int = 0, listener:Function = null, useWeakReference:Boolean = false):void
         {
             if (parent)
                 parent.addChild(this);
@@ -57,15 +56,14 @@ package com.flashfla.components
             if (listener != null)
             {
                 this._listener = listener;
-                this._useCapture = useCapture;
-                this.addEventListener(MouseEvent.MOUSE_WHEEL, listener, useCapture, priority, useWeakReference);
+                this.addEventListener(MouseEvent.MOUSE_WHEEL, listener, false, 0, useWeakReference);
             }
         }
 
         public function dispose():void
         {
             if (_listener != null)
-                this.removeEventListener(MouseEvent.MOUSE_WHEEL, _listener, _useCapture);
+                this.removeEventListener(MouseEvent.MOUSE_WHEEL, _listener);
 
             if (_mask)
             {

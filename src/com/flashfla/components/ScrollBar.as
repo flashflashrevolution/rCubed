@@ -23,9 +23,8 @@ package com.flashfla.components
         public var scroll:Number = 0;
 
         private var _listener:Function = null;
-        private var _useCapture:Boolean = false;
 
-        public function ScrollBar(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:int = 0, height:int = 0, dragger:Sprite = null, background:Sprite = null, listener:Function = null, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void
+        public function ScrollBar(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:int = 0, height:int = 0, dragger:Sprite = null, background:Sprite = null, listener:Function = null, useWeakReference:Boolean = false):void
         {
             if (parent)
                 parent.addChild(this);
@@ -75,8 +74,7 @@ package com.flashfla.components
             if (listener != null)
             {
                 this._listener = listener;
-                this._useCapture = useCapture;
-                this.addEventListener(Event.CHANGE, listener, useCapture, priority, useWeakReference);
+                this.addEventListener(Event.CHANGE, listener, false, 0, useWeakReference);
             }
         }
 

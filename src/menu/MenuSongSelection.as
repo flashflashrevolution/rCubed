@@ -267,7 +267,7 @@ package menu
             var optionsTexts:Array = [[_lang.string("song_selection_menu_search"), "search"], [_lang.string("song_selection_search"), "queue"]]
             for (i = 0; i < optionsTexts.length; i++)
             {
-                var optionActionBox:BoxButton = new BoxButton(optionsBox, (i * 88.5), 0, 85.5, 27, optionsTexts[i][0], 11, clickHandler, false, 0, true);
+                var optionActionBox:BoxButton = new BoxButton(optionsBox, (i * 88.5), 0, 85.5, 27, optionsTexts[i][0], 11, clickHandler, true);
                 optionActionBox.action = optionsTexts[i][1];
             }
 
@@ -287,7 +287,7 @@ package menu
             //- Add ScrollPane
             if (pane == null)
             {
-                pane = new ScrollPane(this, 155, 64, 401, 351, mouseWheelHandler, false, 0, true);
+                pane = new ScrollPane(this, 155, 64, 401, 351, mouseWheelHandler, true);
                 pane.graphics.lineStyle(1, 0xFFFFFF, 0.35, false);
                 pane.graphics.moveTo(0.2, -0.5);
                 pane.graphics.lineTo(399, -0.5);
@@ -299,7 +299,7 @@ package menu
             //- Add ScrollBar
             if (scrollbar == null)
             {
-                scrollbar = new ScrollBar(this, 744, 81, 21, 325, new ScrollDragger(), new ScrollBackground(), scrollBarMoved, false, 0, true);
+                scrollbar = new ScrollBar(this, 744, 81, 21, 325, new ScrollDragger(), new ScrollBackground(), scrollBarMoved, true);
             }
 
             //- Build Content
@@ -1045,13 +1045,13 @@ package menu
                 searchTypeBox.selectedIndex = 0;
             }
 
-            var searchBtn:BoxButton = new BoxButton(infoBox, 5, 67, 164, 27, _lang.string("song_selection_search_panel_search"), 12, clickHandler, false, 0, true);
+            var searchBtn:BoxButton = new BoxButton(infoBox, 5, 67, 164, 27, _lang.string("song_selection_search_panel_search"), 12, clickHandler, true);
             searchBtn.action = "doSearch";
 
-            var randomButton:BoxButton = new BoxButton(infoBox, 5, 256, 164, 27, _lang.string("song_selection_filter_panel_random"), 12, clickHandler, false, 0, true);
+            var randomButton:BoxButton = new BoxButton(infoBox, 5, 256, 164, 27, _lang.string("song_selection_filter_panel_random"), 12, clickHandler, true);
             randomButton.action = "doFilterRandom";
 
-            var filterQueueManager:BoxButton = new BoxButton(infoBox, 5, 288, 164, 27, _lang.string("song_selection_filter_panel_manager"), 12, clickHandler, false, 0, true);
+            var filterQueueManager:BoxButton = new BoxButton(infoBox, 5, 288, 164, 27, _lang.string("song_selection_filter_panel_manager"), 12, clickHandler, true);
             filterQueueManager.action = "filterManager";
         }
 
@@ -1097,26 +1097,26 @@ package menu
             var isQueueNotAlone:Boolean = (options.queuePlaylist.length > 1);
 
             // Actions
-            var songQueuePlay:BoxButton = new BoxButton(infoBox, 5, 160, 164, 27, _lang.string("song_selection_queue_panel_play"), 12, clickHandler, false, 0, true);
+            var songQueuePlay:BoxButton = new BoxButton(infoBox, 5, 160, 164, 27, _lang.string("song_selection_queue_panel_play"), 12, clickHandler, true);
             songQueuePlay.action = "playQueue";
             songQueuePlay.enabled = isQueueNotEmpty;
 
-            var songQueuePlayFromHere:BoxButton = new BoxButton(infoBox, 5, 192, 164, 27, _lang.string("song_selection_queue_panel_play_from_here"), 12, clickHandler, false, 0, true);
+            var songQueuePlayFromHere:BoxButton = new BoxButton(infoBox, 5, 192, 164, 27, _lang.string("song_selection_queue_panel_play_from_here"), 12, clickHandler, true);
             songQueuePlayFromHere.action = "playQueueFromHere";
             songQueuePlayFromHere.enabled = isQueueNotAlone;
 
-            var songQueueRandomizer:BoxButton = new BoxButton(infoBox, 5, 224, 164, 27, _lang.string("song_selection_queue_panel_randomize"), 12, clickHandler, false, 0, true);
+            var songQueueRandomizer:BoxButton = new BoxButton(infoBox, 5, 224, 164, 27, _lang.string("song_selection_queue_panel_randomize"), 12, clickHandler, true);
             songQueueRandomizer.action = "queueRandomize";
             songQueueRandomizer.enabled = isQueueNotAlone;
 
-            var songQueueManager:BoxButton = new BoxButton(infoBox, 5, 256, 164, 27, _lang.string("song_selection_queue_panel_manager"), 12, clickHandler, false, 0, true);
+            var songQueueManager:BoxButton = new BoxButton(infoBox, 5, 256, 164, 27, _lang.string("song_selection_queue_panel_manager"), 12, clickHandler, true);
             songQueueManager.action = "queueManager";
 
-            var songQueueSave:BoxButton = new BoxButton(infoBox, 5, 288, 79.5, 27, _lang.string("song_selection_queue_panel_save"), 12, clickHandler, false, 0, true);
+            var songQueueSave:BoxButton = new BoxButton(infoBox, 5, 288, 79.5, 27, _lang.string("song_selection_queue_panel_save"), 12, clickHandler, true);
             songQueueSave.action = "queueSave";
             songQueueSave.enabled = isQueueNotEmpty;
 
-            var songQueueClear:BoxButton = new BoxButton(infoBox, 89.5, 288, 79.5, 27, _lang.string("song_selection_queue_panel_clear"), 12, clickHandler, false, 0, true);
+            var songQueueClear:BoxButton = new BoxButton(infoBox, 89.5, 288, 79.5, 27, _lang.string("song_selection_queue_panel_clear"), 12, clickHandler, true);
             songQueueClear.action = "clearQueue";
             songQueueClear.enabled = isQueueNotEmpty;
         }
@@ -1136,7 +1136,7 @@ package menu
             infoTitle.width = 164;
 
             // Refresh button
-            var refreshBtn:BoxButton = new BoxButton(infoBox, infoBox.width - 19 - 2, 2, 19, 19, "R", 12, refreshHighscoresClick, false, 0, true);
+            var refreshBtn:BoxButton = new BoxButton(infoBox, infoBox.width - 19 - 2, 2, 19, 19, "R", 12, refreshHighscoresClick, true);
 
             var infoRanks:Object = _gvars.activeUser.getLevelRank(songDetails) || {};
             var highscores:Object = _gvars.getHighscores(songDetails.level);
@@ -1263,19 +1263,19 @@ package menu
                 var buttonWidth:int = isCanonEngine ? 51.5 : 79.5;
 
                 //- Make Display
-                var songQueueButton:BoxIcon = new BoxIcon(infoBox, 5, 256, buttonWidth, 27, new iconList(), songQueueClick, false, 0, true);
+                var songQueueButton:BoxIcon = new BoxIcon(infoBox, 5, 256, buttonWidth, 27, new iconList(), songQueueClick, true);
                 songQueueButton.level = songDetails.level;
                 songQueueButton.setHoverText(_lang.string("song_selection_song_panel_hover_queue"));
 
                 if (isCanonEngine)
                 {
-                    var songHighscoresButton:BoxIcon = new BoxIcon(infoBox, 5 + buttonWidth + 5, 256, buttonWidth + 1, 27, new iconTrophy(), clickHandler, false, 0, true);
+                    var songHighscoresButton:BoxIcon = new BoxIcon(infoBox, 5 + buttonWidth + 5, 256, buttonWidth + 1, 27, new iconTrophy(), clickHandler, true);
                     songHighscoresButton.level = songDetails.level;
                     songHighscoresButton.action = "highscores";
                     songHighscoresButton.setHoverText((options.infoTab == TAB_HIGHSCORES ? _lang.string("song_selection_song_panel_hover_info") : _lang.string("song_selection_song_panel_hover_scores")));
                 }
 
-                var songOptionsButton:BoxIcon = new BoxIcon(infoBox, 5 + buttonWidth + 6 + (isCanonEngine ? (buttonWidth + 5) : 0), 256, buttonWidth, 27, new iconGear(), clickHandler, false, 0, true);
+                var songOptionsButton:BoxIcon = new BoxIcon(infoBox, 5 + buttonWidth + 6 + (isCanonEngine ? (buttonWidth + 5) : 0), 256, buttonWidth, 27, new iconGear(), clickHandler, true);
                 songOptionsButton.level = songDetails.level;
                 songOptionsButton.action = "songOptions";
                 songOptionsButton.setHoverText(_lang.string("song_selection_song_panel_hover_song_options"));
@@ -1284,10 +1284,10 @@ package menu
                 if (_mp.gameplayCanPick())
                 {
                     buttonWidth = 79.5;
-                    var songLoadButton:BoxButton = new BoxButton(infoBox, 89.5, 288, 79.5, 27, _lang.string("song_selection_song_panel_mp_load"), 14, songLoadClick, false, 0, true);
+                    var songLoadButton:BoxButton = new BoxButton(infoBox, 89.5, 288, 79.5, 27, _lang.string("song_selection_song_panel_mp_load"), 14, songLoadClick, true);
                     songLoadButton.level = songDetails.level;
                 }
-                var songStartButton:BoxButton = new BoxButton(infoBox, 5, 288, buttonWidth, 27, _lang.string("song_selection_song_panel_play"), 14, songStartClick, false, 0, true);
+                var songStartButton:BoxButton = new BoxButton(infoBox, 5, 288, buttonWidth, 27, _lang.string("song_selection_song_panel_play"), 14, songStartClick, true);
                 songStartButton.level = songDetails.level;
             }
             else
@@ -1299,7 +1299,7 @@ package menu
                     {
                         var hasEnoughCredits:Boolean = (_gvars.activeUser.credits >= song_price);
 
-                        var purchasedSongButtonLocked:BoxButton = new BoxButton(infoBox, 5, 256, 164, 27, sprintf(_lang.string("song_selection_song_panel_purchase"), {"song_price": song_price}), 12, clickHandler, false, 0, true);
+                        var purchasedSongButtonLocked:BoxButton = new BoxButton(infoBox, 5, 256, 164, 27, sprintf(_lang.string("song_selection_song_panel_purchase"), {"song_price": song_price}), 12, clickHandler, true);
                         purchasedSongButtonLocked.song_details = songDetails;
                         purchasedSongButtonLocked.action = "purchase";
                         purchasedSongButtonLocked.enabled = hasEnoughCredits;
@@ -1326,7 +1326,7 @@ package menu
                         }
                     }
 
-                    var songHighscoresButtonLocked:BoxButton = new BoxButton(infoBox, 5, 288, 164, 27, (options.infoTab == TAB_HIGHSCORES ? _lang.string("song_selection_song_panel_info") : _lang.string("song_selection_song_panel_scores")), 12, clickHandler, false, 0, true);
+                    var songHighscoresButtonLocked:BoxButton = new BoxButton(infoBox, 5, 288, 164, 27, (options.infoTab == TAB_HIGHSCORES ? _lang.string("song_selection_song_panel_info") : _lang.string("song_selection_song_panel_scores")), 12, clickHandler, true);
                     songHighscoresButtonLocked.level = songDetails.level;
                     songHighscoresButtonLocked.action = "highscores";
                 }
