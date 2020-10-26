@@ -20,7 +20,7 @@ package com.flashfla.components
 
         private var _listener:Function = null;
 
-        public function ScrollPane(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:int = 0, height:int = 0, listener:Function = null, useWeakReference:Boolean = false):void
+        public function ScrollPane(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:int = 0, height:int = 0, listener:Function = null):void
         {
             if (parent)
                 parent.addChild(this);
@@ -56,7 +56,7 @@ package com.flashfla.components
             if (listener != null)
             {
                 this._listener = listener;
-                this.addEventListener(MouseEvent.MOUSE_WHEEL, listener, false, 0, useWeakReference);
+                this.addEventListener(MouseEvent.MOUSE_WHEEL, listener);
             }
         }
 

@@ -12,9 +12,9 @@ package menu
         public var panel:String;
         public var index:String;
 
-        public function MenuButton(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, message:String = "", isActive:Boolean = false):void
+        public function MenuButton(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, message:String = "", isActive:Boolean = false, listener:Function = null):void
         {
-            super(parent, xpos, ypos, 115, 28, message, 12);
+            super(parent, xpos, ypos, 115, 28, message, 12, listener);
             super.active = isActive;
         }
     }

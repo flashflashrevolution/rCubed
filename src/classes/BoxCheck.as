@@ -15,7 +15,7 @@ package classes
 
         private var _listener:Function = null;
 
-        public function BoxCheck(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, listener:Function = null, useWeakReference:Boolean = false):void
+        public function BoxCheck(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, listener:Function = null):void
         {
             if (parent)
                 parent.addChild(this);
@@ -33,7 +33,7 @@ package classes
             if (listener != null)
             {
                 this._listener = listener;
-                this.addEventListener(MouseEvent.CLICK, listener, false, 0, useWeakReference);
+                this.addEventListener(MouseEvent.CLICK, listener);
             }
 
             draw();

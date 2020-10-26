@@ -234,12 +234,11 @@ package menu
             //- Add Menu Buttons
             for (var item:String in menuItems)
             {
-                var menuItem:MenuButton = new MenuButton(menuItemBox, Number(item) * 122, 0, _lang.string(menuItems[item][0]), item == options.activePanel);
+                var menuItem:MenuButton = new MenuButton(menuItemBox, Number(item) * 122, 0, _lang.string(menuItems[item][0]), item == options.activePanel, menuItemClick);
                 menuItem.panel = menuItems[item][1];
                 menuItem.mouseChildren = false;
                 menuItem.useHandCursor = true;
                 menuItem.buttonMode = true;
-                menuItem.addEventListener(MouseEvent.CLICK, menuItemClick);
             }
 
             this.addChild(menuItemBox);

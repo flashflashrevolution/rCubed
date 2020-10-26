@@ -10,7 +10,7 @@ package classes
 
         private var _listener:Function = null;
 
-        public function BoxButton(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:Number = 0, height:Number = 0, text:String = "", size:int = 12, listener:Function = null, useWeakReference:Boolean = false)
+        public function BoxButton(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:Number = 0, height:Number = 0, text:String = "", size:int = 12, listener:Function = null)
         {
             super(parent, xpos, ypos, true, false);
             super.setSize(width, height);
@@ -31,7 +31,7 @@ package classes
             if (listener != null)
             {
                 this._listener = listener;
-                this.addEventListener(MouseEvent.CLICK, listener, false, 0, useWeakReference);
+                this.addEventListener(MouseEvent.CLICK, listener);
             }
         }
 

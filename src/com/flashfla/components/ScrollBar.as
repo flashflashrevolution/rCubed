@@ -24,7 +24,7 @@ package com.flashfla.components
 
         private var _listener:Function = null;
 
-        public function ScrollBar(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:int = 0, height:int = 0, dragger:Sprite = null, background:Sprite = null, listener:Function = null, useWeakReference:Boolean = false):void
+        public function ScrollBar(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:int = 0, height:int = 0, dragger:Sprite = null, background:Sprite = null, listener:Function = null):void
         {
             if (parent)
                 parent.addChild(this);
@@ -74,7 +74,7 @@ package com.flashfla.components
             if (listener != null)
             {
                 this._listener = listener;
-                this.addEventListener(Event.CHANGE, listener, false, 0, useWeakReference);
+                this.addEventListener(Event.CHANGE, listener);
             }
         }
 
