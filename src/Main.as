@@ -34,7 +34,6 @@ package
     import flash.events.ContextMenuEvent;
     import flash.events.Event;
     import flash.events.KeyboardEvent;
-    import flash.events.MouseEvent;
     import flash.system.Capabilities;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
@@ -105,8 +104,6 @@ package
 
             //- Set GlobalVariables Stage
             _gvars.gameMain = this;
-
-            SystemUtil.init();
 
             if (stage)
             {
@@ -183,14 +180,11 @@ package
             TweenMax.to(epilepsyWarning, 1, {alpha: 0.6, ease: SineInOut, yoyo: true, repeat: -1});
 
             //- Add Debug Tracking
-            ver = new Text(Capabilities.version.replace(/,/g, ".") + " - Build " + CONFIG::timeStamp + " - " + Constant.AIR_VERSION);
+            ver = new Text(this, stage.width - 5, 2, Capabilities.version.replace(/,/g, ".") + " - Build " + CONFIG::timeStamp + " - " + Constant.AIR_VERSION);
             ver.alpha = 0.15;
-            ver.x = stage.width - 5;
-            ver.y = 2;
             ver.align = Text.RIGHT;
             ver.mouseEnabled = false;
             ver.cacheAsBitmap = true;
-            this.addChild(ver);
 
             // Holidays!
             var d:Date = new Date();
@@ -290,10 +284,7 @@ package
             this.addChild(loadStatus);
 
             //- Preloader Display
-            preloader = new ProgressBar(GAME_WIDTH - 20, 20);
-            preloader.x = 10;
-            preloader.y = GAME_HEIGHT - 30;
-            this.addChild(preloader);
+            preloader = new ProgressBar(this, 10, GAME_HEIGHT - 30, GAME_WIDTH - 20, 20);
 
             //- Frame Listener
             this.addEventListener(Event.ENTER_FRAME, updatePreloader);
@@ -383,21 +374,16 @@ package
             preloader.update(Math.round((loadScripts / loadTotal) * 100));
             if (loadTimer >= 300 && !retryLoadButton)
             {
-                retryLoadButton = new BoxButton(75, 25, "RELOAD");
-                retryLoadButton.x = Main.GAME_WIDTH - 85;
-                retryLoadButton.y = preloader.y - 35;
-                retryLoadButton.addEventListener(MouseEvent.CLICK, e_retryClick);
-                addChild(retryLoadButton);
+                retryLoadButton = new BoxButton(this, Main.GAME_WIDTH - 85, preloader.y - 35, 75, 25, "RELOAD", 12, e_retryClick);
             }
 
             if (preloader.isComplete)
             {
                 loadComplete = true;
-                if (retryLoadButton)
+                if (retryLoadButton && this.contains(retryLoadButton))
                 {
                     removeChild(retryLoadButton);
-                    retryLoadButton.removeEventListener(MouseEvent.CLICK, e_retryClick);
-                    retryLoadButton = null;
+                    retryLoadButton.dispose();
                 }
 
                 buildContextMenu();

@@ -61,9 +61,7 @@ package menu
             this.addChild(background);
 
             //- Add ScrollPane
-            pane = new ScrollPane(578, 358);
-            pane.x = 155; // 332
-            pane.y = 64;
+            pane = new ScrollPane(this, 155, 64, 578, 358);
             var border:Sprite = new Sprite();
             border.graphics.lineStyle(1, 0xFFFFFF, 1, true);
             border.graphics.moveTo(0.3, -0.5);
@@ -72,38 +70,18 @@ package menu
             border.graphics.lineTo(577, 358.5);
             border.alpha = 0.35;
             pane.addChild(border);
-            this.addChild(pane);
 
             //- Add ScrollBar
-            scrollbar = new ScrollBar(21, 325, new ScrollDragger(), new ScrollBackground());
-            scrollbar.x = 744;
-            scrollbar.y = 81;
-            this.addChild(scrollbar);
+            scrollbar = new ScrollBar(this, 744, 81, 21, 325, new ScrollDragger(), new ScrollBackground());
 
             // Menu Left
-            normalTokenButton = new BoxButton(124, 29, _lang.string("menu_tokens_normal"));
-            normalTokenButton.x = 5;
-            normalTokenButton.y = 130;
-            normalTokenButton.addEventListener(MouseEvent.CLICK, onNormalSelect);
-            this.addChild(normalTokenButton);
+            normalTokenButton = new BoxButton(this, 5, 130, 124, 29, _lang.string("menu_tokens_normal"), 12, onNormalSelect);
 
-            skillTokenButton = new BoxButton(124, 29, _lang.string("menu_tokens_skill"));
-            skillTokenButton.x = 5;
-            skillTokenButton.y = 164;
+            skillTokenButton = new BoxButton(this, 5, 164, 124, 29, _lang.string("menu_tokens_skill"), 12, onSkillSelect);
             skillTokenButton.active = true;
-            skillTokenButton.addEventListener(MouseEvent.CLICK, onSkillSelect);
-            this.addChild(skillTokenButton);
 
-            var hideLabel:Text = new Text(_lang.string("menu_tokens_hide_complete"));
-            hideLabel.x = 10;
-            hideLabel.y = 230;
-            addChild(hideLabel);
-
-            hideCompleteCheck = new BoxCheck();
-            hideCompleteCheck.x = 106;
-            hideCompleteCheck.y = 233;
-            hideCompleteCheck.addEventListener(MouseEvent.CLICK, hideCompleteClick);
-            addChild(hideCompleteCheck);
+            var hideLabel:Text = new Text(this, 10, 230, _lang.string("menu_tokens_hide_complete"));
+            hideCompleteCheck = new BoxCheck(this, 106, 233, hideCompleteClick);
 
             //- Add Content
             buildTokens();
@@ -148,6 +126,10 @@ package menu
                 this.removeChild(pane);
                 pane = null;
             }
+
+            normalTokenButton.dispose();
+            skillTokenButton.dispose();
+
             super.dispose();
         }
 

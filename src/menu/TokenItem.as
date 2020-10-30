@@ -77,16 +77,13 @@ package menu
             messageText.htmlText = "<font face=\"" + Language.UNI_FONT_NAME + "\" color=\"#FFFFFF\" size=\"12\"><b>" + messageString + "</b></font>";
 
             //- Make Display
-            var box:Box = new Box(577, Math.max(54, (32 + (messageText.numLines * 17))), false);
+            var box:Box = new Box(this, 5, 0, false);
+            box.setSize(577, Math.max(54, (32 + (messageText.numLines * 17))));
 
             //- Name
-            var nameText:Text = new Text(token_info["name"], 14);
-            nameText.x = 5;
+            var nameText:Text = new Text(box, 5, 0, token_info["name"], 14);
             nameText.setAreaParams(350, 27);
-            box.addChild(nameText);
             box.addChild(messageText);
-
-            this.addChild(box);
         }
 
         public function addTokenImage(image:Bitmap, doFade:Boolean = true):void

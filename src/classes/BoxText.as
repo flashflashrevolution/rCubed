@@ -1,5 +1,6 @@
 package classes
 {
+    import flash.display.DisplayObjectContainer;
     import flash.events.Event;
     import flash.events.FocusEvent;
     import flash.text.AntiAliasType;
@@ -12,15 +13,18 @@ package classes
         private var _input:TextField;
         private var _isFocused:Boolean = false;
 
-        public function BoxText(width:int = 100, height:int = 20, textformat:TextFormat = null)
+        public function BoxText(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:int = 100, height:int = 20, textformat:TextFormat = null)
         {
             if (textformat)
                 _textFormat = textformat;
 
-            super(width + 1, height + 1, false, false);
+            super(parent, xpos, ypos, false, false);
+            super.setSize(width + 1, height + 1);
+
+            init();
         }
 
-        override protected function init():void
+        protected function init():void
         {
             _input = new TextField();
             _input.width = width - 4;
@@ -40,8 +44,6 @@ package classes
             _input.addEventListener(FocusEvent.FOCUS_OUT, onFocus);
             _input.addEventListener(Event.CHANGE, onChange);
             this.addChild(_input);
-
-            super.init();
         }
 
         override public function dispose():void
@@ -51,7 +53,6 @@ package classes
             _input.removeEventListener(FocusEvent.FOCUS_OUT, onFocus);
             _input.removeEventListener(Event.CHANGE, onChange);
         }
-
 
         ////////////////////////////////////////////////////////////////////////
         //- Events

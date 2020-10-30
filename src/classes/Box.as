@@ -1,5 +1,6 @@
 package classes
 {
+    import flash.display.DisplayObjectContainer;
     import flash.display.GradientType;
     import flash.display.Sprite;
     import flash.events.MouseEvent;
@@ -7,8 +8,8 @@ package classes
     dynamic public class Box extends Sprite
     {
         // Display
-        private var _width:Number;
-        private var _height:Number;
+        private var _width:Number = -1;
+        private var _height:Number = -1;
         private var _highlight:Boolean = false;
         private var _active:Boolean = false;
 
@@ -30,21 +31,29 @@ package classes
         private var BORDER_ALPHA:Number = 0.35;
         private var BORDER_ALPHA_ACTIVE:Number = 0.55;
 
-        public function Box(width:Number, height:Number, useHover:Boolean = true, useGradient:Boolean = true):void
+        public function Box(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, useHover:Boolean = true, useGradient:Boolean = true)
         {
-            this._width = width;
-            this._height = height;
             this._useHover = useHover;
             this._useGradient = useGradient;
 
-            init();
+            this.x = xpos;
+            this.y = ypos;
+
+            if (parent)
+                parent.addChild(this);
 
             //- Add Hover Listeners
             setHoverStatus(_useHover);
         }
 
-        protected function init():void
+        public function setSize(w:Number, h:Number):void
         {
+            if ((w == _width && h == _height) || (w < 0) || (h < 0) || isNaN(w) || isNaN(h))
+                return;
+
+            this._width = w;
+            this._height = h;
+
             draw();
         }
 
@@ -109,8 +118,7 @@ package classes
 
         override public function set width(val:Number):void
         {
-            _width = val;
-            draw();
+            this.setSize(val, _height);
         }
 
         override public function get height():Number
@@ -120,8 +128,7 @@ package classes
 
         override public function set height(val:Number):void
         {
-            _height = val;
-            draw();
+            this.setSize(_width, val);
         }
 
         public function get highlight():Boolean

@@ -31,64 +31,38 @@ package classes.filter
 
         public function SavedFilterButton(parent:DisplayObjectContainer, xpos:Number, ypos:Number, filter:EngineLevelFilter, updater:PopupFilterManager)
         {
-            parent.addChild(this);
-            this.x = xpos;
-            this.y = ypos;
             this.filter = filter;
             this.updater = updater;
-            super(704, 35, false, false);
+            super(parent, xpos, ypos, false, false);
+            super.setSize(704, 35);
+
+            init();
         }
 
-        override protected function init():void
+        protected function init():void
         {
-            super.init();
-            defaultCheckbox = new BoxCheck();
-            defaultCheckbox.x = 7;
-            defaultCheckbox.y = 11;
+            defaultCheckbox = new BoxCheck(this, 7, 11, e_defaultClick);
             defaultCheckbox.checked = filter.is_default;
-            defaultCheckbox.addEventListener(MouseEvent.CLICK, e_defaultClick);
             defaultCheckbox.addEventListener(MouseEvent.MOUSE_OVER, e_defaultMouseOver);
-            addChild(defaultCheckbox);
 
-            filterName = new Text(filter.name);
-            filterName.x = 25;
+            filterName = new Text(this, 25, 0, filter.name);
             filterName.height = 35;
-            addChild(filterName);
 
-            deleteButton = new BoxButton(100, 23, _lang.string("filter_editor_delete"));
-            deleteButton.x = width - 105;
-            deleteButton.y = 5;
-            deleteButton.addEventListener(MouseEvent.CLICK, e_deleteClick);
-            addChild(deleteButton);
-
-            editButton = new BoxButton(100, 23, _lang.string("filter_editor_select_edit"));
-            editButton.x = deleteButton.x - 105;
-            editButton.y = 5;
-            editButton.addEventListener(MouseEvent.CLICK, e_editClick);
-            addChild(editButton);
-
-            exportButton = new BoxButton(100, 23, _lang.string("popup_filter_filter_single_export"));
-            exportButton.x = editButton.x - 105;
-            exportButton.y = 5;
-            exportButton.addEventListener(MouseEvent.CLICK, e_exportClick);
-            addChild(exportButton);
+            deleteButton = new BoxButton(this, width - 105, 5, 100, 23, _lang.string("filter_editor_delete"), 12, e_deleteClick);
+            editButton = new BoxButton(this, deleteButton.x - 105, 5, 100, 23, _lang.string("filter_editor_select_edit"), 12, e_editClick);
+            exportButton = new BoxButton(this, editButton.x - 105, 5, 100, 23, _lang.string("popup_filter_filter_single_export"), 12, e_exportClick);
         }
 
         override public function dispose():void
         {
-            defaultCheckbox.removeEventListener(MouseEvent.CLICK, e_defaultClick);
             defaultCheckbox.removeEventListener(MouseEvent.MOUSE_OVER, e_defaultMouseOver);
             defaultCheckbox.removeEventListener(MouseEvent.MOUSE_OUT, e_defaultMouseOut);
+            defaultCheckbox.dispose();
 
             filterName.dispose();
 
-            deleteButton.removeEventListener(MouseEvent.CLICK, e_deleteClick);
             deleteButton.dispose();
-
-            editButton.removeEventListener(MouseEvent.CLICK, e_editClick);
             editButton.dispose();
-
-            exportButton.removeEventListener(MouseEvent.CLICK, e_exportClick);
             exportButton.dispose();
 
             super.dispose();
@@ -100,9 +74,8 @@ package classes.filter
             if (!hover_message)
             {
                 hover_message = new Sprite();
-                var msg:Text = new Text(_lang.string("popup_filter_default_filter"));
+                var msg:Text = new Text(null, 5, 0, _lang.string("popup_filter_default_filter"));
                 msg.height = 23;
-                msg.x = 5;
                 hover_message.graphics.lineStyle(1, 0xffffff, 0.75);
                 hover_message.graphics.beginFill(GameBackgroundColor.BG_POPUP, 1);
                 hover_message.graphics.drawRect(0, 0, msg.width + 10, 23);

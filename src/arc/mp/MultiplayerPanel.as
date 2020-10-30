@@ -59,10 +59,9 @@ package arc.mp
             }
             else
             {
-                textLogin = new Text("Please Login or Register");
+                textLogin = new Text(this, 0, 0, "Please Login or Register");
                 textLogin.x = Main.GAME_WIDTH / 2 - textLogin.width / 2;
                 textLogin.y = Main.GAME_HEIGHT / 2 - textLogin.height * 3 / 2;
-                addChild(textLogin);
                 return;
             }
 
@@ -193,64 +192,56 @@ package arc.mp
                 }
             });
 
-            buttonMP = new BoxButton(130, 25, "Connect");
-            buttonMP.x = 5;
-            buttonMP.y = Main.GAME_HEIGHT - 30;
-            buttonMP.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void
+            function clickMP(event:MouseEvent):void
             {
                 if (connection.connected)
                     connection.disconnect();
                 connection.mode = Multiplayer.GAME_R3;
                 connection.connect();
                 showThrobber();
-            });
-            addChild(buttonMP);
-            showButton(buttonMP, false);
+            }
 
-            buttonLegacy = new BoxButton(140, 40, "Connect to Legacy");
-            buttonLegacy.x = buttonMP.x;
-            buttonLegacy.y = buttonMP.y + buttonMP.height + 10;
-            buttonLegacy.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void
+            function clickLegacy(event:MouseEvent):void
             {
                 if (connection.connected)
                     connection.disconnect();
                 connection.mode = Multiplayer.GAME_LEGACY;
                 connection.connect();
                 showThrobber();
-            });
-            addChild(buttonLegacy);
-            showButton(buttonLegacy, false);
+            }
 
-            buttonVelocity = new BoxButton(buttonLegacy.width, buttonLegacy.height, "Connect to Velocity");
-            buttonVelocity.x = buttonLegacy.x;
-            buttonVelocity.y = buttonLegacy.y + buttonLegacy.height + 10;
-            buttonVelocity.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void
+            function clickVelocity(event:MouseEvent):void
             {
                 if (connection.connected)
                     connection.disconnect();
                 connection.mode = Multiplayer.GAME_VELOCITY;
                 connection.connect();
                 showThrobber();
-            });
-            addChild(buttonVelocity);
-            showButton(buttonVelocity, false);
+            }
 
-            buttonDisconnect = new BoxButton(buttonMP.width, buttonMP.height, "Disconnect");
-            buttonDisconnect.x = buttonMP.x;
-            buttonDisconnect.y = buttonMP.y;
-            buttonDisconnect.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void
+            function clickDisconnect(event:MouseEvent):void
             {
                 if (connection.connected)
                     connection.disconnect();
-            });
+            }
 
-            buttonLobby = new BoxButton(buttonLegacy.width, buttonLegacy.height, "Join Lobby");
-            buttonLobby.x = buttonDisconnect.x;
-            buttonLobby.y = buttonDisconnect.y + buttonDisconnect.height + 10;
-            buttonLobby.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void
+            function clickJoinLobby(event:MouseEvent):void
             {
                 connection.joinLobby();
-            });
+            }
+
+            buttonMP = new BoxButton(this, 5, Main.GAME_HEIGHT - 30, 130, 25, "Connect", 12, clickMP);
+            showButton(buttonMP, false);
+
+            buttonLegacy = new BoxButton(this, buttonMP.x, buttonMP.y + buttonMP.height + 10, 140, 40, "Connect to Legacy", 12, clickLegacy);
+            showButton(buttonLegacy, false);
+
+            buttonVelocity = new BoxButton(this, buttonLegacy.x, buttonLegacy.y + buttonLegacy.height + 10, buttonLegacy.width, buttonLegacy.height, "Connect to Velocity", 12, clickVelocity);
+            showButton(buttonVelocity, false);
+
+            buttonDisconnect = new BoxButton(null, buttonMP.x, buttonMP.y, buttonMP.width, buttonMP.height, "Disconnect", 12, clickDisconnect);
+
+            buttonLobby = new BoxButton(null, buttonDisconnect.x, buttonDisconnect.y + buttonDisconnect.height + 10, buttonLegacy.width, buttonLegacy.height, "Join Lobby", 12, clickJoinLobby);
 
             throbber = new Throbber();
             throbber.x = Main.GAME_WIDTH / 2;

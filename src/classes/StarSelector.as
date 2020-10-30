@@ -1,5 +1,6 @@
 package classes
 {
+    import flash.display.DisplayObjectContainer;
     import flash.display.Graphics;
     import flash.display.Sprite;
     import flash.events.Event;
@@ -15,9 +16,14 @@ package classes
         public var MIN_VALUE:Number = 0;
         public var MAX_VALUE:Number = 5;
 
-        public function StarSelector(isActive:Boolean = true)
+        public function StarSelector(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, isActive:Boolean = true)
         {
-            super();
+            if (parent)
+                parent.addChild(this);
+
+            this.x = xpos;
+            this.y = ypos;
+
             init(isActive);
         }
 
@@ -159,7 +165,5 @@ package classes
             grph.lineTo(_x + (0.5 * STAR_WIDTH), _y + (0 * STAR_HEIGHT));
             grph.endFill();
         }
-
     }
-
 }

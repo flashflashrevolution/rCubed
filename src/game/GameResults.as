@@ -166,29 +166,21 @@ package game
             this.addChild(buttonMenu);
 
             // Main Bavigation Buttons
-            navOptions = new BoxButton(170, 40, _lang.string("game_results_menu_options"), 17);
-            navOptions.addEventListener(MouseEvent.CLICK, eventHandler);
-            buttonMenu.addChild(navOptions);
+            navOptions = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_options"), 17, eventHandler);
             buttonMenuItems.push(navOptions);
 
-            navHighscores = new BoxButton(170, 40, _lang.string("game_results_menu_highscores"), 17);
-            navHighscores.addEventListener(MouseEvent.CLICK, eventHandler);
-            buttonMenu.addChild(navHighscores);
+            navHighscores = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_highscores"), 17, eventHandler);
             buttonMenuItems.push(navHighscores);
 
             if (!_mp.gameplayPlayingStatus())
             {
-                navReplay = new BoxButton(170, 40, _lang.string("game_results_menu_replay_song"), 17);
-                navReplay.addEventListener(MouseEvent.CLICK, eventHandler);
-                buttonMenu.addChild(navReplay);
+                navReplay = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_replay_song"), 17, eventHandler);
                 buttonMenuItems.push(navReplay);
             }
 
             if (!_gvars.flashvars.replay && !_gvars.flashvars.preview_file)
             {
-                navMenu = new BoxButton(170, 40, _lang.string("game_results_menu_exit_menu"), 17);
-                navMenu.addEventListener(MouseEvent.CLICK, eventHandler);
-                buttonMenu.addChild(navMenu);
+                navMenu = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_exit_menu"), 17, eventHandler);
                 buttonMenuItems.push(navMenu);
             }
 
@@ -209,48 +201,24 @@ package game
             resultsDisplay.addChild(navRating);
 
             // Song Results Buttons
-            navScreenShot = new BoxIcon(32, 32, new iconPhoto());
-            navScreenShot.x = 522;
-            navScreenShot.y = 6;
+            navScreenShot = new BoxIcon(this, 522, 6, 32, 32, new iconPhoto(), eventHandler);
             navScreenShot.setIconColor("#E2FEFF");
             navScreenShot.setHoverText(_lang.string("game_results_queue_save_screenshot"), "bottom");
-            navScreenShot.addEventListener(MouseEvent.CLICK, eventHandler);
-            this.addChild(navScreenShot);
 
-            navSaveReplay = new BoxIcon(32, 32, new iconVideo());
-            navSaveReplay.x = 485;
-            navSaveReplay.y = 6;
+            navSaveReplay = new BoxIcon(this, 485, 6, 32, 32, new iconVideo(), eventHandler);
             navSaveReplay.setIconColor("#E2FEFF");
             navSaveReplay.setHoverText(_lang.string("game_results_queue_save_replay"), "bottom");
-            navSaveReplay.addEventListener(MouseEvent.CLICK, eventHandler);
-            this.addChild(navSaveReplay);
 
-            navRandomSong = new BoxIcon(32, 32, new iconRandom());
-            navRandomSong.x = 448;
-            navRandomSong.y = 6;
+            navRandomSong = new BoxIcon(this, 448, 6, 32, 32, new iconRandom(), eventHandler);
             navRandomSong.setIconColor("#E2FEFF");
             navRandomSong.setHoverText(_lang.string("game_results_play_random_song"), "bottom");
-            navRandomSong.addEventListener(MouseEvent.CLICK, eventHandler);
-            this.addChild(navRandomSong);
 
             // Song Results - Song Queue
-            navPrev = new BoxButton(90, 32, _lang.string("game_results_queue_previous"));
-            navPrev.x = 18;
-            navPrev.y = 62;
-            navPrev.addEventListener(MouseEvent.CLICK, eventHandler);
-            this.addChild(navPrev);
-
-            navNext = new BoxButton(90, 32, _lang.string("game_results_queue_next"));
-            navNext.x = 672;
-            navNext.y = 62;
-            navNext.addEventListener(MouseEvent.CLICK, eventHandler);
-            this.addChild(navNext);
+            navPrev = new BoxButton(this, 18, 62, 90, 32, _lang.string("game_results_queue_previous"), 12, eventHandler);
+            navNext = new BoxButton(this, 672, 62, 90, 32, _lang.string("game_results_queue_next"), 12, eventHandler);
 
             // Graph
-            resultsMods = new Text("---");
-            resultsMods.x = 18;
-            resultsMods.y = 276;
-            this.addChild(resultsMods);
+            resultsMods = new Text(this, 18, 276, "---");
 
             graphDraw = new Sprite();
             graphDraw.x = 30;
@@ -264,20 +232,13 @@ package game
             graphOverlay.mouseEnabled = false;
             this.addChild(graphOverlay);
 
-            graphToggle = new BoxIcon(16, 18, new iconRight());
-            graphToggle.x = 10;
-            graphToggle.y = 298;
+            graphToggle = new BoxIcon(this, 10, 298, 16, 18, new iconRight(), eventHandler);
             graphToggle.padding = 6;
             graphToggle.setHoverText(_lang.string("result_next_graph_type"), "right");
-            graphToggle.addEventListener(MouseEvent.CLICK, eventHandler);
-            this.addChild(graphToggle);
 
-            graphAccuracy = new BoxIcon(16, 18, new iconSmallT());
-            graphAccuracy.x = 10;
-            graphAccuracy.y = 318;
+            graphAccuracy = new BoxIcon(this, 10, 318, 16, 18, new iconSmallT());
             graphAccuracy.padding = 6;
             graphAccuracy.delay = 250;
-            this.addChild(graphAccuracy);
 
             // Display Game Result
             displayGameResult(songResults.length > 1 ? -1 : 0);

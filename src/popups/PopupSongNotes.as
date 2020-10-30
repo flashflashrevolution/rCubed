@@ -80,55 +80,36 @@ package popups
             bmp = new Bitmap(bmd);
             this.addChild(bmp);
 
-            var bgbox:Box = new Box(390, Main.GAME_HEIGHT + 2, false, false);
-            bgbox.x = (Main.GAME_WIDTH - 390) / 2;
-            bgbox.y = -1;
+            var bgbox:Box = new Box(this, (Main.GAME_WIDTH - 390) / 2, -1, false, false);
+            bgbox.setSize(390, Main.GAME_HEIGHT + 2);
             bgbox.color = GameBackgroundColor.BG_POPUP;
             bgbox.normalAlpha = 0.5;
             bgbox.activeAlpha = 1;
-            this.addChild(bgbox);
 
-            box = new Box(bgbox.width, bgbox.height, false, false);
-            box.x = bgbox.x;
-            box.y = -1;
+            box = new Box(this, bgbox.x, -1, false, false);
+            box.setSize(bgbox.width, bgbox.height);
             box.activeAlpha = 0.4;
-            this.addChild(box);
 
-            var titleDisplay:Text = new Text("- " + sObject["name"] + " -", 20);
-            titleDisplay.x = 5;
-            titleDisplay.y = 20;
+            var titleDisplay:Text = new Text(box, 5, 20, "- " + sObject["name"] + " -", 20);
             titleDisplay.width = box.width - 10;
             titleDisplay.align = Text.CENTER;
-            box.addChild(titleDisplay);
 
             // Divider
             box.graphics.lineStyle(1, 0xffffff);
             box.graphics.moveTo(10, 65);
             box.graphics.lineTo(box.width - 10, 65);
 
-            var lblSongRating:Text = new Text(_lang.string("song_rating_label"), 14);
-            lblSongRating.x = 20;
-            lblSongRating.y = 69;
+            var lblSongRating:Text = new Text(box, 20, 69, _lang.string("song_rating_label"), 14);
             lblSongRating.width = 145;
             lblSongRating.align = Text.LEFT;
-            box.addChild(lblSongRating);
 
-            sRating = new StarSelector();
-            sRating.x = 22;
-            sRating.y = 95;
-            box.addChild(sRating);
+            sRating = new StarSelector(box, 22, 95);
 
-            var lblSongFavorite:Text = new Text(_lang.string("song_favorite_label"), 14);
-            lblSongFavorite.x = box.width - 165;
-            lblSongFavorite.y = 68;
+            var lblSongFavorite:Text = new Text(box, box.width - 165, 68, _lang.string("song_favorite_label"), 14);
             lblSongFavorite.width = 145;
             lblSongFavorite.align = Text.RIGHT;
-            box.addChild(lblSongFavorite);
 
-            sFavorite = new HeartSelector();
-            sFavorite.x = box.width - 52;
-            sFavorite.y = 93
-            box.addChild(sFavorite);
+            sFavorite = new HeartSelector(box, box.width - 52, 93);
 
             // Divider
             box.graphics.lineStyle(1, 0xffffff);
@@ -139,16 +120,10 @@ package popups
             var yOff:int = 140;
 
             //- Notes Field
-            var notesLabel:Text = new Text(_lang.string("song_notes"));
-            notesLabel.x = xOff;
-            notesLabel.y = yOff;
-            box.addChild(notesLabel);
+            var notesLabel:Text = new Text(box, xOff, yOff, _lang.string("song_notes"));
 
-            notesLength = new Text("0 / 250");
-            notesLength.x = box.width - xOff;
-            notesLength.y = yOff;
+            notesLength = new Text(box, box.width - xOff, yOff, "0 / 250");
             notesLength.align = "right";
-            box.addChild(notesLength);
             yOff += 20;
 
             box.graphics.lineStyle(1, 0xffffff, 0.5);
@@ -173,80 +148,38 @@ package popups
             yOff += 90;
 
             // Settings
-            var setMirrorInvertText:Text = new Text(_lang.string("song_notes_setting_mirror_invert"));
-            setMirrorInvertText.x = xOff + 22;
-            setMirrorInvertText.y = yOff;
-            box.addChild(setMirrorInvertText);
-
-            setMirrorInvert = new BoxCheck();
-            setMirrorInvert.x = xOff + 2;
-            setMirrorInvert.y = yOff + 2;
-            setMirrorInvert.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(setMirrorInvert);
+            var setMirrorInvertText:Text = new Text(box, xOff + 22, yOff, _lang.string("song_notes_setting_mirror_invert"));
+            setMirrorInvert = new BoxCheck(box, xOff + 2, yOff + 2, clickHandler);
             yOff += 30;
 
-            var setCustomOffsetsText:Text = new Text(_lang.string("song_notes_setting_custom_offsets"));
-            setCustomOffsetsText.x = xOff + 22;
-            setCustomOffsetsText.y = yOff;
-            box.addChild(setCustomOffsetsText);
-
-            setCustomOffsets = new BoxCheck();
-            setCustomOffsets.x = xOff + 2;
-            setCustomOffsets.y = yOff + 2;
-            setCustomOffsets.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(setCustomOffsets);
+            var setCustomOffsetsText:Text = new Text(box, xOff + 22, yOff, _lang.string("song_notes_setting_custom_offsets"));
+            setCustomOffsets = new BoxCheck(box, xOff + 2, yOff + 2, clickHandler);
             yOff += 30;
 
             //- Global Offset
-            var gameOffset:Text = new Text(_lang.string("options_global_offset"));
-            gameOffset.x = xOff;
-            gameOffset.y = yOff;
-            box.addChild(gameOffset);
+            var gameOffset:Text = new Text(box, xOff, yOff, _lang.string("options_global_offset"));
             yOff += 20;
 
-            optionMusicOffset = new ValidatedText(100, 20, ValidatedText.R_FLOAT);
-            optionMusicOffset.x = xOff;
-            optionMusicOffset.y = yOff;
+            optionMusicOffset = new ValidatedText(box, xOff, yOff, 100, 20, ValidatedText.R_FLOAT, changeHandler);
             optionMusicOffset.text = "0";
-            optionMusicOffset.addEventListener(Event.CHANGE, changeHandler);
-            box.addChild(optionMusicOffset);
             yOff += 30;
 
             //- Judge Offset
-            var gameJudgeOffset:Text = new Text(_lang.string("options_judge_offset"));
-            gameJudgeOffset.x = xOff;
-            gameJudgeOffset.y = yOff;
-            box.addChild(gameJudgeOffset);
+            var gameJudgeOffset:Text = new Text(box, xOff, yOff, _lang.string("options_judge_offset"));
             yOff += 20;
 
-            optionJudgeOffset = new ValidatedText(100, 20, ValidatedText.R_FLOAT);
-            optionJudgeOffset.x = xOff;
-            optionJudgeOffset.y = yOff;
+            optionJudgeOffset = new ValidatedText(box, xOff, yOff, 100, 20, ValidatedText.R_FLOAT, changeHandler);
             optionJudgeOffset.text = "0";
-            optionJudgeOffset.addEventListener(Event.CHANGE, changeHandler);
-            box.addChild(optionJudgeOffset);
 
             //- Revert
-            revertOptions = new BoxButton(80, 27, _lang.string("menu_revert"));
-            revertOptions.x = 20;
-            revertOptions.y = box.height - 42;
+            revertOptions = new BoxButton(box, 20, box.height - 42, 80, 27, _lang.string("menu_revert"), 12, clickHandler);
             revertOptions.color = 0xff0000;
-            revertOptions.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(revertOptions);
 
             //- Close
-            closeOptions = new BoxButton(80, 27, _lang.string("menu_close"));
-            closeOptions.x = box.width - 100;
-            closeOptions.y = box.height - 42;
-            closeOptions.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(closeOptions);
+            closeOptions = new BoxButton(box, box.width - 100, box.height - 42, 80, 27, _lang.string("menu_close"), 12, clickHandler);
 
             //- Confirm
-            confirmOptions = new BoxButton(80, 27, _lang.string("menu_confirm"));
-            confirmOptions.x = closeOptions.x - 95;
-            confirmOptions.y = box.height - 42;
-            confirmOptions.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(confirmOptions);
+            confirmOptions = new BoxButton(box, closeOptions.x - 95, box.height - 42, 80, 27, _lang.string("menu_confirm"), 12, clickHandler);
 
             refreshFields();
         }
@@ -274,13 +207,10 @@ package popups
         override public function stageRemove():void
         {
             notesField.removeEventListener(Event.CHANGE, e_notesFieldChange);
-            setMirrorInvert.removeEventListener(MouseEvent.CLICK, clickHandler);
-            setCustomOffsets.removeEventListener(MouseEvent.CLICK, clickHandler);
-            revertOptions.removeEventListener(MouseEvent.CLICK, clickHandler);
-            closeOptions.removeEventListener(MouseEvent.CLICK, clickHandler);
-            confirmOptions.removeEventListener(MouseEvent.CLICK, clickHandler);
-            optionJudgeOffset.removeEventListener(Event.CHANGE, changeHandler);
-            optionMusicOffset.removeEventListener(Event.CHANGE, changeHandler);
+            setMirrorInvert.dispose();
+            setCustomOffsets.dispose();
+            optionJudgeOffset.dispose();
+            optionMusicOffset.dispose();
 
             notesLength.dispose();
             optionJudgeOffset.dispose();
