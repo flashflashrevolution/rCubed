@@ -217,6 +217,7 @@ package popups
             optionMusicOffset.dispose();
 
             notesLength.dispose();
+            populateOffsets.dispose();
             optionJudgeOffset.dispose();
             optionMusicOffset.dispose();
             revertOptions.dispose();
@@ -257,7 +258,6 @@ package popups
             //- Revert
             else if (e.target == revertOptions)
             {
-                sRating.value = 0;
                 sFavorite.checked = false;
                 setMirrorInvert.checked = false;
                 setCustomOffsets.checked = false;
