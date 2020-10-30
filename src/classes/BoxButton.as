@@ -1,32 +1,45 @@
 package classes
 {
+    import flash.display.DisplayObjectContainer;
+    import flash.events.MouseEvent;
 
     dynamic public class BoxButton extends Box
     {
         private var _text:Text;
-
         private var _enabled:Boolean = true;
 
-        public function BoxButton(width:Number, height:Number, text:String, size:int = 12, color:String = "#FFFFFF", useHover:Boolean = true, useGradient:Boolean = false)
+        private var _listener:Function = null;
+
+        public function BoxButton(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:Number = 0, height:Number = 0, text:String = "", size:int = 12, listener:Function = null)
         {
-            super(width, height, useHover, useGradient);
+            super(parent, xpos, ypos, true, false);
+            super.setSize(width, height);
 
             //- Add Text
-            _text = new Text(text, size, color);
+            _text = new Text(this, 0, 0, text, size, "#FFFFFF");
             _text.height = height + 1;
             _text.width = width;
             _text.align = Text.CENTER;
-            this.addChild(_text);
 
             //- Set Defaults
             this.mouseEnabled = true;
             this.mouseChildren = false;
             this.useHandCursor = true;
             this.buttonMode = true;
+
+            //- Set click event listener
+            if (listener != null)
+            {
+                this._listener = listener;
+                this.addEventListener(MouseEvent.CLICK, listener);
+            }
         }
 
         override public function dispose():void
         {
+            if (_listener != null)
+                this.removeEventListener(MouseEvent.CLICK, _listener);
+
             super.dispose();
 
             if (_text != null)
@@ -40,13 +53,13 @@ package classes
         override public function set width(value:Number):void
         {
             _text.width = value;
-            super.width = value;
+            super.setSize(value, super.height);
         }
 
         override public function set height(value:Number):void
         {
             _text.height = value;
-            super.height = value;
+            super.setSize(super.width, value);
         }
 
         override public function get highlight():Boolean
@@ -76,6 +89,11 @@ package classes
         public function set text(value:String):void
         {
             _text.text = value;
+        }
+
+        public function set textColor(color:String):void
+        {
+            _text.fontColor = color;
         }
     }
 }

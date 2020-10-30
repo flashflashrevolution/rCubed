@@ -2,6 +2,7 @@ package classes
 {
     import assets.menu.icons.fa.iconHeartEmpty;
     import assets.menu.icons.fa.iconHeartFull;
+    import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.events.Event;
     import flash.events.MouseEvent;
@@ -12,8 +13,14 @@ package classes
         private var fillSprite:UIIcon;
         private var _checked:Boolean = false;
 
-        public function HeartSelector(isActive:Boolean = true)
+        public function HeartSelector(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, isActive:Boolean = true)
         {
+            if (parent)
+                parent.addChild(this);
+
+            this.x = xpos;
+            this.y = ypos;
+
             init(isActive);
         }
 

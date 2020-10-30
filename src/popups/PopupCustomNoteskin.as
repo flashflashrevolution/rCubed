@@ -87,27 +87,20 @@ package popups
 
             this.addChild(bmp);
 
-            var bgbox:Box = new Box(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40, false, false);
-            bgbox.x = 20;
-            bgbox.y = 20;
+            var bgbox:Box = new Box(this, 20, 20, false, false);
+            bgbox.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             bgbox.color = GameBackgroundColor.BG_POPUP;
             bgbox.normalAlpha = 0.5;
             bgbox.activeAlpha = 1;
-            this.addChild(bgbox);
 
-            box = new Box(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40, false, false);
-            box.x = 20;
-            box.y = 20;
+            box = new Box(this, 20, 20, false, false);
+            box.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             box.activeAlpha = 0.4;
             box.graphics.lineStyle(1, 0xffffff);
             box.graphics.moveTo(box.width - sidebar_width, 0); // Sidebar border
             box.graphics.lineTo(box.width - sidebar_width, box.height);
-            this.addChild(box);
 
-            image_holder = new ScrollPane(box.width - sidebar_width - 2, box.height - 2);
-            image_holder.x = 1;
-            image_holder.y = 1;
-            box.addChild(image_holder);
+            image_holder = new ScrollPane(box, 1, 1, box.width - sidebar_width - 2, box.height - 2);
 
             //---------------------------------------------------------------------------------------------------------//
             var xPos:int = box.width - sidebar_width + 10;
@@ -115,58 +108,37 @@ package popups
             var xOff:int = 0;
 
 
-            btn_importImage = new BoxButton(sidebar_width - 20, 25, _lang.string("popup_noteskin_import_image")); // "Import Image"
-            btn_importImage.x = xPos;
-            btn_importImage.y = yPos;
-            btn_importImage.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(btn_importImage);
+            btn_importImage = new BoxButton(box, xPos, yPos, sidebar_width - 20, 25, _lang.string("popup_noteskin_import_image"), 12, clickHandler); // "Import Image"
             yPos += 30;
 
-            btn_importJSON = new BoxButton(sidebar_width - 20, 25, _lang.string("popup_noteskin_import_json")); // "Import JSON"
-            btn_importJSON.x = xPos;
-            btn_importJSON.y = yPos;
-            btn_importJSON.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(btn_importJSON);
+            btn_importJSON = new BoxButton(box, xPos, yPos, sidebar_width - 20, 25, _lang.string("popup_noteskin_import_json"), 12, clickHandler); // "Import JSON"
             yPos += 30;
 
-            var cellDescText:Text = new Text(_lang.string("popup_noteskin_grid_rotation")); // "Grid & Rotation:"
-            cellDescText.x = xPos;
-            cellDescText.y = yPos;
+            var cellDescText:Text = new Text(box, xPos, yPos, _lang.string("popup_noteskin_grid_rotation")); // "Grid & Rotation:"
             cellDescText.width = sidebar_width - 20;
-            box.addChild(cellDescText);
             yPos += 25;
 
-            input_cellDims = new BoxText((sidebar_width - 25) / 2, 20);
-            input_cellDims.x = xPos;
-            input_cellDims.y = yPos;
+            input_cellDims = new BoxText(box, xPos, yPos, (sidebar_width - 25) / 2, 20);
             input_cellDims.text = noteskin_struct["options"]["grid_dim"];
             input_cellDims.restrict = "0-9,";
             input_cellDims.addEventListener(Event.CHANGE, changeHandler);
-            box.addChild(input_cellDims);
 
-            input_cellRotation = new BoxText((sidebar_width - 25) / 2, 20);
-            input_cellRotation.x = xPos + (((sidebar_width - 25) / 2) + 5);
-            input_cellRotation.y = yPos;
+            input_cellRotation = new BoxText(box, xPos + (((sidebar_width - 25) / 2) + 5), yPos, (sidebar_width - 25) / 2, 20);
             input_cellRotation.text = noteskin_struct["options"]["rotate"];
             input_cellRotation.restrict = "-0-9";
             input_cellRotation.addEventListener(Event.CHANGE, changeHandler);
-            box.addChild(input_cellRotation);
             yPos += 25;
 
             var btn_note_color_input:BoxButton;
             for (var n:int = 0; n < DEFAULT_OPTIONS.noteColors.length; n++)
             {
-                btn_note_color_input = new BoxButton((sidebar_width - 25) / 2, 20, _lang.string("note_colors_" + DEFAULT_OPTIONS.noteColors[n]));
-                btn_note_color_input.x = (n % 2 == 0 ? xPos : xPos + ((sidebar_width - 25) / 2) + 5);
-                btn_note_color_input.y = yPos;
+                btn_note_color_input = new BoxButton(box, (n % 2 == 0 ? xPos : xPos + ((sidebar_width - 25) / 2) + 5), yPos, (sidebar_width - 25) / 2, 20, _lang.string("note_colors_" + DEFAULT_OPTIONS.noteColors[n]), 12, clickHandler);
                 btn_note_color_input.alpha = 0.75;
                 btn_note_color_input.note_color = DEFAULT_OPTIONS.noteColors[n];
 
                 if (n % 2 == 1)
                     yPos += 25;
 
-                btn_note_color_input.addEventListener(MouseEvent.CLICK, clickHandler);
-                box.addChild(btn_note_color_input);
                 note_colors_btns.push(btn_note_color_input);
             }
 
@@ -175,23 +147,17 @@ package popups
             {
                 xOff = 0;
                 // Direction Text
-                var note_dir:Text = new Text(DEFAULT_OPTIONS.noteDirections[n] + " Cell:");
-                note_dir.x = xPos + 43;
-                note_dir.y = yPos;
+                var note_dir:Text = new Text(box, xPos + 43, yPos, DEFAULT_OPTIONS.noteDirections[n] + " Cell:");
                 note_dir.align = "right";
-                box.addChild(note_dir);
                 xOff += 44; //21
 
                 var btn_width:int = (sidebar_width - 64); // / 2;
 
-                input_note_dir = new BoxText(btn_width, 20);
-                input_note_dir.x = xPos + xOff;
-                input_note_dir.y = yPos;
+                input_note_dir = new BoxText(box, xPos + xOff, yPos, btn_width, 20);
                 input_note_dir.pos = DEFAULT_OPTIONS.noteDirections[n];
                 input_note_dir.addEventListener(Event.CHANGE, changeHandler);
                 input_note_dir.restrict = "0-9,";
                 note_colors_inputs.push(input_note_dir);
-                box.addChild(input_note_dir);
                 xOff += btn_width + 5;
                 /*
                    input_note_dir = new BoxText(btn_width, 20);
@@ -209,25 +175,13 @@ package popups
             updateDirections();
 
             //- Export
-            exportOptions = new BoxButton(sidebar_width - 20, 25, _lang.string("menu_copy_to_clipboard"));
-            exportOptions.x = xPos;
-            exportOptions.y = box.height - 95;
-            exportOptions.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(exportOptions);
+            exportOptions = new BoxButton(box, xPos, box.height - 95, sidebar_width - 20, 25, _lang.string("menu_copy_to_clipboard"), 12, clickHandler);
 
             //- Save
-            saveOptions = new BoxButton(sidebar_width - 20, 25, _lang.string("menu_save"));
-            saveOptions.x = xPos;
-            saveOptions.y = box.height - 65;
-            saveOptions.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(saveOptions);
+            saveOptions = new BoxButton(box, xPos, box.height - 65, sidebar_width - 20, 25, _lang.string("menu_save"), 12, clickHandler);
 
             //- Close
-            closeOptions = new BoxButton(sidebar_width - 20, 25, _lang.string("menu_close"));
-            closeOptions.x = xPos;
-            closeOptions.y = box.height - 35;
-            closeOptions.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(closeOptions);
+            closeOptions = new BoxButton(box, xPos, box.height - 35, sidebar_width - 20, 25, _lang.string("menu_close"), 12, clickHandler);
         }
 
         override public function stageRemove():void
@@ -335,10 +289,7 @@ package popups
                         cell_overlay.graphics.drawRect(n_x * cell_width, n_y * cell_height, cell_width, cell_height);
                         cell_overlay.graphics.endFill();
 
-                        var cell_post:Text = new Text(n_x + "," + n_y);
-                        cell_post.x = cell_overlay.x + n_x * cell_width + 3;
-                        cell_post.y = cell_overlay.y + n_y * cell_height;
-                        image_holder.content.addChild(cell_post);
+                        var cell_post:Text = new Text(image_holder.content, cell_overlay.x + n_x * cell_width + 3, cell_overlay.y + n_y * cell_height, n_x + "," + n_y);
 
                         cell_overlay.graphics.beginFill(0, 0.75);
                         cell_overlay.graphics.drawRect(n_x * cell_width, n_y * cell_height, cell_post.width + 6, 20);

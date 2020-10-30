@@ -527,10 +527,7 @@ package game
 
             if (options.displaySongProgress || options.replay)
             {
-                progressDisplay = new ProgressBar(458, 20, 4, 0x545454, 0.1);
-                progressDisplay.x = 161;
-                progressDisplay.y = 9.35;
-                gameplayUI.addChild(progressDisplay);
+                progressDisplay = new ProgressBar(gameplayUI, 161, 9.35, 458, 20, 4, 0x545454, 0.1);
 
                 if (options.replay)
                     progressDisplay.addEventListener(MouseEvent.CLICK, progressMouseClick);
@@ -550,10 +547,7 @@ package game
                 gameplayUI.mouseChildren = false;
                 gameplayUI.mouseEnabled = false;
 
-                exitEditor = new BoxButton(75, 30, _lang.string("menu_close"));
-                exitEditor.x = (Main.GAME_WIDTH / 2) - (exitEditor.width / 2);
-                exitEditor.y = (Main.GAME_HEIGHT / 2) - (exitEditor.height / 2);
-                exitEditor.addEventListener(MouseEvent.CLICK, function(e:MouseEvent):void
+                function closeEditor(e:MouseEvent):void
                 {
                     GAME_STATE = GAME_END;
                     if (!options.replay)
@@ -561,19 +555,18 @@ package game
                         _gvars.activeUser.saveLocal();
                         _gvars.activeUser.save();
                     }
-                });
-                this.addChild(exitEditor);
-                resetEditor = new BoxButton(75, 30, _lang.string("menu_reset"));
-                resetEditor.x = exitEditor.x;
-                resetEditor.y = exitEditor.y + 35;
-                resetEditor.addEventListener(MouseEvent.CLICK, function(e:MouseEvent):void
+                }
+
+                function resetLayout(e:MouseEvent):void
                 {
                     for (var key:String in options.layout)
                         delete options.layout[key];
                     _avars.interfaceSave();
                     interfaceSetup();
-                });
-                this.addChild(resetEditor);
+                }
+
+                exitEditor = new BoxButton(this, (Main.GAME_WIDTH - 75) / 2, (Main.GAME_HEIGHT - 30) / 2, 75, 30, _lang.string("menu_close"), 12, closeEditor);
+                resetEditor = new BoxButton(this, exitEditor.x, exitEditor.y + 35, 75, 30, _lang.string("menu_reset"), 12, resetLayout);
             }
         }
 

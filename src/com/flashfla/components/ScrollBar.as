@@ -5,6 +5,7 @@
 package com.flashfla.components
 {
     import com.greensock.TweenLite;
+    import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.events.Event;
     import flash.events.MouseEvent;
@@ -21,8 +22,16 @@ package com.flashfla.components
 
         public var scroll:Number = 0;
 
-        public function ScrollBar(width:int, height:int, dragger:Sprite = null, background:Sprite = null):void
+        private var _listener:Function = null;
+
+        public function ScrollBar(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:int = 0, height:int = 0, dragger:Sprite = null, background:Sprite = null, listener:Function = null):void
         {
+            if (parent)
+                parent.addChild(this);
+
+            this.x = xpos;
+            this.y = ypos;
+
             this._width = width;
             this._height = height;
             this._dragger = dragger;
@@ -60,6 +69,13 @@ package com.flashfla.components
 
             //- Set Bottom Bound
             _bottom = Math.floor(_height - _dragger.height);
+
+            //- Set click event listener
+            if (listener != null)
+            {
+                this._listener = listener;
+                this.addEventListener(Event.CHANGE, listener);
+            }
         }
 
         public function reset():void

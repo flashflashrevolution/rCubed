@@ -58,69 +58,38 @@ package popups
 
             this.addChild(bmp);
 
-            var bgbox:Box = new Box(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40, false, false);
-            bgbox.x = 20;
-            bgbox.y = 20;
+            var bgbox:Box = new Box(this, 20, 20, false, false);
+            bgbox.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             bgbox.color = GameBackgroundColor.BG_POPUP;
             bgbox.normalAlpha = 0.5;
             bgbox.activeAlpha = 1;
-            this.addChild(bgbox);
 
-            box = new Box(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40, false, false);
-            box.x = 20;
-            box.y = 20;
+            box = new Box(this, 20, 20, false, false);
+            box.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             box.activeAlpha = 0.4;
-            this.addChild(box);
 
-            var titleDisplay:Text = new Text(_lang.string("popup_queue_manager"), 20);
-            titleDisplay.x = 10;
-            titleDisplay.y = 8;
+            var titleDisplay:Text = new Text(box, 10, 8, _lang.string("popup_queue_manager"), 20);
             titleDisplay.width = box.width - 10;
-            box.addChild(titleDisplay);
 
-            menuMain = new BoxButton(125, 25, _lang.string("options_queue_saved"));
-            menuMain.x = box.width - menuMain.width * 2 - 30;
-            menuMain.y = 8;
+            menuMain = new BoxButton(box, box.width - 125 * 2 - 30, 8, 125, 25, _lang.string("options_queue_saved"), 12, clickHandler);
             menuMain.menu_select = TAB_MAIN;
-            menuMain.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(menuMain);
 
-            menuPregen = new BoxButton(125, 25, _lang.string("options_queue_premade"));
-            menuPregen.x = box.width - menuMain.width - 15;
-            menuPregen.y = 8;
+            menuPregen = new BoxButton(box, box.width - menuMain.width - 15, 8, 125, 25, _lang.string("options_queue_premade"), 12, clickHandler);
             menuPregen.menu_select = TAB_PREGEN;
-            menuPregen.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(menuPregen);
 
             //- content
-            scrollpane = new ScrollPane(box.width - 45, 341);
-            scrollpane.x = 10;
-            scrollpane.y = 42;
+            scrollpane = new ScrollPane(box, 10, 42, box.width - 45, 341, mouseWheelHandler);
             scrollpane.graphics.lineStyle(1, 0x64A4B8, 0.25, true);
             scrollpane.graphics.drawRect(0, 0, scrollpane.width - 1, scrollpane.height - 1);
-            scrollpane.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler);
-            box.addChild(scrollpane);
-            scrollbar = new ScrollBar(20, 341);
-            scrollbar.x = 10 + scrollpane.width;
-            scrollbar.y = 42;
-            scrollbar.addEventListener(Event.CHANGE, scrollBarMoved);
-            box.addChild(scrollbar);
+            scrollbar = new ScrollBar(box, 10 + scrollpane.width, 42, 20, 341, null, null, scrollBarMoved);
 
             renderQueues();
 
             //- importBtn
-            importBtn = new BoxButton(79.5, 27, _lang.string("popup_queue_import"));
-            importBtn.x = box.width - 180;
-            importBtn.y = box.height - 42;
-            importBtn.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(importBtn);
+            importBtn = new BoxButton(box, box.width - 180, box.height - 42, 79.5, 27, _lang.string("popup_queue_import"), 12, clickHandler);
 
             //- Close
-            closeBtn = new BoxButton(79.5, 27, _lang.string("menu_close"));
-            closeBtn.x = box.width - 94.5;
-            closeBtn.y = box.height - 42;
-            closeBtn.addEventListener(MouseEvent.CLICK, clickHandler);
-            box.addChild(closeBtn);
+            closeBtn = new BoxButton(box, box.width - 94.5, box.height - 42, 79.5, 27, _lang.string("menu_close"), 12, clickHandler);
         }
 
         private function scrollBarMoved(e:Event):void
@@ -137,6 +106,11 @@ package popups
 
         override public function stageRemove():void
         {
+            menuMain.dispose();
+            menuPregen.dispose();
+            importBtn.dispose();
+            closeBtn.dispose();
+
             box.dispose();
             this.removeChild(box);
             this.removeChild(bmp);
@@ -178,11 +152,8 @@ package popups
                 }
                 else
                 {
-                    var noSavedDisplay:Text = new Text(_lang.string("popup_queue_no_queues"));
-                    noSavedDisplay.x = 10;
-                    noSavedDisplay.y = 8;
+                    var noSavedDisplay:Text = new Text(scrollpane.content, 10, 8, _lang.string("popup_queue_no_queues"));
                     noSavedDisplay.width = box.width - 10;
-                    scrollpane.content.addChild(noSavedDisplay);
                 }
             }
             else if (CURRENT_TAB == TAB_PREGEN)
@@ -323,8 +294,8 @@ internal class QueueBox extends Sprite
         var yOffset:int = 25;
 
         // Draw Box
-        box = new Box(690, (!longview ? 35 : queueItem.items.length * 20 + 30), false);
-        this.addChild(box);
+        box = new Box(this, 0, 0, false);
+        box.setSize(690, (!longview ? 35 : queueItem.items.length * 20 + 30));
 
         // Add Song Names
         var totalTime:int = 0;
@@ -336,10 +307,7 @@ internal class QueueBox extends Sprite
                 if (longview)
                 {
                     var access:int = _gvars.checkSongAccess(songData);
-                    var songName:Text = new Text(" - " + songData["name"] + " [" + songData["time"] + "]", 12, access == GlobalVariables.SONG_ACCESS_PLAYABLE ? "#FFFFFF" : "#FF9797");
-                    songName.x = 5;
-                    songName.y = yOffset;
-                    box.addChild(songName);
+                    var songName:Text = new Text(box, 5, yOffset, " - " + songData["name"] + " [" + songData["time"] + "]", 12, access == GlobalVariables.SONG_ACCESS_PLAYABLE ? "#FFFFFF" : "#FF9797");
                     yOffset += 20;
                 }
                 totalTime += songData["timeSecs"];
@@ -347,37 +315,22 @@ internal class QueueBox extends Sprite
         }
 
         // Add Queue Names + Info
-        var queueName:Text = new Text(queueItem.name + " [" + TimeUtil.convertToHHMMSS(totalTime) + "]", 14);
-        queueName.x = 5;
-        queueName.y = 5;
-        box.addChild(queueName);
+        var queueName:Text = new Text(box, 5, 5, queueItem.name + " [" + TimeUtil.convertToHHMMSS(totalTime) + "]", 14);
 
         if (!premade)
         {
             //- Copy Button
-            copyBtn = new BoxButton(70, 25, _lang.string("popup_queue_copy"));
-            copyBtn.x = box.width - 75;
-            copyBtn.y = 5;
-            box.addChild(copyBtn);
+            copyBtn = new BoxButton(box, box.width - 75, 5, 70, 25, _lang.string("popup_queue_copy"));
 
             //- Delete Button
-            deleteBtn = new BoxButton(70, 25, _lang.string("popup_queue_delete"));
-            deleteBtn.x = copyBtn.x - 75;
-            deleteBtn.y = 5;
-            box.addChild(deleteBtn);
+            deleteBtn = new BoxButton(box, copyBtn.x - 75, 5, 70, 25, _lang.string("popup_queue_delete"));
 
             //- Rename Button
-            renameBtn = new BoxButton(70, 25, _lang.string("popup_queue_rename"));
-            renameBtn.x = deleteBtn.x - 75;
-            renameBtn.y = 5;
-            box.addChild(renameBtn);
+            renameBtn = new BoxButton(box, deleteBtn.x - 75, 5, 70, 25, _lang.string("popup_queue_rename"));
         }
 
         //- PLAY Button
-        playBtn = new BoxButton(70, 25, _lang.string("popup_queue_play"));
-        playBtn.x = (renameBtn ? renameBtn.x - 75 : box.width - 75);
-        playBtn.y = 5;
-        box.addChild(playBtn);
+        playBtn = new BoxButton(box, (renameBtn ? renameBtn.x - 75 : box.width - 75), 5, 70, 25, _lang.string("popup_queue_play"));
 
         this.addEventListener(MouseEvent.CLICK, clickEvent);
     }
@@ -467,6 +420,11 @@ internal class QueueBox extends Sprite
         //- Remove is already existed.
         if (box != null)
         {
+            copyBtn.dispose();
+            deleteBtn.dispose();
+            playBtn.dispose();
+            renameBtn.dispose();
+
             box.dispose();
             this.removeChild(box);
             box = null;

@@ -70,79 +70,42 @@ package popups
 
             this.addChild(bmp);
 
-            var bgbox:Box = new Box(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40, false, false);
-            bgbox.x = 20;
-            bgbox.y = 20;
+            var bgbox:Box = new Box(this, 20, 20, false, false);
+            bgbox.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             bgbox.color = GameBackgroundColor.BG_POPUP;
             bgbox.normalAlpha = 0.5;
             bgbox.activeAlpha = 1;
-            this.addChild(bgbox);
 
-            box = new Box(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40, false, false);
-            box.x = 20;
-            box.y = 20;
+            box = new Box(this, 20, 20, false, false);
+            box.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             box.activeAlpha = 0.4;
-            this.addChild(box);
 
             // Tab Label
-            tabLabel = new Text("", 20);
-            tabLabel.x = 10;
-            tabLabel.y = 8;
+            tabLabel = new Text(box, 10, 8, "", 20);
             tabLabel.width = box.width - 10;
-            box.addChild(tabLabel);
 
             //- Closed
-            closeButton = new BoxButton(100, 31, _lang.string("popup_close"));
-            closeButton.x = box.width - 105;
-            closeButton.y = 5;
-            closeButton.addEventListener(MouseEvent.CLICK, e_closeButton);
-            box.addChild(closeButton);
+            closeButton = new BoxButton(box, box.width - 105, 5, 100, 31, _lang.string("popup_close"), 12, e_closeButton);
 
             //- Saved 
-            filterListButton = new BoxButton(100, 31, _lang.string("popup_filter_saved_filters"));
-            filterListButton.x = closeButton.x - 105;
-            filterListButton.y = 5;
-            filterListButton.addEventListener(MouseEvent.CLICK, e_toggleTabButton);
-            box.addChild(filterListButton);
+            filterListButton = new BoxButton(box, closeButton.x - 105, 5, 100, 31, _lang.string("popup_filter_saved_filters"), 12, e_toggleTabButton);
 
             //- Clear
-            clearFilterButton = new BoxButton(100, 31, _lang.string("popup_filter_clear_filter"));
-            clearFilterButton.x = filterListButton.x - 105;
-            clearFilterButton.y = 5;
-            clearFilterButton.addEventListener(MouseEvent.CLICK, e_clearFilterButton);
-            box.addChild(clearFilterButton);
+            clearFilterButton = new BoxButton(box, filterListButton.x - 105, 5, 100, 31, _lang.string("popup_filter_clear_filter"), 12, e_clearFilterButton);
 
             //- Add
-            addSavedFilterButton = new BoxButton(100, 31, _lang.string("popup_filter_add_filter"));
-            addSavedFilterButton.x = filterListButton.x - 105;
-            addSavedFilterButton.y = 5;
-            addSavedFilterButton.addEventListener(MouseEvent.CLICK, e_addSavedFilterButton);
-            box.addChild(addSavedFilterButton);
+            addSavedFilterButton = new BoxButton(box, filterListButton.x - 105, 5, 100, 31, _lang.string("popup_filter_add_filter"), 12, e_addSavedFilterButton);
 
-            importFilterButton = new BoxButton(100, 31, _lang.string("popup_filter_filter_single_import"));
-            importFilterButton.x = addSavedFilterButton.x - 105;
-            importFilterButton.y = 5;
-            importFilterButton.addEventListener(MouseEvent.CLICK, e_importFilterButton);
-            box.addChild(importFilterButton);
+            //- Import Filter
+            importFilterButton = new BoxButton(box, addSavedFilterButton.x - 105, 5, 100, 31, _lang.string("popup_filter_filter_single_import"), 12, e_importFilterButton);
 
             // Filter Name Input
-            filterNameInput = new BoxText(clearFilterButton.x - 11, 30);
-            filterNameInput.x = 5;
-            filterNameInput.y = 5;
+            filterNameInput = new BoxText(box, 5, 5, clearFilterButton.x - 11, 30);
             filterNameInput.addEventListener(Event.CHANGE, e_filterNameUpdate);
-            box.addChild(filterNameInput);
 
             //- content
-            scrollpane = new ScrollPane(box.width - 35, box.height - 46);
-            scrollpane.x = 5;
-            scrollpane.y = 41;
-            scrollpane.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler);
-            box.addChild(scrollpane);
-            scrollbar = new ScrollBar(20, scrollpane.height);
-            scrollbar.x = 10 + scrollpane.width;
-            scrollbar.y = 41;
-            scrollbar.addEventListener(Event.CHANGE, e_scrollBarMoved);
-            box.addChild(scrollbar);
+            scrollpane = new ScrollPane(box, 5, 41, box.width - 35, box.height - 46, mouseWheelHandler);
+            scrollbar = new ScrollBar(box, 10 + scrollpane.width, 41, 20, scrollpane.height, null, null, e_scrollBarMoved);
 
             // new type selector
             typeSelector = new Sprite();
@@ -157,23 +120,16 @@ package popups
             typeSelector.graphics.drawRect(Main.GAME_WIDTH / 2 - 200, -1, 400, Main.GAME_HEIGHT + 2);
             typeSelector.graphics.endFill();
 
-            var typeSelectorTitle:Text = new Text(_lang.string("filter_editor_add_filter"));
-            typeSelectorTitle.x = Main.GAME_WIDTH / 2 - 200;
-            typeSelectorTitle.y = 5;
+            var typeSelectorTitle:Text = new Text(typeSelector, Main.GAME_WIDTH / 2 - 200, 5, _lang.string("filter_editor_add_filter"));
             typeSelectorTitle.width = 400;
             typeSelectorTitle.align = Text.CENTER;
-            typeSelector.addChild(typeSelectorTitle);
 
             var typeButton:BoxButton;
             var typeOptions:Array = EngineLevelFilter.createOptions(EngineLevelFilter.FILTERS, "type");
             for (var i:int = 0; i < typeOptions.length; i++)
             {
-                typeButton = new BoxButton(185, 25, typeOptions[i]["label"]);
+                typeButton = new BoxButton(typeSelector, (Main.GAME_WIDTH / 2 - 200) + 10 + (195 * (i % 2)), 30 + (Math.floor(i / 2) * 35), 185, 25, typeOptions[i]["label"], 12, e_addFilterSelection);
                 typeButton.tag = typeOptions[i]["data"];
-                typeButton.x = (Main.GAME_WIDTH / 2 - 200) + 10 + (195 * (i % 2));
-                typeButton.y = 30 + (Math.floor(i / 2) * 35);
-                typeButton.addEventListener(MouseEvent.CLICK, e_addFilterSelection);
-                typeSelector.addChild(typeButton);
             }
 
             draw();
@@ -251,18 +207,11 @@ package popups
                         pG.lineTo(xPos - INDENT_GAP + 10, yPos + 14);
 
                         // AND / OR Label
-                        var type_text:Text = new Text(_lang.string("filter_type_" + filter.type));
-                        type_text.x = xPos;
-                        type_text.y = yPos + 2;
-                        scrollpane.content.addChild(type_text);
+                        var type_text:Text = new Text(scrollpane.content, xPos, yPos + 2, _lang.string("filter_type_" + filter.type));
 
                         // Remove Filter Button
-                        var removeFilter:BoxButton = new BoxButton(23, 23, "X");
-                        removeFilter.x = xPos + INDENT_GAP + 327;
-                        removeFilter.y = yPos;
-                        removeFilter.addEventListener(MouseEvent.CLICK, e_removeFilter);
+                        var removeFilter:BoxButton = new BoxButton(scrollpane.content, xPos + INDENT_GAP + 327, yPos, 23, 23, "X", 12, e_removeFilter);
                         removeFilter.tag = filter;
-                        scrollpane.content.addChild(removeFilter);
 
                         yPos -= 8;
                     }
@@ -283,12 +232,8 @@ package popups
                     pG.moveTo(xPos + INDENT_GAP - 4, yPos + 57);
                     pG.lineTo(xPos + 10, yPos + 57);
 
-                    var addFilter:BoxButton = new BoxButton(23, 23, "+");
-                    addFilter.x = xPos + INDENT_GAP;
-                    addFilter.y = yPos += 44;
-                    addFilter.addEventListener(MouseEvent.CLICK, e_addFilter);
+                    var addFilter:BoxButton = new BoxButton(scrollpane.content, xPos + INDENT_GAP, yPos += 44, 23, 23, "+", 12, e_addFilter);
                     addFilter.tag = filter;
-                    scrollpane.content.addChild(addFilter);
                     pG.drawRect(addFilter.x, addFilter.y, 23, 23);
 
                     pG.moveTo(xPos + 10, topYPos);

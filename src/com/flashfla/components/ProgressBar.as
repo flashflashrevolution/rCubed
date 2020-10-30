@@ -5,23 +5,30 @@
 package com.flashfla.components
 {
     import com.greensock.TweenLite;
-    import flash.display.MovieClip;
+    import flash.display.DisplayObjectContainer;
+    import flash.display.Sprite;
     import flash.events.Event;
 
-    public class ProgressBar extends MovieClip
+    public class ProgressBar extends Sprite
     {
         public static const LOADER_COMPLETE:String = "LoaderComplete";
 
-        private var top_mc:MovieClip = new MovieClip();
-        private var progress_mc:MovieClip = new MovieClip();
+        private var top_mc:Sprite = new Sprite();
+        private var progress_mc:Sprite = new Sprite();
 
         private var curPercent:Number = 0;
         public var isComplete:Boolean = false;
         public var barWidth:int;
         public var barHeight:int;
 
-        public function ProgressBar(bWidth:uint = 450, bHeight:uint = 20, bSplits:uint = 0, borColor:uint = 0x000000, borSize:Number = 2, bColor:uint = 0x00BFFF)
+        public function ProgressBar(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, bWidth:uint = 450, bHeight:uint = 20, bSplits:uint = 0, borColor:uint = 0x000000, borSize:Number = 2, bColor:uint = 0x00BFFF)
         {
+            if (parent)
+                parent.addChild(this);
+
+            this.x = xpos;
+            this.y = ypos;
+
             // Draw Background
             top_mc.graphics.beginFill(0xFFFFFF, 0.0);
             top_mc.graphics.lineStyle(0);
