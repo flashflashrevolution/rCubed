@@ -522,24 +522,14 @@ package popups
                     if (displayArray[i] == "JUDGE_ANIMATIONS")
                     {
                         yOff -= 4;
-                        var gameJudgeSpeed:Text = new Text(_lang.string("options_judge_speed"));
-                        gameJudgeSpeed.x = xOff + 23;
-                        gameJudgeSpeed.y = yOff;
-                        box.addChild(gameJudgeSpeed);
+                        var gameJudgeSpeed:Text = new Text(box, xOff + 23, yOff, _lang.string("options_judge_speed"));
                         yOff += 23;
 
-                        optionJudgeSpeed = new BoxSlider(100, 10);
-                        optionJudgeSpeed.x = xOff + 23;
-                        optionJudgeSpeed.y = yOff;
+                        optionJudgeSpeed = new BoxSlider(box, xOff + 23, yOff, 100, 10, changeHandler);
                         optionJudgeSpeed.minValue = 0.25;
                         optionJudgeSpeed.maxValue = 3;
-                        optionJudgeSpeed.addEventListener(Event.CHANGE, changeHandler);
-                        box.addChild(optionJudgeSpeed);
 
-                        gameJudgeSpeedDisplay = new Text(_gvars.activeUser.judgeSpeed.toFixed(2) + "x");
-                        gameJudgeSpeedDisplay.x = xOff + 128;
-                        gameJudgeSpeedDisplay.y = yOff - 5;
-                        box.addChild(gameJudgeSpeedDisplay);
+                        gameJudgeSpeedDisplay = new Text(box, xOff + 128, yOff - 5, _gvars.activeUser.judgeSpeed.toFixed(2) + "x");
                         yOff += 20;
                     }
                 }
@@ -974,19 +964,11 @@ package popups
             else if (e.target == optionGameVolume)
             {
                 _gvars.activeUser.gameVolume = optionGameVolume.slideValue;
-                if (isNaN(_gvars.activeUser.gameVolume))
-                {
-                    _gvars.activeUser.gameVolume = 1;
-                }
-                _gvars.activeUser.gameVolume = Math.max(Math.min(_gvars.activeUser.gameVolume, optionGameVolume.maxValue), optionGameVolume.minValue);
                 gameVolumeValueDisplay.text = Math.round(_gvars.activeUser.gameVolume * 100) + "%";
             }
             else if (e.target == optionJudgeSpeed)
             {
-                var newJudgeSpeed:Number = Math.max(Math.min(optionJudgeSpeed.slideValue, optionJudgeSpeed.maxValue), optionJudgeSpeed.minValue);
-                newJudgeSpeed = (Math.round((_gvars.activeUser.judgeSpeed * 100) / 5) * 5) / 100; // Snap to 0.05 intervals.
-
-                _gvars.activeUser.judgeSpeed = newJudgeSpeed;
+                _gvars.activeUser.judgeSpeed = (Math.round((optionJudgeSpeed.slideValue * 100) / 5) * 5) / 100; // Snap to 0.05 intervals.
                 gameJudgeSpeedDisplay.text = _gvars.activeUser.judgeSpeed.toFixed(2) + "x";
             }
             else if (e.target == optionFPS)
