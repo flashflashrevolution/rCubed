@@ -165,7 +165,7 @@ package popups
             optionMusicOffset.text = "0";
 
             //- Apply Current Offsets
-            populateOffsets = new BoxButton(box, xOff + 110, yOff, 180, 27, "Apply Current Offsets", 12, clickHandler);
+            populateOffsets = new BoxButton(box, xOff + 110, yOff, 180, 27, _lang.string("song_notes_setting_apply_current_offsets"), 12, clickHandler);
             yOff += 30;
 
             //- Judge Offset
