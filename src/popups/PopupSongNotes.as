@@ -58,6 +58,7 @@ package popups
         private var revertOptions:BoxButton;
         private var confirmOptions:BoxButton;
         private var closeOptions:BoxButton;
+        private var populateOffsets:BoxButton;
 
         public var songRatingValue:Number;
 
@@ -122,7 +123,7 @@ package popups
             //- Notes Field
             var notesLabel:Text = new Text(box, xOff, yOff, _lang.string("song_notes"));
 
-            notesLength = new Text(box, box.width - xOff, yOff, "0 / 250");
+            notesLength = new Text(box, box.width - xOff, yOff, "(0 / 250)");
             notesLength.align = "right";
             yOff += 20;
 
@@ -162,6 +163,9 @@ package popups
 
             optionMusicOffset = new ValidatedText(box, xOff, yOff, 100, 20, ValidatedText.R_FLOAT, changeHandler);
             optionMusicOffset.text = "0";
+
+            //- Apply Current Offsets
+            populateOffsets = new BoxButton(box, xOff + 110, yOff, 180, 27, _lang.string("song_notes_setting_apply_current_offsets"), 12, clickHandler);
             yOff += 30;
 
             //- Judge Offset
@@ -213,6 +217,7 @@ package popups
             optionMusicOffset.dispose();
 
             notesLength.dispose();
+            populateOffsets.dispose();
             optionJudgeOffset.dispose();
             optionMusicOffset.dispose();
             revertOptions.dispose();
@@ -232,11 +237,37 @@ package popups
 
         private function clickHandler(e:MouseEvent):void
         {
+            //- Use Inverse Chart Mirror
             if (e.target == setMirrorInvert)
                 setMirrorInvert.checked = !setMirrorInvert.checked;
 
+            //- Use Custom Offsets
             else if (e.target == setCustomOffsets)
                 setCustomOffsets.checked = !setCustomOffsets.checked;
+
+            //- Apply Current Offsets
+            else if (e.target == populateOffsets)
+            {
+                setCustomOffsets.checked = true;
+                optionMusicOffset.text = _gvars.activeUser.GLOBAL_OFFSET.toString();
+                optionJudgeOffset.text = _gvars.activeUser.JUDGE_OFFSET.toString();
+                optionMusicOffset.validate(0);
+                optionJudgeOffset.validate(0);
+            }
+
+            //- Revert
+            else if (e.target == revertOptions)
+            {
+                sFavorite.checked = false;
+                setMirrorInvert.checked = false;
+                setCustomOffsets.checked = false;
+                notesField.text = "";
+                notesLength.text = "(0 / 250)";
+                optionMusicOffset.text = "0";
+                optionJudgeOffset.text = "0";
+                optionMusicOffset.validate(0);
+                optionJudgeOffset.validate(0);
+            }
 
             //- Confirm Rating
             else if (e.target == confirmOptions)
