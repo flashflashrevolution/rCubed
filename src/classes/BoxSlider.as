@@ -77,6 +77,9 @@ package classes
             _slideValue = (_slider.x / (_width - _slider.width)) * valueRange + _minValue;
         }
 
+        /**
+         * Returns the slider value and capped between the min and max values.
+         */
         public function get slideValue():Number
         {
             return Math.max(Math.min(_slideValue, _maxValue), _minValue);

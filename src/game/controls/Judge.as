@@ -25,9 +25,7 @@ package game.controls
         private var lastTime:Number = 0;
         private var sX:Number = 0;
 
-        // Not hooked up to anything currently.
         private var speedScale:Number = 1;
-        private var speedScaleInverse:Number = 1;
 
         public function Judge(options:GameOptions)
         {
@@ -35,6 +33,8 @@ package game.controls
 
             if (!this.options.displayJudgeAnimations)
                 indexes = Judge_Tweens.judge_indexes_static;
+
+            speedScale = this.options.judgeSpeed;
 
             labelDesc[100] = {colour: options.judgeColours[0], title: "AMAZING!!!"};
             labelDesc[50] = {colour: options.judgeColours[1], title: "PERFECT!"};
@@ -140,8 +140,8 @@ package game.controls
                 var next:Array = indexes[lastScore][frame + i[6]]; // Next Frame
                 if (i[0] > 0 && next != null)
                 {
-                    TweenLite.to(this, i[0] * speedScaleInverse, {scaleX: next[3], scaleY: next[4], alpha: next[5]});
-                    TweenLite.to(field, i[0] * speedScaleInverse, {x: sX + next[1], y: (next[2] - 30)});
+                    TweenLite.to(this, i[0] / speedScale, {scaleX: next[3], scaleY: next[4], alpha: next[5]});
+                    TweenLite.to(field, i[0] / speedScale, {x: sX + next[1], y: (next[2] - 30)});
                 }
             }
         }

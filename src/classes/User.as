@@ -120,6 +120,7 @@ package classes
         public var activeMods:Array = [];
         public var activeVisualMods:Array = [];
         public var slideDirection:String = "up";
+        public var judgeSpeed:Number = 1;
         public var gameSpeed:Number = 1.5;
         public var receptorGap:Number = 80;
         public var noteScale:Number = 1;
@@ -523,6 +524,8 @@ package classes
                 this.slideDirection = _settings.direction;
             if (_settings.speed != null)
                 this.gameSpeed = _settings.speed;
+            if (_settings.judgeSpeed != null)
+                this.judgeSpeed = _settings.judgeSpeed;
             if (_settings.gap != null)
                 this.receptorGap = _settings.gap;
             if (_settings.noteScale != null)
@@ -630,6 +633,7 @@ package classes
 
             gameSave.keys = [this.keyLeft, this.keyDown, this.keyUp, this.keyRight, this.keyRestart, this.keyQuit, this.keyOptions];
 
+            gameSave.judgeSpeed = this.judgeSpeed;
             gameSave.speed = this.gameSpeed;
             gameSave.direction = this.slideDirection;
             gameSave.noteskin = this.activeNoteskin;

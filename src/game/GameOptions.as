@@ -13,6 +13,7 @@ package game
         public var songRate:Number = 1;
 
         public var scrollDirection:String = "up";
+        public var judgeSpeed:Number = 1;
         public var scrollSpeed:Number = 1.5;
         public var receptorSpacing:int = 80;
         public var noteScale:Number = 1;
@@ -87,6 +88,7 @@ package game
             forceNewJudge = user.forceNewJudge;
 
             scrollDirection = user.slideDirection;
+            judgeSpeed = user.judgeSpeed;
             scrollSpeed = user.gameSpeed;
             receptorSpacing = user.receptorGap;
             noteScale = user.noteScale;
@@ -166,6 +168,7 @@ package game
             forceNewJudge = settings["forceNewJudge"] || false;
 
             scrollDirection = settings["direction"] || "up";
+            judgeSpeed = settings["judgeSpeed"] || 1;
             scrollSpeed = settings["speed"] || 1.5;
             receptorSpacing = settings["gap"] || 80;
             noteScale = settings["noteScale"] || 1;
@@ -244,6 +247,7 @@ package game
             settings["viewScreencut"] = displayScreencut;
             settings["viewSongProgress"] = displaySongProgress;
             settings["speed"] = scrollSpeed;
+            settings["judgeSpeed"] = judgeSpeed;
             settings["direction"] = scrollDirection;
             settings["noteskin"] = noteskin;
             settings["gap"] = receptorSpacing;

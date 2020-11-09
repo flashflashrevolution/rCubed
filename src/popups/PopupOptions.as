@@ -119,6 +119,8 @@ package popups
 
         private var optionDisplays:Array;
         private var optionVisualGameMods:Array;
+        private var optionJudgeSpeed:BoxSlider;
+        private var gameJudgeSpeedDisplay:Text;
         private var optionGameMods:Array;
         private var optionNoteskins:Array;
         private var optionNoteskinPreview:GameNote;
@@ -515,6 +517,19 @@ package popups
                         var gameDisplayCheck:BoxCheck = new BoxCheck(box, xOff + 3, yOff, clickHandler);
                         gameDisplayCheck.display = displayArray[i];
                         optionDisplays.push(gameDisplayCheck);
+                        yOff += 20;
+                    }
+                    if (displayArray[i] == "JUDGE_ANIMATIONS")
+                    {
+                        yOff -= 4;
+                        var gameJudgeSpeed:Text = new Text(box, xOff + 23, yOff, _lang.string("options_judge_speed"));
+                        yOff += 23;
+
+                        optionJudgeSpeed = new BoxSlider(box, xOff + 23, yOff, 100, 10, changeHandler);
+                        optionJudgeSpeed.minValue = 0.25;
+                        optionJudgeSpeed.maxValue = 3;
+
+                        gameJudgeSpeedDisplay = new Text(box, xOff + 128, yOff - 5, _gvars.activeUser.judgeSpeed.toFixed(2) + "x");
                         yOff += 20;
                     }
                 }
@@ -949,12 +964,12 @@ package popups
             else if (e.target == optionGameVolume)
             {
                 _gvars.activeUser.gameVolume = optionGameVolume.slideValue;
-                if (isNaN(_gvars.activeUser.gameVolume))
-                {
-                    _gvars.activeUser.gameVolume = 1;
-                }
-                _gvars.activeUser.gameVolume = Math.max(Math.min(_gvars.activeUser.gameVolume, optionGameVolume.maxValue), optionGameVolume.minValue);
                 gameVolumeValueDisplay.text = Math.round(_gvars.activeUser.gameVolume * 100) + "%";
+            }
+            else if (e.target == optionJudgeSpeed)
+            {
+                _gvars.activeUser.judgeSpeed = (Math.round((optionJudgeSpeed.slideValue * 100) / 5) * 5) / 100; // Snap to 0.05 intervals.
+                gameJudgeSpeedDisplay.text = _gvars.activeUser.judgeSpeed.toFixed(2) + "x";
             }
             else if (e.target == optionFPS)
             {
@@ -1641,6 +1656,8 @@ package popups
                 {
                     item.checked = (_gvars.activeUser.activeVisualMods.indexOf(item.visual_mod) != -1);
                 }
+
+                optionJudgeSpeed.slideValue = _gvars.activeUser.judgeSpeed;
 
                 // Set Noteskin
                 for each (item in optionNoteskins)
