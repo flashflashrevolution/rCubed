@@ -5,13 +5,13 @@ package arc.mp
     import arc.mp.MultiplayerChat;
     import arc.mp.MultiplayerPrompt;
     import arc.mp.MultiplayerUsers;
-    import classes.BoxButton;
-    import classes.Text;
+    import classes.ui.BoxButton;
+    import classes.ui.Text;
+    import classes.ui.Throbber;
     import com.bit101.components.List;
     import com.bit101.components.PushButton;
     import com.bit101.components.Style;
     import com.bit101.components.Window;
-    import com.flashfla.components.Throbber;
     import com.flashfla.net.Multiplayer;
     import flash.events.ContextMenuEvent;
     import flash.events.Event;

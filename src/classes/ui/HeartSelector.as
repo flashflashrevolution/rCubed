@@ -1,4 +1,4 @@
-package classes
+package classes.ui
 {
     import assets.menu.icons.fa.iconHeartEmpty;
     import assets.menu.icons.fa.iconHeartFull;

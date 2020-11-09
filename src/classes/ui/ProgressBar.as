@@ -2,7 +2,7 @@
  * @author Jonathan (Velocity)
  */
 
-package com.flashfla.components
+package classes.ui
 {
     import com.greensock.TweenLite;
     import flash.display.DisplayObjectContainer;

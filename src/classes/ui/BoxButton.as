@@ -1,4 +1,4 @@
-package classes
+package classes.ui
 {
     import flash.display.DisplayObjectContainer;
     import flash.events.MouseEvent;

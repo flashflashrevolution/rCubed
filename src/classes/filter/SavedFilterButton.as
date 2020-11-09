@@ -2,11 +2,11 @@ package classes.filter
 {
     import assets.GameBackgroundColor;
     import classes.Alert;
-    import classes.Box;
-    import classes.BoxButton;
-    import classes.BoxCheck;
     import classes.Language;
-    import classes.Text;
+    import classes.ui.Box;
+    import classes.ui.BoxButton;
+    import classes.ui.BoxCheck;
+    import classes.ui.Text;
     import com.flashfla.utils.ArrayUtil;
     import com.flashfla.utils.SystemUtil;
     import flash.display.DisplayObjectContainer;

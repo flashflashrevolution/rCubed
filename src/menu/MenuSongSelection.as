@@ -18,22 +18,22 @@ package menu
     import assets.menu.icons.fa.iconRight;
     import assets.menu.icons.fa.iconTrophy;
     import classes.Alert;
-    import classes.BoxButton;
-    import classes.BoxIcon;
-    import classes.BoxText;
     import classes.Language;
     import classes.Playlist;
     import classes.SongPlayerBytes;
     import classes.SongPreview;
     import classes.SongQueueItem;
-    import classes.StarSelector;
-    import classes.Text;
     import classes.chart.Song;
+    import classes.ui.BoxButton;
+    import classes.ui.BoxIcon;
+    import classes.ui.BoxText;
+    import classes.ui.ScrollBar;
+    import classes.ui.ScrollPane;
+    import classes.ui.StarSelector;
+    import classes.ui.Text;
+    import classes.ui.Throbber;
     import com.bit101.components.ComboBox;
     import com.bit101.components.PushButton;
-    import com.flashfla.components.ScrollBar;
-    import com.flashfla.components.ScrollPane;
-    import com.flashfla.components.Throbber;
     import com.flashfla.net.WebRequest;
     import com.flashfla.utils.ArrayUtil;
     import com.flashfla.utils.NumberUtil;
@@ -2098,9 +2098,7 @@ package menu
 
 
 import assets.GameBackgroundColor;
-
-import classes.Text;
-
+import classes.ui.Text;
 import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.events.Event;

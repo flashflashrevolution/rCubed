@@ -1,13 +1,13 @@
 package arc.mp
 {
     import com.bit101.components.InputText;
+    import com.bit101.components.Label;
     import com.bit101.components.Window;
     import flash.display.DisplayObjectContainer;
     import flash.events.Event;
     import flash.events.KeyboardEvent;
     import flash.ui.Keyboard;
     import it.gotoandplay.smartfoxserver.SFSEvent;
-    import com.bit101.components.Label;
 
     public class MultiplayerRoomCreatePrompt extends Window
     {

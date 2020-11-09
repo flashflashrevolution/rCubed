@@ -1,4 +1,4 @@
-package classes
+package classes.ui
 {
     import assets.GameBackgroundColor;
     import flash.display.DisplayObjectContainer;

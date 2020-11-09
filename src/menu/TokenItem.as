@@ -4,10 +4,10 @@
 
 package menu
 {
-    import classes.Box;
     import classes.Language;
     import classes.Playlist;
-    import classes.Text;
+    import classes.ui.Box;
+    import classes.ui.Text;
     import com.greensock.TweenLite;
     import flash.display.Bitmap;
     import flash.display.BitmapData;

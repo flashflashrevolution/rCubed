@@ -1,8 +1,8 @@
 package menu
 {
     import classes.Language;
-    import classes.MouseTooltip;
-    import classes.Text;
+    import classes.ui.MouseTooltip;
+    import classes.ui.Text;
     import com.flashfla.utils.NumberUtil;
     import com.flashfla.utils.sprintf;
     import flash.display.GradientType;

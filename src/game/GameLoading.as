@@ -1,10 +1,10 @@
 package game
 {
-    import classes.BoxButton;
     import classes.Language;
     import classes.Playlist;
     import classes.chart.Song;
-    import com.flashfla.components.ProgressBar;
+    import classes.ui.BoxButton;
+    import classes.ui.ProgressBar;
     import com.flashfla.utils.NumberUtil;
     import com.greensock.TweenLite;
     import flash.display.Sprite;

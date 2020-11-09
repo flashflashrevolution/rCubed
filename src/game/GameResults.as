@@ -10,13 +10,13 @@ package game
     import assets.results.ResultsBackground;
     import by.blooddy.crypto.SHA1;
     import classes.Alert;
-    import classes.BoxButton;
-    import classes.BoxIcon;
     import classes.Language;
     import classes.Playlist;
-    import classes.StarSelector;
-    import classes.Text;
     import classes.replay.Replay;
+    import classes.ui.BoxButton;
+    import classes.ui.BoxIcon;
+    import classes.ui.StarSelector;
+    import classes.ui.Text;
     import com.flashfla.net.DynamicURLLoader;
     import com.flashfla.utils.NumberUtil;
     import com.flashfla.utils.ObjectUtil;

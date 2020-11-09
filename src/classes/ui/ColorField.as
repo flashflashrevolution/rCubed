@@ -1,4 +1,4 @@
-package com.flashfla.components
+package classes.ui
 {
     import assets.settings.colorPickerBMP;
     import flash.display.Bitmap;

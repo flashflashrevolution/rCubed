@@ -1,12 +1,12 @@
 package popups
 {
-    import classes.Box;
-    import classes.BoxButton;
-    import classes.BoxText;
     import classes.Language;
-    import classes.Text;
-    import classes.ValidatedText;
     import classes.filter.EngineLevelFilter;
+    import classes.ui.Box;
+    import classes.ui.BoxButton;
+    import classes.ui.BoxText;
+    import classes.ui.Text;
+    import classes.ui.ValidatedText;
     import com.bit101.components.ComboBox;
     import com.flashfla.utils.ArrayUtil;
     import flash.display.DisplayObjectContainer;

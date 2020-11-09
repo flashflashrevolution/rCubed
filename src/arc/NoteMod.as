@@ -3,8 +3,6 @@ package arc
     import classes.chart.Note;
     import classes.chart.Song;
     import game.GameOptions;
-    import GlobalVariables;
-    import arc.ArcGlobals;
 
     public class NoteMod extends Object
     {
