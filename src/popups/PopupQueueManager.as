@@ -2,14 +2,14 @@ package popups
 {
     import arc.mp.MultiplayerPrompt;
     import assets.GameBackgroundColor;
-    import classes.Box;
-    import classes.BoxButton;
     import classes.Language;
     import classes.Playlist;
     import classes.SongQueueItem;
-    import classes.Text;
-    import com.flashfla.components.ScrollBar;
-    import com.flashfla.components.ScrollPane;
+    import classes.ui.Box;
+    import classes.ui.BoxButton;
+    import classes.ui.ScrollBar;
+    import classes.ui.ScrollPane;
+    import classes.ui.Text;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
     import flash.events.Event;
@@ -255,12 +255,12 @@ package popups
 
 import arc.mp.MultiplayerPrompt;
 import classes.Alert;
-import classes.Box;
-import classes.BoxButton;
 import classes.Language;
 import classes.Playlist;
 import classes.SongQueueItem;
-import classes.Text;
+import classes.ui.Box;
+import classes.ui.BoxButton;
+import classes.ui.Text;
 import com.flashfla.utils.SystemUtil;
 import com.flashfla.utils.TimeUtil;
 import flash.display.Sprite;

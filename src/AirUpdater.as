@@ -1,10 +1,10 @@
 package
 {
-    import classes.Box;
-    import classes.BoxButton;
     import classes.Language;
     import classes.Site;
-    import classes.Text;
+    import classes.ui.Box;
+    import classes.ui.BoxButton;
+    import classes.ui.Text;
     import com.coltware.airxzip.ZipEntry;
     import com.coltware.airxzip.ZipFileReader;
     import com.flashfla.utils.NumberUtil;

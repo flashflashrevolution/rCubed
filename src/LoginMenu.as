@@ -1,13 +1,13 @@
 package
 {
-    import classes.Box;
-    import classes.BoxButton;
-    import classes.BoxCheck;
-    import classes.BoxText;
     import classes.Language;
     import classes.Playlist;
-    import classes.SimpleBoxButton;
-    import classes.Text;
+    import classes.ui.Box;
+    import classes.ui.BoxButton;
+    import classes.ui.BoxCheck;
+    import classes.ui.BoxText;
+    import classes.ui.SimpleBoxButton;
+    import classes.ui.Text;
     import com.flashfla.utils.Crypt;
     import com.flashfla.utils.SpriteUtil;
     import flash.display.DisplayObject;

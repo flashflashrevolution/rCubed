@@ -1,4 +1,4 @@
-package classes
+package classes.ui
 {
     import com.flashfla.utils.ColorUtil;
     import flash.display.DisplayObject;

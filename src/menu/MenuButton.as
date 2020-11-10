@@ -4,7 +4,7 @@
 
 package menu
 {
-    import classes.BoxButton;
+    import classes.ui.BoxButton;
     import flash.display.DisplayObjectContainer;
 
     public class MenuButton extends BoxButton

@@ -1,9 +1,9 @@
 package game.graph
 {
     import assets.menu.icons.fa.iconSmallF;
-    import classes.BoxIcon;
     import classes.Language;
-    import classes.Text;
+    import classes.ui.BoxIcon;
+    import classes.ui.Text;
     import com.flashfla.utils.sprintf;
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;

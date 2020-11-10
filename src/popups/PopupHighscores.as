@@ -1,11 +1,11 @@
 package popups
 {
     import assets.GameBackgroundColor;
-    import classes.Box;
-    import classes.BoxButton;
     import classes.Language;
-    import classes.Text;
-    import com.flashfla.components.Throbber;
+    import classes.ui.Box;
+    import classes.ui.BoxButton;
+    import classes.ui.Text;
+    import classes.ui.Throbber;
     import com.flashfla.loader.DataEvent;
     import com.flashfla.utils.NumberUtil;
     import com.flashfla.utils.ObjectUtil;

@@ -1,32 +1,19 @@
 package arc.mp
 {
-    import Main;
-    import menu.MenuPanel;
-    import classes.Text;
-    import classes.BoxButton;
-
     import arc.ArcGlobals;
-    import arc.mp.MultiplayerPrompt;
-    import arc.mp.ListItemDoubleClick;
+    import com.bit101.components.Component;
+    import com.bit101.components.InputText;
+    import com.bit101.components.Style;
+    import com.bit101.components.TextArea;
     import com.flashfla.net.Multiplayer;
-
-    import flash.ui.Keyboard;
-    import flash.ui.ContextMenu;
-    import flash.ui.ContextMenuItem;
+    import flash.display.DisplayObjectContainer;
     import flash.events.ContextMenuEvent;
     import flash.events.Event;
-    import flash.events.MouseEvent;
     import flash.events.KeyboardEvent;
-    import flash.display.DisplayObjectContainer;
-
-    import com.bit101.components.Component;
-    import com.bit101.components.TextArea;
-    import com.bit101.components.InputText;
-    import com.bit101.components.List;
-    import com.bit101.components.PushButton;
-
+    import flash.ui.ContextMenu;
+    import flash.ui.ContextMenuItem;
+    import flash.ui.Keyboard;
     import it.gotoandplay.smartfoxserver.SFSEvent;
-    import com.bit101.components.Style;
 
     public class MultiplayerChat extends Component
     {

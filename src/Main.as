@@ -11,17 +11,17 @@ package
 
     import assets.GameBackgroundColor;
     import classes.Alert;
-    import classes.BoxButton;
     import classes.Language;
     import classes.Noteskins;
     import classes.Playlist;
     import classes.Site;
     import classes.SongPreview;
-    import classes.Text;
     import classes.User;
     import classes.replay.Replay;
+    import classes.ui.BoxButton;
+    import classes.ui.ProgressBar;
+    import classes.ui.Text;
     import com.flashdynamix.utils.SWFProfiler;
-    import com.flashfla.components.ProgressBar;
     import com.flashfla.utils.ObjectUtil;
     import com.flashfla.utils.SystemUtil;
     import com.greensock.TweenLite;

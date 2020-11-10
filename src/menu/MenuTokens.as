@@ -4,13 +4,13 @@ package menu
     import assets.menu.ScrollDragger;
     import assets.menu.SongSelectionBackground;
     import by.blooddy.crypto.MD5;
-    import classes.BoxButton;
-    import classes.BoxCheck;
     import classes.Language;
     import classes.Playlist;
-    import classes.Text;
-    import com.flashfla.components.ScrollBar;
-    import com.flashfla.components.ScrollPane;
+    import classes.ui.BoxButton;
+    import classes.ui.BoxCheck;
+    import classes.ui.ScrollBar;
+    import classes.ui.ScrollPane;
+    import classes.ui.Text;
     import flash.display.Bitmap;
     import flash.display.Loader;
     import flash.display.Sprite;

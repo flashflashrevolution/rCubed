@@ -5,7 +5,6 @@ package game
     import assets.gameplay.viewLR;
     import assets.gameplay.viewUD;
     import classes.Alert;
-    import classes.BoxButton;
     import classes.GameNote;
     import classes.Language;
     import classes.Noteskins;
@@ -14,7 +13,8 @@ package game
     import classes.chart.NoteChart;
     import classes.chart.Song;
     import classes.replay.ReplayNote;
-    import com.flashfla.components.ProgressBar;
+    import classes.ui.BoxButton;
+    import classes.ui.ProgressBar;
     import com.flashfla.net.Multiplayer;
     import com.flashfla.utils.Average;
     import com.flashfla.utils.RollingAverage;

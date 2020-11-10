@@ -1,10 +1,10 @@
 package popups
 {
     import assets.GameBackgroundColor;
-    import classes.Box;
-    import classes.BoxButton;
     import classes.Language;
-    import classes.Text;
+    import classes.ui.Box;
+    import classes.ui.BoxButton;
+    import classes.ui.Text;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
     import flash.events.MouseEvent;

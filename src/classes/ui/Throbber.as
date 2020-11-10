@@ -1,4 +1,4 @@
-package com.flashfla.components
+package classes.ui
 {
     import flash.display.CapsStyle;
     import flash.display.Graphics;

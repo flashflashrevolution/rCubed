@@ -4,9 +4,9 @@
 
 package popups
 {
-    import classes.Box;
-    import classes.BoxButton;
     import classes.Language;
+    import classes.ui.Box;
+    import classes.ui.BoxButton;
     import com.greensock.TweenLite;
     import com.greensock.easing.BackIn;
     import com.greensock.easing.BackOut;

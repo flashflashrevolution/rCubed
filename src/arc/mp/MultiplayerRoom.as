@@ -1,25 +1,16 @@
 package arc.mp
 {
-    import menu.MainMenu;
-    import com.flashfla.net.Multiplayer;
-    import arc.mp.ListItemDoubleClick;
-    import arc.mp.MultiplayerPrompt;
-    import arc.mp.MultiplayerPlayer;
     import arc.mp.MultiplayerChat;
+    import arc.mp.MultiplayerPlayer;
     import arc.mp.MultiplayerUsers;
-
-    import flash.ui.Keyboard;
+    import com.bit101.components.PushButton;
+    import com.bit101.components.Window;
+    import com.flashfla.net.Multiplayer;
+    import flash.display.DisplayObjectContainer;
     import flash.events.Event;
     import flash.events.MouseEvent;
-    import flash.display.DisplayObjectContainer;
-
-    import com.bit101.components.TextArea;
-    import com.bit101.components.InputText;
-    import com.bit101.components.List;
-    import com.bit101.components.Window;
-    import com.bit101.components.PushButton;
-
     import it.gotoandplay.smartfoxserver.SFSEvent;
+    import menu.MainMenu;
 
     public class MultiplayerRoom extends Window
     {

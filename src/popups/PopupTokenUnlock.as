@@ -1,9 +1,9 @@
 package popups
 {
     import assets.GameBackgroundColor;
-    import classes.Box;
-    import classes.BoxButton;
     import classes.Language;
+    import classes.ui.Box;
+    import classes.ui.BoxButton;
     import com.greensock.TweenLite;
     import com.greensock.easing.Back;
     import flash.display.Bitmap;

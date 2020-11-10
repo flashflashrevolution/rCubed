@@ -2,10 +2,10 @@ package popups
 {
     import arc.mp.MultiplayerSingleton;
     import assets.GameBackgroundColor;
-    import classes.Box;
-    import classes.BoxButton;
     import classes.Language;
     import classes.Playlist;
+    import classes.ui.Box;
+    import classes.ui.BoxButton;
     import com.flashdynamix.utils.SWFProfiler;
     import flash.display.Bitmap;
     import flash.display.BitmapData;

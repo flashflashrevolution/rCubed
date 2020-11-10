@@ -1,17 +1,11 @@
 package arc.mp
 {
+    import com.bit101.components.Label;
+    import com.bit101.components.Panel;
     import com.flashfla.net.Multiplayer;
-    import classes.Playlist;
-
-    import flash.ui.Keyboard;
+    import flash.display.DisplayObjectContainer;
     import flash.events.Event;
     import flash.events.MouseEvent;
-    import flash.display.DisplayObjectContainer;
-
-    import com.bit101.components.Label;
-    import com.bit101.components.PushButton;
-    import com.bit101.components.Panel;
-
     import it.gotoandplay.smartfoxserver.SFSEvent;
 
     public class MultiplayerPlayer extends Panel
