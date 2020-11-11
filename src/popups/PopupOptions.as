@@ -632,13 +632,13 @@ package popups
                     yOff += 20;
                 }
 
-                optionOpenCustomNoteskinEditor = new BoxButton(box, xOff + 3, yOff + 1, 179, 23, "Open noteskin editor", 12, clickHandler);
+                optionOpenCustomNoteskinEditor = new BoxButton(box, xOff + 3, yOff + 1, 179, 23, _lang.string("options_open_noteskin_editor"), 12, clickHandler);
                 yOff += 25;
 
-                optionImportCustomNoteskin = new BoxButton(box, xOff + 3, yOff + 1, 179, 23, "Import noteskin JSON", 12, clickHandler);
+                optionImportCustomNoteskin = new BoxButton(box, xOff + 3, yOff + 1, 179, 23, _lang.string("options_import_noteskin_json"), 12, clickHandler);
                 yOff += 25;
 
-                optionCopyCustomNoteskin = new BoxButton(box, xOff + 3, yOff + 1, 179, 23, "Copy noteskin data", 12, clickHandler);
+                optionCopyCustomNoteskin = new BoxButton(box, xOff + 3, yOff + 1, 179, 23, _lang.string("options_copy_noteskin_data"), 12, clickHandler);
             }
             else if (CURRENT_TAB == TAB_COLORS)
             {
