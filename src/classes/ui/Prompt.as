@@ -2,7 +2,9 @@ package classes.ui
 {
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
+    import flash.events.KeyboardEvent;
     import flash.events.MouseEvent;
+    import flash.ui.Keyboard;
 
     dynamic public class Prompt extends Sprite
     {
@@ -52,6 +54,7 @@ package classes.ui
             _textfield.borderColor = 0x000000;
             _textfield.borderAlpha = 1;
             _textfield.displayAsPassword = displayAsPassword;
+            _textfield.field.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 
             //- Add Submit Button
             _submit_button = new BoxButton(_box, promptWidth - buttonWidth - 3, 23, buttonWidth, 29, buttonText, 12, submitPrompt);
@@ -67,9 +70,10 @@ package classes.ui
 
         private function closePrompt(e:MouseEvent = null):void
         {
+            _textfield.field.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
+            _textfield.dispose();
             _submit_button.dispose();
             _close_button.dispose();
-            _textfield.dispose();
             _text.dispose();
             _box.dispose();
 
@@ -77,11 +81,23 @@ package classes.ui
                 this._parent.removeChild(this);
         }
 
-        private function submitPrompt(e:MouseEvent):void
+        private function submitPrompt(e:MouseEvent = null):void
         {
             if (this._promptFunc != null && _textfield.field.text.length > 0)
                 this._promptFunc(_textfield.field.text);
             closePrompt();
+        }
+
+        private function keyDown(e:KeyboardEvent):void
+        {
+            if (e.keyCode == Keyboard.ENTER)
+            {
+                submitPrompt();
+            }
+            else if (e.keyCode == Keyboard.ESCAPE)
+            {
+                closePrompt();
+            }
         }
     }
 }
