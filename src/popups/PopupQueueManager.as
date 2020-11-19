@@ -1,12 +1,12 @@
 package popups
 {
-    import arc.mp.MultiplayerPrompt;
     import assets.GameBackgroundColor;
     import classes.Language;
     import classes.Playlist;
     import classes.SongQueueItem;
     import classes.ui.Box;
     import classes.ui.BoxButton;
+    import classes.ui.Prompt;
     import classes.ui.ScrollBar;
     import classes.ui.ScrollPane;
     import classes.ui.Text;
@@ -187,21 +187,21 @@ package popups
             scrollbar.draggerVisibility = (yOffset > scrollpane.height);
         }
 
+        private function e_importSongQueue(songQueueJSON:String):void
+        {
+            var temp:SongQueueItem = SongQueueItem.fromString(songQueueJSON);
+            if (temp.items.length > 0)
+            {
+                _gvars.playerUser.songQueues.push(temp);
+                renderQueues();
+            }
+        }
+
         private function clickHandler(e:MouseEvent):void
         {
             if (e.target == importBtn)
             {
-                var prompt:MultiplayerPrompt = new MultiplayerPrompt(box.parent, _lang.stringSimple("popup_queue_import_song_queue"));
-                prompt.move(Main.GAME_WIDTH / 2 - prompt.width / 2, Main.GAME_HEIGHT / 2 - prompt.height / 2);
-                prompt.addEventListener(MultiplayerPrompt.EVENT_SEND, function(subevent:Object):void
-                {
-                    var temp:SongQueueItem = SongQueueItem.fromString(subevent.params.value);
-                    if (temp.items.length > 0)
-                    {
-                        _gvars.playerUser.songQueues.push(temp);
-                        renderQueues();
-                    }
-                });
+                new Prompt(box.parent, 320, _lang.string("popup_queue_import_song_queue"), 100, "SUBMIT", e_importSongQueue);
             }
             else if (e.target == menuPregen)
             {
@@ -253,13 +253,13 @@ package popups
     }
 }
 
-import arc.mp.MultiplayerPrompt;
 import classes.Alert;
 import classes.Language;
 import classes.Playlist;
 import classes.SongQueueItem;
 import classes.ui.Box;
 import classes.ui.BoxButton;
+import classes.ui.Prompt;
 import classes.ui.Text;
 import com.flashfla.utils.SystemUtil;
 import com.flashfla.utils.TimeUtil;
@@ -403,16 +403,16 @@ internal class QueueBox extends Sprite
         }
     }
 
+    private function e_renameQueue(queueName:String):void
+    {
+        queueItem.name = queueName;
+        popup.renderQueues();
+        _gvars.playerUser.save();
+    }
+
     private function renameQueue():void
     {
-        var prompt:MultiplayerPrompt = new MultiplayerPrompt(this.popup, _lang.stringSimple("popup_queue_rename_no_caps"));
-        prompt.move(Main.GAME_WIDTH / 2 - prompt.width / 2, Main.GAME_HEIGHT / 2 - prompt.height / 2);
-        prompt.addEventListener(MultiplayerPrompt.EVENT_SEND, function(subevent:Object):void
-        {
-            queueItem.name = subevent.params.value;
-            popup.renderQueues();
-            _gvars.playerUser.save();
-        });
+        new Prompt(this.popup, 320, _lang.string("popup_queue_rename_no_caps"), 100, "RENAME", e_renameQueue);
     }
 
     public function dispose():void

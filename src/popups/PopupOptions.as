@@ -1,7 +1,6 @@
 package popups
 {
     import arc.ArcGlobals;
-    import arc.mp.MultiplayerPrompt;
     import assets.GameBackgroundColor;
     import classes.Alert;
     import classes.GameNote;
@@ -21,6 +20,7 @@ package popups
     import classes.ui.BoxText;
     import classes.ui.ColorField;
     import classes.ui.MouseTooltip;
+    import classes.ui.Prompt;
     import classes.ui.Text;
     import classes.ui.ValidatedText;
     import com.bit101.components.ComboBox;
@@ -217,21 +217,22 @@ package popups
 
         private function e_contextOptionsImport(e:ContextMenuEvent):void
         {
-            var prompt:MultiplayerPrompt = new MultiplayerPrompt(box.parent, _lang.stringSimple("popup_options_import"));
-            prompt.addEventListener(MultiplayerPrompt.EVENT_SEND, function(subevent:Object):void
+            new Prompt(box.parent, 320, _lang.string("popup_options_import"), 100, "IMPORT", e_importOptions);
+        }
+
+        private function e_importOptions(optionsJSON:String):void
+        {
+            try
             {
-                try
-                {
-                    var item:Object = JSON.parse(subevent.params.value);
-                    _gvars.activeUser.settings = item;
-                    _gvars.gameMain.addAlert("Settings Imported!", 120, Alert.GREEN);
-                    renderOptions();
-                }
-                catch (e:Error)
-                {
-                    _gvars.gameMain.addAlert("Import Fail...", 120, Alert.GREEN);
-                }
-            });
+                var item:Object = JSON.parse(optionsJSON);
+                _gvars.activeUser.settings = item;
+                _gvars.gameMain.addAlert("Settings Imported!", 120, Alert.GREEN);
+                renderOptions();
+            }
+            catch (e:Error)
+            {
+                _gvars.gameMain.addAlert("Import Fail...", 120, Alert.GREEN);
+            }
         }
 
         private function renderMenu():void
@@ -1238,29 +1239,7 @@ package popups
             //- Import Custom Noteskin
             else if (e.target == optionImportCustomNoteskin)
             {
-                var prompt:MultiplayerPrompt = new MultiplayerPrompt(box.parent, _lang.stringSimple("popup_noteskin_import_json")); // "Import JSON"
-                prompt.move(Main.GAME_WIDTH / 2 - prompt.width / 2, Main.GAME_HEIGHT / 2 - prompt.height / 2);
-                prompt.addEventListener(MultiplayerPrompt.EVENT_SEND, function(subevent:Object):void
-                {
-                    try
-                    {
-                        var json:Object = JSON.parse(subevent.params.value);
-                        if (json["rects"] != null && json["data"] != null)
-                        {
-                            ObjectUtil.merge(noteskin_struct, json["rects"]);
-
-                            var imageDecoder:Base64Decoder = new Base64Decoder();
-                            imageDecoder.decode(json["data"]);
-                            fileData = imageDecoder.toByteArray();
-                        }
-                        LocalStore.setVariable("custom_noteskin", noteskinsString(), 20971520); // 20MB Mins size requested.
-                        Noteskins.instance.loadCustomNoteskin();
-                        GlobalVariables.instance.gameMain.addAlert(_lang.string("popup_noteskin_saved"), 90, Alert.GREEN);
-                    }
-                    catch (e:Error)
-                    {
-                    }
-                });
+                new Prompt(box.parent, 320, _lang.string("popup_noteskin_import_json"), 100, "IMPORT", e_importNoteskin);
             }
 
             //- Copy Custom Noteskin
@@ -1549,17 +1528,18 @@ package popups
             }
         }
 
+        private function e_addEngine(url:String):void
+        {
+            ChartFFRLegacy.parseEngine(url, engineAdd);
+        }
+
         private function engineSelect(e:Event):void
         {
             var data:Object = engineCombo.selectedItem.data;
             // Add Engine
             if (data == this)
             {
-                var prompt:MultiplayerPrompt = new MultiplayerPrompt(this, "Engine URL");
-                prompt.addEventListener(MultiplayerPrompt.EVENT_SEND, function(subevent:Object):void
-                {
-                    ChartFFRLegacy.parseEngine(subevent.params.value, engineAdd);
-                });
+                new Prompt(this, 320, "Engine URL", 120, "Add Engine", e_addEngine);
             }
             // Clears Engines
             else if (data == engineCombo)
@@ -1628,6 +1608,28 @@ package popups
             if (_avars.legacyEngines.length > 0 && engineCombo.items.length > 2)
                 engineCombo.addItem({label: "Clear Engines", data: engineCombo});
             engineComboIgnore = false;
+        }
+
+        private function e_importNoteskin(noteskinJSON:String):void
+        {
+            try
+            {
+                var json:Object = JSON.parse(noteskinJSON);
+                if (json["rects"] != null && json["data"] != null)
+                {
+                    ObjectUtil.merge(noteskin_struct, json["rects"]);
+
+                    var imageDecoder:Base64Decoder = new Base64Decoder();
+                    imageDecoder.decode(json["data"]);
+                    fileData = imageDecoder.toByteArray();
+                }
+                LocalStore.setVariable("custom_noteskin", noteskinsString(), 20971520); // 20MB Mins size requested.
+                Noteskins.instance.loadCustomNoteskin();
+                GlobalVariables.instance.gameMain.addAlert(_lang.string("popup_noteskin_saved"), 90, Alert.GREEN);
+            }
+            catch (e:Error)
+            {
+            }
         }
 
         private function noteskinsString():String
@@ -1830,6 +1832,29 @@ package popups
             }
         }
 
+        private function e_changeJudgeWindow(judgeWindow:String):void
+        {
+            _avars.configJudge = null;
+            var judge:Array;
+            for each (var item:String in judgeWindow.split(":"))
+            {
+                if (!judge)
+                    judge = new Array();
+                var items:Array = item.split(",");
+                if (items.length != 2)
+                {
+                    judge = null;
+                    break;
+                }
+                judge.push({t: parseInt(items[0]), s: parseInt(items[1])});
+            }
+            _avars.configJudge = judge;
+            if (judge)
+                _gvars.gameMain.addAlert("Judge window set, score saving disabled");
+            else
+                _gvars.gameMain.addAlert("Judge window cleared");
+        }
+
         private function arcJudgeMenu():ContextMenu
         {
             var judgeMenu:ContextMenu = new ContextMenu();
@@ -1837,29 +1862,7 @@ package popups
             var self:PopupOptions = this;
             judgeItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, function(event:ContextMenuEvent):void
             {
-                var prompt:MultiplayerPrompt = new MultiplayerPrompt(self, "Judge Window");
-                prompt.addEventListener(MultiplayerPrompt.EVENT_SEND, function(subevent:Object):void
-                {
-                    _avars.configJudge = null;
-                    var judge:Array;
-                    for each (var item:String in subevent.params.value.split(":"))
-                    {
-                        if (!judge)
-                            judge = new Array();
-                        var items:Array = item.split(",");
-                        if (items.length != 2)
-                        {
-                            judge = null;
-                            break;
-                        }
-                        judge.push({t: parseInt(items[0]), s: parseInt(items[1])});
-                    }
-                    _avars.configJudge = judge;
-                    if (judge)
-                        _gvars.gameMain.addAlert("Judge window set, score saving disabled");
-                    else
-                        _gvars.gameMain.addAlert("Judge window cleared");
-                });
+                new Prompt(self, 320, "Judge Window", 100, "SUBMIT", e_changeJudgeWindow);
             });
             judgeMenu.customItems.push(judgeItem);
             return judgeMenu;

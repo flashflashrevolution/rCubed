@@ -2,7 +2,7 @@ package arc.mp
 {
     import arc.mp.ListItemDoubleClick;
     import arc.mp.MultiplayerChat;
-    import arc.mp.MultiplayerPrompt;
+    import classes.ui.Prompt;
     import com.bit101.components.Component;
     import com.bit101.components.List;
     import com.flashfla.net.Multiplayer;
@@ -39,14 +39,14 @@ package arc.mp
             controlUsers.autoHideScrollBar = true;
             controlUsers.addEventListener(MouseEvent.DOUBLE_CLICK, function(event:MouseEvent):void
             {
-                var user:Object = controlUsers.selectedItem.data;
-                var pm:MultiplayerPrompt = new MultiplayerPrompt(owner, "PM " + user.userName);
-                pm.addEventListener(MultiplayerPrompt.EVENT_SEND, function(subevent:SFSEvent):void
+                function e_sendPM(message:String):void
                 {
-                    connection.sendPrivateMessage(user, subevent.params.value, room);
+                    connection.sendPrivateMessage(user, message, room);
                     if (controlChat != null)
-                        controlChat.textAreaAddLine(MultiplayerChat.textFormatPrivateMessageOut(user, subevent.params.value));
-                });
+                        controlChat.textAreaAddLine(MultiplayerChat.textFormatPrivateMessageOut(user, message));
+                }
+                var user:Object = controlUsers.selectedItem.data;
+                new Prompt(owner, 320, "PM " + user.userName, 100, "SEND", e_sendPM);
             });
             addChild(controlUsers);
 
@@ -131,46 +131,48 @@ package arc.mp
                 var userItem:ContextMenuItem = new ContextMenuItem("Send Moderator Message");
                 userItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, function(event:ContextMenuEvent):void
                 {
-                    var user:Object = event.mouseTarget["data"]["data"];
-                    var pm:MultiplayerPrompt = new MultiplayerPrompt(owner, "Moderator Message " + user.userName);
-                    pm.addEventListener(MultiplayerPrompt.EVENT_SEND, function(subevent:SFSEvent):void
+                    function e_sendModMessage(message:String):void
                     {
-                        connection.sendServerMessage(subevent.params.value, user);
+                        connection.sendServerMessage(message, user);
                         if (controlChat != null)
-                            controlChat.textAreaAddLine(MultiplayerChat.textFormatServerMessage(room.user, subevent.params.value));
-                    });
+                            controlChat.textAreaAddLine(MultiplayerChat.textFormatServerMessage(room.user, message));
+                    }
+                    var user:Object = event.mouseTarget["data"]["data"];
+                    new Prompt(owner, 320, "Moderator Message " + user.userName, 100, "SEND", e_sendModMessage);
                 });
                 userMenu.customItems.push(userItem);
                 userItem = new ContextMenuItem("Mute User");
                 userItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, function(event:ContextMenuEvent):void
                 {
-                    var user:Object = event.mouseTarget["data"]["data"];
-                    var minutes:MultiplayerPrompt = new MultiplayerPrompt(owner, "Mute Duration (minutes) for " + user.userName);
-                    minutes.addEventListener(MultiplayerPrompt.EVENT_SEND, function(subevent:SFSEvent):void
+                    function e_muteUser(minutesString:String):void
                     {
-                        if (!isNaN(subevent.params.value))
+                        var minutes:Number = parseInt(minutesString);
+                        if (!isNaN(minutes))
                         {
-                            connection.muteUser(user, parseInt(subevent.params.value));
+                            connection.muteUser(user, minutes);
                             if (controlChat != null)
-                                controlChat.textAreaAddLine(MultiplayerChat.textFormatModeratorMute(user, subevent.params.value));
+                                controlChat.textAreaAddLine(MultiplayerChat.textFormatModeratorMute(user, minutes));
                         }
-                    });
+                    }
+                    var user:Object = event.mouseTarget["data"]["data"];
+                    new Prompt(owner, 320, "Mute Duration (minutes) for " + user.userName, 100, "MUTE", e_muteUser);
                 });
                 userMenu.customItems.push(userItem);
                 userItem = new ContextMenuItem("Ban User");
                 userItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, function(event:ContextMenuEvent):void
                 {
-                    var user:Object = event.mouseTarget["data"]["data"];
-                    var minutes:MultiplayerPrompt = new MultiplayerPrompt(owner, "Ban Duration (minutes) for " + user.userName);
-                    minutes.addEventListener(MultiplayerPrompt.EVENT_SEND, function(subevent:SFSEvent):void
+                    function e_banUser(minutesString:String):void
                     {
-                        if (!isNaN(subevent.params.value))
+                        var minutes:Number = parseInt(minutesString);
+                        if (!isNaN(minutes))
                         {
-                            connection.banUser(user, parseInt(subevent.params.value));
+                            connection.banUser(user, minutes);
                             if (controlChat != null)
-                                controlChat.textAreaAddLine(MultiplayerChat.textFormatModeratorBan(user, subevent.params.value));
+                                controlChat.textAreaAddLine(MultiplayerChat.textFormatModeratorBan(user, minutes));
                         }
-                    });
+                    }
+                    var user:Object = event.mouseTarget["data"]["data"];
+                    new Prompt(owner, 320, "Ban Duration (minutes) for " + user.userName, 100, "BAN", e_banUser);
                 });
                 userMenu.customItems.push(userItem);
                 controlUsers.contextMenu = userMenu;

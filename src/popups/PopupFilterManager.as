@@ -1,6 +1,5 @@
 package popups
 {
-    import arc.mp.MultiplayerPrompt;
     import assets.GameBackgroundColor;
     import classes.Language;
     import classes.filter.EngineLevelFilter;
@@ -8,6 +7,7 @@ package popups
     import classes.ui.Box;
     import classes.ui.BoxButton;
     import classes.ui.BoxText;
+    import classes.ui.Prompt;
     import classes.ui.ScrollBar;
     import classes.ui.ScrollPane;
     import classes.ui.Text;
@@ -320,17 +320,14 @@ package popups
 
         private function e_importFilterButton(e:Event):void
         {
-            var prompt:MultiplayerPrompt = new MultiplayerPrompt(box.parent, _lang.stringSimple("popup_filter_filter_single_import"));
-            prompt.move(Main.GAME_WIDTH / 2 - prompt.width / 2, Main.GAME_HEIGHT / 2 - prompt.height / 2);
-            prompt.addEventListener(MultiplayerPrompt.EVENT_SEND, e_importFilter);
-            prompt.addEventListener(Event.CLOSE, e_closeImportFilterPrompt);
+            new Prompt(box.parent, 320, _lang.string("popup_filter_filter_single_import"), 100, "IMPORT", e_importFilter);
         }
 
-        private function e_importFilter(subevent:Object):void
+        private function e_importFilter(filterJSON:String):void
         {
             try
             {
-                var item:Object = JSON.parse(subevent.params.value);
+                var item:Object = JSON.parse(filterJSON);
                 var filter:EngineLevelFilter = new EngineLevelFilter();
                 filter.setup(item);
                 filter.is_default = false;
@@ -341,13 +338,6 @@ package popups
             {
 
             }
-        }
-
-        private function e_closeImportFilterPrompt(e:Event):void
-        {
-            var prompt:MultiplayerPrompt = (e.target as MultiplayerPrompt);
-            prompt.removeEventListener(MultiplayerPrompt.EVENT_SEND, e_importFilter);
-            prompt.removeEventListener(Event.CLOSE, e_closeImportFilterPrompt);
         }
 
         private function e_addFilter(e:Event):void

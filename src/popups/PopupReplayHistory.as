@@ -1,7 +1,6 @@
 package popups
 {
     import arc.ArcGlobals;
-    import arc.mp.MultiplayerPrompt;
     import assets.GameBackgroundColor;
     import classes.FileTracker;
     import classes.Language;
@@ -10,6 +9,7 @@ package popups
     import classes.ui.Box;
     import classes.ui.BoxButton;
     import classes.ui.BoxText;
+    import classes.ui.Prompt;
     import classes.ui.ScrollBar;
     import classes.ui.ScrollPane;
     import classes.ui.Text;
@@ -325,6 +325,29 @@ package popups
             }
         }
 
+        private function e_importReplay(replayString:String):void
+        {
+            var r:Replay = new Replay(new Date().getTime());
+            r.parseEncode(replayString);
+            if (r.isEdited)
+                _gvars.gameMain.addAlert(_lang.string("popup_replay_import_edited"), 180);
+            if (r.isValid())
+            {
+                _gvars.replayHistory.unshift(r);
+                var engineID:String = (r.settings.arc_engine ? r.settings.arc_engine.engineID : Constant.BRAND_NAME_SHORT_LOWER);
+                if (INTERNAL_REPLAYS[engineID] == null)
+                {
+                    INTERNAL_REPLAYS_LIST.push(engineID);
+                    INTERNAL_REPLAYS[engineID] = 0;
+                }
+                INTERNAL_REPLAYS["all"]++;
+                INTERNAL_REPLAYS[engineID]++;
+                renderReplays();
+            }
+            else
+                _gvars.gameMain.addAlert(_lang.string("popup_replay_import_invalid"));
+        }
+
         private function e_boxClickHandler(e:MouseEvent):void
         {
             if (e.target == engine_list_left)
@@ -347,29 +370,7 @@ package popups
             }
             else if (e.target == importBtn)
             {
-                var prompt:MultiplayerPrompt = new MultiplayerPrompt(box.parent, _lang.stringSimple("popup_replay_import_window_title"));
-                prompt.addEventListener(MultiplayerPrompt.EVENT_SEND, function(subevent:Object):void
-                {
-                    var r:Replay = new Replay(new Date().getTime());
-                    r.parseEncode(subevent.params.value);
-                    if (r.isEdited)
-                        _gvars.gameMain.addAlert(_lang.string("popup_replay_import_edited"), 180);
-                    if (r.isValid())
-                    {
-                        _gvars.replayHistory.unshift(r);
-                        var engineID:String = (r.settings.arc_engine ? r.settings.arc_engine.engineID : Constant.BRAND_NAME_SHORT_LOWER);
-                        if (INTERNAL_REPLAYS[engineID] == null)
-                        {
-                            INTERNAL_REPLAYS_LIST.push(engineID);
-                            INTERNAL_REPLAYS[engineID] = 0;
-                        }
-                        INTERNAL_REPLAYS["all"]++;
-                        INTERNAL_REPLAYS[engineID]++;
-                        renderReplays();
-                    }
-                    else
-                        _gvars.gameMain.addAlert(_lang.string("popup_replay_import_invalid"));
-                });
+                new Prompt(box.parent, 320, _lang.string("popup_replay_import_window_title"), 100, "IMPORT", e_importReplay);
             }
             //- Close
             else if (e.target == closeBtn)

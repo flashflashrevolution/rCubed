@@ -5,7 +5,6 @@
 package menu
 {
     import arc.ArcGlobals;
-    import arc.mp.MultiplayerPrompt;
     import arc.mp.MultiplayerSingleton;
     import assets.GameBackgroundColor;
     import assets.menu.GenreSelection;
@@ -27,6 +26,7 @@ package menu
     import classes.ui.BoxButton;
     import classes.ui.BoxIcon;
     import classes.ui.BoxText;
+    import classes.ui.Prompt;
     import classes.ui.ScrollBar;
     import classes.ui.ScrollPane;
     import classes.ui.StarSelector;
@@ -1759,10 +1759,7 @@ package menu
                 }
                 else if (clickAction == "queueSave")
                 {
-                    var prompt:MultiplayerPrompt = new MultiplayerPrompt(this, _lang.stringSimple("song_selection_song_queue_name_prompt"));
-                    prompt.move(Main.GAME_WIDTH / 2 - prompt.width / 2, Main.GAME_HEIGHT / 2 - prompt.height / 2);
-                    prompt.addEventListener(MultiplayerPrompt.EVENT_SEND, e_saveSongQueue);
-                    prompt.addEventListener(Event.CLOSE, e_closeSongQueuePrompt);
+                    new Prompt(this, 320, _lang.string("song_selection_song_queue_name_prompt"), 100, "SUBMIT", e_saveSongQueue);
                 }
                 else if (clickAction == "queueManager")
                 {
@@ -1927,29 +1924,15 @@ package menu
          * Callback for saving a song queue.
          * @param subevent
          */
-        private function e_saveSongQueue(subevent:Object):void
+        private function e_saveSongQueue(queueName:String):void
         {
-            if (subevent.params.value.length > 0)
+            var songArray:Array = [];
+            for (var songQueueI:int = 0; songQueueI < _gvars.songQueue.length; songQueueI++)
             {
-                var songArray:Array = [];
-                for (var songQueueI:int = 0; songQueueI < _gvars.songQueue.length; songQueueI++)
-                {
-                    songArray[songArray.length] = _gvars.songQueue[songQueueI].level;
-                }
-                _gvars.playerUser.songQueues.push(new SongQueueItem(subevent.params.value, songArray));
-                _gvars.playerUser.save();
+                songArray[songArray.length] = _gvars.songQueue[songQueueI].level;
             }
-        }
-
-        /**
-         * Callback for closing the prompt for saving a song queue.
-         * @param e
-         */
-        private function e_closeSongQueuePrompt(e:Event):void
-        {
-            var prompt:MultiplayerPrompt = (e.target as MultiplayerPrompt);
-            prompt.removeEventListener(MultiplayerPrompt.EVENT_SEND, e_saveSongQueue);
-            prompt.removeEventListener(Event.CLOSE, e_closeSongQueuePrompt);
+            _gvars.playerUser.songQueues.push(new SongQueueItem(queueName, songArray));
+            _gvars.playerUser.save();
         }
 
         /**
