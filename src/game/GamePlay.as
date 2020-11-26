@@ -49,6 +49,8 @@ package game
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import sql.SQLSongDetails;
+    import flash.display.BitmapData;
+    import flash.display.Bitmap;
 
     public class GamePlay extends MenuPanel
     {
@@ -179,6 +181,10 @@ package game
 
         private var SOCKET_SONG_MESSAGE:Object = {};
         private var SOCKET_SCORE_MESSAGE:Object = {};
+
+        // Anti-GPU Rampdown Hack
+        private var GPU_PIXEL_BMD:BitmapData;
+        private var GPU_PIXEL_BITMAP:Bitmap;
 
         public function GamePlay(myParent:MenuPanel)
         {
@@ -432,6 +438,11 @@ package game
 
         private function initBackground():void
         {
+            // Anti-GPU Rampdown Hack
+            GPU_PIXEL_BMD = new BitmapData(1, 1, false, 0x010101);
+            GPU_PIXEL_BITMAP = new Bitmap(GPU_PIXEL_BMD);
+            this.addChild(GPU_PIXEL_BITMAP);
+
             // if (!displayBlackBG)
             // {
             //     displayBlackBG = new Sprite();
@@ -745,6 +756,19 @@ package game
         private function logicTick():void
         {
             gameProgress++;
+
+            // Anti-GPU Rampdown Hack:
+            // By doing a sparse but steady amount of screen updates using a single pixel in the
+            // top left, the GPU is kept active on laptops. This fixes the issue when a skip can
+            // appear to happen when the GPU re-awakes to begin drawing updates after a break in
+            // a song.
+            if (gameProgress % 15 == 0)
+            {
+                if ((gameProgress & 1) == 0)
+                    GPU_PIXEL_BMD.setPixel(0, 0, 0x010101);
+                else
+                    GPU_PIXEL_BMD.setPixel(0, 0, 0x020202);
+            }
 
             if (levelScript != null)
                 levelScript.doProgressTick(gameProgress);
@@ -1345,6 +1369,12 @@ package game
             }
 
             // Remove UI
+            if (GPU_PIXEL_BITMAP)
+            {
+                this.removeChild(GPU_PIXEL_BITMAP);
+                GPU_PIXEL_BITMAP = null;
+                GPU_PIXEL_BMD = null;
+            }
             if (displayBlackBG)
             {
                 this.removeChild(displayBlackBG);
