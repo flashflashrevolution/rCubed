@@ -3,9 +3,9 @@ package arc.mp
     import arc.ArcGlobals;
     import arc.mp.ListItemDoubleClick;
     import arc.mp.MultiplayerChat;
-    import arc.mp.MultiplayerPrompt;
     import arc.mp.MultiplayerUsers;
     import classes.ui.BoxButton;
+    import classes.ui.Prompt;
     import classes.ui.Text;
     import classes.ui.Throbber;
     import com.bit101.components.List;
@@ -287,15 +287,13 @@ package arc.mp
 
         private function joinRoom(room:Object, player:Boolean):void
         {
-            if (room.isPrivate)
+            function e_joinRoomPassword(password:String):void
             {
-                var password:MultiplayerPrompt = new MultiplayerPrompt(this, "Password: " + room.name);
-                password.controlInput.password = true;
-                password.addEventListener(MultiplayerPrompt.EVENT_SEND, function(subevent:SFSEvent):void
-                {
-                    connection.joinRoom(room, player, subevent.params.value);
-                });
+                connection.joinRoom(room, player, password);
             }
+
+            if (room.isPrivate)
+                new Prompt(this, 320, "Password: " + room.name, 100, "SUBMIT", e_joinRoomPassword, true);
             else
                 connection.joinRoom(room, player);
         }
