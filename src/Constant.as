@@ -22,7 +22,7 @@ package
         public static const LOCAL_SO_NAME:String = "90579262-509d-4370-9c2e-564667e511d7";
         public static const ENGINE_VERSION:int = 3;
 
-        public static const ROOT_URL:String = "http://" + R3::ROOT_URL + "/";
+        public static const ROOT_URL:String = "https://" + R3::ROOT_URL + "/";
 
         // Site URLs
         public static const SITE_DATA_URL:String = ROOT_URL + "game/r3/r3-siteData.v2.php";
