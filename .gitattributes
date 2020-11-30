@@ -1,3 +1,5 @@
+* text=auto
+
 *.db filter=lfs diff=lfs merge=lfs -text
 *.fla filter=lfs diff=lfs merge=lfs -text
 *.p12 filter=lfs diff=lfs merge=lfs -text

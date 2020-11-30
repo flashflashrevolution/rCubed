@@ -64,7 +64,7 @@ Click the ![Fork][fork-icon] Fork button in the header of this repo before conti
 - Paste the following command:
 
 ```bash
-git lfs install; git config core.ignorecase false; git config core.autocrlf false
+git lfs install; git config core.ignorecase false
 ```
 
 ### Clone your Repo
