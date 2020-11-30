@@ -4,13 +4,9 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Latest Release][latest-release-badge]](https://github.com/flashflashrevolution/rCubed/releases)
-
 ![Platform Support][platforms-badge]
-
 ![Release][release-status-badge]
-
 ![Master][master-status-badge]
-
 [![FFR Discord][discord-badge]](https://discord.gg/ffr)
 
 ---
