@@ -13,7 +13,9 @@
 
 R^3 is the third and latest game engine for **[Flash Flash Revolution](http://www.flashflashrevolution.com/)**, a free online rhythm game that has been played by over 2 million registered users since 2002.
 
-![R^3 Engine Menu](https://i.imgur.com/7cdoGVt.png) ![R^3 Engine Gameplay](https://i.imgur.com/GLiKTdQ.png)
+![R^3 Engine Menu](.github/images/landing_page.png)
+![R^3 Engine Gameplay](.github/images/gameplay.png)
+![R^3 Results](.github/images/results_page.png)
 
 ---
 
