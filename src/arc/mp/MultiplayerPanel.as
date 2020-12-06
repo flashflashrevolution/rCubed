@@ -5,6 +5,7 @@ package arc.mp
     import arc.mp.MultiplayerChat;
     import arc.mp.MultiplayerUsers;
     import classes.ui.BoxButton;
+    import classes.ui.MPCreateRoomPrompt;
     import classes.ui.Prompt;
     import classes.ui.Text;
     import classes.ui.Throbber;
@@ -104,11 +105,12 @@ package arc.mp
             controlCreate.move(controlRooms.x, controlRooms.y + controlRooms.height);
             controlCreate.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void
             {
-                var prompt:MultiplayerRoomCreatePrompt = new MultiplayerRoomCreatePrompt(self, "Create Room");
-                prompt.addEventListener(MultiplayerRoomCreatePrompt.EVENT_SEND, function(subevent:SFSEvent):void
+                function e_createRoom(roomName:String, password:String):void
                 {
-                    connection.createRoom(subevent.params.room, subevent.params.password);
-                });
+                    connection.createRoom(roomName, password);
+                }
+
+                new MPCreateRoomPrompt(self, 320, 120, e_createRoom);
             });
             window.addChild(controlCreate);
 
