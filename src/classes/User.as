@@ -94,10 +94,11 @@ package classes
         public var DISPLAY_MP_MASK:Boolean = false;
         public var DISPLAY_MP_TIMESTAMP:Boolean = false;
         public var judgeColours:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
-        public var comboColours:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag
-        public var enableComboColors:Array = [true, true, true, false, false, false, false, false];
+        public var comboColours:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000, 0xDCC200]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag, RawGood
+        public var enableComboColors:Array = [true, true, true, false, false, false, false, false, false];
         public var gameColours:Array = [0x1495BD, 0x033242, 0x0C6A88, 0x074B62];
         public var noteColours:Object = ["red", "blue", "purple", "yellow", "pink", "orange", "cyan", "green", "white"];
+        public var rawGoodTracker:Number = 0;
 
         public var autofailAmazing:int = 0;
         public var autofailPerfect:int = 0;
@@ -561,6 +562,8 @@ package classes
                 this.gameColours = _settings.gameColours;
             if (_settings.noteColours != null)
                 this.noteColours = _settings.noteColours;
+            if (_settings.rawGoodTracker != null)
+                this.rawGoodTracker = _settings.rawGoodTracker;
             if (_settings.gameVolume != null)
                 this.gameVolume = _settings.gameVolume;
             if (_settings.isolationOffset != null)
@@ -648,6 +651,7 @@ package classes
             gameSave.enableComboColors = this.enableComboColors;
             gameSave.gameColours = this.gameColours;
             gameSave.noteColours = this.noteColours;
+            gameSave.rawGoodTracker = this.rawGoodTracker;
             gameSave.songQueues = this.songQueues;
             gameSave.gameVolume = this.gameVolume;
             gameSave.filters = doExportFilters(this.filters);
