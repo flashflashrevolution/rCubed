@@ -749,7 +749,7 @@ package popups
                 var gameRawGoodTracker:Text = new Text(box, xOff, yOff, _lang.string("options_raw_goods_tracker"));
                 gameRawGoodTracker.width = 70;
                 gameRawGoodTracker.align = Text.RIGHT;
-                optionRawGoodTracker = new ValidatedText(box, xOff + 75, yOff, 70, 20, ValidatedText.R_INT_P, changeHandler)
+                optionRawGoodTracker = new ValidatedText(box, xOff + 75, yOff, 70, 20, ValidatedText.R_FLOAT_P, changeHandler)
 
                 ///- Col 3
                 xOff += 245;
