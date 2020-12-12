@@ -116,15 +116,15 @@ package game.controls
                     field.textColor = colors[7];
                     fieldShadow.textColor = colors_dark[7];
                 }
-                else if (colors_enabled[3] && raw_goods < 10) // Display SDG color if raw goods < 10
-                {
-                    field.textColor = colors[3];
-                    fieldShadow.textColor = colors_dark[3];
-                }
                 else if (colors_enabled[8] && raw_goods <= options.rawGoodTracker) // Display color for raw good tracker
                 {
                     field.textColor = colors[8];
                     fieldShadow.textColor = colors_dark[8];
+                }
+                else if (colors_enabled[3] && raw_goods < 10) // Display SDG color if raw goods < 10
+                {
+                    field.textColor = colors[3];
+                    fieldShadow.textColor = colors_dark[3];
                 }
                 else if (colors_enabled[1] && miss == 0) // Display green for FC
                 {
