@@ -86,6 +86,7 @@ package game.controls
                [5] = Average Flag,
                [6] = Boo Flag,
                [7] = Miss Flag
+               [8] = Raw Goods
              */
 
             if (options && (!options.isAutoplay || options.isEditor || options.multiplayer))
@@ -114,6 +115,11 @@ package game.controls
                 {
                     field.textColor = colors[7];
                     fieldShadow.textColor = colors_dark[7];
+                }
+                else if (colors_enabled[8] && raw_goods <= options.rawGoodTracker) // Display color for raw good tracker
+                {
+                    field.textColor = colors[8];
+                    fieldShadow.textColor = colors_dark[8];
                 }
                 else if (colors_enabled[3] && raw_goods < 10) // Display SDG color if raw goods < 10
                 {

@@ -141,6 +141,7 @@ package popups
         private var optionComboColorCheck:BoxCheck;
         private var optionGameColors:Array;
         private var optionNoteColors:Array;
+        private var optionRawGoodTracker:ValidatedText;
 
         private var isolationText:ValidatedText;
         private var isolationTotalText:ValidatedText;
@@ -745,6 +746,11 @@ package popups
                     yOff += 25;
                 }
 
+                var gameRawGoodTracker:Text = new Text(box, xOff, yOff, _lang.string("options_raw_goods_tracker"));
+                gameRawGoodTracker.width = 70;
+                gameRawGoodTracker.align = Text.RIGHT;
+                optionRawGoodTracker = new ValidatedText(box, xOff + 75, yOff, 70, 20, ValidatedText.R_FLOAT_P, changeHandler)
+
                 ///- Col 3
                 xOff += 245;
                 yOff = BASE_Y_POSITION;
@@ -1013,6 +1019,10 @@ package popups
             {
                 Style.fontSize = _avars.configMPSize = optionMPSize.validate(10);
                 _avars.mpSave();
+            }
+            else if (e.target == optionRawGoodTracker)
+            {
+                _gvars.activeUser.rawGoodTracker = optionRawGoodTracker.validate(0, 0);
             }
             else if (e.target.hasOwnProperty("autofail"))
             {
@@ -1791,6 +1801,10 @@ package popups
                         optionComboColors[i]["enable"].checked = (_gvars.activeUser.enableComboColors[i]);
                     }
                 }
+
+                // Set Raw Good Tracker
+                optionRawGoodTracker.text = _gvars.activeUser.rawGoodTracker.toString();
+
                 // Set Game Colors
                 for (i = 0; i < DEFAULT_OPTIONS.gameColours.length; i++)
                 {
