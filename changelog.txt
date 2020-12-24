@@ -12,7 +12,7 @@ R^3 (v1.3.1) [2020-12-24]
 - Move UI classes into classes.ui.* (#240)
 - Enable applying current offsets in song notes (#237)
 
-@ Trevor
+@Trevor
 - Add combo colour for raw goods (#253)
 
 @Zageron
