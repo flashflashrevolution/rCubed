@@ -19,9 +19,12 @@ package game
     import com.flashfla.utils.Average;
     import com.flashfla.utils.RollingAverage;
     import com.flashfla.utils.TimeUtil;
+    import flash.display.Bitmap;
+    import flash.display.BitmapData;
     import flash.display.GradientType;
     import flash.display.MovieClip;
     import flash.display.Sprite;
+    import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.IOErrorEvent;
     import flash.events.KeyboardEvent;
@@ -49,8 +52,6 @@ package game
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import sql.SQLSongDetails;
-    import flash.display.BitmapData;
-    import flash.display.Bitmap;
 
     public class GamePlay extends MenuPanel
     {
@@ -620,6 +621,7 @@ package game
             // Post Start Time
             if (postStart && !_gvars.activeUser.isGuest && !options.replay && !options.isEditor && song.entry.engine == null && !mpSpectate)
             {
+                Logger.debug(this, "Posting Start of level " + song.id);
                 _loader = new URLLoader();
                 addLoaderListeners();
 
@@ -708,6 +710,7 @@ package game
         {
             removeLoaderListeners();
             var data:URLVariables = e.target.data;
+            Logger.debug(this, "Post Start Load Success = " + data.result);
             if (data.result == "success")
             {
                 _gvars.songStartTime = data.current_date;
@@ -715,8 +718,9 @@ package game
             }
         }
 
-        private function siteLoadError(e:Event = null):void
+        private function siteLoadError(e:ErrorEvent = null):void
         {
+            Logger.error(this, "Post Start Load Failure: " + Logger.event_error(e));
             removeLoaderListeners();
             //_gvars.gameMain.addAlert("Error sending game start, score may not save", 60, Alert.RED);
         }

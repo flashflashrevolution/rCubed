@@ -4,6 +4,7 @@ package classes
     import classes.chart.parse.ChartFFRLegacy;
     import com.flashfla.utils.ArrayUtil;
     import com.flashfla.utils.Crypt;
+    import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.events.IOErrorEvent;
@@ -118,6 +119,7 @@ package classes
 
         private function playlistLoadComplete(e:Event):void
         {
+            Logger.info(this, "Load Success");
             removeLoaderListeners();
             var data:Object;
             var legacy:Boolean = ArcGlobals.instance.configLegacy;
@@ -238,11 +240,13 @@ package classes
             indexList.sortOn("level", Array.NUMERIC);
             _isLoaded = true;
             _loadError = false;
+            Logger.info(this, "Parsed " + indexList.length + " songs.");
             this.dispatchEvent(new Event(GlobalVariables.LOAD_COMPLETE));
         }
 
-        private function playlistLoadError(e:Event = null):void
+        private function playlistLoadError(e:ErrorEvent = null):void
         {
+            Logger.error(this, "Load Failure: " + Logger.event_error(e));
             removeLoaderListeners();
             _loadError = true;
             this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));

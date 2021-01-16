@@ -11,6 +11,7 @@ package classes
     import flash.events.SecurityErrorEvent;
     import flash.net.URLLoader;
     import flash.net.URLRequest;
+    import flash.events.ErrorEvent;
 
     public class Language extends EventDispatcher
     {
@@ -146,6 +147,7 @@ package classes
 
         private function languageLoadComplete(e:Event):void
         {
+            Logger.info(this, "Load Success");
             removeLoaderListeners();
 
             try
@@ -200,8 +202,9 @@ package classes
             }
         }
 
-        private function languageLoadError(e:Event = null):void
+        private function languageLoadError(e:ErrorEvent = null):void
         {
+            Logger.error(this, "Load Failure: " + Logger.event_error(e));
             removeLoaderListeners();
             this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
         }

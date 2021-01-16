@@ -24,6 +24,7 @@ package game
     import com.flashfla.utils.sprintf;
     import flash.display.DisplayObject;
     import flash.display.Sprite;
+    import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.IOErrorEvent;
     import flash.events.KeyboardEvent;
@@ -945,134 +946,144 @@ package game
          */
         private function siteLoadComplete(e:Event):void
         {
+            Logger.debug(this, "Canon Score Save Success");
+
             removeLoaderListeners(siteLoadComplete, siteLoadError);
-
-            var result:Object = e.target.postData;
-            var data:Object = JSON.parse(e.target.data);
-            var song:Object = e.target.song;
-            var gameResult:GameScoreResult = e.target.results;
-            var totalScore:int = e.target.resultsTotal;
-
-            if (data.result == 0)
+            try
             {
-                _gvars.gameMain.addAlert(_lang.string("game_result_save_success"), 90, Alert.DARK_GREEN);
 
-                // Server Message
-                if (data.gServerMessage != null)
+                var result:Object = e.target.postData;
+                var data:Object = JSON.parse(e.target.data);
+                var song:Object = e.target.song;
+                var gameResult:GameScoreResult = e.target.results;
+                var totalScore:int = e.target.resultsTotal;
+                Logger.debug(this, "Score Save Result: " + data.result);
+                if (data.result == 0)
                 {
-                    _gvars.gameMain.addAlert(data.gServerMessage, 360);
-                }
+                    _gvars.gameMain.addAlert(_lang.string("game_result_save_success"), 90, Alert.DARK_GREEN);
 
-                // Server Message Popup
-                if (data.gServerMessageFull != null)
-                {
-                    _gvars.gameMain.addPopupQueue(new PopupMessage(this, data.gServerMessageFull, data.gServerMessageTitle ? data.gServerMessageTitle : ""));
-                }
-
-                // Token Unlock
-                if (data.token_unlocks != null)
-                {
-                    for each (var token_item:Object in data.token_unlocks)
+                    // Server Message
+                    if (data.gServerMessage != null)
                     {
-                        _gvars.gameMain.addPopupQueue(new PopupTokenUnlock(this, token_item.type, token_item.ID, token_item.text));
-                        _gvars.unlockTokenById(token_item.type, token_item.ID);
-                    }
-                }
-                else if (data.tUnlock != null)
-                {
-                    _gvars.gameMain.addPopupQueue(new PopupTokenUnlock(this, data.tType, data.tID, data.tText, data.tName, data.tMessage));
-                    _gvars.unlockTokenById(data.tType, data.tID);
-                }
-
-                // Valid Legal Score
-                if (result.update)
-                {
-                    // Check Old vs New Rankings.
-                    if (data.new_ranking < data.old_ranking && data.old_ranking > 0)
-                    {
-                        _gvars.gameMain.addAlert("New Best Rank: " + data.old_ranking + "->" + data.new_ranking + " (" + ((data.old_ranking - data.new_ranking) * -1) + ")", 240, Alert.DARK_GREEN);
+                        _gvars.gameMain.addAlert(data.gServerMessage, 360);
                     }
 
-                    // Check raw score vs level ranks and update.
-                    var previousLevelRanks:Object = _gvars.activeUser.level_ranks[song.level];
-                    var newLevelRanks:Object = {"genre": song.genre,
-                            "rank": data.new_ranking,
-                            "score": gameResult.score,
-                            "results": gameResult.pa_string + "-" + gameResult.max_combo,
-                            "perfect": gameResult.amazing + gameResult.perfect,
-                            "plays": 1,
-                            "aaas": int(gameResult.is_aaa),
-                            "fcs": int(gameResult.is_fc),
-                            "good": gameResult.good,
-                            "average": gameResult.average,
-                            "miss": gameResult.miss,
-                            "boo": gameResult.boo,
-                            "maxcombo": gameResult.max_combo,
-                            "rawscore": gameResult.score};
-
-                    // Update Level Ranks is missing or better.
-                    if (previousLevelRanks == null || gameResult.score > previousLevelRanks.score)
+                    // Server Message Popup
+                    if (data.gServerMessageFull != null)
                     {
-                        // Update Counts for Play, FC, AAA from previous.
-                        if (previousLevelRanks != null)
+                        _gvars.gameMain.addPopupQueue(new PopupMessage(this, data.gServerMessageFull, data.gServerMessageTitle ? data.gServerMessageTitle : ""));
+                    }
+
+                    // Token Unlock
+                    if (data.token_unlocks != null)
+                    {
+                        for each (var token_item:Object in data.token_unlocks)
                         {
-                            newLevelRanks["plays"] += previousLevelRanks["plays"];
-                            newLevelRanks["aaas"] += previousLevelRanks["aaas"];
-                            newLevelRanks["fcs"] += previousLevelRanks["fcs"];
+                            _gvars.gameMain.addPopupQueue(new PopupTokenUnlock(this, token_item.type, token_item.ID, token_item.text));
+                            _gvars.unlockTokenById(token_item.type, token_item.ID);
                         }
-                        _gvars.activeUser.level_ranks[song.level] = newLevelRanks;
+                    }
+                    else if (data.tUnlock != null)
+                    {
+                        _gvars.gameMain.addPopupQueue(new PopupTokenUnlock(this, data.tType, data.tID, data.tText, data.tName, data.tMessage));
+                        _gvars.unlockTokenById(data.tType, data.tID);
                     }
 
-                    // Update Counters
+                    // Valid Legal Score
+                    if (result.update)
+                    {
+                        // Check Old vs New Rankings.
+                        if (data.new_ranking < data.old_ranking && data.old_ranking > 0)
+                        {
+                            _gvars.gameMain.addAlert("New Best Rank: " + data.old_ranking + "->" + data.new_ranking + " (" + ((data.old_ranking - data.new_ranking) * -1) + ")", 240, Alert.DARK_GREEN);
+                        }
+
+                        // Check raw score vs level ranks and update.
+                        var previousLevelRanks:Object = _gvars.activeUser.level_ranks[song.level];
+                        var newLevelRanks:Object = {"genre": song.genre,
+                                "rank": data.new_ranking,
+                                "score": gameResult.score,
+                                "results": gameResult.pa_string + "-" + gameResult.max_combo,
+                                "perfect": gameResult.amazing + gameResult.perfect,
+                                "plays": 1,
+                                "aaas": int(gameResult.is_aaa),
+                                "fcs": int(gameResult.is_fc),
+                                "good": gameResult.good,
+                                "average": gameResult.average,
+                                "miss": gameResult.miss,
+                                "boo": gameResult.boo,
+                                "maxcombo": gameResult.max_combo,
+                                "rawscore": gameResult.score};
+
+                        // Update Level Ranks is missing or better.
+                        if (previousLevelRanks == null || gameResult.score > previousLevelRanks.score)
+                        {
+                            // Update Counts for Play, FC, AAA from previous.
+                            if (previousLevelRanks != null)
+                            {
+                                newLevelRanks["plays"] += previousLevelRanks["plays"];
+                                newLevelRanks["aaas"] += previousLevelRanks["aaas"];
+                                newLevelRanks["fcs"] += previousLevelRanks["fcs"];
+                            }
+                            _gvars.activeUser.level_ranks[song.level] = newLevelRanks;
+                        }
+
+                        // Update Counters
+                        else
+                        {
+                            previousLevelRanks["plays"] += newLevelRanks["plays"];
+                            previousLevelRanks["aaas"] += newLevelRanks["aaas"];
+                            previousLevelRanks["fcs"] += newLevelRanks["fcs"];
+                        }
+
+                        _gvars.songResultRanks[e.target.rank_index] = {old_ranking: data.old_ranking, new_ranking: data.new_ranking};
+
+                        // Update Rank Display if current score.
+                        var gameIndex:int = (songResults.length == 1 ? e.target.rank_index : songRankIndex);
+                        if (e.target.rank_index == gameIndex && resultsDisplay != null)
+                        {
+                            resultsDisplay.result_rank.htmlText = "<B>Rank: " + _gvars.songResultRanks[gameIndex].new_ranking;
+                            resultsDisplay.result_last_best.htmlText = "<B>Last Best: " + _gvars.songResultRanks[gameIndex].old_ranking;
+                        }
+                    }
                     else
                     {
-                        previousLevelRanks["plays"] += newLevelRanks["plays"];
-                        previousLevelRanks["aaas"] += newLevelRanks["aaas"];
-                        previousLevelRanks["fcs"] += newLevelRanks["fcs"];
+                        resultsDisplay.result_rank.htmlText = "Game mods enabled!";
                     }
 
-                    _gvars.songResultRanks[e.target.rank_index] = {old_ranking: data.old_ranking, new_ranking: data.new_ranking};
+                    _gvars.activeUser.grandTotal += gameResult.score_total;
+                    _gvars.activeUser.credits += gameResult.credits;
 
-                    // Update Rank Display if current score.
-                    var gameIndex:int = (songResults.length == 1 ? e.target.rank_index : songRankIndex);
-                    if (e.target.rank_index == gameIndex && resultsDisplay != null)
-                    {
-                        resultsDisplay.result_rank.htmlText = "<B>Rank: " + _gvars.songResultRanks[gameIndex].new_ranking;
-                        resultsDisplay.result_last_best.htmlText = "<B>Last Best: " + _gvars.songResultRanks[gameIndex].old_ranking;
-                    }
+                    Playlist.instanceCanon.updateSongAccess();
+
+                    // Update Judge Offset
+                    updateJudgeOffset(gameResult);
+
+                    // Display Popup Queue
+                    if (resultsDisplay != null)
+                        _gvars.gameMain.displayPopupQueue();
                 }
                 else
                 {
-                    resultsDisplay.result_rank.htmlText = "Game mods enabled!";
+                    if (!data.ignore)
+                        _gvars.gameMain.addAlert("Failed to save results. (ERR: " + data.result + ")", 360, Alert.RED);
+
+                    if (resultsDisplay != null)
+                        resultsDisplay.result_rank.htmlText = data.ignore ? "" : "Score save failed!";
                 }
-
-                _gvars.activeUser.grandTotal += gameResult.score_total;
-                _gvars.activeUser.credits += gameResult.credits;
-
-                Playlist.instanceCanon.updateSongAccess();
-
-                // Update Judge Offset
-                updateJudgeOffset(gameResult);
-
-                // Display Popup Queue
-                if (resultsDisplay != null)
-                    _gvars.gameMain.displayPopupQueue();
             }
-            else
+            catch (err:Error)
             {
-                if (!data.ignore)
-                    _gvars.gameMain.addAlert("Failed to save results. (ERR: " + data.result + ")", 360, Alert.RED);
-
-                if (resultsDisplay != null)
-                    resultsDisplay.result_rank.htmlText = data.ignore ? "" : "Score save failed!";
+                Logger.error(this, "Canon Response Error: " + Logger.exception_error(err));
             }
         }
 
         /**
          * Loader Event: Site Score Save Failure
          */
-        private function siteLoadError(e:Event = null):void
+        private function siteLoadError(e:ErrorEvent = null):void
         {
+            Logger.error(this, "Canon Score Save Failure: " + Logger.event_error(e));
             removeLoaderListeners(siteLoadComplete, siteLoadError);
             _gvars.gameMain.addAlert(_lang.string("error_server_connection_failure"), 120, Alert.RED);
 
@@ -1171,6 +1182,8 @@ package game
          */
         private function altSiteLoadComplete(e:Event):void
         {
+            Logger.debug(this, "Alt Score Save Success");
+
             removeLoaderListeners(altSiteLoadComplete, altSiteLoadError);
             try
             {
@@ -1179,51 +1192,53 @@ package game
                 var totalScore:int = e.target.resultsTotal;
                 var data:Object = JSON.parse(e.target.data);
                 var gameResult:GameScoreResult = e.target.results;
-                if (data)
+
+                Logger.debug(this, "Alt Score Save Result: " + data.result);
+
+                if (data.result == 0)
                 {
-                    if (data.result == 0)
+                    //_gvars.gameMain.addAlert("Score Saved successfully!", 90);
+
+                    // Server Message
+                    if (data.gServerMessage != null)
                     {
-                        //_gvars.gameMain.addAlert("Score Saved successfully!", 90);
+                        _gvars.gameMain.addAlert(data.gServerMessage, 360);
+                    }
 
-                        // Server Message
-                        if (data.gServerMessage != null)
-                        {
-                            _gvars.gameMain.addAlert(data.gServerMessage, 360);
-                        }
+                    // Server Message Popup
+                    if (data.gServerMessageFull != null)
+                    {
+                        _gvars.gameMain.addPopupQueue(new PopupMessage(this, data.gServerMessageFull, data.gServerMessageTitle ? data.gServerMessageTitle : ""));
+                    }
 
-                        // Server Message Popup
-                        if (data.gServerMessageFull != null)
-                        {
-                            _gvars.gameMain.addPopupQueue(new PopupMessage(this, data.gServerMessageFull, data.gServerMessageTitle ? data.gServerMessageTitle : ""));
-                        }
+                    // Token Unlock
+                    if (data.tUnlock != null)
+                    {
+                        _gvars.gameMain.addPopupQueue(new PopupTokenUnlock(this, data.tType, data.tID, data.tText, data.tName, data.tMessage));
+                    }
 
-                        // Token Unlock
-                        if (data.tUnlock != null)
-                        {
-                            _gvars.gameMain.addPopupQueue(new PopupTokenUnlock(this, data.tType, data.tID, data.tText, data.tName, data.tMessage));
-                        }
+                    // Update Judge Offset
+                    updateJudgeOffset(gameResult);
 
-                        // Update Judge Offset
-                        updateJudgeOffset(gameResult);
-
-                        // Display Popup Queue
-                        if (resultsDisplay != null)
-                        {
-                            _gvars.gameMain.displayPopupQueue();
-                        }
+                    // Display Popup Queue
+                    if (resultsDisplay != null)
+                    {
+                        _gvars.gameMain.displayPopupQueue();
                     }
                 }
             }
-            catch (e:Error)
+            catch (err:Error)
             {
+                Logger.error(this, "Alt Response Error: " + Logger.exception_error(err));
             }
         }
 
         /**
          * Loader Event: Alt Engine Score Save Failure
          */
-        private function altSiteLoadError(e:Event = null):void
+        private function altSiteLoadError(e:ErrorEvent = null):void
         {
+            Logger.error(this, "Alt Score Save Failure: " + Logger.event_error(e));
             removeLoaderListeners(altSiteLoadComplete, altSiteLoadError);
         }
 
@@ -1290,8 +1305,9 @@ package game
                         fileStream.close();
                     }
                 }
-                catch (e:Error)
+                catch (err:Error)
                 {
+                    Logger.error(this, "Local Replay Save Error: " + Logger.exception_error(err));
                 }
             }
         }

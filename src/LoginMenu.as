@@ -25,6 +25,7 @@ package
     import flash.net.navigateToURL;
     import flash.ui.Keyboard;
     import menu.MenuPanel;
+    import flash.events.ErrorEvent;
 
     public class LoginMenu extends MenuPanel
     {
@@ -231,6 +232,8 @@ package
             req.method = URLRequestMethod.POST;
             _loader.load(req);
 
+            Logger.info(this, "Attempting session login for: " + requestVars.username.substr(0, 4) + "..." + requestVars.token.substr(-4));
+
             isLoading = true;
         }
 
@@ -251,6 +254,8 @@ package
             req.data = requestVars;
             req.method = URLRequestMethod.POST;
             _loader.load(req);
+
+            Logger.info(this, "Attempting login for: " + requestVars.username.substr(0, 4) + "...");
 
             setFields(true);
         }
@@ -281,12 +286,14 @@ package
             var _data:Object = JSON.parse(e.target.data);
             if (_data.result == 4)
             {
+                Logger.error(this, "Invalid User/Session");
                 isLoading = false;
                 _gvars.gameMain.addAlert(_lang.string("login_invalid_session"));
                 changeUserEvent(e);
             }
             else if (_data.result >= 1 && _data.result <= 3)
             {
+                Logger.info(this, "Login Success!");
                 if (_data.result == 1 || _data.result == 2)
                     saveLoginDetails(this.rememberPassword, _data.session);
                 _gvars.userSession = _data.session;
@@ -300,8 +307,9 @@ package
             }
         }
 
-        private function loginLoadError(e:Event = null):void
+        private function loginLoadError(e:ErrorEvent = null):void
         {
+            Logger.error(this, "Login Load Error: " + Logger.event_error(e));
             removeLoaderListeners();
             setFields(false);
         }

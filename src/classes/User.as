@@ -10,6 +10,7 @@ package classes
     import com.flashfla.utils.ArrayUtil;
     import flash.display.Loader;
     import flash.display.LoaderInfo;
+    import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.events.IOErrorEvent;
@@ -249,6 +250,7 @@ package classes
 
         private function profileLoadComplete(e:Event):void
         {
+            Logger.info(this, "Profile Load Success");
             removeLoaderListeners();
             try
             {
@@ -269,7 +271,7 @@ package classes
             catch (err:Error)
             {
                 _loadError = true;
-                _gvars.logDebugError("profileLoadCompleteFailure", err);
+                Logger.error(this, "Profile Error: " + Logger.exception_error(err));
                 this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
             }
         }
@@ -322,8 +324,9 @@ package classes
             }
         }
 
-        private function profileLoadError(e:Event = null):void
+        private function profileLoadError(e:ErrorEvent = null):void
         {
+            Logger.error(this, "Profile Load Failure: " + Logger.event_error(e));
             removeLoaderListeners();
             _loadError = true;
             this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
@@ -393,6 +396,7 @@ package classes
 
         private function ranksLoadComplete(e:Event):void
         {
+            Logger.info(this, "Ranks Load Success");
             removeLoaderRanksListeners();
             level_ranks = new Object();
 
@@ -431,8 +435,9 @@ package classes
             this.dispatchEvent(new Event(GlobalVariables.LOAD_COMPLETE));
         }
 
-        private function ranksLoadError(e:Event = null):void
+        private function ranksLoadError(e:ErrorEvent = null):void
         {
+            Logger.error(this, "Ranks Load Failure: " + Logger.event_error(e));
             removeLoaderRanksListeners();
             this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
         }
@@ -680,7 +685,7 @@ package classes
         private function settingSaveComplete(e:Event):void
         {
             removeLoaderSaveListeners();
-            trace("2:User Settings Saved!");
+            Logger.debug(this, "Settings Saved!");
             this.dispatchEvent(new Event(GlobalVariables.LOAD_COMPLETE));
         }
 

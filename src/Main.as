@@ -147,6 +147,8 @@ package
             TweenLite.defaultOverwrite = "all";
             stage.stageFocusRect = false;
 
+            Logger.init();
+
             //- Load Air Items
             _gvars.loadAirOptions();
             stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE;
@@ -327,7 +329,6 @@ package
 
         private function gameScriptLoad(e:Event = null):void
         {
-            trace("0:Loaded: " + e.target);
             e.target.removeEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
             e.target.removeEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
             loadScripts++;
@@ -338,7 +339,6 @@ package
 
         private function gameScriptLoadError(e:Event = null):void
         {
-            trace("0:Load Error: " + e.target);
             e.target.removeEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
             e.target.removeEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
 

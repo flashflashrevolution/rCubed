@@ -1,5 +1,6 @@
 package classes
 {
+    import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.events.IOErrorEvent;
@@ -76,6 +77,7 @@ package classes
 
         private function siteLoadComplete(e:Event):void
         {
+            Logger.info(this, "Load Success");
             removeLoaderListeners();
             try
             {
@@ -113,8 +115,9 @@ package classes
             }
         }
 
-        private function siteLoadError(e:Event = null):void
+        private function siteLoadError(e:ErrorEvent = null):void
         {
+            Logger.error(this, "Load Failure: " + Logger.event_error(e));
             removeLoaderListeners();
             this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
         }
