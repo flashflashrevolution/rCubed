@@ -994,6 +994,9 @@ package game
                             threshold = 1;
                         if (options.replay)
                             threshold = 0x7fffffff;
+
+                        //Logger.debug("GP", "lAP: " + lastAbsolutePosition + " | aP: " + absolutePosition + " | sDS: " + songDelayStarted + " | sD: " + songDelay + " | sOv: " + songOffset.value + " | sGP: " + song.getPosition() + " | sP: " + songPosition + " | gP: " + gamePosition + " | tP: " + targetProgress + " | t: " + threshold);
+
                         while (gameProgress < targetProgress && threshold-- > 0)
                             logicTick();
 

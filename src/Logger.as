@@ -21,36 +21,33 @@ package
         public static const ERROR:Number = 3; // Red
         public static const NOTICE:Number = 4; // Purple
 
-        public static var enabled:Boolean = CONFIG::debug;
+        public static var enabled:Boolean = false;
         public static var file_log:Boolean = false;
         public static var history:Array = [];
 
         public static function init():void
         {
-            CONFIG::debug
+            if (file_log && LOG_STREAM == null)
             {
-                if (file_log && LOG_STREAM == null)
-                {
-                    var now:Date = new Date();
-                    var filename:String = AirContext.createFileName(now.toLocaleString(), " ");
-                    LOG_FILE = new File(AirContext.getAppPath("logs/" + filename + ".txt"));
-                    LOG_STREAM = new FileStream();
-                    LOG_STREAM.addEventListener(SecurityErrorEvent.SECURITY_ERROR, e_logFileFail);
-                    LOG_STREAM.addEventListener(IOErrorEvent.IO_ERROR, e_logFileFail);
-                    LOG_STREAM.open(LOG_FILE, FileMode.WRITE);
-                    LOG_STREAM.writeUTFBytes("======================" + filename + "======================\n");
-                    LOG_STREAM.writeUTFBytes("R3 Version: " + Constant.AIR_VERSION + " | " + CONFIG::timeStamp + "\n");
-                    LOG_STREAM.close();
-                }
+                var now:Date = new Date();
+                var filename:String = AirContext.createFileName(now.toLocaleString(), " ");
+                LOG_FILE = new File(AirContext.getAppPath("logs/" + filename + ".txt"));
+                LOG_STREAM = new FileStream();
+                LOG_STREAM.addEventListener(SecurityErrorEvent.SECURITY_ERROR, e_logFileFail);
+                LOG_STREAM.addEventListener(IOErrorEvent.IO_ERROR, e_logFileFail);
+                LOG_STREAM.open(LOG_FILE, FileMode.WRITE);
+                LOG_STREAM.writeUTFBytes("======================" + filename + "======================\n");
+                LOG_STREAM.writeUTFBytes("R3 Version: " + Constant.AIR_VERSION + " | " + CONFIG::timeStamp + "\n");
+                LOG_STREAM.close();
+            }
 
-                function e_logFileFail(e:Event):void
-                {
-                    trace("Unable to use file logging.");
-                    LOG_STREAM.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, e_logFileFail);
-                    LOG_STREAM.removeEventListener(IOErrorEvent.IO_ERROR, e_logFileFail);
-                    LOG_FILE = null;
-                    LOG_STREAM = null;
-                }
+            function e_logFileFail(e:Event):void
+            {
+                trace("Unable to use file logging.");
+                LOG_STREAM.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, e_logFileFail);
+                LOG_STREAM.removeEventListener(IOErrorEvent.IO_ERROR, e_logFileFail);
+                LOG_FILE = null;
+                LOG_STREAM = null;
             }
         }
 
@@ -86,38 +83,35 @@ package
 
         public static function log(clazz:*, level:int, text:*, simple:Boolean = false):void
         {
-            CONFIG::debug
+            // Check if Logger Enabled
+            if (!enabled)
+                return;
+
+            // Store History
+            history.push([getTimer(), class_name(clazz), level, text, simple]);
+            if (history.length > 250)
+                history.unshift();
+
+            // Create Log Message
+            var msg:String = "";
+            if (text is Error)
             {
-                // Check if Logger Enabled
-                if (!enabled)
-                    return;
+                var err:Error = (text as Error);
+                msg = "Error: " + exception_error(err);
+            }
+            else
+            {
+                msg = text;
+            }
 
-                // Store History
-                history.push([getTimer(), class_name(clazz), level, text, simple]);
-                if (history.length > 250)
-                    history.unshift();
+            // Display
+            trace(level + ":" + (!simple ? "[" + TimeUtil.convertToHHMMSS(getTimer() / 1000) + "][" + class_name(clazz) + "] " : "") + msg);
 
-                // Create Log Message
-                var msg:String = "";
-                if (text is Error)
-                {
-                    var err:Error = (text as Error);
-                    msg = "Error: " + exception_error(err);
-                }
-                else
-                {
-                    msg = text;
-                }
-
-                // Display
-                trace(level + ":" + (!simple ? "[" + TimeUtil.convertToHHMMSS(getTimer() / 1000) + "][" + class_name(clazz) + "] " : "") + msg);
-
-                if (LOG_STREAM != null)
-                {
-                    LOG_STREAM.open(LOG_FILE, FileMode.APPEND);
-                    LOG_STREAM.writeUTFBytes(((!simple ? "[" + TimeUtil.convertToHHMMSS(getTimer() / 1000) + "][" + class_name(clazz) + "] " : "") + msg + "\n"));
-                    LOG_STREAM.close();
-                }
+            if (LOG_STREAM != null)
+            {
+                LOG_STREAM.open(LOG_FILE, FileMode.APPEND);
+                LOG_STREAM.writeUTFBytes(((!simple ? "[" + TimeUtil.convertToHHMMSS(getTimer() / 1000) + "][" + class_name(clazz) + "] " : "") + msg + "\n"));
+                LOG_STREAM.close();
             }
         }
 
