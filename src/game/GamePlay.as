@@ -259,21 +259,6 @@ package game
             // Init Core
             initCore();
 
-            if (options.isEditor)
-            {
-                options.isAutoplay = true;
-                stage.frameRate = options.frameRate;
-                stage.addEventListener(Event.ENTER_FRAME, editorOnEnterFrame, false, int.MAX_VALUE, true);
-                stage.addEventListener(KeyboardEvent.KEY_DOWN, editorKeyboardKeyDown, false, int.MAX_VALUE, true);
-            }
-            else
-            {
-                stage.frameRate = song.frameRate;
-                stage.addEventListener(Event.ENTER_FRAME, onEnterFrame, false, int.MAX_VALUE, true);
-                stage.addEventListener(KeyboardEvent.KEY_DOWN, keyboardKeyDown, false, int.MAX_VALUE, true);
-                stage.addEventListener(KeyboardEvent.KEY_UP, keyboardKeyUp, false, int.MAX_VALUE, true);
-            }
-
             // Prebuild Websocket Message, this is updated instead of creating a new object every message.
             SOCKET_SONG_MESSAGE = {"player": {
                         "settings": options.settingsEncode(),
@@ -372,6 +357,22 @@ package game
 
             if (song.entry && song.entry.name)
                 stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE + " - " + song.entry.name;
+
+            // Add onEnterFrame Listeners
+            if (options.isEditor)
+            {
+                options.isAutoplay = true;
+                stage.frameRate = options.frameRate;
+                stage.addEventListener(Event.ENTER_FRAME, editorOnEnterFrame, false, int.MAX_VALUE, true);
+                stage.addEventListener(KeyboardEvent.KEY_DOWN, editorKeyboardKeyDown, false, int.MAX_VALUE, true);
+            }
+            else
+            {
+                stage.frameRate = song.frameRate;
+                stage.addEventListener(Event.ENTER_FRAME, onEnterFrame, false, int.MAX_VALUE, true);
+                stage.addEventListener(KeyboardEvent.KEY_DOWN, keyboardKeyDown, true, int.MAX_VALUE, true);
+                stage.addEventListener(KeyboardEvent.KEY_UP, keyboardKeyUp, true, int.MAX_VALUE, true);
+            }
         }
 
         override public function stageRemove():void
@@ -386,8 +387,8 @@ package game
             else
             {
                 stage.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
-                stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyboardKeyDown);
-                stage.removeEventListener(KeyboardEvent.KEY_UP, keyboardKeyUp);
+                stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyboardKeyDown, true);
+                stage.removeEventListener(KeyboardEvent.KEY_UP, keyboardKeyUp, true);
 
                 if (options.multiplayer)
                 {
@@ -1330,6 +1331,13 @@ package game
             if (!legacyMode && !options.replay && !options.isEditor && !mpSpectate)
             {
                 _avars.configMusicOffset = (_avars.configMusicOffset * 0.85) + songOffset.value * 0.15;
+
+                // Cap between 10 seconds for sanity.
+                if (Math.abs(_avars.configMusicOffset) >= 5000)
+                {
+                    _avars.configMusicOffset = Math.max(-5000, Math.min(5000, _avars.configMusicOffset));
+                }
+
                 _avars.musicOffsetSave();
             }
 
