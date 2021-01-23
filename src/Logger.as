@@ -21,7 +21,7 @@ package
         public static const ERROR:Number = 3; // Red
         public static const NOTICE:Number = 4; // Purple
 
-        public static var enabled:Boolean = false;
+        public static var enabled:Boolean = CONFIG::debug;
         public static var file_log:Boolean = false;
         public static var history:Array = [];
 
