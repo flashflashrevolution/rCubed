@@ -1332,7 +1332,7 @@ package game
             {
                 _avars.configMusicOffset = (_avars.configMusicOffset * 0.85) + songOffset.value * 0.15;
 
-                // Cap between 10 seconds for sanity.
+                // Cap between 5 seconds for sanity.
                 if (Math.abs(_avars.configMusicOffset) >= 5000)
                 {
                     _avars.configMusicOffset = Math.max(-5000, Math.min(5000, _avars.configMusicOffset));
