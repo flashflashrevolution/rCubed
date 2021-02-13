@@ -67,7 +67,7 @@ package classes.ui
                     break;
             }
 
-            if (listener)
+            if (listener != null)
             {
                 this._listener = listener;
                 this.addEventListener(Event.CHANGE, listener);
