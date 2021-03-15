@@ -1,12 +1,42 @@
 package it.gotoandplay.smartfoxserver.handlers
 {
+    import flash.utils.getTimer;
     import it.gotoandplay.smartfoxserver.SmartFoxClient;
-    import it.gotoandplay.smartfoxserver.SFSEvent;
     import it.gotoandplay.smartfoxserver.data.Room;
     import it.gotoandplay.smartfoxserver.data.User;
     import it.gotoandplay.smartfoxserver.util.Entities;
     import it.gotoandplay.smartfoxserver.util.ObjectSerializer;
-    import flash.utils.getTimer;
+    import it.gotoandplay.smartfoxserver.TypedSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.AdminMessageEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.LoginEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.BuddyListErrorEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.BuddyListEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.BuddyListUpdateEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.BuddyPermissionRequestEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.BuddyRoomEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomLeftEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.SpectatorSwitchedEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.PlayerSwitchedEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionLostEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.LogoutEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomVariablesUpdateEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomAddedEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomDeletedEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomListUpdateEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserCountChangeEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomErrorEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserEnterRoomEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserLeaveRoomEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.PublicMessageEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.PrivateMessageEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ModerationMessageEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ObjectReceivedEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserVariablesUpdateEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RandomKeyEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoundTripResponseEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.CreateRoomErrorEvent;
 
     /**
      * SysHandler class: handles "sys" type messages.
@@ -85,15 +115,16 @@ package it.gotoandplay.smartfoxserver.handlers
             }
         }
 
-
         // Handle correct API
         public function handleApiOK(o:Object):void
         {
             sfs.isConnected = true
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onConnection, {success: true})
+            var params:Object = {}
+            params.success = true
+
+            var evt:TypedSFSEvent = new ConnectionEvent(params)
             sfs.dispatchEvent(evt)
         }
-
 
         // Handle obsolete API
         public function handleApiKO(o:Object):void
@@ -102,10 +133,9 @@ package it.gotoandplay.smartfoxserver.handlers
             params.success = false
             params.error = "API are obsolete, please upgrade"
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onConnection, params)
+            var evt:TypedSFSEvent = new ConnectionEvent(params)
             sfs.dispatchEvent(evt)
         }
-
 
         // Handle successfull login
         public function handleLoginOk(o:Object):void
@@ -124,7 +154,7 @@ package it.gotoandplay.smartfoxserver.handlers
             params.name = name
             params.error = ""
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onLogin, params)
+            var evt:TypedSFSEvent = new LoginEvent(params)
             sfs.dispatchEvent(evt)
 
             // Request room list
@@ -138,7 +168,7 @@ package it.gotoandplay.smartfoxserver.handlers
             params.success = false
             params.error = o.body.login.@e
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onLogin, params)
+            var evt:TypedSFSEvent = new LoginEvent(params)
             sfs.dispatchEvent(evt)
         }
 
@@ -147,7 +177,7 @@ package it.gotoandplay.smartfoxserver.handlers
         {
             sfs.__logout()
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onLogout, {})
+            var evt:TypedSFSEvent = new LogoutEvent()
             sfs.dispatchEvent(evt)
         }
 
@@ -158,6 +188,9 @@ package it.gotoandplay.smartfoxserver.handlers
             var filling:Boolean = (roomList.length == 0);
             var roomsInList:Array = new Array();
             var room:Room;
+            var params:Object = {}
+            var evt:TypedSFSEvent
+
             for each (var roomXml:XML in o.body.rmList.rm)
             {
                 var changedVars:Array = new Array();
@@ -186,24 +219,45 @@ package it.gotoandplay.smartfoxserver.handlers
 
                 if (!filling)
                 {
+                    params = {}
+                    params.room = room;
+
                     if (newRoom)
-                        sfs.dispatchEvent(new SFSEvent(SFSEvent.onRoomAdded, {room: room}));
+                    {
+                        evt = new RoomAddedEvent(params)
+                        sfs.dispatchEvent(evt)
+                    }
                     else if (updated)
-                        sfs.dispatchEvent(new SFSEvent(SFSEvent.onRoomVariablesUpdate, {room: room, changedVars: changedVars, roomList: true}));
+                    {
+                        params.changedVars = changedVars
+                        params.roomList = true;
+                        evt = new RoomVariablesUpdateEvent(params)
+                        sfs.dispatchEvent(evt)
+                    }
                 }
                 roomsInList.push(roomId);
             }
+
             for each (room in roomList)
             {
                 if (roomsInList.indexOf(room.getId()) < 0)
                 {
                     delete roomList[room.getId()];
-                    sfs.dispatchEvent(new SFSEvent(SFSEvent.onRoomDeleted, {room: room}));
+                    params = {}
+                    params.room = room
+
+                    evt = new RoomDeletedEvent(params)
+                    sfs.dispatchEvent(evt)
                 }
             }
 
             if (filling)
-                sfs.dispatchEvent(new SFSEvent(SFSEvent.onRoomListUpdate, {roomList: roomList}));
+            {
+                params = {}
+                params.roomList = roomList
+                evt = new RoomListUpdateEvent(params)
+                sfs.dispatchEvent(evt)
+            }
         }
 
         // Handle the user count change in a room
@@ -223,7 +277,7 @@ package it.gotoandplay.smartfoxserver.handlers
                 var params:Object = {}
                 params.room = room
 
-                var evt:SFSEvent = new SFSEvent(SFSEvent.onUserCountChange, params)
+                var evt:TypedSFSEvent = new UserCountChangeEvent(params)
                 sfs.dispatchEvent(evt)
             }
         }
@@ -232,7 +286,6 @@ package it.gotoandplay.smartfoxserver.handlers
         // Successfull room Join
         public function handleJoinOk(o:Object):void
         {
-
             var roomId:int = int(o.body.@r)
             var roomVarsXml:XMLList = o.body
             var userListXml:XMLList = o.body.uLs.u
@@ -295,7 +348,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var params:Object = {}
             params.room = currRoom
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onJoinRoom, params)
+            var evt:TypedSFSEvent = new JoinRoomEvent(params)
             sfs.dispatchEvent(evt)
         }
 
@@ -307,7 +360,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var params:Object = {}
             params.error = o.body.error.@msg
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onJoinRoomError, params)
+            var evt:TypedSFSEvent = new JoinRoomErrorEvent(params)
             sfs.dispatchEvent(evt)
         }
 
@@ -347,7 +400,7 @@ package it.gotoandplay.smartfoxserver.handlers
             params.roomId = roomId
             params.user = newUser
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onUserEnterRoom, params)
+            var evt:TypedSFSEvent = new UserEnterRoomEvent(params)
             sfs.dispatchEvent(evt)
         }
 
@@ -372,7 +425,7 @@ package it.gotoandplay.smartfoxserver.handlers
             params.userId = userId
             params.userName = uName
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onUserLeaveRoom, params)
+            var evt:TypedSFSEvent = new UserLeaveRoomEvent(params)
             sfs.dispatchEvent(evt)
         }
 
@@ -390,7 +443,7 @@ package it.gotoandplay.smartfoxserver.handlers
             params.sender = sender
             params.roomId = roomId
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onPublicMessage, params)
+            var evt:TypedSFSEvent = new PublicMessageEvent(params)
             sfs.dispatchEvent(evt)
 
         }
@@ -410,7 +463,7 @@ package it.gotoandplay.smartfoxserver.handlers
             params.roomId = roomId
             params.userId = userId
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onPrivateMessage, params)
+            var evt:TypedSFSEvent = new PrivateMessageEvent(params)
             sfs.dispatchEvent(evt)
         }
 
@@ -424,7 +477,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var params:Object = {}
             params.message = Entities.decodeEntities(message)
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onAdminMessage, params)
+            var evt:TypedSFSEvent = new AdminMessageEvent(params)
             sfs.dispatchEvent(evt)
 
         }
@@ -446,7 +499,7 @@ package it.gotoandplay.smartfoxserver.handlers
             params.message = Entities.decodeEntities(message)
             params.sender = sender
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onModeratorMessage, params)
+            var evt:TypedSFSEvent = new ModerationMessageEvent(params)
             sfs.dispatchEvent(evt)
         }
 
@@ -464,7 +517,7 @@ package it.gotoandplay.smartfoxserver.handlers
             params.obj = asObj
             params.sender = sender
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onObjectReceived, params)
+            var evt:TypedSFSEvent = new ObjectReceivedEvent(params)
             sfs.dispatchEvent(evt)
         }
 
@@ -487,35 +540,9 @@ package it.gotoandplay.smartfoxserver.handlers
             params.room = currRoom
             params.changedVars = changedVars
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onRoomVariablesUpdate, params)
+            var evt:TypedSFSEvent = new RoomVariablesUpdateEvent(params)
             sfs.dispatchEvent(evt)
         }
-
-        /**
-         *	OLD
-
-           public function handleUserVarsUpdateOld(o:Object):void
-           {
-           var roomId:int = int(o.body.@r)
-           var userId:int = int(o.body.user.@id)
-
-           var currUser:User = sfs.getRoom(roomId).getUser(userId)
-           var changedVars:Array = []
-
-           if (o.body.vars.toString().length > 0)
-           {
-           populateVariables(currUser.getVariables(), o.body, changedVars)
-           }
-
-           // Fire event!
-           var params:Object = {}
-           params.user = currUser
-           params.changedVars = changedVars
-
-           var evt:SFSEvent = new SFSEvent(SFSEvent.onUserVariablesUpdate, params)
-           sfs.dispatchEvent(evt)
-           }
-         */
 
         public function handleUserVarsUpdate(o:Object):void
         {
@@ -548,7 +575,7 @@ package it.gotoandplay.smartfoxserver.handlers
                 params.user = returnUser
                 params.changedVars = changedVars
 
-                var evt:SFSEvent = new SFSEvent(SFSEvent.onUserVariablesUpdate, params)
+                var evt:TypedSFSEvent = new UserVariablesUpdateEvent(params)
                 sfs.dispatchEvent(evt)
             }
         }
@@ -578,7 +605,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var params:Object = {}
             params.room = newRoom
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onRoomAdded, params)
+            var evt:TypedSFSEvent = new RoomAddedEvent(params)
             sfs.dispatchEvent(evt)
 
         }
@@ -600,7 +627,7 @@ package it.gotoandplay.smartfoxserver.handlers
             // Remove reference from main room list
             delete roomList[roomId]
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onRoomDeleted, params)
+            var evt:TypedSFSEvent = new RoomDeletedEvent(params)
             sfs.dispatchEvent(evt)
         }
 
@@ -613,7 +640,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var params:Object = {}
             params.key = key
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onRandomKey, params)
+            var evt:TypedSFSEvent = new RandomKeyEvent(params)
             sfs.dispatchEvent(evt)
         }
 
@@ -626,7 +653,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var params:Object = {}
             params.elapsed = res
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onRoundTripResponse, params)
+            var evt:TypedSFSEvent = new RoundTripResponseEvent(params)
             sfs.dispatchEvent(evt)
         }
 
@@ -638,7 +665,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var params:Object = {}
             params.error = errMsg
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onCreateRoomError, params)
+            var evt:TypedSFSEvent = new CreateRoomErrorEvent(params)
             sfs.dispatchEvent(evt)
         }
 
@@ -648,7 +675,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var myVars:XMLList = o.body.mv
             var buddy:Object
             var params:Object = {}
-            var evt:SFSEvent = null
+            var evt:TypedSFSEvent = null
 
             /*
              * Get my buddy variables
@@ -691,7 +718,7 @@ package it.gotoandplay.smartfoxserver.handlers
 
                 // Fire event!
                 params.list = sfs.buddyList
-                evt = new SFSEvent(SFSEvent.onBuddyList, params)
+                evt = new BuddyListEvent(params)
                 sfs.dispatchEvent(evt)
             }
 
@@ -700,7 +727,7 @@ package it.gotoandplay.smartfoxserver.handlers
             {
                 // Fire event!
                 params.error = o.body.err.toString()
-                evt = new SFSEvent(SFSEvent.onBuddyListError, params)
+                evt = new BuddyListErrorEvent(params)
                 sfs.dispatchEvent(evt)
             }
         }
@@ -709,14 +736,14 @@ package it.gotoandplay.smartfoxserver.handlers
         private function handleBuddyListUpdate(o:Object):void
         {
             var params:Object = {}
-            var evt:SFSEvent = null
+            var evt:TypedSFSEvent = null
 
             // Catch Buddy List load error!
             if (o.body.err.toString().length > 0)
             {
                 // Fire event!
                 params.error = o.body.err.toString()
-                evt = new SFSEvent(SFSEvent.onBuddyListError, params)
+                evt = new BuddyListErrorEvent(params)
                 sfs.dispatchEvent(evt)
 
                 // Stop here
@@ -767,7 +794,7 @@ package it.gotoandplay.smartfoxserver.handlers
                 {
                     params.buddy = buddy
 
-                    evt = new SFSEvent(SFSEvent.onBuddyListUpdate, params)
+                    evt = new BuddyListUpdateEvent(params)
                     sfs.dispatchEvent(evt)
                 }
             }
@@ -783,7 +810,7 @@ package it.gotoandplay.smartfoxserver.handlers
             if (o.body.txt != undefined)
                 params.message = Entities.decodeEntities(o.body.txt)
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onBuddyPermissionRequest, params)
+            var evt:TypedSFSEvent = new BuddyPermissionRequestEvent(params)
             sfs.dispatchEvent(evt)
         }
 
@@ -813,7 +840,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var params:Object = {}
             params.list = sfs.buddyList
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onBuddyList, params)
+            var evt:TypedSFSEvent = new BuddyListEvent(params)
             sfs.dispatchEvent(evt)
         }
 
@@ -835,7 +862,7 @@ package it.gotoandplay.smartfoxserver.handlers
                     var params:Object = {}
                     params.list = sfs.buddyList
 
-                    var evt:SFSEvent = new SFSEvent(SFSEvent.onBuddyList, params)
+                    var evt:TypedSFSEvent = new BuddyListEvent(params)
                     sfs.dispatchEvent(evt)
 
                     break
@@ -856,7 +883,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var params:Object = {}
             params.idList = ids
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onBuddyRoom, params)
+            var evt:TypedSFSEvent = new BuddyRoomEvent(params)
             sfs.dispatchEvent(evt)
         }
 
@@ -872,7 +899,7 @@ package it.gotoandplay.smartfoxserver.handlers
             if (room != null)
                 room.clearUserList();
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onRoomLeft, params)
+            var evt:TypedSFSEvent = new RoomLeftEvent(params)
             sfs.dispatchEvent(evt)
         }
 
@@ -916,7 +943,7 @@ package it.gotoandplay.smartfoxserver.handlers
             params.room = theRoom
             params.userId = userId;
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onSpectatorSwitched, params)
+            var evt:TypedSFSEvent = new SpectatorSwitchedEvent(params)
             sfs.dispatchEvent(evt)
         }
 
@@ -959,7 +986,7 @@ package it.gotoandplay.smartfoxserver.handlers
             params.room = theRoom;
             params.userId = userId;
 
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onPlayerSwitched, params);
+            var evt:TypedSFSEvent = new PlayerSwitchedEvent(params)
             sfs.dispatchEvent(evt);
         }
 
@@ -1006,7 +1033,7 @@ package it.gotoandplay.smartfoxserver.handlers
 
         public function dispatchDisconnection():void
         {
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onConnectionLost, null)
+            var evt:TypedSFSEvent = new ConnectionLostEvent()
             sfs.dispatchEvent(evt)
         }
 

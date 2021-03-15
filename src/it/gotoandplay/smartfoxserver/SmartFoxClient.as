@@ -23,6 +23,13 @@ package it.gotoandplay.smartfoxserver
     import it.gotoandplay.smartfoxserver.util.Entities;
     import it.gotoandplay.smartfoxserver.http.HttpConnection;
     import it.gotoandplay.smartfoxserver.http.HttpEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.BuddyListEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.BuddyListUpdateEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ConfigLoadSuccessEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ConfigLoadFailureEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.DebugMessageEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionLostEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionEvent;
 
     
     
@@ -907,7 +914,7 @@ package it.gotoandplay.smartfoxserver
             var params:Object = {}
             params.list = buddyList
             
-            var evt:SFSEvent = new SFSEvent(SFSEvent.onBuddyList, params)
+            var evt:TypedSFSEvent = new BuddyListEvent(params)
             dispatchEvent(evt)
         }
         
@@ -1650,7 +1657,7 @@ package it.gotoandplay.smartfoxserver
                 var params:Object = {}
                 params.list = buddyList
                 
-                var evt:SFSEvent = new SFSEvent(SFSEvent.onBuddyList, params)
+                var evt:TypedSFSEvent = new BuddyListEvent(params)
                 dispatchEvent(evt)
             }
         }
@@ -2084,7 +2091,7 @@ package it.gotoandplay.smartfoxserver
                     var params:Object = {}
                     params.buddy = b
                     
-                    var evt:SFSEvent = new SFSEvent(SFSEvent.onBuddyListUpdate, params)
+                    var evt:TypedSFSEvent = new BuddyListUpdateEvent(params)
                     dispatchEvent(evt)
                     
                 }
@@ -2553,7 +2560,7 @@ package it.gotoandplay.smartfoxserver
             else
             {
                 // Dispatch onConfigLoadSuccess event
-                var sfsEvt:SFSEvent = new SFSEvent( SFSEvent.onConfigLoadSuccess, {} )
+                var sfsEvt:TypedSFSEvent = new ConfigLoadSuccessEvent()
                 dispatchEvent( sfsEvt )
             }
         }
@@ -2561,7 +2568,7 @@ package it.gotoandplay.smartfoxserver
         private function onConfigLoadFailure( evt:IOErrorEvent ):void
         {
             var params:Object = { message:evt.text }
-            var sfsEvt:SFSEvent = new SFSEvent( SFSEvent.onConfigLoadFailure, params )
+            var sfsEvt:TypedSFSEvent = new ConfigLoadFailureEvent(params)
             
             dispatchEvent( sfsEvt )
         }
@@ -2592,7 +2599,8 @@ package it.gotoandplay.smartfoxserver
             {
                 trace(message)
                 
-                var evt:SFSEvent = new SFSEvent(SFSEvent.onDebugMessage, {message:message})
+                var params:Object = { message:message }
+                var evt:TypedSFSEvent = new DebugMessageEvent(params)
                 dispatchEvent(evt)
             }
         }
@@ -2861,8 +2869,8 @@ package it.gotoandplay.smartfoxserver
             initialize()
 
             // Fire event
-            var sfse:SFSEvent = new SFSEvent(SFSEvent.onConnectionLost, {})
-            dispatchEvent(sfse)
+            var sfsEvt:TypedSFSEvent = new ConnectionLostEvent()
+            dispatchEvent(sfsEvt)
         }
         
         private function handleHttpData(evt:HttpEvent):void
@@ -2933,8 +2941,8 @@ package it.gotoandplay.smartfoxserver
             initialize()
             
             // Fire event
-            var sfse:SFSEvent = new SFSEvent(SFSEvent.onConnectionLost, {})
-            dispatchEvent(sfse)
+            var sfsEvt:TypedSFSEvent = new ConnectionLostEvent()
+            dispatchEvent(sfsEvt)
         }
         
         private function handleIOError(evt:IOErrorEvent):void
@@ -3031,8 +3039,8 @@ package it.gotoandplay.smartfoxserver
             params.success = false
             params.error = "I/O Error"
     
-            var sfse:SFSEvent = new SFSEvent(SFSEvent.onConnection, params)
-            dispatchEvent(sfse)
+            var evt:TypedSFSEvent = new ConnectionEvent(params)
+            dispatchEvent(evt)
         }
     }
 }
