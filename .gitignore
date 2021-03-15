@@ -1,4 +1,6 @@
 .vscode/settings.json
+*.code-workspace
+!r3.code-workspace
 bin/
 node_modules/
 package-lock.json
