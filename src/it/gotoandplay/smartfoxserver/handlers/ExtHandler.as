@@ -2,7 +2,7 @@ package it.gotoandplay.smartfoxserver.handlers
 {
     import it.gotoandplay.smartfoxserver.SmartFoxClient;
     import it.gotoandplay.smartfoxserver.util.ObjectSerializer;
-    import it.gotoandplay.smartfoxserver.SFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ExtensionResponseEvent;
 
     /**
      * ExtHandler class.
@@ -30,7 +30,7 @@ package it.gotoandplay.smartfoxserver.handlers
         public function handleMessage(msgObj:Object, type:String):void
         {
             var params:Object
-            var evt:SFSEvent
+            var evt:ExtensionResponseEvent
 
             if (type == SmartFoxClient.XTMSG_TYPE_XML)
             {
@@ -46,9 +46,9 @@ package it.gotoandplay.smartfoxserver.handlers
                     // Fire event!
                     params = {}
                     params.dataObj = asObj
-                    params.type = type
+                    params.protocol = type
 
-                    evt = new SFSEvent(SFSEvent.onExtensionResponse, params)
+                    evt = new ExtensionResponseEvent(params)
                     sfs.dispatchEvent(evt)
                 }
             }
@@ -58,9 +58,9 @@ package it.gotoandplay.smartfoxserver.handlers
                 // Fire event!
                 params = {}
                 params.dataObj = msgObj.o
-                params.type = type
+                params.protocol = type
 
-                evt = new SFSEvent(SFSEvent.onExtensionResponse, params)
+                evt = new ExtensionResponseEvent(params)
                 sfs.dispatchEvent(evt)
             }
 
@@ -69,9 +69,9 @@ package it.gotoandplay.smartfoxserver.handlers
                 // Fire event!
                 params = {}
                 params.dataObj = msgObj
-                params.type = type
+                params.protocol = type
 
-                evt = new SFSEvent(SFSEvent.onExtensionResponse, params)
+                evt = new ExtensionResponseEvent(params)
                 sfs.dispatchEvent(evt)
             }
         }

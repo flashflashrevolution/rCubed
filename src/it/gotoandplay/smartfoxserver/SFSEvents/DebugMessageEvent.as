@@ -4,13 +4,13 @@ package it.gotoandplay.smartfoxserver.SFSEvents
     import it.gotoandplay.smartfoxserver.TypedSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvent;
 
-    public class AdminMessageEvent extends TypedSFSEvent
+    public class DebugMessageEvent extends TypedSFSEvent
     {
         public var message:String;
 
-        public function AdminMessageEvent(params:Object)
+        public function DebugMessageEvent(params:Object)
         {
-            super(SFSEvent.onAdminMessage);
+            super(SFSEvent.onDebugMessage);
             message = params.message;
         }
     }

@@ -5,6 +5,7 @@ package com.flashfla.utils
     import it.gotoandplay.smartfoxserver.SFSEvent
     import it.gotoandplay.smartfoxserver.data.Room
     import it.gotoandplay.smartfoxserver.data.User
+    import it.gotoandplay.smartfoxserver.SFSEvents.ExtensionResponseEvent;
 
     public class SmartFox extends EventDispatcher
     {
@@ -41,7 +42,7 @@ package com.flashfla.utils
                 // IRRFUSCATOR_ignorebegin
                 _sfs.addEventListener(SFSEvent.onConnection, onSFSEvent);
                 _sfs.addEventListener(SFSEvent.onConnectionLost, onSFSEvent);
-                _sfs.addEventListener(SFSEvent.onExtensionResponse, onSFSEvent);
+                _sfs.addEventListener(SFSEvent.onExtensionResponse, onExtension);
                 _sfs.addEventListener(SFSEvent.onRoomListUpdate, onSFSEvent);
                 _sfs.addEventListener(SFSEvent.onJoinRoom, onSFSEvent);
                 _sfs.addEventListener(SFSEvent.onJoinRoomError, onSFSEvent);
@@ -86,10 +87,6 @@ package com.flashfla.utils
             {
                 case SFSEvent.onConnection:
                     onConnection(evt);
-                    break;
-
-                case SFSEvent.onExtensionResponse:
-                    onExtension(evt);
                     break;
 
                 case SFSEvent.onRoomListUpdate:
@@ -157,9 +154,9 @@ package com.flashfla.utils
         /*
          * Handler login event
          */
-        private function onLogin(evt:SFSEvent):void
+        private function onLogin(evt:ExtensionResponseEvent):void
         {
-            var obj:Object = evt.params.dataObj;
+            var obj:Object = evt.dataObj;
             var ok:Boolean = obj._cmd == "logOK";
             if (ok)
             {
@@ -254,15 +251,16 @@ package com.flashfla.utils
         /*
          * Handles Extension events
          */
-        private function onExtension(evt:SFSEvent):void
+        private function onExtension(evt:ExtensionResponseEvent):void
         {
-            var obj:Object = evt.params.dataObj;
+            var obj:Object = evt.dataObj;
             var _cmd:String = obj._cmd;
             if (obj != null)
             {
                 if (_cmd == "logOK" || _cmd == "logKO")
                 {
                     onLogin(evt);
+                    this.dispatchEvent(evt);
                 }
             }
         }

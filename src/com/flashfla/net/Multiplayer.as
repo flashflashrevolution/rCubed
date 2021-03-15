@@ -12,6 +12,8 @@ package com.flashfla.net
 
     import arc.ArcGlobals;
     import classes.Playlist;
+    import it.gotoandplay.smartfoxserver.SFSEvents.AdminMessageEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ExtensionResponseEvent;
 
     public class Multiplayer extends EventDispatcher
     {
@@ -967,9 +969,9 @@ package com.flashfla.net
             eventError("Create Room Failed: " + event.params.error);
         }
 
-        private function onExtensionResponse(event:SFSEvent):void
+        private function onExtensionResponse(event:ExtensionResponseEvent):void
         {
-            var data:Object = event.params.dataObj;
+            var data:Object = event.dataObj;
             switch (data._cmd)
             {
                 case "logOK":
@@ -1025,9 +1027,9 @@ package com.flashfla.net
             eventLogin();
         }
 
-        private function onAdminMessage(event:SFSEvent):void
+        private function onAdminMessage(event:AdminMessageEvent):void
         {
-            eventServerMessage(htmlUnescape(event.params.message));
+            eventServerMessage(htmlUnescape(event.message));
         }
 
         private function onModeratorMessage(event:SFSEvent):void
