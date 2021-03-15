@@ -28,6 +28,7 @@ R^3 is the third and latest game engine for **[Flash Flash Revolution](http://ww
     - [Fork the Repo](#fork-the-repo)
     - [Configure Git](#configure-git)
     - [Clone your Repo](#clone-your-repo)
+    - [Create custom Workspace](#create-custom-workspace)
     - [Install Workspace Extensions](#install-workspace-extensions)
     - [Use AIR SDK](#use-air-sdk)
     - [Build Fonts](#build-fonts)
@@ -41,14 +42,14 @@ R^3 is the third and latest game engine for **[Flash Flash Revolution](http://ww
 
 ## Getting Started
 
-These instructions will get you a copy of the R^3 Engine up and running on **Windows** for development and testing purposes  (Mac and Linux are not supported).
+These instructions will get you a copy of the R^3 Engine up and running on **Windows** for development and testing purposes (Mac and Linux are not supported).
 
 ### Prerequisites
 
 - [Visual Studio Code](https://code.visualstudio.com/Download)
 - [Git for Windows](https://git-scm.com/download/win)
 - [Java Runtime Environment](https://java.com/en/download/)
-- [Adobe AIR SDK & Compiler](https://www.adobe.com/devnet/air/air-sdk-download.html) *(v32.0.0.116 is the final Adobe release)*
+- [Adobe AIR SDK & Compiler](http://airdownload.adobe.com/air/win/download/32.0/AIRSDK_Compiler.zip) *(v32.0.0.116 is the final Adobe release)*
   - Extract the contents of the zip folder to your computer
 
 ### Fork the Repo
@@ -73,9 +74,16 @@ Next you'll need to clone your forked repo to your computer:
   - Enter `https://github.com/YOUR_GITHUB_USERNAME/rCubed.git`.
 - If successful, a popup will prompt you to open the cloned repo.
 
+### Create custom Workspace
+
+In order to setup the SDK path locally in a later step, you'll create a custom workspace from the template.
+
+- Make a copy of the `r3.code-workspace` file alongside it, in the root folder.
+- Rename the new workspace to anything else but keep the same extension (for example `my-workspace.code-workspace`).
+
 ### Install Workspace Extensions
 
-- Open the `r3.code-workspace` file.
+- Open your workspace file.
 - A popup will prompt you to automatically install the recommended extensions (You can install them manually by pressing <kbd>CTRL+SHIFT+X</kbd> and searching).
   - [ActionScript & MXML](vscode:extension/bowlerhatllc.vscode-nextgenas)
   - [Actionscript Tools](vscode:extension/lonewolf.vscode-astools)
@@ -115,7 +123,7 @@ To contact a member of the FFR development team:
 
 - Join the [FFR Discord](https://discord.gg/ffr) and post in the #dev-chitchat channel.
 - [Open an issue](https://github.com/flashflashrevolution/rCubed/issues/new/choose) on GitHub.
-- [Private message](http://www.flashflashrevolution.com/team/)  a developer on FFR.
+- [Private message](http://www.flashflashrevolution.com/team/) a developer on FFR.
 
 <!-- URL Shortlinks -->
 
@@ -132,7 +140,6 @@ To contact a member of the FFR development team:
 <!-- Image Shortlinks -->
 
 [fork-icon]: https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/svg/repo-forked.svg
-
 
 ## Contributors ✨
 
@@ -170,4 +177,5 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- prettier-ignore-end -->
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors)
+specification. Contributions of any kind welcome!
