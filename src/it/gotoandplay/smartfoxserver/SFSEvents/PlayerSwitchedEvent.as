@@ -9,6 +9,7 @@ package it.gotoandplay.smartfoxserver.SFSEvents
     {
         public var success:String;
         public var newId:int;
+        public var userId:int;
         public var room:Room;
 
         public function PlayerSwitchedEvent(params:Object)
@@ -16,6 +17,7 @@ package it.gotoandplay.smartfoxserver.SFSEvents
             super(SFSEvent.onPlayerSwitched);
             success = params.success;
             newId = params.newId;
+            userId = params.userId;
             room = params.room;
         }
     }

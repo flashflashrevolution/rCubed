@@ -1066,14 +1066,14 @@ package com.flashfla.net
             if (event.success)
             {
                 var room:Object = getRoom(event.room);
-                var user:Object = getUser(event.room, (event as Object).userId);
+                var user:Object = getUser(event.room, event.userId);
                 if (user.userID == currentUser.userID)
                     clearRoomPlayer(room);
                 updateRoom(event.room);
                 eventRoomUserStatus(room, user);
             }
             // TODO: Check userId
-            else if ((event as Object).userId == currentUser.userID)
+            else if (event.userId == currentUser.userID)
             {
                 eventError("Spectate Failed");
             }
@@ -1084,13 +1084,13 @@ package com.flashfla.net
             if (event.success)
             {
                 var room:Object = getRoom(event.room);
-                var user:Object = getUser(event.room, (event as *).userId);
+                var user:Object = getUser(event.room, event.userId);
                 updateRoom(event.room);
                 if (user.userID == currentUser.userID)
                     setRoomPlayer(room);
                 eventRoomUserStatus(room, user);
             }
-            else if ((event as *).userId == currentUser.userID)
+            else if (event.userId == currentUser.userID)
             {
                 eventError("Join Failed");
             }
@@ -1098,13 +1098,12 @@ package com.flashfla.net
 
         private function onPrivateMessage(event:PrivateMessageEvent):void
         {
-            if (event.sender.getId() == currentUser.userID)
+            if (event.userId == currentUser.userID)
                 return; // XXX: Ignore PM events sent by yourself because they don't include the recipient for some stupid reason
             var room:Room = server.getRoom(event.roomId);
             var user:User = event.sender;
-            // TODO: Weird check ? Events didn't seem to hold `userId``
             if (user == null)
-                user = room.getUser(event.sender.getVariable("userId"));
+                user = room.getUser(event.userId);
             eventMessage(MESSAGE_PRIVATE, getRoom(room), getUser(room, user), htmlUnescape(event.message));
         }
 
@@ -1113,7 +1112,7 @@ package com.flashfla.net
             var room:Room = server.getRoom(event.roomId);
             var user:User = event.sender;
             if (user == null)
-                user = room.getUser(event.sender.getVariable("userId"));
+                user = room.getUser(event.userId);
             eventMessage(MESSAGE_PUBLIC, getRoom(room), getUser(room, user), htmlUnescape(event.message));
         }
 

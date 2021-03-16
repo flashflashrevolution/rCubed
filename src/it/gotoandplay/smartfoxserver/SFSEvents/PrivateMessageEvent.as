@@ -9,6 +9,7 @@ package it.gotoandplay.smartfoxserver.SFSEvents
     {
         public var message:String;
         public var sender:User;
+        public var userId:int;
         public var roomId:int;
 
         public function PrivateMessageEvent(params:Object)
@@ -16,6 +17,7 @@ package it.gotoandplay.smartfoxserver.SFSEvents
             super(SFSEvent.onPrivateMessage);
             message = params.message;
             sender = params.sender;
+            userId = params.userId;
             roomId = params.roomId;
         }
     }
