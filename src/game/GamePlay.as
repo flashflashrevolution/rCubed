@@ -45,13 +45,13 @@ package game
     import game.controls.NoteBox;
     import game.controls.PAWindow;
     import game.controls.Score;
-    import it.gotoandplay.smartfoxserver.SFSEvent;
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import sql.SQLSongDetails;
     import flash.display.BitmapData;
     import flash.display.Bitmap;
     import com.flashfla.net.events.GameUpdateEvent;
+    import com.flashfla.net.events.GameResultsEvent;
 
     public class GamePlay extends MenuPanel
     {
@@ -2205,12 +2205,12 @@ package game
 
         private var multiplayerResults:Array = new Array();
 
-        public function onMultiplayerUpdate(event:SFSEvent):void
+        public function onMultiplayerUpdate(event:GameUpdateEvent):void
         {
-            var user:Object = event.params.user;
+            var user:Object = event.user;
             var data:Object = user.gameplay;
 
-            if (options.multiplayer != event.params.room || !data || user.userID == options.multiplayer.connection.currentUser.userID)
+            if (options.multiplayer != event.room || !data || user.userID == options.multiplayer.connection.currentUser.userID)
                 return;
 
             var diff:Object = multiplayerDiff(user.playerID, data);
@@ -2250,9 +2250,9 @@ package game
             }
         }
 
-        public function onMultiplayerResults(event:SFSEvent):void
+        public function onMultiplayerResults(event:GameResultsEvent):void
         {
-            if (event.params.room == options.multiplayer)
+            if (event.room == options.multiplayer)
                 GAME_STATE = GAME_END;
         }
 

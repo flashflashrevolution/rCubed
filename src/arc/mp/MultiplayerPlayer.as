@@ -6,7 +6,9 @@ package arc.mp
     import flash.display.DisplayObjectContainer;
     import flash.events.Event;
     import flash.events.MouseEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvent;
+    import com.flashfla.net.events.RoomUpdateEvent;
+    import com.flashfla.net.events.RoomUserEvent;
+    import com.flashfla.net.events.RoomUserStatusEvent;
 
     public class MultiplayerPlayer extends Panel
     {
@@ -50,19 +52,19 @@ package arc.mp
             height = comboLabel.y + comboLabel.height;
             width = 150;
 
-            connection.addEventListener(Multiplayer.EVENT_ROOM_UPDATE, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_ROOM_UPDATE, function(event:RoomUpdateEvent):void
             {
-                if (event.params.room == room)
+                if (event.room == room)
                     redraw();
             });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_USER, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_ROOM_USER, function(event:RoomUserEvent):void
             {
-                if (event.params.room == room)
+                if (event.room == room)
                     redraw();
             });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, function(event:RoomUserStatusEvent):void
             {
-                if (event.params.room == room)
+                if (event.room == room)
                     redraw();
             });
 

@@ -9,8 +9,11 @@ package arc.mp
     import flash.display.DisplayObjectContainer;
     import flash.events.Event;
     import flash.events.MouseEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvent;
     import menu.MainMenu;
+    import com.flashfla.net.events.GameStartEvent;
+    import com.flashfla.net.events.ConnectionEvent;
+    import com.flashfla.net.events.RoomLeftEvent;
+    import com.flashfla.net.events.RoomUpdateEvent;
 
     public class MultiplayerRoom extends Window
     {
@@ -77,24 +80,24 @@ package arc.mp
             });
             addChild(controlSpectate);
 
-            connection.addEventListener(Multiplayer.EVENT_GAME_START, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_GAME_START, function(event:GameStartEvent):void
             {
-                if (spectating && event.params.room == room && !room.user.isPlayer && GlobalVariables.instance.gameMain.activePanel is MainMenu)
+                if (spectating && event.room == room && !room.user.isPlayer && GlobalVariables.instance.gameMain.activePanel is MainMenu)
                     MultiplayerSingleton.getInstance().spectateGame(room);
             });
 
             connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, onRoomUpdate);
             connection.addEventListener(Multiplayer.EVENT_ROOM_USER, onRoomUpdate);
 
-            connection.addEventListener(Multiplayer.EVENT_CONNECTION, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_CONNECTION, function(event:ConnectionEvent):void
             {
                 if (!connection.connected)
                     room = null;
             });
 
-            connection.addEventListener(Multiplayer.EVENT_ROOM_LEFT, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_ROOM_LEFT, function(event:RoomLeftEvent):void
             {
-                if (event.params.room == room)
+                if (event.room == room)
                 {
                     if (self.parent == parent)
                         parent.removeChild(self);
@@ -141,9 +144,9 @@ package arc.mp
             controlChat.redraw(true);
         }
 
-        private function onRoomUpdate(event:SFSEvent):void
+        private function onRoomUpdate(event:RoomUpdateEvent):void
         {
-            if (event.params.room == room)
+            if (event.room == room)
                 controlSpectate.label = room.user.isPlayer ? "Spectate" : (room.playerCount < 2 ? "Join Game" : (spectating ? "Stop Spectating" : "Start Spectating"));
         }
     }
