@@ -51,6 +51,7 @@ package game
     import sql.SQLSongDetails;
     import flash.display.BitmapData;
     import flash.display.Bitmap;
+    import com.flashfla.net.events.GameUpdateEvent;
 
     public class GamePlay extends MenuPanel
     {
@@ -2104,7 +2105,7 @@ package game
 
             if (options.multiplayer)
             {
-                dispatchEvent(new SFSEvent(Multiplayer.EVENT_GAME_UPDATE, {gameScore: gameScore,
+                dispatchEvent(new GameUpdateEvent({gameScore: gameScore,
                         gameLife: gameLife,
                         hitMaxCombo: hitMaxCombo,
                         hitCombo: hitCombo,

@@ -6,12 +6,12 @@ package com.flashfla.net.events
 
     public class RoomLeftEvent extends TypedSFSEvent
     {
-        public var message:String;
+        public var room:Object;
 
         public function RoomLeftEvent(params:Object)
         {
             super(Multiplayer.EVENT_ROOM_LEFT);
-            message = params.message;
+            room = params.room;
         }
     }
 }

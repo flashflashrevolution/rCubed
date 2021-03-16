@@ -6,12 +6,9 @@ package com.flashfla.net.events
 
     public class RoomListEvent extends TypedSFSEvent
     {
-        public var message:String;
-
-        public function RoomListEvent(params:Object)
+        public function RoomListEvent()
         {
             super(Multiplayer.EVENT_ROOM_LIST);
-            message = params.message;
         }
     }
 }

@@ -6,12 +6,9 @@ package com.flashfla.net.events
 
     public class LoginEvent extends TypedSFSEvent
     {
-        public var message:String;
-
-        public function LoginEvent(params:Object)
+        public function LoginEvent()
         {
             super(Multiplayer.EVENT_LOGIN);
-            message = params.message;
         }
     }
 }

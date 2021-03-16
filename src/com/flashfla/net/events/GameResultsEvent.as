@@ -6,12 +6,12 @@ package com.flashfla.net.events
 
     public class GameResultsEvent extends TypedSFSEvent
     {
-        public var message:String;
+        public var room:Object;
 
         public function GameResultsEvent(params:Object)
         {
             super(Multiplayer.EVENT_GAME_RESULTS);
-            message = params.message;
+            room = params.room;
         }
     }
 }

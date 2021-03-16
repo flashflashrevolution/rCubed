@@ -6,12 +6,16 @@ package com.flashfla.net.events
 
     public class RoomUpdateEvent extends TypedSFSEvent
     {
-        public var message:String;
+        public var room:Object;
+        public var roomList:Boolean;
+        public var changed:Array;
 
         public function RoomUpdateEvent(params:Object)
         {
             super(Multiplayer.EVENT_ROOM_UPDATE);
-            message = params.message;
+            room = params.room;
+            roomList = params.roomList;
+            changed = params.changed;
         }
     }
 }

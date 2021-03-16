@@ -6,12 +6,14 @@ package com.flashfla.net.events
 
     public class RoomUserStatusEvent extends TypedSFSEvent
     {
-        public var message:String;
+        public var user:Object;
+        public var room:Object;
 
         public function RoomUserStatusEvent(params:Object)
         {
             super(Multiplayer.EVENT_ROOM_USER_STATUS);
-            message = params.message;
+            user = params.user;
+            room = params.room;
         }
     }
 }

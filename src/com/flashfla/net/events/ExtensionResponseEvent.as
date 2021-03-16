@@ -6,12 +6,12 @@ package com.flashfla.net.events
 
     public class ExtensionResponseEvent extends TypedSFSEvent
     {
-        public var message:String;
+        public var data:Object;
 
         public function ExtensionResponseEvent(params:Object)
         {
             super(Multiplayer.EVENT_XT_RESPONSE);
-            message = params.message;
+            data = params.data;
         }
     }
 }

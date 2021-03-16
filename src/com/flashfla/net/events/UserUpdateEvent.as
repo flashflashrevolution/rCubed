@@ -6,12 +6,14 @@ package com.flashfla.net.events
 
     public class UserUpdateEvent extends TypedSFSEvent
     {
-        public var message:String;
+        public var user:Object;
+        public var changed:Array;
 
         public function UserUpdateEvent(params:Object)
         {
             super(Multiplayer.EVENT_USER_UPDATE);
-            message = params.message;
+            user = params.user;
+            changed = params.changed;
         }
     }
 }
