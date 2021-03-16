@@ -28,6 +28,7 @@ package arc.mp
     import com.flashfla.net.events.GameResultsEvent;
     import com.flashfla.net.events.GameStartEvent;
     import com.flashfla.net.events.GameUpdateEvent;
+    import com.flashfla.net.events.RoomUserStatusEvent;
 
     public class MultiplayerSingleton extends Object
     {
@@ -89,7 +90,7 @@ package arc.mp
             connection.addEventListener(Multiplayer.EVENT_ROOM_JOINED, onRoomJoined);
             connection.addEventListener(Multiplayer.EVENT_ROOM_LEFT, onRoomLeft);
             connection.addEventListener(Multiplayer.EVENT_ROOM_USER, onRoomUser);
-            connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, onRoomUser);
+            connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, onRoomUserStatus);
             connection.addEventListener(Multiplayer.EVENT_MESSAGE, onMessage);
             connection.addEventListener(Multiplayer.EVENT_GAME_RESULTS, onGameResults);
             connection.addEventListener(Multiplayer.EVENT_GAME_START, onGameStart);
@@ -145,10 +146,18 @@ package arc.mp
 
         private function onRoomUser(event:RoomUserEvent):void
         {
-            var room:Object = event.room;
-            var user:Object = event.user;
+            updateRoomUser(event.room, event.user);
+        }
+
+        private function onRoomUserStatus(event:RoomUserStatusEvent):void
+        {
+            updateRoomUser(event.room, event.user);
+        }
+
+        private function updateRoomUser(room:Object, user:Object):void
+        {
             if (user.room == room && user.userID != connection.currentUser.userID && room.user.isPlayer && user.isPlayer && room.isGame)
-                _gvars.gameMain.addAlert("A Challenger Appears! " + event.user.userName);
+                _gvars.gameMain.addAlert("A Challenger Appears! " + user.userName);
         }
 
         private function onMessage(event:MessageEvent):void

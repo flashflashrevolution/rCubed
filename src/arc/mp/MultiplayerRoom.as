@@ -13,7 +13,8 @@ package arc.mp
     import com.flashfla.net.events.GameStartEvent;
     import com.flashfla.net.events.ConnectionEvent;
     import com.flashfla.net.events.RoomLeftEvent;
-    import com.flashfla.net.events.RoomUpdateEvent;
+    import com.flashfla.net.events.RoomUserEvent;
+    import com.flashfla.net.events.RoomUserStatusEvent;
 
     public class MultiplayerRoom extends Window
     {
@@ -86,8 +87,8 @@ package arc.mp
                     MultiplayerSingleton.getInstance().spectateGame(room);
             });
 
-            connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, onRoomUpdate);
-            connection.addEventListener(Multiplayer.EVENT_ROOM_USER, onRoomUpdate);
+            connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, onRoomUserStatus);
+            connection.addEventListener(Multiplayer.EVENT_ROOM_USER, onRoomUser);
 
             connection.addEventListener(Multiplayer.EVENT_CONNECTION, function(event:ConnectionEvent):void
             {
@@ -144,9 +145,19 @@ package arc.mp
             controlChat.redraw(true);
         }
 
-        private function onRoomUpdate(event:RoomUpdateEvent):void
+        private function onRoomUserStatus(event:RoomUserStatusEvent):void
         {
-            if (event.room == room)
+            updateRoom(event.room);
+        }
+
+        private function onRoomUser(event:RoomUserEvent):void
+        {
+            updateRoom(event.room);
+        }
+
+        private function updateRoom(roomToUpdate:Object):void
+        {
+            if (roomToUpdate == room)
                 controlSpectate.label = room.user.isPlayer ? "Spectate" : (room.playerCount < 2 ? "Join Game" : (spectating ? "Stop Spectating" : "Start Spectating"));
         }
     }

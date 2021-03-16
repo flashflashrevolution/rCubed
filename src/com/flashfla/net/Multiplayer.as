@@ -50,6 +50,7 @@ package com.flashfla.net
     import com.flashfla.net.events.GameUpdateEvent;
     import com.flashfla.net.events.GameResultsEvent;
     import com.flashfla.net.events.ExtensionResponseEvent;
+    import com.flashfla.net.events.RoomUserStatusEvent;
 
     public class Multiplayer extends EventDispatcher
     {
@@ -916,7 +917,7 @@ package com.flashfla.net
 
         private function eventRoomUserStatus(room:Object, user:Object):void
         {
-            dispatchEvent(new RoomUserEvent({room: room, user: user}));
+            dispatchEvent(new RoomUserStatusEvent({room: room, user: user}));
         }
 
         private function eventRoomJoined(room:Object):void
