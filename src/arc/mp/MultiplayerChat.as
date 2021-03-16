@@ -13,7 +13,14 @@ package arc.mp
     import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
     import flash.ui.Keyboard;
-    import it.gotoandplay.smartfoxserver.SFSEvent;
+    import com.flashfla.net.events.ServerMessageEvent;
+    import com.flashfla.net.events.ExtensionResponseEvent;
+    import com.flashfla.net.events.MessageEvent;
+    import com.flashfla.net.events.RoomUserEvent;
+    import com.flashfla.net.events.ConnectionEvent;
+    import com.flashfla.net.events.LoginEvent;
+    import com.flashfla.net.events.RoomJoinedEvent;
+    import com.flashfla.net.events.GameResultsEvent;
 
     public class MultiplayerChat extends Component
     {
@@ -58,14 +65,14 @@ package arc.mp
             });
             addChild(controlInput);
 
-            connection.addEventListener(Multiplayer.EVENT_SERVER_MESSAGE, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_SERVER_MESSAGE, function(event:ServerMessageEvent):void
             {
-                textAreaAddLine(textFormatServerMessage(event.params.user, event.params.message));
+                textAreaAddLine(textFormatServerMessage(event.user, event.message));
             });
-            connection.addEventListener(Multiplayer.EVENT_XT_RESPONSE, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_XT_RESPONSE, function(event:ExtensionResponseEvent):void
             {
                 //textAreaAddLine(textFormatServerMessage(event.params.user, event.params.message));
-                var data:Object = event.params.data;
+                var data:Object = event.data;
                 if (data.rid == room)
                 {
                     if (data._cmd == "html_message")
@@ -74,40 +81,40 @@ package arc.mp
                     }
                 }
             });
-            connection.addEventListener(Multiplayer.EVENT_MESSAGE, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_MESSAGE, function(event:MessageEvent):void
             {
-                if (event.params.type == Multiplayer.MESSAGE_PUBLIC)
+                if (event.msgType == Multiplayer.MESSAGE_PUBLIC)
                 {
-                    if (event.params.room == room)
-                        textAreaAddLine(textFormatMessage(event.params.user, event.params.message));
+                    if (event.room == room)
+                        textAreaAddLine(textFormatMessage(event.user, event.message));
                 }
-                else if (event.params.room == null || event.params.room == room)
-                    textAreaAddLine(textFormatPrivateMessageIn(event.params.user, event.params.message));
+                else if (event.room == null || event.room == room)
+                    textAreaAddLine(textFormatPrivateMessageIn(event.user, event.message));
             });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_USER, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_ROOM_USER, function(event:RoomUserEvent):void
             {
                 // Broadcast join/left message in rooms, do not broadcast in lobby
                 // Add "&& event.params.user.room != null" to omit "has left" messages
-                if (room != null && room.name != "Lobby" && event.params.room == room)
-                    textAreaAddLine(textFormatUser(event.params.user, event.params.user.room != null));
+                if (room != null && room.name != "Lobby" && event.room == room)
+                    textAreaAddLine(textFormatUser(event.user, event.user.room != null));
             });
-            connection.addEventListener(Multiplayer.EVENT_CONNECTION, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_CONNECTION, function(event:ConnectionEvent):void
             {
                 if (!connection.connected)
                     textAreaAddLine(textFormatDisconnect());
             });
-            connection.addEventListener(Multiplayer.EVENT_LOGIN, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_LOGIN, function(event:LoginEvent):void
             {
                 buildContextMenu();
             });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_JOINED, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_ROOM_JOINED, function(event:RoomJoinedEvent):void
             {
-                if (event.params.room == room)
-                    textAreaAddLine(textFormatJoin(event.params.room));
+                if (event.room == room)
+                    textAreaAddLine(textFormatJoin(event.room));
             });
-            connection.addEventListener(Multiplayer.EVENT_GAME_RESULTS, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_GAME_RESULTS, function(event:GameResultsEvent):void
             {
-                if (event.params.room == room)
+                if (event.room == room)
                     textAreaAddLine(textFormatGameResults(room));
             });
             GlobalVariables.instance.gameMain.addEventListener(Main.EVENT_PANEL_SWITCHED, checkRedraw);

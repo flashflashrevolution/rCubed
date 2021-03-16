@@ -12,29 +12,45 @@ package com.flashfla.net
 
     import arc.ArcGlobals;
     import classes.Playlist;
-    import it.gotoandplay.smartfoxserver.SFSEvents.AdminMessageEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.ExtensionResponseEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.DebugMessageEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.CreateRoomErrorEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.LogoutEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.ModerationMessageEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.PlayerSwitchedEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.SpectatorSwitchedEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.PrivateMessageEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.PublicMessageEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.RoomListUpdateEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.RoomVariablesUpdateEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.RoomAddedEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.RoomDeletedEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.RoomLeftEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomErrorEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.UserCountChangeEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.UserEnterRoomEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.UserLeaveRoomEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.UserVariablesUpdateEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionLostEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.AdminMessageSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ExtensionResponseSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.DebugMessageSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.CreateRoomErrorSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.LogoutSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ModerationMessageSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.PlayerSwitchedSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.SpectatorSwitchedSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.PrivateMessageSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.PublicMessageSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomListUpdateSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomVariablesUpdateSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomAddedSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomDeletedSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomLeftSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomErrorSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserCountChangeSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserEnterRoomSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserLeaveRoomSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserVariablesUpdateSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionLostSFSEvent;
+    import com.flashfla.net.events.ConnectionEvent;
+    import com.flashfla.net.events.LoginEvent;
+    import com.flashfla.net.events.ErrorEvent;
+    import com.flashfla.net.events.ServerMessageEvent;
+    import com.flashfla.net.events.MessageEvent;
+    import com.flashfla.net.events.RoomUserEvent;
+    import com.flashfla.net.events.RoomJoinedEvent;
+    import com.flashfla.net.events.RoomLeftEvent;
+    import com.flashfla.net.events.RoomUpdateEvent;
+    import com.flashfla.net.events.RoomListEvent;
+    import com.flashfla.net.events.UserUpdateEvent;
+    import com.flashfla.net.events.GameStartEvent;
+    import com.flashfla.net.events.GameUpdateEvent;
+    import com.flashfla.net.events.GameResultsEvent;
+    import com.flashfla.net.events.ExtensionResponseEvent;
+    import com.flashfla.net.events.RoomUserStatusEvent;
 
     public class Multiplayer extends EventDispatcher
     {
@@ -876,80 +892,80 @@ package com.flashfla.net
 
         private function eventError(message:String):void
         {
-            dispatchEvent(new SFSEvent(EVENT_ERROR, {message: message}));
+            dispatchEvent(new ErrorEvent({message: message}));
         }
 
         private function eventConnection():void
         {
-            dispatchEvent(new SFSEvent(EVENT_CONNECTION, {}));
+            dispatchEvent(new ConnectionEvent());
         }
 
         private function eventLogin():void
         {
-            dispatchEvent(new SFSEvent(EVENT_LOGIN, {}));
+            dispatchEvent(new LoginEvent());
         }
 
         private function eventServerMessage(message:String, user:Object = null):void
         {
-            dispatchEvent(new SFSEvent(EVENT_SERVER_MESSAGE, {message: stripMessage(message), user: user}));
+            dispatchEvent(new ServerMessageEvent({message: stripMessage(message), user: user}));
         }
 
         private function eventMessage(type:int, room:Object, user:Object, message:String):void
         {
-            dispatchEvent(new SFSEvent(EVENT_MESSAGE, {type: type, room: room, user: user, message: stripMessage(message)}));
+            dispatchEvent(new MessageEvent({msgType: type, room: room, user: user, message: stripMessage(message)}));
         }
 
         private function eventRoomUserStatus(room:Object, user:Object):void
         {
-            dispatchEvent(new SFSEvent(EVENT_ROOM_USER_STATUS, {room: room, user: user}));
+            dispatchEvent(new RoomUserStatusEvent({room: room, user: user}));
         }
 
         private function eventRoomJoined(room:Object):void
         {
-            dispatchEvent(new SFSEvent(EVENT_ROOM_JOINED, {room: room}));
+            dispatchEvent(new RoomJoinedEvent({room: room}));
         }
 
         private function eventRoomLeft(room:Object):void
         {
-            dispatchEvent(new SFSEvent(EVENT_ROOM_LEFT, {room: room}));
+            dispatchEvent(new RoomLeftEvent({room: room}));
         }
 
         private function eventRoomUpdate(room:Object, roomList:Boolean = false, changed:Array = null):void
         {
-            dispatchEvent(new SFSEvent(EVENT_ROOM_UPDATE, {room: room, roomList: roomList, changed: (changed || [])}));
+            dispatchEvent(new RoomUpdateEvent({room: room, roomList: roomList, changed: (changed || [])}));
         }
 
         private function eventRoomUser(room:Object, user:Object):void
         {
-            dispatchEvent(new SFSEvent(EVENT_ROOM_USER, {room: room, user: user}));
+            dispatchEvent(new RoomUserEvent({room: room, user: user}));
         }
 
         private function eventRoomList():void
         {
-            dispatchEvent(new SFSEvent(EVENT_ROOM_LIST, {}));
+            dispatchEvent(new RoomListEvent());
         }
 
         private function eventUserUpdate(user:Object, changed:Array = null):void
         {
-            dispatchEvent(new SFSEvent(EVENT_USER_UPDATE, {user: user, changed: (changed || [])}));
+            dispatchEvent(new UserUpdateEvent({user: user, changed: (changed || [])}));
         }
 
         private function eventGameStart(room:Object):void
         {
-            dispatchEvent(new SFSEvent(EVENT_GAME_START, {room: room}));
+            dispatchEvent(new GameStartEvent({room: room}));
         }
 
         private function eventGameUpdate(room:Object, user:Object):void
         {
-            dispatchEvent(new SFSEvent(EVENT_GAME_UPDATE, {room: room, user: user}));
+            dispatchEvent(new GameUpdateEvent({room: room, user: user}));
         }
 
         private function eventGameResults(room:Object):void
         {
-            dispatchEvent(new SFSEvent(EVENT_GAME_RESULTS, {room: room}));
+            dispatchEvent(new GameResultsEvent({room: room}));
         }
 
-        private function onConnection(event:ConnectionEvent):void
+        private function onConnection(event:ConnectionSFSEvent):void
         {
             connected = event.success;
 
@@ -966,7 +982,7 @@ package com.flashfla.net
                 eventError("Multiplayer Connection Error: " + event.error);
         }
 
-        private function onConnectionLost(event:ConnectionLostEvent):void
+        private function onConnectionLost(event:ConnectionLostSFSEvent):void
         {
             connected = false;
 
@@ -979,18 +995,18 @@ package com.flashfla.net
 
         CONFIG::debug
         {
-            private function onDebugMessage(event:DebugMessageEvent):void
+            private function onDebugMessage(event:DebugMessageSFSEvent):void
             {
                 //trace("arc_msg: SFS: " + event.params.message);
             }
         }
 
-        private function onCreateRoomError(event:CreateRoomErrorEvent):void
+        private function onCreateRoomError(event:CreateRoomErrorSFSEvent):void
         {
             eventError("Create Room Failed: " + event.error);
         }
 
-        private function onExtensionResponse(event:ExtensionResponseEvent):void
+        private function onExtensionResponse(event:ExtensionResponseSFSEvent):void
         {
             var data:Object = event.dataObj;
             switch (data._cmd)
@@ -1037,23 +1053,23 @@ package com.flashfla.net
                 case "html_message":
                     data.uid = getUser(data.rid, data.uid);
                     data.rid = getRoom(data.rid);
-                    dispatchEvent(new SFSEvent(EVENT_XT_RESPONSE, {data: data}));
+                    dispatchEvent(new ExtensionResponseEvent({data: data}));
                     break;
             }
         }
 
-        private function onLogout(event:LogoutEvent):void
+        private function onLogout(event:LogoutSFSEvent):void
         {
             currentUser.loggedIn = false;
             eventLogin();
         }
 
-        private function onAdminMessage(event:AdminMessageEvent):void
+        private function onAdminMessage(event:AdminMessageSFSEvent):void
         {
             eventServerMessage(htmlUnescape(event.message));
         }
 
-        private function onModeratorMessage(event:ModerationMessageEvent):void
+        private function onModeratorMessage(event:ModerationMessageSFSEvent):void
         {
             var user:Object = null;
             if (event.sender != null)
@@ -1061,7 +1077,7 @@ package com.flashfla.net
             eventServerMessage(htmlUnescape(event.message), user);
         }
 
-        private function onPlayerSwitched(event:PlayerSwitchedEvent):void
+        private function onPlayerSwitched(event:PlayerSwitchedSFSEvent):void
         {
             if (event.success)
             {
@@ -1079,7 +1095,7 @@ package com.flashfla.net
             }
         }
 
-        private function onSpectatorSwitched(event:SpectatorSwitchedEvent):void
+        private function onSpectatorSwitched(event:SpectatorSwitchedSFSEvent):void
         {
             if (event.success)
             {
@@ -1096,7 +1112,7 @@ package com.flashfla.net
             }
         }
 
-        private function onPrivateMessage(event:PrivateMessageEvent):void
+        private function onPrivateMessage(event:PrivateMessageSFSEvent):void
         {
             if (event.userId == currentUser.userID)
                 return; // XXX: Ignore PM events sent by yourself because they don't include the recipient for some stupid reason
@@ -1107,7 +1123,7 @@ package com.flashfla.net
             eventMessage(MESSAGE_PRIVATE, getRoom(room), getUser(room, user), htmlUnescape(event.message));
         }
 
-        private function onPublicMessage(event:PublicMessageEvent):void
+        private function onPublicMessage(event:PublicMessageSFSEvent):void
         {
             var room:Room = server.getRoom(event.roomId);
             var user:User = event.sender;
@@ -1116,7 +1132,7 @@ package com.flashfla.net
             eventMessage(MESSAGE_PUBLIC, getRoom(room), getUser(room, user), htmlUnescape(event.message));
         }
 
-        private function onRoomListUpdate(event:RoomListUpdateEvent):void
+        private function onRoomListUpdate(event:RoomListUpdateSFSEvent):void
         {
             clearRooms();
             for each (var room:Room in event.roomList)
@@ -1124,7 +1140,7 @@ package com.flashfla.net
             eventRoomList();
         }
 
-        private function onRoomVariablesUpdate(event:RoomVariablesUpdateEvent):void
+        private function onRoomVariablesUpdate(event:RoomVariablesUpdateSFSEvent):void
         {
             var room:Object = getRoom(event.room);
             updateRoom(event.room);
@@ -1213,13 +1229,13 @@ package com.flashfla.net
                 eventGameResults(room);
         }
 
-        private function onRoomAdded(event:RoomAddedEvent):void
+        private function onRoomAdded(event:RoomAddedSFSEvent):void
         {
             addRoom(event.room);
             eventRoomList();
         }
 
-        private function onRoomDeleted(event:RoomDeletedEvent):void
+        private function onRoomDeleted(event:RoomDeletedSFSEvent):void
         {
             var room:Object = getRoom(event.room);
             removeRoom(event.room);
@@ -1228,7 +1244,7 @@ package com.flashfla.net
             eventRoomList();
         }
 
-        private function onRoomLeft(event:RoomLeftEvent):void
+        private function onRoomLeft(event:RoomLeftSFSEvent):void
         {
             var room:Object = getRoom(event.roomId);
             if (room == null)
@@ -1252,7 +1268,7 @@ package com.flashfla.net
             eventRoomLeft(room);
         }
 
-        private function onJoinRoom(event:JoinRoomEvent):void
+        private function onJoinRoom(event:JoinRoomSFSEvent):void
         {
             updateRoom(event.room);
             var room:Object = getRoom(event.room);
@@ -1262,25 +1278,25 @@ package com.flashfla.net
             eventRoomJoined(room);
         }
 
-        private function onJoinRoomError(event:JoinRoomErrorEvent):void
+        private function onJoinRoomError(event:JoinRoomErrorSFSEvent):void
         {
             eventError("Join Failed: " + event.error);
         }
 
-        private function onUserCountChange(event:UserCountChangeEvent):void
+        private function onUserCountChange(event:UserCountChangeSFSEvent):void
         {
             updateRoom(event.room);
             eventRoomUpdate(getRoom(event.room));
         }
 
-        private function onUserEnterRoom(event:UserEnterRoomEvent):void
+        private function onUserEnterRoom(event:UserEnterRoomSFSEvent):void
         {
             updateRoom(event.roomId);
             eventRoomUser(getRoom(event.roomId), getUser(event.roomId, event.user));
             eventRoomUpdate(getRoom(event.roomId));
         }
 
-        private function onUserLeaveRoom(event:UserLeaveRoomEvent):void
+        private function onUserLeaveRoom(event:UserLeaveRoomSFSEvent):void
         {
             var user:Object = getUser(event.roomId, event.userId);
             var room:Object = getRoom(event.roomId);
@@ -1289,7 +1305,7 @@ package com.flashfla.net
             eventRoomUpdate(room);
         }
 
-        private function onUserVariablesUpdate(event:UserVariablesUpdateEvent):void
+        private function onUserVariablesUpdate(event:UserVariablesUpdateSFSEvent):void
         {
             updateUser(event.user);
             eventUserUpdate(findUser(event.user), event.changedVars);
