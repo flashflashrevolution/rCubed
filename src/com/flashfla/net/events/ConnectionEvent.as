@@ -6,12 +6,10 @@ package com.flashfla.net.events
 
     public class ConnectionEvent extends TypedSFSEvent
     {
-        public var message:String;
 
-        public function ConnectionEvent(params:Object)
+        public function ConnectionEvent()
         {
             super(Multiplayer.EVENT_CONNECTION);
-            message = params.message;
         }
     }
 }

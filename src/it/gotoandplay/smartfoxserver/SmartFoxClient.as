@@ -23,13 +23,13 @@ package it.gotoandplay.smartfoxserver
     import it.gotoandplay.smartfoxserver.util.Entities;
     import it.gotoandplay.smartfoxserver.http.HttpConnection;
     import it.gotoandplay.smartfoxserver.http.HttpEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.BuddyListEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.BuddyListUpdateEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.ConfigLoadSuccessEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.ConfigLoadFailureEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.DebugMessageEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionLostEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.BuddyListSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.BuddyListUpdateSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ConfigLoadSuccessSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ConfigLoadFailureSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.DebugMessageSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionLostSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionSFSEvent;
 
     
     
@@ -914,7 +914,7 @@ package it.gotoandplay.smartfoxserver
             var params:Object = {}
             params.list = buddyList
             
-            var evt:TypedSFSEvent = new BuddyListEvent(params)
+            var evt:TypedSFSEvent = new BuddyListSFSEvent(params)
             dispatchEvent(evt)
         }
         
@@ -1657,7 +1657,7 @@ package it.gotoandplay.smartfoxserver
                 var params:Object = {}
                 params.list = buddyList
                 
-                var evt:TypedSFSEvent = new BuddyListEvent(params)
+                var evt:TypedSFSEvent = new BuddyListSFSEvent(params)
                 dispatchEvent(evt)
             }
         }
@@ -2091,7 +2091,7 @@ package it.gotoandplay.smartfoxserver
                     var params:Object = {}
                     params.buddy = b
                     
-                    var evt:TypedSFSEvent = new BuddyListUpdateEvent(params)
+                    var evt:TypedSFSEvent = new BuddyListUpdateSFSEvent(params)
                     dispatchEvent(evt)
                     
                 }
@@ -2560,7 +2560,7 @@ package it.gotoandplay.smartfoxserver
             else
             {
                 // Dispatch onConfigLoadSuccess event
-                var sfsEvt:TypedSFSEvent = new ConfigLoadSuccessEvent()
+                var sfsEvt:TypedSFSEvent = new ConfigLoadSuccessSFSEvent()
                 dispatchEvent( sfsEvt )
             }
         }
@@ -2568,7 +2568,7 @@ package it.gotoandplay.smartfoxserver
         private function onConfigLoadFailure( evt:IOErrorEvent ):void
         {
             var params:Object = { message:evt.text }
-            var sfsEvt:TypedSFSEvent = new ConfigLoadFailureEvent(params)
+            var sfsEvt:TypedSFSEvent = new ConfigLoadFailureSFSEvent(params)
             
             dispatchEvent( sfsEvt )
         }
@@ -2600,7 +2600,7 @@ package it.gotoandplay.smartfoxserver
                 trace(message)
                 
                 var params:Object = { message:message }
-                var evt:TypedSFSEvent = new DebugMessageEvent(params)
+                var evt:TypedSFSEvent = new DebugMessageSFSEvent(params)
                 dispatchEvent(evt)
             }
         }
@@ -2869,7 +2869,7 @@ package it.gotoandplay.smartfoxserver
             initialize()
 
             // Fire event
-            var sfsEvt:TypedSFSEvent = new ConnectionLostEvent()
+            var sfsEvt:TypedSFSEvent = new ConnectionLostSFSEvent()
             dispatchEvent(sfsEvt)
         }
         
@@ -2941,7 +2941,7 @@ package it.gotoandplay.smartfoxserver
             initialize()
             
             // Fire event
-            var sfsEvt:TypedSFSEvent = new ConnectionLostEvent()
+            var sfsEvt:TypedSFSEvent = new ConnectionLostSFSEvent()
             dispatchEvent(sfsEvt)
         }
         
@@ -3039,7 +3039,7 @@ package it.gotoandplay.smartfoxserver
             params.success = false
             params.error = "I/O Error"
     
-            var evt:TypedSFSEvent = new ConnectionEvent(params)
+            var evt:TypedSFSEvent = new ConnectionSFSEvent(params)
             dispatchEvent(evt)
         }
     }

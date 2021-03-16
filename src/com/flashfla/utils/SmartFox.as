@@ -5,20 +5,20 @@ package com.flashfla.utils
     import it.gotoandplay.smartfoxserver.SFSEvent
     import it.gotoandplay.smartfoxserver.data.Room
     import it.gotoandplay.smartfoxserver.data.User
-    import it.gotoandplay.smartfoxserver.SFSEvents.ExtensionResponseEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionLostEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.RoomAddedEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.RoomDeletedEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.CreateRoomErrorEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.PublicMessageEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.PrivateMessageEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.UserCountChangeEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.UserEnterRoomEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.UserLeaveRoomEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.RoomListUpdateEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomErrorEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ExtensionResponseSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionLostSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomAddedSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomDeletedSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.CreateRoomErrorSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.PublicMessageSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.PrivateMessageSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserCountChangeSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserEnterRoomSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserLeaveRoomSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomListUpdateSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomErrorSFSEvent;
 
     public class SmartFox extends EventDispatcher
     {
@@ -97,7 +97,7 @@ package com.flashfla.utils
         /*
          * Handler Server connection
          */
-        private function onConnection(evt:ConnectionEvent):void
+        private function onConnection(evt:ConnectionSFSEvent):void
         {
             isConnected = evt.success;
 
@@ -107,7 +107,7 @@ package com.flashfla.utils
         /*
          * Handler login event
          */
-        private function onLogin(evt:ExtensionResponseEvent):void
+        private function onLogin(evt:ExtensionResponseSFSEvent):void
         {
             var obj:Object = evt.dataObj;
             var ok:Boolean = obj._cmd == "logOK";
@@ -122,7 +122,7 @@ package com.flashfla.utils
             }
         }
 
-        private function onRoomListUpdate(evt:RoomListUpdateEvent):void
+        private function onRoomListUpdate(evt:RoomListUpdateSFSEvent):void
         {
             // Dump the names of the available rooms in the current zone
             roomList = evt.roomList;
@@ -139,7 +139,7 @@ package com.flashfla.utils
         /*
          * Handler a join room event
          */
-        private function onJoinRoom(evt:JoinRoomEvent):void
+        private function onJoinRoom(evt:JoinRoomSFSEvent):void
         {
             var room:Room = evt.room;
             roomUsers = room.getUserList();
@@ -150,7 +150,7 @@ package com.flashfla.utils
         /*
          * Handle error while joining a room
          */
-        private function onJoinRoomError(evt:JoinRoomErrorEvent):void
+        private function onJoinRoomError(evt:JoinRoomErrorSFSEvent):void
         {
             trace(evt);
             this.dispatchEvent(evt);
@@ -159,49 +159,49 @@ package com.flashfla.utils
         /*
          * Handle disconnection
          */
-        private function onConnectionLost(evt:ConnectionLostEvent):void
+        private function onConnectionLost(evt:ConnectionLostSFSEvent):void
         {
             trace(ObjectUtil.print_r(evt));
             this.dispatchEvent(evt);
         }
 
-        private function onRoomAdded(e:RoomAddedEvent):void
+        private function onRoomAdded(e:RoomAddedSFSEvent):void
         {
             this.dispatchEvent(e);
         }
 
-        private function onRoomDeleted(e:RoomDeletedEvent):void
+        private function onRoomDeleted(e:RoomDeletedSFSEvent):void
         {
             this.dispatchEvent(e);
         }
 
-        private function onCreateRoomError(e:CreateRoomErrorEvent):void
+        private function onCreateRoomError(e:CreateRoomErrorSFSEvent):void
         {
             this.dispatchEvent(e);
         }
 
-        private function onPublicMessage(e:PublicMessageEvent):void
+        private function onPublicMessage(e:PublicMessageSFSEvent):void
         {
             this.dispatchEvent(e);
         }
 
-        private function onPrivateMessage(e:PrivateMessageEvent):void
+        private function onPrivateMessage(e:PrivateMessageSFSEvent):void
         {
             this.dispatchEvent(e);
         }
 
-        private function onUserCountChange(e:UserCountChangeEvent):void
+        private function onUserCountChange(e:UserCountChangeSFSEvent):void
         {
             this.dispatchEvent(e);
         }
 
-        private function onUserEnterRoom(e:UserEnterRoomEvent):void
+        private function onUserEnterRoom(e:UserEnterRoomSFSEvent):void
         {
             addUser(e.user);
             this.dispatchEvent(e);
         }
 
-        private function onUserLeaveRoom(e:UserLeaveRoomEvent):void
+        private function onUserLeaveRoom(e:UserLeaveRoomSFSEvent):void
         {
             removeUser(e.userId);
             this.dispatchEvent(e);
@@ -210,7 +210,7 @@ package com.flashfla.utils
         /*
          * Handles Extension events
          */
-        private function onExtension(evt:ExtensionResponseEvent):void
+        private function onExtension(evt:ExtensionResponseSFSEvent):void
         {
             var obj:Object = evt.dataObj;
             var _cmd:String = obj._cmd;
