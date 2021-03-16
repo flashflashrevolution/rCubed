@@ -861,7 +861,7 @@ package menu
             var songInfo:SongInfo = _playlist.getSongInfo(songItem.level);
             if (songInfo != null)
             {
-                var song:Song = _gvars.getSongFile(songInfo);
+                var song:Song = _gvars.getSongFile(songInfo, true);
                 if (song.isLoaded)
                 {
                     writeMenuMusicBytes(song);
@@ -915,7 +915,7 @@ package menu
             var songInfo:SongInfo = _playlist.getSongInfo(songItem.level);
             if (songInfo != null)
             {
-                var song:Song = _gvars.getSongFile(songInfo);
+                var song:Song = _gvars.getSongFile(songInfo, true);
                 if (song.isLoaded)
                 {
                     playSongPreview(song);
@@ -1849,6 +1849,14 @@ package menu
 
                 case Keyboard.DOWN:
                     newIndex += 1;
+                    break;
+
+                case Keyboard.HOME:
+                    newIndex = 0;
+                    break;
+
+                case Keyboard.END:
+                    newIndex = genreLength - 1;
                     break;
 
                 case Keyboard.TAB:

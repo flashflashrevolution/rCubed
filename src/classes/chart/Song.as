@@ -269,7 +269,6 @@ package classes.chart
             var chartData:ByteArray;
             if (type == NoteChart.FFR_MP3)
             {
-
                 if (e.target is URLLoader)
                     chartData = e.target.data;
                 else if (e.target is LoaderInfo)
