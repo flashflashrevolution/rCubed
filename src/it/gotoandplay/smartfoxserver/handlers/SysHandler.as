@@ -225,14 +225,15 @@ package it.gotoandplay.smartfoxserver.handlers
                     if (newRoom)
                     {
                         evt = new RoomAddedEvent(params)
+                        sfs.dispatchEvent(evt)
                     }
                     else if (updated)
                     {
                         params.changedVars = changedVars
                         params.roomList = true;
                         evt = new RoomVariablesUpdateEvent(params)
+                        sfs.dispatchEvent(evt)
                     }
-                    sfs.dispatchEvent(evt)
                 }
                 roomsInList.push(roomId);
             }

@@ -14,6 +14,27 @@ package com.flashfla.net
     import classes.Playlist;
     import it.gotoandplay.smartfoxserver.SFSEvents.AdminMessageEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.ExtensionResponseEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.DebugMessageEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.CreateRoomErrorEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.LogoutEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ModerationMessageEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.PlayerSwitchedEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.SpectatorSwitchedEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.PrivateMessageEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.PublicMessageEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomListUpdateEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomVariablesUpdateEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomAddedEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomDeletedEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomLeftEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomErrorEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserCountChangeEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserEnterRoomEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserLeaveRoomEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserVariablesUpdateEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionLostEvent;
 
     public class Multiplayer extends EventDispatcher
     {
@@ -928,9 +949,9 @@ package com.flashfla.net
             dispatchEvent(new SFSEvent(EVENT_GAME_RESULTS, {room: room}));
         }
 
-        private function onConnection(event:SFSEvent):void
+        private function onConnection(event:ConnectionEvent):void
         {
-            connected = event.params.success;
+            connected = event.success;
 
             if (connected)
             {
@@ -942,10 +963,10 @@ package com.flashfla.net
             eventConnection();
 
             if (!connected)
-                eventError("Multiplayer Connection Error: " + event.params.error);
+                eventError("Multiplayer Connection Error: " + event.error);
         }
 
-        private function onConnectionLost(event:SFSEvent):void
+        private function onConnectionLost(event:ConnectionLostEvent):void
         {
             connected = false;
 
@@ -958,15 +979,15 @@ package com.flashfla.net
 
         CONFIG::debug
         {
-            private function onDebugMessage(event:SFSEvent):void
+            private function onDebugMessage(event:DebugMessageEvent):void
             {
                 //trace("arc_msg: SFS: " + event.params.message);
             }
         }
 
-        private function onCreateRoomError(event:SFSEvent):void
+        private function onCreateRoomError(event:CreateRoomErrorEvent):void
         {
-            eventError("Create Room Failed: " + event.params.error);
+            eventError("Create Room Failed: " + event.error);
         }
 
         private function onExtensionResponse(event:ExtensionResponseEvent):void
@@ -1021,7 +1042,7 @@ package com.flashfla.net
             }
         }
 
-        private function onLogout(event:SFSEvent):void
+        private function onLogout(event:LogoutEvent):void
         {
             currentUser.loggedIn = false;
             eventLogin();
@@ -1032,81 +1053,84 @@ package com.flashfla.net
             eventServerMessage(htmlUnescape(event.message));
         }
 
-        private function onModeratorMessage(event:SFSEvent):void
+        private function onModeratorMessage(event:ModerationMessageEvent):void
         {
             var user:Object = null;
-            if (event.params.sender != null)
-                user = findUser(event.params.sender);
-            eventServerMessage(htmlUnescape(event.params.message), user);
+            if (event.sender != null)
+                user = findUser(event.sender);
+            eventServerMessage(htmlUnescape(event.message), user);
         }
 
-        private function onPlayerSwitched(event:SFSEvent):void
+        private function onPlayerSwitched(event:PlayerSwitchedEvent):void
         {
-            if (event.params.success)
+            if (event.success)
             {
-                var room:Object = getRoom(event.params.room);
-                var user:Object = getUser(event.params.room, event.params.userId);
+                var room:Object = getRoom(event.room);
+                var user:Object = getUser(event.room, (event as Object).userId);
                 if (user.userID == currentUser.userID)
                     clearRoomPlayer(room);
-                updateRoom(event.params.room);
+                updateRoom(event.room);
                 eventRoomUserStatus(room, user);
             }
-            else if (event.params.userId == currentUser.userID)
+            // TODO: Check userId
+            else if ((event as Object).userId == currentUser.userID)
             {
                 eventError("Spectate Failed");
             }
         }
 
-        private function onSpectatorSwitched(event:SFSEvent):void
+        private function onSpectatorSwitched(event:SpectatorSwitchedEvent):void
         {
-            if (event.params.success)
+            if (event.success)
             {
-                var room:Object = getRoom(event.params.room);
-                var user:Object = getUser(event.params.room, event.params.userId);
-                updateRoom(event.params.room);
+                var room:Object = getRoom(event.room);
+                var user:Object = getUser(event.room, (event as *).userId);
+                updateRoom(event.room);
                 if (user.userID == currentUser.userID)
                     setRoomPlayer(room);
                 eventRoomUserStatus(room, user);
             }
-            else if (event.params.userId == currentUser.userID)
+            else if ((event as *).userId == currentUser.userID)
             {
                 eventError("Join Failed");
             }
         }
 
-        private function onPrivateMessage(event:SFSEvent):void
+        private function onPrivateMessage(event:PrivateMessageEvent):void
         {
-            if (event.params.userId == currentUser.userID)
+            if (event.sender.getId() == currentUser.userID)
                 return; // XXX: Ignore PM events sent by yourself because they don't include the recipient for some stupid reason
-            var room:Room = server.getRoom(event.params.roomId);
-            var user:User = event.params.sender;
+            var room:Room = server.getRoom(event.roomId);
+            var user:User = event.sender;
+            // TODO: Weird check ? Events didn't seem to hold `userId``
             if (user == null)
-                user = room.getUser(event.params.userId);
-            eventMessage(MESSAGE_PRIVATE, getRoom(room), getUser(room, user), htmlUnescape(event.params.message));
+                user = room.getUser(event.sender.getVariable("userId"));
+            eventMessage(MESSAGE_PRIVATE, getRoom(room), getUser(room, user), htmlUnescape(event.message));
         }
 
-        private function onPublicMessage(event:SFSEvent):void
+        private function onPublicMessage(event:PublicMessageEvent):void
         {
-            var room:Room = server.getRoom(event.params.roomId);
-            var user:User = event.params.sender;
+            var room:Room = server.getRoom(event.roomId);
+            var user:User = event.sender;
             if (user == null)
-                user = room.getUser(event.params.userId);
-            eventMessage(MESSAGE_PUBLIC, getRoom(room), getUser(room, user), htmlUnescape(event.params.message));
+                user = room.getUser(event.sender.getVariable("userId"));
+            eventMessage(MESSAGE_PUBLIC, getRoom(room), getUser(room, user), htmlUnescape(event.message));
         }
 
-        private function onRoomListUpdate(event:SFSEvent):void
+        private function onRoomListUpdate(event:RoomListUpdateEvent):void
         {
             clearRooms();
-            for each (var room:Room in event.params.roomList)
+            for each (var room:Room in event.roomList)
                 addRoom(room);
             eventRoomList();
         }
 
-        private function onRoomVariablesUpdate(event:SFSEvent):void
+        private function onRoomVariablesUpdate(event:RoomVariablesUpdateEvent):void
         {
-            var room:Object = getRoom(event.params.room);
-            updateRoom(event.params.room);
-            eventRoomUpdate(room, event.params.roomList, event.params.changedVars);
+            var room:Object = getRoom(event.room);
+            updateRoom(event.room);
+            // TODO: Check roomList param validity
+            eventRoomUpdate(room, true, event.changedVars);
 
             if (!room.isGame)
                 return;
@@ -1190,29 +1214,29 @@ package com.flashfla.net
                 eventGameResults(room);
         }
 
-        private function onRoomAdded(event:SFSEvent):void
+        private function onRoomAdded(event:RoomAddedEvent):void
         {
-            addRoom(event.params.room);
+            addRoom(event.room);
             eventRoomList();
         }
 
-        private function onRoomDeleted(event:SFSEvent):void
+        private function onRoomDeleted(event:RoomDeletedEvent):void
         {
-            var room:Object = getRoom(event.params.room);
-            removeRoom(event.params.room);
+            var room:Object = getRoom(event.room);
+            removeRoom(event.room);
             if (room.isJoined)
                 ghostRooms.push(room);
             eventRoomList();
         }
 
-        private function onRoomLeft(event:SFSEvent):void
+        private function onRoomLeft(event:RoomLeftEvent):void
         {
-            var room:Object = getRoom(event.params.roomId);
+            var room:Object = getRoom(event.roomId);
             if (room == null)
             {
                 for each (var ghost:Object in ghostRooms)
                 {
-                    if (ghost.roomID == event.params.roomId)
+                    if (ghost.roomID == event.roomId)
                     {
                         room = ghost;
                         ghostRooms = ghostRooms.filter(function(item:*, index:int, array:Array):Boolean
@@ -1223,53 +1247,53 @@ package com.flashfla.net
                     }
                 }
             }
-            updateRoom(event.params.roomId);
+            updateRoom(event.roomId);
             room.isJoined = false;
             currentUser.room = null;
             eventRoomLeft(room);
         }
 
-        private function onJoinRoom(event:SFSEvent):void
+        private function onJoinRoom(event:JoinRoomEvent):void
         {
-            updateRoom(event.params.room);
-            var room:Object = getRoom(event.params.room);
+            updateRoom(event.room);
+            var room:Object = getRoom(event.room);
             setRoomPlayer(room);
             updateUserVariables();
-            updateUser(event.params.room.getUserList()[currentUser.userID]);
+            updateUser(event.room.getUserList()[currentUser.userID]);
             eventRoomJoined(room);
         }
 
-        private function onJoinRoomError(event:SFSEvent):void
+        private function onJoinRoomError(event:JoinRoomErrorEvent):void
         {
-            eventError("Join Failed: " + event.params.error);
+            eventError("Join Failed: " + event.error);
         }
 
-        private function onUserCountChange(event:SFSEvent):void
+        private function onUserCountChange(event:UserCountChangeEvent):void
         {
-            updateRoom(event.params.room);
-            eventRoomUpdate(getRoom(event.params.room));
+            updateRoom(event.room);
+            eventRoomUpdate(getRoom(event.room));
         }
 
-        private function onUserEnterRoom(event:SFSEvent):void
+        private function onUserEnterRoom(event:UserEnterRoomEvent):void
         {
-            updateRoom(event.params.roomId);
-            eventRoomUser(getRoom(event.params.roomId), getUser(event.params.roomId, event.params.user));
-            eventRoomUpdate(getRoom(event.params.roomId));
+            updateRoom(event.roomId);
+            eventRoomUser(getRoom(event.roomId), getUser(event.roomId, event.user));
+            eventRoomUpdate(getRoom(event.roomId));
         }
 
-        private function onUserLeaveRoom(event:SFSEvent):void
+        private function onUserLeaveRoom(event:UserLeaveRoomEvent):void
         {
-            var user:Object = getUser(event.params.roomId, event.params.userId);
-            var room:Object = getRoom(event.params.roomId);
-            updateRoom(event.params.roomId);
+            var user:Object = getUser(event.roomId, event.userId);
+            var room:Object = getRoom(event.roomId);
+            updateRoom(event.roomId);
             eventRoomUser(room, user);
             eventRoomUpdate(room);
         }
 
-        private function onUserVariablesUpdate(event:SFSEvent):void
+        private function onUserVariablesUpdate(event:UserVariablesUpdateEvent):void
         {
-            updateUser(event.params.user);
-            eventUserUpdate(findUser(event.params.user), event.params.changedVars);
+            updateUser(event.user);
+            eventUserUpdate(findUser(event.user), event.changedVars);
         }
 
         public static function htmlUnescape(str:String):String
