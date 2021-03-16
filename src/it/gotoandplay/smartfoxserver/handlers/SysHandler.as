@@ -1,16 +1,15 @@
 package it.gotoandplay.smartfoxserver.handlers
 {
+    import flash.utils.getTimer;
     import it.gotoandplay.smartfoxserver.SmartFoxClient;
-    import it.gotoandplay.smartfoxserver.SFSEvent;
     import it.gotoandplay.smartfoxserver.data.Room;
     import it.gotoandplay.smartfoxserver.data.User;
     import it.gotoandplay.smartfoxserver.util.Entities;
     import it.gotoandplay.smartfoxserver.util.ObjectSerializer;
-    import flash.utils.getTimer;
+    import it.gotoandplay.smartfoxserver.TypedSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.AdminMessageEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.LoginEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.BuddyListErrorEvent;
-    import it.gotoandplay.smartfoxserver.TypedSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.BuddyListEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.BuddyListUpdateEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.BuddyPermissionRequestEvent;
