@@ -5,6 +5,20 @@ package com.flashfla.utils
     import it.gotoandplay.smartfoxserver.SFSEvent
     import it.gotoandplay.smartfoxserver.data.Room
     import it.gotoandplay.smartfoxserver.data.User
+    import it.gotoandplay.smartfoxserver.SFSEvents.ExtensionResponseSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionLostSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomAddedSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomDeletedSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.CreateRoomErrorSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.PublicMessageSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.PrivateMessageSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserCountChangeSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserEnterRoomSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserLeaveRoomSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.RoomListUpdateSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomErrorSFSEvent;
 
     public class SmartFox extends EventDispatcher
     {
@@ -39,20 +53,20 @@ package com.flashfla.utils
 
                 // Add event listeners
                 // IRRFUSCATOR_ignorebegin
-                _sfs.addEventListener(SFSEvent.onConnection, onSFSEvent);
-                _sfs.addEventListener(SFSEvent.onConnectionLost, onSFSEvent);
-                _sfs.addEventListener(SFSEvent.onExtensionResponse, onSFSEvent);
-                _sfs.addEventListener(SFSEvent.onRoomListUpdate, onSFSEvent);
-                _sfs.addEventListener(SFSEvent.onJoinRoom, onSFSEvent);
-                _sfs.addEventListener(SFSEvent.onJoinRoomError, onSFSEvent);
-                _sfs.addEventListener(SFSEvent.onRoomAdded, onSFSEvent);
-                _sfs.addEventListener(SFSEvent.onRoomDeleted, onSFSEvent);
-                _sfs.addEventListener(SFSEvent.onCreateRoomError, onSFSEvent);
-                _sfs.addEventListener(SFSEvent.onPublicMessage, onSFSEvent);
-                _sfs.addEventListener(SFSEvent.onPrivateMessage, onSFSEvent);
-                _sfs.addEventListener(SFSEvent.onUserCountChange, onSFSEvent);
-                _sfs.addEventListener(SFSEvent.onUserEnterRoom, onSFSEvent);
-                _sfs.addEventListener(SFSEvent.onUserLeaveRoom, onSFSEvent);
+                _sfs.addEventListener(SFSEvent.onConnection, onConnection);
+                _sfs.addEventListener(SFSEvent.onConnectionLost, onConnectionLost);
+                _sfs.addEventListener(SFSEvent.onExtensionResponse, onExtension);
+                _sfs.addEventListener(SFSEvent.onRoomListUpdate, onRoomListUpdate);
+                _sfs.addEventListener(SFSEvent.onJoinRoom, onJoinRoom);
+                _sfs.addEventListener(SFSEvent.onJoinRoomError, onJoinRoomError);
+                _sfs.addEventListener(SFSEvent.onRoomAdded, onRoomAdded);
+                _sfs.addEventListener(SFSEvent.onRoomDeleted, onRoomDeleted);
+                _sfs.addEventListener(SFSEvent.onCreateRoomError, onCreateRoomError);
+                _sfs.addEventListener(SFSEvent.onPublicMessage, onPublicMessage);
+                _sfs.addEventListener(SFSEvent.onPrivateMessage, onPrivateMessage);
+                _sfs.addEventListener(SFSEvent.onUserCountChange, onUserCountChange);
+                _sfs.addEventListener(SFSEvent.onUserEnterRoom, onUserEnterRoom);
+                _sfs.addEventListener(SFSEvent.onUserLeaveRoom, onUserLeaveRoom);
                 // IRRFUSCATOR_ignoreend
 
                 // Connect to server
@@ -80,86 +94,22 @@ package com.flashfla.utils
         // SmartFoxClient Event Handlers
         //---------------------------------------------------------------------
 
-        private function onSFSEvent(evt:SFSEvent):void
-        {
-            switch (evt.type)
-            {
-                case SFSEvent.onConnection:
-                    onConnection(evt);
-                    break;
-
-                case SFSEvent.onExtensionResponse:
-                    onExtension(evt);
-                    break;
-
-                case SFSEvent.onRoomListUpdate:
-                    onRoomListUpdate(evt);
-                    break;
-
-                case SFSEvent.onJoinRoom:
-                    onJoinRoom(evt);
-                    break;
-
-                case SFSEvent.onJoinRoomError:
-                    onJoinRoomError(evt);
-                    break;
-
-                case SFSEvent.onConnectionLost:
-                    onConnectionLost(evt);
-                    break;
-
-                case SFSEvent.onRoomAdded:
-                    onRoomAdded(evt);
-                    break;
-
-                case SFSEvent.onRoomDeleted:
-                    onRoomDeleted(evt);
-                    break;
-
-                case SFSEvent.onCreateRoomError:
-                    onCreateRoomError(evt);
-                    break;
-
-                case SFSEvent.onPublicMessage:
-                    onPublicMessage(evt);
-                    break;
-
-                case SFSEvent.onPrivateMessage:
-                    onPrivateMessage(evt);
-                    break;
-
-                case SFSEvent.onUserCountChange:
-                    onUserCountChange(evt);
-                    break;
-
-                case SFSEvent.onUserEnterRoom:
-                    onUserEnterRoom(evt);
-                    break;
-
-                case SFSEvent.onUserEnterRoom:
-                    onUserLeaveRoom(evt);
-                    break;
-            }
-            trace(evt);
-            trace("1:" + ObjectUtil.print_r(evt.params));
-            trace("--------");
-            this.dispatchEvent(evt);
-        }
-
         /*
          * Handler Server connection
          */
-        private function onConnection(evt:SFSEvent):void
+        private function onConnection(evt:ConnectionSFSEvent):void
         {
-            isConnected = evt.params.success;
+            isConnected = evt.success;
+
+            this.dispatchEvent(evt);
         }
 
         /*
          * Handler login event
          */
-        private function onLogin(evt:SFSEvent):void
+        private function onLogin(evt:ExtensionResponseSFSEvent):void
         {
-            var obj:Object = evt.params.dataObj;
+            var obj:Object = evt.dataObj;
             var ok:Boolean = obj._cmd == "logOK";
             if (ok)
             {
@@ -172,10 +122,10 @@ package com.flashfla.utils
             }
         }
 
-        private function onRoomListUpdate(evt:SFSEvent):void
+        private function onRoomListUpdate(evt:RoomListUpdateSFSEvent):void
         {
             // Dump the names of the available rooms in the current zone
-            roomList = evt.params.roomList;
+            roomList = evt.roomList;
             //for (var r:String in evt.params.roomList)
             //trace(evt.params.roomList[r].getName())
 
@@ -189,74 +139,80 @@ package com.flashfla.utils
         /*
          * Handler a join room event
          */
-        private function onJoinRoom(evt:SFSEvent):void
+        private function onJoinRoom(evt:JoinRoomSFSEvent):void
         {
-            var room:Room = evt.params.room as Room;
+            var room:Room = evt.room;
             roomUsers = room.getUserList();
+
+            this.dispatchEvent(evt);
         }
 
         /*
          * Handle error while joining a room
          */
-        private function onJoinRoomError(evt:SFSEvent):void
+        private function onJoinRoomError(evt:JoinRoomErrorSFSEvent):void
         {
             trace(evt);
+            this.dispatchEvent(evt);
         }
 
         /*
          * Handle disconnection
          */
-        private function onConnectionLost(evt:SFSEvent):void
+        private function onConnectionLost(evt:ConnectionLostSFSEvent):void
         {
-            trace(ObjectUtil.print_r(evt.params));
+            trace(ObjectUtil.print_r(evt));
+            this.dispatchEvent(evt);
         }
 
-        private function onRoomAdded(e:SFSEvent):void
+        private function onRoomAdded(e:RoomAddedSFSEvent):void
         {
-
+            this.dispatchEvent(e);
         }
 
-        private function onRoomDeleted(e:SFSEvent):void
+        private function onRoomDeleted(e:RoomDeletedSFSEvent):void
         {
-
+            this.dispatchEvent(e);
         }
 
-        private function onCreateRoomError(e:SFSEvent):void
+        private function onCreateRoomError(e:CreateRoomErrorSFSEvent):void
         {
-
+            this.dispatchEvent(e);
         }
 
-        private function onPublicMessage(e:SFSEvent):void
+        private function onPublicMessage(e:PublicMessageSFSEvent):void
         {
-
+            this.dispatchEvent(e);
         }
 
-        private function onPrivateMessage(e:SFSEvent):void
+        private function onPrivateMessage(e:PrivateMessageSFSEvent):void
         {
-
+            this.dispatchEvent(e);
         }
 
-        private function onUserCountChange(e:SFSEvent):void
+        private function onUserCountChange(e:UserCountChangeSFSEvent):void
         {
-
+            this.dispatchEvent(e);
         }
 
-        private function onUserEnterRoom(e:SFSEvent):void
+        private function onUserEnterRoom(e:UserEnterRoomSFSEvent):void
         {
-            addUser(e.params.user as User);
+            addUser(e.user);
+            this.dispatchEvent(e);
         }
 
-        private function onUserLeaveRoom(e:SFSEvent):void
+        private function onUserLeaveRoom(e:UserLeaveRoomSFSEvent):void
         {
-            removeUser(e.params.userId);
+            removeUser(e.userId);
+            this.dispatchEvent(e);
         }
 
         /*
          * Handles Extension events
          */
-        private function onExtension(evt:SFSEvent):void
+        private function onExtension(evt:ExtensionResponseSFSEvent):void
         {
-            var obj:Object = evt.params.dataObj;
+            var obj:Object = evt.dataObj;
             var _cmd:String = obj._cmd;
             if (obj != null)
             {
@@ -265,6 +221,7 @@ package com.flashfla.utils
                     onLogin(evt);
                 }
             }
+            this.dispatchEvent(evt);
         }
 
         private function addUser(user:User):void

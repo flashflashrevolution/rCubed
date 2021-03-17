@@ -11,7 +11,10 @@ package arc.mp
     import flash.events.MouseEvent;
     import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
-    import it.gotoandplay.smartfoxserver.SFSEvent;
+    import com.flashfla.net.events.LoginEvent;
+    import com.flashfla.net.events.RoomUserEvent;
+    import com.flashfla.net.events.RoomJoinedEvent;
+    import com.flashfla.net.events.UserUpdateEvent;
 
     public class MultiplayerUsers extends Component
     {
@@ -52,23 +55,23 @@ package arc.mp
 
             setSize(200, 350);
 
-            connection.addEventListener(Multiplayer.EVENT_LOGIN, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_LOGIN, function(event:LoginEvent):void
             {
                 buildContextMenu();
             });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_USER, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_ROOM_USER, function(event:RoomUserEvent):void
             {
-                if (event.params.room == room)
+                if (event.room == room)
                     updateUsers();
             });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_JOINED, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_ROOM_JOINED, function(event:RoomJoinedEvent):void
             {
-                if (event.params.room == room)
+                if (event.room == room)
                     updateUsers();
             });
-            connection.addEventListener(Multiplayer.EVENT_USER_UPDATE, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_USER_UPDATE, function(event:UserUpdateEvent):void
             {
-                updateUser(event.params.user);
+                updateUser(event.user);
             });
 
             buildContextMenu();
