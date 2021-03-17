@@ -17,8 +17,8 @@ package it.gotoandplay.smartfoxserver
     import it.gotoandplay.smartfoxserver.handlers.IMessageHandler;
     import it.gotoandplay.smartfoxserver.handlers.SysHandler;
     import it.gotoandplay.smartfoxserver.handlers.ExtHandler;
-    import it.gotoandplay.smartfoxserver.data.Room;
-    import it.gotoandplay.smartfoxserver.data.User;
+    import it.gotoandplay.smartfoxserver.data.SFSRoom;
+    import it.gotoandplay.smartfoxserver.data.SFSUser;
     import it.gotoandplay.smartfoxserver.util.ObjectSerializer;
     import it.gotoandplay.smartfoxserver.util.Entities;
     import it.gotoandplay.smartfoxserver.http.HttpConnection;
@@ -1183,7 +1183,7 @@ package it.gotoandplay.smartfoxserver
          *
          * @version SmartFoxServer Basic / Pro
          */
-        public function getRoom(roomId:int):Room
+        public function getRoom(roomId:int):SFSRoom
         {
             if ( !checkRoomList() )
                 return null
@@ -1211,14 +1211,14 @@ package it.gotoandplay.smartfoxserver
          *
          * @version SmartFoxServer Basic / Pro
          */
-        public function getRoomByName(roomName:String):Room
+        public function getRoomByName(roomName:String):SFSRoom
         {
             if ( !checkRoomList() )
                 return null
             
-            var room:Room = null
+            var room:SFSRoom = null
             
-            for each (var r:Room in roomList)
+            for each (var r:SFSRoom in roomList)
             {
                 if (r.getName() == roomName)
                 {
@@ -1282,7 +1282,7 @@ package it.gotoandplay.smartfoxserver
          *
          * @version SmartFoxServer Basic / Pro
          */
-        public function getActiveRoom():Room
+        public function getActiveRoom():SFSRoom
         {
             if ( !checkRoomList() || !checkJoin() )
                 return null
@@ -1408,7 +1408,7 @@ package it.gotoandplay.smartfoxserver
                 else if (typeof newRoom == "string")
                 {
                     // Search the room
-                    for each (var r:Room in roomList)
+                    for each (var r:SFSRoom in roomList)
                     {
                         if (r.getName() == newRoom)
                         {
@@ -2269,7 +2269,7 @@ package it.gotoandplay.smartfoxserver
             else
                 xmlMsg = "<vars so='0'>"
                 
-            var room:Room = getRoom(roomId);
+            var room:SFSRoom = getRoom(roomId);
             var roomVars:Array = room.getVariables();
             for each (var rv:Object in varList) {
                 if (roomVars[rv.name] != rv.val)
@@ -2318,8 +2318,8 @@ package it.gotoandplay.smartfoxserver
                 
             var header:Object = {t:"sys"}
 
-            for each (var room:Room in getAllRooms()) {
-                var user:User = room.getUser(myUserId);
+            for each (var room:SFSRoom in getAllRooms()) {
+                var user:SFSUser = room.getUser(myUserId);
                 if (user != null)
                     user.setVariables(varObj);
             }

@@ -29,6 +29,7 @@ package arc.mp
     import com.flashfla.net.events.GameStartEvent;
     import com.flashfla.net.events.GameUpdateEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
+    import it.gotoandplay.smartfoxserver.data.SFSRoom;
 
     public class MultiplayerSingleton extends Object
     {
@@ -41,7 +42,7 @@ package arc.mp
 
         private var autoJoin:Boolean;
 
-        private var currentRoom:Object = null;
+        private var currentRoom:SFSRoom = null;
         private var currentSong:Object = null;
         private var currentSongFile:Song = null;
         private var currentStatus:int = 0;

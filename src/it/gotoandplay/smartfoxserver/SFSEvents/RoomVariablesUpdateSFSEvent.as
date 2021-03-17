@@ -3,11 +3,11 @@ package it.gotoandplay.smartfoxserver.SFSEvents
 
     import it.gotoandplay.smartfoxserver.TypedSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvent;
-    import it.gotoandplay.smartfoxserver.data.Room;
+    import it.gotoandplay.smartfoxserver.data.SFSRoom;
 
     public class RoomVariablesUpdateSFSEvent extends TypedSFSEvent
     {
-        public var room:Room;
+        public var room:SFSRoom;
         public var changedVars:Array;
 
         public function RoomVariablesUpdateSFSEvent(params:Object)

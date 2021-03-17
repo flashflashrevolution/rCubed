@@ -2,8 +2,8 @@ package it.gotoandplay.smartfoxserver.handlers
 {
     import flash.utils.getTimer;
     import it.gotoandplay.smartfoxserver.SmartFoxClient;
-    import it.gotoandplay.smartfoxserver.data.Room;
-    import it.gotoandplay.smartfoxserver.data.User;
+    import it.gotoandplay.smartfoxserver.data.SFSRoom;
+    import it.gotoandplay.smartfoxserver.data.SFSUser;
     import it.gotoandplay.smartfoxserver.util.Entities;
     import it.gotoandplay.smartfoxserver.util.ObjectSerializer;
     import it.gotoandplay.smartfoxserver.TypedSFSEvent;
@@ -187,7 +187,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var roomList:Array = sfs.getAllRooms();
             var filling:Boolean = (roomList.length == 0);
             var roomsInList:Array = new Array();
-            var room:Room;
+            var room:SFSRoom;
             var params:Object = {}
             var evt:TypedSFSEvent
 
@@ -200,7 +200,7 @@ package it.gotoandplay.smartfoxserver.handlers
                 var updated:Boolean = false;
                 if (room == null)
                 {
-                    room = new Room(roomId, roomXml.n, int(roomXml.@maxu), int(roomXml.@maxs), (roomXml.@temp == "1"), (roomXml.@game == "1"), (roomXml.@priv == "1"), (roomXml.@lmb == "1"), int(roomXml.@ucnt), int(roomXml.@scnt));
+                    room = new SFSRoom(roomId, roomXml.n, int(roomXml.@maxu), int(roomXml.@maxs), (roomXml.@temp == "1"), (roomXml.@game == "1"), (roomXml.@priv == "1"), (roomXml.@lmb == "1"), int(roomXml.@ucnt), int(roomXml.@scnt));
                     roomList[roomId] = room;
                     newRoom = true;
                 }
@@ -267,7 +267,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var sCount:int = int(o.body.@s)
             var roomId:int = int(o.body.@r)
 
-            var room:Room = sfs.getAllRooms()[roomId]
+            var room:SFSRoom = sfs.getAllRooms()[roomId]
 
             if (room != null)
             {
@@ -295,7 +295,7 @@ package it.gotoandplay.smartfoxserver.handlers
             sfs.activeRoomId = roomId
 
             // get current Room and populates usrList
-            var currRoom:Room = sfs.getRoom(roomId)
+            var currRoom:SFSRoom = sfs.getRoom(roomId)
 
             // Clear the old data, we need to start from a clean list
             currRoom.clearUserList()
@@ -326,7 +326,7 @@ package it.gotoandplay.smartfoxserver.handlers
                 var pId:int = usr.@p == null ? -1 : int(usr.@p)
 
                 // Create and populate User
-                var user:User = new User(id, name)
+                var user:SFSUser = new SFSUser(id, name)
                 user.setModerator(isMod)
                 user.setIsSpectator(isSpec)
                 user.setPlayerId(pId)
@@ -378,10 +378,10 @@ package it.gotoandplay.smartfoxserver.handlers
 
             var varList:XMLList = o.body.u.vars["var"]
 
-            var currRoom:Room = sfs.getRoom(roomId)
+            var currRoom:SFSRoom = sfs.getRoom(roomId)
 
             // Create new user object
-            var newUser:User = new User(usrId, usrName)
+            var newUser:SFSUser = new SFSUser(usrId, usrName)
             newUser.setModerator(isMod)
             newUser.setIsSpectator(isSpec)
             newUser.setPlayerId(pid)
@@ -411,7 +411,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var roomId:int = int(o.body.@r)
 
             // Get room
-            var theRoom:Room = sfs.getRoom(roomId)
+            var theRoom:SFSRoom = sfs.getRoom(roomId)
 
             // Get user name
             var uName:String = theRoom.getUser(userId).getName()
@@ -435,7 +435,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var userId:int = int(o.body.user.@id)
             var message:String = o.body.txt
 
-            var sender:User = sfs.getRoom(roomId).getUser(userId)
+            var sender:SFSUser = sfs.getRoom(roomId).getUser(userId)
 
             // Fire event!
             var params:Object = {}
@@ -454,7 +454,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var userId:int = int(o.body.user.@id)
             var message:String = o.body.txt
 
-            var sender:User = sfs.getRoom(roomId).getUser(userId)
+            var sender:SFSUser = sfs.getRoom(roomId).getUser(userId)
 
             // Fire event!
             var params:Object = {}
@@ -488,8 +488,8 @@ package it.gotoandplay.smartfoxserver.handlers
             var userId:int = int(o.body.user.@id)
             var message:String = o.body.txt
 
-            var sender:User = null;
-            var room:Room = sfs.getRoom(roomId)
+            var sender:SFSUser = null;
+            var room:SFSRoom = sfs.getRoom(roomId)
 
             if (room != null)
                 sender = sfs.getRoom(roomId).getUser(userId)
@@ -509,7 +509,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var userId:int = int(o.body.user.@id)
             var xmlStr:String = o.body.dataObj
 
-            var sender:User = sfs.getRoom(roomId).getUser(userId)
+            var sender:SFSUser = sfs.getRoom(roomId).getUser(userId)
             var asObj:Object = ObjectSerializer.getInstance().deserialize(new XML(xmlStr))
 
             // Fire event!
@@ -526,7 +526,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var roomId:int = int(o.body.@r)
             var userId:int = int(o.body.user.@id)
 
-            var currRoom:Room = sfs.getRoom(roomId)
+            var currRoom:SFSRoom = sfs.getRoom(roomId)
             var changedVars:Array = []
 
             // Handle Room Variables
@@ -548,14 +548,14 @@ package it.gotoandplay.smartfoxserver.handlers
         {
             var userId:int = int(o.body.user.@id)
             var changedVars:Array
-            var varOwner:User = null
-            var returnUser:User = null
+            var varOwner:SFSUser = null
+            var returnUser:SFSUser = null
 
             // First, we check if there's actual variables data available
             if (o.body.vars.toString().length > 0)
             {
                 // Search the userId in all available rooms
-                for each (var room:Room in sfs.getAllRooms())
+                for each (var room:SFSRoom in sfs.getAllRooms())
                 {
                     varOwner = room.getUser(userId)
 
@@ -592,7 +592,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var isLimbo:Boolean = o.body.rm.@limbo == "1" ? true : false
 
             // Create room obj
-            var newRoom:Room = new Room(rId, rName, rMax, rSpec, isTemp, isGame, isPriv, isLimbo)
+            var newRoom:SFSRoom = new SFSRoom(rId, rName, rMax, rSpec, isTemp, isGame, isPriv, isLimbo)
 
             var rList:Array = sfs.getAllRooms()
             rList[rId] = newRoom
@@ -895,7 +895,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var params:Object = {}
             params.roomId = roomLeft
 
-            var room:Room = sfs.getRoom(roomLeft);
+            var room:SFSRoom = sfs.getRoom(roomLeft);
             if (room != null)
                 room.clearUserList();
 
@@ -909,7 +909,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var playerId:int = int(o.body.pid.@id)
 
             // Synch user count, if switch successful
-            var theRoom:Room = sfs.getRoom(roomId)
+            var theRoom:SFSRoom = sfs.getRoom(roomId)
 
             var userId:int;
             if (o.body.pid.@u != undefined)
@@ -926,7 +926,7 @@ package it.gotoandplay.smartfoxserver.handlers
                 theRoom.setUserCount(theRoom.getUserCount() + 1)
                 theRoom.setSpectatorCount(theRoom.getSpectatorCount() - 1)
 
-                var user:User = theRoom.getUser(userId);
+                var user:SFSUser = theRoom.getUser(userId);
 
                 if (user != null)
                 {
@@ -951,7 +951,7 @@ package it.gotoandplay.smartfoxserver.handlers
         {
             var roomId:int = int(o.body.@r)
             var playerId:int = int(o.body.pid.@id)
-            var theRoom:Room = sfs.getRoom(roomId)
+            var theRoom:SFSRoom = sfs.getRoom(roomId)
             var userId:int;
             if (o.body.pid.@u != undefined)
                 userId = int(o.body.pid.@u);
@@ -968,7 +968,7 @@ package it.gotoandplay.smartfoxserver.handlers
                 theRoom.setUserCount(theRoom.getUserCount() - 1)
                 theRoom.setSpectatorCount(theRoom.getSpectatorCount() + 1)
 
-                var user:User = theRoom.getUser(userId)
+                var user:SFSUser = theRoom.getUser(userId)
 
                 if (user != null)
                 {

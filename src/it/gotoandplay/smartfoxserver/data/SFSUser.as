@@ -13,7 +13,7 @@ package it.gotoandplay.smartfoxserver.data
      * 			{@link http://www.smartfoxserver.com}
      * 			{@link http://www.gotoandplay.it}
      */
-    public class User
+    public class SFSUser
     {
         private var id:int
         private var name:String
@@ -30,7 +30,7 @@ package it.gotoandplay.smartfoxserver.data
          *
          * @exclude
          */
-        public function User(id:int, name:String)
+        public function SFSUser(id:int, name:String)
         {
             this.id = id
             this.name = name

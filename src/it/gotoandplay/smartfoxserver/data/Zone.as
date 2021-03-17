@@ -25,19 +25,19 @@ package it.gotoandplay.smartfoxserver.data
             this.roomList = []
         }
 
-        public function getRoom(id:int):Room
+        public function getRoom(id:int):SFSRoom
         {
-            return (roomList[id] as Room)
+            return (roomList[id] as SFSRoom)
         }
 
-        public function getRoomByName(name:String):Room
+        public function getRoomByName(name:String):SFSRoom
         {
-            var room:Room = null
+            var room:SFSRoom = null
             var found:Boolean = false
 
             for (var key:String in roomList)
             {
-                room = roomList[key] as Room
+                room = roomList[key] as SFSRoom
 
                 if (room.getName() == name)
                 {

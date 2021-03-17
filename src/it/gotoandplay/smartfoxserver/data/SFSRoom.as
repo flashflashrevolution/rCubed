@@ -14,7 +14,7 @@ package it.gotoandplay.smartfoxserver.data
      * 			{@link http://www.smartfoxserver.com}
      * 			{@link http://www.gotoandplay.it}
      */
-    public class Room
+    public class SFSRoom
     {
         private var id:int
         private var name:String
@@ -48,7 +48,7 @@ package it.gotoandplay.smartfoxserver.data
          *
          * @exclude
          */
-        public function Room(id:int, name:String, maxUsers:int, maxSpectators:int, isTemp:Boolean, isGame:Boolean, isPrivate:Boolean, isLimbo:Boolean, userCount:int = 0, specCount:int = 0)
+        public function SFSRoom(id:int, name:String, maxUsers:int, maxSpectators:int, isTemp:Boolean, isGame:Boolean, isPrivate:Boolean, isLimbo:Boolean, userCount:int = 0, specCount:int = 0)
         {
             this.id = id
             this.name = name
@@ -73,7 +73,7 @@ package it.gotoandplay.smartfoxserver.data
          *
          * @exclude
          */
-        public function addUser(u:User, id:int):void
+        public function addUser(u:SFSUser, id:int):void
         {
             userList[id] = u
 
@@ -92,7 +92,7 @@ package it.gotoandplay.smartfoxserver.data
          */
         public function removeUser(id:int):void
         {
-            var u:User = userList[id]
+            var u:SFSUser = userList[id]
 
             if (this.game && u.isSpectator())
                 specCount--
@@ -141,9 +141,9 @@ package it.gotoandplay.smartfoxserver.data
          *
          * @version	SmartFoxServer Basic / Pro
          */
-        public function getUser(userId:*):User
+        public function getUser(userId:*):SFSUser
         {
-            var user:User = null
+            var user:SFSUser = null
 
             if (typeof userId == "number")
             {
@@ -154,7 +154,7 @@ package it.gotoandplay.smartfoxserver.data
             {
                 for (var i:String in userList)
                 {
-                    var u:User = this.userList[i]
+                    var u:SFSUser = this.userList[i]
 
                     if (u.getName() == userId)
                     {

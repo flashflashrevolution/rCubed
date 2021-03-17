@@ -7,8 +7,8 @@ package com.flashfla.net
 
     import it.gotoandplay.smartfoxserver.SmartFoxClient;
     import it.gotoandplay.smartfoxserver.SFSEvent;
-    import it.gotoandplay.smartfoxserver.data.Room;
-    import it.gotoandplay.smartfoxserver.data.User;
+    import it.gotoandplay.smartfoxserver.data.SFSRoom;
+    import it.gotoandplay.smartfoxserver.data.SFSUser;
 
     import arc.ArcGlobals;
     import classes.Playlist;
@@ -591,10 +591,10 @@ package com.flashfla.net
             }
             server.setUserVariables(vars);
 
-            var foundSfsUser:User = null;
-            for each (var sfsRoom:Room in server.getAllRooms())
+            var foundSfsUser:SFSUser = null;
+            for each (var sfsRoom:SFSRoom in server.getAllRooms())
             {
-                for each (var sfsUser:User in sfsRoom.getUserList())
+                for each (var sfsUser:SFSUser in sfsRoom.getUserList())
                 {
                     if (sfsUser.getId() == currentUser.userID)
                     {
@@ -725,7 +725,7 @@ package com.flashfla.net
 
         private function addRoom(sfsRoom:*):void
         {
-            if (!(sfsRoom is Room))
+            if (!(sfsRoom is SFSRoom))
                 sfsRoom = server.getRoom(sfsRoom);
 
             var room:Object = new Object();
@@ -751,7 +751,7 @@ package com.flashfla.net
 
         private function updateRoom(sfsRoom:*):void
         {
-            if (!(sfsRoom is Room))
+            if (!(sfsRoom is SFSRoom))
                 sfsRoom = server.getRoom(sfsRoom);
 
             var room:Object = getRoom(sfsRoom);
@@ -776,7 +776,7 @@ package com.flashfla.net
                     item.room = null;
                 return ret;
             });
-            for each (var sfsUser:User in sfsRoom.getUserList())
+            for each (var sfsUser:SFSUser in sfsRoom.getUserList())
             {
                 if (getUser(room.roomID, sfsUser) == null)
                 {
@@ -826,7 +826,7 @@ package com.flashfla.net
             }
         }
 
-        private function updateUser(sfsUser:User):void
+        private function updateUser(sfsUser:SFSUser):void
         {
             for each (var room:Object in rooms)
             {
@@ -841,7 +841,7 @@ package com.flashfla.net
             }
         }
 
-        private function findUser(sfsUser:User):Object
+        private function findUser(sfsUser:SFSUser):Object
         {
             for each (var room:Object in rooms)
             {
@@ -858,8 +858,8 @@ package com.flashfla.net
         private function getRoom(sfsRoom:*):Object
         {
             var roomId:int;
-            if (sfsRoom is Room)
-                roomId = Room(sfsRoom).getId();
+            if (sfsRoom is SFSRoom)
+                roomId = SFSRoom(sfsRoom).getId();
             else
                 roomId = int(sfsRoom);
 
@@ -876,8 +876,8 @@ package com.flashfla.net
         {
             var room:Object = getRoom(sfsRoom);
             var userId:int;
-            if (sfsUser is User)
-                userId = User(sfsUser).getId();
+            if (sfsUser is SFSUser)
+                userId = SFSUser(sfsUser).getId();
             else
                 userId = int(sfsUser);
 
@@ -1116,8 +1116,8 @@ package com.flashfla.net
         {
             if (event.userId == currentUser.userID)
                 return; // XXX: Ignore PM events sent by yourself because they don't include the recipient for some stupid reason
-            var room:Room = server.getRoom(event.roomId);
-            var user:User = event.sender;
+            var room:SFSRoom = server.getRoom(event.roomId);
+            var user:SFSUser = event.sender;
             if (user == null)
                 user = room.getUser(event.userId);
             eventMessage(MESSAGE_PRIVATE, getRoom(room), getUser(room, user), htmlUnescape(event.message));
@@ -1125,8 +1125,8 @@ package com.flashfla.net
 
         private function onPublicMessage(event:PublicMessageSFSEvent):void
         {
-            var room:Room = server.getRoom(event.roomId);
-            var user:User = event.sender;
+            var room:SFSRoom = server.getRoom(event.roomId);
+            var user:SFSUser = event.sender;
             if (user == null)
                 user = room.getUser(event.userId);
             eventMessage(MESSAGE_PUBLIC, getRoom(room), getUser(room, user), htmlUnescape(event.message));
@@ -1135,7 +1135,7 @@ package com.flashfla.net
         private function onRoomListUpdate(event:RoomListUpdateSFSEvent):void
         {
             clearRooms();
-            for each (var room:Room in event.roomList)
+            for each (var room:SFSRoom in event.roomList)
                 addRoom(room);
             eventRoomList();
         }
