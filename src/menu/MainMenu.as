@@ -82,7 +82,7 @@ package menu
         override public function init():Boolean
         {
             //- Setup Options
-            options = new Object();
+            options = {};
             options.activePanel = -1;
 
             //- Add Logo

@@ -123,7 +123,7 @@ package com.flashfla.net
         public var currentUser:User;
         public var rooms:Vector.<Room>;
         public var ghostRooms:Vector.<Room>;
-        public var lobby:Room;
+        public var _lobby:Room;
         public var inSolo:Boolean;
 
         public var mode:int;
@@ -165,12 +165,12 @@ package com.flashfla.net
 
         public function Multiplayer(_mode:int = GAME_R3)
         {
-            currentUser = new User();
+            currentUser = new User(false, true);
             rooms = new <Room>[];
             ghostRooms = new <Room>[];
             mode = _mode;
 
-            server = new SmartFoxClient(false); // CONFIG::debug);
+            server = new SmartFoxClient(true); // CONFIG::debug);
 
             CONFIG::debug
             {
@@ -265,6 +265,28 @@ package com.flashfla.net
                 else if (target.id != null)
                     server.sendXtMessage(SERVER_EXTENSIONS[mode], "html_message", {"m": message, "t": SmartFoxClient.MODMSG_TO_ROOM, "v": target.id});
             }
+        }
+
+        public function get lobby():Room
+        {
+            if (_lobby)
+                return _lobby;
+
+            for each (var room:Room in rooms)
+            {
+                if (room.name == "Lobby")
+                {
+                    _lobby = room
+                    return _lobby
+                }
+            }
+
+            return null
+        }
+
+        public function set lobby(room:Room):void
+        {
+            _lobby = room;
         }
 
         public function getUserList(room:Room):void
@@ -727,6 +749,7 @@ package com.flashfla.net
 
         private function addRoom(room:Room):void
         {
+            room.connection = this;
             rooms.push(room);
 
             if (room.name == "Lobby")
@@ -737,46 +760,15 @@ package com.flashfla.net
 
         private function updateRoom(room:Room):void
         {
-            var user:User;
-
             if (room == null)
                 return;
 
             if (currentUser.room == room)
                 currentUser.room = null;
 
-            room.userCount = room.userCount;
-            room.specCount = room.specCount;
-            room.variables = room.variables;
-            room.isJoined = false;
-            room.user = null;
-
-            room.userList = room.userList.filter(function(item:User, index:int, vec:Vector.<User>):Boolean
+            for each (var user:User in room.userList)
             {
-                var ret:Boolean = room.getUser(item.id) != null;
-                if (!ret)
-                    item.room = null;
-                return ret;
-            });
-            for each (var _user:User in room.userList)
-            {
-                if (getRoomUserById(room, _user.id) == null)
-                {
-                    user = new User();
-                    user.room = room;
-                    user.id = _user.id;
-                    user.name = _user.name;
-                    user.isModerator = _user.isModerator;
-                    user.variables = _user.variables;
-                    parseUserVariables(user);
-                    room.userList.push(user);
-                }
-            }
-            for each (user in room.userList)
-            {
-                _user = room.getUser(user.id);
-                user.id = _user.id;
-                user.isPlayer = room.isGame && !_user.isSpec;
+                user.isPlayer = room.isGame && !user.isSpec;
                 if (user.id == currentUser.id)
                 {
                     room.isJoined = true;
@@ -786,7 +778,7 @@ package com.flashfla.net
                 }
                 if (user.isPlayer)
                 {
-                    room.players[user.id] = user;
+                    room.players.push(user);
                     parseRoomUserVariables(room, user);
                 }
             }
@@ -1003,8 +995,7 @@ package com.flashfla.net
                     currentUser.userColour = data.usercolor;
                     currentUser.userLevel = data.userlevel;
                     currentUser.id = data.userID;
-                    // TODO: Keep this to fix id's later
-                    //currentUser.siteID = data.siteID;
+                    currentUser.siteId = data.siteID;
                     currentUser.isModerator = (data.mod || data.userclass == CLASS_ADMIN || data.userclass == CLASS_FORUM_MOD || data.userclass == CLASS_CHAT_MOD || data.userclass == CLASS_MP_MOD);
                     currentUser.isAdmin = (data.userclass == CLASS_ADMIN);
                     currentUser.userStatus = 0;
@@ -1057,10 +1048,8 @@ package com.flashfla.net
 
         private function onModeratorMessage(event:ModerationMessageSFSEvent):void
         {
-            var user:User = null;
             if (event.sender != null)
-                user = findUser(event.sender);
-            eventServerMessage(htmlUnescape(event.message), user);
+                eventServerMessage(htmlUnescape(event.message), event.sender);
         }
 
         private function onPlayerSwitched(event:PlayerSwitchedSFSEvent):void
@@ -1223,7 +1212,7 @@ package com.flashfla.net
 
         private function onRoomDeleted(event:RoomDeletedSFSEvent):void
         {
-            var room:Object = getRoom(event.room);
+            var room:Room = getRoom(event.room);
             removeRoom(event.room);
             if (room.isJoined)
                 ghostRooms.push(room);
@@ -1292,7 +1281,7 @@ package com.flashfla.net
         private function onUserVariablesUpdate(event:UserVariablesUpdateSFSEvent):void
         {
             updateUser(event.user);
-            eventUserUpdate(findUser(event.user), event.changedVars);
+            eventUserUpdate(event.user, event.changedVars);
         }
 
         public static function htmlUnescape(str:String):String

@@ -14,13 +14,13 @@ package com.flashfla.utils
 
         public static function inVector(vec:*, items:*):Boolean
         {
-            if (!(vec is Vector) || !(items is Vector))
+            var _vec:Vector.<*> = Vector.<*>(vec);
+            var _items:Vector.<*> = Vector.<*>(items);
+
+            if (!(vec.length) || !(items.length) || vec.length < items.length)
             {
                 return false;
             }
-
-            var _vec:Vector.<*> = vec as Vector.<*>;
-            var _items:Vector.<*> = items as Vector.<*>;
 
             for (var y:int = 0; y < _items.length; y++)
             {

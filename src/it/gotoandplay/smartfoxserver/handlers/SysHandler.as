@@ -310,17 +310,18 @@ package it.gotoandplay.smartfoxserver.handlers
             for each (var usr:XML in userListXml)
             {
                 // grab the user properties
-                var name:String = usr.n
                 var id:int = int(usr.@i)
+                var name:String = usr.n
                 var isMod:Boolean = usr.@m == "1" ? true : false
                 var isSpec:Boolean = usr.@s == "1" ? true : false
                 var pId:int = usr.@p == null ? -1 : int(usr.@p)
 
                 // Create and populate User
-                var user:User = new User(id, name)
+                var user:User = new User(true)
+                user.id = id
+                user.name = name
                 user.isModerator = isMod
                 user.isSpec = isSpec
-                user.id = pId
 
                 // Handle user variables
                 if (usr.vars.toString().length > 0)
@@ -372,10 +373,11 @@ package it.gotoandplay.smartfoxserver.handlers
             var currRoom:Room = sfs.getRoom(roomId)
 
             // Create new user object
-            var newUser:User = new User(usrId, usrName)
+            var newUser:User = new User(true)
+            newUser.id = usrId
+            newUser.name = usrName
             newUser.isModerator = isMod
             newUser.isSpec = isSpec
-            newUser.id = pid
 
             // Add user to room
             currRoom.addUser(newUser)

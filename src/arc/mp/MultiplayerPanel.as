@@ -188,7 +188,7 @@ package arc.mp
                     return;
                 }
                 var inGame:Boolean = false;
-                for each (var room:Object in connection.rooms)
+                for each (var room:Room in connection.rooms)
                 {
                     if (room.isJoined && room != connection.lobby)
                         inGame = true;
@@ -407,29 +407,29 @@ package arc.mp
                 window.visible = show;
         }
 
-        private function foreachroom(foreach:Function):void
+        private function forEachRoom(foreach:Function):void
         {
             for (var i:int = 0; i < numChildren; i++)
             {
-                var room:Object = getChildAt(i);
-                if (room is MultiplayerRoom)
-                    foreach(room);
+                var container:Object = getChildAt(i);
+                if (container is MultiplayerRoom)
+                    foreach(container);
             }
         }
 
-        public function hideRooms(show:Boolean = false):void
+        public function setRoomsVisibility(visible:Boolean = false):void
         {
-            foreachroom(function(room:MultiplayerRoom):void
+            forEachRoom(function(room:MultiplayerRoom):void
             {
-                room.visible = show;
-                if (show)
+                room.visible = visible;
+                if (visible)
                     room.redraw();
             });
         }
 
-        public function hideRoom(room:Object, show:Boolean = false):void
+        public function hideRoom(room:Room, show:Boolean = false):void
         {
-            foreachroom(function(mproom:MultiplayerRoom):void
+            forEachRoom(function(mproom:MultiplayerRoom):void
             {
                 if (mproom.room == room)
                 {

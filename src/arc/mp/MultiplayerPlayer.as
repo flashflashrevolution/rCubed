@@ -9,11 +9,13 @@ package arc.mp
     import com.flashfla.net.events.RoomUpdateEvent;
     import com.flashfla.net.events.RoomUserEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
+    import classes.Room;
+    import classes.User;
 
     public class MultiplayerPlayer extends Panel
     {
         private var connection:Multiplayer;
-        public var room:Object;
+        public var room:Room;
         public var player:int;
 
         private var playerLabel:Label;
@@ -24,7 +26,7 @@ package arc.mp
         private var comboLabel:Label;
         private var canRedraw:Boolean = true;
 
-        public function MultiplayerPlayer(parent:DisplayObjectContainer, roomValue:Object, playerValue:int)
+        public function MultiplayerPlayer(parent:DisplayObjectContainer, roomValue:Room, playerValue:int)
         {
             super(parent);
 
@@ -87,16 +89,17 @@ package arc.mp
             if (!canRedraw)
                 return;
 
-            var user:Object = null;
-            for each (var roomUser:Object in room.users)
+            var user:User = null;
+            for each (var roomUser:User in room.userList)
             {
-                if (roomUser.playerID == player)
+                if (roomUser.id == player)
                 {
                     user = roomUser;
                     break;
                 }
             }
 
+            // TODO: Wtf ?
             var gameplay:Object = room.players[player] || {};
             gameplay = gameplay.gameplay;
             if (!roomUser || !gameplay)
@@ -144,7 +147,7 @@ package arc.mp
 
 
                 playerLabel.html = true;
-                playerLabel.text = MultiplayerChat.textFormatLevel(user) + user.userName;
+                playerLabel.text = MultiplayerChat.textFormatLevel(user) + user.name;
                 scoreLabel.text = "Score: " + gameplay.score;
                 paLabel.text = "PA: " + (gameplay.amazing + gameplay.perfect) + " - " + gameplay.good + " - " + gameplay.average + " - " + gameplay.miss + " - " + gameplay.boo;
                 comboLabel.text = "Combo: " + gameplay.combo + " / " + gameplay.maxCombo;

@@ -307,8 +307,8 @@ package classes
 
             // Public
             this.name = _data["name"];
-            this.id = _data["id"];
-            this.groups = VectorUtil.fromArr(_data["groups"]) as Vector.<Number>;
+            this.siteId = _data["id"];
+            this.groups = Vector.<Number>(VectorUtil.fromArr(_data["groups"]));
             this.joinDate = _data["joinDate"];
             this.gameRank = _data["gameRank"];
             this.gamesPlayed = _data["gamesPlayed"];
@@ -365,7 +365,7 @@ package classes
 
         private function setupPermissions():void
         {
-            this.isGuest = (this.id <= 2);
+            this.isGuest = (this.siteId <= 2);
             this.isVeteran = VectorUtil.inVector(this.groups, new <Number>[VETERAN_ID]);
             this.isAdmin = VectorUtil.inVector(this.groups, new <Number>[ADMIN_ID]);
             this.isDeveloper = VectorUtil.inVector(this.groups, new <Number>[DEVELOPER_ID])

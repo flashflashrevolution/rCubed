@@ -879,7 +879,7 @@ package game
         {
             var lowIndex:int = 0;
             var highIndex:int = 0;
-            for each (var user:Object in options.multiplayer.players)
+            for each (var user:User in options.multiplayer.players)
             {
                 var gameplay:Object = user.gameplay;
                 var index:int = gameplay.amazing + gameplay.perfect + gameplay.good + gameplay.average + gameplay.miss;
@@ -1651,33 +1651,33 @@ package game
             if (!options.displayMP && !mpSpectate)
                 return;
 
-            for each (var user:Object in options.multiplayer.players)
+            for each (var user:User in options.multiplayer.players)
             {
-                if (user.userID == options.multiplayer.connection.currentUser.id)
+                if (user.id == options.multiplayer.connection.currentUser.id)
                     continue;
 
                 if (options.displayMPPA)
                 {
                     var pa:PAWindow = new PAWindow(options);
                     addChild(pa);
-                    mpPA[user.playerID] = pa;
+                    mpPA[user.id] = pa;
                 }
 
                 if (mpSpectate)
                 {
                     var header:MPHeader = new MPHeader(user);
                     if (options.displayMPPA)
-                        mpPA[user.playerID].addChild(header);
+                        mpPA[user.id].addChild(header);
                     else
                         addChild(header);
-                    mpHeader[user.playerID] = header;
+                    mpHeader[user.id] = header;
                 }
 
                 if (options.displayMPCombo)
                 {
                     var combo:Combo = new Combo(options);
                     addChild(combo);
-                    mpCombo[user.playerID] = combo;
+                    mpCombo[user.id] = combo;
                 }
 
                 // Hide opponent's judge
@@ -1686,7 +1686,7 @@ package game
                     //if (options.displayMPJudge) {
                     var judge:Judge = new Judge(options);
                     addChild(judge);
-                    mpJudge[user.playerID] = judge;
+                    mpJudge[user.id] = judge;
                     if (options.isEditor)
                         judge.showJudge(100, true);
                 }

@@ -72,7 +72,7 @@ package arc.mp
                 panel = new MultiplayerPanel(parent);
             panel.setParent(parent);
             panel.hideBackground(true);
-            panel.hideRooms(true);
+            panel.setRoomsVisibility(true);
             return panel;
         }
 
@@ -504,7 +504,7 @@ package arc.mp
             var panel:MultiplayerPanel = getPanel(gameResults);
             gameResults.addChild(panel);
             panel.hideBackground(false);
-            panel.hideRooms(false);
+            panel.setRoomsVisibility(false);
             panel.hideRoom(room, true);
 
             if (sendingScore)

@@ -17,13 +17,12 @@ package game.controls
         public static const ALIGN_LEFT:String = TextFieldAutoSize.LEFT;
         public static const ALIGN_RIGHT:String = TextFieldAutoSize.RIGHT;
 
-        public var user:Object;
-        public var userData:User;
+        public var user:User;
 
         public var avatar:Loader;
         public var field:TextField;
 
-        public function MPHeader(user:Object)
+        public function MPHeader(user:User)
         {
             this.user = user;
 
@@ -36,7 +35,7 @@ package game.controls
             field.y = 0;
             field.height = 20;
             field.autoSize = TextFieldAutoSize.LEFT;
-            field.text = user.userName;
+            field.text = user.name;
             addChild(field);
 
             avatar = new Loader();
@@ -46,10 +45,10 @@ package game.controls
             Constant.addDefaultRequestVariables(vars);
             vars["cHeight"] = 100;
             vars["cWidth"] = 100;
-            if (user.siteID)
-                vars["uid"] = user.siteID;
+            if (user.siteId)
+                vars["uid"] = user.siteId;
             else
-                vars["uname"] = user.userName;
+                vars["uname"] = user.name;
             request.data = vars;
             avatar.load(request);
         }

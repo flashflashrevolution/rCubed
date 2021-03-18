@@ -91,24 +91,24 @@ package arc.mp
         {
             controlUsers.items.sort(function(ud1:Object, ud2:Object):int
             {
-                var u1:Object = ud1.data;
-                var u2:Object = ud2.data;
+                var u1:User = ud1.data;
+                var u2:User = ud2.data;
                 var c1:int = u1.userLevel || u1.userLevel || 0;
                 var c2:int = u2.userLevel || u2.userLevel || 0;
                 if (c1 < c2)
                     return 1;
                 else if (c1 > c2)
                     return -1;
-                return u1.userName.toLowerCase().localeCompare(u2.userName.toLowerCase());
+                return u1.name.toLowerCase().localeCompare(u2.name.toLowerCase());
             });
             controlUsers.items = controlUsers.items;
         }
 
-        public function updateUser(user:Object):void
+        public function updateUser(user:User):void
         {
             for each (var item:Object in controlUsers.items)
             {
-                if (item.data.userID == user.userID)
+                if (item.data.id == user.id)
                 {
                     item.label = MultiplayerChat.nameUser(user);
                     item.data = user;

@@ -66,21 +66,20 @@ package classes
                 userCount++
         }
 
-        public function removeUser(id:int):void
+        public function removeUser(userId:int):void
         {
-            var idx:int = 0
-            var found:Boolean = false
-            for each (var user:User in userList)
+            var idx:int = -1
+            for (var index:int in userList)
             {
-                if (user.id == id)
+                var _user:User = userList[index]
+                if (_user.id == userId)
                 {
-                    found = true
+                    idx = index
                     break
                 }
-                idx++
             }
 
-            if (found)
+            if (idx >= 0)
             {
                 delete userList[idx]
 
@@ -91,30 +90,12 @@ package classes
             }
         }
 
-        /**
-         * Retrieve a user currently in the room.
-         *
-         * @param 	userId:	the user name ({@code String}) or the id ({@code int}) of the user to retrieve.
-         *
-         * @return	A {@link User} object.
-         */
         public function getUser(userId:int):User
         {
-            var idx:int = 0
-            var found:Boolean = false
-            for each (var user:User in userList)
+            for each (var _user:User in userList)
             {
-                if (user.id == id)
-                {
-                    found = true
-                    break
-                }
-                idx++
-            }
-
-            if (found)
-            {
-                return userList[idx]
+                if (_user.id == userId)
+                    return user
             }
 
             return null
