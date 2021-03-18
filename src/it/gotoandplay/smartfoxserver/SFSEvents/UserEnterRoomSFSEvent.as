@@ -3,12 +3,12 @@ package it.gotoandplay.smartfoxserver.SFSEvents
 
     import it.gotoandplay.smartfoxserver.TypedSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvent;
-    import it.gotoandplay.smartfoxserver.data.SFSUser;
+    import classes.User;
 
     public class UserEnterRoomSFSEvent extends TypedSFSEvent
     {
         public var roomId:int;
-        public var user:SFSUser;
+        public var user:User;
 
         public function UserEnterRoomSFSEvent(params:Object)
         {

@@ -2,18 +2,11 @@ package it.gotoandplay.smartfoxserver.handlers
 {
     import flash.utils.getTimer;
     import it.gotoandplay.smartfoxserver.SmartFoxClient;
-    import it.gotoandplay.smartfoxserver.data.SFSRoom;
-    import it.gotoandplay.smartfoxserver.data.SFSUser;
     import it.gotoandplay.smartfoxserver.util.Entities;
     import it.gotoandplay.smartfoxserver.util.ObjectSerializer;
     import it.gotoandplay.smartfoxserver.TypedSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.AdminMessageSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.LoginSFSEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.BuddyListErrorSFSEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.BuddyListSFSEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.BuddyListUpdateSFSEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.BuddyPermissionRequestSFSEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.BuddyRoomSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.RoomLeftSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.SpectatorSwitchedSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.PlayerSwitchedSFSEvent;
@@ -37,6 +30,9 @@ package it.gotoandplay.smartfoxserver.handlers
     import it.gotoandplay.smartfoxserver.SFSEvents.RandomKeySFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.RoundTripResponseSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.CreateRoomErrorSFSEvent;
+    import classes.User;
+    import classes.Room;
+    import com.flashfla.utils.VectorUtil;
 
     /**
      * SysHandler class: handles "sys" type messages.
@@ -82,14 +78,8 @@ package it.gotoandplay.smartfoxserver.handlers
             handlersTable["roundTripRes"] = this.handleRoundTripBench
             handlersTable["uVarsUpdate"] = this.handleUserVarsUpdate
             handlersTable["createRmKO"] = this.handleCreateRoomError
-            handlersTable["bList"] = this.handleBuddyList
-            handlersTable["bUpd"] = this.handleBuddyListUpdate
-            handlersTable["bAdd"] = this.handleBuddyAdded
-            handlersTable["roomB"] = this.handleBuddyRoom
             handlersTable["leaveRoom"] = this.handleLeaveRoom
             handlersTable["swSpec"] = this.handleSpectatorSwitched
-            handlersTable["bPrm"] = this.handleAddBuddyPermission
-            handlersTable["remB"] = this.handleRemoveBuddy
             handlersTable["swPl"] = this.handlePlayerSwitched
         }
 
@@ -186,21 +176,21 @@ package it.gotoandplay.smartfoxserver.handlers
         {
             var roomList:Array = sfs.getAllRooms();
             var filling:Boolean = (roomList.length == 0);
-            var roomsInList:Array = new Array();
-            var room:SFSRoom;
+            var roomsInList:Array = [];
+            var room:Room;
             var params:Object = {}
             var evt:TypedSFSEvent
 
             for each (var roomXml:XML in o.body.rmList.rm)
             {
-                var changedVars:Array = new Array();
+                var changedVars:Array = [];
                 var roomId:int = int(roomXml.@id);
                 room = (roomList != null ? roomList[roomId] : null);
                 var newRoom:Boolean = false;
                 var updated:Boolean = false;
                 if (room == null)
                 {
-                    room = new SFSRoom(roomId, roomXml.n, int(roomXml.@maxu), int(roomXml.@maxs), (roomXml.@temp == "1"), (roomXml.@game == "1"), (roomXml.@priv == "1"), (roomXml.@lmb == "1"), int(roomXml.@ucnt), int(roomXml.@scnt));
+                    room = new Room(roomId, roomXml.n, int(roomXml.@maxu), int(roomXml.@maxs), (roomXml.@temp == "1"), (roomXml.@game == "1"), (roomXml.@priv == "1"), (roomXml.@lmb == "1"), int(roomXml.@ucnt), int(roomXml.@scnt));
                     roomList[roomId] = room;
                     newRoom = true;
                 }
@@ -208,9 +198,9 @@ package it.gotoandplay.smartfoxserver.handlers
                 {
                     var uCount:int = int(roomXml.@ucnt);
                     var sCount:int = int(roomXml.@scnt);
-                    updated ||= room.getUserCount() != uCount || room.getSpectatorCount() != sCount;
-                    room.setUserCount(uCount);
-                    room.setSpectatorCount(sCount);
+                    updated ||= room.userCount != uCount || room.specCount != sCount;
+                    room.userCount = uCount;
+                    room.specCount = sCount;
                 }
 
                 if (roomXml.vars.toString().length > 0)
@@ -240,9 +230,9 @@ package it.gotoandplay.smartfoxserver.handlers
 
             for each (room in roomList)
             {
-                if (roomsInList.indexOf(room.getId()) < 0)
+                if (roomsInList.indexOf(room.id) < 0)
                 {
-                    delete roomList[room.getId()];
+                    delete roomList[room.id];
                     params = {}
                     params.room = room
 
@@ -254,7 +244,8 @@ package it.gotoandplay.smartfoxserver.handlers
             if (filling)
             {
                 params = {}
-                params.roomList = roomList
+                var roomVec:Vector.<Room> = Vector.<Room>(VectorUtil.fromArr(roomList))
+                params.roomList = roomVec
                 evt = new RoomListUpdateSFSEvent(params)
                 sfs.dispatchEvent(evt)
             }
@@ -267,12 +258,12 @@ package it.gotoandplay.smartfoxserver.handlers
             var sCount:int = int(o.body.@s)
             var roomId:int = int(o.body.@r)
 
-            var room:SFSRoom = sfs.getAllRooms()[roomId]
+            var room:Room = sfs.getAllRooms()[roomId]
 
             if (room != null)
             {
-                room.setUserCount(uCount)
-                room.setSpectatorCount(sCount)
+                room.userCount = uCount
+                room.specCount = sCount
 
                 var params:Object = {}
                 params.room = room
@@ -295,7 +286,7 @@ package it.gotoandplay.smartfoxserver.handlers
             sfs.activeRoomId = roomId
 
             // get current Room and populates usrList
-            var currRoom:SFSRoom = sfs.getRoom(roomId)
+            var currRoom:Room = sfs.getRoom(roomId)
 
             // Clear the old data, we need to start from a clean list
             currRoom.clearUserList()
@@ -306,7 +297,7 @@ package it.gotoandplay.smartfoxserver.handlers
 
             // Also set the myPlayerId in the room
             // for multi-room applications
-            currRoom.setMyPlayerIndex(playerId)
+            currRoom.myPlayerIndex = playerId
 
             // Handle Room Variables
             if (roomVarsXml.vars.toString().length > 0)
@@ -326,10 +317,10 @@ package it.gotoandplay.smartfoxserver.handlers
                 var pId:int = usr.@p == null ? -1 : int(usr.@p)
 
                 // Create and populate User
-                var user:SFSUser = new SFSUser(id, name)
-                user.setModerator(isMod)
-                user.setIsSpectator(isSpec)
-                user.setPlayerId(pId)
+                var user:User = new User(id, name)
+                user.isModerator = isMod
+                user.isSpec = isSpec
+                user.id = pId
 
                 // Handle user variables
                 if (usr.vars.toString().length > 0)
@@ -338,7 +329,7 @@ package it.gotoandplay.smartfoxserver.handlers
                 }
 
                 // Add user
-                currRoom.addUser(user, id)
+                currRoom.addUser(user)
             }
 
             // operation completed, release lock
@@ -378,21 +369,21 @@ package it.gotoandplay.smartfoxserver.handlers
 
             var varList:XMLList = o.body.u.vars["var"]
 
-            var currRoom:SFSRoom = sfs.getRoom(roomId)
+            var currRoom:Room = sfs.getRoom(roomId)
 
             // Create new user object
-            var newUser:SFSUser = new SFSUser(usrId, usrName)
-            newUser.setModerator(isMod)
-            newUser.setIsSpectator(isSpec)
-            newUser.setPlayerId(pid)
+            var newUser:User = new User(usrId, usrName)
+            newUser.isModerator = isMod
+            newUser.isSpec = isSpec
+            newUser.id = pid
 
             // Add user to room
-            currRoom.addUser(newUser, usrId)
+            currRoom.addUser(newUser)
 
             // Populate user vars
             if (o.body.u.vars.toString().length > 0)
             {
-                populateVariables(newUser.getVariables(), o.body.u)
+                populateVariables(newUser.variables, o.body.u)
             }
 
             // Fire event!
@@ -411,10 +402,10 @@ package it.gotoandplay.smartfoxserver.handlers
             var roomId:int = int(o.body.@r)
 
             // Get room
-            var theRoom:SFSRoom = sfs.getRoom(roomId)
+            var theRoom:Room = sfs.getRoom(roomId)
 
             // Get user name
-            var uName:String = theRoom.getUser(userId).getName()
+            var uName:String = theRoom.getUser(userId).name
 
             // Remove user
             theRoom.removeUser(userId)
@@ -435,7 +426,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var userId:int = int(o.body.user.@id)
             var message:String = o.body.txt
 
-            var sender:SFSUser = sfs.getRoom(roomId).getUser(userId)
+            var sender:User = sfs.getRoom(roomId).getUser(userId)
 
             // Fire event!
             var params:Object = {}
@@ -454,7 +445,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var userId:int = int(o.body.user.@id)
             var message:String = o.body.txt
 
-            var sender:SFSUser = sfs.getRoom(roomId).getUser(userId)
+            var sender:User = sfs.getRoom(roomId).getUser(userId)
 
             // Fire event!
             var params:Object = {}
@@ -488,8 +479,8 @@ package it.gotoandplay.smartfoxserver.handlers
             var userId:int = int(o.body.user.@id)
             var message:String = o.body.txt
 
-            var sender:SFSUser = null;
-            var room:SFSRoom = sfs.getRoom(roomId)
+            var sender:User = null;
+            var room:Room = sfs.getRoom(roomId)
 
             if (room != null)
                 sender = sfs.getRoom(roomId).getUser(userId)
@@ -509,7 +500,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var userId:int = int(o.body.user.@id)
             var xmlStr:String = o.body.dataObj
 
-            var sender:SFSUser = sfs.getRoom(roomId).getUser(userId)
+            var sender:User = sfs.getRoom(roomId).getUser(userId)
             var asObj:Object = ObjectSerializer.getInstance().deserialize(new XML(xmlStr))
 
             // Fire event!
@@ -526,7 +517,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var roomId:int = int(o.body.@r)
             var userId:int = int(o.body.user.@id)
 
-            var currRoom:SFSRoom = sfs.getRoom(roomId)
+            var currRoom:Room = sfs.getRoom(roomId)
             var changedVars:Array = []
 
             // Handle Room Variables
@@ -548,14 +539,14 @@ package it.gotoandplay.smartfoxserver.handlers
         {
             var userId:int = int(o.body.user.@id)
             var changedVars:Array
-            var varOwner:SFSUser = null
-            var returnUser:SFSUser = null
+            var varOwner:User = null
+            var returnUser:User = null
 
             // First, we check if there's actual variables data available
             if (o.body.vars.toString().length > 0)
             {
                 // Search the userId in all available rooms
-                for each (var room:SFSRoom in sfs.getAllRooms())
+                for each (var room:Room in sfs.getAllRooms())
                 {
                     varOwner = room.getUser(userId)
 
@@ -592,7 +583,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var isLimbo:Boolean = o.body.rm.@limbo == "1" ? true : false
 
             // Create room obj
-            var newRoom:SFSRoom = new SFSRoom(rId, rName, rMax, rSpec, isTemp, isGame, isPriv, isLimbo)
+            var newRoom:Room = new Room(rId, rName, rMax, rSpec, isTemp, isGame, isPriv, isLimbo)
 
             var rList:Array = sfs.getAllRooms()
             rList[rId] = newRoom
@@ -669,224 +660,6 @@ package it.gotoandplay.smartfoxserver.handlers
             sfs.dispatchEvent(evt)
         }
 
-        private function handleBuddyList(o:Object):void
-        {
-            var bList:XMLList = o.body.bList
-            var myVars:XMLList = o.body.mv
-            var buddy:Object
-            var params:Object = {}
-            var evt:TypedSFSEvent = null
-
-            /*
-             * Get my buddy variables
-             */
-            if (myVars != null && myVars.toString().length > 0)
-            {
-                for each (var myVar:XML in myVars.v)
-                    sfs.myBuddyVars[myVar.@n.toString()] = myVar.toString()
-            }
-
-            if (bList != null && bList.b.length != null)
-            {
-
-                if (bList.toString().length > 0)
-                {
-                    for each (var b:XML in bList.b)
-                    {
-                        buddy = {}
-                        buddy.isOnline = b.@s == "1" ? true : false
-                        buddy.name = b.n.toString()
-                        buddy.id = b.@i
-                        buddy.isBlocked = b.@x == "1" ? true : false
-                        buddy.variables = {}
-
-
-                        // Runs through buddy variables
-                        var bVars:XMLList = b.vs
-
-                        if (bVars.toString().length > 0)
-                        {
-                            for each (var bVar:XML in bVars.v)
-                            {
-                                buddy.variables[bVar.@n.toString()] = bVar.toString()
-                            }
-                        }
-
-                        sfs.buddyList.push(buddy)
-                    }
-                }
-
-                // Fire event!
-                params.list = sfs.buddyList
-                evt = new BuddyListSFSEvent(params)
-                sfs.dispatchEvent(evt)
-            }
-
-            // Buddy List load error!
-            else
-            {
-                // Fire event!
-                params.error = o.body.err.toString()
-                evt = new BuddyListErrorSFSEvent(params)
-                sfs.dispatchEvent(evt)
-            }
-        }
-
-
-        private function handleBuddyListUpdate(o:Object):void
-        {
-            var params:Object = {}
-            var evt:TypedSFSEvent = null
-
-            // Catch Buddy List load error!
-            if (o.body.err.toString().length > 0)
-            {
-                // Fire event!
-                params.error = o.body.err.toString()
-                evt = new BuddyListErrorSFSEvent(params)
-                sfs.dispatchEvent(evt)
-
-                // Stop here
-                return
-            }
-
-            if (o.body.b != null)
-            {
-                var buddy:Object = {}
-                buddy.isOnline = o.body.b.@s == "1" ? true : false
-                buddy.name = o.body.b.n.toString()
-                buddy.id = o.body.b.@i
-                buddy.isBlocked = o.body.b.@x == "1" ? true : false
-
-                // Runs through buddy variables
-                var bVars:XMLList = o.body.b.vs
-
-                var tempB:Object = null
-                var found:Boolean = false
-
-                for (var it:String in sfs.buddyList)
-                {
-                    tempB = sfs.buddyList[it]
-
-                    if (tempB.name == buddy.name)
-                    {
-                        // swap objects
-                        sfs.buddyList[it] = buddy
-                        buddy.isBlocked = tempB.isBlocked
-                        buddy.variables = tempB.variables
-
-                        // add/modify variables
-                        if (bVars.toString().length > 0)
-                        {
-                            for each (var bVar:XML in bVars.v)
-                            {
-                                buddy.variables[bVar.@n.toString()] = bVar.toString()
-                            }
-                        }
-
-                        found = true
-                        break
-                    }
-                }
-
-                // Fire event!
-                if (found)
-                {
-                    params.buddy = buddy
-
-                    evt = new BuddyListUpdateSFSEvent(params)
-                    sfs.dispatchEvent(evt)
-                }
-            }
-        }
-
-        private function handleAddBuddyPermission(o:Object):void
-        {
-            // Fire event!
-            var params:Object = {}
-            params.sender = o.body.n.toString()
-            params.message = ""
-
-            if (o.body.txt != undefined)
-                params.message = Entities.decodeEntities(o.body.txt)
-
-            var evt:TypedSFSEvent = new BuddyPermissionRequestSFSEvent(params)
-            sfs.dispatchEvent(evt)
-        }
-
-        private function handleBuddyAdded(o:Object):void
-        {
-            var buddy:Object = {}
-            buddy.isOnline = o.body.b.@s == "1" ? true : false
-            buddy.name = o.body.b.n.toString()
-            buddy.id = o.body.b.@i
-            buddy.isBlocked = o.body.b.@x == "1" ? true : false
-            buddy.variables = {}
-
-            // Runs through buddy variables
-            var bVars:XMLList = o.body.b.vs
-
-            if (bVars.toString().length > 0)
-            {
-                for each (var bVar:XML in bVars.v)
-                {
-                    buddy.variables[bVar.@n.toString()] = bVar.toString()
-                }
-            }
-
-            sfs.buddyList.push(buddy)
-
-            // Fire event!
-            var params:Object = {}
-            params.list = sfs.buddyList
-
-            var evt:TypedSFSEvent = new BuddyListSFSEvent(params)
-            sfs.dispatchEvent(evt)
-        }
-
-        private function handleRemoveBuddy(o:Object):void
-        {
-            var buddyName:String = o.body.n.toString()
-
-            var buddy:Object = null
-
-            for (var it:String in sfs.buddyList)
-            {
-                buddy = sfs.buddyList[it]
-
-                if (buddy.name == buddyName)
-                {
-                    delete sfs.buddyList[it]
-
-                    // Fire event!
-                    var params:Object = {}
-                    params.list = sfs.buddyList
-
-                    var evt:TypedSFSEvent = new BuddyListSFSEvent(params)
-                    sfs.dispatchEvent(evt)
-
-                    break
-                }
-            }
-
-        }
-
-        private function handleBuddyRoom(o:Object):void
-        {
-            var roomIds:String = o.body.br.@r
-            var ids:Array = roomIds.split(",")
-
-            for (var i:int = 0; i < ids.length; i++)
-                ids[i] = int(ids[i])
-
-            // Fire event!
-            var params:Object = {}
-            params.idList = ids
-
-            var evt:TypedSFSEvent = new BuddyRoomSFSEvent(params)
-            sfs.dispatchEvent(evt)
-        }
-
         private function handleLeaveRoom(o:Object):void
         {
             var roomLeft:int = int(o.body.rm.@id)
@@ -895,7 +668,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var params:Object = {}
             params.roomId = roomLeft
 
-            var room:SFSRoom = sfs.getRoom(roomLeft);
+            var room:Room = sfs.getRoom(roomLeft);
             if (room != null)
                 room.clearUserList();
 
@@ -909,7 +682,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var playerId:int = int(o.body.pid.@id)
 
             // Synch user count, if switch successful
-            var theRoom:SFSRoom = sfs.getRoom(roomId)
+            var theRoom:Room = sfs.getRoom(roomId)
 
             var userId:int;
             if (o.body.pid.@u != undefined)
@@ -918,20 +691,20 @@ package it.gotoandplay.smartfoxserver.handlers
             {
                 userId = sfs.myUserId;
                 sfs.playerId = playerId;
-                theRoom.setMyPlayerIndex(playerId);
+                theRoom.myPlayerIndex = playerId;
             }
 
             if (playerId > 0)
             {
-                theRoom.setUserCount(theRoom.getUserCount() + 1)
-                theRoom.setSpectatorCount(theRoom.getSpectatorCount() - 1)
+                theRoom.userCount++
+                theRoom.specCount--
 
-                var user:SFSUser = theRoom.getUser(userId);
+                var user:User = theRoom.getUser(userId);
 
                 if (user != null)
                 {
-                    user.setIsSpectator(false);
-                    user.setPlayerId(playerId);
+                    user.isSpec = false;
+                    user.id = playerId;
                 }
             }
 
@@ -951,7 +724,7 @@ package it.gotoandplay.smartfoxserver.handlers
         {
             var roomId:int = int(o.body.@r)
             var playerId:int = int(o.body.pid.@id)
-            var theRoom:SFSRoom = sfs.getRoom(roomId)
+            var theRoom:Room = sfs.getRoom(roomId)
             var userId:int;
             if (o.body.pid.@u != undefined)
                 userId = int(o.body.pid.@u);
@@ -959,21 +732,21 @@ package it.gotoandplay.smartfoxserver.handlers
             {
                 userId = sfs.myUserId;
                 sfs.playerId = playerId;
-                theRoom.setMyPlayerIndex(playerId);
+                theRoom.myPlayerIndex = playerId;
             }
 
             // Success
             if (playerId == -1)
             {
-                theRoom.setUserCount(theRoom.getUserCount() - 1)
-                theRoom.setSpectatorCount(theRoom.getSpectatorCount() + 1)
+                theRoom.userCount--
+                theRoom.specCount++
 
-                var user:SFSUser = theRoom.getUser(userId)
+                var user:User = theRoom.getUser(userId)
 
                 if (user != null)
                 {
-                    user.setIsSpectator(true);
-                    user.setPlayerId(playerId);
+                    user.isSpec = true;
+                    user.id = playerId;
                 }
             }
 

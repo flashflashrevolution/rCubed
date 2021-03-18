@@ -321,7 +321,7 @@ package
                 return SONG_ACCESS_BANNED;
             if (song.credits > 0 && activeUser.credits < song.credits)
                 return SONG_ACCESS_CREDITS;
-            if (song.price > 0 && playerUser.purchased[song.index] != 1)
+            if (song.price > 0 && (song.index >= playerUser.purchased.length || !playerUser.purchased[song.index]))
                 return SONG_ACCESS_PURCHASED;
             if (song.engine == null && TOKENS[song.level] != null && TOKENS[song.level].unlock == 0)
                 return SONG_ACCESS_TOKEN;

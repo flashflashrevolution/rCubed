@@ -7,7 +7,6 @@ package classes
     import arc.ArcGlobals;
     import assets.GameBackgroundColor;
     import classes.filter.EngineLevelFilter;
-    import com.flashfla.utils.ArrayUtil;
     import flash.display.Loader;
     import flash.display.LoaderInfo;
     import flash.events.Event;
@@ -22,20 +21,21 @@ package classes
     import flash.net.URLVariables;
     import flash.ui.Keyboard;
     import sql.SQLSongDetails;
+    import com.flashfla.utils.VectorUtil;
 
     public class User extends EventDispatcher
     {
         //- Constants
-        public static const ADMIN_ID:Number = 6;
-        public static const DEVELOPER_ID:Number = 83;
-        public static const BANNED_ID:Number = 8;
-        public static const CHAT_MOD_ID:Number = 24;
-        public static const FORUM_MOD_ID:Number = 5;
-        public static const MULTI_MOD_ID:Number = 44;
-        public static const MUSIC_PRODUCER_ID:Number = 46;
-        public static const PROFILE_MOD_ID:Number = 56;
-        public static const SIM_AUTHOR_ID:Number = 47;
-        public static const VETERAN_ID:Number = 49;
+        public static const ADMIN_ID:int = 6;
+        public static const DEVELOPER_ID:int = 83;
+        public static const BANNED_ID:int = 8;
+        public static const CHAT_MOD_ID:int = 24;
+        public static const FORUM_MOD_ID:int = 5;
+        public static const MULTI_MOD_ID:int = 44;
+        public static const MUSIC_PRODUCER_ID:int = 46;
+        public static const PROFILE_MOD_ID:int = 56;
+        public static const SIM_AUTHOR_ID:int = 47;
+        public static const VETERAN_ID:int = 49;
 
         ///- Private Locals
         private var _gvars:GlobalVariables = GlobalVariables.instance;
@@ -45,12 +45,23 @@ package classes
         private var _isLoading:Boolean = false;
         private var _loadError:Boolean = false;
 
+        //- SFS vars
+        public var id:int;
+        public var variables:Array
+        public var isSpec:Boolean
+
         //- User Vars
         public var name:String;
-        public var id:int;
+        public var siteId:int;
         public var hash:String;
-        public var groups:Array;
+        public var groups:Vector.<Number>;
         public var language:String = "us";
+
+        public var gameVersion:int;
+        public var userLevel:int;
+        public var userClass:Object;
+        public var userColour:Object;
+        public var userStatus:Object;
 
         public var joinDate:String;
         public var skillLevel:Number;
@@ -59,14 +70,16 @@ package classes
         public var gamesPlayed:Number;
         public var grandTotal:Number;
         public var credits:Number;
-        public var purchased:Array;
+        public var purchased:Vector.<Boolean>;
         public var averageRank:Number;
         public var level_ranks:Object = {};
         public var avatar:Loader;
         public var startUpScreen:int = 0; // 0 = MP Connect + MP Screen   |   1 = MP Connect + Song List   |   2 = Song List
+        public var room:Room;
+        public var loggedIn:Boolean;
 
-        public var songQueues:Array = [];
-        public var filters:Array = [];
+        public var songQueues:Vector.<Object> = new <Object>[];
+        public var filters:Vector.<EngineLevelFilter> = new <EngineLevelFilter>[];
         public var songRatings:Object = {};
 
         public var DISPLAY_LEGACY_SONGS:Boolean = false;
@@ -95,7 +108,7 @@ package classes
         public var DISPLAY_MP_TIMESTAMP:Boolean = false;
         public var judgeColours:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
         public var comboColours:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000, 0xDC00C2]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag, RawGood
-        public var enableComboColors:Array = [true, true, true, false, false, false, false, false, false];
+        public var enableComboColors:Vector.<Boolean> = new <Boolean>[true, true, true, false, false, false, false, false, false];
         public var gameColours:Array = [0x1495BD, 0x033242, 0x0C6A88, 0x074B62];
         public var noteColours:Object = ["red", "blue", "purple", "yellow", "pink", "orange", "cyan", "green", "white"];
         public var rawGoodTracker:Number = 0;
@@ -131,10 +144,13 @@ package classes
         public var forceNewJudge:Boolean = false;
         public var songRate:Number = 1;
 
+        public var gameplay:Object;
+
 
         //- Permissions
         public var isActiveUser:Boolean;
         public var isGuest:Boolean;
+        public var isPlayer:Boolean;
         public var isVeteran:Boolean;
         public var isAdmin:Boolean;
         public var isDeveloper:Boolean
@@ -159,6 +175,9 @@ package classes
          */
         public function User(loadData:Boolean = false, isActiveUser:Boolean = false, userid:int = -1):void
         {
+            this.variables = [];
+            this.isSpec = false;
+
             this.isActiveUser = isActiveUser;
 
             if (loadData)
@@ -289,7 +308,7 @@ package classes
             // Public
             this.name = _data["name"];
             this.id = _data["id"];
-            this.groups = _data["groups"];
+            this.groups = VectorUtil.fromArr(_data["groups"]) as Vector.<Number>;
             this.joinDate = _data["joinDate"];
             this.gameRank = _data["gameRank"];
             this.gamesPlayed = _data["gamesPlayed"];
@@ -315,10 +334,10 @@ package classes
 
         public function setPurchasedString(str:String):void
         {
-            this.purchased = [];
+            this.purchased = new <Boolean>[];
             for (var x:int = 1; x < str.length; x++)
             {
-                this.purchased.push(str.charAt(x));
+                this.purchased.push(str.charAt(x) == "1");
             }
         }
 
@@ -347,17 +366,17 @@ package classes
         private function setupPermissions():void
         {
             this.isGuest = (this.id <= 2);
-            this.isVeteran = ArrayUtil.in_array(this.groups, [VETERAN_ID]);
-            this.isAdmin = ArrayUtil.in_array(this.groups, [ADMIN_ID]);
-            this.isDeveloper = ArrayUtil.in_array(this.groups, [DEVELOPER_ID])
-            this.isForumBanned = ArrayUtil.in_array(this.groups, [BANNED_ID]);
-            this.isModerator = ArrayUtil.in_array(this.groups, [ADMIN_ID, FORUM_MOD_ID, CHAT_MOD_ID, PROFILE_MOD_ID, MULTI_MOD_ID]);
-            this.isForumModerator = ArrayUtil.in_array(this.groups, [FORUM_MOD_ID, ADMIN_ID]);
-            this.isProfileModerator = ArrayUtil.in_array(this.groups, [PROFILE_MOD_ID, ADMIN_ID]);
-            this.isChatModerator = ArrayUtil.in_array(this.groups, [CHAT_MOD_ID, ADMIN_ID]);
-            this.isMultiModerator = ArrayUtil.in_array(this.groups, [MULTI_MOD_ID, ADMIN_ID]);
-            this.isMusician = ArrayUtil.in_array(this.groups, [MUSIC_PRODUCER_ID]);
-            this.isSimArtist = ArrayUtil.in_array(this.groups, [SIM_AUTHOR_ID]);
+            this.isVeteran = VectorUtil.inVector(this.groups, new <Number>[VETERAN_ID]);
+            this.isAdmin = VectorUtil.inVector(this.groups, new <Number>[ADMIN_ID]);
+            this.isDeveloper = VectorUtil.inVector(this.groups, new <Number>[DEVELOPER_ID])
+            this.isForumBanned = VectorUtil.inVector(this.groups, new <Number>[BANNED_ID]);
+            this.isModerator = VectorUtil.inVector(this.groups, new <Number>[ADMIN_ID, FORUM_MOD_ID, CHAT_MOD_ID, PROFILE_MOD_ID, MULTI_MOD_ID]);
+            this.isForumModerator = VectorUtil.inVector(this.groups, new <Number>[FORUM_MOD_ID, ADMIN_ID]);
+            this.isProfileModerator = VectorUtil.inVector(this.groups, new <Number>[PROFILE_MOD_ID, ADMIN_ID]);
+            this.isChatModerator = VectorUtil.inVector(this.groups, new <Number>[CHAT_MOD_ID, ADMIN_ID]);
+            this.isMultiModerator = VectorUtil.inVector(this.groups, new <Number>[MULTI_MOD_ID, ADMIN_ID]);
+            this.isMusician = VectorUtil.inVector(this.groups, new <Number>[MUSIC_PRODUCER_ID]);
+            this.isSimArtist = VectorUtil.inVector(this.groups, new <Number>[SIM_AUTHOR_ID]);
         }
 
         public function loadAvatar():void
@@ -579,7 +598,7 @@ package classes
 
             if (_settings.songQueues != null)
             {
-                this.songQueues = [];
+                this.songQueues = new <Object>[];
                 for each (var queueItem:Object in _settings.songQueues)
                 {
                     this.songQueues.push(new SongQueueItem(queueItem.name, queueItem.items));
@@ -766,17 +785,17 @@ package classes
 
         /**
          * Imports user filters from a save object.
-         * @param	filters Array of Filter objects.
+         * @param	filtersIn Array of Filter objects.
          * @return Array of EngineLevelFilters.
          */
-        private function doImportFilters(filters_in:Array):Array
+        private function doImportFilters(filtersIn:Array):Vector.<EngineLevelFilter>
         {
             if (isActiveUser)
                 _gvars.activeFilter = null;
 
-            var newFilters:Array = [];
+            var newFilters:Vector.<EngineLevelFilter> = new <EngineLevelFilter>[];
             var filter:EngineLevelFilter;
-            for each (var item:Object in filters_in)
+            for each (var item:Object in filtersIn)
             {
                 filter = new EngineLevelFilter();
                 filter.setup(item);
@@ -795,19 +814,62 @@ package classes
 
         /**
          * Exports the user filters into an array of filter objects.
-         * @param	filters_out Array of Filters to export.
+         * @param	filtersOut Array of EngineLevelFilter to export.
          * @return	Array of Filter Object.
          */
-        private function doExportFilters(filters_out:Array):Array
+        private function doExportFilters(filtersOut:Vector.<EngineLevelFilter>):Array
         {
-            var filtersOut:Array = [];
-            for each (var item:EngineLevelFilter in filters_out)
+            var filters:Array = [];
+            for each (var item:EngineLevelFilter in filtersOut)
             {
                 var exportFilter:Object = item.export();
                 if (exportFilter["filters"] && exportFilter["filters"].length > 0) // Don't export blank filters.
-                    filtersOut.push(exportFilter);
+                    filters.push(exportFilter);
             }
-            return filtersOut;
+            return filters;
+        }
+
+        public function getVariable(varName:String):Object
+        {
+            return this.variables[varName];
+        }
+
+        public function getVariables():Array
+        {
+            return this.variables;
+        }
+
+        /**
+         * Set the User Variables.
+         *
+         * @param	o:	an object containing variables' key-value pairs.
+         *
+         * @exclude
+         */
+        public function setVariables(o:Object):void
+        {
+            /*
+             * TODO: only string, number (int, uint) and boolean should be allowed
+             */
+            for (var key:String in o)
+            {
+                var v:* = o[key];
+                if (v != null)
+                    this.variables[key] = v;
+
+                else
+                    delete this.variables[key];
+            }
+        }
+
+        /**
+         * Reset User Variabless.
+         *
+         * @exclude
+         */
+        public function clearVariables():void
+        {
+            this.variables = [];
         }
     }
 }

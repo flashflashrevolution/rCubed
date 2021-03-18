@@ -21,6 +21,7 @@ package arc.mp
     import com.flashfla.net.events.LoginEvent;
     import com.flashfla.net.events.RoomJoinedEvent;
     import com.flashfla.net.events.GameResultsEvent;
+    import classes.Room;
 
     public class MultiplayerChat extends Component
     {
@@ -33,10 +34,10 @@ package arc.mp
         private var chatScrollV:int;
         private var chatFrameDelay:int;
 
-        public var room:Object;
+        public var room:Room;
         public var connection:Multiplayer;
 
-        public function MultiplayerChat(parent:DisplayObjectContainer, roomValue:Object, owner:DisplayObjectContainer = null)
+        public function MultiplayerChat(parent:DisplayObjectContainer, roomValue:Room, owner:DisplayObjectContainer = null)
         {
             super(parent);
             this.room = roomValue;

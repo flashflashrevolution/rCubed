@@ -1,5 +1,8 @@
 package it.gotoandplay.smartfoxserver
 {
+    import classes.Room;
+    import classes.User;
+
     import flash.net.Socket;
     import flash.events.Event;
     import flash.events.EventDispatcher;
@@ -17,21 +20,15 @@ package it.gotoandplay.smartfoxserver
     import it.gotoandplay.smartfoxserver.handlers.IMessageHandler;
     import it.gotoandplay.smartfoxserver.handlers.SysHandler;
     import it.gotoandplay.smartfoxserver.handlers.ExtHandler;
-    import it.gotoandplay.smartfoxserver.data.SFSRoom;
-    import it.gotoandplay.smartfoxserver.data.SFSUser;
     import it.gotoandplay.smartfoxserver.util.ObjectSerializer;
     import it.gotoandplay.smartfoxserver.util.Entities;
     import it.gotoandplay.smartfoxserver.http.HttpConnection;
     import it.gotoandplay.smartfoxserver.http.HttpEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.BuddyListSFSEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.BuddyListUpdateSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.ConfigLoadSuccessSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.ConfigLoadFailureSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.DebugMessageSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionLostSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionSFSEvent;
-
-    
     
     /**
      * SmartFoxClient is the main class in the SmartFoxServer API.
@@ -255,78 +252,6 @@ package it.gotoandplay.smartfoxserver
          * @version SmartFoxServer Pro
          */
         public var smartConnect:Boolean = true
-        
-        //--- BlueBox settings (end) ---------------------------------------------------------------------
-        
-        /**
-         * An array containing the objects representing each buddy of the user's buddy list.
-         * The buddy list can be iterated with a <i>for-in</i> loop, or a specific object can be retrieved by means of the {@link #getBuddyById} and {@link #getBuddyByName} methods.
-         *
-         * <b>NOTE</b>: this property and all the buddy-related method are available only if the buddy list feature is enabled for the current zone. Check the SmartFoxServer server-side configuration.
-         *
-         * Each element in the buddy list is an object with the following properties:
-         * @param   id:         (<b>int</b>) the buddy id.
-         * @param   name:       (<b>String</b>) the buddy name.
-         * @param   isOnline:   (<b>Boolean</b>) the buddy online status: {@code true} if the buddy is online; {@code false} if the buddy is offline.
-         * @param   isBlocked:  (<b>Boolean</b>) the buddy block status: {@code true} if the buddy is blocked; {@code false} if the buddy is not blocked; when a buddy is blocked, SmartFoxServer does not deliver private messages from/to that user.
-         * @param   variables:  (<b>Object</b>) an object with extra properties of the buddy (Buddy Variables); see also {@link #setBuddyVariables}.
-         *
-         * @example The following example shows how to retrieve the properties of each buddy in the buddy list.
-         *          <code>
-         *          for (var b:String in smartFox.buddyList)
-         *          {
-         *              var buddy:Object = smartFox.buddyList[b]
-         *
-         *              // Trace buddy properties
-         *              trace("Buddy id: " + buddy.id)
-         *              trace("Buddy name: " + buddy.name)
-         *              trace("Is buddy online? " + buddy.isOnline ? "Yes" : "No")
-         *              trace("Is buddy blocked? " + buddy.isBlocked ? "Yes" : "No")
-         *
-         *              // Trace all Buddy Variables
-         *              for (var v:String in buddy.variables)
-         *                  trace("\t" + v + " --> " + buddy.variables[v])
-         *          }
-         *          </code>
-         *
-         * @see     #myBuddyVars
-         * @see     #loadBuddyList
-         * @see     #getBuddyById
-         * @see     #getBuddyByName
-         * @see     #removeBuddy
-         * @see     #setBuddyBlockStatus
-         * @see     #setBuddyVariables
-         * @see     SFSEvent#onBuddyList
-         * @see     SFSEvent#onBuddyListUpdate
-         *
-         * @history SmartFoxServer Pro v1.6.0 - Buddy's <i>isBlocked</i> property added.
-         *
-         * @version SmartFoxServer Basic (except block status) / Pro
-         */
-        public var buddyList:Array
-        
-        /**
-         * The current user's Buddy Variables.
-         * This is an associative array containing the current user's properties when he/she is present in the buddy lists of other users.
-         * See the {@link #setBuddyVariables} method for more details.
-         *
-         * @example The following example shows how to read the current user's own Buddy Variables.
-         *          <code>
-         *          for (var v:String in smartFox.myBuddyVars)
-         *              trace("Variable " + v + " --> " + smartFox.myBuddyVars[v])
-         *          </code>
-         *
-         * @see     #setBuddyVariables
-         * @see     #getBuddyById
-         * @see     #getBuddyByName
-         * @see     SFSEvent#onBuddyList
-         * @see     SFSEvent#onBuddyListUpdate
-         *
-         * @since   SmartFoxServer Pro v1.6.0
-         *
-         * @version SmartFoxServer Pro
-         */
-        public var myBuddyVars:Array
         
         /**
          * Toggle the client-side debugging informations.
@@ -810,55 +735,6 @@ package it.gotoandplay.smartfoxserver
         }
         
         /**
-         * Add a user to the buddy list.
-         * Since SmartFoxServer Pro 1.6.0, the buddy list feature can be configured to use a <i>basic</i> or <i>advanced</i> security mode (see the SmartFoxServer server-side configuration file).
-         * Check the following usage notes for details on the behavior of the <b>addBuddy</b> method in the two cases.
-         *
-         * @usageNote   Before you can add or remove any buddy from the list you must load the buddy-list from the server.
-         *              Always make sure to call {@see #loadBuddyList} before interacting with the buddy-list.
-         *
-         *              <i>Basic security mode</i>
-         *              When a buddy is added, if the buddy list is already full, the {@link SFSEvent#onBuddyListError} event is fired; otherwise the buddy list is updated and the {@link SFSEvent#onBuddyList} event is fired.
-         *              <hr />
-         *              <i>Advanced security mode</i>
-         *              If the {@code <addBuddyPermission>} parameter is set to {@code true} in the buddy list configuration section of a zone, before the user is actually added to the buddy list he/she must grant his/her permission.
-         *              The permission request is sent if the user is online only; the user receives the {@link SFSEvent#onBuddyPermissionRequest} event. When the permission is granted, the buddy list is updated and the {@link SFSEvent#onBuddyList} event is fired.
-         *              If the permission is not granted (or the buddy didn't receive the permission request), the <b>addBuddy</b> method can be called again after a certain amount of time only. This time is set in the server configuration {@code <permissionTimeOut>} parameter.
-         *              Also, if the {@code <mutualAddBuddy>} parameter is set to {@code true}, when user A adds user B to the buddy list, he/she is automatically added to user B's buddy list.
-         *              Lastly, if the buddy list is full, the {@link SFSEvent#onBuddyListError} event is fired.
-         *
-         * @param   buddyName:  the name of the user to be added to the buddy list.
-         *
-         * @sends   SFSEvent#onBuddyList
-         * @sends   SFSEvent#onBuddyListError
-         * @sends   SFSEvent#onBuddyPermissionRequest
-         *
-         * @example The following example shows how to add a user to the buddy list.
-         *          <code>
-         *          smartFox.addBuddy("jack")
-         *          </code>
-         *
-         * @see     #buddyList
-         * @see     #removeBuddy
-         * @see     #setBuddyBlockStatus
-         * @see     SFSEvent#onBuddyList
-         * @see     SFSEvent#onBuddyListError
-         * @see     SFSEvent#onBuddyPermissionRequest
-         *
-         * @history SmartFoxServer Pro v1.6.0 - Buddy list's <i>advanced security mode</i> implemented.
-         *
-         * @version SmartFoxServer Basic (except <i>advanced mode</i>) / Pro
-         */
-        public function addBuddy(buddyName:String):void
-        {
-            if (buddyName != myUserName && !checkBuddyDuplicates(buddyName))
-            {
-                var xmlMsg:String = "<n>" + buddyName + "</n>"
-                send({t:"sys"}, "addB", -1, xmlMsg)
-            }
-        }
-        
-        /**
          * Automatically join the the default room (if existing) for the current zone.
          * A default room can be specified in the SmartFoxServer server-side configuration by adding the {@code autoJoin = "true"} attribute to one of the {@code <Room>} tags in a zone.
          * When a room is marked as <i>autoJoin</i> it becomes the default room where all clients are joined when this method is called.
@@ -884,38 +760,6 @@ package it.gotoandplay.smartfoxserver
                 
             var header:Object   = {t:"sys"}
             this.send(header, "autoJoin", (this.activeRoomId ? this.activeRoomId : -1) , "")
-        }
-        
-        /**
-         * Remove all users from the buddy list.
-         *
-         * @deprecated  In order to avoid conflits with the buddy list <i>advanced security mode</i> implemented since SmartFoxServer Pro 1.6.0, buddies should be removed one by one, by iterating through the buddy list.
-         *
-         * @sends   SFSEvent#onBuddyList
-         *
-         * @example The following example shows how to clear the buddy list.
-         *          <code>
-         *          smartFox.clearBuddyList()
-         *          </code>
-         *
-         * @see     #buddyList
-         * @see     SFSEvent#onBuddyList
-         *
-         * @history SmartFoxServer Pro v1.6.0 - Method deprecated.
-         *
-         * @version SmartFoxServer Basic / Pro
-         */
-        public function clearBuddyList():void
-        {
-            buddyList = []
-            send({t:"sys"}, "clearB", -1, "")
-            
-            // Fire event!
-            var params:Object = {}
-            params.list = buddyList
-            
-            var evt:TypedSFSEvent = new BuddyListSFSEvent(params)
-            dispatchEvent(evt)
         }
         
         /**
@@ -1051,119 +895,6 @@ package it.gotoandplay.smartfoxserver
         }
         
         /**
-         * Get a buddy from the buddy list, using the buddy's username as key.
-         * Refer to the {@link #buddyList} property for a description of the buddy object's properties.
-         *
-         * @param   buddyName:  the username of the buddy.
-         *
-         * @return  The buddy object.
-         *
-         * @example The following example shows how to retrieve a buddy from the buddy list.
-         *          <code>
-         *          var buddy:Object = smartFox.getBuddyByName("jack")
-         *
-         *          trace("Buddy id: " + buddy.id)
-         *          trace("Buddy name: " + buddy.name)
-         *          trace("Is buddy online? " + buddy.isOnline ? "Yes" : "No")
-         *          trace("Is buddy blocked? " + buddy.isBlocked ? "Yes" : "No")
-         *
-         *          trace("Buddy Variables:")
-         *          for (var v:String in buddy.variables)
-         *              trace("\t" + v + " --> " + buddy.variables[v])
-         *          </code>
-         *
-         * @see     #buddyList
-         * @see     #getBuddyById
-         *
-         * @since   SmartFoxServer Pro v1.6.0
-         *
-         * @version SmartFoxServer Pro
-         */
-        public function getBuddyByName(buddyName:String):Object
-        {
-            for each (var buddy:Object in buddyList)
-            {
-                if (buddy.name == buddyName)
-                    return buddy
-            }
-            
-            return null
-        }
-        
-        /**
-         * Get a buddy from the buddy list, using the user id as key.
-         * Refer to the {@link #buddyList} property for a description of the buddy object's properties.
-         *
-         * @param   id: the user id of the buddy.
-         *
-         * @return  The buddy object.
-         *
-         * @example The following example shows how to retrieve a buddy from the buddy list.
-         *          <code>
-         *          var buddy:Object = smartFox.getBuddyById(25)
-         *
-         *          trace("Buddy id: " + buddy.id)
-         *          trace("Buddy name: " + buddy.name)
-         *          trace("Is buddy online? " + buddy.isOnline ? "Yes" : "No")
-         *          trace("Is buddy blocked? " + buddy.isBlocked ? "Yes" : "No")
-         *
-         *          trace("Buddy Variables:")
-         *          for (var v:String in buddy.variables)
-         *              trace("\t" + v + " --> " + buddy.variables[v])
-         *          </code>
-         *
-         * @see     #buddyList
-         * @see     #getBuddyByName
-         *
-         * @since   SmartFoxServer Pro v1.6.0
-         *
-         * @version SmartFoxServer Pro
-         */
-        public function getBuddyById(id:int):Object
-        {
-            for each (var buddy:Object in buddyList)
-            {
-                if (buddy.id == id)
-                    return buddy
-            }
-            
-            return null
-        }
-        
-        /**
-         * Request the room id(s) of the room(s) where a buddy is currently located into.
-         *
-         * @param   buddy:  a buddy object taken from the {@link #buddyList} array.
-         *
-         * @sends   SFSEvent#onBuddyRoom
-         *
-         * @example The following example shows how to join the same room of a buddy.
-         *          <code>
-         *          smartFox.addEventListener(SFSEvent.onBuddyRoom, onBuddyRoomHandler)
-         *
-         *          var buddy:Object = smartFox.getBuddyByName("jack")
-         *          smartFox.getBuddyRoom(buddy)
-         *
-         *          function onBuddyRoomHandler(evt:SFSEvent):void
-         *          {
-         *              // Reach the buddy in his room
-         *              smartFox.join(evt.params.idList[0])
-         *          }
-         *          </code>
-         *
-         * @see     #buddyList
-         * @see     SFSEvent#onBuddyRoom
-         *
-         * @version SmartFoxServer Basic / Pro
-         */
-        public function getBuddyRoom(buddy:Object):void
-        {
-            // If buddy is active...
-            if (buddy.id != -1)
-                send({t:"sys"}, "roomB", -1, "<b id='" + buddy.id + "' />")
-        }
-        
-        /**
          * Get a {@link Room} object, using its id as key.
          *
          * @param   roomId: the id of the room.
@@ -1183,7 +914,7 @@ package it.gotoandplay.smartfoxserver
          *
          * @version SmartFoxServer Basic / Pro
          */
-        public function getRoom(roomId:int):SFSRoom
+        public function getRoom(roomId:int):Room
         {
             if ( !checkRoomList() )
                 return null
@@ -1211,16 +942,16 @@ package it.gotoandplay.smartfoxserver
          *
          * @version SmartFoxServer Basic / Pro
          */
-        public function getRoomByName(roomName:String):SFSRoom
+        public function getRoomByName(roomName:String):Room
         {
             if ( !checkRoomList() )
                 return null
             
-            var room:SFSRoom = null
+            var room:Room = null
             
-            for each (var r:SFSRoom in roomList)
+            for each (var r:Room in roomList)
             {
-                if (r.getName() == roomName)
+                if (r.name == roomName)
                 {
                     room = r
                     break
@@ -1282,7 +1013,7 @@ package it.gotoandplay.smartfoxserver
          *
          * @version SmartFoxServer Basic / Pro
          */
-        public function getActiveRoom():SFSRoom
+        public function getActiveRoom():Room
         {
             if ( !checkRoomList() || !checkJoin() )
                 return null
@@ -1408,11 +1139,11 @@ package it.gotoandplay.smartfoxserver
                 else if (typeof newRoom == "string")
                 {
                     // Search the room
-                    for each (var r:SFSRoom in roomList)
+                    for each (var r:Room in roomList)
                     {
-                        if (r.getName() == newRoom)
+                        if (r.name == newRoom)
                         {
-                            newRoomId = r.getId()
+                            newRoomId = r.id
                             break
                         }
                     }
@@ -1475,47 +1206,6 @@ package it.gotoandplay.smartfoxserver
             var xmlMsg:String = "<rm id='" + roomId + "' />"
             
             send(header, "leaveRoom", roomId, xmlMsg)
-        }
-        
-        /**
-         * Load the buddy list for the current user.
-         *
-         * @sends   SFSEvent#onBuddyList
-         * @sends   SFSEvent#onBuddyListError
-         *
-         * @example The following example shows how to load the current user's buddy list.
-         *          <code>
-         *          smartFox.addEventListener(SFSEvent.onBuddyList, onBuddyListHandler)
-         *
-         *          smartFox.loadBuddyList()
-         *
-         *          function onBuddyListHandler(evt:SFSEvent):void
-         *          {
-         *              for (var b:String in smartFox.buddyList)
-         *              {
-         *                  var buddy:Object = smartFox.buddyList[b]
-         *
-         *                  trace("Buddy id: " + buddy.id)
-         *                  trace("Buddy name: " + buddy.name)
-         *                  trace("Is buddy online? " + buddy.isOnline ? "Yes" : "No")
-         *                  trace("Is buddy blocked? " + buddy.isBlocked ? "Yes" : "No")
-         *
-         *                  trace("Buddy Variables:")
-         *                  for (var k:String in buddy.variables)
-         *                      trace("\t" + k + " --> " + buddy.variables[k])
-         *              }
-         *          }
-         *          </code>
-         *
-         * @see     #buddyList
-         * @see     SFSEvent#onBuddyList
-         * @see     SFSEvent#onBuddyListError
-         *
-         * @version SmartFoxServer Basic / Pro
-         */
-        public function loadBuddyList():void
-        {
-            send({t:"sys"}, "loadB", -1, "")
         }
 
         /**
@@ -1598,71 +1288,6 @@ package it.gotoandplay.smartfoxserver
         }
         
         /**
-         * Remove a buddy from the buddy list.
-         * Since SmartFoxServer Pro 1.6.0, the buddy list feature can be configured to use a <i>basic</i> or <i>advanced</i> security mode (see the SmartFoxServer server-side configuration file).
-         * Check the following usage notes for details on the behavior of the <b>removeBuddy</b> method in the two cases.
-         *
-         * @usageNote   Before you can add or remove any buddy from the list you must load the buddy-list from the server.
-         *              Always make sure to call {@see #loadBuddyList} before interacting with the buddy-list.
-         *
-         *              <i>Basic security mode</i>
-         *              When a buddy is removed, the buddy list is updated and the {@link SFSEvent#onBuddyList} event is fired.
-         *              <hr />
-         *              <i>Advanced security mode</i>
-         *              In addition to the basic behavior, if the {@code <mutualRemoveBuddy>} server-side configuration parameter is set to {@code true}, when user A removes user B from the buddy list, he/she is automatically removed from user B's buddy list.
-         *
-         * @param   buddyName:  the name of the user to be removed from the buddy list.
-         *
-         * @sends   SFSEvent#onBuddyList
-         *
-         * @example The following example shows how to remove a user from the buddy list.
-         *          <code>
-         *          var buddyName:String = "jack"
-         *          smartFox.removeBuddy(buddyName)
-         *          </code>
-         *
-         * @see     #buddyList
-         * @see     #addBuddy
-         * @see     SFSEvent#onBuddyList
-         *
-         * @history SmartFoxServer Pro v1.6.0 - Buddy list's <i>advanced security mode</i> implemented.
-         *
-         * @version SmartFoxServer Basic (except <i>advanced mode</i>) / Pro
-         */
-        public function removeBuddy(buddyName:String):void
-        {
-            var found:Boolean = false
-            var buddy:Object
-            
-            for (var it:String in buddyList)
-            {
-                buddy = buddyList[it]
-                
-                if (buddy.name == buddyName)
-                {
-                    delete buddyList[it]
-                    found = true
-                    break
-                }
-            }
-            
-            if (found)
-            {
-                var header:Object = {t:"sys"}
-                var xmlMsg:String = "<n>" + buddyName + "</n>"
-                    
-                send(header, "remB", -1, xmlMsg)
-                    
-                // Fire event!
-                var params:Object = {}
-                params.list = buddyList
-                
-                var evt:TypedSFSEvent = new BuddyListSFSEvent(params)
-                dispatchEvent(evt)
-            }
-        }
-        
-        /**
          * Send a roundtrip request to the server to test the connection' speed.
          * The roundtrip request sends a small packet to the server which immediately responds with another small packet, and causing the {@link SFSEvent#onRoundTripResponse} event to be fired.
          * The time taken by the packet to travel forth and back is called "roundtrip time" and can be used to calculate the average network lag of the client.
@@ -1702,58 +1327,6 @@ package it.gotoandplay.smartfoxserver
         {
             this.benchStartTime = getTimer()
             send({t:"sys"}, "roundTrip", activeRoomId, "")
-        }
-        
-        /**
-         * Grant current user permission to be added to a buddy list.
-         * If the SmartFoxServer Pro 1.6.0 <i>advanced</i> security mode is used (see the SmartFoxServer server-side configuration), when a user wants to add a buddy to his/her buddy list, a permission request is sent to the buddy.
-         * Once the {@link SFSEvent#onBuddyPermissionRequest} event is received, this method must be used by the buddy to grant or refuse permission. When the permission is granted, the requester's buddy list is updated.
-         *
-         * @param   allowBuddy:     {@code true} to grant permission, {@code false} to refuse to be added to the requester's buddy list.
-         * @param   targetBuddy:    the username of the requester.
-         *
-         * @example The following example shows how to grant permission to be added to a buddy list once request is received.
-         *          <code>
-         *          smartFox.addEventListener(SFSEvent.onBuddyPermissionRequest, onBuddyPermissionRequestHandler)
-         *
-         *          var autoGrantPermission:Boolean = true
-         *
-         *          function onBuddyPermissionRequestHandler(evt:SFSEvent):void
-         *          {
-         *              if (autoGrantPermission)
-         *              {
-         *                  // Automatically grant permission
-         *
-         *                  smartFox.sendBuddyPermissionResponse(true, evt.params.sender)
-         *              }
-         *              else
-         *              {
-         *                  // Display a custom alert containing grant/refuse buttons
-         *
-         *                  var alert_mc:CustomAlertPanel = new CustomAlertPanel()
-         *
-         *                  alert_mc.name_lb.text = evt.params.sender
-         *                  alert_mc.message_lb.text = evt.params.message
-         *
-         *                  // Display alert
-         *                  addChild(alert_mc)
-         *              }
-         *          }
-         *          </code>
-         *
-         * @see     #addBuddy
-         * @see     SFSEvent#onBuddyPermissionRequest
-         *
-         * @since   SmartFoxServer Pro v1.6.0
-         *
-         * @version SmartFoxServer Pro
-         */
-        public function sendBuddyPermissionResponse(allowBuddy:Boolean, targetBuddy:String):void
-        {
-            var header:Object = {t:"sys"}
-            var xmlMsg:String = "<n res='" + (allowBuddy ? "g" : "r") + "'>" + targetBuddy + "</n>";
-            
-            send(header, "bPrm", -1, xmlMsg)
         }
         
         /**
@@ -2057,110 +1630,6 @@ package it.gotoandplay.smartfoxserver
         }
         
         /**
-         * Block or unblock a user in the buddy list.
-         * When a buddy is blocked, SmartFoxServer does not deliver private messages from/to that user.
-         *
-         * @param   buddyName:  the name of the buddy to be blocked or unblocked.
-         * @param   status:     {@code true} to block the buddy, {@code false} to unblock the buddy.
-         *
-         * @example The following example shows how to block a user from the buddy list.
-         *          <code>
-         *          smartFox.setBuddyBlockStatus("jack", true)
-         *          </code>
-         *
-         * @see     #buddyList
-         *
-         * @since   SmartFoxServer Pro v1.6.0
-         *
-         * @version SmartFoxServer Pro
-         */
-        public function setBuddyBlockStatus(buddyName:String, status:Boolean):void
-        {
-            var b:Object = getBuddyByName(buddyName)
-            
-            if ( b != null )
-            {
-                if (b.isBlocked != status)
-                {
-                    b.isBlocked = status
-                    
-                    var xmlMsg:String = "<n x='" + (status ? "1" : "0") +"'>" + buddyName + "</n>"
-                    send({t:"sys"}, "setB", -1, xmlMsg)
-                    
-                    // Fire internal update
-                    var params:Object = {}
-                    params.buddy = b
-                    
-                    var evt:TypedSFSEvent = new BuddyListUpdateSFSEvent(params)
-                    dispatchEvent(evt)
-                    
-                }
-            }
-        }
-        
-        /**
-         * Set the current user's Buddy Variables.
-         * This method allows to set a number of properties of the current user as buddy of other users; in other words these variables will be received by the other users who have the current user as a buddy.
-         *
-         * Buddy Variables are the best way to share user's informations with all the other users having him/her in their buddy list.: for example the nickname, the current audio track the user is listening to, etc. The most typical usage is to set a variable containing the current user status, like "available", "occupied", "away", "invisible", etc.).
-         *
-         * <b>NOTE</b>: before the release of SmartFoxServer Pro v1.6.0, Buddy Variables could not be stored, and existed during the user session only. SmartFoxServer Pro v1.6.0 introduced the ability to persist (store) all Buddy Variables and the possibility to save "offline Buddy Variables" (see the following usage notes).
-         *
-         * @usageNote   Let's assume that three users (A, B and C) use an "istant messenger"-like application, and user A is part of the buddy lists of users B and C.
-         *              If user A sets his own variables (using the {@link #setBuddyVariables} method), the {@link #myBuddyVars} array on his client gets populated and a {@link SFSEvent#onBuddyListUpdate} event is dispatched to users B and C.
-         *              User B and C can then read those variables in their own buddy lists by means of the <b>variables</b> property on the buddy object (which can be retrieved from the {@link #buddyList} array by means of the {@link #getBuddyById} or {@link #getBuddyByName} methods).
-         *              <hr />
-         *              If the buddy list's <i>advanced security mode</i> is used (see the SmartFoxServer server-side configuration), Buddy Variables persistence is enabled: in this way regular variables are saved when a user goes offline and they are restored (and dispatched to the other users) when their owner comes back online.
-         *              Also, setting the {@code <offLineBuddyVariables>} parameter to {@code true}, offline variables can be used: this kind of Buddy Variables is loaded regardless the buddy is online or not, providing further informations for each entry in the buddy list. A typical usage for offline variables is to define a buddy image or additional informations such as country, email, rank, etc.
-         *              To creare an offline Buddy Variable, the "$" character must be placed before the variable name.
-         *
-         * @param   varList:    an associative array, where the key is the name of the variable and the value is the variable's value. Buddy Variables should all be strings. If you need to use other data types you should apply the appropriate type casts.
-         *
-         * @sends   SFSEvent#onBuddyListUpdate
-         *
-         * @example The following example shows how to set three variables containing the user's status, the current audio track the user listening to and the user's rank. The last one is an offline variable.
-         *          <code>
-         *          var bVars:Object = new Object()
-         *          bVars["status"] = "away"
-         *          bVars["track"] = "One Of These Days"
-         *          bVars["$rank"] = "guru"
-         *
-         *          smartFox.setBuddyVariables(bVars)
-         *          </code>
-         *
-         * @see     #myBuddyVars
-         * @see     SFSEvent#onBuddyListUpdate
-         *
-         * @history SmartFoxServer Pro v1.6.0 - Buddy list's <i>advanced security mode</i> implemented (persistent and offline Buddy Variables).
-         *
-         * @version SmartFoxServer Basic (except <i>advanced mode</i>) / Pro
-         */
-        public function setBuddyVariables(varList:Array):void
-        {
-            var header:Object = {t:"sys"}
-            
-            // Encapsulate Variables
-            var xmlMsg:String = "<vars>"
-            
-            // Reference to the user setting the variables
-            for (var vName:String in varList)
-            {
-                var vValue:String = varList[vName]
-                
-                // if variable is new or updated send it and update locally
-                if (myBuddyVars[vName] != vValue)
-                {
-                    myBuddyVars[vName] = vValue
-                    xmlMsg += "<var n='" + vName + "'><![CDATA[" + vValue + "]]></var>"
-                }
-            }
-            
-            xmlMsg += "</vars>"
-        
-            this.send(header, "setBvars", -1, xmlMsg)
-        }
-        
-        /**
          * Set one or more Room Variables.
          * Room Variables are a useful feature to share data across the clients, keeping it in a centralized place on the server. When a user sets/updates/deletes one or more Room Variables, all the other users in the same room are notified.
          * Allowed data types for Room Variables are Numbers, Strings and Booleans; in order save bandwidth, Arrays and Objects are not supported. Nevertheless, an array of values can be simulated, for example, by using an index in front of the name of each variable (check one of the following examples).
@@ -2269,7 +1738,7 @@ package it.gotoandplay.smartfoxserver
             else
                 xmlMsg = "<vars so='0'>"
                 
-            var room:SFSRoom = getRoom(roomId);
+            var room:Room = getRoom(roomId);
             var roomVars:Array = room.getVariables();
             for each (var rv:Object in varList) {
                 if (roomVars[rv.name] != rv.val)
@@ -2318,8 +1787,8 @@ package it.gotoandplay.smartfoxserver
                 
             var header:Object = {t:"sys"}
 
-            for each (var room:SFSRoom in getAllRooms()) {
-                var user:SFSUser = room.getUser(myUserId);
+            for each (var room:Room in getAllRooms()) {
+                var user:User = room.getUser(myUserId);
                 if (user != null)
                     user.setVariables(varObj);
             }
@@ -2514,8 +1983,6 @@ package it.gotoandplay.smartfoxserver
             
             // Clear data structures
             this.roomList = []
-            this.buddyList = []
-            this.myBuddyVars = []
             
             // Set connection status
             if (!isLogOut)
@@ -2648,24 +2115,6 @@ package it.gotoandplay.smartfoxserver
         private function closeHeader():String
         {
             return "</msg>"
-        }
-        
-        private function checkBuddyDuplicates(buddyName:String):Boolean
-        {
-            // Check for buddy duplicates in the current buddy list
-            
-            var res:Boolean = false
-        
-            for each(var buddy:Object in buddyList)
-            {
-                if (buddy.name == buddyName)
-                {
-                    res = true
-                    break
-                }
-            }
-            
-            return res
         }
         
         private function xmlReceived(msg:String):void

@@ -30,6 +30,7 @@ package arc.mp
     import com.flashfla.net.events.RoomListEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
     import com.flashfla.net.events.RoomUpdateEvent;
+    import classes.Room;
 
     public class MultiplayerPanel extends MenuPanel
     {
@@ -89,8 +90,8 @@ package arc.mp
             {
                 if (controlRooms.selectedItem != null && controlRooms.selectedItem.data != null)
                 {
-                    var room:Object = controlRooms.selectedItem.data;
-                    joinRoom(room, room.playerCount < room.maxPlayerCount);
+                    var room:Room = controlRooms.selectedItem.data;
+                    joinRoom(room, room.players.length < room.maxPlayers);
                 }
             });
             window.addChild(controlRooms);
@@ -277,7 +278,7 @@ package arc.mp
             var roomItem:ContextMenuItem = new ContextMenuItem("Spectate");
             roomItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, function(event:ContextMenuEvent):void
             {
-                var room:Object = event.mouseTarget["data"]["data"];
+                var room:Room = event.mouseTarget["data"]["data"];
                 joinRoom(room, false);
             });
             roomMenu.customItems.push(roomItem);
@@ -286,7 +287,7 @@ package arc.mp
                 roomItem = new ContextMenuItem("Nuke Room");
                 roomItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, function(event:ContextMenuEvent):void
                 {
-                    var room:Object = event.mouseTarget["data"]["data"];
+                    var room:Room = event.mouseTarget["data"]["data"];
                     connection.nukeRoom(room);
                 });
                 roomMenu.customItems.push(roomItem);
@@ -294,7 +295,7 @@ package arc.mp
             controlRooms.contextMenu = roomMenu;
         }
 
-        private function joinRoom(room:Object, player:Boolean):void
+        private function joinRoom(room:Room, player:Boolean):void
         {
             function e_joinRoomPassword(password:String):void
             {
@@ -307,7 +308,7 @@ package arc.mp
                 connection.joinRoom(room, player);
         }
 
-        private function updateRoom(room:Object):void
+        private function updateRoom(room:Room):void
         {
             if (window.parent == null)
                 return;
@@ -325,8 +326,8 @@ package arc.mp
 
         private function updateRooms():void
         {
-            var items:Array = new Array();
-            for each (var room:Object in connection.rooms)
+            var items:Array = [];
+            for each (var room:Room in connection.rooms)
             {
                 if (room.isGame)
                     items.push({label: nameRoom(room), labelhtml: true, data: room});
@@ -336,12 +337,13 @@ package arc.mp
             controlRooms.listItemClass = controlRooms.listItemClass;
         }
 
-        public function updateWindowTitle(room:Object):void
+        public function updateWindowTitle(room:Room):void
         { // Minus 2 Rooms due to The Entrence (Fake) and Lobby
-            window.title = Multiplayer.GAME_VERSIONS[connection.mode] + " " + room.name + " - Rooms: " + (connection.rooms.length - 2) + " - Players: " + room.playerCount;
+            if (room != null)
+                window.title = Multiplayer.GAME_VERSIONS[connection.mode] + " " + room.name + " - Rooms: " + (connection.rooms.length - 2) + " - Players: " + room.players.length;
         }
 
-        private function nameRoom(room:Object):String
+        private function nameRoom(room:Room):String
         {
             /*
                var colour:String;
@@ -368,9 +370,9 @@ package arc.mp
 
             const dulledColour:String = MultiplayerChat.textDullColour(color, 1).toString(16);
             const roomName:String = "(" + title + ")";
-            const spectatorString:String = (room.spectatorCount > 0) ? "+" + room.spectatorCount + " " : "";
+            const spectatorString:String = (room.specCount > 0) ? "+" + room.specCount + " " : "";
 
-            return MultiplayerChat.textFormatSize(room.playerCount + "/2 " + spectatorString, "-1") + MultiplayerChat.textFormatColour(MultiplayerChat.textEscape((room.isPrivate ? "!" : "") + roomName), "#" + dulledColour) + " " + room.name;
+            return MultiplayerChat.textFormatSize(room.players.length + "/2 " + spectatorString, "-1") + MultiplayerChat.textFormatColour(MultiplayerChat.textEscape((room.isPrivate ? "!" : "") + roomName), "#" + dulledColour) + " " + room.name;
         }
 
         public function setParent(value:MenuPanel):void

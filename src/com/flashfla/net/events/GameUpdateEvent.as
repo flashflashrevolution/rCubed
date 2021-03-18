@@ -2,13 +2,13 @@ package com.flashfla.net.events
 {
 
     import it.gotoandplay.smartfoxserver.TypedSFSEvent;
-    import it.gotoandplay.smartfoxserver.data.SFSRoom;
+    import classes.Room
     import com.flashfla.net.Multiplayer;
     import classes.User;
 
     public class GameUpdateEvent extends TypedSFSEvent
     {
-        public var room:SFSRoom;
+        public var room:Room;
         public var user:User;
         public var gameScore:int;
         public var gameLife:int;

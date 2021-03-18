@@ -4,6 +4,7 @@ package game
     import classes.chart.Song;
     import classes.replay.Replay;
     import arc.ArcGlobals;
+    import classes.Room;
 
     public class GameOptions extends Object
     {
@@ -48,7 +49,7 @@ package game
 
         public var judgeColours:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
         public var comboColours:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000, 0xDC00C2]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag, RawGood
-        public var enableComboColors:Array = [true, true, true, false, false, false, false, false, false];
+        public var enableComboColors:Vector.<Boolean> = new <Boolean>[true, true, true, false, false, false, false, false, false];
         public var gameColours:Array = [0x1495BD, 0x033242, 0x0C6A88, 0x074B62];
         public var noteDirections:Array = ["D", "L", "U", "R"];
         public var noteColors:Array = ["red", "blue", "purple", "yellow", "pink", "orange", "cyan", "green", "white"];
@@ -64,7 +65,7 @@ package game
         public var loadPreview:Boolean = false;
         public var isEditor:Boolean = false;
         public var isAutoplay:Boolean = false;
-        public var multiplayer:Object = null;
+        public var multiplayer:Room = null;
         public var singleplayer:Boolean = false;
         public var autofail:Array = [0, 0, 0, 0, 0, 0, 0];
 

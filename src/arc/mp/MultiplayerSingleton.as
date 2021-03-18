@@ -2,6 +2,7 @@ package arc.mp
 {
     import arc.mp.MultiplayerPanel;
     import classes.Playlist;
+    import classes.Room;
     import classes.chart.Song;
     import classes.replay.Replay;
     import com.flashfla.net.Multiplayer;
@@ -29,7 +30,7 @@ package arc.mp
     import com.flashfla.net.events.GameStartEvent;
     import com.flashfla.net.events.GameUpdateEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
-    import it.gotoandplay.smartfoxserver.data.SFSRoom;
+    import classes.User;
 
     public class MultiplayerSingleton extends Object
     {
@@ -42,7 +43,7 @@ package arc.mp
 
         private var autoJoin:Boolean;
 
-        private var currentRoom:SFSRoom = null;
+        private var currentRoom:Room = null;
         private var currentSong:Object = null;
         private var currentSongFile:Song = null;
         private var currentStatus:int = 0;
@@ -155,23 +156,23 @@ package arc.mp
             updateRoomUser(event.room, event.user);
         }
 
-        private function updateRoomUser(room:Object, user:Object):void
+        private function updateRoomUser(room:Room, user:User):void
         {
-            if (user.room == room && user.userID != connection.currentUser.userID && room.user.isPlayer && user.isPlayer && room.isGame)
-                _gvars.gameMain.addAlert("A Challenger Appears! " + user.userName);
+            if (user.room == room && user.id != connection.currentUser.id && room.user.isPlayer && user.isPlayer && room.isGame)
+                _gvars.gameMain.addAlert("A Challenger Appears! " + user.name);
         }
 
         private function onMessage(event:MessageEvent):void
         {
             if (event.msgType == Multiplayer.MESSAGE_PRIVATE)
-                _gvars.gameMain.addAlert("*** " + event.user.userName + ": " + event.message);
+                _gvars.gameMain.addAlert("*** " + event.user.name + ": " + event.message);
         }
 
         private function foreachroom(foreach:Function):void
         {
             if (!connection.connected)
                 return;
-            for each (var room:Object in connection.rooms)
+            for each (var room:Room in connection.rooms)
             {
                 if (room.isGame && room.isJoined && room.user.isPlayer)
                     foreach(room);
@@ -181,7 +182,7 @@ package arc.mp
         private function gameplayUpdateRoom(data:Object = null):void
         {
             if (data == null)
-                data = new Object();
+                data = {};
             if (data.status == null)
                 data.status = currentStatus;
             if (data.songName == null || data.songID == null)
@@ -198,7 +199,7 @@ package arc.mp
                 connection.setRoomGameplay(connection.currentUser.room, data);
             else
             {
-                foreachroom(function(room:Object):void
+                foreachroom(function(room:Room):void
                 {
                     connection.setRoomGameplay(room, data);
                 });
@@ -218,7 +219,7 @@ package arc.mp
         public function gameplayCanPick():Boolean
         {
             var isPlayer:Boolean = false;
-            foreachroom(function(room:Object):void
+            foreachroom(function(room:Room):void
             {
                 if (room.user.isPlayer)
                     isPlayer = true;
@@ -337,13 +338,13 @@ package arc.mp
         public function gameplayHasOpponent():Boolean
         {
             var ret:Boolean = false;
-            foreachroom(function(room:Object):void
+            foreachroom(function(room:Room):void
             {
                 if (room.user.isPlayer)
                 {
-                    for each (var user:Object in room.users)
+                    for each (var user:User in room.userList)
                     {
-                        if (user.isPlayer && user.userID != connection.currentUser.userID)
+                        if (user.isPlayer && user.id != connection.currentUser.id)
                         {
                             ret = true;
                             return;
@@ -368,13 +369,13 @@ package arc.mp
 
         private function onGameResults(event:GameResultsEvent):void
         {
-            var room:Object = event.room;
-            if (room.user.playerID == 1 && (connection.mode == Multiplayer.GAME_LEGACY || room.variables["gameScoreRecorded"] != "y"))
+            var room:Room = event.room;
+            if (room.user.id == 1 && (connection.mode == Multiplayer.GAME_LEGACY || room.variables["gameScoreRecorded"] != "y"))
                 gameplaySubmit(room);
 
             for each (var player:Object in room.match.players)
             {
-                if (player.userID == connection.currentUser.userID)
+                if (player.userID == connection.currentUser.id)
                     continue;
 
                 var gameplay:Object = room.match.gameplay[player.userID];
@@ -390,12 +391,12 @@ package arc.mp
 
         private function onGameStart(event:GameStartEvent):void
         {
-            var room:Object = event.room;
+            var room:Room = event.room;
             if (room.user.isPlayer)
                 gameplayStart(room);
         }
 
-        public function spectateGame(room:Object):void
+        public function spectateGame(room:Room):void
         {
             var song:Object = room.match.song;
             _gvars.songQueue = [song];
@@ -411,7 +412,7 @@ package arc.mp
             _gvars.gameMain.switchTo(Main.GAME_PLAY_PANEL);
         }
 
-        public function gameplayStart(room:Object):void
+        public function gameplayStart(room:Room):void
         {
             gameplayUpdateRoom(connection.mode == Multiplayer.GAME_VELOCITY ? {"gameScoreRecorded": "n"} : null);
 
@@ -454,14 +455,14 @@ package arc.mp
 
         public function gameplayResults(gameResults:MenuPanel, songResults:Vector.<GameScoreResult>):void
         {
-            var room:Object = _gvars.options.multiplayer;
+            var room:Room = _gvars.options.multiplayer;
 
             if (!room || !room.user.isPlayer || currentStatus != Multiplayer.STATUS_PLAYING)
                 return;
 
             currentStatus = Multiplayer.STATUS_RESULTS;
 
-            var sendingScore:Boolean = (room.match.status == Multiplayer.STATUS_RESULTS && ((connection.mode == Multiplayer.GAME_LEGACY && room.user.playerID == 1) || (connection.mode == Multiplayer.GAME_VELOCITY && room.variables["gameScoreRecorded"] != "y")));
+            var sendingScore:Boolean = (room.match.status == Multiplayer.STATUS_RESULTS && ((connection.mode == Multiplayer.GAME_LEGACY && room.user.id == 1) || (connection.mode == Multiplayer.GAME_VELOCITY && room.variables["gameScoreRecorded"] != "y")));
 
             var replay:Replay = null;
             var results:GameScoreResult = null;
@@ -510,7 +511,7 @@ package arc.mp
                 gameplaySubmit(room);
         }
 
-        public function gameplaySubmit(room:Object):void
+        public function gameplaySubmit(room:Room):void
         {
             var matchSong:Object = currentSong || room.match.song;
 
@@ -525,8 +526,8 @@ package arc.mp
             var velocity:Boolean = (connection.mode == Multiplayer.GAME_VELOCITY);
             var results1:Object = room.match.gameplay[(room.match.players[1] || {}).userID];
             var results2:Object = room.match.gameplay[(room.match.players[2] || {}).userID];
-            var currentOpponent:Object = (room.user.playerID == 1 ? room.match.players[2] : room.match.players[1]);
-            var resultsOpponent:Object = (room.user.playerID == 1 ? results2 : results1);
+            var currentOpponent:User = (room.user.id == 1 ? room.match.players[2] : room.match.players[1]);
+            var resultsOpponent:Object = (room.user.id == 1 ? results2 : results1);
 
             if (!currentOpponent)
                 return;
@@ -542,8 +543,8 @@ package arc.mp
                 data.winner = results1.score > results2.score ? 1 : 2;
                 data.loser = results1.score < results2.score ? 1 : 2;
             }
-            data["player" + room.user.playerID + "id"] = (velocity ? connection.currentUser.siteID : connection.currentUser.userName);
-            data["player" + currentOpponent.playerID + "id"] = (velocity ? resultsOpponent.siteID : currentOpponent.userName);
+            data["player" + room.user.id + "id"] = (velocity ? connection.currentUser.id : connection.currentUser.name);
+            data["player" + currentOpponent.id + "id"] = (velocity ? resultsOpponent.siteID : currentOpponent.name);
 
             var loader:URLLoader = new URLLoader();
             var request:URLRequest = new URLRequest(velocity ? Constant.MULTIPLAYER_SUBMIT_URL_VELOCITY : Constant.MULTIPLAYER_SUBMIT_URL);

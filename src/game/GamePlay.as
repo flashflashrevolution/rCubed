@@ -52,6 +52,7 @@ package game
     import flash.display.Bitmap;
     import com.flashfla.net.events.GameUpdateEvent;
     import com.flashfla.net.events.GameResultsEvent;
+    import classes.User;
 
     public class GamePlay extends MenuPanel
     {
@@ -1652,7 +1653,7 @@ package game
 
             for each (var user:Object in options.multiplayer.players)
             {
-                if (user.userID == options.multiplayer.connection.currentUser.userID)
+                if (user.userID == options.multiplayer.connection.currentUser.id)
                     continue;
 
                 if (options.displayMPPA)
@@ -1782,9 +1783,9 @@ package game
             if (options.multiplayer)
             {
                 var index:int = 0;
-                for (var id:int = 1; id < options.multiplayer.playerCount + 1; id++)
+                for (var id:int = 1; id < options.multiplayer.players.length + 1; id++)
                 {
-                    if (id == options.multiplayer.user.playerID)
+                    if (id == options.multiplayer.user.id)
                         continue;
 
                     index++;
@@ -2203,27 +2204,27 @@ package game
             return diff;
         }
 
-        private var multiplayerResults:Array = new Array();
+        private var multiplayerResults:Array = [];
 
         public function onMultiplayerUpdate(event:GameUpdateEvent):void
         {
-            var user:Object = event.user;
+            var user:User = event.user;
             var data:Object = user.gameplay;
 
-            if (options.multiplayer != event.room || !data || user.userID == options.multiplayer.connection.currentUser.userID)
+            if (options.multiplayer != event.room || !data || user.id == options.multiplayer.connection.currentUser.id)
                 return;
 
-            var diff:Object = multiplayerDiff(user.playerID, data);
+            var diff:Object = multiplayerDiff(user.id, data);
 
-            var combo:Combo = mpCombo[user.playerID];
+            var combo:Combo = mpCombo[user.id];
             if (combo)
                 combo.update(data.combo, data.amazing, data.perfect, data.good, data.average, data.miss, data.boo);
 
-            var pa:PAWindow = mpPA[user.playerID];
+            var pa:PAWindow = mpPA[user.id];
             if (pa)
                 pa.update(data.amazing, data.perfect, data.good, data.average, data.miss, data.boo);
 
-            var judge:Judge = mpJudge[user.playerID];
+            var judge:Judge = mpJudge[user.id];
             if (judge)
             {
                 var value:int = 0;
@@ -2243,10 +2244,10 @@ package game
                     judge.showJudge(value);
             }
 
-            if (data.status == Multiplayer.STATUS_RESULTS && !multiplayerResults[user.userID])
+            if (data.status == Multiplayer.STATUS_RESULTS && !multiplayerResults[user.id])
             {
-                multiplayerResults[user.userID] = true;
-                _gvars.gameMain.addAlert(user.userName + " finished playing the song", 240, Alert.RED);
+                multiplayerResults[user.id] = true;
+                _gvars.gameMain.addAlert(user.name + " finished playing the song", 240, Alert.RED);
             }
         }
 

@@ -3,18 +3,20 @@ package arc.mp
     import arc.mp.ListItemDoubleClick;
     import arc.mp.MultiplayerChat;
     import classes.ui.Prompt;
+    import classes.Room;
+    import classes.User;
     import com.bit101.components.Component;
     import com.bit101.components.List;
     import com.flashfla.net.Multiplayer;
+    import com.flashfla.net.events.LoginEvent;
+    import com.flashfla.net.events.RoomUserEvent;
+    import com.flashfla.net.events.RoomJoinedEvent;
+    import com.flashfla.net.events.UserUpdateEvent;
     import flash.display.DisplayObjectContainer;
     import flash.events.ContextMenuEvent;
     import flash.events.MouseEvent;
     import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
-    import com.flashfla.net.events.LoginEvent;
-    import com.flashfla.net.events.RoomUserEvent;
-    import com.flashfla.net.events.RoomJoinedEvent;
-    import com.flashfla.net.events.UserUpdateEvent;
 
     public class MultiplayerUsers extends Component
     {
@@ -22,13 +24,13 @@ package arc.mp
         private var controlChat:MultiplayerChat;
         private var owner:DisplayObjectContainer;
 
-        public var room:Object;
+        public var room:Room;
         public var connection:Multiplayer;
 
-        public function MultiplayerUsers(parent:DisplayObjectContainer, roomValue:Object, ownerValue:DisplayObjectContainer = null, controlChatValue:MultiplayerChat = null)
+        public function MultiplayerUsers(parent:DisplayObjectContainer, room:Room, ownerValue:DisplayObjectContainer = null, controlChatValue:MultiplayerChat = null)
         {
             super(parent);
-            this.room = roomValue;
+            this.room = room;
             this.controlChat = controlChatValue;
             this.owner = ownerValue;
 
@@ -48,8 +50,8 @@ package arc.mp
                     if (controlChat != null)
                         controlChat.textAreaAddLine(MultiplayerChat.textFormatPrivateMessageOut(user, message));
                 }
-                var user:Object = controlUsers.selectedItem.data;
-                new Prompt(owner, 320, "PM " + user.userName, 100, "SEND", e_sendPM);
+                var user:User = controlUsers.selectedItem.data;
+                new Prompt(owner, 320, "PM " + user.name, 100, "SEND", e_sendPM);
             });
             addChild(controlUsers);
 
@@ -118,8 +120,8 @@ package arc.mp
 
         public function updateUsers():void
         {
-            var items:Array = new Array();
-            for each (var user:Object in room.users)
+            var items:Array = [];
+            for each (var user:User in room.userList)
                 items.push({label: MultiplayerChat.nameUser(user), labelhtml: true, data: user});
             controlUsers.items = items;
             sortUsers();
@@ -140,8 +142,8 @@ package arc.mp
                         if (controlChat != null)
                             controlChat.textAreaAddLine(MultiplayerChat.textFormatServerMessage(room.user, message));
                     }
-                    var user:Object = event.mouseTarget["data"]["data"];
-                    new Prompt(owner, 320, "Moderator Message " + user.userName, 100, "SEND", e_sendModMessage);
+                    var user:User = event.mouseTarget["data"]["data"];
+                    new Prompt(owner, 320, "Moderator Message " + user.name, 100, "SEND", e_sendModMessage);
                 });
                 userMenu.customItems.push(userItem);
                 userItem = new ContextMenuItem("Mute User");
@@ -157,8 +159,8 @@ package arc.mp
                                 controlChat.textAreaAddLine(MultiplayerChat.textFormatModeratorMute(user, minutes));
                         }
                     }
-                    var user:Object = event.mouseTarget["data"]["data"];
-                    new Prompt(owner, 320, "Mute Duration (minutes) for " + user.userName, 100, "MUTE", e_muteUser);
+                    var user:User = event.mouseTarget["data"]["data"];
+                    new Prompt(owner, 320, "Mute Duration (minutes) for " + user.name, 100, "MUTE", e_muteUser);
                 });
                 userMenu.customItems.push(userItem);
                 userItem = new ContextMenuItem("Ban User");
@@ -174,8 +176,8 @@ package arc.mp
                                 controlChat.textAreaAddLine(MultiplayerChat.textFormatModeratorBan(user, minutes));
                         }
                     }
-                    var user:Object = event.mouseTarget["data"]["data"];
-                    new Prompt(owner, 320, "Ban Duration (minutes) for " + user.userName, 100, "BAN", e_banUser);
+                    var user:User = event.mouseTarget["data"]["data"];
+                    new Prompt(owner, 320, "Ban Duration (minutes) for " + user.name, 100, "BAN", e_banUser);
                 });
                 userMenu.customItems.push(userItem);
                 controlUsers.contextMenu = userMenu;

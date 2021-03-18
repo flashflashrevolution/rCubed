@@ -2,12 +2,12 @@ package com.flashfla.net.events
 {
 
     import it.gotoandplay.smartfoxserver.TypedSFSEvent;
-    import it.gotoandplay.smartfoxserver.data.SFSRoom;
+    import classes.Room
     import com.flashfla.net.Multiplayer;
 
     public class RoomJoinedEvent extends TypedSFSEvent
     {
-        public var room:SFSRoom;
+        public var room:Room;
 
         public function RoomJoinedEvent(params:Object)
         {
