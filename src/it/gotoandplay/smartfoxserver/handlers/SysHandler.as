@@ -378,6 +378,7 @@ package it.gotoandplay.smartfoxserver.handlers
             newUser.name = usrName
             newUser.isModerator = isMod
             newUser.isSpec = isSpec
+            newUser.playerIdx = pid
 
             // Add user to room
             currRoom.addUser(newUser)

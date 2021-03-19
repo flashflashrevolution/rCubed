@@ -278,7 +278,12 @@ package arc.mp
             var roomItem:ContextMenuItem = new ContextMenuItem("Spectate");
             roomItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, function(event:ContextMenuEvent):void
             {
-                var room:Room = event.mouseTarget["data"]["data"];
+                var item:Object = event.mouseTarget["data"];
+
+                if (!item)
+                    return;
+
+                var room:Room = item["data"];
                 joinRoom(room, false);
             });
             roomMenu.customItems.push(roomItem);
@@ -287,7 +292,12 @@ package arc.mp
                 roomItem = new ContextMenuItem("Nuke Room");
                 roomItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, function(event:ContextMenuEvent):void
                 {
-                    var room:Room = event.mouseTarget["data"]["data"];
+                    var item:Object = event.mouseTarget["data"];
+
+                    if (!item)
+                        return;
+
+                    var room:Room = item["data"];
                     connection.nukeRoom(room);
                 });
                 roomMenu.customItems.push(roomItem);
@@ -410,13 +420,13 @@ package arc.mp
                 window.visible = show;
         }
 
-        private function forEachRoom(foreach:Function):void
+        private function forEachRoom(func:Function):void
         {
             for (var i:int = 0; i < numChildren; i++)
             {
                 var container:Object = getChildAt(i);
                 if (container is MultiplayerRoom)
-                    foreach(container);
+                    func(container);
             }
         }
 

@@ -1751,7 +1751,7 @@ package it.gotoandplay.smartfoxserver
         }
         
         /**
-         * Set on or more User Variables.
+         * Set one or more User Variables.
          * User Variables are a useful tool to store user data that has to be shared with other users. When a user sets/updates/deletes one or more User Variables, all the other users in the same room are notified.
          * Allowed data types for User Variables are Numbers, Strings and Booleans; Arrays and Objects are not supported in order save bandwidth.
          * If a User Variable is set to {@code null}, it is deleted from the server. Also, User Variables are destroyed when their owner logs out or gets disconnected.

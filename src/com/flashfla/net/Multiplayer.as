@@ -427,7 +427,7 @@ package com.flashfla.net
             switch (mode)
             {
                 case GAME_VELOCITY:
-                    var prefix:String = "p" + user.id;
+                    var prefix:String = "p" + user.playerIdx;
                     ret.maxCombo = hex2dec(vars[prefix + "_maxcombo"]);
                     ret.combo = hex2dec(vars[prefix + "_combo"]);
                     ret.perfect = hex2dec(vars[prefix + "_perfect"]);
@@ -463,7 +463,7 @@ package com.flashfla.net
                         ret.statusLoading = int(loading);
                     break;
                 case GAME_R3:
-                    stats = String(vars["P" + user.id + "_GAMESCORES"]).split(":");
+                    stats = String(vars["P" + user.playerIdx + "_GAMESCORES"]).split(":");
                     ret.score = int(stats[0]);
                     ret.amazing = int(stats[1]);
                     ret.perfect = int(stats[2]);
@@ -473,14 +473,14 @@ package com.flashfla.net
                     ret.boo = int(stats[6]);
                     ret.combo = int(stats[7]);
                     ret.maxCombo = int(stats[8]);
-                    ret.status = int(vars["P" + user.id + "_STATE"]);
-                    ret.songID = int(vars["P" + user.id + "_SONGID"]);
-                    ret.statusLoading = int(vars["P" + user.id + "_SONGID_PROGRESS"]);
-                    ret.life = int(vars["P" + user.id + "_GAMELIFE"]);
+                    ret.status = int(vars["P" + user.playerIdx + "_STATE"]);
+                    ret.songID = int(vars["P" + user.playerIdx + "_SONGID"]);
+                    ret.statusLoading = int(vars["P" + user.playerIdx + "_SONGID_PROGRESS"]);
+                    ret.life = int(vars["P" + user.playerIdx + "_GAMELIFE"]);
                     break;
             }
 
-            var engine:String = vars["arc_engine" + user.id];
+            var engine:String = vars["arc_engine" + user.playerIdx];
             if (engine)
             {
                 ret.song = ArcGlobals.instance.legacyDecode(JSON.parse(engine));
@@ -533,7 +533,7 @@ package com.flashfla.net
             var vars:Object = {};
             if (room.isGame && room.isJoined && room.user.isPlayer)
             {
-                var prefix:String = room.user.id.toString();
+                var prefix:String = room.user.playerIdx.toString();
                 switch (mode)
                 {
                     case GAME_R3:
@@ -593,12 +593,11 @@ package com.flashfla.net
         }
 
         /**
-         * Sets the variables of the current user in the server.
-         * Then, all user instances with the same SFS id in any room are replaced by the current user.
+         * Sets the `vars` of the current user.
          */
         private function updateUserVariables():void
         {
-            var vars:Object = {};
+            var vars:Array = [];
             switch (mode)
             {
                 case GAME_R3:
@@ -615,6 +614,7 @@ package com.flashfla.net
                     vars["MP_Color"] = currentUser.userColour;
                     break;
             }
+            currentUser.variables = vars;
         }
 
         /**
@@ -668,7 +668,7 @@ package com.flashfla.net
                 switch (mode)
                 {
                     case GAME_VELOCITY:
-                        var prefix:String = "p" + room.user.id;
+                        var prefix:String = "p" + room.user.playerIdx;
                         vars[prefix + "_maxcombo"] = dec2hex(data.maxCombo);
                         vars[prefix + "_combo"] = dec2hex(data.combo);
                         vars[prefix + "_perfect"] = dec2hex(data.amazing + data.perfect);
@@ -694,18 +694,18 @@ package com.flashfla.net
                                 status = STATUS_NONE;
                                 break;
                         }
-                        vars["mpstats" + room.user.id] = String((data.songName != null ? data.songName : data.song.name)).replace(/:/g, "") + ":" + int(data.score) + ":" + int(data.life) + ":" + int(data.maxCombo) + ":" + int(data.combo) + ":" + int(data.amazing + data.perfect) + ":" + int(data.good) + ":" + int(data.average) + ":" + int(data.miss) + ":" + int(data.boo) + ":" + STATUS_LEGACY.indexOf(status);
+                        vars["mpstats" + room.user.playerIdx] = String((data.songName != null ? data.songName : data.song.name)).replace(/:/g, "") + ":" + int(data.score) + ":" + int(data.life) + ":" + int(data.maxCombo) + ":" + int(data.combo) + ":" + int(data.amazing + data.perfect) + ":" + int(data.good) + ":" + int(data.average) + ":" + int(data.miss) + ":" + int(data.boo) + ":" + STATUS_LEGACY.indexOf(status);
                         if (data.statusLoading != null)
-                            vars["arc_status_loading" + room.user.id] = int(data.statusLoading);
+                            vars["arc_status_loading" + room.user.playerIdx] = int(data.statusLoading);
                         else
-                            vars["arc_status_loading" + room.user.id] = null;
+                            vars["arc_status_loading" + room.user.playerIdx] = null;
                         break;
                     case GAME_R3:
-                        vars["P" + room.user.id + "_GAMESCORES"] = int(data.score) + ":" + int(data.amazing) + ":" + int(data.perfect) + ":" + int(data.good) + ":" + int(data.average) + ":" + int(data.miss) + ":" + int(data.boo) + ":" + int(data.combo) + ":" + int(data.maxCombo);
-                        vars["P" + room.user.id + "_STATE"] = int(data.status);
-                        vars["P" + room.user.id + "_GAMELIFE"] = int(data.life * 24 / 100);
-                        vars["P" + room.user.id + "_SONGID"] = (data.song == null ? data.songID : int(data.song.level));
-                        vars["P" + room.user.id + "_SONGID_PROGRESS"] = int(data.statusLoading);
+                        vars["P" + room.user.playerIdx + "_GAMESCORES"] = int(data.score) + ":" + int(data.amazing) + ":" + int(data.perfect) + ":" + int(data.good) + ":" + int(data.average) + ":" + int(data.miss) + ":" + int(data.boo) + ":" + int(data.combo) + ":" + int(data.maxCombo);
+                        vars["P" + room.user.playerIdx + "_STATE"] = int(data.status);
+                        vars["P" + room.user.playerIdx + "_GAMELIFE"] = int(data.life * 24 / 100);
+                        vars["P" + room.user.playerIdx + "_SONGID"] = (data.song == null ? data.songID : int(data.song.level));
+                        vars["P" + room.user.playerIdx + "_SONGID_PROGRESS"] = int(data.statusLoading);
                         break;
                 }
                 var engine:Object = ArcGlobals.instance.legacyEncode(data.song);
@@ -713,11 +713,11 @@ package com.flashfla.net
                 {
                     if (mode == GAME_LEGACY)
                         delete engine.songName;
-                    vars["arc_engine" + room.user.id] = JSON.stringify(engine);
+                    vars["arc_engine" + room.user.playerIdx] = JSON.stringify(engine);
                 }
                 else if (data.song === null || (data.song && !data.song.engine))
-                    vars["arc_engine" + room.user.id] = null;
-                vars["arc_replay" + room.user.id] = data.replay || null;
+                    vars["arc_engine" + room.user.playerIdx] = null;
+                vars["arc_replay" + room.user.playerIdx] = data.replay || null;
             }
             setRoomVariables(room, vars);
         }

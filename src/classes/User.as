@@ -56,6 +56,7 @@ package classes
         public var hash:String;
         public var groups:Vector.<Number>;
         public var language:String = "us";
+        public var playerIdx:int;
 
         public var gameVersion:int;
         public var userLevel:int;
