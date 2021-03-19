@@ -81,7 +81,7 @@ package classes
 
             if (idx >= 0)
             {
-                delete userList[idx]
+                userList.removeAt(idx)
 
                 if (this.isGame && user.isSpec)
                     specCount--
@@ -95,7 +95,7 @@ package classes
             for each (var _user:User in userList)
             {
                 if (_user.id == userId)
-                    return user
+                    return _user
             }
 
             return null

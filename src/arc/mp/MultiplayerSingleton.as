@@ -158,7 +158,7 @@ package arc.mp
 
         private function updateRoomUser(room:Room, user:User):void
         {
-            if (user.room == room && user.id != connection.currentUser.id && room.user.isPlayer && user.isPlayer && room.isGame)
+            if (user != null && user.room == room && user.id != connection.currentUser.id && room.user.isPlayer && user.isPlayer && room.isGame)
                 _gvars.gameMain.addAlert("A Challenger Appears! " + user.name);
         }
 

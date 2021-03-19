@@ -34,6 +34,8 @@ package arc.mp
             this.controlChat = controlChatValue;
             this.owner = ownerValue;
 
+            var self:MultiplayerUsers = this
+
             if (owner == null)
                 owner = parent;
 
@@ -63,12 +65,12 @@ package arc.mp
             });
             connection.addEventListener(Multiplayer.EVENT_ROOM_USER, function(event:RoomUserEvent):void
             {
-                if (event.room == room)
+                if (event.room.id == self.room.id)
                     updateUsers();
             });
             connection.addEventListener(Multiplayer.EVENT_ROOM_JOINED, function(event:RoomJoinedEvent):void
             {
-                if (event.room == room)
+                if (event.room.id == self.room.id)
                     updateUsers();
             });
             connection.addEventListener(Multiplayer.EVENT_USER_UPDATE, function(event:UserUpdateEvent):void

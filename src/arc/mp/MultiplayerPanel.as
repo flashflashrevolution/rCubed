@@ -152,8 +152,8 @@ package arc.mp
                 }
                 else
                 {
-                    new MultiplayerRoom(self, event.room);
                     updateRoom(event.room);
+                    new MultiplayerRoom(self, event.room);
                 }
             });
             connection.addEventListener(Multiplayer.EVENT_ROOM_LEFT, function(event:RoomLeftEvent):void
@@ -324,6 +324,9 @@ package arc.mp
             }
         }
 
+        /**
+         * Updates the rooms list
+         */
         private function updateRooms():void
         {
             var items:Array = [];

@@ -625,7 +625,7 @@ package com.flashfla.net
                     }
                 }
             }
-            updateUser(foundUser);
+            parseUserVariables(foundUser);
 
             var found:User = null;
             for each (var room:Room in rooms)
@@ -800,25 +800,6 @@ package com.flashfla.net
             }
         }
 
-        private function updateUser(user:User):void
-        {
-            parseUserVariables(user);
-        }
-
-        private function findUser(user:User):User
-        {
-            for each (var room:Room in rooms)
-            {
-                for each (var _user:User in room.userList)
-                {
-                    if (_user.id == user.id)
-                        return user;
-                }
-            }
-
-            return null;
-        }
-
         private function getRoom(room:Room):Room
         {
             for each (var _room:Room in rooms)
@@ -843,9 +824,7 @@ package com.flashfla.net
 
         private function getRoomUserById(room:Room, userId:int):User
         {
-            var _room:Room = getRoom(room);
-
-            for each (var _user:User in _room.userList)
+            for each (var _user:User in room.userList)
             {
                 if (_user.id == userId)
                     return _user;
@@ -995,7 +974,7 @@ package com.flashfla.net
                     currentUser.userColour = data.usercolor;
                     currentUser.userLevel = data.userlevel;
                     currentUser.id = data.userID;
-                    currentUser.siteId = data.siteID;
+                    currentUser.siteId = int(data.siteID);
                     currentUser.isModerator = (data.mod || data.userclass == CLASS_ADMIN || data.userclass == CLASS_FORUM_MOD || data.userclass == CLASS_CHAT_MOD || data.userclass == CLASS_MP_MOD);
                     currentUser.isAdmin = (data.userclass == CLASS_ADMIN);
                     currentUser.userStatus = 0;
@@ -1095,7 +1074,7 @@ package com.flashfla.net
             var user:User = event.sender;
             if (user == null)
                 user = room.getUser(event.userId);
-            eventMessage(MESSAGE_PRIVATE, getRoom(room), getRoomUserById(room, user.id), htmlUnescape(event.message));
+            eventMessage(MESSAGE_PRIVATE, room, getRoomUserById(room, user.id), htmlUnescape(event.message));
         }
 
         private function onPublicMessage(event:PublicMessageSFSEvent):void
@@ -1104,7 +1083,7 @@ package com.flashfla.net
             var user:User = event.sender;
             if (user == null)
                 user = room.getUser(event.userId);
-            eventMessage(MESSAGE_PUBLIC, getRoom(room), getRoomUserById(room, user.id), htmlUnescape(event.message));
+            eventMessage(MESSAGE_PUBLIC, room, getRoomUserById(room, user.id), htmlUnescape(event.message));
         }
 
         private function onRoomListUpdate(event:RoomListUpdateSFSEvent):void
@@ -1219,6 +1198,9 @@ package com.flashfla.net
             eventRoomList();
         }
 
+        /**
+         * Called when the current player has left a room
+         */
         private function onRoomLeft(event:RoomLeftSFSEvent):void
         {
             var room:Room = getRoomById(event.roomId);
@@ -1229,7 +1211,7 @@ package com.flashfla.net
                     if (ghost.id == event.roomId)
                     {
                         room = ghost;
-                        ghostRooms = ghostRooms.filter(function(item:Room, index:int, array:Array):Boolean
+                        ghostRooms = ghostRooms.filter(function(item:Room, index:int, vec:Vector.<Room>):Boolean
                         {
                             return item.id != ghost.id;
                         });
@@ -1243,13 +1225,20 @@ package com.flashfla.net
             eventRoomLeft(room);
         }
 
+        /**
+         * Called when the current player has joined a room
+         */
         private function onJoinRoom(event:JoinRoomSFSEvent):void
         {
             updateRoom(event.room);
             var room:Room = getRoom(event.room);
+            for each (var _user:User in room.userList)
+            {
+                parseUserVariables(_user);
+            }
             setRoomPlayer(room);
-            updateUserVariables();
-            updateUser(currentUser);
+            //updateUserVariables();
+            //updateUser(currentUser);
             eventRoomJoined(room);
         }
 
@@ -1264,23 +1253,36 @@ package com.flashfla.net
             eventRoomUpdate(getRoom(event.room));
         }
 
+        /**
+         * Called when a user enters any room
+         */
         private function onUserEnterRoom(event:UserEnterRoomSFSEvent):void
         {
-            eventRoomUser(getRoomById(event.roomId), getRoomByIdUserById(event.roomId, event.user.id));
-            eventRoomUpdate(getRoomById(event.roomId));
+            var room:Room = getRoomById(event.roomId);
+            var user:User = event.user;
+
+            eventRoomUser(room, user);
+            eventRoomUpdate(room);
         }
 
+        /**
+         * Called when a user leaves any room
+         */
         private function onUserLeaveRoom(event:UserLeaveRoomSFSEvent):void
         {
-            var user:User = getRoomByIdUserById(event.roomId, event.userId);
             var room:Room = getRoomById(event.roomId);
+            var user:User = getRoomUserById(room, event.userId);
+
+            if (user)
+                room.removeUser(user.id);
+
             eventRoomUser(room, user);
             eventRoomUpdate(room);
         }
 
         private function onUserVariablesUpdate(event:UserVariablesUpdateSFSEvent):void
         {
-            updateUser(event.user);
+            parseUserVariables(event.user);
             eventUserUpdate(event.user, event.changedVars);
         }
 

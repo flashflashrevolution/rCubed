@@ -317,7 +317,7 @@ package it.gotoandplay.smartfoxserver.handlers
                 var pId:int = usr.@p == null ? -1 : int(usr.@p)
 
                 // Create and populate User
-                var user:User = new User(true)
+                var user:User = new User()
                 user.id = id
                 user.name = name
                 user.isModerator = isMod
@@ -373,7 +373,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var currRoom:Room = sfs.getRoom(roomId)
 
             // Create new user object
-            var newUser:User = new User(true)
+            var newUser:User = new User()
             newUser.id = usrId
             newUser.name = usrName
             newUser.isModerator = isMod
@@ -407,7 +407,8 @@ package it.gotoandplay.smartfoxserver.handlers
             var theRoom:Room = sfs.getRoom(roomId)
 
             // Get user name
-            var uName:String = theRoom.getUser(userId).name
+            var user:User = theRoom.getUser(userId)
+            var uName:String = user.name
 
             // Remove user
             theRoom.removeUser(userId)
