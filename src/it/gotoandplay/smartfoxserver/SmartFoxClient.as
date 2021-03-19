@@ -166,7 +166,6 @@ package it.gotoandplay.smartfoxserver
         // Properties
         // -------------------------------------------------------
         
-        private var roomList:Array
         private var connected:Boolean
         private var benchStartTime:int
         
@@ -755,9 +754,6 @@ package it.gotoandplay.smartfoxserver
          */
         public function autoJoin():void
         {
-            if ( !checkRoomList() )
-                return
-                
             var header:Object   = {t:"sys"}
             this.send(header, "autoJoin", (this.activeRoomId ? this.activeRoomId : -1) , "")
         }
@@ -815,7 +811,7 @@ package it.gotoandplay.smartfoxserver
          */
         public function createRoom(roomObj:Object, roomId:int = -1):void
         {
-            if ( !checkRoomList() || !checkJoin() )
+            if ( !checkJoin() )
                 return
             
             if (roomId == -1)
@@ -868,100 +864,6 @@ package it.gotoandplay.smartfoxserver
         }
         
         /**
-         * Get the list of rooms in the current zone.
-         * Unlike the {@link #getRoomList} method, this method returns the list of {@link Room} objects already stored on the client, so no request is sent to the server.
-         *
-         * @return  The list of rooms available in the current zone.
-         *
-         * @example The following example shows how to retrieve the room list.
-         *          <code>
-         *          var rooms:Array = smartFox.getAllRooms()
-         *
-         *          for (var r:String in rooms)
-         *          {
-         *              var room:Room = rooms[r]
-         *              trace("Room: " + room.getName())
-         *          }
-         *          </code>
-         *
-         * @see     #getRoomList
-         * @see     Room
-         *
-         * @version SmartFoxServer Basic / Pro
-         */
-        public function getAllRooms():Array
-        {
-            return roomList
-        }
-        
-        /**
-         * Get a {@link Room} object, using its id as key.
-         *
-         * @param   roomId: the id of the room.
-         *
-         * @return  The {@link Room} object.
-         *
-         * @example The following example shows how to retrieve a room from its id.
-         *          <code>
-         *          var roomObj:Room = smartFox.getRoom(15)
-         *          trace("Room name: " + roomObj.getName() + ", max users: " + roomObj.getMaxUsers())
-         *          </code>
-         *
-         * @see     #getRoomByName
-         * @see     #getAllRooms
-         * @see     #getRoomList
-         * @see     Room
-         *
-         * @version SmartFoxServer Basic / Pro
-         */
-        public function getRoom(roomId:int):Room
-        {
-            if ( !checkRoomList() )
-                return null
-                
-            return roomList[roomId]
-        }
-        
-        /**
-         * Get a {@link Room} object, using its name as key.
-         *
-         * @param   roomName:   the name of the room.
-         *
-         * @return  The {@link Room} object.
-         *
-         * @example The following example shows how to retrieve a room from its id.
-         *          <code>
-         *          var roomObj:Room = smartFox.getRoomByName("The Entrance")
-         *          trace("Room id: " + roomObj.getId() + ", max users: " + roomObj.getMaxUsers())
-         *          </code>
-         *
-         * @see     #getRoom
-         * @see     #getAllRooms
-         * @see     #getRoomList
-         * @see     Room
-         *
-         * @version SmartFoxServer Basic / Pro
-         */
-        public function getRoomByName(roomName:String):Room
-        {
-            if ( !checkRoomList() )
-                return null
-            
-            var room:Room = null
-            
-            for each (var r:Room in roomList)
-            {
-                if (r.name == roomName)
-                {
-                    room = r
-                    break
-                }
-            }
-            
-            return room
-        }
-        
-        /**
          * Retrieve the updated list of rooms in the current zone.
          * Unlike the {@link #getAllRooms} method, this method sends a request to the server, which then sends back the complete list of rooms with all their properties and server-side variables (Room Variables).
          *
@@ -995,30 +897,6 @@ package it.gotoandplay.smartfoxserver
         {
             var header:Object   = {t:"sys"}
             send(header, "getRmList", activeRoomId, "")
-        }
-        
-        /**
-         * Get the currently active {@link Room} object.
-         * SmartFoxServer allows users to join two or more rooms at the same time (multi-room join). If this feature is used, then this method is useless and the application should track the various room id(s) manually, for example by keeping them in an array.
-         *
-         * @return  the {@link Room} object of the currently active room; if the user joined more than one room, the last joined room is returned.
-         *
-         * @example The following example shows how to retrieve the current room object.
-         *          <code>
-         *          var room:Room = smartFox.getActiveRoom()
-         *          trace("Current room is: " + room.getName())
-         *          </code>
-         *
-         * @see     #activeRoomId
-         *
-         * @version SmartFoxServer Basic / Pro
-         */
-        public function getActiveRoom():Room
-        {
-            if ( !checkRoomList() || !checkJoin() )
-                return null
-                
-            return roomList[activeRoomId]
         }
         
         /**
@@ -1123,32 +1001,12 @@ package it.gotoandplay.smartfoxserver
          *
          * @version SmartFoxServer Basic / Pro
          */
-        public function joinRoom(newRoom:*, pword:String  = "", isSpectator:Boolean = false, dontLeave:Boolean = false, oldRoom:int = -1):void
+        public function joinRoom(newRoomId:int, pword:String  = "", isSpectator:Boolean = false, dontLeave:Boolean = false, oldRoom:int = -1):void
         {
-            if ( !checkRoomList() )
-                return
-                
-            var newRoomId:int = -1
             var isSpec:int = isSpectator ? 1 : 0
             
             if (!this.changingRoom)
             {
-                if (typeof newRoom == "number")
-                    newRoomId = int(newRoom)
-
-                else if (typeof newRoom == "string")
-                {
-                    // Search the room
-                    for each (var r:Room in roomList)
-                    {
-                        if (r.name == newRoom)
-                        {
-                            newRoomId = r.id
-                            break
-                        }
-                    }
-                }
-                
                 if (newRoomId != -1)
                 {
                     var header:Object = {t:"sys"}
@@ -1199,7 +1057,7 @@ package it.gotoandplay.smartfoxserver
          */
         public function leaveRoom(roomId:int):void
         {
-            if ( !checkRoomList() || !checkJoin() )
+            if ( !checkJoin() )
                 return
                 
             var header:Object = {t:"sys"}
@@ -1357,7 +1215,7 @@ package it.gotoandplay.smartfoxserver
          */
         public function sendPublicMessage(message:String, roomId:int = -1):void
         {
-            if ( !checkRoomList() || !checkJoin() )
+            if ( !checkJoin() )
                 return
                 
             if (roomId == -1)
@@ -1398,7 +1256,7 @@ package it.gotoandplay.smartfoxserver
          */
         public function sendPrivateMessage(message:String, recipientId:int, roomId:int = -1):void
         {
-            if ( !checkRoomList() || !checkJoin() )
+            if ( !checkJoin() )
                 return
                 
             if (roomId == -1)
@@ -1436,7 +1294,7 @@ package it.gotoandplay.smartfoxserver
          */
         public function sendModeratorMessage(message:String, type:String, id:int = -1):void
         {
-            if ( !checkRoomList() || !checkJoin() )
+            if ( !checkJoin() )
                 return
                 
             var header:Object = {t:"sys"}
@@ -1481,7 +1339,7 @@ package it.gotoandplay.smartfoxserver
          */
         public function sendObject(obj:Object, roomId:int = -1):void
         {
-            if ( !checkRoomList() || !checkJoin() )
+            if ( !checkJoin() )
                 return
                 
             if (roomId == -1)
@@ -1520,7 +1378,7 @@ package it.gotoandplay.smartfoxserver
          */
         public function sendObjectToGroup(obj:Object, userList:Array, roomId:int = -1):void
         {
-            if ( !checkRoomList() || !checkJoin() )
+            if ( !checkJoin() )
                 return
                 
             if (roomId == -1)
@@ -1582,9 +1440,6 @@ package it.gotoandplay.smartfoxserver
          */
         public function sendXtMessage(xtName:String, cmd:String, paramObj:*, type:String = "xml", roomId:int = -1):void
         {
-            if ( !checkRoomList() )
-                return
-                
             if (roomId == -1)
                 roomId = activeRoomId
             
@@ -1724,7 +1579,7 @@ package it.gotoandplay.smartfoxserver
          */
         public function setRoomVariables(varList:Array, roomId:int = -1, setOwnership:Boolean = true):void
         {
-            if ( !checkRoomList() || !checkJoin() )
+            if ( !checkJoin() )
                 return
                 
             if (roomId == -1)
@@ -1738,12 +1593,8 @@ package it.gotoandplay.smartfoxserver
             else
                 xmlMsg = "<vars so='0'>"
                 
-            var room:Room = getRoom(roomId);
-            var roomVars:Array = room.getVariables();
-            for each (var rv:Object in varList) {
-                if (roomVars[rv.name] != rv.val)
-                    xmlMsg += getXmlRoomVariable(rv)
-            }
+            for each (var rv:Object in varList)
+                xmlMsg += getXmlRoomVariable(rv)
                 
             xmlMsg += "</vars>"
             
@@ -1779,19 +1630,13 @@ package it.gotoandplay.smartfoxserver
          */
         public function setUserVariables(varObj:Object, roomId:int = -1):void
         {
-            if ( !checkRoomList() || !checkJoin() )
+            if ( !checkJoin() )
                 return
                 
             if (roomId == -1)
                 roomId = activeRoomId
                 
             var header:Object = {t:"sys"}
-
-            for each (var room:Room in getAllRooms()) {
-                var user:User = room.getUser(myUserId);
-                if (user != null)
-                    user.setVariables(varObj);
-            }
 
             // Prepare and send message
             var xmlMsg:String = getXmlUserVariable(varObj)
@@ -1980,9 +1825,6 @@ package it.gotoandplay.smartfoxserver
             this.activeRoomId = -1
             this.myUserId = -1
             this.myUserName = ""
-            
-            // Clear data structures
-            this.roomList = []
             
             // Set connection status
             if (!isLogOut)
@@ -2261,19 +2103,6 @@ package it.gotoandplay.smartfoxserver
             xmlStr += "</vars>"
             
             return xmlStr
-        }
-        
-        private function checkRoomList():Boolean
-        {
-            var success:Boolean = true
-            
-            if (roomList == null || roomList.length == 0)
-            {
-                success = false
-                errorTrace("The room list is empty!\nThe client API cannot function properly until the room list is populated.\nPlease consult the documentation for more infos.")
-            }
-            
-            return success
         }
         
         private function checkJoin():Boolean

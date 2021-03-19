@@ -168,7 +168,7 @@ package classes
 
         ///- Constructor
         /**
-         * Defines the creation of a new User object for the currect active user. Not to be confused with MPUser.
+         * Defines the creation of a new User object.
          *
          * @param	loadData Loads the user data on creation.
          * @param	isActiveUser Sets the active user flag.

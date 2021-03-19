@@ -83,6 +83,11 @@ package arc.mp
             resize();
         }
 
+        public function get currentUser():User
+        {
+            return connection.currentUser
+        }
+
         public function resize():void
         {
             controlUsers.move(0, 0);
@@ -142,10 +147,15 @@ package arc.mp
                     {
                         connection.sendServerMessage(message, user);
                         if (controlChat != null)
-                            controlChat.textAreaAddLine(MultiplayerChat.textFormatServerMessage(room.user, message));
+                            controlChat.textAreaAddLine(MultiplayerChat.textFormatServerMessage(currentUser, message));
                     }
-                    var user:User = event.mouseTarget["data"]["data"];
-                    new Prompt(owner, 320, "Moderator Message " + user.name, 100, "SEND", e_sendModMessage);
+                    var item:Object = event.mouseTarget["data"];
+
+                    if (item)
+                    {
+                        var user:User = item["data"];
+                        new Prompt(owner, 320, "Moderator Message " + user.name, 100, "SEND", e_sendModMessage);
+                    }
                 });
                 userMenu.customItems.push(userItem);
                 userItem = new ContextMenuItem("Mute User");

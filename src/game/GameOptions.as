@@ -145,7 +145,7 @@ package game
             isolationOffset = avars.configIsolationStart;
             isolationLength = avars.configIsolationLength;
 
-            var layoutKey:String = multiplayer ? (multiplayer.user.isPlayer ? "mp" : "mpspec") : "sp";
+            var layoutKey:String = multiplayer ? (multiplayer.connection.currentUser.isPlayer ? "mp" : "mpspec") : "sp";
             if (!avars.configInterface[layoutKey])
                 avars.configInterface[layoutKey] = {};
             layout = avars.configInterface[layoutKey];

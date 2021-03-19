@@ -29,7 +29,7 @@ package com.flashfla.net
     import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomErrorSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.UserCountChangeSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.UserEnterRoomSFSEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.UserLeaveRoomSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserLeftRoomSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.UserVariablesUpdateSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionLostSFSEvent;
@@ -196,7 +196,7 @@ package com.flashfla.net
             server.addEventListener(SFSEvent.onJoinRoomError, onJoinRoomError);
             server.addEventListener(SFSEvent.onUserCountChange, onUserCountChange);
             server.addEventListener(SFSEvent.onUserEnterRoom, onUserEnterRoom);
-            server.addEventListener(SFSEvent.onUserLeaveRoom, onUserLeaveRoom);
+            server.addEventListener(SFSEvent.onUserLeaveRoom, onUserLeftRoom);
             server.addEventListener(SFSEvent.onUserVariablesUpdate, onUserVariablesUpdate);
         }
 
@@ -345,7 +345,7 @@ package com.flashfla.net
         {
             if (connected && room && room.isJoined)
             {
-                if (room.user.isPlayer)
+                if (room.isPlayer(currentUser))
                     server.switchPlayer(room.id);
                 else
                 {
@@ -531,9 +531,11 @@ package com.flashfla.net
         private function clearRoomPlayer(room:Room):void
         {
             var vars:Object = {};
-            if (room.isGame && room.isJoined && room.user.isPlayer)
+            var currentUserIdx:int = room.getPlayerIndex(currentUser);
+
+            if (room.isGame && room.isJoined && currentUserIdx >= 0)
             {
-                var prefix:String = room.user.playerIdx.toString();
+                var prefix:String = currentUserIdx.toString();
                 switch (mode)
                 {
                     case GAME_R3:
@@ -551,8 +553,8 @@ package com.flashfla.net
                         vars["mpstats" + prefix] = null;
                         break;
                 }
-                vars["arc_engine" + room.user.id] = null;
-                vars["arc_replay" + room.user.id] = null;
+                vars["arc_engine" + currentUser.id] = null;
+                vars["arc_replay" + currentUser.id] = null;
             }
             setRoomVariables(room, vars);
         }
@@ -560,9 +562,11 @@ package com.flashfla.net
         private function setRoomPlayer(room:Room):void
         {
             var vars:Object = {};
-            if (room.isGame && room.isJoined && room.user.isPlayer)
+            var currentUserIdx:int = room.getPlayerIndex(currentUser);
+
+            if (room.isGame && room.isJoined && currentUserIdx >= 0)
             {
-                var prefix:String = room.user.id.toString();
+                var prefix:String = currentUserIdx.toString();
                 switch (mode)
                 {
                     case GAME_R3:
@@ -618,7 +622,7 @@ package com.flashfla.net
         }
 
         /**
-         * Injects the current user instance in the rooms (both on SFS side and on MP side).
+         * Injects the current user instance in the rooms.
          * This is necessary since the server does not provide `vars` for the logged in user
          * on `joinOK` events. These `vars` are only provided in the `logOK` part of a `xtRes` event.
          */
@@ -627,22 +631,7 @@ package com.flashfla.net
             // Send the current user's variable to the server
             server.setUserVariables(currentUser.variables);
 
-            // Update the User instance in SFS
-            for each (var sfsRoom:Room in server.getAllRooms())
-            {
-                for (var sfsUserIdx:int in sfsRoom.userList)
-                {
-                    var sfsUser:User = sfsRoom.userList[sfsUserIdx];
-
-                    if (sfsUser.id == currentUser.id)
-                    {
-                        sfsRoom.userList[sfsUserIdx] = currentUser;
-                        break;
-                    }
-                }
-            }
-
-            // Update the User instance in MP
+            // Update the User instance in all rooms
             for each (var room:Room in rooms)
             {
                 for (var mpUserIdx:int in room.userList)
@@ -663,12 +652,13 @@ package com.flashfla.net
         public function setRoomGameplay(room:Room, data:Object):void
         {
             var vars:Object = {};
-            if (room.isJoined && room.user.isPlayer)
+            if (room.isJoined)
             {
+                var user:User = room.getPlayer(1)
                 switch (mode)
                 {
                     case GAME_VELOCITY:
-                        var prefix:String = "p" + room.user.playerIdx;
+                        var prefix:String = "p" + user.playerIdx;
                         vars[prefix + "_maxcombo"] = dec2hex(data.maxCombo);
                         vars[prefix + "_combo"] = dec2hex(data.combo);
                         vars[prefix + "_perfect"] = dec2hex(data.amazing + data.perfect);
@@ -677,8 +667,7 @@ package com.flashfla.net
                         vars[prefix + "_boo"] = dec2hex(data.boo);
                         vars[prefix + "_miss"] = dec2hex(data.miss);
                         vars[prefix + "_levelid"] = dec2hex(data.song == null ? data.songID : int(data.song.level));
-                        var statusLoading:int = data.statusLoading;
-                        vars[prefix + "_levelloading"] = dec2hex(statusLoading);
+                        vars[prefix + "_levelloading"] = dec2hex(data.statusLoading);
                         vars[prefix + "_state"] = dec2hex(STATUS_VELOCITY.indexOf(data.status));
                         if (data.gameScoreRecorded != null)
                             vars["gameScoreRecorded"] = data.gameScoreRecorded;
@@ -694,18 +683,18 @@ package com.flashfla.net
                                 status = STATUS_NONE;
                                 break;
                         }
-                        vars["mpstats" + room.user.playerIdx] = String((data.songName != null ? data.songName : data.song.name)).replace(/:/g, "") + ":" + int(data.score) + ":" + int(data.life) + ":" + int(data.maxCombo) + ":" + int(data.combo) + ":" + int(data.amazing + data.perfect) + ":" + int(data.good) + ":" + int(data.average) + ":" + int(data.miss) + ":" + int(data.boo) + ":" + STATUS_LEGACY.indexOf(status);
+                        vars["mpstats" + user.playerIdx] = String((data.songName != null ? data.songName : data.song.name)).replace(/:/g, "") + ":" + int(data.score) + ":" + int(data.life) + ":" + int(data.maxCombo) + ":" + int(data.combo) + ":" + int(data.amazing + data.perfect) + ":" + int(data.good) + ":" + int(data.average) + ":" + int(data.miss) + ":" + int(data.boo) + ":" + STATUS_LEGACY.indexOf(status);
                         if (data.statusLoading != null)
-                            vars["arc_status_loading" + room.user.playerIdx] = int(data.statusLoading);
+                            vars["arc_status_loading" + user.playerIdx] = int(data.statusLoading);
                         else
-                            vars["arc_status_loading" + room.user.playerIdx] = null;
+                            vars["arc_status_loading" + user.playerIdx] = null;
                         break;
                     case GAME_R3:
-                        vars["P" + room.user.playerIdx + "_GAMESCORES"] = int(data.score) + ":" + int(data.amazing) + ":" + int(data.perfect) + ":" + int(data.good) + ":" + int(data.average) + ":" + int(data.miss) + ":" + int(data.boo) + ":" + int(data.combo) + ":" + int(data.maxCombo);
-                        vars["P" + room.user.playerIdx + "_STATE"] = int(data.status);
-                        vars["P" + room.user.playerIdx + "_GAMELIFE"] = int(data.life * 24 / 100);
-                        vars["P" + room.user.playerIdx + "_SONGID"] = (data.song == null ? data.songID : int(data.song.level));
-                        vars["P" + room.user.playerIdx + "_SONGID_PROGRESS"] = int(data.statusLoading);
+                        vars["P" + user.playerIdx + "_GAMESCORES"] = int(data.score) + ":" + int(data.amazing) + ":" + int(data.perfect) + ":" + int(data.good) + ":" + int(data.average) + ":" + int(data.miss) + ":" + int(data.boo) + ":" + int(data.combo) + ":" + int(data.maxCombo);
+                        vars["P" + user.playerIdx + "_STATE"] = int(data.status);
+                        vars["P" + user.playerIdx + "_GAMELIFE"] = int(data.life * 24 / 100);
+                        vars["P" + user.playerIdx + "_SONGID"] = (data.song == null ? data.songID : int(data.song.level));
+                        vars["P" + user.playerIdx + "_SONGID_PROGRESS"] = int(data.statusLoading);
                         break;
                 }
                 var engine:Object = ArcGlobals.instance.legacyEncode(data.song);
@@ -713,11 +702,11 @@ package com.flashfla.net
                 {
                     if (mode == GAME_LEGACY)
                         delete engine.songName;
-                    vars["arc_engine" + room.user.playerIdx] = JSON.stringify(engine);
+                    vars["arc_engine" + user.playerIdx] = JSON.stringify(engine);
                 }
                 else if (data.song === null || (data.song && !data.song.engine))
-                    vars["arc_engine" + room.user.playerIdx] = null;
-                vars["arc_replay" + room.user.playerIdx] = data.replay || null;
+                    vars["arc_engine" + user.playerIdx] = null;
+                vars["arc_replay" + user.playerIdx] = data.replay || null;
             }
             setRoomVariables(room, vars);
         }
@@ -744,11 +733,6 @@ package com.flashfla.net
                         break;
                 }
             }
-        }
-
-        private function parseRoomUserVariables(room:Room, user:User):void
-        {
-            user.gameplay = parseRoomVariablesForUser(room, user);
         }
 
         private function clearRooms():void
@@ -788,14 +772,13 @@ package com.flashfla.net
                 if (user.id == currentUser.id)
                 {
                     room.isJoined = true;
-                    room.user = user;
                     if (user.isPlayer)
                         currentUser.room = room;
                 }
                 if (user.isPlayer)
                 {
-                    room.players.push(user);
-                    parseRoomUserVariables(room, user);
+                    room.addPlayer(user);
+                    parseRoomVariablesForUser(room, user);
                 }
             }
             if (mode == GAME_R3)
@@ -1125,7 +1108,7 @@ package com.flashfla.net
             var status:int = -1;
             var istatus:int = STATUS_NONE;
             var song:Object = null;
-            var songMatch:Boolean = room.players.length > 0;
+            var songMatch:Boolean = room.playerCount > 0;
             for each (var user:User in room.players)
             {
                 var gameplay:Object = user.gameplay;
@@ -1166,7 +1149,7 @@ package com.flashfla.net
                 if (status == STATUS_RESULTS)
                 {
                     eventReport = 2;
-                    if (room.user.isPlayer)
+                    if (room.isPlayer(currentUser))
                         reportSongEnd(room);
                 }
                 else if (status == STATUS_LOADED || (status == STATUS_PLAYING && room.match.status < STATUS_LOADED))
@@ -1174,7 +1157,7 @@ package com.flashfla.net
                     if (room.players.length > 1 && songMatch)
                     {
                         eventReport = 1;
-                        if (room.user.isPlayer)
+                        if (room.isPlayer(currentUser))
                             reportSongStart(room);
                         status = STATUS_PLAYING;
                     }
@@ -1250,9 +1233,10 @@ package com.flashfla.net
         {
             updateRoom(event.room);
             var room:Room = getRoom(event.room);
-            for each (var _user:User in room.userList)
+            for each (var _user:User in event.users)
             {
                 parseUserVariables(_user);
+                room.addUser(_user);
             }
 
             injectCurrentUser();
@@ -1282,6 +1266,8 @@ package com.flashfla.net
             var room:Room = getRoomById(event.roomId);
             var user:User = event.user;
 
+            room.addUser(user);
+
             eventRoomUser(room, user);
             eventRoomUpdate(room);
         }
@@ -1289,7 +1275,7 @@ package com.flashfla.net
         /**
          * Called when a user leaves any room
          */
-        private function onUserLeaveRoom(event:UserLeaveRoomSFSEvent):void
+        private function onUserLeftRoom(event:UserLeftRoomSFSEvent):void
         {
             var room:Room = getRoomById(event.roomId);
             var user:User = getRoomUserById(room, event.userId);

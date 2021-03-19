@@ -98,6 +98,11 @@ package arc.mp
             connection.addEventListener(Multiplayer.EVENT_GAME_START, onGameStart);
         }
 
+        public function get currentUser():User
+        {
+            return connection.currentUser
+        }
+
         private function onError(event:ErrorEvent):void
         {
             _gvars.gameMain.addAlert("MP Error: " + event.message);
@@ -158,7 +163,7 @@ package arc.mp
 
         private function updateRoomUser(room:Room, user:User):void
         {
-            if (user != null && user.room == room && user.id != connection.currentUser.id && room.user.isPlayer && user.isPlayer && room.isGame)
+            if (user != null && user.room == room && user.id != connection.currentUser.id && room.isPlayer(currentUser) && user.isPlayer && room.isGame)
                 _gvars.gameMain.addAlert("A Challenger Appears! " + user.name);
         }
 
@@ -174,7 +179,7 @@ package arc.mp
                 return;
             for each (var room:Room in connection.rooms)
             {
-                if (room.isGame && room.isJoined && room.user.isPlayer)
+                if (room.isGame && room.isJoined && room.isPlayer)
                     foreach(room);
             }
         }
@@ -221,7 +226,7 @@ package arc.mp
             var isPlayer:Boolean = false;
             foreachroom(function(room:Room):void
             {
-                if (room.user.isPlayer)
+                if (room.isPlayer(currentUser))
                     isPlayer = true;
             });
             return isPlayer;
@@ -340,17 +345,8 @@ package arc.mp
             var ret:Boolean = false;
             foreachroom(function(room:Room):void
             {
-                if (room.user.isPlayer)
-                {
-                    for each (var user:User in room.userList)
-                    {
-                        if (user.isPlayer && user.id != connection.currentUser.id)
-                        {
-                            ret = true;
-                            return;
-                        }
-                    }
-                }
+                if (room.isPlayer(currentUser) && room.playerCount > 1)
+                    ret = true;
             });
             return ret;
         }
@@ -370,7 +366,7 @@ package arc.mp
         private function onGameResults(event:GameResultsEvent):void
         {
             var room:Room = event.room;
-            if (room.user.id == 1 && (connection.mode == Multiplayer.GAME_LEGACY || room.variables["gameScoreRecorded"] != "y"))
+            if (room.getPlayerIndex(currentUser) == 1 && (connection.mode == Multiplayer.GAME_LEGACY || room.variables["gameScoreRecorded"] != "y"))
                 gameplaySubmit(room);
 
             for each (var player:Object in room.match.players)
@@ -392,7 +388,7 @@ package arc.mp
         private function onGameStart(event:GameStartEvent):void
         {
             var room:Room = event.room;
-            if (room.user.isPlayer)
+            if (room.isPlayer(currentUser))
                 gameplayStart(room);
         }
 
@@ -457,12 +453,12 @@ package arc.mp
         {
             var room:Room = _gvars.options.multiplayer;
 
-            if (!room || !room.user.isPlayer || currentStatus != Multiplayer.STATUS_PLAYING)
+            if (!room || !room.isPlayer(currentUser) || currentStatus != Multiplayer.STATUS_PLAYING)
                 return;
 
             currentStatus = Multiplayer.STATUS_RESULTS;
 
-            var sendingScore:Boolean = (room.match.status == Multiplayer.STATUS_RESULTS && ((connection.mode == Multiplayer.GAME_LEGACY && room.user.id == 1) || (connection.mode == Multiplayer.GAME_VELOCITY && room.variables["gameScoreRecorded"] != "y")));
+            var sendingScore:Boolean = (room.match.status == Multiplayer.STATUS_RESULTS && ((connection.mode == Multiplayer.GAME_LEGACY && room.getPlayerIndex(currentUser) == 1) || (connection.mode == Multiplayer.GAME_VELOCITY && room.variables["gameScoreRecorded"] != "y")));
 
             var replay:Replay = null;
             var results:GameScoreResult = null;
@@ -523,11 +519,12 @@ package arc.mp
                 return velocity ? Multiplayer.dec2hex(value) : value.toString();
             };
 
+            var currentUserIdx:int = room.getPlayerIndex(currentUser)
             var velocity:Boolean = (connection.mode == Multiplayer.GAME_VELOCITY);
             var results1:Object = room.match.gameplay[(room.match.players[1] || {}).userID];
             var results2:Object = room.match.gameplay[(room.match.players[2] || {}).userID];
-            var currentOpponent:User = (room.user.id == 1 ? room.match.players[2] : room.match.players[1]);
-            var resultsOpponent:Object = (room.user.id == 1 ? results2 : results1);
+            var currentOpponent:User = (currentUserIdx == 1 ? room.match.players[2] : room.match.players[1]);
+            var resultsOpponent:Object = (currentUserIdx == 1 ? results2 : results1);
 
             if (!currentOpponent)
                 return;
@@ -543,8 +540,8 @@ package arc.mp
                 data.winner = results1.score > results2.score ? 1 : 2;
                 data.loser = results1.score < results2.score ? 1 : 2;
             }
-            data["player" + room.user.id + "id"] = (velocity ? connection.currentUser.id : connection.currentUser.name);
-            data["player" + currentOpponent.id + "id"] = (velocity ? resultsOpponent.siteID : currentOpponent.name);
+            data["player" + currentUserIdx + "id"] = (velocity ? connection.currentUser.id : connection.currentUser.name);
+            data["player" + room.getPlayerIndex(currentOpponent) + "id"] = (velocity ? resultsOpponent.siteID : currentOpponent.name);
 
             var loader:URLLoader = new URLLoader();
             var request:URLRequest = new URLRequest(velocity ? Constant.MULTIPLAYER_SUBMIT_URL_VELOCITY : Constant.MULTIPLAYER_SUBMIT_URL);

@@ -12,7 +12,6 @@ package classes
         public var maxPlayers:int
         public var userCount:int
         public var specCount:int
-        public var user:User
         public var match:Object
 
         // Room flags
@@ -27,15 +26,33 @@ package classes
         public var mode:Object
         public var scoreMode:Object
         public var ranked:Object
-
         public var myPlayerIndex:int
-
         public var userList:Vector.<User>
-        public var players:Vector.<User>
-
         public var connection:Multiplayer;
 
-        public var variables:Array
+        /**
+         * An associative array containing Room Variables' values, where the key is the variable name.
+         *
+         * @example
+         * ```
+         * var roomVars:Array = room.variables
+         * for (var v:String in roomVars)
+         *      trace("Name:" + v + " | Value:" + roomVars[v])
+         * 	```
+         */
+        public var variables:Object
+
+        /**
+         * Maps indexes to players.
+         * For example:
+         * ```
+         * _players[2] = someUser;
+         * var secondPlayer:User = _players[2];
+         * ```
+         */
+        private var _players:Object
+
+        private var _playerCount:int
 
         public function Room(id:int, name:String = "", maxUsers:int = 0, maxSpectators:int = 0, isTemp:Boolean = false, isGame:Boolean = false, isPrivate:Boolean = false, isLimbo:Boolean = false, userCount:int = 0, specCount:int = 0)
         {
@@ -52,8 +69,69 @@ package classes
             this.userCount = userCount
             this.specCount = specCount
             this.userList = new <User>[]
-            this.players = new <User>[]
+
             this.variables = []
+
+            this._players = {}
+            this._playerCount = 0
+        }
+
+        public function addPlayer(user:User):void
+        {
+            _players[_playerCount + 1] = user
+            _playerCount++
+        }
+
+        public function setPlayer(index:int, user:User):void
+        {
+            if (!_players[index])
+            {
+                _players[index] = user
+                _playerCount++
+            }
+        }
+
+        public function getPlayer(index:int):User
+        {
+            return _players[index]
+        }
+
+        public function getPlayerIndex(user:User):int
+        {
+            for (var idx:int in _players)
+                if (_players[idx] == user)
+                    return idx
+
+            return -1
+        }
+
+        public function isPlayer(user:User):Boolean
+        {
+            return getPlayerIndex(user) >= 0
+        }
+
+        public function removePlayer(index:int):void
+        {
+            if (getPlayer(index))
+            {
+                delete _players[index]
+                _playerCount--
+            }
+        }
+
+        public function get playerCount():int
+        {
+            return _playerCount
+        }
+
+        public function get players():Vector.<User>
+        {
+            var playerVec:Vector.<User> = new Vector.<User>(true, _playerCount)
+
+            for (var idx:int in _players)
+                playerVec.push(_players[idx])
+
+            return playerVec
         }
 
         public function addUser(user:User):void
@@ -83,7 +161,7 @@ package classes
             {
                 userList.removeAt(idx)
 
-                if (this.isGame && user.isSpec)
+                if (this.isGame)
                     specCount--
                 else
                     userCount--
@@ -106,38 +184,6 @@ package classes
             this.userList = new <User>[]
             this.userCount = 0
             this.specCount = 0
-        }
-
-        public function getVariable(varName:String):Vector.<Object>
-        {
-            return variables[varName]
-        }
-
-        /**
-         * Retrieve the list of all Room Variables.
-         *
-         * @return	An associative array containing Room Variables' values, where the key is the variable name.
-         *
-         * @example	<code>
-         * 			var roomVars:Array = room.getVariables()
-         *
-         * 			for (var v:String in roomVars)
-         * 				trace("Name:" + v + " | Value:" + roomVars[v])
-         * 			</code>
-         */
-        public function getVariables():Array
-        {
-            return variables
-        }
-
-        public function setVariables(vars:Array):void
-        {
-            this.variables = vars
-        }
-
-        public function clearVariables():void
-        {
-            this.variables = []
         }
     }
 }

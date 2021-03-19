@@ -16,7 +16,7 @@ package arc.mp
     {
         private var connection:Multiplayer;
         public var room:Room;
-        public var userId:int;
+        public var playerIdx:int;
 
         private var playerLabel:Label;
         private var songLabel:Label;
@@ -33,11 +33,11 @@ package arc.mp
             var self:MultiplayerPlayer = this
 
             room = roomValue;
-            userId = playerValue;
+            playerIdx = playerValue;
 
             connection = room.connection;
 
-            playerLabel = new Label(content, 0, 0, "Player " + userId + ": ");
+            playerLabel = new Label(content, 0, 0, "Player " + playerIdx + ": ");
             songLabel = new Label(content, 0, playerLabel.y + playerLabel.height - 4, "Song: ");
             statusLabel = new Label(content, 0, songLabel.y + songLabel.height - 4, "Song: ");
             scoreLabel = new Label(content, 0, statusLabel.y + statusLabel.height - 4, "Score: ");
@@ -47,10 +47,14 @@ package arc.mp
             songLabel.mouseEnabled = true;
             songLabel.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void
             {
-                var vars:Object = room.players[userId] || {};
-                vars = vars.gameplay;
-                if (vars != null)
-                    MultiplayerSingleton.getInstance().gameplayPick(vars.song);
+                var user:User = room.getPlayer(playerIdx);
+
+                if (user)
+                {
+                    var gameplay:Object = user.gameplay;
+                    if (gameplay != null)
+                        MultiplayerSingleton.getInstance().gameplayPick(gameplay.song);
+                }
             });
 
             height = comboLabel.y + comboLabel.height;
@@ -94,28 +98,18 @@ package arc.mp
             var user:User = null;
             for each (var roomUser:User in room.userList)
             {
-                if (roomUser.id == userId)
+                if (roomUser.playerIdx == playerIdx)
                 {
                     user = roomUser;
                     break;
                 }
             }
 
-            var player:User
-            for each (var _user:User in room.userList)
-            {
-                if (_user.id == userId)
-                    player = user;
-            }
+            var gameplay:Object;
+            if (user)
+                gameplay = user.gameplay;
 
-            if (player == null)
-            {
-                trace("Player with id " + userId + " was not found in room " + room.id);
-                return;
-            }
-
-            var gameplay:Object = player.gameplay;
-            if (!roomUser || !gameplay)
+            if (!gameplay)
             {
                 playerLabel.text = "";
                 songLabel.text = "";

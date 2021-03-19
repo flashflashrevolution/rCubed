@@ -8,13 +8,13 @@ package it.gotoandplay.smartfoxserver.SFSEvents
     public class ModerationMessageSFSEvent extends TypedSFSEvent
     {
         public var message:String;
-        public var sender:User;
+        public var userId:User;
 
         public function ModerationMessageSFSEvent(params:Object)
         {
             super(SFSEvent.onModeratorMessage);
             message = params.message;
-            sender = params.sender;
+            userId = params.userId;
         }
     }
 }

@@ -3,22 +3,19 @@ package it.gotoandplay.smartfoxserver.SFSEvents
 
     import it.gotoandplay.smartfoxserver.TypedSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvent;
-    import classes.Room
 
     public class SpectatorSwitchedSFSEvent extends TypedSFSEvent
     {
-        public var success:String;
-        public var newId:int;
+        public var playerId:int;
         public var userId:int;
-        public var room:Room;
+        public var roomId:int;
 
         public function SpectatorSwitchedSFSEvent(params:Object)
         {
             super(SFSEvent.onSpectatorSwitched);
-            success = params.success;
-            newId = params.newId;
+            playerId = params.playerId;
             userId = params.userId;
-            room = params.room;
+            roomId = params.roomId;
         }
     }
 }

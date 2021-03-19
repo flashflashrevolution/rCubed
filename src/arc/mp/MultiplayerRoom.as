@@ -16,6 +16,7 @@ package arc.mp
     import com.flashfla.net.events.RoomUserEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
     import classes.Room;
+    import classes.User;
 
     public class MultiplayerRoom extends Window
     {
@@ -59,14 +60,14 @@ package arc.mp
             controlUsers.updateUsers();
 
             controlSpectate = new PushButton();
-            controlSpectate.label = room.user.isPlayer ? "Spectate" : (room.players.length < 2 ? "Join Game" : "Start Spectating");
+            controlSpectate.label = room.isPlayer(currentUser) ? "Spectate" : (room.playerCount < 2 ? "Join Game" : "Start Spectating");
             controlSpectate.setSize(controlUsers.width, controlChat.controlInput.height);
             controlSpectate.move(controlUsers.x, controlUsers.y + controlUsers.height);
             controlSpectate.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void
             {
                 if (!room)
                     return;
-                if (room.user.isPlayer || room.players.length < 2)
+                if (room.isPlayer(currentUser) || room.playerCount < 2)
                 {
                     connection.switchRole(room);
                     spectating = false;
@@ -84,7 +85,7 @@ package arc.mp
 
             connection.addEventListener(Multiplayer.EVENT_GAME_START, function(event:GameStartEvent):void
             {
-                if (spectating && event.room == room && !room.user.isPlayer && GlobalVariables.instance.gameMain.activePanel is MainMenu)
+                if (spectating && event.room == room && !room.isPlayer(currentUser) && GlobalVariables.instance.gameMain.activePanel is MainMenu)
                     MultiplayerSingleton.getInstance().spectateGame(room);
             });
 
@@ -139,6 +140,11 @@ package arc.mp
             });
         }
 
+        public function get currentUser():User
+        {
+            return connection.currentUser
+        }
+
         public function redraw():void
         {
             controlPlayer1.redraw(true);
@@ -159,7 +165,7 @@ package arc.mp
         private function updateRoom(roomToUpdate:Room):void
         {
             if (roomToUpdate == room)
-                controlSpectate.label = room.user.isPlayer ? "Spectate" : (room.players.length < 2 ? "Join Game" : (spectating ? "Stop Spectating" : "Start Spectating"));
+                controlSpectate.label = room.isPlayer(currentUser) ? "Spectate" : (room.playerCount < 2 ? "Join Game" : (spectating ? "Stop Spectating" : "Start Spectating"));
         }
     }
 }

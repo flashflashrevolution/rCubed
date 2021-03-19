@@ -607,7 +607,7 @@ package game
             judgeOffset = options.offsetJudge * 1000 / 30;
             autoJudgeOffset = options.autoJudgeOffset;
 
-            mpSpectate = (options.multiplayer && !options.multiplayer.user.isPlayer);
+            mpSpectate = (options.multiplayer && !options.multiplayer.connection.currentUser.isPlayer);
             if (mpSpectate)
             {
                 options.displayCombo = options.displayComboTotal = options.displayPA = false;
@@ -1783,9 +1783,9 @@ package game
             if (options.multiplayer)
             {
                 var index:int = 0;
-                for (var id:int = 1; id < options.multiplayer.players.length + 1; id++)
+                for (var id:int = 1; id < options.multiplayer.playerCount + 1; id++)
                 {
-                    if (id == options.multiplayer.user.id)
+                    if (id == options.multiplayer.connection.currentUser.id)
                         continue;
 
                     index++;

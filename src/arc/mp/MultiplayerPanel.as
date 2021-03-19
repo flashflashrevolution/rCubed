@@ -91,7 +91,7 @@ package arc.mp
                 if (controlRooms.selectedItem != null && controlRooms.selectedItem.data != null)
                 {
                     var room:Room = controlRooms.selectedItem.data;
-                    joinRoom(room, room.players.length < room.maxPlayers);
+                    joinRoom(room, room.playerCount < room.maxPlayers);
                 }
             });
             window.addChild(controlRooms);
@@ -353,7 +353,7 @@ package arc.mp
         public function updateWindowTitle(room:Room):void
         { // Minus 2 Rooms due to The Entrence (Fake) and Lobby
             if (room != null)
-                window.title = Multiplayer.GAME_VERSIONS[connection.mode] + " " + room.name + " - Rooms: " + (connection.rooms.length - 2) + " - Players: " + room.players.length;
+                window.title = Multiplayer.GAME_VERSIONS[connection.mode] + " " + room.name + " - Rooms: " + (connection.rooms.length - 2) + " - Players: " + room.playerCount;
         }
 
         private function nameRoom(room:Room):String
@@ -385,7 +385,7 @@ package arc.mp
             const roomName:String = "(" + title + ")";
             const spectatorString:String = (room.specCount > 0) ? "+" + room.specCount + " " : "";
 
-            return MultiplayerChat.textFormatSize(room.players.length + "/2 " + spectatorString, "-1") + MultiplayerChat.textFormatColour(MultiplayerChat.textEscape((room.isPrivate ? "!" : "") + roomName), "#" + dulledColour) + " " + room.name;
+            return MultiplayerChat.textFormatSize(room.playerCount + "/2 " + spectatorString, "-1") + MultiplayerChat.textFormatColour(MultiplayerChat.textEscape((room.isPrivate ? "!" : "") + roomName), "#" + dulledColour) + " " + room.name;
         }
 
         public function setParent(value:MenuPanel):void
