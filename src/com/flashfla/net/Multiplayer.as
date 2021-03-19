@@ -230,9 +230,9 @@ package com.flashfla.net
                 if (target == null)
                     server.sendModeratorMessage(message, SmartFoxClient.MODMSG_TO_ZONE);
                 else if (target.userID != null)
-                    server.sendModeratorMessage(message, SmartFoxClient.MODMSG_TO_USER, target.userID);
+                    server.sendModeratorMessage(message, SmartFoxClient.MODMSG_TO_USER, target.id);
                 else if (target.roomID != null)
-                    server.sendModeratorMessage(message, SmartFoxClient.MODMSG_TO_ROOM, target.roomID);
+                    server.sendModeratorMessage(message, SmartFoxClient.MODMSG_TO_ROOM, target.id);
             }
         }
 
@@ -592,6 +592,10 @@ package com.flashfla.net
             setRoomVariables(room, vars);
         }
 
+        /**
+         * Sets the variables of the current user in the server.
+         * Then, all user instances with the same SFS id in any room are replaced by the current user.
+         */
         private function updateUserVariables():void
         {
             var vars:Object = {};
@@ -611,37 +615,49 @@ package com.flashfla.net
                     vars["MP_Color"] = currentUser.userColour;
                     break;
             }
-            server.setUserVariables(vars);
+        }
 
-            var foundUser:User = null;
+        /**
+         * Injects the current user instance in the rooms (both on SFS side and on MP side).
+         * This is necessary since the server does not provide `vars` for the logged in user
+         * on `joinOK` events. These `vars` are only provided in the `logOK` part of a `xtRes` event.
+         */
+        private function injectCurrentUser():void
+        {
+            // Send the current user's variable to the server
+            server.setUserVariables(currentUser.variables);
+
+            // Update the User instance in SFS
             for each (var sfsRoom:Room in server.getAllRooms())
             {
-                for each (var _user:User in sfsRoom.userList)
+                for (var sfsUserIdx:int in sfsRoom.userList)
                 {
-                    if (_user.id == currentUser.id)
+                    var sfsUser:User = sfsRoom.userList[sfsUserIdx];
+
+                    if (sfsUser.id == currentUser.id)
                     {
-                        foundUser = _user;
+                        sfsRoom.userList[sfsUserIdx] = currentUser;
                         break;
                     }
                 }
             }
-            parseUserVariables(foundUser);
 
-            var found:User = null;
+            // Update the User instance in MP
             for each (var room:Room in rooms)
             {
-                for each (var user:User in room.userList)
+                for (var mpUserIdx:int in room.userList)
                 {
-                    if (user.id == currentUser.id)
+                    var mpUser:User = room.userList[mpUserIdx];
+
+                    if (mpUser.id == currentUser.id)
                     {
-                        found = user;
+                        room.userList[mpUserIdx] = currentUser;
                         break;
                     }
                 }
-                if (found != null)
-                    break;
             }
-            eventUserUpdate(found);
+
+            eventUserUpdate(currentUser);
         }
 
         public function setRoomGameplay(room:Room, data:Object):void
@@ -979,6 +995,8 @@ package com.flashfla.net
                     currentUser.isAdmin = (data.userclass == CLASS_ADMIN);
                     currentUser.userStatus = 0;
 
+                    updateUserVariables();
+
                     server.myUserId = currentUser.id;
                     server.myUserName = currentUser.name;
                     server.amIModerator = currentUser.isModerator;
@@ -1236,6 +1254,9 @@ package com.flashfla.net
             {
                 parseUserVariables(_user);
             }
+
+            injectCurrentUser();
+
             setRoomPlayer(room);
             //updateUserVariables();
             //updateUser(currentUser);
