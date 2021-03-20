@@ -128,7 +128,7 @@ package arc.mp
         public function updateUsers():void
         {
             var items:Array = [];
-            for each (var user:User in room.userList)
+            for each (var user:User in room.users)
                 items.push({label: MultiplayerChat.nameUser(user), labelhtml: true, data: user});
             controlUsers.items = items;
             sortUsers();

@@ -173,10 +173,13 @@ package it.gotoandplay.smartfoxserver.handlers
 
                 if (roomXml.vars.toString().length > 0)
                     populateVariables(room.variables, roomXml)
+
+                roomList.push(room)
             }
 
             var params:Object = {}
             params.roomList = roomList
+
             var evt:TypedSFSEvent = new RoomListUpdateSFSEvent(params)
             sfs.dispatchEvent(evt)
         }
@@ -236,7 +239,7 @@ package it.gotoandplay.smartfoxserver.handlers
 
                 // Handle user variables
                 if (usr.vars.toString().length > 0)
-                    populateVariables(user.getVariables(), usr)
+                    populateVariables(user.variables, usr)
 
                 // Add user
                 userVec.push(user)
@@ -420,10 +423,10 @@ package it.gotoandplay.smartfoxserver.handlers
             var rName:String = o.body.rm.name
             var rMax:int = int(o.body.rm.@max)
             var rSpec:int = int(o.body.rm.@spec)
-            var isTemp:Boolean = o.body.rm.@temp == "1" ? true : false
-            var isGame:Boolean = o.body.rm.@game == "1" ? true : false
-            var isPriv:Boolean = o.body.rm.@priv == "1" ? true : false
-            var isLimbo:Boolean = o.body.rm.@limbo == "1" ? true : false
+            var isTemp:Boolean = o.body.rm.@temp == "1"
+            var isGame:Boolean = o.body.rm.@game == "1"
+            var isPriv:Boolean = o.body.rm.@priv == "1"
+            var isLimbo:Boolean = o.body.rm.@limbo == "1"
 
             // Create room obj
             var room:Room = new Room(rId, rName, rMax, rSpec, isTemp, isGame, isPriv, isLimbo)

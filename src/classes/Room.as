@@ -27,7 +27,6 @@ package classes
         public var scoreMode:Object
         public var ranked:Object
         public var myPlayerIndex:int
-        public var userList:Vector.<User>
         public var connection:Multiplayer;
 
         /**
@@ -47,10 +46,20 @@ package classes
          * For example:
          * ```
          * _players[2] = someUser;
-         * var secondPlayer:User = _players[2];
+         * var someUser:User = _players[2];
          * ```
          */
         private var _players:Object
+
+        /**
+         * Maps ids to users.
+         * For example:
+         * ```
+         * _users[1234224] = someUser;
+         * var someUser:User = _users[1234224];
+         * ```
+         */
+        private var _users:Object
 
         private var _playerCount:int
 
@@ -61,17 +70,17 @@ package classes
             this.maxSpectators = maxSpectators
             this.maxUsers = maxUsers
             this.isTemp = isTemp
-            this.isTemp = isGame
+            this.isGame = isGame
             this.isPrivate = isPrivate
             this.isLimbo = isLimbo
             this.isJoined = false
 
             this.userCount = userCount
             this.specCount = specCount
-            this.userList = new <User>[]
 
             this.variables = []
 
+            this._users = {}
             this._players = {}
             this._playerCount = 0
         }
@@ -136,7 +145,10 @@ package classes
 
         public function addUser(user:User):void
         {
-            userList.push(user)
+            if (getUser(user.id))
+                return;
+
+            _users[user.id] = user
 
             if (this.isGame && user.isSpec)
                 specCount++
@@ -146,42 +158,36 @@ package classes
 
         public function removeUser(userId:int):void
         {
-            var idx:int = -1
-            for (var index:int in userList)
-            {
-                var _user:User = userList[index]
-                if (_user.id == userId)
-                {
-                    idx = index
-                    break
-                }
-            }
+            if (!getUser(userId))
+                return;
 
-            if (idx >= 0)
-            {
-                userList.removeAt(idx)
-
-                if (this.isGame)
-                    specCount--
-                else
-                    userCount--
-            }
+            delete _users[userId]
         }
 
         public function getUser(userId:int):User
         {
-            for each (var _user:User in userList)
-            {
-                if (_user.id == userId)
-                    return _user
-            }
-
-            return null
+            return _users[userId]
         }
 
-        public function clearUserList():void
+        public function updateUser(user:User):void
         {
-            this.userList = new <User>[]
+            if (getUser(user.id))
+                _users[user.id] = user;
+        }
+
+        public function get users():Vector.<User>
+        {
+            var usersVec:Vector.<User> = new <User>[]
+
+            for (var idx:int in _users)
+                usersVec.push(_users[idx])
+
+            return usersVec
+        }
+
+        public function clearUsers():void
+        {
+            this._users = {}
             this.userCount = 0
             this.specCount = 0
         }

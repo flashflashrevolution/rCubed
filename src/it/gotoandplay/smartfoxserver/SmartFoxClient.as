@@ -1675,7 +1675,7 @@ package it.gotoandplay.smartfoxserver
          */
         public function switchSpectator(roomId:int = -1):void
         {
-            if ( !checkRoomList() || !checkJoin() )
+            if ( !checkJoin() )
                 return
                 
             if (roomId == -1)
@@ -1717,7 +1717,7 @@ package it.gotoandplay.smartfoxserver
          */
         public function switchPlayer(roomId:int = -1):void
         {
-            if ( !checkRoomList() || !checkJoin() )
+            if ( !checkJoin() )
                 return
                 
             if (roomId == -1)
@@ -1802,14 +1802,6 @@ package it.gotoandplay.smartfoxserver
         public function getBenchStartTime():int
         {
             return this.benchStartTime
-        }
-        
-        /**
-         * @private
-         */
-        public function clearRoomList():void
-        {
-            this.roomList = []
         }
         
         // -------------------------------------------------------

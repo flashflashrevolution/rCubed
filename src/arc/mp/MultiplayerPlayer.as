@@ -96,7 +96,7 @@ package arc.mp
                 return;
 
             var user:User = null;
-            for each (var roomUser:User in room.userList)
+            for each (var roomUser:User in room.users)
             {
                 if (roomUser.playerIdx == playerIdx)
                 {

@@ -174,18 +174,18 @@ package classes
          * @param	isActiveUser Sets the active user flag.
          * @tiptext
          */
-        public function User(loadData:Boolean = false, isActiveUser:Boolean = false, userid:int = -1):void
+        public function User(loadData:Boolean = false, isActiveUser:Boolean = false, sfsId:int = -1):void
         {
+            this.id = sfsId;
             this.variables = [];
             this.isSpec = false;
-
             this.isActiveUser = isActiveUser;
 
             if (loadData)
             {
-                if (userid > -1)
+                if (sfsId > -1)
                 {
-                    loadUser(userid);
+                    loadUser(sfsId);
                 }
                 else
                 {
@@ -630,7 +630,7 @@ package classes
             if (id <= 2 && !returnObject)
                 return {};
 
-            var gameSave:Object = new Object();
+            var gameSave:Object = {};
             gameSave.language = this.language;
             gameSave.viewOffset = this.GLOBAL_OFFSET;
             gameSave.judgeOffset = this.JUDGE_OFFSET;
@@ -783,7 +783,6 @@ package classes
             return songRatings[song_entry.level] != null ? songRatings[song_entry.level] : 0;
         }
 
-
         /**
          * Imports user filters from a save object.
          * @param	filtersIn Array of Filter objects.
@@ -830,16 +829,6 @@ package classes
             return filters;
         }
 
-        public function getVariable(varName:String):Object
-        {
-            return this.variables[varName];
-        }
-
-        public function getVariables():Array
-        {
-            return this.variables;
-        }
-
         /**
          * Set the User Variables.
          *
@@ -861,16 +850,6 @@ package classes
                 else
                     delete this.variables[key];
             }
-        }
-
-        /**
-         * Reset User Variabless.
-         *
-         * @exclude
-         */
-        public function clearVariables():void
-        {
-            this.variables = [];
         }
     }
 }
