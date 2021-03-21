@@ -3,38 +3,36 @@ package arc.mp
     import com.bit101.components.Label;
     import com.bit101.components.Panel;
     import com.flashfla.net.Multiplayer;
-    import flash.display.DisplayObjectContainer;
-    import flash.events.Event;
-    import flash.events.MouseEvent;
     import com.flashfla.net.events.RoomUpdateEvent;
     import com.flashfla.net.events.RoomUserEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
+    import flash.display.DisplayObjectContainer;
+    import flash.events.Event;
+    import flash.events.MouseEvent;
     import classes.Room;
     import classes.User;
 
     public class MultiplayerPlayer extends Panel
     {
-        private var connection:Multiplayer;
-        public var room:Room;
-        public var playerIdx:int;
-
         private var playerLabel:Label;
         private var songLabel:Label;
         private var statusLabel:Label;
         private var scoreLabel:Label;
         private var paLabel:Label;
         private var comboLabel:Label;
+
         private var canRedraw:Boolean = true;
 
-        public function MultiplayerPlayer(parent:DisplayObjectContainer, roomValue:Room, playerValue:int)
+        private var connection:Multiplayer;
+        public var room:Room;
+        public var playerIdx:int;
+
+        public function MultiplayerPlayer(parent:DisplayObjectContainer, room:Room, playerIdx:int)
         {
             super(parent);
 
-            var self:MultiplayerPlayer = this
-
-            room = roomValue;
-            playerIdx = playerValue;
-
+            this.room = room;
+            this.playerIdx = playerIdx;
             connection = room.connection;
 
             playerLabel = new Label(content, 0, 0, "Player " + playerIdx + ": ");
@@ -45,40 +43,48 @@ package arc.mp
             comboLabel = new Label(content, 0, paLabel.y + paLabel.height - 4, "Combo: ");
 
             songLabel.mouseEnabled = true;
-            songLabel.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void
-            {
-                var user:User = room.getPlayer(playerIdx);
-
-                if (user)
-                {
-                    var gameplay:Object = user.gameplay;
-                    if (gameplay != null)
-                        MultiplayerSingleton.getInstance().gameplayPick(gameplay.song);
-                }
-            });
+            songLabel.addEventListener(MouseEvent.CLICK, onSongLabelClick);
 
             height = comboLabel.y + comboLabel.height;
             width = 150;
 
-            connection.addEventListener(Multiplayer.EVENT_ROOM_UPDATE, function(event:RoomUpdateEvent):void
-            {
-                if (event.room == self.room)
-                    redraw();
-            });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_USER, function(event:RoomUserEvent):void
-            {
-                if (event.room == self.room)
-                    redraw();
-            });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, function(event:RoomUserStatusEvent):void
-            {
-                if (event.room == self.room)
-                    redraw();
-            });
+            connection.addEventListener(Multiplayer.EVENT_ROOM_UPDATE, onRoomUpdate);
+            connection.addEventListener(Multiplayer.EVENT_ROOM_USER, onRoomUser);
+            connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, onRoomUserStatus);
 
             GlobalVariables.instance.gameMain.addEventListener(Main.EVENT_PANEL_SWITCHED, checkRedraw);
 
             redraw();
+        }
+
+        private function onSongLabelClick(event:MouseEvent):void
+        {
+            var user:User = room.getPlayer(playerIdx);
+
+            if (user)
+            {
+                var gameplay:Object = user.gameplay;
+                if (gameplay != null)
+                    MultiplayerSingleton.getInstance().gameplayPick(gameplay.song);
+            }
+        }
+
+        private function onRoomUpdate(event:RoomUpdateEvent):void
+        {
+            if (event.room == room)
+                redraw();
+        }
+
+        private function onRoomUser(event:RoomUserEvent):void
+        {
+            if (event.room == room)
+                redraw();
+        }
+
+        private function onRoomUserStatus(event:RoomUserStatusEvent):void
+        {
+            if (event.room == room)
+                redraw();
         }
 
         private function checkRedraw(event:Event):void
@@ -95,15 +101,8 @@ package arc.mp
             if (!canRedraw)
                 return;
 
-            var user:User = null;
-            for each (var roomUser:User in room.users)
-            {
-                if (roomUser.playerIdx == playerIdx)
-                {
-                    user = roomUser;
-                    break;
-                }
-            }
+            // Get the user who's playing at this element's index
+            var user:User = room.getPlayer(playerIdx);
 
             var gameplay:Object;
             if (user)
@@ -163,7 +162,7 @@ package arc.mp
 
         public static function nameSong(gameplay:Object):String
         {
-            if (gameplay.song)
+            if (gameplay && gameplay.song)
                 return gameplay.song.name;
 
             return "No Song Selected";

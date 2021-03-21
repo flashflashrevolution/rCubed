@@ -3,21 +3,10 @@ package arc.mp
     import arc.mp.MultiplayerPanel;
     import classes.Playlist;
     import classes.Room;
+    import classes.User;
     import classes.chart.Song;
     import classes.replay.Replay;
     import com.flashfla.net.Multiplayer;
-    import flash.events.Event;
-    import flash.events.TimerEvent;
-    import flash.net.URLLoader;
-    import flash.net.URLRequest;
-    import flash.net.URLRequestMethod;
-    import flash.net.URLVariables;
-    import flash.utils.Timer;
-    import game.GameOptions;
-    import game.GameScoreResult;
-    import menu.MainMenu;
-    import menu.MenuPanel;
-    import menu.MenuSongSelection;
     import com.flashfla.net.events.ErrorEvent;
     import com.flashfla.net.events.ConnectionEvent;
     import com.flashfla.net.events.LoginEvent;
@@ -30,7 +19,18 @@ package arc.mp
     import com.flashfla.net.events.GameStartEvent;
     import com.flashfla.net.events.GameUpdateEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
-    import classes.User;
+    import flash.events.Event;
+    import flash.events.TimerEvent;
+    import flash.net.URLLoader;
+    import flash.net.URLRequest;
+    import flash.net.URLRequestMethod;
+    import flash.net.URLVariables;
+    import flash.utils.Timer;
+    import game.GameOptions;
+    import game.GameScoreResult;
+    import menu.MainMenu;
+    import menu.MenuPanel;
+    import menu.MenuSongSelection;
 
     public class MultiplayerSingleton extends Object
     {
@@ -48,6 +48,8 @@ package arc.mp
         private var currentSongFile:Song = null;
         private var currentStatus:int = 0;
 
+        private var panel:MultiplayerPanel = null;
+
         private static var instance:MultiplayerSingleton = null;
 
         public static function getInstance():MultiplayerSingleton
@@ -63,8 +65,6 @@ package arc.mp
                 instance.connection.disconnect();
             instance = null;
         }
-
-        private var panel:MultiplayerPanel = null;
 
         public function getPanel(parent:MenuPanel):MultiplayerPanel
         {
@@ -163,7 +163,7 @@ package arc.mp
 
         private function updateRoomUser(room:Room, user:User):void
         {
-            if (user != null && user.room == room && user.id != connection.currentUser.id && room.isPlayer(currentUser) && user.isPlayer && room.isGame)
+            if (user != null && room.isGameRoom && user.id != currentUser.id && room.isPlayer(currentUser) && room.isPlayer(user))
                 _gvars.gameMain.addAlert("A Challenger Appears! " + user.name);
         }
 
@@ -173,14 +173,14 @@ package arc.mp
                 _gvars.gameMain.addAlert("*** " + event.user.name + ": " + event.message);
         }
 
-        private function foreachroom(foreach:Function):void
+        private function forEachRoom(func:Function):void
         {
             if (!connection.connected)
                 return;
             for each (var room:Room in connection.rooms)
             {
-                if (room.isGame && room.isJoined && room.isPlayer)
-                    foreach(room);
+                if (room.isGameRoom)
+                    func(room);
             }
         }
 
@@ -188,27 +188,24 @@ package arc.mp
         {
             if (data == null)
                 data = {};
+
             if (data.status == null)
                 data.status = currentStatus;
+
             if (data.songName == null || data.songID == null)
             {
                 data.song = currentSong;
                 if (currentSong == null)
                     data.songName = "No Song Selected";
             }
+
             if (currentSongFile != null && !currentSongFile.isLoaded)
-            {
                 data.statusLoading = currentSongFile.progress;
-            }
-            if (connection.currentUser.room != null)
-                connection.setRoomGameplay(connection.currentUser.room, data);
-            else
+
+            forEachRoom(function(room:Room):void
             {
-                foreachroom(function(room:Room):void
-                {
-                    connection.setRoomGameplay(room, data);
-                });
-            }
+                connection.setRoomGameplay(room, data);
+            });
         }
 
         // Should be called in MenuSongSelection whenever the selection changes.
@@ -224,7 +221,7 @@ package arc.mp
         public function gameplayCanPick():Boolean
         {
             var isPlayer:Boolean = false;
-            foreachroom(function(room:Room):void
+            forEachRoom(function(room:Room):void
             {
                 if (room.isPlayer(currentUser))
                     isPlayer = true;
@@ -235,7 +232,7 @@ package arc.mp
         // Called by MultiplayerPlayer when you click on the song label/name
         public function gameplayPick(song:Object):void
         {
-            if (currentStatus >= Multiplayer.STATUS_PLAYING)
+            if (currentStatus >= Multiplayer.STATUS_PLAYING || song == null)
                 return;
 
             var playlistEngineID:Object = Playlist.instance.engine ? Playlist.instance.engine.id : null;
@@ -343,7 +340,7 @@ package arc.mp
         public function gameplayHasOpponent():Boolean
         {
             var ret:Boolean = false;
-            foreachroom(function(room:Room):void
+            forEachRoom(function(room:Room):void
             {
                 if (room.isPlayer(currentUser) && room.playerCount > 1)
                     ret = true;
@@ -371,10 +368,10 @@ package arc.mp
 
             for each (var player:Object in room.match.players)
             {
-                if (player.userID == connection.currentUser.id)
+                if (player.id == connection.currentUser.id)
                     continue;
 
-                var gameplay:Object = room.match.gameplay[player.userID];
+                var gameplay:Object = room.match.gameplay[player.id];
                 if (gameplay && gameplay.replay)
                 {
                     var replay:Replay = new Replay(new Date().getTime());
@@ -397,7 +394,7 @@ package arc.mp
             var song:Object = room.match.song;
             _gvars.songQueue = [song];
             _gvars.options = new GameOptions();
-            _gvars.options.multiplayer = room;
+            _gvars.options.mpRoom = room;
             _gvars.options.fill();
             if (_gvars.options.frameRate <= 30)
                 _gvars.options.frameRate = 60;
@@ -415,7 +412,7 @@ package arc.mp
             currentStatus = Multiplayer.STATUS_PLAYING;
 
             _gvars.options = new GameOptions();
-            _gvars.options.multiplayer = room;
+            _gvars.options.mpRoom = room;
             _gvars.options.fill();
             _gvars.options.song = currentSongFile;
             _gvars.options.judgeWindow = null;
@@ -425,7 +422,7 @@ package arc.mp
 
         public function gameplayPlaying(play:Object):Boolean
         {
-            if (!_gvars.options.multiplayer || currentStatus != Multiplayer.STATUS_PLAYING)
+            if (!_gvars.options.mpRoom || currentStatus != Multiplayer.STATUS_PLAYING)
                 return false;
 
             play.addEventListener(Multiplayer.EVENT_GAME_UPDATE, onGameUpdate);
@@ -434,7 +431,7 @@ package arc.mp
 
         private function onGameUpdate(event:GameUpdateEvent):void
         {
-            if (!_gvars.options.multiplayer || currentStatus != Multiplayer.STATUS_PLAYING)
+            if (!_gvars.options.mpRoom || currentStatus != Multiplayer.STATUS_PLAYING)
                 return;
 
             gameplayUpdateRoom({score: event.gameScore,
@@ -451,7 +448,7 @@ package arc.mp
 
         public function gameplayResults(gameResults:MenuPanel, songResults:Vector.<GameScoreResult>):void
         {
-            var room:Room = _gvars.options.multiplayer;
+            var room:Room = _gvars.options.mpRoom;
 
             if (!room || !room.isPlayer(currentUser) || currentStatus != Multiplayer.STATUS_PLAYING)
                 return;
@@ -533,6 +530,7 @@ package arc.mp
                 results1 = {score: 1, life: 0, maxcombo: 0, combo: 0, amazing: 0, perfect: 0, good: 0, average: 0, miss: 0, boo: 0};
             if (results2 == null)
                 results2 = {score: 1, life: 0, maxcombo: 0, combo: 0, amazing: 0, perfect: 0, good: 0, average: 0, miss: 0, boo: 0};
+
             var data:URLVariables = new URLVariables();
             data.gamestats = matchSong.name + ":" + convertNumber(results1.score) + ":" + convertNumber(results1.life) + ":" + convertNumber(results1.maxcombo) + ":" + convertNumber(results1.combo) + ":" + convertNumber(results1.amazing + results1.perfect) + ":" + convertNumber(results1.good) + ":" + convertNumber(results1.average) + ":" + convertNumber(results1.miss) + ":" + convertNumber(results1.boo) + ":" + matchSong.name + ":" + convertNumber(results2.score) + ":" + convertNumber(results2.life) + ":" + convertNumber(results2.maxcombo) + ":" + convertNumber(results2.combo) + ":" + convertNumber(results2.amazing + results2.perfect) + ":" + convertNumber(results2.good) + ":" + convertNumber(results2.average) + ":" + convertNumber(results2.miss) + ":" + convertNumber(results2.boo);
             if (results1.score != results2.score && results1.score > 0 && results2.score > 0)
@@ -550,7 +548,7 @@ package arc.mp
             loader.load(request);
 
             if (velocity)
-                connection.setRoomVariables(room, {"gameScoreRecorded": "y"});
+                connection.sendRoomVariables(room, {"gameScoreRecorded": "y"});
         }
 
         // Call after results screen / on main menu

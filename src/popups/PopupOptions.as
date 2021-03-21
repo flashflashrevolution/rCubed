@@ -1335,7 +1335,7 @@ package popups
             {
                 _gvars.options = new GameOptions();
                 _gvars.options.isEditor = true;
-                _gvars.options.multiplayer = e.target.editor_multiplayer;
+                _gvars.options.mpRoom = e.target.editor_multiplayer;
                 _gvars.options.song = new Song({level: 1337, type: "EDITOR"});
                 _gvars.options.fill();
                 removePopup();

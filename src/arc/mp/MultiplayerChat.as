@@ -6,13 +6,6 @@ package arc.mp
     import com.bit101.components.Style;
     import com.bit101.components.TextArea;
     import com.flashfla.net.Multiplayer;
-    import flash.display.DisplayObjectContainer;
-    import flash.events.ContextMenuEvent;
-    import flash.events.Event;
-    import flash.events.KeyboardEvent;
-    import flash.ui.ContextMenu;
-    import flash.ui.ContextMenuItem;
-    import flash.ui.Keyboard;
     import com.flashfla.net.events.ServerMessageEvent;
     import com.flashfla.net.events.ExtensionResponseEvent;
     import com.flashfla.net.events.MessageEvent;
@@ -21,6 +14,13 @@ package arc.mp
     import com.flashfla.net.events.LoginEvent;
     import com.flashfla.net.events.RoomJoinedEvent;
     import com.flashfla.net.events.GameResultsEvent;
+    import flash.display.DisplayObjectContainer;
+    import flash.events.ContextMenuEvent;
+    import flash.events.Event;
+    import flash.events.KeyboardEvent;
+    import flash.ui.ContextMenu;
+    import flash.ui.ContextMenuItem;
+    import flash.ui.Keyboard;
     import classes.Room;
     import classes.User;
 
@@ -38,13 +38,10 @@ package arc.mp
         public var room:Room;
         public var connection:Multiplayer;
 
-        public function MultiplayerChat(parent:DisplayObjectContainer, roomValue:Room, owner:DisplayObjectContainer = null)
+        public function MultiplayerChat(parent:DisplayObjectContainer, roomValue:Room)
         {
             super(parent);
             this.room = roomValue;
-
-            if (owner == null)
-                owner = parent;
 
             connection = MultiplayerSingleton.getInstance().connection;
 
@@ -98,7 +95,7 @@ package arc.mp
                 // Broadcast join/left message in rooms, do not broadcast in lobby
                 // Add "&& event.params.user.room != null" to omit "has left" messages
                 if (room != null && room.name != "Lobby" && event.room == room)
-                    textAreaAddLine(textFormatUser(event.user, event.user.room != null));
+                    textAreaAddLine(textFormatUser(event.user, event.room.getUser(event.user.id) != null));
             });
             connection.addEventListener(Multiplayer.EVENT_CONNECTION, function(event:ConnectionEvent):void
             {

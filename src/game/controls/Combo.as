@@ -65,7 +65,7 @@ package game.controls
             field.text = "0";
             addChild(field);
 
-            if (options && options.isAutoplay && !options.isEditor && !options.multiplayer)
+            if (options && options.isAutoplay && !options.isEditor && !options.mpRoom)
             {
                 field.textColor = 0xD00000;
                 fieldShadow.textColor = 0x5B0000;
@@ -89,7 +89,7 @@ package game.controls
                [8] = Raw Goods
              */
 
-            if (options && (!options.isAutoplay || options.isEditor || options.multiplayer))
+            if (options && (!options.isAutoplay || options.isEditor || options.mpRoom))
             {
                 if (colors_enabled[2] && good + average + boo + miss == 0) // Display AAA color
                 {

@@ -76,7 +76,6 @@ package classes
         public var level_ranks:Object = {};
         public var avatar:Loader;
         public var startUpScreen:int = 0; // 0 = MP Connect + MP Screen   |   1 = MP Connect + Song List   |   2 = Song List
-        public var room:Room;
         public var loggedIn:Boolean;
 
         public var songQueues:Vector.<Object> = new <Object>[];

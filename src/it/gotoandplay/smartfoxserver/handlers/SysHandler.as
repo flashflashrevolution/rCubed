@@ -5,7 +5,7 @@ package it.gotoandplay.smartfoxserver.handlers
     import it.gotoandplay.smartfoxserver.TypedSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.AdminMessageSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.LoginSFSEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.RoomLeftSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.LeftRoomSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.SpectatorSwitchedSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.PlayerSwitchedSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionLostSFSEvent;
@@ -16,7 +16,7 @@ package it.gotoandplay.smartfoxserver.handlers
     import it.gotoandplay.smartfoxserver.SFSEvents.RoomDeletedSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.RoomListUpdateSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.UserCountChangeSFSEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.JoinedRoomSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomErrorSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.UserEnterRoomSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.UserLeftRoomSFSEvent;
@@ -252,7 +252,7 @@ package it.gotoandplay.smartfoxserver.handlers
             params.room = room
             params.users = userVec
 
-            var evt:TypedSFSEvent = new JoinRoomSFSEvent(params)
+            var evt:TypedSFSEvent = new JoinedRoomSFSEvent(params)
             sfs.dispatchEvent(evt)
         }
 
@@ -471,7 +471,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var params:Object = {}
             params.roomId = roomId
 
-            var evt:TypedSFSEvent = new RoomLeftSFSEvent(params)
+            var evt:TypedSFSEvent = new LeftRoomSFSEvent(params)
             sfs.dispatchEvent(evt)
         }
 

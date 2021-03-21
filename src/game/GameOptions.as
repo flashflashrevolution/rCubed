@@ -65,7 +65,7 @@ package game
         public var loadPreview:Boolean = false;
         public var isEditor:Boolean = false;
         public var isAutoplay:Boolean = false;
-        public var multiplayer:Room = null;
+        public var mpRoom:Room = null;
         public var singleplayer:Boolean = false;
         public var autofail:Array = [0, 0, 0, 0, 0, 0, 0];
 
@@ -145,7 +145,7 @@ package game
             isolationOffset = avars.configIsolationStart;
             isolationLength = avars.configIsolationLength;
 
-            var layoutKey:String = multiplayer ? (multiplayer.connection.currentUser.isPlayer ? "mp" : "mpspec") : "sp";
+            var layoutKey:String = mpRoom ? (mpRoom.connection.currentUser.isPlayer ? "mp" : "mpspec") : "sp";
             if (!avars.configInterface[layoutKey])
                 avars.configInterface[layoutKey] = {};
             layout = avars.configInterface[layoutKey];

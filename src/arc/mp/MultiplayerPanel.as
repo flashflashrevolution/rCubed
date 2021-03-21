@@ -31,6 +31,7 @@ package arc.mp
     import com.flashfla.net.events.RoomUserStatusEvent;
     import com.flashfla.net.events.RoomUpdateEvent;
     import classes.Room;
+    import classes.User;
 
     public class MultiplayerPanel extends MenuPanel
     {
@@ -91,13 +92,13 @@ package arc.mp
                 if (controlRooms.selectedItem != null && controlRooms.selectedItem.data != null)
                 {
                     var room:Room = controlRooms.selectedItem.data;
-                    joinRoom(room, room.playerCount < room.maxPlayers);
+                    joinRoom(room, true);
                 }
             });
             window.addChild(controlRooms);
             buildContextMenu();
 
-            controlChat = new MultiplayerChat(window, connection.lobby, this);
+            controlChat = new MultiplayerChat(window, connection.lobby);
             controlChat.move(controlRooms.x + controlRooms.width, controlRooms.y);
             controlChat.setSize(365, controlRooms.height + controlChat.controlInput.height);
             controlChat.resize();
@@ -190,7 +191,7 @@ package arc.mp
                 var inGame:Boolean = false;
                 for each (var room:Room in connection.rooms)
                 {
-                    if (room.isJoined && room != connection.lobby)
+                    if (room.hasUser(currentUser) && room != connection.lobby)
                         inGame = true;
                 }
                 if (inGame)
@@ -272,6 +273,11 @@ package arc.mp
             });
         }
 
+        public function get currentUser():User
+        {
+            return connection.currentUser;
+        }
+
         public function buildContextMenu():void
         {
             var roomMenu:ContextMenu = new ContextMenu();
@@ -287,7 +293,7 @@ package arc.mp
                 joinRoom(room, false);
             });
             roomMenu.customItems.push(roomItem);
-            if (connection.currentUser.isModerator)
+            if (currentUser.isModerator)
             {
                 roomItem = new ContextMenuItem("Nuke Room");
                 roomItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, function(event:ContextMenuEvent):void
@@ -305,17 +311,17 @@ package arc.mp
             controlRooms.contextMenu = roomMenu;
         }
 
-        private function joinRoom(room:Room, player:Boolean):void
+        private function joinRoom(room:Room, asPlayer:Boolean):void
         {
             function e_joinRoomPassword(password:String):void
             {
-                connection.joinRoom(room, player, password);
+                connection.joinRoom(room, asPlayer, password);
             }
 
             if (room.isPrivate)
                 new Prompt(this, 320, "Password: " + room.name, 100, "SUBMIT", e_joinRoomPassword, true);
             else
-                connection.joinRoom(room, player);
+                connection.joinRoom(room, asPlayer);
         }
 
         private function updateRoom(room:Room):void
@@ -342,7 +348,7 @@ package arc.mp
             var items:Array = [];
             for each (var room:Room in connection.rooms)
             {
-                if (room.isGame)
+                if (room.isGameRoom)
                     items.push({label: nameRoom(room), labelhtml: true, data: room});
             }
             updateWindowTitle(connection.lobby);
@@ -358,25 +364,6 @@ package arc.mp
 
         private function nameRoom(room:Room):String
         {
-            /*
-               var colour:String;
-               if (room.playerCount < room.maxPlayerCount) {
-               if (room.playerCount > 0)
-               colour = "#109010";
-               else
-               colour = "#909090";
-               } else if (room.spectatorCount >= room.maxSpectatorCount)
-               colour = "#a81818";
-               else {
-               var gameplay:Object = connection.getRoomGameplay(room);
-               var p1:Object = gameplay["player1"];
-               var p2:Object = gameplay["player2"];
-               if (p1 && p2 && p1.status == p2.status && p1.status == Multiplayer.STATUS_PLAYING)
-               colour = "#101090";
-               else
-               colour = "#101010";
-               }
-             */
             const level:int = room.level;
             const color:int = ArcGlobals.getDivisionColor(level);
             const title:String = ArcGlobals.getDivisionTitle(level);

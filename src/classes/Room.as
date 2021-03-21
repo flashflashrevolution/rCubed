@@ -5,6 +5,8 @@ package classes
 
     public class Room extends EventDispatcher
     {
+        private static const MAX_PLAYERS:int = 2
+
         public var id:int
         public var name:String
         public var maxUsers:int
@@ -15,8 +17,7 @@ package classes
         public var match:Object
 
         // Room flags
-        public var isJoined:Boolean
-        public var isGame:Boolean
+        public var isGameRoom:Boolean
         public var isPrivate:Boolean
         public var isTemp:Boolean
         public var isLimbo:Boolean
@@ -42,7 +43,7 @@ package classes
         public var variables:Object
 
         /**
-         * Maps indexes to players.
+         * Maps indexes to players. This map is 1-based.
          * For example:
          * ```
          * _players[2] = someUser;
@@ -70,10 +71,9 @@ package classes
             this.maxSpectators = maxSpectators
             this.maxUsers = maxUsers
             this.isTemp = isTemp
-            this.isGame = isGame
+            this.isGameRoom = isGame
             this.isPrivate = isPrivate
             this.isLimbo = isLimbo
-            this.isJoined = false
 
             this.userCount = userCount
             this.specCount = specCount
@@ -85,19 +85,39 @@ package classes
             this._playerCount = 0
         }
 
-        public function addPlayer(user:User):void
+        public function addPlayer(user:User):int
         {
-            _players[_playerCount + 1] = user
-            _playerCount++
+            if (_playerCount == MAX_PLAYERS)
+                return -1
+
+            var idx:int = 1
+            while (idx <= MAX_PLAYERS)
+            {
+                if (!_players[idx])
+                {
+                    _players[idx] = user
+                    _playerCount++
+                    return idx
+                }
+                idx++
+            }
+
+            return -1
         }
 
-        public function setPlayer(index:int, user:User):void
+        public function setPlayer(index:int, user:User):Boolean
         {
+            if (index > MAX_PLAYERS)
+                return false
+
             if (!_players[index])
             {
                 _players[index] = user
                 _playerCount++
+                return true
             }
+
+            return false
         }
 
         public function getPlayer(index:int):User
@@ -119,13 +139,19 @@ package classes
             return getPlayerIndex(user) >= 0
         }
 
-        public function removePlayer(index:int):void
+        public function removePlayer(index:int):Boolean
         {
             if (getPlayer(index))
             {
                 delete _players[index]
                 _playerCount--
+
+                if (_playerCount < 0)
+                    _playerCount = 0
+
+                return true
             }
+            return false
         }
 
         public function get playerCount():int
@@ -135,7 +161,7 @@ package classes
 
         public function get players():Vector.<User>
         {
-            var playerVec:Vector.<User> = new Vector.<User>(true, _playerCount)
+            var playerVec:Vector.<User> = new <User>[]
 
             for (var idx:int in _players)
                 playerVec.push(_players[idx])
@@ -149,11 +175,6 @@ package classes
                 return;
 
             _users[user.id] = user
-
-            if (this.isGame && user.isSpec)
-                specCount++
-            else
-                userCount++
         }
 
         public function removeUser(userId:int):void
@@ -167,6 +188,11 @@ package classes
         public function getUser(userId:int):User
         {
             return _users[userId]
+        }
+
+        public function hasUser(user:User):Boolean
+        {
+            return getUser(user.id) != null
         }
 
         public function updateUser(user:User):void
@@ -190,6 +216,14 @@ package classes
             this._users = {}
             this.userCount = 0
             this.specCount = 0
+        }
+
+        public function get isInGameState():Boolean
+        {
+            if (!match || !match.song || !match.status)
+                return false
+
+            return match.status == Multiplayer.STATUS_PLAYING
         }
     }
 }

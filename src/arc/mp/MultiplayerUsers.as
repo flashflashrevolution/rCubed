@@ -27,56 +27,27 @@ package arc.mp
         public var room:Room;
         public var connection:Multiplayer;
 
-        public function MultiplayerUsers(parent:DisplayObjectContainer, room:Room, ownerValue:DisplayObjectContainer = null, controlChatValue:MultiplayerChat = null)
+        public function MultiplayerUsers(parent:DisplayObjectContainer, room:Room, owner:DisplayObjectContainer = null, controlChat:MultiplayerChat = null)
         {
             super(parent);
             this.room = room;
-            this.controlChat = controlChatValue;
-            this.owner = ownerValue;
-
-            var self:MultiplayerUsers = this
-
-            if (owner == null)
-                owner = parent;
+            this.controlChat = controlChat;
+            this.owner = owner ? owner : parent;
 
             connection = MultiplayerSingleton.getInstance().connection;
 
             controlUsers = new List();
             controlUsers.listItemClass = ListItemDoubleClick;
             controlUsers.autoHideScrollBar = true;
-            controlUsers.addEventListener(MouseEvent.DOUBLE_CLICK, function(event:MouseEvent):void
-            {
-                function e_sendPM(message:String):void
-                {
-                    connection.sendPrivateMessage(user, message, room);
-                    if (controlChat != null)
-                        controlChat.textAreaAddLine(MultiplayerChat.textFormatPrivateMessageOut(user, message));
-                }
-                var user:User = controlUsers.selectedItem.data;
-                new Prompt(owner, 320, "PM " + user.name, 100, "SEND", e_sendPM);
-            });
+            controlUsers.addEventListener(MouseEvent.DOUBLE_CLICK, onUserListDoubleClick);
             addChild(controlUsers);
 
             setSize(200, 350);
 
-            connection.addEventListener(Multiplayer.EVENT_LOGIN, function(event:LoginEvent):void
-            {
-                buildContextMenu();
-            });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_USER, function(event:RoomUserEvent):void
-            {
-                if (event.room.id == self.room.id)
-                    updateUsers();
-            });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_JOINED, function(event:RoomJoinedEvent):void
-            {
-                if (event.room.id == self.room.id)
-                    updateUsers();
-            });
-            connection.addEventListener(Multiplayer.EVENT_USER_UPDATE, function(event:UserUpdateEvent):void
-            {
-                updateUser(event.user);
-            });
+            connection.addEventListener(Multiplayer.EVENT_LOGIN, onLogin);
+            connection.addEventListener(Multiplayer.EVENT_ROOM_USER, onRoomUser);
+            connection.addEventListener(Multiplayer.EVENT_ROOM_JOINED, onRoomJoined);
+            connection.addEventListener(Multiplayer.EVENT_USER_UPDATE, onUserUpdate);
 
             buildContextMenu();
 
@@ -94,7 +65,51 @@ package arc.mp
             controlUsers.setSize(width, height);
         }
 
-        public function sortUsers():void
+        public function updateUsers():void
+        {
+            var items:Array = [];
+            for each (var user:User in room.users)
+                items.push({label: MultiplayerChat.nameUser(user), labelhtml: true, data: user});
+            controlUsers.items = items;
+            sortUsers();
+            controlUsers.listItemClass = controlUsers.listItemClass;
+        }
+
+        private function onUserListDoubleClick(event:MouseEvent):void
+        {
+            function e_sendPM(message:String):void
+            {
+                connection.sendPrivateMessage(user, message, room);
+                if (controlChat != null)
+                    controlChat.textAreaAddLine(MultiplayerChat.textFormatPrivateMessageOut(user, message));
+            }
+            var user:User = controlUsers.selectedItem.data;
+            new Prompt(owner, 320, "PM " + user.name, 100, "SEND", e_sendPM);
+        }
+
+        private function onLogin(event:LoginEvent):void
+        {
+            buildContextMenu();
+        }
+
+        private function onRoomUser(event:RoomUserEvent):void
+        {
+            if (event.room == room)
+                updateUsers();
+        }
+
+        private function onRoomJoined(event:RoomJoinedEvent):void
+        {
+            if (event.room == room)
+                updateUsers();
+        }
+
+        private function onUserUpdate(event:UserUpdateEvent):void
+        {
+            updateUser(event.user);
+        }
+
+        private function sortUsers():void
         {
             controlUsers.items.sort(function(ud1:Object, ud2:Object):int
             {
@@ -111,7 +126,7 @@ package arc.mp
             controlUsers.items = controlUsers.items;
         }
 
-        public function updateUser(user:User):void
+        private function updateUser(user:User):void
         {
             for each (var item:Object in controlUsers.items)
             {
@@ -125,17 +140,7 @@ package arc.mp
             }
         }
 
-        public function updateUsers():void
-        {
-            var items:Array = [];
-            for each (var user:User in room.users)
-                items.push({label: MultiplayerChat.nameUser(user), labelhtml: true, data: user});
-            controlUsers.items = items;
-            sortUsers();
-            controlUsers.listItemClass = controlUsers.listItemClass;
-        }
-
-        public function buildContextMenu():void
+        private function buildContextMenu():void
         {
             if (connection.currentUser.isModerator)
             {

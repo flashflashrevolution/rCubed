@@ -333,15 +333,15 @@ package game
             }
 
             // Setup MP Things
-            if (options.multiplayer)
+            if (options.mpRoom)
             {
                 MultiplayerSingleton.getInstance().gameplayPlaying(this);
                 if (!options.isEditor)
                 {
                     options.singleplayer = false; // Back to multiplayer lobby
-                    options.multiplayer.connection.addEventListener(Multiplayer.EVENT_GAME_UPDATE, onMultiplayerUpdate);
+                    options.mpRoom.connection.addEventListener(Multiplayer.EVENT_GAME_UPDATE, onMultiplayerUpdate);
                     if (mpSpectate)
-                        options.multiplayer.connection.addEventListener(Multiplayer.EVENT_GAME_RESULTS, onMultiplayerResults);
+                        options.mpRoom.connection.addEventListener(Multiplayer.EVENT_GAME_RESULTS, onMultiplayerResults);
                 }
             }
             else
@@ -392,10 +392,10 @@ package game
                 stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyboardKeyDown, true);
                 stage.removeEventListener(KeyboardEvent.KEY_UP, keyboardKeyUp, true);
 
-                if (options.multiplayer)
+                if (options.mpRoom)
                 {
-                    options.multiplayer.connection.removeEventListener(Multiplayer.EVENT_GAME_UPDATE, onMultiplayerUpdate);
-                    options.multiplayer.connection.removeEventListener(Multiplayer.EVENT_GAME_RESULTS, onMultiplayerResults);
+                    options.mpRoom.connection.removeEventListener(Multiplayer.EVENT_GAME_UPDATE, onMultiplayerUpdate);
+                    options.mpRoom.connection.removeEventListener(Multiplayer.EVENT_GAME_RESULTS, onMultiplayerResults);
                 }
             }
 
@@ -553,7 +553,7 @@ package game
                 buildHealth();
             }
 
-            if (options.multiplayer)
+            if (options.mpRoom)
                 buildMultiplayer();
 
             if (options.isEditor)
@@ -607,14 +607,14 @@ package game
             judgeOffset = options.offsetJudge * 1000 / 30;
             autoJudgeOffset = options.autoJudgeOffset;
 
-            mpSpectate = (options.multiplayer && !options.multiplayer.connection.currentUser.isPlayer);
+            mpSpectate = (options.mpRoom && !options.mpRoom.connection.currentUser.isPlayer);
             if (mpSpectate)
             {
                 options.displayCombo = options.displayComboTotal = options.displayPA = false;
-                if (options.multiplayer.connection.mode != Multiplayer.GAME_R3)
+                if (options.mpRoom.connection.mode != Multiplayer.GAME_R3)
                     options.displayAmazing = false;
             }
-            else if (options.multiplayer)
+            else if (options.mpRoom)
                 options.displayComboTotal = false;
         }
 
@@ -879,7 +879,7 @@ package game
         {
             var lowIndex:int = 0;
             var highIndex:int = 0;
-            for each (var user:User in options.multiplayer.players)
+            for each (var user:User in options.mpRoom.players)
             {
                 var gameplay:Object = user.gameplay;
                 var index:int = gameplay.amazing + gameplay.perfect + gameplay.good + gameplay.average + gameplay.miss;
@@ -1092,7 +1092,7 @@ package game
             }
 
             // Game Restart
-            if (keyCode == _gvars.playerUser.keyRestart && !options.multiplayer)
+            if (keyCode == _gvars.playerUser.keyRestart && !options.mpRoom)
             {
                 GAME_STATE = GAME_RESTART;
             }
@@ -1651,9 +1651,9 @@ package game
             if (!options.displayMP && !mpSpectate)
                 return;
 
-            for each (var user:User in options.multiplayer.players)
+            for each (var user:User in options.mpRoom.players)
             {
-                if (user.id == options.multiplayer.connection.currentUser.id)
+                if (user.id == options.mpRoom.connection.currentUser.id)
                     continue;
 
                 if (options.displayMPPA)
@@ -1780,12 +1780,12 @@ package game
                 interfaceEditor(comboTotalStatic, interfaceLayout(LAYOUT_COMBO_TOTAL_STATIC, false));
             }
 
-            if (options.multiplayer)
+            if (options.mpRoom)
             {
                 var index:int = 0;
-                for (var id:int = 1; id < options.multiplayer.playerCount + 1; id++)
+                for (var id:int = 1; id < options.mpRoom.playerCount + 1; id++)
                 {
-                    if (id == options.multiplayer.connection.currentUser.id)
+                    if (id == options.mpRoom.connection.currentUser.id)
                         continue;
 
                     index++;
@@ -2104,7 +2104,7 @@ package game
 
             updateFieldVars();
 
-            if (options.multiplayer)
+            if (options.mpRoom)
             {
                 dispatchEvent(new GameUpdateEvent({gameScore: gameScore,
                         gameLife: gameLife,
@@ -2211,7 +2211,7 @@ package game
             var user:User = event.user;
             var data:Object = user.gameplay;
 
-            if (options.multiplayer != event.room || !data || user.id == options.multiplayer.connection.currentUser.id)
+            if (options.mpRoom != event.room || !data || user.id == options.mpRoom.connection.currentUser.id)
                 return;
 
             var diff:Object = multiplayerDiff(user.id, data);
@@ -2253,7 +2253,7 @@ package game
 
         public function onMultiplayerResults(event:GameResultsEvent):void
         {
-            if (event.room == options.multiplayer)
+            if (event.room == options.mpRoom)
                 GAME_STATE = GAME_END;
         }
 
