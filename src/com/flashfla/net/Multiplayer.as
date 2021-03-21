@@ -52,6 +52,7 @@ package com.flashfla.net
     import com.flashfla.net.events.ExtensionResponseEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
     import classes.Gameplay;
+    import com.flashfla.utils.StringUtil;
 
     public class Multiplayer extends EventDispatcher
     {
@@ -666,10 +667,11 @@ package com.flashfla.net
             if (room.hasUser(currentUser))
             {
                 var user:User = currentUser;
-                var prefix:String = "p" + user.playerIdx;
+                var prefix:String;
                 switch (mode)
                 {
                     case GAME_VELOCITY:
+                        prefix = "p" + user.playerIdx;
                         vars[prefix + "_maxcombo"] = dec2hex(gameplay.maxCombo);
                         vars[prefix + "_combo"] = dec2hex(gameplay.combo);
                         vars[prefix + "_perfect"] = dec2hex(gameplay.amazing + gameplay.perfect);
@@ -694,14 +696,39 @@ package com.flashfla.net
                                 status = STATUS_NONE;
                                 break;
                         }
-                        vars["mpstats" + user.playerIdx] = String((gameplay.songName != null ? gameplay.songName : gameplay.song.name)).replace(/:/g, "") + ":" + int(gameplay.score) + ":" + int(gameplay.life) + ":" + int(gameplay.maxCombo) + ":" + int(gameplay.combo) + ":" + int(gameplay.amazing + gameplay.perfect) + ":" + int(gameplay.good) + ":" + int(gameplay.average) + ":" + int(gameplay.miss) + ":" + int(gameplay.boo) + ":" + STATUS_LEGACY.indexOf(status);
+
+                        // Ordering is important
+                        var mpStats:Array = [String((gameplay.songName != null ? gameplay.songName : gameplay.song.name)).replace(/:/g, ""),
+                            gameplay.score,
+                            gameplay.life,
+                            gameplay.maxCombo,
+                            gameplay.combo,
+                            gameplay.amazing + gameplay.perfect,
+                            gameplay.good,
+                            gameplay.average,
+                            gameplay.miss,
+                            gameplay.boo,
+                            STATUS_LEGACY.indexOf(status)];
+                        vars["mpstats" + user.playerIdx] = StringUtil.join(":", mpStats);
                         if (gameplay.statusLoading)
                             vars["arc_status_loading" + user.playerIdx] = int(gameplay.statusLoading);
                         else
                             vars["arc_status_loading" + user.playerIdx] = null;
                         break;
                     case GAME_R3:
-                        vars[prefix + "_GAMESCORES"] = int(gameplay.score) + ":" + int(gameplay.amazing) + ":" + int(gameplay.perfect) + ":" + int(gameplay.good) + ":" + int(gameplay.average) + ":" + int(gameplay.miss) + ":" + int(gameplay.boo) + ":" + int(gameplay.combo) + ":" + int(gameplay.maxCombo);
+                        prefix = "P" + user.playerIdx;
+
+                        // Ordering is important
+                        var gamescores:Array = [gameplay.score,
+                            gameplay.amazing,
+                            gameplay.perfect,
+                            gameplay.good,
+                            gameplay.average,
+                            gameplay.miss,
+                            gameplay.boo,
+                            gameplay.combo,
+                            gameplay.maxCombo];
+                        vars[prefix + "_GAMESCORES"] = StringUtil.join(":", gamescores);
                         vars[prefix + "_STATE"] = int(gameplay.status);
                         vars[prefix + "_GAMELIFE"] = int(gameplay.life * 24 / 100);
                         vars[prefix + "_SONGID"] = (gameplay.song == null ? gameplay.songID : int(gameplay.song.level));

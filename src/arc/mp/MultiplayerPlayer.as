@@ -64,8 +64,8 @@ package arc.mp
 
             if (user)
             {
-                var gameplay:Object = user.gameplay;
-                if (gameplay != null)
+                var gameplay:Gameplay = user.gameplay;
+                if (gameplay)
                     MultiplayerSingleton.getInstance().gameplayPick(gameplay.song);
             }
         }
