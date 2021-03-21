@@ -51,6 +51,7 @@ package com.flashfla.net
     import com.flashfla.net.events.GameResultsEvent;
     import com.flashfla.net.events.ExtensionResponseEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
+    import classes.Gameplay;
 
     public class Multiplayer extends EventDispatcher
     {
@@ -313,12 +314,19 @@ package com.flashfla.net
                 server.getRoomList();
         }
 
+        /**
+         * Sends a request to the server to join a specific room as a player or not.
+         * Optionally, a password can be set for the room.
+         */
         public function joinRoom(room:Room, asPlayer:Boolean = true, password:String = ""):void
         {
             if (connected && room)
                 server.joinRoom(room.id, password, !asPlayer, true);
         }
 
+        /**
+         * Sends a request to the server to leave a specific room.
+         */
         public function leaveRoom(room:Room):void
         {
             if (connected && room)
@@ -363,6 +371,9 @@ package com.flashfla.net
             }
         }
 
+        /**
+         * Builds a request to create a new room and sends it to the server.
+         */
         public function createRoom(name:String, password:String = "", maxUsers:int = 2, maxSpectators:int = 100):void
         {
             if (connected && name)
@@ -418,9 +429,9 @@ package com.flashfla.net
          * Returns a gameplay object from the room's variables given the user's playerIdx.
          * If the user isn't a player in that room, returns null.
          */
-        private function getUserGameplayFromRoom(room:Room, user:User):Object
+        private function getUserGameplayFromRoom(room:Room, user:User):Gameplay
         {
-            var ret:Object = {};
+            var gameplay:Gameplay = new Gameplay();
             var vars:Object = room.variables;
             var stats:Array;
 
@@ -428,113 +439,118 @@ package com.flashfla.net
             if (playerIdx <= 0)
                 return null;
 
+            var prefix:String = "p" + playerIdx;
             switch (mode)
             {
                 case GAME_VELOCITY:
-                    var prefix:String = "p" + playerIdx;
-                    ret.maxCombo = hex2dec(vars[prefix + "_maxcombo"]);
-                    ret.combo = hex2dec(vars[prefix + "_combo"]);
-                    ret.perfect = hex2dec(vars[prefix + "_perfect"]);
-                    ret.good = hex2dec(vars[prefix + "_good"]);
-                    ret.average = hex2dec(vars[prefix + "_average"]);
-                    ret.boo = hex2dec(vars[prefix + "_boo"]);
-                    ret.miss = hex2dec(vars[prefix + "_miss"]);
-                    ret.songID = hex2dec(vars[prefix + "_levelid"]);
-                    ret.statusLoading = hex2dec(vars[prefix + "_levelloading"]);
-                    ret.status = STATUS_VELOCITY[hex2dec(vars[prefix + "_state"])];
+                    gameplay.maxCombo = hex2dec(vars[prefix + "_maxcombo"]);
+                    gameplay.combo = hex2dec(vars[prefix + "_combo"]);
+                    gameplay.perfect = hex2dec(vars[prefix + "_perfect"]);
+                    gameplay.good = hex2dec(vars[prefix + "_good"]);
+                    gameplay.average = hex2dec(vars[prefix + "_average"]);
+                    gameplay.boo = hex2dec(vars[prefix + "_boo"]);
+                    gameplay.miss = hex2dec(vars[prefix + "_miss"]);
+                    gameplay.songID = hex2dec(vars[prefix + "_levelid"]);
+                    gameplay.statusLoading = hex2dec(vars[prefix + "_levelloading"]);
+                    gameplay.status = STATUS_VELOCITY[hex2dec(vars[prefix + "_state"])];
                     //user.id = ret.siteID = hex2dec(vars[prefix + "_uid"]);
-                    ret.userName = vars[prefix + "_name"];
-                    ret.score = ret.perfect * 50 + ret.good * 25 + ret.average * 5 - ret.miss * 10 - ret.boo * 5;
-                    ret.amazing = 0;
-                    ret.life = 24;
+                    gameplay.userName = vars[prefix + "_name"];
+                    gameplay.score = gameplay.perfect * 50 + gameplay.good * 25 + gameplay.average * 5 - gameplay.miss * 10 - gameplay.boo * 5;
+                    gameplay.amazing = 0;
+                    gameplay.life = 24;
                     break;
                 case GAME_LEGACY:
                     stats = String(vars["mpstats" + user.id]).split(":");
-                    ret.songName = stats[0] || "No Song Selected";
-                    ret.score = int(stats[1]);
-                    ret.life = int(stats[2]);
-                    ret.maxCombo = int(stats[3]);
-                    ret.combo = int(stats[4]);
-                    ret.perfect = int(stats[5]);
-                    ret.good = int(stats[6]);
-                    ret.average = int(stats[7]);
-                    ret.miss = int(stats[8]);
-                    ret.boo = int(stats[9]);
-                    ret.status = STATUS_LEGACY[int(stats[10])];
-                    ret.amazing = 0;
+                    gameplay.songName = stats[0] || "No Song Selected";
+                    gameplay.score = int(stats[1]);
+                    gameplay.life = int(stats[2]);
+                    gameplay.maxCombo = int(stats[3]);
+                    gameplay.combo = int(stats[4]);
+                    gameplay.perfect = int(stats[5]);
+                    gameplay.good = int(stats[6]);
+                    gameplay.average = int(stats[7]);
+                    gameplay.miss = int(stats[8]);
+                    gameplay.boo = int(stats[9]);
+                    gameplay.status = STATUS_LEGACY[int(stats[10])];
+                    gameplay.amazing = 0;
                     var loading:Object = vars["arc_status_loading" + user.id];
                     if (loading != null)
-                        ret.statusLoading = int(loading);
+                        gameplay.statusLoading = int(loading);
                     break;
                 case GAME_R3:
-                    stats = String(vars["P" + playerIdx + "_GAMESCORES"]).split(":");
-                    ret.score = int(stats[0]);
-                    ret.amazing = int(stats[1]);
-                    ret.perfect = int(stats[2]);
-                    ret.good = int(stats[3]);
-                    ret.average = int(stats[4]);
-                    ret.miss = int(stats[5]);
-                    ret.boo = int(stats[6]);
-                    ret.combo = int(stats[7]);
-                    ret.maxCombo = int(stats[8]);
-                    ret.status = int(vars["P" + playerIdx + "_STATE"]);
-                    ret.songID = int(vars["P" + playerIdx + "_SONGID"]);
-                    ret.statusLoading = int(vars["P" + playerIdx + "_SONGID_PROGRESS"]);
-                    ret.life = int(vars["P" + playerIdx + "_GAMELIFE"]);
+                    stats = String(vars[prefix + "_GAMESCORES"]).split(":");
+                    gameplay.score = int(stats[0]);
+                    gameplay.amazing = int(stats[1]);
+                    gameplay.perfect = int(stats[2]);
+                    gameplay.good = int(stats[3]);
+                    gameplay.average = int(stats[4]);
+                    gameplay.miss = int(stats[5]);
+                    gameplay.boo = int(stats[6]);
+                    gameplay.combo = int(stats[7]);
+                    gameplay.maxCombo = int(stats[8]);
+                    gameplay.status = int(vars[prefix + "_STATE"]);
+                    gameplay.songID = int(vars[prefix + "_SONGID"]);
+                    gameplay.statusLoading = int(vars[prefix + "_SONGID_PROGRESS"]);
+                    gameplay.life = int(vars[prefix + "_GAMELIFE"]);
                     break;
             }
 
             var engine:String = vars["arc_engine" + playerIdx];
             if (engine)
             {
-                ret.song = ArcGlobals.instance.legacyDecode(JSON.parse(engine));
-                if (ret.song)
+                gameplay.song = ArcGlobals.instance.legacyDecode(JSON.parse(engine));
+                if (gameplay.song)
                 {
-                    if (!ret.song.name)
-                        ret.song.name = ret.songName;
-                    if (!("level" in ret.song) || ret.song.level < 0)
-                        ret.song.level = ret.songID || -1;
+                    if (!gameplay.song.name)
+                        gameplay.song.name = gameplay.songName;
+                    if (!("level" in gameplay.song) || gameplay.song.level < 0)
+                        gameplay.song.level = gameplay.songID || -1;
                 }
             }
             else
             {
                 var playlist:Playlist = Playlist.instanceCanon;
-                if (ret.songID)
-                    ret.song = playlist.playList[ret.songID];
-                if (!ret.song)
+                if (gameplay.songID)
+                    gameplay.song = playlist.playList[gameplay.songID];
+                if (!gameplay.song)
                 {
                     for each (var song:Object in playlist.playList)
                     {
-                        if (song.name == ret.songName)
+                        if (song.name == gameplay.songName)
                         {
-                            ret.song = song;
+                            gameplay.song = song;
                             break;
                         }
                     }
                 }
             }
-            var replay:Object = vars["arc_replay" + playerIdx];
-            if (replay)
-                ret.replay = replay;
+            var replayString:String = vars["arc_replay" + playerIdx];
+            if (replayString)
+                gameplay.encodedReplay = replayString;
 
-            ret.room = room;
-            ret.user = user;
+            // TODO: Check if these relationships are needed (they're causing circular dependencies)
+            gameplay.room = room;
+            gameplay.user = user;
 
-            return ret;
+            return gameplay;
         }
 
         /**
-         * Sends the room variables to the server to propagate to other users
+         * Formats and sends the room variables for the currentUser to the server.
          */
         public function sendRoomVariables(room:Room, data:Object, changeOwnership:Boolean = true):void
         {
             var varArray:Array = [];
             for (var name:String in data)
                 varArray.push({name: name, val: data[name]});
+
             if (varArray.length > 0)
                 server.setRoomVariables(varArray, room.id, changeOwnership);
         }
 
+        /**
+         * Formats empty room variables for the currentUser and sends them to the server.
+         */
         private function clearRoomPlayerVariables(room:Room):void
         {
             if (!room.isGameRoom)
@@ -545,28 +561,28 @@ package com.flashfla.net
 
             if (currentUserIdx > 0)
             {
-                var prefix:String = currentUserIdx.toString();
+                var playerIdx:String = currentUserIdx.toString();
+                var prefix:String = "P" + playerIdx;
                 switch (mode)
                 {
                     case GAME_R3:
-                        prefix = "P" + prefix;
                         vars[prefix + "_NAME"] = null;
                         vars[prefix + "_UID"] = null;
                         break;
                     case GAME_VELOCITY:
-                        prefix = "p" + prefix;
                         vars[prefix + "_name"] = null;
                         vars[prefix + "_uid"] = null;
                         break;
                     case GAME_LEGACY:
-                        vars["player" + prefix] = null;
-                        vars["mpstats" + prefix] = null;
+                        vars["player" + playerIdx] = null;
+                        vars["mpstats" + playerIdx] = null;
                         break;
                 }
                 vars["arc_engine" + currentUser.id] = null;
                 vars["arc_replay" + currentUser.id] = null;
             }
 
+            // Send room vars to server
             sendRoomVariables(room, vars);
         }
 
@@ -588,7 +604,7 @@ package com.flashfla.net
                         vars[prefix + "_NAME"] = currentUser.name;
                         vars[prefix + "_UID"] = currentUser.id;
 
-                        // Check if there are opponents
+                        // If no opponents, set the room's level to the currentUser's level
                         if (!room.playerCount > 1)
                             sendRoomVariables(room, {"GAME_LEVEL": currentUser.userLevel}, false);
                         break;
@@ -620,43 +636,46 @@ package com.flashfla.net
                     vars["GAME_VER"] = GAME_VERSIONS[GAME_R3];
                     vars["MP_LEVEL"] = currentUser.userLevel;
                     vars["MP_CLASS"] = currentUser.userClass;
-                    vars["MP_COLOR"] = currentUser.userColour;
+                    vars["MP_COLOR"] = currentUser.userColor;
                     vars["MP_STATUS"] = currentUser.userStatus;
                     break;
                 default:
                     vars["MP_Level"] = currentUser.userLevel;
                     vars["MP_Class"] = CLASS_LEGACY.indexOf(currentUser.userClass);
-                    vars["MP_Color"] = currentUser.userColour;
+                    vars["MP_Color"] = currentUser.userColor;
                     break;
             }
             currentUser.variables = vars;
         }
 
-        public function setRoomGameplay(room:Room, data:Object):void
+        /**
+         * Builds a request to update a room's gameplay state and sends it to the server.
+         */
+        public function setRoomGameplay(room:Room, gameplay:Gameplay):void
         {
             var vars:Object = {};
             if (room.hasUser(currentUser))
             {
-                var user:User = room.getPlayer(1);
+                var user:User = currentUser;
+                var prefix:String = "p" + user.playerIdx;
                 switch (mode)
                 {
                     case GAME_VELOCITY:
-                        var prefix:String = "p" + user.playerIdx;
-                        vars[prefix + "_maxcombo"] = dec2hex(data.maxCombo);
-                        vars[prefix + "_combo"] = dec2hex(data.combo);
-                        vars[prefix + "_perfect"] = dec2hex(data.amazing + data.perfect);
-                        vars[prefix + "_good"] = dec2hex(data.good);
-                        vars[prefix + "_average"] = dec2hex(data.average);
-                        vars[prefix + "_boo"] = dec2hex(data.boo);
-                        vars[prefix + "_miss"] = dec2hex(data.miss);
-                        vars[prefix + "_levelid"] = dec2hex(data.song == null ? data.songID : int(data.song.level));
-                        vars[prefix + "_levelloading"] = dec2hex(data.statusLoading);
-                        vars[prefix + "_state"] = dec2hex(STATUS_VELOCITY.indexOf(data.status));
-                        if (data.gameScoreRecorded != null)
-                            vars["gameScoreRecorded"] = data.gameScoreRecorded;
+                        vars[prefix + "_maxcombo"] = dec2hex(gameplay.maxCombo);
+                        vars[prefix + "_combo"] = dec2hex(gameplay.combo);
+                        vars[prefix + "_perfect"] = dec2hex(gameplay.amazing + gameplay.perfect);
+                        vars[prefix + "_good"] = dec2hex(gameplay.good);
+                        vars[prefix + "_average"] = dec2hex(gameplay.average);
+                        vars[prefix + "_boo"] = dec2hex(gameplay.boo);
+                        vars[prefix + "_miss"] = dec2hex(gameplay.miss);
+                        vars[prefix + "_levelid"] = dec2hex(gameplay.song == null ? gameplay.songID : int(gameplay.song.level));
+                        vars[prefix + "_levelloading"] = dec2hex(gameplay.statusLoading);
+                        vars[prefix + "_state"] = dec2hex(STATUS_VELOCITY.indexOf(gameplay.status));
+                        if (gameplay.gameScoreRecorded != null)
+                            vars["gameScoreRecorded"] = gameplay.gameScoreRecorded ? "y" : "n";
                         break;
                     case GAME_LEGACY:
-                        var status:int = data.status;
+                        var status:int = gameplay.status;
                         switch (status)
                         {
                             case STATUS_LOADED:
@@ -666,34 +685,37 @@ package com.flashfla.net
                                 status = STATUS_NONE;
                                 break;
                         }
-                        vars["mpstats" + user.playerIdx] = String((data.songName != null ? data.songName : data.song.name)).replace(/:/g, "") + ":" + int(data.score) + ":" + int(data.life) + ":" + int(data.maxCombo) + ":" + int(data.combo) + ":" + int(data.amazing + data.perfect) + ":" + int(data.good) + ":" + int(data.average) + ":" + int(data.miss) + ":" + int(data.boo) + ":" + STATUS_LEGACY.indexOf(status);
-                        if (data.statusLoading != null)
-                            vars["arc_status_loading" + user.playerIdx] = int(data.statusLoading);
+                        vars["mpstats" + user.playerIdx] = String((gameplay.songName != null ? gameplay.songName : gameplay.song.name)).replace(/:/g, "") + ":" + int(gameplay.score) + ":" + int(gameplay.life) + ":" + int(gameplay.maxCombo) + ":" + int(gameplay.combo) + ":" + int(gameplay.amazing + gameplay.perfect) + ":" + int(gameplay.good) + ":" + int(gameplay.average) + ":" + int(gameplay.miss) + ":" + int(gameplay.boo) + ":" + STATUS_LEGACY.indexOf(status);
+                        if (gameplay.statusLoading)
+                            vars["arc_status_loading" + user.playerIdx] = int(gameplay.statusLoading);
                         else
                             vars["arc_status_loading" + user.playerIdx] = null;
                         break;
                     case GAME_R3:
-                        vars["P" + user.playerIdx + "_GAMESCORES"] = int(data.score) + ":" + int(data.amazing) + ":" + int(data.perfect) + ":" + int(data.good) + ":" + int(data.average) + ":" + int(data.miss) + ":" + int(data.boo) + ":" + int(data.combo) + ":" + int(data.maxCombo);
-                        vars["P" + user.playerIdx + "_STATE"] = int(data.status);
-                        vars["P" + user.playerIdx + "_GAMELIFE"] = int(data.life * 24 / 100);
-                        vars["P" + user.playerIdx + "_SONGID"] = (data.song == null ? data.songID : int(data.song.level));
-                        vars["P" + user.playerIdx + "_SONGID_PROGRESS"] = int(data.statusLoading);
+                        vars[prefix + "_GAMESCORES"] = int(gameplay.score) + ":" + int(gameplay.amazing) + ":" + int(gameplay.perfect) + ":" + int(gameplay.good) + ":" + int(gameplay.average) + ":" + int(gameplay.miss) + ":" + int(gameplay.boo) + ":" + int(gameplay.combo) + ":" + int(gameplay.maxCombo);
+                        vars[prefix + "_STATE"] = int(gameplay.status);
+                        vars[prefix + "_GAMELIFE"] = int(gameplay.life * 24 / 100);
+                        vars[prefix + "_SONGID"] = (gameplay.song == null ? gameplay.songID : int(gameplay.song.level));
+                        vars[prefix + "_SONGID_PROGRESS"] = int(gameplay.statusLoading);
                         break;
                 }
-                var engine:Object = ArcGlobals.instance.legacyEncode(data.song);
+                var engine:Object = ArcGlobals.instance.legacyEncode(gameplay.song);
                 if (engine)
                 {
                     if (mode == GAME_LEGACY)
                         delete engine.songName;
                     vars["arc_engine" + user.playerIdx] = JSON.stringify(engine);
                 }
-                else if (data.song === null || (data.song && !data.song.engine))
+                else if (gameplay.song === null || (gameplay.song && !gameplay.song.engine))
                     vars["arc_engine" + user.playerIdx] = null;
-                vars["arc_replay" + user.playerIdx] = data.replay || null;
+                vars["arc_replay" + user.playerIdx] = gameplay.encodedReplay || null;
             }
             sendRoomVariables(room, vars);
         }
 
+        /**
+         * Applies the user's `variables` values to its matching fields.
+         */
         private function applyUserVariables(user:User):void
         {
             if (user != null)
@@ -706,13 +728,13 @@ package com.flashfla.net
                         user.gameVersion = GAME_VERSIONS.indexOf(vars["GAME_VER"]);
                         user.userLevel = vars["MP_LEVEL"];
                         user.userClass = vars["MP_CLASS"];
-                        user.userColour = vars["MP_COLOR"];
+                        user.userColor = vars["MP_COLOR"];
                         user.userStatus = vars["MP_STATUS"];
                         break;
                     default:
                         user.userLevel = vars["MP_Level"];
                         user.userClass = CLASS_LEGACY[vars["MP_Class"]];
-                        user.userColour = vars["MP_Color"];
+                        user.userColor = vars["MP_Color"];
                         break;
                 }
             }
@@ -742,6 +764,7 @@ package com.flashfla.net
             if (room == null)
                 return;
 
+            // Update each player's gameplay
             for each (var user:User in room.players)
                 user.gameplay = getUserGameplayFromRoom(room, user);
 
@@ -896,7 +919,7 @@ package com.flashfla.net
                     currentUser.loggedIn = true;
                     currentUser.name = data.name;
                     currentUser.userClass = (mode == GAME_R3 ? data.userclass : CLASS_LEGACY[data.userclass]);
-                    currentUser.userColour = data.usercolor;
+                    currentUser.userColor = data.usercolor;
                     currentUser.userLevel = data.userlevel;
                     currentUser.id = data.userID;
                     currentUser.siteId = int(data.siteID);
@@ -1057,7 +1080,7 @@ package com.flashfla.net
             var songMatch:Boolean = room.playerCount > 0;
             for each (var user:User in room.players)
             {
-                var gameplay:Object = user.gameplay;
+                var gameplay:Gameplay = user.gameplay;
                 if (gameplay)
                 {
                     var pstatus:int = room.match.playerStatus[user.id] || STATUS_NONE;
@@ -1263,9 +1286,9 @@ package com.flashfla.net
 
             room.addUser(user);
 
-            // Always attempt to add a new user to a room as a player if possible
+            // Always attempt to add a new user to a room as a player
             if (room.isGameRoom)
-                if (room.setPlayer(user.playerIdx, user) > 0)
+                if (room.setPlayer(user.playerIdx, user))
                     user.gameplay = getUserGameplayFromRoom(room, user);
 
             eventRoomUser(room, user);

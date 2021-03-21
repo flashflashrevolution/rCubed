@@ -297,7 +297,7 @@ package classes.chart
                 }
 
                 // Generate SWF Containing a MP3 as class "SoundClass".
-                var metadata:Object = new Object();
+                var metadata:Object = {};
                 var bytes:ByteArray = MP3Extraction.extractSound(chartData, metadata);
                 bytes.position = 0;
                 mp3Frame = metadata.frame - 2;

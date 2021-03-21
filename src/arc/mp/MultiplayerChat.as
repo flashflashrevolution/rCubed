@@ -252,9 +252,9 @@ package arc.mp
 
         public static function textFormatUserName(user:User, postfix:String = ""):String
         {
-            var usercolour:int = user.userClass as int;
-            if (user.userColour != null)
-                usercolour = user.userColour as int;
+            var usercolour:int = user.userClass;
+            if (!user.userColor)
+                usercolour = user.userColor;
             var colour:String = textDullColour(Multiplayer.COLOURS[usercolour], 0.75).toString(16);
             if (user.variables.arc_colour != null)
                 colour = user.variables.arc_colour;

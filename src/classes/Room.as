@@ -107,7 +107,7 @@ package classes
 
         public function setPlayer(index:int, user:User):Boolean
         {
-            if (index > MAX_PLAYERS)
+            if (index <= 0 || index > MAX_PLAYERS)
                 return false
 
             if (!_players[index])

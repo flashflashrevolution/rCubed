@@ -850,7 +850,7 @@ package game
             var ret:Boolean = false;
             ret ||= valid_score && !result.options.isScoreValid(true, false);
             ret ||= valid_replay && !result.options.isScoreValid(false, true);
-            ret ||= check_replay && (_gvars.flashvars.replay || result.replay.length <= 0 || result.score <= 0 || (result.options.replay && result.options.replay.isEdited) || result.user.id != _gvars.playerUser.id)
+            ret ||= check_replay && (_gvars.flashvars.replay || result.replayData.length <= 0 || result.score <= 0 || (result.options.replay && result.options.replay.isEdited) || result.user.id != _gvars.playerUser.id)
             ret ||= check_alt_engine && (result.user.id <= 2 || result.song_entry.engine != null);
             return !ret;
         }
@@ -871,7 +871,7 @@ package game
             var ret:Boolean = false;
             ret ||= valid_score && !result.options.isScoreUpdated(true, false);
             ret ||= valid_replay && !result.options.isScoreUpdated(false, true);
-            ret ||= check_replay && (_gvars.flashvars.replay || result.replay.length <= 0 || result.score <= 0 || (result.options.replay && result.options.replay.isEdited) || result.user.id != _gvars.playerUser.id)
+            ret ||= check_replay && (_gvars.flashvars.replay || result.replayData.length <= 0 || result.score <= 0 || (result.options.replay && result.options.replay.isEdited) || result.user.id != _gvars.playerUser.id)
             ret ||= check_alt_engine && (result.user.id <= 2 || result.song_entry.engine != null);
             return !ret;
         }
@@ -920,7 +920,7 @@ package game
             scoreSender.boo = gameResult.boo;
             scoreSender.max_combo = gameResult.max_combo;
             scoreSender.score = gameResult.score;
-            scoreSender.replay = Replay.getReplayString(gameResult.replay);
+            scoreSender.replay = Replay.getReplayString(gameResult.replayData);
             scoreSender.save_settings = JSON.stringify(gameResult.options.settingsEncode());
             scoreSender.restart_stats = JSON.stringify(gameResult.restart_stats);
             scoreSender.session = _gvars.userSession;
@@ -1256,8 +1256,8 @@ package game
             nR.miss = result.miss;
             nR.boo = result.boo;
             nR.maxcombo = result.max_combo;
-            nR.replay = result.replay;
-            nR.replay_bin = result.replay_bin;
+            nR.replayData = result.replayData;
+            nR.replayBin = result.replayBin;
             nR.timestamp = int(new Date().getTime() / 1000);
             _gvars.replayHistory.unshift(nR);
 
@@ -1269,7 +1269,7 @@ package game
             }
 
             // Write Local txt Replay Encode
-            if (_gvars.air_autoSaveLocalReplays && result.replay_bin != null)
+            if (_gvars.air_autoSaveLocalReplays && result.replayBin != null)
             {
                 try
                 {
@@ -1325,7 +1325,7 @@ package game
             scoreSender.boo = gameResult.boo;
             scoreSender.max_combo = gameResult.max_combo;
             scoreSender.score = gameResult.score;
-            scoreSender.replay = Replay.getReplayString(gameResult.replay);
+            scoreSender.replay = Replay.getReplayString(gameResult.replayData);
             scoreSender.replay_bin = gameResult.replay_bin_encoded;
             scoreSender.save_settings = JSON.stringify(gameResult.options.settingsEncode());
             scoreSender.session = _gvars.userSession;

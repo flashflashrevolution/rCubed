@@ -67,7 +67,7 @@ package game
         }
 
         // Replay v3
-        public var replay:Array;
+        public var replayData:Array; // Probably array of ReplayNote
         public var replay_hit:Array;
 
         // Binary Replays (aka Replay v4)
@@ -75,7 +75,7 @@ package game
         public var replay_bin_boos:Array;
         private var _replay_bin:ByteArray;
 
-        public function get replay_bin():ByteArray
+        public function get replayBin():ByteArray
         {
             if (_replay_bin == null)
             {
@@ -88,11 +88,11 @@ package game
 
         public function get replay_bin_encoded():String
         {
-            if (replay_bin == null || replay_bin.length == 0)
+            if (replayBin == null || replayBin.length == 0)
                 return null;
 
             var enc:Base64Encoder = new Base64Encoder();
-            enc.encodeBytes(replay_bin);
+            enc.encodeBytes(replayBin);
             return ReplayPack.MAGIC + "|" + enc.toString();
         }
 

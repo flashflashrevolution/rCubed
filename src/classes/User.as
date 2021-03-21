@@ -60,9 +60,9 @@ package classes
 
         public var gameVersion:int;
         public var userLevel:int;
-        public var userClass:Object;
-        public var userColour:Object;
-        public var userStatus:Object;
+        public var userClass:int;
+        public var userColor:int;
+        public var userStatus:int;
 
         public var joinDate:String;
         public var skillLevel:Number;
@@ -144,7 +144,7 @@ package classes
         public var forceNewJudge:Boolean = false;
         public var songRate:Number = 1;
 
-        public var gameplay:Object;
+        public var gameplay:Gameplay;
 
 
         //- Permissions

@@ -4,6 +4,7 @@ package arc.mp
     import classes.Playlist;
     import classes.Room;
     import classes.User;
+    import classes.Gameplay;
     import classes.chart.Song;
     import classes.replay.Replay;
     import com.flashfla.net.Multiplayer;
@@ -184,27 +185,27 @@ package arc.mp
             }
         }
 
-        private function gameplayUpdateRoom(data:Object = null):void
+        private function gameplayUpdateRoom(gameplay:Gameplay = null):void
         {
-            if (data == null)
-                data = {};
+            if (gameplay == null)
+                gameplay = new Gameplay();
 
-            if (data.status == null)
-                data.status = currentStatus;
+            if (gameplay.status)
+                gameplay.status = currentStatus;
 
-            if (data.songName == null || data.songID == null)
+            if (gameplay.songName == null || gameplay.songID)
             {
-                data.song = currentSong;
+                gameplay.song = currentSong;
                 if (currentSong == null)
-                    data.songName = "No Song Selected";
+                    gameplay.songName = "No Song Selected";
             }
 
             if (currentSongFile != null && !currentSongFile.isLoaded)
-                data.statusLoading = currentSongFile.progress;
+                gameplay.statusLoading = currentSongFile.progress;
 
             forEachRoom(function(room:Room):void
             {
-                connection.setRoomGameplay(room, data);
+                connection.setRoomGameplay(room, gameplay);
             });
         }
 
@@ -366,7 +367,7 @@ package arc.mp
             if (room.getPlayerIndex(currentUser) == 1 && (connection.mode == Multiplayer.GAME_LEGACY || room.variables["gameScoreRecorded"] != "y"))
                 gameplaySubmit(room);
 
-            for each (var player:Object in room.match.players)
+            for each (var player:User in room.match.players)
             {
                 if (player.id == connection.currentUser.id)
                     continue;
@@ -407,7 +408,16 @@ package arc.mp
 
         public function gameplayStart(room:Room):void
         {
-            gameplayUpdateRoom(connection.mode == Multiplayer.GAME_VELOCITY ? {"gameScoreRecorded": "n"} : null);
+            if (connection.mode == Multiplayer.GAME_VELOCITY)
+            {
+                var newGameplay:Gameplay = new Gameplay();
+                newGameplay.gameScoreRecorded = false; // "n"
+                gameplayUpdateRoom(newGameplay);
+            }
+            else
+            {
+                gameplayUpdateRoom();
+            }
 
             currentStatus = Multiplayer.STATUS_PLAYING;
 
@@ -434,16 +444,19 @@ package arc.mp
             if (!_gvars.options.mpRoom || currentStatus != Multiplayer.STATUS_PLAYING)
                 return;
 
-            gameplayUpdateRoom({score: event.gameScore,
-                    life: event.gameLife,
-                    maxCombo: event.hitMaxCombo,
-                    combo: event.hitCombo,
-                    amazing: event.hitAmazing,
-                    perfect: event.hitPerfect,
-                    good: event.hitGood,
-                    average: event.hitAverage,
-                    miss: event.hitMiss,
-                    boo: event.hitBoo});
+            var updatedGameplay:Gameplay = new Gameplay();
+            updatedGameplay.score = event.gameScore;
+            updatedGameplay.life = event.gameLife;
+            updatedGameplay.maxCombo = event.hitMaxCombo;
+            updatedGameplay.combo = event.hitCombo;
+            updatedGameplay.amazing = event.hitAmazing;
+            updatedGameplay.perfect = event.hitPerfect;
+            updatedGameplay.good = event.hitGood;
+            updatedGameplay.average = event.hitAverage;
+            updatedGameplay.miss = event.hitMiss;
+            updatedGameplay.boo = event.hitBoo;
+
+            gameplayUpdateRoom(updatedGameplay);
         }
 
         public function gameplayResults(gameResults:MenuPanel, songResults:Vector.<GameScoreResult>):void
@@ -478,20 +491,16 @@ package arc.mp
                     }
                 }
             }
-            var data:Object = (results ? {score: results.score,
-                    life: 24,
-                    maxCombo: results.max_combo,
-                    combo: results.combo,
-                    amazing: results.amazing,
-                    perfect: results.perfect,
-                    good: results.good,
-                    average: results.average,
-                    miss: results.miss,
-                    boo: results.boo} : {});
+            var data:Gameplay = new Gameplay();
+            if (results)
+            {
+                data.score = results.score, data.life = 24, data.maxCombo = results.max_combo, data.combo = results.combo, data.amazing = results.amazing, data.perfect = results.perfect, data.good = results.good, data.average = results.average, data.miss = results.miss, data.boo = results.boo
+            }
+
             if (sendingScore)
-                data["gameScoreRecorded"] = "y";
+                data.gameScoreRecorded = true; // "y"
             if (replay)
-                data["replay"] = replay.getEncode();
+                data.encodedReplay = replay.getEncode();
             gameplayUpdateRoom(data);
 
             var panel:MultiplayerPanel = getPanel(gameResults);

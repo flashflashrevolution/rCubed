@@ -19,7 +19,7 @@ package classes.replay
 
         public var fileReplay:Boolean = false;
 
-        public var replay_bin:ByteArray;
+        public var replayBin:ByteArray;
 
         public var isLoaded:Boolean = false;
         public var isEdited:Boolean = false;
@@ -38,7 +38,7 @@ package classes.replay
         public var miss:Number;
         public var boo:Number;
         public var maxcombo:Number;
-        public var replay:Array;
+        public var replayData:Array;
         public var timestamp:Number;
 
         public function Replay(id:Number, doLoad:Boolean = false)
@@ -173,7 +173,7 @@ package classes.replay
 
             //- Frames
             var tempReplay:String = data.replayframes;
-            replay = [];
+            replayData = [];
 
             //- Clean up
             // Legacy Replay Format ((LDUR),(FRAME)|), Handled in the Velo Converter
@@ -221,15 +221,15 @@ package classes.replay
             this.settings = data.settings;
 
             //- Replay
-            this.replay = [];
+            this.replayData = [];
             for each (var item:Object in data.rep_boos)
-                this.replay.push(new ReplayNote(item["d"], -2, item["t"]));
+                this.replayData.push(new ReplayNote(item["d"], -2, item["t"]));
 
             //- Edited Check
             if (data.checksum != data.rechecksum)
                 isEdited = true;
 
-            this.replay_bin = data.replay_bin;
+            this.replayBin = data.replay_bin;
             this.generationReplayNotes = data.rep_notes;
             this.needsBeatboxGeneration = true;
         }
@@ -242,7 +242,7 @@ package classes.replay
             {
                 var dir:String = tempReplay[x].charAt(0);
                 var frame:Number = uint("0x" + tempReplay[x].substr(1));
-                replay.push(new ReplayNote(dir, frame - 30));
+                replayData.push(new ReplayNote(dir, frame - 30));
             }
 
         }
@@ -264,7 +264,7 @@ package classes.replay
                 {
                     var dir:String = getDirCol(noteDir);
                     var frame:int = uint("0x" + noteVal + game_curChar) + lastFrame;
-                    replay.push(new ReplayNote(dir, frame - offsetf));
+                    replayData.push(new ReplayNote(dir, frame - offsetf));
                     lastFrame = frame;
                 }
                 else if (game_curChar == "W" || game_curChar == "X" || game_curChar == "Y" || game_curChar == "Z")
@@ -325,15 +325,15 @@ package classes.replay
         /////
         public function getPress(index:int):ReplayNote
         {
-            return replay[index];
+            return replayData[index];
         }
 
         public function getEncode(onlyBinReplay:Boolean = false):String
         {
-            if (replay_bin != null)
+            if (replayBin != null)
             {
                 var enc:Base64Encoder = new Base64Encoder();
-                enc.encodeBytes(replay_bin);
+                enc.encodeBytes(replayBin);
                 return ReplayPack.MAGIC + "|" + enc.toString();
             }
 
@@ -345,7 +345,7 @@ package classes.replay
                 o.replaylevelid = this.level;
                 o.replaysettings = JSON.stringify(this.settings);
                 o.replayscore = (sT + "|" + perfect + "|" + good + "|" + average + "|" + miss + "|" + boo + "|" + maxcombo);
-                o.replayframes = getReplayString(replay);
+                o.replayframes = getReplayString(replayData);
                 o.replayversion = "R^3";
                 o.timestamp = timestamp;
 
@@ -393,7 +393,7 @@ package classes.replay
 
         public function isValid():Boolean
         {
-            return replay != null;
+            return replayData != null;
         }
 
         public static function getReplayString(replay:Object):String

@@ -93,7 +93,7 @@ package game.graph
 
             if (song_file != null)
             {
-                for each (var replayHit:ReplayNote in result.replay)
+                for each (var replayHit:ReplayNote in result.replayData)
                 {
                     pos_y = (replayHit.frame * result.options.songRate + song_file.musicDelay) * ratio_x;
                     status = replayHit.score;

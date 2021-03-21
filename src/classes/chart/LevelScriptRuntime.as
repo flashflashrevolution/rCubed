@@ -1,7 +1,7 @@
 package classes.chart
 {
     import game.GameOptions;
-    import game.GamePlay;
+    import game.GameplayDisplay;
 
     /**
      * @author FictionVoid
@@ -9,10 +9,10 @@ package classes.chart
     public class LevelScriptRuntime implements ILevelScriptRuntime
     {
         private var options:GameOptions;
-        private var gameplay:GamePlay;
+        private var gameplay:GameplayDisplay;
         private var level_script:ILevelScript;
 
-        public function LevelScriptRuntime(gameplay:GamePlay, script:ILevelScript)
+        public function LevelScriptRuntime(gameplay:GameplayDisplay, script:ILevelScript)
         {
             this.options = gameplay.getScriptVariable("options") as GameOptions;
             this.gameplay = gameplay;
@@ -35,7 +35,7 @@ package classes.chart
             return options;
         }
 
-        public function getGameplay():GamePlay
+        public function getGameplay():GameplayDisplay
         {
             return gameplay;
         }

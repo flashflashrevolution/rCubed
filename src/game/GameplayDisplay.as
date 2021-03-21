@@ -54,7 +54,7 @@ package game
     import com.flashfla.net.events.GameResultsEvent;
     import classes.User;
 
-    public class GamePlay extends MenuPanel
+    public class GameplayDisplay extends MenuPanel
     {
         public static const GAME_DISPOSE:int = -1;
         public static const GAME_PLAY:int = 0;
@@ -188,7 +188,7 @@ package game
         private var GPU_PIXEL_BMD:BitmapData;
         private var GPU_PIXEL_BITMAP:Bitmap;
 
-        public function GamePlay(myParent:MenuPanel)
+        public function GameplayDisplay(myParent:MenuPanel)
         {
             super(myParent);
         }
@@ -1302,7 +1302,7 @@ package game
                 newGameResults.accuracy_deviation = accuracy.deviation;
                 newGameResults.options = this.options;
                 newGameResults.restart_stats = _gvars.songStats.data;
-                newGameResults.replay = gameReplay.concat();
+                newGameResults.replayData = gameReplay.concat();
                 newGameResults.replay_hit = gameReplayHit.concat();
                 newGameResults.replay_bin_notes = binReplayNotes;
                 newGameResults.replay_bin_boos = binReplayBoos;
