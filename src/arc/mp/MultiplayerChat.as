@@ -23,6 +23,7 @@ package arc.mp
     import flash.ui.Keyboard;
     import classes.Room;
     import classes.User;
+    import classes.Gameplay;
 
     public class MultiplayerChat extends Component
     {
@@ -240,7 +241,7 @@ package arc.mp
 
         public static function nameUser(user:User, format:Boolean = true):String
         {
-            if (user == null)
+            if (!user)
                 return "";
             return (user.userLevel >= 0 ? textFormatLevel(user) : "") + (format ? textFormatUserName(user) : textEscape(user.name));
         }
@@ -327,20 +328,20 @@ package arc.mp
                 return textFormatGameResultsSingle(room, 1);
 
             // Compare Scores
-            var p1:Object = room.match.gameplay[room.match.players[1].id];
-            var p2:Object = room.match.gameplay[room.match.players[2].id];
+            var p1:Gameplay = room.match.gameplay[room.match.players[1].id];
+            var p2:Gameplay = room.match.gameplay[room.match.players[2].id];
 
-            var pa:Function = function(data:Object):String
+            var pa:Function = function(gameplay:Gameplay):String
             {
-                return (data.amazing + data.perfect) + "-" + data.good + "-" + data.average + "-" + data.miss + "-" + data.boo + "-" + data.maxCombo;
+                return (gameplay.amazing + gameplay.perfect) + "-" + gameplay.good + "-" + gameplay.average + "-" + gameplay.miss + "-" + gameplay.boo + "-" + gameplay.maxCombo;
             }
 
-            var winner:Object = (p1.score > p2.score ? p1 : p2);
-            var loser:Object = (p1.score > p2.score ? p2 : p1);
+            var winner:Gameplay = (p1.score > p2.score ? p1 : p2);
+            var loser:Gameplay = (p1.score > p2.score ? p2 : p1);
             var tie:Boolean = (p1.score == p2.score);
 
-            var winnertext:String = winner.user.userName + " (" + winner.score + " " + pa(winner) + ")";
-            var losertext:String = loser.user.userName + " (" + loser.score + " " + pa(loser) + ")";
+            var winnertext:String = winner.user.name + " (" + winner.score + " " + pa(winner) + ")";
+            var losertext:String = loser.user.name + " (" + loser.score + " " + pa(loser) + ")";
             var songname:String = MultiplayerPlayer.nameSong(p1);
             return textFormatSize(textFormatBold(textFormatColour(textEscape("* " + songname + ": " + winnertext + (tie ? " tied with " : " won against ") + losertext), "#189018")), "-2");
         }

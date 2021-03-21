@@ -11,6 +11,7 @@ package arc.mp
     import flash.events.MouseEvent;
     import classes.Room;
     import classes.User;
+    import classes.Gameplay;
 
     public class MultiplayerPlayer extends Panel
     {
@@ -104,7 +105,7 @@ package arc.mp
             // Get the user who's playing at this element's index
             var user:User = room.getPlayer(playerIdx);
 
-            var gameplay:Object;
+            var gameplay:Gameplay;
             if (user)
                 gameplay = user.gameplay;
 
@@ -151,7 +152,6 @@ package arc.mp
                         break;
                 }
 
-
                 playerLabel.html = true;
                 playerLabel.text = MultiplayerChat.textFormatLevel(user) + user.name;
                 scoreLabel.text = "Score: " + gameplay.score;
@@ -160,7 +160,7 @@ package arc.mp
             }
         }
 
-        public static function nameSong(gameplay:Object):String
+        public static function nameSong(gameplay:Gameplay):String
         {
             if (gameplay && gameplay.song)
                 return gameplay.song.name;

@@ -256,6 +256,9 @@ package com.flashfla.net
             }
         }
 
+        /**
+         * The lobby room, if it exists.
+         */
         public function get lobby():Room
         {
             if (_lobby)
@@ -439,10 +442,11 @@ package com.flashfla.net
             if (playerIdx <= 0)
                 return null;
 
-            var prefix:String = "p" + playerIdx;
+            var prefix:String;
             switch (mode)
             {
                 case GAME_VELOCITY:
+                    prefix = "p" + playerIdx;
                     gameplay.maxCombo = hex2dec(vars[prefix + "_maxcombo"]);
                     gameplay.combo = hex2dec(vars[prefix + "_combo"]);
                     gameplay.perfect = hex2dec(vars[prefix + "_perfect"]);
@@ -478,6 +482,7 @@ package com.flashfla.net
                         gameplay.statusLoading = int(loading);
                     break;
                 case GAME_R3:
+                    prefix = "P" + playerIdx;
                     stats = String(vars[prefix + "_GAMESCORES"]).split(":");
                     gameplay.score = int(stats[0]);
                     gameplay.amazing = int(stats[1]);
@@ -586,6 +591,9 @@ package com.flashfla.net
             sendRoomVariables(room, vars);
         }
 
+        /**
+         * Sends the current user's "player" variables (if any) to the server.
+         */
         private function setRoomPlayerVariables(room:Room):void
         {
             if (!room.isGameRoom)
@@ -649,7 +657,8 @@ package com.flashfla.net
         }
 
         /**
-         * Builds a request to update a room's gameplay state and sends it to the server.
+         * Builds a request to update the current user's gameplay state
+         * in the specified room and sends it to the server.
          */
         public function setRoomGameplay(room:Room, gameplay:Gameplay):void
         {
@@ -929,6 +938,7 @@ package com.flashfla.net
 
                     setCurrentUserVariables();
 
+                    // TODO: Check the usage of these and if they're absolutely needed internally for SFS
                     server.myUserId = currentUser.id;
                     server.myUserName = currentUser.name;
                     server.amIModerator = currentUser.isModerator;
