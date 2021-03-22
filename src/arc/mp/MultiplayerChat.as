@@ -54,74 +54,93 @@ package arc.mp
             addChild(controlChat);
 
             controlInput = new InputText();
-            controlInput.addEventListener(KeyboardEvent.KEY_DOWN, function(event:KeyboardEvent):void
-            {
-                if (event.keyCode == Keyboard.ENTER)
-                {
-                    connection.sendMessage(room, controlInput.text);
-                    controlInput.text = "";
-                }
-                event.stopPropagation();
-            });
+            controlInput.addEventListener(KeyboardEvent.KEY_DOWN, onInputTextKeyDown);
             addChild(controlInput);
 
-            connection.addEventListener(Multiplayer.EVENT_SERVER_MESSAGE, function(event:ServerMessageEvent):void
-            {
-                textAreaAddLine(textFormatServerMessage(event.user, event.message));
-            });
-            connection.addEventListener(Multiplayer.EVENT_XT_RESPONSE, function(event:ExtensionResponseEvent):void
-            {
-                //textAreaAddLine(textFormatServerMessage(event.params.user, event.params.message));
-                var data:Object = event.data;
-                if (data.rid == room)
-                {
-                    if (data._cmd == "html_message")
-                    {
-                        textAreaAddLine(textFormatUserName(data.uid, ": ") + data.m);
-                    }
-                }
-            });
-            connection.addEventListener(Multiplayer.EVENT_MESSAGE, function(event:MessageEvent):void
-            {
-                if (event.msgType == Multiplayer.MESSAGE_PUBLIC)
-                {
-                    if (event.room == room)
-                        textAreaAddLine(textFormatMessage(event.user, event.message));
-                }
-                else if (event.room == null || event.room == room)
-                    textAreaAddLine(textFormatPrivateMessageIn(event.user, event.message));
-            });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_USER, function(event:RoomUserEvent):void
-            {
-                // Broadcast join/left message in rooms, do not broadcast in lobby
-                // Add "&& event.params.user.room != null" to omit "has left" messages
-                if (room != null && room.name != "Lobby" && event.room == room)
-                    textAreaAddLine(textFormatUser(event.user, event.room.getUser(event.user.id) != null));
-            });
-            connection.addEventListener(Multiplayer.EVENT_CONNECTION, function(event:ConnectionEvent):void
-            {
-                if (!connection.connected)
-                    textAreaAddLine(textFormatDisconnect());
-            });
-            connection.addEventListener(Multiplayer.EVENT_LOGIN, function(event:LoginEvent):void
-            {
-                buildContextMenu();
-            });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_JOINED, function(event:RoomJoinedEvent):void
-            {
-                if (event.room == room)
-                    textAreaAddLine(textFormatJoin(event.room));
-            });
-            connection.addEventListener(Multiplayer.EVENT_GAME_RESULTS, function(event:GameResultsEvent):void
-            {
-                if (event.room == room)
-                    textAreaAddLine(textFormatGameResults(room));
-            });
+            connection.addEventListener(Multiplayer.EVENT_SERVER_MESSAGE, onServerMessageEvent);
+            connection.addEventListener(Multiplayer.EVENT_XT_RESPONSE, onExtensionResponseEvent);
+            connection.addEventListener(Multiplayer.EVENT_MESSAGE, onMessageEvent);
+            connection.addEventListener(Multiplayer.EVENT_ROOM_USER, onRoomUserEvent);
+            connection.addEventListener(Multiplayer.EVENT_CONNECTION, onConnectionEvent);
+            connection.addEventListener(Multiplayer.EVENT_LOGIN, onLoginEvent);
+            connection.addEventListener(Multiplayer.EVENT_ROOM_JOINED, onRoomJoinedEvent);
+            connection.addEventListener(Multiplayer.EVENT_GAME_RESULTS, onGameResultsEvent);
+
             GlobalVariables.instance.gameMain.addEventListener(Main.EVENT_PANEL_SWITCHED, checkRedraw);
 
             buildContextMenu();
 
             resize();
+        }
+
+        private function onInputTextKeyDown(event:KeyboardEvent):void
+        {
+            if (event.keyCode == Keyboard.ENTER)
+            {
+                connection.sendMessage(room, controlInput.text);
+                controlInput.text = "";
+            }
+            event.stopPropagation();
+        }
+
+        private function onServerMessageEvent(event:ServerMessageEvent):void
+        {
+            textAreaAddLine(textFormatServerMessage(event.user, event.message));
+        }
+
+        private function onExtensionResponseEvent(event:ExtensionResponseEvent):void
+        {
+            //textAreaAddLine(textFormatServerMessage(event.params.user, event.params.message));
+            var data:Object = event.data;
+            if (data.rid == room)
+            {
+                if (data._cmd == "html_message")
+                {
+                    textAreaAddLine(textFormatUserName(data.uid, ": ") + data.m);
+                }
+            }
+        }
+
+        private function onMessageEvent(event:MessageEvent):void
+        {
+            if (event.msgType == Multiplayer.MESSAGE_PUBLIC)
+            {
+                if (event.room == room)
+                    textAreaAddLine(textFormatMessage(event.user, event.message));
+            }
+            else if (event.room == null || event.room == room)
+                textAreaAddLine(textFormatPrivateMessageIn(event.user, event.message));
+        }
+
+        private function onRoomUserEvent(event:RoomUserEvent):void
+        {
+            // Broadcast join/left message in rooms, do not broadcast in lobby
+            // Add "&& event.params.user.room != null" to omit "has left" messages
+            if (room != null && room.name != "Lobby" && event.room == room)
+                textAreaAddLine(textFormatUser(event.user, room.getUser(event.user.id) != null));
+        }
+
+        private function onConnectionEvent(event:ConnectionEvent):void
+        {
+            if (!connection.connected)
+                textAreaAddLine(textFormatDisconnect());
+        }
+
+        private function onLoginEvent(event:LoginEvent):void
+        {
+            buildContextMenu();
+        }
+
+        private function onRoomJoinedEvent(event:RoomJoinedEvent):void
+        {
+            if (event.room == room)
+                textAreaAddLine(textFormatJoin(room));
+        }
+
+        private function onGameResultsEvent(event:GameResultsEvent):void
+        {
+            if (event.room == room)
+                textAreaAddLine(textFormatGameResults(room));
         }
 
         private function checkRedraw(event:Event):void
