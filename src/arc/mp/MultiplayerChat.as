@@ -348,7 +348,7 @@ package arc.mp
 
         public static function textFormatGameResultsSingle(room:Room, playerIndex:Number):String
         {
-            var p1:Object = room.match.gameplay[room.match.players[playerIndex].id];
+            var p1:Gameplay = room.match.gameplay[room.match.players[playerIndex].id];
             return textFormatSize(textFormatBold(textFormatColour(textEscape("* Player has left, " + p1.user.name + " has won."), "#189018")), "-2");
         }
 

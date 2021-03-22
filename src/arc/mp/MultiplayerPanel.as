@@ -153,7 +153,7 @@ package arc.mp
                 }
                 else
                 {
-                    updateRoom(event.room);
+                    updateRoomPanel(event.room);
                     new MultiplayerRoom(self, event.room);
                 }
             });
@@ -174,12 +174,12 @@ package arc.mp
             });
             connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, function(event:RoomUserStatusEvent):void
             {
-                updateRoom(event.room);
+                updateRoomPanel(event.room);
             });
             connection.addEventListener(Multiplayer.EVENT_ROOM_UPDATE, function(event:RoomUpdateEvent):void
             {
                 if (event.roomList == true)
-                    updateRoom(event.room);
+                    updateRoomPanel(event.room);
             });
             window.addEventListener(Event.CLOSE, function(event:Event):void
             {
@@ -324,7 +324,7 @@ package arc.mp
                 connection.joinRoom(room, asPlayer);
         }
 
-        private function updateRoom(room:Room):void
+        private function updateRoomPanel(room:Room):void
         {
             if (window.parent == null)
                 return;

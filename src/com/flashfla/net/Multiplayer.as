@@ -430,18 +430,29 @@ package com.flashfla.net
         }
 
         /**
-         * Returns a gameplay object from the room's variables given the user's playerIdx.
+         * Returns a gameplay object from the room's variables given the user.
          * If the user isn't a player in that room, returns null.
          */
-        private function getUserGameplayFromRoom(room:Room, user:User):Gameplay
+        private function updateUserGameplayFromRoom(room:Room, user:User):void
         {
-            var gameplay:Gameplay = new Gameplay();
-            var vars:Object = room.variables;
-            var stats:Array;
+            if (!user)
+                return;
 
             var playerIdx:int = room.getPlayerIndex(user);
             if (playerIdx <= 0)
-                return null;
+                user.gameplay = null;
+
+            var gameplay:Gameplay;
+            if (user.gameplay)
+                gameplay = user.gameplay;
+            else
+            {
+                user.gameplay = new Gameplay();
+                gameplay = user.gameplay;
+            }
+
+            var vars:Object = room.variables;
+            var stats:Array;
 
             var prefix:String;
             switch (mode)
@@ -537,8 +548,6 @@ package com.flashfla.net
             // TODO: Check if these relationships are needed (they're causing circular dependencies)
             gameplay.room = room;
             gameplay.user = user;
-
-            return gameplay;
         }
 
         /**
@@ -802,7 +811,7 @@ package com.flashfla.net
 
             // Update each player's gameplay
             for each (var user:User in room.players)
-                user.gameplay = getUserGameplayFromRoom(room, user);
+                updateUserGameplayFromRoom(room, user);
 
             if (mode == GAME_R3)
             {
@@ -870,9 +879,9 @@ package com.flashfla.net
             dispatchEvent(new RoomLeftEvent({room: room}));
         }
 
-        private function eventRoomUpdate(room:Room, roomList:Boolean = false, changed:Array = null):void
+        private function eventRoomUpdate(room:Room, roomList:Boolean = false):void
         {
-            dispatchEvent(new RoomUpdateEvent({room: room, roomList: roomList, changed: (changed || [])}));
+            dispatchEvent(new RoomUpdateEvent({room: room, roomList: roomList}));
         }
 
         private function eventRoomUser(room:Room, user:User):void
@@ -1014,8 +1023,11 @@ package com.flashfla.net
 
         private function onModeratorMessage(event:ModerationMessageSFSEvent):void
         {
-            if (event.userId != null)
-                eventServerMessage(htmlUnescape(event.message), event.userId);
+            if (event.userId)
+            {
+                var user:User = getRoomById(event.roomId).getUser(event.userId);
+                eventServerMessage(htmlUnescape(event.message), user);
+            }
         }
 
         private function onPlayerSwitched(event:PlayerSwitchedSFSEvent):void
@@ -1104,9 +1116,20 @@ package com.flashfla.net
         private function onRoomVariablesUpdate(event:RoomVariablesUpdateSFSEvent):void
         {
             var room:Room = getRoom(event.room);
-            updateRoom(event.room);
+
+            if (!room)
+                return;
+
+            // Apply new vars to the room
+            room.applyVariablesFromOtherRoom(event.room);
+
+            // Only parse variables updates for room the current user is in
+            if (!room.hasUser(currentUser))
+                return;
+
+            updateRoom(room);
             // TODO: Check roomList param validity
-            eventRoomUpdate(room, true, event.changedVars);
+            eventRoomUpdate(room, true);
 
             if (!room.isGameRoom)
                 return;
@@ -1120,11 +1143,11 @@ package com.flashfla.net
                 var gameplay:Gameplay = user.gameplay;
                 if (gameplay)
                 {
-                    var pstatus:int = room.match.playerStatus[user.id] || STATUS_NONE;
+                    var pstatus:int = room.match.playerStatus[user.playerIdx] || STATUS_NONE;
                     var newstatus:Boolean = false;
                     if (gameplay.status > pstatus)
                     {
-                        room.match.playerStatus[user.id] = gameplay.status;
+                        room.match.playerStatus[user.playerIdx] = gameplay.status;
                         pstatus = gameplay.status;
                         newstatus = true;
                     }
@@ -1137,7 +1160,7 @@ package com.flashfla.net
                         eventGameUpdate(room, user);
                     if (newstatus && gameplay.status == STATUS_RESULTS)
                     {
-                        room.match.players[user.id] = user;
+                        room.match.players[user.playerIdx] = user;
                         room.match.gameplay[user.id] = gameplay;
                         eventGameUpdate(room, user);
                     }
@@ -1326,7 +1349,7 @@ package com.flashfla.net
             // Always attempt to add a new user to a room as a player
             if (room.isGameRoom)
                 if (room.setPlayer(user.playerIdx, user))
-                    user.gameplay = getUserGameplayFromRoom(room, user);
+                    updateUserGameplayFromRoom(room, user);
 
             eventRoomUser(room, user);
             eventRoomUpdate(room);

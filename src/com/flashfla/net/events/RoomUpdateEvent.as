@@ -9,14 +9,12 @@ package com.flashfla.net.events
     {
         public var room:Room;
         public var roomList:Boolean;
-        public var changed:Array;
 
         public function RoomUpdateEvent(params:Object)
         {
             super(Multiplayer.EVENT_ROOM_UPDATE);
             room = params.room;
             roomList = params.roomList;
-            changed = params.changed;
         }
     }
 }

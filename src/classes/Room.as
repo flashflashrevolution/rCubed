@@ -225,5 +225,11 @@ package classes
 
             return match.status == Multiplayer.STATUS_PLAYING
         }
+
+        public function applyVariablesFromOtherRoom(otherRoom:Room):void
+        {
+            for (var variable:String in otherRoom.variables)
+                this.variables[variable] = otherRoom.variables[variable]
+        }
     }
 }

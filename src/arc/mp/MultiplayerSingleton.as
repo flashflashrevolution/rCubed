@@ -387,11 +387,11 @@ package arc.mp
                 if (player.id == connection.currentUser.id)
                     continue;
 
-                var gameplay:Object = room.match.gameplay[player.id];
-                if (gameplay && gameplay.replay)
+                var gameplay:Gameplay = room.match.gameplay[player.id];
+                if (gameplay && gameplay.encodedReplay)
                 {
                     var replay:Replay = new Replay(new Date().getTime());
-                    replay.parseEncode(gameplay.replay);
+                    replay.parseEncode(gameplay.encodedReplay);
                     if (!replay.isEdited && replay.isValid())
                         _gvars.replayHistory.unshift(replay);
                 }
@@ -553,7 +553,7 @@ package arc.mp
                 return velocity ? Multiplayer.dec2hex(value) : value.toString();
             };
 
-            var currentUserIdx:int = room.getPlayerIndex(currentUser)
+            var currentUserIdx:int = room.getPlayerIndex(currentUser);
             var velocity:Boolean = (connection.mode == Multiplayer.GAME_VELOCITY);
             var resultsP1:Gameplay = room.match.gameplay[(room.match.players[1] || {}).id];
             var resultsP2:Gameplay = room.match.gameplay[(room.match.players[2] || {}).id];

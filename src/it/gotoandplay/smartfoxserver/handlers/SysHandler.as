@@ -355,6 +355,8 @@ package it.gotoandplay.smartfoxserver.handlers
 
             var params:Object = {}
             params.message = Entities.decodeEntities(message)
+            params.userId = userId
+            params.roomId = roomId
 
             var evt:TypedSFSEvent = new AdminMessageSFSEvent(params)
             sfs.dispatchEvent(evt)
@@ -370,6 +372,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var params:Object = {}
             params.message = Entities.decodeEntities(message)
             params.userId = userId
+            params.roomId = roomId
 
             var evt:TypedSFSEvent = new ModerationMessageSFSEvent(params)
             sfs.dispatchEvent(evt)
@@ -385,11 +388,10 @@ package it.gotoandplay.smartfoxserver.handlers
             // Handle Room Variables
             if (o.body.vars.toString().length > 0)
             {
-                populateVariables(room.variables, o.body, changedVars)
+                populateVariables(room.variables, o.body)
 
                 var params:Object = {}
                 params.room = room
-                params.changedVars = changedVars
 
                 var evt:TypedSFSEvent = new RoomVariablesUpdateSFSEvent(params)
                 sfs.dispatchEvent(evt)
@@ -530,7 +532,7 @@ package it.gotoandplay.smartfoxserver.handlers
                 var value:Object = vValue;
 
                 if (vType == "b")
-                    value = (vValue == "1" ? true : false);
+                    value = (vValue == "1");
                 else if (vType == "n")
                     value = Number(vValue);
                 else if (vType == "x")
