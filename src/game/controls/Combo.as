@@ -91,7 +91,12 @@ package game.controls
 
             if (options && (!options.isAutoplay || options.isEditor || options.multiplayer))
             {
-                if (colors_enabled[2] && good + average + boo + miss == 0) // Display AAA color
+                if (colors_enabled[8] && raw_goods >= options.rawGoodTracker) // Display color for raw good tracker
+                {
+                    field.textColor = colors[8];
+                    fieldShadow.textColor = colors_dark[8];
+                }
+                else if (colors_enabled[2] && good + average + boo + miss == 0) // Display AAA color
                 {
                     field.textColor = colors[2];
                     fieldShadow.textColor = colors_dark[2];
@@ -115,11 +120,6 @@ package game.controls
                 {
                     field.textColor = colors[7];
                     fieldShadow.textColor = colors_dark[7];
-                }
-                else if (colors_enabled[8] && raw_goods <= options.rawGoodTracker) // Display color for raw good tracker
-                {
-                    field.textColor = colors[8];
-                    fieldShadow.textColor = colors_dark[8];
                 }
                 else if (colors_enabled[3] && raw_goods < 10) // Display SDG color if raw goods < 10
                 {
