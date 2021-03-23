@@ -1,3 +1,31 @@
+R^3 (v1.3.1) [2020-12-24]
+---------------------------------------------------------------------
+@Psycast
+- Anti-GPU Rampdown (#243)
+- Add Judge Animation Speed Slider (#233)
+- Make File Paths on other OS work. (#235)
+- Embed Readme images into repo. (#247)
+
+@G-Flat
+- Refactor UI constructors (#234)
+- Beautify MP room create prompt (#251)
+- Use a nicer prompt window (#242)
+- Remove custom noteskins menu (#241)
+- Move UI classes into classes.ui.* (#240)
+- Enable applying current offsets in song notes (#237)
+
+@Zageron
+- Embed Readme images into repo. (#247) - Co-Author
+- Edit url prefix. (#245)
+
+@Trevor
+- Add combo colour for raw goods (#253)
+
+@Fission
+- Force `LF` line endings in `.gitattributes` (#249)
+- Remove linebreaks between `README.md` badges (#248)
+
+
 R^3 (v1.3.0) [2020-10-01]
 ---------------------------------------------------------------------
 @Psycast

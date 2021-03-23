@@ -14,10 +14,21 @@ package arc.mp
     import flash.utils.Timer;
     import game.GameOptions;
     import game.GameScoreResult;
-    import it.gotoandplay.smartfoxserver.SFSEvent;
     import menu.MainMenu;
     import menu.MenuPanel;
     import menu.MenuSongSelection;
+    import com.flashfla.net.events.ErrorEvent;
+    import com.flashfla.net.events.ConnectionEvent;
+    import com.flashfla.net.events.LoginEvent;
+    import com.flashfla.net.events.RoomListEvent;
+    import com.flashfla.net.events.RoomJoinedEvent;
+    import com.flashfla.net.events.RoomLeftEvent;
+    import com.flashfla.net.events.RoomUserEvent;
+    import com.flashfla.net.events.MessageEvent;
+    import com.flashfla.net.events.GameResultsEvent;
+    import com.flashfla.net.events.GameStartEvent;
+    import com.flashfla.net.events.GameUpdateEvent;
+    import com.flashfla.net.events.RoomUserStatusEvent;
 
     public class MultiplayerSingleton extends Object
     {
@@ -79,18 +90,18 @@ package arc.mp
             connection.addEventListener(Multiplayer.EVENT_ROOM_JOINED, onRoomJoined);
             connection.addEventListener(Multiplayer.EVENT_ROOM_LEFT, onRoomLeft);
             connection.addEventListener(Multiplayer.EVENT_ROOM_USER, onRoomUser);
-            connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, onRoomUser);
+            connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, onRoomUserStatus);
             connection.addEventListener(Multiplayer.EVENT_MESSAGE, onMessage);
             connection.addEventListener(Multiplayer.EVENT_GAME_RESULTS, onGameResults);
             connection.addEventListener(Multiplayer.EVENT_GAME_START, onGameStart);
         }
 
-        private function onError(event:SFSEvent):void
+        private function onError(event:ErrorEvent):void
         {
-            _gvars.gameMain.addAlert("MP Error: " + event.params.message);
+            _gvars.gameMain.addAlert("MP Error: " + event.message);
         }
 
-        private function onConnection(event:SFSEvent):void
+        private function onConnection(event:ConnectionEvent):void
         {
             if (connection.connected)
             {
@@ -99,21 +110,21 @@ package arc.mp
             }
         }
 
-        private function onLogin(event:SFSEvent):void
+        private function onLogin(event:LoginEvent):void
         {
             if (!connection.currentUser.loggedIn)
                 connection.disconnect();
         }
 
-        private function onRoomList(event:SFSEvent):void
+        private function onRoomList(event:RoomListEvent):void
         {
             if (!autoJoin)
                 connection.joinLobby();
         }
 
-        private function onRoomJoined(event:SFSEvent):void
+        private function onRoomJoined(event:RoomJoinedEvent):void
         {
-            if (event.params.room == connection.lobby)
+            if (event.room == connection.lobby)
             {
                 if (autoJoin)
                 {
@@ -124,27 +135,35 @@ package arc.mp
             }
             else
             {
-                currentRoom = event.params.room;
+                currentRoom = event.room;
             }
         }
 
-        private function onRoomLeft(event:SFSEvent):void
+        private function onRoomLeft(event:RoomLeftEvent):void
         {
             currentRoom = null;
         }
 
-        private function onRoomUser(event:SFSEvent):void
+        private function onRoomUser(event:RoomUserEvent):void
         {
-            var room:Object = event.params.room;
-            var user:Object = event.params.user;
-            if (user.room == room && user.userID != connection.currentUser.userID && room.user.isPlayer && user.isPlayer && room.isGame)
-                _gvars.gameMain.addAlert("A Challenger Appears! " + event.params.user.userName);
+            updateRoomUser(event.room, event.user);
         }
 
-        private function onMessage(event:SFSEvent):void
+        private function onRoomUserStatus(event:RoomUserStatusEvent):void
         {
-            if (event.params.type == Multiplayer.MESSAGE_PRIVATE)
-                _gvars.gameMain.addAlert("*** " + event.params.user.userName + ": " + event.params.message);
+            updateRoomUser(event.room, event.user);
+        }
+
+        private function updateRoomUser(room:Object, user:Object):void
+        {
+            if (user.room == room && user.userID != connection.currentUser.userID && room.user.isPlayer && user.isPlayer && room.isGame)
+                _gvars.gameMain.addAlert("A Challenger Appears! " + user.userName);
+        }
+
+        private function onMessage(event:MessageEvent):void
+        {
+            if (event.msgType == Multiplayer.MESSAGE_PRIVATE)
+                _gvars.gameMain.addAlert("*** " + event.user.userName + ": " + event.message);
         }
 
         private function foreachroom(foreach:Function):void
@@ -346,9 +365,9 @@ package arc.mp
             return currentRoom != null;
         }
 
-        private function onGameResults(event:SFSEvent):void
+        private function onGameResults(event:GameResultsEvent):void
         {
-            var room:Object = event.params.room;
+            var room:Object = event.room;
             if (room.user.playerID == 1 && (connection.mode == Multiplayer.GAME_LEGACY || room.variables["gameScoreRecorded"] != "y"))
                 gameplaySubmit(room);
 
@@ -368,9 +387,9 @@ package arc.mp
             }
         }
 
-        private function onGameStart(event:SFSEvent):void
+        private function onGameStart(event:GameStartEvent):void
         {
-            var room:Object = event.params.room;
+            var room:Object = event.room;
             if (room.user.isPlayer)
                 gameplayStart(room);
         }
@@ -415,21 +434,21 @@ package arc.mp
             return true;
         }
 
-        private function onGameUpdate(event:SFSEvent):void
+        private function onGameUpdate(event:GameUpdateEvent):void
         {
             if (!_gvars.options.multiplayer || currentStatus != Multiplayer.STATUS_PLAYING)
                 return;
 
-            gameplayUpdateRoom({score: event.params.gameScore,
-                    life: event.params.gameLife,
-                    maxCombo: event.params.hitMaxCombo,
-                    combo: event.params.hitCombo,
-                    amazing: event.params.hitAmazing,
-                    perfect: event.params.hitPerfect,
-                    good: event.params.hitGood,
-                    average: event.params.hitAverage,
-                    miss: event.params.hitMiss,
-                    boo: event.params.hitBoo});
+            gameplayUpdateRoom({score: event.gameScore,
+                    life: event.gameLife,
+                    maxCombo: event.hitMaxCombo,
+                    combo: event.hitCombo,
+                    amazing: event.hitAmazing,
+                    perfect: event.hitPerfect,
+                    good: event.hitGood,
+                    average: event.hitAverage,
+                    miss: event.hitMiss,
+                    boo: event.hitBoo});
         }
 
         public function gameplayResults(gameResults:MenuPanel, songResults:Vector.<GameScoreResult>):void
@@ -492,7 +511,9 @@ package arc.mp
 
         public function gameplaySubmit(room:Object):void
         {
-            if (currentSong.engine != null)
+            var matchSong:Object = currentSong || room.match.song;
+
+            if (matchSong != null && matchSong.engine != null)
                 return;
 
             var convertNumber:Function = function(value:int):String
@@ -514,7 +535,7 @@ package arc.mp
             if (results2 == null)
                 results2 = {score: 1, life: 0, maxcombo: 0, combo: 0, amazing: 0, perfect: 0, good: 0, average: 0, miss: 0, boo: 0};
             var data:URLVariables = new URLVariables();
-            data.gamestats = currentSong.name + ":" + convertNumber(results1.score) + ":" + convertNumber(results1.life) + ":" + convertNumber(results1.maxcombo) + ":" + convertNumber(results1.combo) + ":" + convertNumber(results1.amazing + results1.perfect) + ":" + convertNumber(results1.good) + ":" + convertNumber(results1.average) + ":" + convertNumber(results1.miss) + ":" + convertNumber(results1.boo) + ":" + currentSong.name + ":" + convertNumber(results2.score) + ":" + convertNumber(results2.life) + ":" + convertNumber(results2.maxcombo) + ":" + convertNumber(results2.combo) + ":" + convertNumber(results2.amazing + results2.perfect) + ":" + convertNumber(results2.good) + ":" + convertNumber(results2.average) + ":" + convertNumber(results2.miss) + ":" + convertNumber(results2.boo);
+            data.gamestats = matchSong.name + ":" + convertNumber(results1.score) + ":" + convertNumber(results1.life) + ":" + convertNumber(results1.maxcombo) + ":" + convertNumber(results1.combo) + ":" + convertNumber(results1.amazing + results1.perfect) + ":" + convertNumber(results1.good) + ":" + convertNumber(results1.average) + ":" + convertNumber(results1.miss) + ":" + convertNumber(results1.boo) + ":" + matchSong.name + ":" + convertNumber(results2.score) + ":" + convertNumber(results2.life) + ":" + convertNumber(results2.maxcombo) + ":" + convertNumber(results2.combo) + ":" + convertNumber(results2.amazing + results2.perfect) + ":" + convertNumber(results2.good) + ":" + convertNumber(results2.average) + ":" + convertNumber(results2.miss) + ":" + convertNumber(results2.boo);
             if (results1.score != results2.score && results1.score > 0 && results2.score > 0)
             {
                 data.winner = results1.score > results2.score ? 1 : 2;

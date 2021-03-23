@@ -103,7 +103,7 @@ jobs:
         if: matrix.os == 'windows-latest' && steps.cache-air-sdk.outputs.cache-hit != 'true'
         run: |
           $ProgressPreference = 'SilentlyContinue';
-          (irm -Uri "http://airdownload.adobe.com/air/win/download/latest/AIRSDK_Compiler.zip" -ContentType "application/octet-stream" -OutFile "air-sdk.zip")
+          (irm -Uri "http://airdownload.adobe.com/air/win/download/32.0/AIRSDK_Compiler.zip" -ContentType "application/octet-stream" -OutFile "air-sdk.zip")
 
       - name: extract-7z-action
         if: matrix.os == 'windows-latest' && steps.cache-air-sdk.outputs.cache-hit != 'true'

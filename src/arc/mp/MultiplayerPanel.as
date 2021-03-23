@@ -5,6 +5,7 @@ package arc.mp
     import arc.mp.MultiplayerChat;
     import arc.mp.MultiplayerUsers;
     import classes.ui.BoxButton;
+    import classes.ui.MPCreateRoomPrompt;
     import classes.ui.Prompt;
     import classes.ui.Text;
     import classes.ui.Throbber;
@@ -20,8 +21,15 @@ package arc.mp
     import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
     import flash.utils.Timer;
-    import it.gotoandplay.smartfoxserver.SFSEvent;
     import menu.MenuPanel;
+    import com.flashfla.net.events.ServerMessageEvent;
+    import com.flashfla.net.events.ConnectionEvent;
+    import com.flashfla.net.events.LoginEvent;
+    import com.flashfla.net.events.RoomJoinedEvent;
+    import com.flashfla.net.events.RoomLeftEvent;
+    import com.flashfla.net.events.RoomListEvent;
+    import com.flashfla.net.events.RoomUserStatusEvent;
+    import com.flashfla.net.events.RoomUpdateEvent;
 
     public class MultiplayerPanel extends MenuPanel
     {
@@ -104,22 +112,23 @@ package arc.mp
             controlCreate.move(controlRooms.x, controlRooms.y + controlRooms.height);
             controlCreate.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void
             {
-                var prompt:MultiplayerRoomCreatePrompt = new MultiplayerRoomCreatePrompt(self, "Create Room");
-                prompt.addEventListener(MultiplayerRoomCreatePrompt.EVENT_SEND, function(subevent:SFSEvent):void
+                function e_createRoom(roomName:String, password:String):void
                 {
-                    connection.createRoom(subevent.params.room, subevent.params.password);
-                });
+                    connection.createRoom(roomName, password);
+                }
+
+                new MPCreateRoomPrompt(self, 320, 120, e_createRoom);
             });
             window.addChild(controlCreate);
 
             window.width = controlUsers.x + controlUsers.width;
             window.height = window.titleBar.height + controlChat.y + controlChat.height;
 
-            connection.addEventListener(Multiplayer.EVENT_SERVER_MESSAGE, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_SERVER_MESSAGE, function(event:ServerMessageEvent):void
             {
-                GlobalVariables.instance.gameMain.addAlert("Server Message: " + event.params.message);
+                GlobalVariables.instance.gameMain.addAlert("Server Message: " + event.message);
             });
-            connection.addEventListener(Multiplayer.EVENT_CONNECTION, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_CONNECTION, function(event:ConnectionEvent):void
             {
                 showButton(buttonDisconnect, connection.connected);
                 showButton(buttonMP, !connection.connected);
@@ -127,48 +136,48 @@ package arc.mp
                 if (!connection.connected)
                     hideThrobber();
             });
-            connection.addEventListener(Multiplayer.EVENT_LOGIN, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_LOGIN, function(event:LoginEvent):void
             {
                 buildContextMenu();
             });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_JOINED, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_ROOM_JOINED, function(event:RoomJoinedEvent):void
             {
-                if (event.params.room == connection.lobby)
+                if (event.room == connection.lobby)
                 {
                     showButton(buttonLobby, false);
                     openWindow();
-                    updateWindowTitle(event.params.room);
+                    updateWindowTitle(event.room);
                     hideThrobber();
                 }
                 else
                 {
-                    new MultiplayerRoom(self, event.params.room);
-                    updateRoom(event.params.room);
+                    new MultiplayerRoom(self, event.room);
+                    updateRoom(event.room);
                 }
             });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_LEFT, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_ROOM_LEFT, function(event:RoomLeftEvent):void
             {
-                if (event.params.room == connection.lobby)
+                if (event.room == connection.lobby)
                 {
                     showButton(buttonLobby, true);
                     closeWindow();
                 }
             });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_LIST, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_ROOM_LIST, function(event:RoomListEvent):void
             {
                 updateRooms();
 
                 controlChat.room = connection.lobby;
                 controlUsers.room = connection.lobby;
             });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, function(event:RoomUserStatusEvent):void
             {
-                updateRoom(event.params.room);
+                updateRoom(event.room);
             });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_UPDATE, function(event:SFSEvent):void
+            connection.addEventListener(Multiplayer.EVENT_ROOM_UPDATE, function(event:RoomUpdateEvent):void
             {
-                if (event.params.roomList == true)
-                    updateRoom(event.params.room);
+                if (event.roomList == true)
+                    updateRoom(event.room);
             });
             window.addEventListener(Event.CLOSE, function(event:Event):void
             {

@@ -45,12 +45,13 @@ package game
     import game.controls.NoteBox;
     import game.controls.PAWindow;
     import game.controls.Score;
-    import it.gotoandplay.smartfoxserver.SFSEvent;
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import sql.SQLSongDetails;
     import flash.display.BitmapData;
     import flash.display.Bitmap;
+    import com.flashfla.net.events.GameUpdateEvent;
+    import com.flashfla.net.events.GameResultsEvent;
 
     public class GamePlay extends MenuPanel
     {
@@ -259,21 +260,6 @@ package game
             // Init Core
             initCore();
 
-            if (options.isEditor)
-            {
-                options.isAutoplay = true;
-                stage.frameRate = options.frameRate;
-                stage.addEventListener(Event.ENTER_FRAME, editorOnEnterFrame, false, int.MAX_VALUE, true);
-                stage.addEventListener(KeyboardEvent.KEY_DOWN, editorKeyboardKeyDown, false, int.MAX_VALUE, true);
-            }
-            else
-            {
-                stage.frameRate = song.frameRate;
-                stage.addEventListener(Event.ENTER_FRAME, onEnterFrame, false, int.MAX_VALUE, true);
-                stage.addEventListener(KeyboardEvent.KEY_DOWN, keyboardKeyDown, false, int.MAX_VALUE, true);
-                stage.addEventListener(KeyboardEvent.KEY_UP, keyboardKeyUp, false, int.MAX_VALUE, true);
-            }
-
             // Prebuild Websocket Message, this is updated instead of creating a new object every message.
             SOCKET_SONG_MESSAGE = {"player": {
                         "settings": options.settingsEncode(),
@@ -372,6 +358,22 @@ package game
 
             if (song.entry && song.entry.name)
                 stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE + " - " + song.entry.name;
+
+            // Add onEnterFrame Listeners
+            if (options.isEditor)
+            {
+                options.isAutoplay = true;
+                stage.frameRate = options.frameRate;
+                stage.addEventListener(Event.ENTER_FRAME, editorOnEnterFrame, false, int.MAX_VALUE, true);
+                stage.addEventListener(KeyboardEvent.KEY_DOWN, editorKeyboardKeyDown, false, int.MAX_VALUE, true);
+            }
+            else
+            {
+                stage.frameRate = song.frameRate;
+                stage.addEventListener(Event.ENTER_FRAME, onEnterFrame, false, int.MAX_VALUE, true);
+                stage.addEventListener(KeyboardEvent.KEY_DOWN, keyboardKeyDown, true, int.MAX_VALUE, true);
+                stage.addEventListener(KeyboardEvent.KEY_UP, keyboardKeyUp, true, int.MAX_VALUE, true);
+            }
         }
 
         override public function stageRemove():void
@@ -386,8 +388,8 @@ package game
             else
             {
                 stage.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
-                stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyboardKeyDown);
-                stage.removeEventListener(KeyboardEvent.KEY_UP, keyboardKeyUp);
+                stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyboardKeyDown, true);
+                stage.removeEventListener(KeyboardEvent.KEY_UP, keyboardKeyUp, true);
 
                 if (options.multiplayer)
                 {
@@ -1330,6 +1332,13 @@ package game
             if (!legacyMode && !options.replay && !options.isEditor && !mpSpectate)
             {
                 _avars.configMusicOffset = (_avars.configMusicOffset * 0.85) + songOffset.value * 0.15;
+
+                // Cap between 5 seconds for sanity.
+                if (Math.abs(_avars.configMusicOffset) >= 5000)
+                {
+                    _avars.configMusicOffset = Math.max(-5000, Math.min(5000, _avars.configMusicOffset));
+                }
+
                 _avars.musicOffsetSave();
             }
 
@@ -2096,7 +2105,7 @@ package game
 
             if (options.multiplayer)
             {
-                dispatchEvent(new SFSEvent(Multiplayer.EVENT_GAME_UPDATE, {gameScore: gameScore,
+                dispatchEvent(new GameUpdateEvent({gameScore: gameScore,
                         gameLife: gameLife,
                         hitMaxCombo: hitMaxCombo,
                         hitCombo: hitCombo,
@@ -2196,12 +2205,12 @@ package game
 
         private var multiplayerResults:Array = new Array();
 
-        public function onMultiplayerUpdate(event:SFSEvent):void
+        public function onMultiplayerUpdate(event:GameUpdateEvent):void
         {
-            var user:Object = event.params.user;
+            var user:Object = event.user;
             var data:Object = user.gameplay;
 
-            if (options.multiplayer != event.params.room || !data || user.userID == options.multiplayer.connection.currentUser.userID)
+            if (options.multiplayer != event.room || !data || user.userID == options.multiplayer.connection.currentUser.userID)
                 return;
 
             var diff:Object = multiplayerDiff(user.playerID, data);
@@ -2241,9 +2250,9 @@ package game
             }
         }
 
-        public function onMultiplayerResults(event:SFSEvent):void
+        public function onMultiplayerResults(event:GameResultsEvent):void
         {
-            if (event.params.room == options.multiplayer)
+            if (event.room == options.multiplayer)
                 GAME_STATE = GAME_END;
         }
 

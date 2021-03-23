@@ -28,7 +28,7 @@ package classes.ui
 
             _box = new Box(this, (Main.GAME_WIDTH - promptWidth) / 2, (Main.GAME_HEIGHT - 55) / 2, false, false);
             _box.setSize(promptWidth, 55);
-            _box.borderColor = 0x424242;
+            _box.borderColor = 0x656565;
             _box.normalAlpha = 1;
             _box.borderAlpha = 1;
 
@@ -40,10 +40,11 @@ package classes.ui
             //- Add Close Button
             _close_button = new BoxButton(_box, promptWidth - 18, 3, 15, 15, "", 12, closePrompt);
             _close_button.color = 0xFF0000;
-            _close_button.borderColor = 0x000000;
+            _close_button.borderColor = 0x880015;
             _close_button.normalAlpha = 0.45;
             _close_button.activeAlpha = 1;
             _close_button.borderAlpha = 1;
+            _close_button.borderActiveAlpha = 1;
 
             //- Add Textfield
             _textfield = new BoxText(_box, 3, 23, promptWidth - buttonWidth - 10, 28);
@@ -52,7 +53,8 @@ package classes.ui
             _textfield.activeAlpha = 0.175;
             _textfield.textColor = 0;
             _textfield.borderColor = 0x000000;
-            _textfield.borderAlpha = 1;
+            _textfield.borderAlpha = 0.2175;
+            _textfield.borderActiveAlpha = 0.455;
             _textfield.displayAsPassword = displayAsPassword;
             _textfield.field.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 
@@ -63,7 +65,8 @@ package classes.ui
             _submit_button.activeAlpha = 0.175;
             _submit_button.textColor = "#000000";
             _submit_button.borderColor = 0x000000;
-            _submit_button.borderAlpha = 1;
+            _submit_button.borderAlpha = 0.2175;
+            _submit_button.borderActiveAlpha = 0.455;
 
             stage.focus = _textfield.field;
         }
