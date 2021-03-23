@@ -1,6 +1,8 @@
 package classes
 {
 
+    import com.flashfla.net.Multiplayer;
+
     public class Gameplay
     {
         public var amazing:int;
@@ -16,14 +18,11 @@ package classes
         public var life:int;
 
         public var score:int;
-        public var songID:int;
+        public var songId:int;
         public var status:int;
         public var statusLoading:int;
-        public var gameScoreRecorded:Boolean;
         public var encodedReplay:String;
 
-        public var room:Room;
-        public var user:User;
         public var song:Object;
 
         /**
@@ -38,6 +37,27 @@ package classes
 
         public function Gameplay()
         {
+        }
+
+        public function reset():void
+        {
+            amazing = 0;
+            perfect = 0;
+            good = 0;
+            average = 0;
+            miss = 0;
+            boo = 0;
+
+            combo = 0;
+            maxCombo = 0;
+            life = 0;
+            score = 0;
+
+            song = null;
+            songId = NaN;
+
+            status = Multiplayer.STATUS_NONE;
+            statusLoading = 0;
         }
     }
 }

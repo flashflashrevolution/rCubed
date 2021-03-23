@@ -8,6 +8,8 @@ package game
     import classes.GameNote;
     import classes.Language;
     import classes.Noteskins;
+    import classes.User;
+    import classes.Gameplay;
     import classes.chart.LevelScriptRuntime;
     import classes.chart.Note;
     import classes.chart.NoteChart;
@@ -19,9 +21,13 @@ package game
     import com.flashfla.utils.Average;
     import com.flashfla.utils.RollingAverage;
     import com.flashfla.utils.TimeUtil;
+    import com.flashfla.net.events.GameUpdateEvent;
+    import com.flashfla.net.events.GameResultsEvent;
     import flash.display.GradientType;
     import flash.display.MovieClip;
     import flash.display.Sprite;
+    import flash.display.BitmapData;
+    import flash.display.Bitmap;
     import flash.events.Event;
     import flash.events.IOErrorEvent;
     import flash.events.KeyboardEvent;
@@ -48,11 +54,6 @@ package game
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import sql.SQLSongDetails;
-    import flash.display.BitmapData;
-    import flash.display.Bitmap;
-    import com.flashfla.net.events.GameUpdateEvent;
-    import com.flashfla.net.events.GameResultsEvent;
-    import classes.User;
 
     public class GameplayDisplay extends MenuPanel
     {
@@ -611,8 +612,6 @@ package game
             if (mpSpectate)
             {
                 options.displayCombo = options.displayComboTotal = options.displayPA = false;
-                if (options.mpRoom.connection.mode != Multiplayer.GAME_R3)
-                    options.displayAmazing = false;
             }
             else if (options.mpRoom)
                 options.displayComboTotal = false;
@@ -881,7 +880,7 @@ package game
             var highIndex:int = 0;
             for each (var user:User in options.mpRoom.players)
             {
-                var gameplay:Object = user.gameplay;
+                var gameplay:Gameplay = user.gameplay;
                 var index:int = gameplay.amazing + gameplay.perfect + gameplay.good + gameplay.average + gameplay.miss;
                 if (!lowIndex || (index && index < lowIndex))
                     lowIndex = index;
@@ -1363,7 +1362,9 @@ package game
             // Cleanup
             initVars(false);
 
-            song.stop();
+            if (song != null)
+                song.stop();
+
             song = null;
 
             if (song_background)
@@ -2209,20 +2210,20 @@ package game
         public function onMultiplayerUpdate(event:GameUpdateEvent):void
         {
             var user:User = event.user;
-            var data:Object = user.gameplay;
+            var gameplay:Gameplay = user.gameplay;
 
-            if (options.mpRoom != event.room || !data || user.id == options.mpRoom.connection.currentUser.id)
+            if (!gameplay || options.mpRoom.isPlayer(user) || user.id == options.mpRoom.connection.currentUser.id)
                 return;
 
-            var diff:Object = multiplayerDiff(user.id, data);
+            var diff:Object = multiplayerDiff(user.id, gameplay);
 
             var combo:Combo = mpCombo[user.id];
             if (combo)
-                combo.update(data.combo, data.amazing, data.perfect, data.good, data.average, data.miss, data.boo);
+                combo.update(gameplay.combo, gameplay.amazing, gameplay.perfect, gameplay.good, gameplay.average, gameplay.miss, gameplay.boo);
 
             var pa:PAWindow = mpPA[user.id];
             if (pa)
-                pa.update(data.amazing, data.perfect, data.good, data.average, data.miss, data.boo);
+                pa.update(gameplay.amazing, gameplay.perfect, gameplay.good, gameplay.average, gameplay.miss, gameplay.boo);
 
             var judge:Judge = mpJudge[user.id];
             if (judge)
@@ -2244,7 +2245,7 @@ package game
                     judge.showJudge(value);
             }
 
-            if (data.status == Multiplayer.STATUS_RESULTS && !multiplayerResults[user.id])
+            if (gameplay.status == Multiplayer.STATUS_RESULTS && !multiplayerResults[user.id])
             {
                 multiplayerResults[user.id] = true;
                 _gvars.gameMain.addAlert(user.name + " finished playing the song", 240, Alert.RED);

@@ -340,35 +340,41 @@ package arc.mp
 
         public static function textFormatGameResults(room:Room):String
         {
-            // Player Left or Missing
-            if (!room.match.players[1] && room.match.players[2])
+            if (room == null)
+                return null;
+
+            var p1:User = room.getPlayer(1);
+            var p2:User = room.getPlayer(2);
+
+            // Player 1 or 2 missing
+            if (!p1 && p2)
                 return textFormatGameResultsSingle(room, 2);
-            if (!room.match.players[2] && room.match.players[1])
+            if (p1 && !p2)
                 return textFormatGameResultsSingle(room, 1);
 
-            // Compare Scores
-            var p1:Gameplay = room.match.gameplay[room.match.players[1].id];
-            var p2:Gameplay = room.match.gameplay[room.match.players[2].id];
+            // Compare scores
+            var gameplayP1:Gameplay = p1.gameplay;
+            var gameplayP2:Gameplay = p2.gameplay;
 
             var pa:Function = function(gameplay:Gameplay):String
             {
                 return (gameplay.amazing + gameplay.perfect) + "-" + gameplay.good + "-" + gameplay.average + "-" + gameplay.miss + "-" + gameplay.boo + "-" + gameplay.maxCombo;
             }
 
-            var winner:Gameplay = (p1.score > p2.score ? p1 : p2);
-            var loser:Gameplay = (p1.score > p2.score ? p2 : p1);
-            var tie:Boolean = (p1.score == p2.score);
+            var winner:User = (gameplayP1.score > gameplayP2.score ? p1 : p2);
+            var loser:User = (gameplayP1.score > gameplayP2.score ? p2 : p1);
+            var isTie:Boolean = (gameplayP1.score == gameplayP2.score);
 
-            var winnertext:String = winner.user.name + " (" + winner.score + " " + pa(winner) + ")";
-            var losertext:String = loser.user.name + " (" + loser.score + " " + pa(loser) + ")";
-            var songname:String = MultiplayerPlayer.nameSong(p1);
-            return textFormatSize(textFormatBold(textFormatColour(textEscape("* " + songname + ": " + winnertext + (tie ? " tied with " : " won against ") + losertext), "#189018")), "-2");
+            var winnertext:String = winner.name + " (" + winner.gameplay.score + " " + pa(winner.gameplay) + ")";
+            var losertext:String = loser.name + " (" + loser.gameplay.score + " " + pa(loser.gameplay) + ")";
+            var songname:String = MultiplayerPlayer.nameSong(gameplayP1);
+            return textFormatSize(textFormatBold(textFormatColour(textEscape("* " + songname + ": " + winnertext + (isTie ? " tied with " : " won against ") + losertext), "#189018")), "-2");
         }
 
         public static function textFormatGameResultsSingle(room:Room, playerIndex:Number):String
         {
-            var p1:Gameplay = room.match.gameplay[room.match.players[playerIndex].id];
-            return textFormatSize(textFormatBold(textFormatColour(textEscape("* Player has left, " + p1.user.name + " has won."), "#189018")), "-2");
+            var player:User = room.getPlayer(playerIndex);
+            return textFormatSize(textFormatBold(textFormatColour(textEscape("* Player has left, " + player.name + " has won."), "#189018")), "-2");
         }
 
         public static function textFormatColour(message:String, colour:String):String

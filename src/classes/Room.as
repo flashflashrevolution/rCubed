@@ -1,11 +1,10 @@
 package classes
 {
-    import flash.events.EventDispatcher;
     import com.flashfla.net.Multiplayer;
 
-    public class Room extends EventDispatcher
+    public class Room
     {
-        private static const MAX_PLAYERS:int = 2
+        public static const MAX_PLAYERS:int = 2
 
         public var id:int
         public var name:String
@@ -14,7 +13,7 @@ package classes
         public var maxPlayers:int
         public var userCount:int
         public var specCount:int
-        public var match:Object
+        public var match:Match
 
         // Room flags
         public var isGameRoom:Boolean
@@ -218,12 +217,37 @@ package classes
             this.specCount = 0
         }
 
-        public function get isInGameState():Boolean
+        public function isAllPlayersInStatus(status:int):Boolean
         {
-            if (!match || !match.song || !match.status)
-                return false
+            if (_playerCount <= 0)
+                return false;
 
-            return match.status == Multiplayer.STATUS_PLAYING
+            for each (var player:User in _players)
+            {
+                if (player.gameplay.status != status)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public function isAllPlayersSameSong():Boolean
+        {
+            if (_playerCount <= 0)
+                return false;
+
+            if (_playerCount == 1)
+                return true;
+
+            var songP1:Object = getPlayer(1).gameplay.song;
+
+            for each (var player:User in _players)
+            {
+                if (player.gameplay.song != songP1)
+                    return false;
+            }
+
+            return true;
         }
 
         public function applyVariablesFromOtherRoom(otherRoom:Room):void

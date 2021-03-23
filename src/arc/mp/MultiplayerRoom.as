@@ -130,7 +130,7 @@ package arc.mp
         private function onGameStart(event:GameStartEvent):void
         {
             // If the current room has started gameplay, enter spectating view
-            if (event.room == room && !room.isPlayer(currentUser) && GlobalVariables.instance.gameMain.activePanel is MainMenu)
+            if (event.room == room && GlobalVariables.instance.gameMain.activePanel is MainMenu)
                 MultiplayerSingleton.getInstance().spectateGame(room);
         }
 

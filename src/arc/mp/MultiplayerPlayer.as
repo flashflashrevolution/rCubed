@@ -162,7 +162,7 @@ package arc.mp
 
         public static function nameSong(gameplay:Gameplay):String
         {
-            if (gameplay && gameplay.song)
+            if (gameplay && gameplay.song && gameplay.song.name)
                 return gameplay.song.name;
 
             return "No Song Selected";

@@ -20,6 +20,8 @@ package arc.mp
     import com.flashfla.net.events.GameStartEvent;
     import com.flashfla.net.events.GameUpdateEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
+    import com.flashfla.utils.StringUtil;
+    import com.flashfla.utils.NumberUtil;
     import flash.events.Event;
     import flash.events.TimerEvent;
     import flash.net.URLLoader;
@@ -32,7 +34,6 @@ package arc.mp
     import menu.MainMenu;
     import menu.MenuPanel;
     import menu.MenuSongSelection;
-    import com.flashfla.utils.StringUtil;
 
     public class MultiplayerSingleton extends Object
     {
@@ -187,41 +188,46 @@ package arc.mp
         }
 
         /**
-         * Updates the current user's gameplay state with a given gameplay object.
-         * Also syncs the user's gameplay with this singleton's state if needed.
+         * Syncs the user's gameplay with this singleton's state.
          */
-        private function updateCurrentUserGameplay(gameplayUpdate:Gameplay = null):void
+        private function updateCurrentUserGameplay():void
         {
-            if (currentUser.gameplay == null)
-                currentUser.gameplay = new Gameplay();
+            var gameplay:Gameplay = currentUser.gameplay;
 
-            if (gameplayUpdate && gameplayUpdate.status)
-                currentUser.gameplay.status = gameplayUpdate.status;
-            else
-                currentUser.gameplay.status = currentStatus;
-
-            if (!gameplayUpdate || !gameplayUpdate.songName || gameplayUpdate.songID)
+            if (gameplay == null || currentStatus == Multiplayer.STATUS_NONE)
             {
-                currentUser.gameplay.song = currentSong;
-                if (currentSong == null)
-                    currentUser.gameplay.songName = "No Song Selected";
+                gameplay = new Gameplay();
+                currentUser.gameplay = gameplay;
             }
 
-            if (currentSongFile != null && !currentSongFile.isLoaded)
-                currentUser.gameplay.statusLoading = currentSongFile.progress;
+            gameplay.song = currentSong;
+            if (gameplay.song == null)
+                gameplay.songName = "No Song Selected";
 
-            propagateUserGameplay();
+            if (currentSongFile != null && !currentSongFile.isLoaded)
+                gameplay.statusLoading = currentSongFile.progress;
+
+            var isNewStatus:Boolean = gameplay.status == currentStatus;
+            gameplay.status = currentStatus;
+            if (currentStatus == Multiplayer.STATUS_CLEANUP)
+            {
+                currentStatus = Multiplayer.STATUS_NONE;
+                gameplay.reset();
+            }
+
+            propagateCurrentUserGameplay();
         }
 
         /**
          * Propagates the current user's gameplay to other rooms
          */
-        private function propagateUserGameplay():void
+        private function propagateCurrentUserGameplay():void
         {
-            forEachRoom(function(room:Room):void
+            for each (var room:Room in connection.rooms)
             {
-                connection.setRoomGameplay(room, currentUser.gameplay);
-            });
+                if (room.isPlayer(currentUser))
+                    connection.sendCurrentUserGameplay(room);
+            }
         }
 
         // Should be called in MenuSongSelection whenever the selection changes.
@@ -379,15 +385,15 @@ package arc.mp
         private function onGameResults(event:GameResultsEvent):void
         {
             var room:Room = event.room;
-            if (room.getPlayerIndex(currentUser) == 1 && (connection.mode == Multiplayer.GAME_LEGACY || room.variables["gameScoreRecorded"] != "y"))
+            if (room.getPlayerIndex(currentUser) == 1 && room.variables["gameScoreRecorded"] != "y")
                 gameplaySubmit(room);
 
-            for each (var player:User in room.match.players)
+            for each (var player:User in room.players)
             {
                 if (player.id == connection.currentUser.id)
                     continue;
 
-                var gameplay:Gameplay = room.match.gameplay[player.id];
+                var gameplay:Gameplay = player.gameplay;
                 if (gameplay && gameplay.encodedReplay)
                 {
                     var replay:Replay = new Replay(new Date().getTime());
@@ -401,8 +407,7 @@ package arc.mp
         private function onGameStart(event:GameStartEvent):void
         {
             var room:Room = event.room;
-            if (room.isPlayer(currentUser))
-                gameplayStart(room);
+            gameplayStart(room);
         }
 
         public function spectateGame(room:Room):void
@@ -423,16 +428,6 @@ package arc.mp
 
         public function gameplayStart(room:Room):void
         {
-            if (connection.mode == Multiplayer.GAME_VELOCITY)
-            {
-                currentUser.gameplay.gameScoreRecorded = false;
-                propagateUserGameplay();
-            }
-            else
-            {
-                updateCurrentUserGameplay();
-            }
-
             currentStatus = Multiplayer.STATUS_PLAYING;
 
             _gvars.options = new GameOptions();
@@ -458,19 +453,20 @@ package arc.mp
             if (!_gvars.options.mpRoom || currentStatus != Multiplayer.STATUS_PLAYING)
                 return;
 
-            currentUser.gameplay.score = event.gameScore;
-            currentUser.gameplay.life = event.gameLife;
-            currentUser.gameplay.maxCombo = event.hitMaxCombo;
-            currentUser.gameplay.combo = event.hitCombo;
-            currentUser.gameplay.amazing = event.hitAmazing;
-            currentUser.gameplay.perfect = event.hitPerfect;
-            currentUser.gameplay.good = event.hitGood;
-            currentUser.gameplay.average = event.hitAverage;
-            currentUser.gameplay.miss = event.hitMiss;
-            currentUser.gameplay.boo = event.hitBoo;
+            var gameplay:Gameplay = currentUser.gameplay;
+            gameplay.score = event.gameScore;
+            gameplay.life = event.gameLife;
+            gameplay.maxCombo = event.hitMaxCombo;
+            gameplay.combo = event.hitCombo;
+            gameplay.amazing = event.hitAmazing;
+            gameplay.perfect = event.hitPerfect;
+            gameplay.good = event.hitGood;
+            gameplay.average = event.hitAverage;
+            gameplay.miss = event.hitMiss;
+            gameplay.boo = event.hitBoo;
 
             // Propagate the gameplay state
-            propagateUserGameplay();
+            propagateCurrentUserGameplay();
         }
 
         public function gameplayResults(gameResults:MenuPanel, songResults:Vector.<GameScoreResult>):void
@@ -482,8 +478,7 @@ package arc.mp
 
             currentStatus = Multiplayer.STATUS_RESULTS;
 
-            var sendingScore:Boolean = (room.match.status == Multiplayer.STATUS_RESULTS && ((connection.mode == Multiplayer.GAME_LEGACY && room.getPlayerIndex(currentUser) == 1) || (connection.mode == Multiplayer.GAME_VELOCITY && room.variables["gameScoreRecorded"] != "y")));
-
+            // Update current user gameplay
             var replay:Replay = null;
             var results:GameScoreResult = null;
             for each (var result:GameScoreResult in songResults)
@@ -521,21 +516,23 @@ package arc.mp
                 gameplay.boo = results.boo;
             }
 
-            if (sendingScore)
-                gameplay.gameScoreRecorded = true;
             if (replay)
                 gameplay.encodedReplay = replay.getEncode();
 
-            propagateUserGameplay();
+            updateCurrentUserGameplay();
 
+            // Update rooms
+            propagateCurrentUserGameplay();
+
+            // Update the visuals
             var panel:MultiplayerPanel = getPanel(gameResults);
             gameResults.addChild(panel);
             panel.hideBackground(false);
             panel.setRoomsVisibility(false);
             panel.hideRoom(room, true);
 
-            if (sendingScore)
-                gameplaySubmit(room);
+            // Submit score to FFR
+            gameplaySubmit(room);
         }
 
         /**
@@ -548,16 +545,17 @@ package arc.mp
             if (matchSong != null && matchSong.engine != null)
                 return;
 
-            var convertNumber:Function = function(value:int):String
-            {
-                return velocity ? Multiplayer.dec2hex(value) : value.toString();
-            };
-
             var currentUserIdx:int = room.getPlayerIndex(currentUser);
-            var velocity:Boolean = (connection.mode == Multiplayer.GAME_VELOCITY);
-            var resultsP1:Gameplay = room.match.gameplay[(room.match.players[1] || {}).id];
-            var resultsP2:Gameplay = room.match.gameplay[(room.match.players[2] || {}).id];
-            var currentOpponent:User = (currentUserIdx == 1 ? room.match.players[2] : room.match.players[1]);
+
+            var player1:User = room.getPlayer(1);
+            var player2:User = room.getPlayer(2);
+
+            if (player1 == null || player2 == null)
+                return;
+
+            var resultsP1:Gameplay = player1.gameplay;
+            var resultsP2:Gameplay = player2.gameplay;
+            var currentOpponent:User = (currentUserIdx == 1 ? player2 : player1);
             var resultsOpponent:Gameplay = (currentUserIdx == 1 ? resultsP2 : resultsP1);
 
             if (!currentOpponent)
@@ -569,15 +567,15 @@ package arc.mp
             {
                 var hasRes:Boolean = result != null;
                 var resultGamestats:Array = [matchSong.name,
-                    convertNumber(hasRes ? result.score : 1),
-                    convertNumber(hasRes ? result.life : 0),
-                    convertNumber(hasRes ? result.maxCombo : 0),
-                    convertNumber(hasRes ? result.combo : 0),
-                    convertNumber(hasRes ? (result.amazing + result.perfect) : 0),
-                    convertNumber(hasRes ? result.good : 0),
-                    convertNumber(hasRes ? result.average : 0),
-                    convertNumber(hasRes ? result.miss : 0),
-                    convertNumber(hasRes ? result.boo : 0)];
+                    hasRes ? result.score : 1,
+                    hasRes ? result.life : 0,
+                    hasRes ? result.maxCombo : 0,
+                    hasRes ? result.combo : 0,
+                    hasRes ? (result.amazing + result.perfect) : 0,
+                    hasRes ? result.good : 0,
+                    hasRes ? result.average : 0,
+                    hasRes ? result.miss : 0,
+                    hasRes ? result.boo : 0];
 
                 gamestats.concat(resultGamestats);
             }
@@ -590,8 +588,8 @@ package arc.mp
                 data.winner = resultsP1.score > resultsP2.score ? 1 : 2;
                 data.loser = resultsP1.score < resultsP2.score ? 1 : 2;
             }
-            data["player" + currentUserIdx + "id"] = (velocity ? connection.currentUser.id : connection.currentUser.name);
-            data["player" + room.getPlayerIndex(currentOpponent) + "id"] = (velocity ? resultsOpponent.user.siteId : currentOpponent.name);
+            data["player" + currentUserIdx + "id"] = connection.currentUser.name;
+            data["player" + room.getPlayerIndex(currentOpponent) + "id"] = currentOpponent.name;
 
             var loader:URLLoader = new URLLoader();
             var request:URLRequest = new URLRequest(velocity ? Constant.MULTIPLAYER_SUBMIT_URL_VELOCITY : Constant.MULTIPLAYER_SUBMIT_URL);
@@ -604,12 +602,14 @@ package arc.mp
         }
 
         // Call after results screen / on main menu
-        public function gameplayReset():void
+        public function gameplayCleanup():void
         {
             currentSong = null;
             currentSongFile = null;
             currentStatus = Multiplayer.STATUS_CLEANUP;
+
             updateCurrentUserGameplay();
+            propagateCurrentUserGameplay();
         }
     }
 }

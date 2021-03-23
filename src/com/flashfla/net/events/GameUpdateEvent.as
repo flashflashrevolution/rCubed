@@ -2,13 +2,11 @@ package com.flashfla.net.events
 {
 
     import it.gotoandplay.smartfoxserver.TypedSFSEvent;
-    import classes.Room
     import com.flashfla.net.Multiplayer;
     import classes.User;
 
     public class GameUpdateEvent extends TypedSFSEvent
     {
-        public var room:Room;
         public var user:User;
         public var gameScore:int;
         public var gameLife:int;
@@ -24,7 +22,6 @@ package com.flashfla.net.events
         public function GameUpdateEvent(params:Object)
         {
             super(Multiplayer.EVENT_GAME_UPDATE);
-            room = params.room;
             user = params.user;
             gameScore = params.gameScore;
             gameLife = params.gameLife;

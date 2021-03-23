@@ -125,12 +125,6 @@ package arc.mp
             buttonMP = new BoxButton(this, 5, Main.GAME_HEIGHT - 30, 130, 25, "Connect", 12, onClickMP);
             showButton(buttonMP, false);
 
-            buttonLegacy = new BoxButton(this, buttonMP.x, buttonMP.y + buttonMP.height + 10, 140, 40, "Connect to Legacy", 12, onClickLegacy);
-            showButton(buttonLegacy, false);
-
-            buttonVelocity = new BoxButton(this, buttonLegacy.x, buttonLegacy.y + buttonLegacy.height + 10, buttonLegacy.width, buttonLegacy.height, "Connect to Velocity", 12, onClickVelocity);
-            showButton(buttonVelocity, false);
-
             buttonDisconnect = new BoxButton(null, buttonMP.x, buttonMP.y, buttonMP.width, buttonMP.height, "Disconnect", 12, onClickDisconnect);
 
             buttonLobby = new BoxButton(null, buttonDisconnect.x, buttonDisconnect.y + buttonDisconnect.height + 10, buttonLegacy.width, buttonLegacy.height, "Join Lobby", 12, onClickJoinLobby);
@@ -259,24 +253,6 @@ package arc.mp
             if (connection.connected)
                 connection.disconnect();
             connection.mode = Multiplayer.GAME_R3;
-            connection.connect();
-            showThrobber();
-        }
-
-        private function onClickLegacy(event:MouseEvent):void
-        {
-            if (connection.connected)
-                connection.disconnect();
-            connection.mode = Multiplayer.GAME_LEGACY;
-            connection.connect();
-            showThrobber();
-        }
-
-        private function onClickVelocity(event:MouseEvent):void
-        {
-            if (connection.connected)
-                connection.disconnect();
-            connection.mode = Multiplayer.GAME_VELOCITY;
             connection.connect();
             showThrobber();
         }
