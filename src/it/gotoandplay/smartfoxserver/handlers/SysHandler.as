@@ -169,7 +169,7 @@ package it.gotoandplay.smartfoxserver.handlers
 
             for each (var roomXml:XML in o.body.rmList.rm)
             {
-                var room:Room = new Room(roomXml.@id, roomXml.n, int(roomXml.@maxu), int(roomXml.@maxs), (roomXml.@temp == "1"), (roomXml.@game == "1"), (roomXml.@priv == "1"), (roomXml.@lmb == "1"), int(roomXml.@ucnt), int(roomXml.@scnt))
+                var room:Room = new Room(roomXml.@id, roomXml.n, int(roomXml.@maxu), int(roomXml.@maxs), (roomXml.@game == "1"), (roomXml.@priv == "1"), int(roomXml.@ucnt), int(roomXml.@scnt))
 
                 if (roomXml.vars.toString().length > 0)
                     populateVariables(room.variables, roomXml)
@@ -431,7 +431,7 @@ package it.gotoandplay.smartfoxserver.handlers
             var isLimbo:Boolean = o.body.rm.@limbo == "1"
 
             // Create room obj
-            var room:Room = new Room(rId, rName, rMax, rSpec, isTemp, isGame, isPriv, isLimbo)
+            var room:Room = new Room(rId, rName, rMax, rSpec, isGame, isPriv)
 
             // Handle Room Variables
             if (o.body.rm.vars.toString().length > 0)
