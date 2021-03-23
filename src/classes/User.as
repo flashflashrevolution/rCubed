@@ -58,7 +58,6 @@ package classes
         public var language:String = "us";
         public var playerIdx:int;
 
-        public var gameVersion:int;
         public var userLevel:int;
         public var userClass:int;
         public var userColor:int;

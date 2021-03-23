@@ -592,13 +592,10 @@ package arc.mp
             data["player" + room.getPlayerIndex(currentOpponent) + "id"] = currentOpponent.name;
 
             var loader:URLLoader = new URLLoader();
-            var request:URLRequest = new URLRequest(velocity ? Constant.MULTIPLAYER_SUBMIT_URL_VELOCITY : Constant.MULTIPLAYER_SUBMIT_URL);
+            var request:URLRequest = new URLRequest(Constant.MULTIPLAYER_SUBMIT_URL);
             request.method = URLRequestMethod.POST;
             request.data = data;
             loader.load(request);
-
-            if (velocity)
-                connection.sendRoomVariables(room, {"gameScoreRecorded": "y"});
         }
 
         // Call after results screen / on main menu

@@ -64,7 +64,6 @@ package arc.mp
             // Connect immediately if logged in
             if (!GlobalVariables.instance.activeUser.isGuest && GlobalVariables.instance.activeUser.id != 2)
             {
-                connection.mode = Multiplayer.GAME_R3;
                 connection.connect();
             }
             else
@@ -252,7 +251,7 @@ package arc.mp
         {
             if (connection.connected)
                 connection.disconnect();
-            connection.mode = Multiplayer.GAME_R3;
+
             connection.connect();
             showThrobber();
         }
@@ -360,7 +359,7 @@ package arc.mp
         public function updateWindowTitle(room:Room):void
         { // Minus 2 Rooms due to The Entrence (Fake) and Lobby
             if (room != null)
-                window.title = Multiplayer.GAME_VERSIONS[connection.mode] + " " + room.name + " - Rooms: " + (connection.rooms.length - 2) + " - Players: " + room.playerCount;
+                window.title = Multiplayer.GAME_VERSION + " " + room.name + " - Rooms: " + (connection.rooms.length - 2) + " - Players: " + room.playerCount;
         }
 
         private function nameRoom(room:Room):String

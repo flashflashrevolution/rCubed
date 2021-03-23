@@ -568,7 +568,7 @@ package com.flashfla.net
             var vars:Array = [];
 
             vars["UID"] = currentUser.id;
-            vars["GAME_VER"] = GAME_VERSIONS[GAME_R3];
+            vars["GAME_VER"] = GAME_VERSION;
             vars["MP_LEVEL"] = currentUser.userLevel;
             vars["MP_CLASS"] = currentUser.userClass;
             vars["MP_COLOR"] = currentUser.userColor;
@@ -630,7 +630,6 @@ package com.flashfla.net
                 var vars:Object = user.variables;
 
                 user.siteId = vars["UID"];
-                user.gameVersion = GAME_VERSIONS.indexOf(vars["GAME_VER"]);
                 user.userLevel = vars["MP_LEVEL"];
                 user.userClass = vars["MP_CLASS"];
                 user.userColor = vars["MP_COLOR"];
