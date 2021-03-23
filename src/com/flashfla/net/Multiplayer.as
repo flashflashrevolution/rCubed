@@ -367,7 +367,10 @@ package com.flashfla.net
                     if (room.isAllPlayersInStatus(STATUS_LOADED) && room.isAllPlayersSameSong())
                     {
                         currentUser.gameplay.status = STATUS_PLAYING;
+
                         reportSongStart(room);
+                        sendCurrentUserStatus(room);
+
                         if (currentUserIsPlayer)
                             eventGameStart(room);
                     }
@@ -971,15 +974,15 @@ package com.flashfla.net
             if (!user)
                 return;
 
-            if (user == currentUser)
-                sendCurrentUserRoomVariables(room);
-
             var newPlayerIdx:int = room.addPlayer(user);
             if (newPlayerIdx > 0)
             {
                 user.isPlayer = true;
                 user.playerIdx = newPlayerIdx;
             }
+
+            if (user == currentUser)
+                sendCurrentUserRoomVariables(room);
 
             updateRoom(room);
 
