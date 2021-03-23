@@ -7,7 +7,6 @@ package com.flashfla.net
     import classes.Room
     import classes.User;
     import classes.Gameplay;
-    import classes.Match;
 
     import it.gotoandplay.smartfoxserver.SFSEvents.AdminMessageSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.ExtensionResponseSFSEvent;
@@ -337,9 +336,6 @@ package com.flashfla.net
 
             if (room.name == "Lobby")
                 lobby = room;
-
-            if (room.isGameRoom)
-                room.match = new Match();
 
             updateRoom(room);
         }

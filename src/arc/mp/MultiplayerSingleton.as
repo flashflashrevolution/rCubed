@@ -412,7 +412,7 @@ package arc.mp
 
         public function spectateGame(room:Room):void
         {
-            var song:Object = room.match.song;
+            var song:Object = room.song;
             _gvars.songQueue = [song];
             _gvars.options = new GameOptions();
             _gvars.options.mpRoom = room;
@@ -540,7 +540,7 @@ package arc.mp
          */
         public function gameplaySubmit(room:Room):void
         {
-            var matchSong:Object = currentSong || room.match.song;
+            var matchSong:Object = currentSong || room.song;
 
             if (matchSong != null && matchSong.engine != null)
                 return;

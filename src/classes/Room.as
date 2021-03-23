@@ -13,20 +13,17 @@ package classes
         public var maxPlayers:int
         public var userCount:int
         public var specCount:int
-        public var match:Match
 
         // Room flags
         public var isGameRoom:Boolean
         public var isPrivate:Boolean
-        public var isTemp:Boolean
-        public var isLimbo:Boolean
 
         // Room game status
         public var level:int
         public var mode:Object
         public var scoreMode:Object
         public var ranked:Object
-        public var myPlayerIndex:int
+        public var song:Object
         public var connection:Multiplayer;
 
         /**
@@ -63,16 +60,14 @@ package classes
 
         private var _playerCount:int
 
-        public function Room(id:int, name:String = "", maxUsers:int = 0, maxSpectators:int = 0, isTemp:Boolean = false, isGame:Boolean = false, isPrivate:Boolean = false, isLimbo:Boolean = false, userCount:int = 0, specCount:int = 0)
+        public function Room(id:int, name:String = "", maxUsers:int = 0, maxSpectators:int = 0, isGame:Boolean = false, isPrivate:Boolean = false, userCount:int = 0, specCount:int = 0)
         {
             this.id = id
             this.name = name
             this.maxSpectators = maxSpectators
             this.maxUsers = maxUsers
-            this.isTemp = isTemp
             this.isGameRoom = isGame
             this.isPrivate = isPrivate
-            this.isLimbo = isLimbo
 
             this.userCount = userCount
             this.specCount = specCount
