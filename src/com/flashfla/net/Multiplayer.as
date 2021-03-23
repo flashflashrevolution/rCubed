@@ -261,8 +261,8 @@ package com.flashfla.net
                 gameplay.song = ArcGlobals.instance.legacyDecode(JSON.parse(engine));
                 if (gameplay.song)
                 {
-                    if (!gameplay.song.name)
-                        gameplay.song.name = gameplay.songName;
+                    //if (!gameplay.song.name)
+                    //    gameplay.song.name = gameplay.songName;
                     if (!("level" in gameplay.song) || gameplay.song.level < 0)
                         gameplay.song.level = gameplay.songId || -1;
                 }
@@ -272,17 +272,17 @@ package com.flashfla.net
                 var playlist:Playlist = Playlist.instanceCanon;
                 if (gameplay.songId)
                     gameplay.song = playlist.playList[gameplay.songId];
-                if (!gameplay.song)
-                {
-                    for each (var song:Object in playlist.playList)
-                    {
-                        if (song.name == gameplay.songName)
-                        {
-                            gameplay.song = song;
-                            break;
-                        }
-                    }
-                }
+                /*if (!gameplay.song)
+                   {
+                   for each (var song:Object in playlist.playList)
+                   {
+                   if (song.name == gameplay.songName)
+                   {
+                   gameplay.song = song;
+                   break;
+                   }
+                   }
+                   }*/
             }
 
             var replayString:String = roomVars["arc_replay" + playerIdx];
@@ -674,10 +674,10 @@ package com.flashfla.net
         }
 
         /**
-         * Builds a request to update the current user's gameplay state
+         * Builds a request to update the current user's gameplay status
          * in the specified room and sends it to the server.
          */
-        public function sendCurrentUserGameplay(room:Room):void
+        public function sendCurrentUserStatus(room:Room):void
         {
             if (!room.hasUser(currentUser))
                 return;
@@ -712,6 +712,38 @@ package com.flashfla.net
                 vars["arc_engine" + user.playerIdx] = null;
 
             vars["arc_replay" + user.playerIdx] = gameplay.encodedReplay || null;
+
+            sendRoomVariables(room, vars);
+        }
+
+        /**
+         * Builds a request to update the current user's gameplay score
+         * in the specified room and sends it to the server.
+         */
+        public function sendCurrentUserScore(room:Room):void
+        {
+            if (!room.hasUser(currentUser))
+                return;
+
+            var vars:Object = {};
+            var user:User = currentUser;
+            var gameplay:Gameplay = currentUser.gameplay;
+
+            var prefix:String = "P" + user.playerIdx;
+
+            // Ordering is important
+            var gamescores:Array = [gameplay.score,
+                gameplay.amazing,
+                gameplay.perfect,
+                gameplay.good,
+                gameplay.average,
+                gameplay.miss,
+                gameplay.boo,
+                gameplay.combo,
+                gameplay.maxCombo];
+
+            vars[prefix + "_GAMESCORES"] = StringUtil.join(":", gamescores);
+            vars[prefix + "_GAMELIFE"] = int(gameplay.life * 24 / 100);
 
             sendRoomVariables(room, vars);
         }

@@ -11,24 +11,21 @@ package classes
         public var average:int;
         public var miss:int;
         public var boo:int;
-
         public var combo:int;
         public var maxCombo:int;
 
         public var life:int;
-
         public var score:int;
-        public var songId:int;
+
         public var status:int;
         public var statusLoading:int;
         public var encodedReplay:String;
 
+        public var songId:int;
         public var song:Object;
 
-        /**
-         * Only used in Velocity engine
-         */
-        public var userName:String;
+        // Flags
+        public var statusChanged:Boolean = false;
 
         /**
          * Only used in Legacy engine
@@ -47,9 +44,9 @@ package classes
             average = 0;
             miss = 0;
             boo = 0;
-
             combo = 0;
             maxCombo = 0;
+
             life = 0;
             score = 0;
 
@@ -58,6 +55,14 @@ package classes
 
             status = Multiplayer.STATUS_NONE;
             statusLoading = 0;
+
+            statusChanged = false;
+        }
+
+        public function setStatus(status:int):void
+        {
+            this.status = status;
+            statusChanged = true;
         }
     }
 }

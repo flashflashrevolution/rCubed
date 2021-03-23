@@ -1895,7 +1895,8 @@ package it.gotoandplay.smartfoxserver
         {
             if (this.debug)
             {
-                trace(message)
+                if (!message.match("'rmList'"))
+                    trace(message)
                 
                 var params:Object = { message:message }
                 var evt:TypedSFSEvent = new DebugMessageSFSEvent(params)

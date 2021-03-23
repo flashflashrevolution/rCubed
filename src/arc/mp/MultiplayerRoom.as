@@ -124,7 +124,7 @@ package arc.mp
         private function onStateButtonClick(event:MouseEvent):void
         {
             if (connection.switchRole(room))
-                updateRoom();
+                updateRoomDisplay();
         }
 
         private function onGameStart(event:GameStartEvent):void
@@ -152,16 +152,16 @@ package arc.mp
         private function onRoomUserStatus(event:RoomUserStatusEvent):void
         {
             if (event.room == room)
-                updateRoom();
+                updateRoomDisplay();
         }
 
         private function onRoomUser(event:RoomUserEvent):void
         {
             if (event.room == room)
-                updateRoom();
+                updateRoomDisplay();
         }
 
-        private function updateRoom():void
+        private function updateRoomDisplay():void
         {
             controlSpectate.label = room.isPlayer(currentUser) ? "Spectate" : "Join Game";
         }

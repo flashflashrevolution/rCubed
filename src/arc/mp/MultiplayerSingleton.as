@@ -188,9 +188,9 @@ package arc.mp
         }
 
         /**
-         * Syncs the user's gameplay with this singleton's state.
+         * Syncs the user's gameplay status with this singleton's state.
          */
-        private function updateCurrentUserGameplay():void
+        private function updateCurrentUserStatus():void
         {
             var gameplay:Gameplay = currentUser.gameplay;
 
@@ -215,18 +215,30 @@ package arc.mp
                 gameplay.reset();
             }
 
-            propagateCurrentUserGameplay();
+            propagateCurrentUserStatus();
         }
 
         /**
-         * Propagates the current user's gameplay to other rooms
+         * Propagates the current user's status to other rooms
          */
-        private function propagateCurrentUserGameplay():void
+        private function propagateCurrentUserStatus():void
         {
             for each (var room:Room in connection.rooms)
             {
                 if (room.isPlayer(currentUser))
-                    connection.sendCurrentUserGameplay(room);
+                    connection.sendCurrentUserStatus(room);
+            }
+        }
+
+        /**
+         * Propagates the current user's score to other rooms
+         */
+        private function propagateCurrentUserScore():void
+        {
+            for each (var room:Room in connection.rooms)
+            {
+                if (room.isPlayer(currentUser))
+                    connection.sendCurrentUserScore(room);
             }
         }
 
@@ -237,7 +249,7 @@ package arc.mp
             currentSongFile = null;
 
             currentStatus = Multiplayer.STATUS_PICKING;
-            updateCurrentUserGameplay();
+            updateCurrentUserStatus();
         }
 
         public function gameplayCanPick():Boolean
@@ -303,7 +315,7 @@ package arc.mp
             currentSongFile = _gvars.getSongFile(currentSong);
 
             currentStatus = Multiplayer.STATUS_LOADING;
-            updateCurrentUserGameplay();
+            updateCurrentUserStatus();
 
             if (gameplayLoadingStatus())
             {
@@ -336,7 +348,7 @@ package arc.mp
                             currentStatus = Multiplayer.STATUS_PICKING;
                             timer.stop();
                         }
-                        updateCurrentUserGameplay();
+                        updateCurrentUserStatus();
                     }
                 });
                 timer.start();
@@ -374,7 +386,7 @@ package arc.mp
         public function gameplayReady():void
         {
             currentStatus = Multiplayer.STATUS_LOADED;
-            updateCurrentUserGameplay();
+            updateCurrentUserStatus();
         }
 
         public function isInRoom():Boolean
@@ -465,8 +477,8 @@ package arc.mp
             gameplay.miss = event.hitMiss;
             gameplay.boo = event.hitBoo;
 
-            // Propagate the gameplay state
-            propagateCurrentUserGameplay();
+            // Propagate the gameplay score only
+            propagateCurrentUserScore();
         }
 
         public function gameplayResults(gameResults:MenuPanel, songResults:Vector.<GameScoreResult>):void
@@ -519,10 +531,10 @@ package arc.mp
             if (replay)
                 gameplay.encodedReplay = replay.getEncode();
 
-            updateCurrentUserGameplay();
+            updateCurrentUserStatus();
 
             // Update rooms
-            propagateCurrentUserGameplay();
+            propagateCurrentUserStatus();
 
             // Update the visuals
             var panel:MultiplayerPanel = getPanel(gameResults);
@@ -605,8 +617,8 @@ package arc.mp
             currentSongFile = null;
             currentStatus = Multiplayer.STATUS_CLEANUP;
 
-            updateCurrentUserGameplay();
-            propagateCurrentUserGameplay();
+            updateCurrentUserStatus();
+            propagateCurrentUserStatus();
         }
     }
 }
