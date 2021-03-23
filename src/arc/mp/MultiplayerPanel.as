@@ -42,8 +42,6 @@ package arc.mp
 
         private var textLogin:Text;
         private var buttonMP:BoxButton;
-        private var buttonLegacy:BoxButton;
-        private var buttonVelocity:BoxButton;
         private var buttonDisconnect:BoxButton;
         private var buttonLobby:BoxButton;
         private var throbber:Throbber;
@@ -126,8 +124,6 @@ package arc.mp
 
             buttonDisconnect = new BoxButton(null, buttonMP.x, buttonMP.y, buttonMP.width, buttonMP.height, "Disconnect", 12, onClickDisconnect);
 
-            buttonLobby = new BoxButton(null, buttonDisconnect.x, buttonDisconnect.y + buttonDisconnect.height + 10, buttonLegacy.width, buttonLegacy.height, "Join Lobby", 12, onClickJoinLobby);
-
             throbber = new Throbber();
             throbber.x = Main.GAME_WIDTH / 2;
             throbber.y = Main.GAME_HEIGHT / 2;
@@ -171,7 +167,6 @@ package arc.mp
         {
             showButton(buttonDisconnect, connection.connected);
             showButton(buttonMP, !connection.connected);
-            showButton(buttonLobby, false);
             if (!connection.connected)
                 hideThrobber();
         }
@@ -185,7 +180,6 @@ package arc.mp
         {
             if (event.room == connection.lobby)
             {
-                showButton(buttonLobby, false);
                 openWindow();
                 updateWindowTitle(event.room);
                 hideThrobber();
@@ -201,7 +195,6 @@ package arc.mp
         {
             if (event.room == connection.lobby)
             {
-                showButton(buttonLobby, true);
                 closeWindow();
             }
         }
@@ -394,13 +387,7 @@ package arc.mp
         public function hideBackground(show:Boolean = false):void
         {
             if (buttonMP != null)
-            {
                 buttonMP.visible = show;
-                buttonLegacy.visible = show;
-                buttonVelocity.visible = show;
-                buttonDisconnect.visible = show;
-                buttonLobby.visible = show;
-            }
             if (textLogin != null)
                 textLogin.visible = show;
             if (window != null)

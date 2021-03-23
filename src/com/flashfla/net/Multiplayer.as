@@ -519,7 +519,7 @@ package com.flashfla.net
 
         public function joinLobby():void
         {
-            joinRoom(lobby, false);
+            joinRoom(lobby, true);
         }
 
         /**
@@ -529,7 +529,7 @@ package com.flashfla.net
         {
             if (connected && room)
             {
-                clearRoomPlayerVariables(room);
+                clearCurrentUserRoomVariables(room);
                 server.leaveRoom(room.id);
             }
         }
@@ -622,7 +622,7 @@ package com.flashfla.net
         /**
          * Formats empty room variables for the currentUser and sends them to the server.
          */
-        private function clearRoomPlayerVariables(room:Room):void
+        private function clearCurrentUserRoomVariables(room:Room):void
         {
             if (!room.isGameRoom)
                 return;
@@ -632,8 +632,7 @@ package com.flashfla.net
 
             if (currentUserIdx > 0)
             {
-                var playerIdx:String = currentUserIdx.toString();
-                var prefix:String = "P" + playerIdx;
+                var prefix:String = "P" + currentUserIdx;
 
                 vars[prefix + "_NAME"] = null;
                 vars[prefix + "_UID"] = null;
@@ -651,7 +650,7 @@ package com.flashfla.net
         /**
          * Sends the current user's "player" variables (if any) to the server.
          */
-        private function setRoomPlayerVariables(room:Room):void
+        private function sendCurrentUserRoomVariables(room:Room):void
         {
             if (!room.isGameRoom)
                 return;
@@ -661,16 +660,17 @@ package com.flashfla.net
 
             if (currentUserIdx > 0)
             {
-                var prefix:String = "P" + currentUserIdx.toString();
+                var prefix:String = "P" + currentUserIdx;
+
                 vars[prefix + "_NAME"] = currentUser.name;
                 vars[prefix + "_UID"] = currentUser.id;
 
                 // If no opponents, set the room's level to the currentUser's level
                 if (!room.playerCount > 1)
-                    sendRoomVariables(room, {"GAME_LEVEL": currentUser.userLevel}, false);
-            }
+                    vars["GAME_LEVEL"] = currentUser.userLevel;
 
-            sendRoomVariables(room, vars);
+                sendRoomVariables(room, vars);
+            }
         }
 
         /**
@@ -919,14 +919,12 @@ package com.flashfla.net
                 return;
 
             if (user == currentUser)
-                clearRoomPlayerVariables(room);
+                clearCurrentUserRoomVariables(room);
 
-            if (room.removePlayer(user.playerIdx))
-            {
-                user.isPlayer = false;
-                user.playerIdx = -1;
-                user.gameplay = null;
-            }
+            room.removePlayer(user.playerIdx);
+            user.isPlayer = false;
+            user.playerIdx = -1;
+            user.gameplay = null;
 
             updateRoom(room);
 
@@ -942,16 +940,13 @@ package com.flashfla.net
                 return;
 
             if (user == currentUser)
-                setRoomPlayerVariables(room);
+                sendCurrentUserRoomVariables(room);
 
-            if (!user.isPlayer)
+            var newPlayerIdx:int = room.addPlayer(user);
+            if (newPlayerIdx > 0)
             {
-                var newPlayerIdx:int = room.addPlayer(user);
-                if (newPlayerIdx > 0)
-                {
-                    user.isPlayer = true;
-                    user.playerIdx = newPlayerIdx;
-                }
+                user.isPlayer = true;
+                user.playerIdx = newPlayerIdx;
             }
 
             updateRoom(room);
@@ -1119,7 +1114,7 @@ package com.flashfla.net
             }
 
             updateRoom(room);
-            setRoomPlayerVariables(room);
+            sendCurrentUserRoomVariables(room);
 
             // Propagate the events
             eventUserUpdate(currentUser);

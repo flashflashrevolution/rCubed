@@ -1,8 +1,5 @@
 package it.gotoandplay.smartfoxserver
 {
-    import classes.Room;
-    import classes.User;
-
     import flash.net.Socket;
     import flash.events.Event;
     import flash.events.EventDispatcher;
