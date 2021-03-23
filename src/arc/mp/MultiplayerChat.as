@@ -24,6 +24,7 @@ package arc.mp
     import classes.Room;
     import classes.User;
     import classes.Gameplay;
+    import com.flashfla.utils.StringUtil;
 
     public class MultiplayerChat extends Component
     {
@@ -399,7 +400,7 @@ package arc.mp
 
         public static function textEscape(message:String):String
         {
-            return Multiplayer.htmlEscape(message);
+            return StringUtil.htmlEscape(message);
         }
     }
 }

@@ -4,6 +4,9 @@
 
 package com.flashfla.utils
 {
+    import flash.xml.XMLDocument;
+    import flash.xml.XMLNode;
+    import flash.xml.XMLNodeType;
 
     public class StringUtil
     {
@@ -104,6 +107,34 @@ package com.flashfla.utils
             if (sep)
                 str = str.slice(0, -(sep.length));
 
+            return str;
+        }
+
+        public static function htmlEscape(str:String):String
+        {
+            return XML(new XMLNode(XMLNodeType.TEXT_NODE, str)).toXMLString();
+        }
+
+        public static function htmlUnescape(str:String):String
+        {
+            try
+            {
+                return new XMLDocument(str).firstChild.nodeValue;
+            }
+            catch (error:Error)
+            {
+            }
+            return str;
+        }
+
+        public static function stripMessage(str:String):String
+        {
+            if (str == null)
+                return "";
+            while (str.length && str.charAt(str.length - 1) == '\n')
+                str = str.substr(0, str.length - 1);
+            while (str.length && str.charAt(0) == '\n')
+                str = str.substr(1);
             return str;
         }
     }
