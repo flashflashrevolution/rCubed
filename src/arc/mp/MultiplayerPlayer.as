@@ -66,7 +66,7 @@ package arc.mp
             {
                 var gameplay:Gameplay = user.gameplay;
                 if (gameplay)
-                    MultiplayerSingleton.getInstance().gameplayPick(gameplay.song);
+                    MultiplayerSingleton.getInstance().gameplayPick(gameplay.songInfo);
             }
         }
 
@@ -162,8 +162,8 @@ package arc.mp
 
         public static function nameSong(gameplay:Gameplay):String
         {
-            if (gameplay && gameplay.song && gameplay.song.name)
-                return gameplay.song.name;
+            if (gameplay && gameplay.songInfo && gameplay.songInfo.name)
+                return gameplay.songInfo.name;
 
             return "No Song Selected";
         }

@@ -258,20 +258,20 @@ package com.flashfla.net
             var engine:String = roomVars["arc_engine" + playerIdx];
             if (engine)
             {
-                gameplay.song = ArcGlobals.instance.legacyDecode(JSON.parse(engine));
-                if (gameplay.song)
+                gameplay.songInfo = ArcGlobals.instance.legacyDecode(JSON.parse(engine));
+                if (gameplay.songInfo)
                 {
                     //if (!gameplay.song.name)
                     //    gameplay.song.name = gameplay.songName;
-                    if (!("level" in gameplay.song) || gameplay.song.level < 0)
-                        gameplay.song.level = gameplay.songId || -1;
+                    if (!("level" in gameplay.songInfo) || gameplay.songInfo.level < 0)
+                        gameplay.songInfo.level = gameplay.songId || -1;
                 }
             }
             else
             {
                 var playlist:Playlist = Playlist.instanceCanon;
                 if (gameplay.songId)
-                    gameplay.song = playlist.playList[gameplay.songId];
+                    gameplay.songInfo = playlist.playList[gameplay.songId];
                 /*if (!gameplay.song)
                    {
                    for each (var song:Object in playlist.playList)
@@ -688,7 +688,7 @@ package com.flashfla.net
             var vars:Object = {};
             var user:User = currentUser;
             var gameplay:Gameplay = currentUser.gameplay;
-            var songEngine:Object = ArcGlobals.instance.legacyEncode(gameplay.song);
+            var songEngine:Object = ArcGlobals.instance.legacyEncode(gameplay.songInfo);
 
             var prefix:String = "P" + user.playerIdx;
 
@@ -706,12 +706,12 @@ package com.flashfla.net
             vars[prefix + "_GAMESCORES"] = StringUtil.join(":", gamescores);
             vars[prefix + "_STATE"] = int(gameplay.status);
             vars[prefix + "_GAMELIFE"] = int(gameplay.life * 24 / 100);
-            vars[prefix + "_SONGID"] = (gameplay.song == null ? gameplay.songId : int(gameplay.song.level));
+            vars[prefix + "_SONGID"] = (gameplay.songInfo == null ? gameplay.songId : int(gameplay.songInfo.level));
             vars[prefix + "_SONGID_PROGRESS"] = int(gameplay.statusLoading);
 
             if (songEngine)
                 vars["arc_engine" + user.playerIdx] = JSON.stringify(songEngine);
-            else if (gameplay.song === null || (gameplay.song && !gameplay.song.engine))
+            else if (gameplay.songInfo === null || (gameplay.songInfo && !gameplay.songInfo.engine))
                 vars["arc_engine" + user.playerIdx] = null;
 
             vars["arc_replay" + user.playerIdx] = gameplay.encodedReplay || null;

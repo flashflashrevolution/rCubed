@@ -53,7 +53,7 @@ package game
     import game.controls.Score;
     import menu.MenuPanel;
     import menu.MenuSongSelection;
-    import sql.SQLSongDetails;
+    import sql.SQLSongUserInfo;
 
     public class GameplayDisplay extends MenuPanel
     {
@@ -211,7 +211,7 @@ package game
             }
 
             // --- Per Song Options
-            var perSongOptions:SQLSongDetails = SQLQueries.getSongDetailsEntry(song.entry);
+            var perSongOptions:SQLSongUserInfo = SQLQueries.getSongUserInfo(song.songInfo);
             if (perSongOptions != null && !options.isEditor && !options.replay)
             {
                 options.fill(); // Reset
@@ -274,32 +274,33 @@ package game
                         "game_played": _gvars.activeUser.gamesPlayed,
                         "game_grand_total": _gvars.activeUser.grandTotal
                     },
-                    "engine": (song.entry.engine == null ? null : {"id": song.entry.engine.id,
-                            "name": song.entry.engine.name,
-                            "config": song.entry.engine.config_url,
-                            "domain": song.entry.engine.domain})
+                    "engine": (song.songInfo.engine == null ? null : {"id": song.songInfo.engine.id,
+                            "name": song.songInfo.engine.name,
+                            "config": song.songInfo.engine.config_url,
+                            "domain": song.songInfo.engine.domain})
                     ,
                     "song": {
-                        "name": song.entry.name,
-                        "level": song.entry.level,
-                        "difficulty": song.entry.difficulty,
-                        "style": song.entry.style,
-                        "author": song.entry.author,
-                        "author_url": song.entry.author_url,
-                        "stepauthor": song.entry.stepauthor,
-                        "credits": song.entry.credits,
-                        "genre": song.entry.genre,
-                        "nps_min": song.entry.min_nps,
-                        "nps_max": song.entry.max_nps,
-                        "release_date": song.entry.releasedate,
-                        "song_rating": song.entry.song_rating,
+                        "name": song.songInfo.name,
+                        "level": song.songInfo.level,
+                        "difficulty": song.songInfo.difficulty,
+                        "style": song.songInfo.style,
+                        "author": song.songInfo.author,
+                        "author_url": song.songInfo.stepauthorURL,
+                        "stepauthor": song.songInfo.stepauthor,
+                        "credits": song.songInfo.credits,
+                        "genre": song.songInfo.genre,
+                        "nps_min": song.songInfo.minNps,
+                        "nps_max": song.songInfo.maxNps,
+                        // TODO: Check these fields
+                        //"release_date": song.songInfo.releasedate,
+                        //"song_rating": song.songInfo.song_rating,
                         // Trust the chart, not the playlist.
                         "time": song.chartTimeFormatted,
                         "time_seconds": song.chartTime,
                         "note_count": song.totalNotes,
                         "nps_avg": (song.totalNotes / song.chartTime)
                     },
-                    "best_score": _gvars.activeUser.getLevelRank(song.entry)};
+                    "best_score": _gvars.activeUser.getLevelRank(song.songInfo)};
 
             SOCKET_SCORE_MESSAGE = {"amazing": 0,
                     "perfect": 0,
@@ -358,8 +359,8 @@ package game
             if (!options.isEditor && !options.replay && !mpSpectate)
                 Mouse.hide();
 
-            if (song.entry && song.entry.name)
-                stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE + " - " + song.entry.name;
+            if (song.songInfo && song.songInfo.name)
+                stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE + " - " + song.songInfo.name;
 
             // Add onEnterFrame Listeners
             if (options.isEditor)
@@ -425,7 +426,7 @@ package game
 
             // Song
             song.updateMusicDelay();
-            legacyMode = (song.type == NoteChart.FFR || song.type == NoteChart.FFR_RAW || song.type == NoteChart.FFR_LEGACY);
+            legacyMode = (song.songInfo.chartType == NoteChart.FFR || song.songInfo.chartType == NoteChart.FFR_RAW || song.songInfo.chartType == NoteChart.FFR_LEGACY);
             if (song.music && (legacyMode || !options.modEnabled("nobackground")))
             {
                 song_background = song.music as MovieClip;
@@ -620,7 +621,7 @@ package game
         private function initVars(postStart:Boolean = true):void
         {
             // Post Start Time
-            if (postStart && !_gvars.activeUser.isGuest && !options.replay && !options.isEditor && song.entry.engine == null && !mpSpectate)
+            if (postStart && !_gvars.activeUser.isGuest && !options.replay && !options.isEditor && song.songInfo.engine == null && !mpSpectate)
             {
                 _loader = new URLLoader();
                 addLoaderListeners();
@@ -1285,7 +1286,7 @@ package game
                 newGameResults.game_index = _gvars.gameIndex++;
                 newGameResults.level = song.id;
                 newGameResults.song = song;
-                newGameResults.song_entry = song.entry;
+                newGameResults.songInfo = song.songInfo;
                 newGameResults.note_count = song.totalNotes;
                 newGameResults.amazing = hitAmazing;
                 newGameResults.perfect = hitPerfect;

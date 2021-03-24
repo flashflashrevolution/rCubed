@@ -75,12 +75,12 @@ package
 
         static public function getSongCachePath(song:Song):String
         {
-            return Constant.SONG_CACHE_PATH + (song.entry.engine ? MD5.hash(song.entry.engine.id) + "/" + MD5.hash(song.entry.levelid.toString()) : '57fea2a7e69445179686b7579d5118ef/' + MD5.hash(song.id.toString())) + "/";
+            return Constant.SONG_CACHE_PATH + (song.songInfo.engine ? MD5.hash(song.songInfo.engine.id) + "/" + MD5.hash(song.songInfo.levelid.toString()) : '57fea2a7e69445179686b7579d5118ef/' + MD5.hash(song.id.toString())) + "/";
         }
 
         static public function getReplayPath(song:Song):String
         {
-            return Constant.REPLAY_PATH + (song.entry.engine ? createFileName(song.entry.engine.id) : Constant.BRAND_NAME_SHORT_LOWER) + "/";
+            return Constant.REPLAY_PATH + (song.songInfo.engine ? createFileName(song.songInfo.engine.id) : Constant.BRAND_NAME_SHORT_LOWER) + "/";
         }
 
         static public function encodeData(rawData:ByteArray, key:uint = 0):ByteArray

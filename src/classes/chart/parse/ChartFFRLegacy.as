@@ -14,18 +14,19 @@ package classes.chart.parse
     import flash.events.IOErrorEvent;
     import flash.events.SecurityErrorEvent;
     import com.flashfla.media.Beatbox;
+    import classes.SongInfo;
 
     public class ChartFFRLegacy extends NoteChart
     {
-        private var song:Object;
+        private var songInfo:SongInfo;
 
-        public function ChartFFRLegacy(entry:Object, inData:Object, framerate:int = 30):void
+        public function ChartFFRLegacy(songInfo:SongInfo, inData:Object, framerate:int = 30):void
         {
             type = NoteChart.FFR_LEGACY;
 
-            super(entry.level, null, framerate);
+            super(songInfo.level, null, framerate);
 
-            song = entry;
+            this.songInfo = songInfo;
 
             parseChart(ByteArray(inData));
         }
@@ -35,16 +36,16 @@ package classes.chart.parse
             return Math.floor(note.time * framerate);
         }
 
-        public static function songUrl(songEntry:Object, engine:Object = null):String
+        public static function songUrl(songInfo:SongInfo, engine:Object = null):String
         {
             if (engine == null)
-                engine = songEntry.engine;
+                engine = songInfo.engine;
             if (engine.songURLMode != null && engine.songURLMode == "replace")
             {
-                var u:String = sprintf(engine.songURL, songEntry);
-                return sprintf(engine.songURL, songEntry);
+                var u:String = sprintf(engine.songURL, songInfo);
+                return sprintf(engine.songURL, songInfo);
             }
-            return engine.songURL + "level_" + songEntry.levelid + ".swf";
+            return engine.songURL + "level_" + songInfo.levelid + ".swf";
         }
 
         public static function validURL(url:String):Boolean
@@ -88,8 +89,8 @@ package classes.chart.parse
                     {
                         if (node.id == null)
                             continue;
-                        var engine:Object = new Object();
-                        engine.level_ranks = new Object();
+                        var engine:Object = {};
+                        engine.level_ranks = {};
                         engine.config_url = url;
                         engine.id = node.id.toString();
                         engine.name = node.name.toString();
@@ -128,9 +129,9 @@ package classes.chart.parse
 
         public static function engineLegacySync(level:int, low:int, high:int):Function
         {
-            return function(song:Object):int
+            return function(songInfo:SongInfo):int
             {
-                return (song.level > level ? high : low);
+                return (songInfo.level > level ? high : low);
             };
         }
 
@@ -150,7 +151,7 @@ package classes.chart.parse
             for (var i:int = 0; i < count; i++)
             {
                 var node:XML = nodes[i];
-                var song:Object = new Object();
+                var song:SongInfo = new SongInfo();
                 song.genre = int(node.@genre.toString());
                 song.name = node.songname.toString();
                 song.difficulty = int(node.songdifficulty.toString());
@@ -162,18 +163,18 @@ package classes.chart.parse
                 else
                     song.level = int(song.levelid);
                 song.order = int(node.order.toString());
-                song.arrows = int(node.arrows.toString());
+                song.noteCount = int(node.arrows.toString());
                 song.author = node.songauthor.toString();
                 song.authorURL = node.songauthorURL.toString();
                 song.stepauthor = node.songstepauthor.toString();
                 song.stepauthorURL = node.songstepauthorurl.toString();
                 song.playhash = node.playhash.toString();
                 song.previewhash = node.previewhash.toString();
-                song.min_nps = int(node.min_nps.toString());
-                song.max_nps = int(node.max_nps.toString());
+                song.minNps = int(node.min_nps.toString());
+                song.maxNps = int(node.max_nps.toString());
                 song.credits = int(node.secretcredits.toString());
                 song.price = int(node.price.toString());
-                song.type = NoteChart.FFR_LEGACY;
+                song.chartType = NoteChart.FFR_LEGACY;
                 song.engine = engine;
 
                 if (Boolean(node.arc_sync.toString()))
@@ -193,7 +194,7 @@ package classes.chart.parse
             {
                 for each (var beat:Object in beatbox)
                 {
-                    var beatPos:int = beat[0] + (song.sync || 0);
+                    var beatPos:int = beat[0] + (songInfo.sync || 0);
                     if (ChartFFRBeatbox.isValidDirection(beat[1]))
                         Notes.push(new Note(beat[1], beatPos / framerate, beat[2] || "blue", beatPos));
                 }

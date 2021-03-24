@@ -2,6 +2,7 @@ package game
 {
     import classes.Language;
     import classes.Playlist;
+    import classes.SongInfo;
     import classes.chart.Song;
     import classes.ui.BoxButton;
     import classes.ui.ProgressBar;
@@ -42,7 +43,7 @@ package game
             //- Set Active Song
             if (_gvars.songQueue.length > 0)
             {
-                var songEntry:Object = _gvars.songQueue[0];
+                var songEntry:SongInfo = _gvars.songQueue[0];
                 _gvars.songQueue.shift();
 
                 song = _gvars.getSongFile(songEntry, _gvars.options.loadPreview);
@@ -65,7 +66,7 @@ package game
 
         override public function stageAdd():void
         {
-            songName = _lang.wrapFont(song.entry.name ? song.entry.name : "Invalid Song / Replay");
+            songName = _lang.wrapFont(song.songInfo.name ? song.songInfo.name : "Invalid Song / Replay");
 
             //- Preloader Display
             preloader = new ProgressBar(this, 10, Main.GAME_HEIGHT - 30, Main.GAME_WIDTH - 20, 20);
@@ -101,7 +102,7 @@ package game
         private function updatePreloader(e:Event):void
         {
             loadTimer++;
-            namedisplay.htmlText = (song.entry.name ? songName + " - " + song.progress + "%  --- " + (song.bytesTotal > 0 ? "(" + NumberUtil.bytesToString(song.bytesLoaded) + " / " + NumberUtil.bytesToString(song.bytesTotal) + ")" : "Connecting...") + (song.loadFail ? " --- <font color=\"#FFC4C4\">[Loading Failed]</font>" : "") : songName);
+            namedisplay.htmlText = (song.songInfo.name ? songName + " - " + song.progress + "%  --- " + (song.bytesTotal > 0 ? "(" + NumberUtil.bytesToString(song.bytesLoaded) + " / " + NumberUtil.bytesToString(song.bytesTotal) + ")" : "Connecting...") + (song.loadFail ? " --- <font color=\"#FFC4C4\">[Loading Failed]</font>" : "") : songName);
             preloader.update(song.progress);
 
             if ((loadTimer >= 60 || song.loadFail) && !cancelLoadButton && !_gvars.flashvars.replay)

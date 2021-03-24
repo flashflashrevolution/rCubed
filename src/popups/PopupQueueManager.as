@@ -17,6 +17,7 @@ package popups
     import flash.filters.BlurFilter;
     import flash.geom.Point;
     import menu.MenuPanel;
+    import classes.SongInfo;
 
     public class PopupQueueManager extends MenuPanel
     {
@@ -230,18 +231,18 @@ package popups
             for (var index:String in _playlist.indexList)
             {
 
-                var _song:Object = _playlist.indexList[index];
-                var _rank:Object = _gvars.activeUser.getLevelRank(_song);
-                var _access:int = _gvars.checkSongAccess(_song);
+                var _songInfo:SongInfo = _playlist.indexList[index];
+                var _rank:Object = _gvars.activeUser.getLevelRank(_songInfo);
+                var _access:int = _gvars.checkSongAccess(_songInfo);
 
                 if (_access == GlobalVariables.SONG_ACCESS_PLAYABLE)
                 {
-                    var stats:int = GlobalVariables.getSongIconIndex(_song, _rank);
+                    var stats:int = GlobalVariables.getSongIconIndex(_songInfo, _rank);
                     if (!songlist[stats])
                     {
                         songlist[stats] = [];
                     }
-                    songlist[stats].push(_song.level);
+                    songlist[stats].push(_songInfo.level);
                 }
             }
             for (var rank:String in songlist)
@@ -268,6 +269,7 @@ import flash.events.MouseEvent;
 import menu.MainMenu;
 import menu.MenuSongSelection;
 import popups.PopupQueueManager;
+import classes.SongInfo;
 
 internal class QueueBox extends Sprite
 {
@@ -301,16 +303,16 @@ internal class QueueBox extends Sprite
         var totalTime:int = 0;
         for each (var songid:int in queueItem.items)
         {
-            var songData:Object = _playlist.playList[songid];
-            if (songData)
+            var songInfo:SongInfo = _playlist.playList[songid];
+            if (songInfo)
             {
                 if (longview)
                 {
-                    var access:int = _gvars.checkSongAccess(songData);
-                    var songName:Text = new Text(box, 5, yOffset, " - " + songData["name"] + " [" + songData["time"] + "]", 12, access == GlobalVariables.SONG_ACCESS_PLAYABLE ? "#FFFFFF" : "#FF9797");
+                    var access:int = _gvars.checkSongAccess(songInfo);
+                    var songName:Text = new Text(box, 5, yOffset, " - " + songInfo["name"] + " [" + songInfo["time"] + "]", 12, access == GlobalVariables.SONG_ACCESS_PLAYABLE ? "#FFFFFF" : "#FF9797");
                     yOffset += 20;
                 }
-                totalTime += songData["timeSecs"];
+                totalTime += songInfo["timeSecs"];
             }
         }
 
@@ -373,13 +375,13 @@ internal class QueueBox extends Sprite
         var newSongQueue:Array = [];
         for each (var songid:int in queueItem.items)
         {
-            var songData:Object = _playlist.playList[songid];
-            if (songData)
+            var songInfo:SongInfo = _playlist.playList[songid];
+            if (songInfo)
             {
-                var access:int = _gvars.checkSongAccess(songData);
+                var access:int = _gvars.checkSongAccess(songInfo);
                 if (access == GlobalVariables.SONG_ACCESS_PLAYABLE)
                 {
-                    newSongQueue.push(songData);
+                    newSongQueue.push(songInfo);
                 }
             }
         }

@@ -4,6 +4,7 @@ package arc
     import classes.chart.parse.ChartFFRLegacy;
     import flash.events.EventDispatcher;
     import flash.net.SharedObject;
+    import classes.SongInfo;
 
     public class ArcGlobals extends EventDispatcher
     {
@@ -49,8 +50,15 @@ package arc
                 ChartFFRLegacy.setEngineSync(engine);
                 if (engine.level_ranks)
                 {
+                    // TODO: check type on this `levelid` (should be int ?)
                     for (var levelid:String in engine.level_ranks)
-                        legacyLevelRanksSet({engine: engine, levelid: levelid}, engine.level_ranks[levelid]);
+                    {
+                        var songInfo:SongInfo = new SongInfo();
+                        songInfo.engine = engine;
+                        songInfo.levelid = int(levelid);
+                        legacyLevelRanksSet(songInfo, engine.level_ranks[levelid]);
+                    }
+
                     delete engine.level_ranks;
                 }
                 legacyEngines.push(engine);
@@ -74,7 +82,10 @@ package arc
             LocalStore.flush();
         }
 
-        public function legacyEncode(song:Object):Object
+        /**
+         * Creates a new `engine` object from the song's fields
+         */
+        public function legacyEncode(song:SongInfo):Object
         {
             if (!song || !song.engine)
                 return null;
@@ -86,7 +97,7 @@ package arc
                     "songAuthor": song.author,
                     "stepAuthor": song.stepauthor,
                     "ffrlURL": song.engine.songURL,
-                    "type": song.type};
+                    "type": song.chartType};
 
             if (song.sync)
                 engine["sync"] = song.sync;
@@ -94,7 +105,7 @@ package arc
             return engine;
         }
 
-        public function legacyDecode(data:Object):Object
+        public function legacyDecode(data:Object):SongInfo
         {
             var playlist:Playlist = Playlist.instance;
             if (playlist.engine && playlist.engine.id == data["engineID"])
@@ -104,17 +115,20 @@ package arc
             if (!engine)
                 engine = {id: data.engineID, songURL: data.ffrlURL};
 
-            return {engine: engine,
-                    level: data["songLevel"],
-                    name: data["songName"],
-                    author: data["songAuthor"],
-                    authorwithurl: data["songAuthor"],
-                    stepauthor: data["stepAuthor"],
-                    stepauthor: data["stepAuthor"],
-                    levelid: data["songID"],
-                    type: data["type"],
-                    sync: data["sync"],
-                    arrows: 0};
+            var songInfo:SongInfo = new SongInfo();
+            songInfo.engine = engine;
+            songInfo.level = data["songLevel"];
+            songInfo.name = data["songName"];
+            songInfo.author = data["songAuthor"];
+            songInfo.authorwithurl = data["songAuthor"];
+            songInfo.stepauthor = data["stepAuthor"];
+            songInfo.stepauthorwithurl = data["stepAuthor"];
+            songInfo.levelid = data["songID"];
+            songInfo.chartType = data["type"];
+            songInfo.sync = data["sync"];
+            songInfo.noteCount = 0;
+
+            return songInfo;
         }
 
         public function resetIsolation():void
@@ -201,24 +215,24 @@ package arc
         public var legacyLevelRanks:Object = null;
         public static const legacyLevelRanksName:String = "90579262-509d-4370-9c2e-835a38cf0387";
 
-        public function legacyLevelRanksGet(song:Object):Object
+        public function legacyLevelRanksGet(songInfo:SongInfo):Object
         {
             if (!legacyLevelRanks)
                 return null;
-            var ranks:Object = legacyLevelRanks[song.engine.id];
+            var ranks:Object = legacyLevelRanks[songInfo.engine.id];
             if (!ranks)
                 return null;
-            return ranks[song.levelid || song.level];
+            return ranks[songInfo.levelid || songInfo.level];
         }
 
-        public function legacyLevelRanksSet(song:Object, value:Object):void
+        public function legacyLevelRanksSet(songInfo:SongInfo, value:Object):void
         {
             if (!legacyLevelRanks)
-                legacyLevelRanks = new Object();
-            var ranks:Object = legacyLevelRanks[song.engine.id];
+                legacyLevelRanks = {};
+            var ranks:Object = legacyLevelRanks[songInfo.engine.id];
             if (!ranks)
-                legacyLevelRanks[song.engine.id] = ranks = new Object();
-            ranks[song.levelid || song.level] = value;
+                legacyLevelRanks[songInfo.engine.id] = ranks = {};
+            ranks[songInfo.levelid || songInfo.level] = value;
         }
 
         public function legacyLevelRanksLoad():void

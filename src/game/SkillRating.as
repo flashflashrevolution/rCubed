@@ -16,17 +16,17 @@ package game
 
         static public function getSongWeight(result:GameScoreResult):Number
         {
-            if (result == null || result.song_entry == null)
+            if (result == null || result.songInfo == null)
                 return 0;
             var rawgoods:Number = result.raw_goods;
             var songweight:Number = 0;
-            var difficulty:Number = result.song_entry.difficulty;
+            var difficulty:Number = result.songInfo.difficulty;
             var delta:Number = D1 + D2 * difficulty + D3 * Math.pow(difficulty, 2) + D4 * Math.pow(difficulty, 3) + D5 * Math.pow(difficulty, 4);
             if (delta - rawgoods * LAMBDA > 0)
             {
                 songweight = Math.pow((delta - rawgoods * LAMBDA) / delta * Math.pow(difficulty + ALPHA, BETA), 1 / BETA) - ALPHA;
             }
-            if (songweight < 0 || result.score <= 0 || result.options.songRate != 1 || result.song_entry.engine != null)
+            if (songweight < 0 || result.score <= 0 || result.options.songRate != 1 || result.songInfo.engine != null)
                 songweight = 0;
             return songweight;
         }

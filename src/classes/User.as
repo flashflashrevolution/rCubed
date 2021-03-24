@@ -20,7 +20,7 @@ package classes
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
     import flash.ui.Keyboard;
-    import sql.SQLSongDetails;
+    import sql.SQLSongUserInfo;
     import com.flashfla.utils.VectorUtil;
 
     public class User extends EventDispatcher
@@ -744,12 +744,12 @@ package classes
             }
         }
 
-        public function getLevelRank(song:Object):Object
+        public function getLevelRank(songInfo:SongInfo):Object
         {
-            if (song.engine)
-                return ArcGlobals.instance.legacyLevelRanksGet(song);
+            if (songInfo.engine)
+                return ArcGlobals.instance.legacyLevelRanksGet(songInfo);
 
-            if (level_ranks[song.level] == null)
+            if (level_ranks[songInfo.level] == null)
                 return {"genre": 23,
                         "rank": 1,
                         "score": 0,
@@ -765,20 +765,20 @@ package classes
                         "maxcombo": 0,
                         "rawscore": 0};
 
-            return level_ranks[song.level];
+            return level_ranks[songInfo.level];
         }
 
-        public function getSongRating(song_entry:Object):Number
+        public function getSongRating(songInfo:SongInfo):Number
         {
-            if (song_entry.engine != null)
+            if (songInfo.engine != null)
             {
-                var sDetails:SQLSongDetails = SQLQueries.getSongDetails(song_entry.engine.id, song_entry.level);
+                var sDetails:SQLSongUserInfo = SQLQueries.getSongDetails(songInfo.engine.id, songInfo.level.toString());
                 if (sDetails)
                     return sDetails.song_rating;
 
                 return 0;
             }
-            return songRatings[song_entry.level] != null ? songRatings[song_entry.level] : 0;
+            return songRatings[songInfo.level] != null ? songRatings[songInfo.level] : 0;
         }
 
         /**

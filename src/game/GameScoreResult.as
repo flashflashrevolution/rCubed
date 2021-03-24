@@ -1,6 +1,7 @@
 package game
 {
     import classes.User;
+    import classes.SongInfo;
     import classes.chart.Song;
     import classes.replay.Base64Encoder;
     import classes.replay.ReplayPack;
@@ -11,7 +12,7 @@ package game
         public var game_index:int;
         public var level:int;
         public var song:Song;
-        public var song_entry:Object;
+        public var songInfo:SongInfo;
         public var note_count:int;
 
         public var is_preview:Boolean = false;
@@ -188,7 +189,7 @@ package game
         {
             var rateString:String = options.songRate != 1 ? " (" + options.songRate + "x Rate)" : "";
 
-            return "R^3 - " + song_entry.name + rateString + " - " + score + " - " + pa_string;
+            return "R^3 - " + songInfo.name + rateString + " - " + score + " - " + pa_string;
         }
     }
 }

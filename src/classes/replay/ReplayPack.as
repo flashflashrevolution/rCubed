@@ -363,8 +363,8 @@ package classes.replay
 
             // Get Alt engine Settings
             var settings:Object = options.settingsEncode();
-            if (options.song.entry.engine)
-                settings.arc_engine = ArcGlobals.instance.legacyEncode(options.song.entry);
+            if (options.song.songInfo.engine)
+                settings.arc_engine = ArcGlobals.instance.legacyEncode(options.song.songInfo);
 
             var timestamp:Number = Math.floor(new Date().getTime() / 1000);
             var settingsEncode:String = JSON.stringify(settings);

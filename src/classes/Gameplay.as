@@ -22,7 +22,7 @@ package classes
         public var encodedReplay:String;
 
         public var songId:int;
-        public var song:Object;
+        public var songInfo:SongInfo;
 
         // Flags
         public var statusChanged:Boolean = false;
@@ -50,7 +50,7 @@ package classes
             life = 0;
             score = 0;
 
-            song = null;
+            songInfo = null;
             songId = NaN;
 
             status = Multiplayer.STATUS_NONE;

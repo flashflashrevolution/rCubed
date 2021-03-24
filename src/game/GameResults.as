@@ -44,6 +44,7 @@ package game
     import popups.PopupMessage;
     import popups.PopupSongNotes;
     import popups.PopupTokenUnlock;
+    import classes.SongInfo;
 
     public class GameResults extends MenuPanel
     {
@@ -52,7 +53,7 @@ package game
         public static const GRAPH_COMBO:int = 0;
         public static const GRAPH_ACCURACY:int = 1;
 
-        private var graph_cache:Object = {"0": {}, "1": {}};
+        private var graphCache:Object = {"0": {}, "1": {}};
 
         private var _mp:MultiplayerSingleton = MultiplayerSingleton.getInstance();
         private var _gvars:GlobalVariables = GlobalVariables.instance;
@@ -287,7 +288,7 @@ package game
             // Variables
             var skillLevel:String = (songResults[0].user != null) ? ("[Lv." + songResults[0].user.skillLevel + "]" + " ") : "";
             var displayTime:String = "";
-            var song_entry:Object;
+            var songInfo:SongInfo;
             var songTitle:String = "";
             var songSubTitle:String = "";
 
@@ -308,8 +309,8 @@ package game
                 for (var x:int = 0; x < songResults.length; x++)
                 {
                     var tempResult:GameScoreResult = songResults[x];
-                    song_entry = tempResult.song_entry;
-                    songSubTitle += song_entry.name + ", ";
+                    songInfo = tempResult.songInfo;
+                    songSubTitle += songInfo.name + ", ";
                     result.note_count += tempResult.note_count;
                     result.amazing += tempResult.amazing;
                     result.perfect += tempResult.perfect;
@@ -343,28 +344,28 @@ package game
             {
                 navHighscores.enabled = true;
                 result = songResults[resultIndex];
-                song_entry = result.song_entry;
+                songInfo = result.songInfo;
 
-                var seconds:Number = Math.floor(song_entry.timeSecs * (1 / result.options.songRate));
+                var seconds:Number = Math.floor(songInfo.timeSecs * (1 / result.options.songRate));
                 var songLength:String = (Math.floor(seconds / 60)) + ":" + (seconds % 60 >= 10 ? "" : "0") + (seconds % 60);
                 var rateString:String = result.options.songRate != 1 ? " (" + result.options.songRate + "x Rate)" : "";
 
                 // Song Title
-                songTitle = song_entry.engine ? song_entry.name + rateString : "<a href=\"" + Constant.LEVEL_STATS_URL + song_entry.level + "\">" + song_entry.name + rateString + "</a>";
-                songSubTitle = sprintf(_lang.string("game_results_subtitle_difficulty"), {"value": song_entry.difficulty}) + " - " + sprintf(_lang.string("game_results_subtitle_length"), {"value": songLength});
-                if (song_entry.author != "")
-                    songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_author"), {"value": song_entry.authorwithurl}));
-                if (song_entry.stepauthor != "")
-                    songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_stepauthor"), {"value": song_entry.stepauthorwithurl}));
+                songTitle = songInfo.engine ? songInfo.name + rateString : "<a href=\"" + Constant.LEVEL_STATS_URL + songInfo.level + "\">" + songInfo.name + rateString + "</a>";
+                songSubTitle = sprintf(_lang.string("game_results_subtitle_difficulty"), {"value": songInfo.difficulty}) + " - " + sprintf(_lang.string("game_results_subtitle_length"), {"value": songLength});
+                if (songInfo.author != "")
+                    songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_author"), {"value": songInfo.authorwithurl}));
+                if (songInfo.stepauthor != "")
+                    songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_stepauthor"), {"value": songInfo.stepauthorwithurl}));
 
                 displayTime = result.end_time;
                 scoreTotal = result.score_total;
 
                 // Song Notes / Star
-                navRating.visible = (result.song_entry != null);
+                navRating.visible = (result.songInfo != null);
 
                 // Highscores
-                if (result.song_entry && result.song_entry.engine)
+                if (result.songInfo && result.songInfo.engine)
                     navHighscores.enabled = false;
 
                 // Cached Rank Index
@@ -424,7 +425,7 @@ package game
                 resultsDisplay.result_last_best.htmlText = "<B>Last Best: " + _gvars.songResultRanks[songRankIndex].old_ranking;
             }
             // Alt Engine Score
-            else if (result.song_entry && result.song_entry.engine)
+            else if (result.songInfo && result.songInfo.engine)
             {
                 resultsDisplay.result_credits.htmlText = "<B>--</B>";
                 var rank:Object = result.legacyLastRank;
@@ -470,9 +471,11 @@ package game
             resultsMods.text = "Scroll Speed: " + result.options.scrollSpeed;
             if (result.restarts > 0)
                 resultsMods.text += ", Restarts: " + result.restarts;
-            var mods:Array = new Array();
+
+            var mods:Array = [];
             for each (var mod:String in result.options.mods)
                 mods.push(_lang.string("options_mod_" + mod));
+
             if (result.options.judgeWindow)
                 mods.push(_lang.string("options_mod_judge"));
             if (mods.length > 0)
@@ -531,33 +534,33 @@ package game
          * @param result GameScoreResult
          * @return Graph Class
          */
-        public function getGraph(graph_type:int, result:GameScoreResult):GraphBase
+        public function getGraph(graphType:int, result:GameScoreResult):GraphBase
         {
-            var cache_id:String = graph_type + "_" + resultIndex;
+            var cacheId:String = graphType + "_" + resultIndex;
 
             // From Cache
-            if (graph_cache[cache_id] != null)
+            if (graphCache[cacheId] != null)
             {
-                return graph_cache[cache_id];
+                return graphCache[cacheId];
             }
 
             // Create New
             else
             {
-                var new_graph:GraphBase;
+                var newGraph:GraphBase;
 
-                if (graph_type == GRAPH_ACCURACY)
+                if (graphType == GRAPH_ACCURACY)
                 {
-                    new_graph = new GraphAccuracy(graphDraw, graphOverlay, result);
+                    newGraph = new GraphAccuracy(graphDraw, graphOverlay, result);
                 }
                 else
                 {
-                    new_graph = new GraphCombo(graphDraw, graphOverlay, result);
+                    newGraph = new GraphCombo(graphDraw, graphOverlay, result);
                 }
 
-                graph_cache[cache_id] = new_graph;
+                graphCache[cacheId] = newGraph;
 
-                return new_graph;
+                return newGraph;
             }
         }
 
@@ -747,14 +750,19 @@ package game
                 //Check for filters and filter the songs list
                 if (_gvars.activeFilter != null)
                 {
-                    songList = _playlist.indexList.filter(function(item:Object, index:int, array:Array):Boolean
+                    var filteredSongInfos:Vector.<SongInfo>;
+                    filteredSongInfos = _playlist.indexList.filter(function(item:SongInfo, index:int, vec:Vector.<SongInfo>):Boolean
                     {
                         return _gvars.activeFilter.process(item, _gvars.activeUser);
                     });
+
+                    songList = [];
+                    for each (var songInfo:SongInfo in filteredSongInfos)
+                        songList.push(songInfo);
                 }
 
                 // Filter to only Playable Songs
-                songList = songList.filter(function(item:Object, index:int, array:Array):Boolean
+                songList = songList.filter(function(item:SongInfo, index:int, array:Array):Boolean
                 {
                     return _gvars.checkSongAccess(item) == GlobalVariables.SONG_ACCESS_PLAYABLE;
                 });
@@ -779,7 +787,7 @@ package game
             {
                 if (resultIndex >= 0)
                 {
-                    addPopup(new PopupHighscores(this, songResults[resultIndex].song_entry));
+                    addPopup(new PopupHighscores(this, songResults[resultIndex].songInfo));
                 }
             }
 
@@ -792,7 +800,7 @@ package game
             {
                 if (resultIndex >= 0)
                 {
-                    _gvars.gameMain.addPopup(new PopupSongNotes(this, songResults[resultIndex].song_entry));
+                    _gvars.gameMain.addPopup(new PopupSongNotes(this, songResults[resultIndex].songInfo));
                 }
             }
 
@@ -851,7 +859,7 @@ package game
             ret ||= valid_score && !result.options.isScoreValid(true, false);
             ret ||= valid_replay && !result.options.isScoreValid(false, true);
             ret ||= check_replay && (_gvars.flashvars.replay || result.replayData.length <= 0 || result.score <= 0 || (result.options.replay && result.options.replay.isEdited) || result.user.id != _gvars.playerUser.id)
-            ret ||= check_alt_engine && (result.user.id <= 2 || result.song_entry.engine != null);
+            ret ||= check_alt_engine && (result.user.id <= 2 || result.songInfo.engine != null);
             return !ret;
         }
 
@@ -872,7 +880,7 @@ package game
             ret ||= valid_score && !result.options.isScoreUpdated(true, false);
             ret ||= valid_replay && !result.options.isScoreUpdated(false, true);
             ret ||= check_replay && (_gvars.flashvars.replay || result.replayData.length <= 0 || result.score <= 0 || (result.options.replay && result.options.replay.isEdited) || result.user.id != _gvars.playerUser.id)
-            ret ||= check_alt_engine && (result.user.id <= 2 || result.song_entry.engine != null);
+            ret ||= check_alt_engine && (result.user.id <= 2 || result.songInfo.engine != null);
             return !ret;
         }
 
@@ -886,7 +894,7 @@ package game
             var gameResult:GameScoreResult = songResults[songResults.length - 1];
 
             // Alt Engine Score
-            if (gameResult.song_entry.engine)
+            if (gameResult.songInfo.engine)
             {
                 sendAltEngineScore();
                 return;
@@ -935,7 +943,7 @@ package game
             // Saving Vars
             _loader.postData = ObjectUtil.clone(scoreSender);
             _loader.rank_index = _gvars.gameIndex;
-            _loader.song = gameResult.song_entry;
+            _loader.song = gameResult.songInfo;
             _loader.results = gameResult;
             _loader.load(req);
         }
@@ -949,7 +957,7 @@ package game
 
             var result:Object = e.target.postData;
             var data:Object = JSON.parse(e.target.data);
-            var song:Object = e.target.song;
+            var songInfo:SongInfo = e.target.song;
             var gameResult:GameScoreResult = e.target.results;
             var totalScore:int = e.target.resultsTotal;
 
@@ -994,8 +1002,8 @@ package game
                     }
 
                     // Check raw score vs level ranks and update.
-                    var previousLevelRanks:Object = _gvars.activeUser.level_ranks[song.level];
-                    var newLevelRanks:Object = {"genre": song.genre,
+                    var previousLevelRanks:Object = _gvars.activeUser.level_ranks[songInfo.level];
+                    var newLevelRanks:Object = {"genre": songInfo.genre,
                             "rank": data.new_ranking,
                             "score": gameResult.score,
                             "results": gameResult.pa_string + "-" + gameResult.max_combo,
@@ -1020,7 +1028,7 @@ package game
                             newLevelRanks["aaas"] += previousLevelRanks["aaas"];
                             newLevelRanks["fcs"] += previousLevelRanks["fcs"];
                         }
-                        _gvars.activeUser.level_ranks[song.level] = newLevelRanks;
+                        _gvars.activeUser.level_ranks[songInfo.level] = newLevelRanks;
                     }
 
                     // Update Counters
@@ -1094,13 +1102,13 @@ package game
             // Get last score
             var gameResult:GameScoreResult = songResults[songResults.length - 1];
 
-            if (!gameResult.song_entry.engine)
+            if (!gameResult.songInfo.engine)
                 return;
 
             // Update Local Alt Engine Levelranks
-            if (((gameResult.legacyLastRank = _avars.legacyLevelRanksGet(gameResult.song_entry)) || {score: 0}).score < gameResult.score)
+            if (((gameResult.legacyLastRank = _avars.legacyLevelRanksGet(gameResult.songInfo)) || {score: 0}).score < gameResult.score)
             {
-                _avars.legacyLevelRanksSet(gameResult.song_entry, {"score": gameResult.score,
+                _avars.legacyLevelRanksSet(gameResult.songInfo, {"score": gameResult.score,
                         "rank": 0,
                         "perfect": gameResult.amazing + gameResult.perfect,
                         "good": gameResult.good,
@@ -1122,18 +1130,18 @@ package game
             var scoreSender:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(scoreSender);
             var sd:Object = {"arrows": gameResult.song.chart.Notes.length, // Playlist XML often lies.
-                    "author": gameResult.song_entry.author,
-                    "difficulty": gameResult.song_entry.difficulty,
-                    "genre": gameResult.song_entry.genre,
-                    "level": gameResult.song_entry.level,
-                    "levelid": gameResult.song_entry.levelid,
-                    "name": gameResult.song_entry.name,
-                    "stepauthor": gameResult.song_entry.stepauthor,
-                    "time": gameResult.song_entry.time};
+                    "author": gameResult.songInfo.author,
+                    "difficulty": gameResult.songInfo.difficulty,
+                    "genre": gameResult.songInfo.genre,
+                    "level": gameResult.songInfo.level,
+                    "levelid": gameResult.songInfo.levelid,
+                    "name": gameResult.songInfo.name,
+                    "stepauthor": gameResult.songInfo.stepauthor,
+                    "time": gameResult.songInfo.time};
 
             // Post Game Data
             var dataObject:Object = {};
-            dataObject.engine = gameResult.song_entry.engine;
+            dataObject.engine = gameResult.songInfo.engine;
             dataObject.song_data = sd;
             dataObject.level = gameResult.level;
             dataObject.rate = gameResult.options.songRate;
@@ -1161,7 +1169,7 @@ package game
             // Saving Vars
             _loader.postData = ObjectUtil.clone(scoreSender);
             _loader.rank_index = _gvars.gameIndex;
-            _loader.song = gameResult.song_entry;
+            _loader.song = gameResult.songInfo;
             _loader.results = gameResult;
             _loader.load(req);
         }
@@ -1175,7 +1183,7 @@ package game
             try
             {
                 var result:Object = JSON.parse(e.target.postData.data);
-                var song:Object = e.target.song;
+                var songInfo:SongInfo = e.target.song;
                 var totalScore:int = e.target.resultsTotal;
                 var data:Object = JSON.parse(e.target.data);
                 var gameResult:GameScoreResult = e.target.results;
@@ -1245,10 +1253,10 @@ package game
 
             var nR:Replay = new Replay(_gvars.gameIndex);
             nR.user = _gvars.playerUser;
-            nR.level = result.song_entry.level;
+            nR.level = result.songInfo.level;
             nR.settings = result.options.settingsEncode();
-            if (result.song_entry.engine)
-                nR.settings.arc_engine = _avars.legacyEncode(result.song_entry);
+            if (result.songInfo.engine)
+                nR.settings.arc_engine = _avars.legacyEncode(result.songInfo);
             nR.score = result.score;
             nR.perfect = (result.amazing + result.perfect);
             nR.good = result.good;
@@ -1274,7 +1282,7 @@ package game
                 try
                 {
                     var path:String = AirContext.getReplayPath(result.song);
-                    path += (result.song.entry.levelid != null ? result.song.entry.levelid : result.song.id.toString())
+                    path += (result.song.songInfo.levelid ? result.song.songInfo.levelid : result.song.id.toString())
                     path += "_" + (new Date().getTime())
                     path += "_" + (result.pa_string + "-" + result.max_combo);
 

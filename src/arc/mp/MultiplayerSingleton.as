@@ -34,6 +34,7 @@ package arc.mp
     import menu.MainMenu;
     import menu.MenuPanel;
     import menu.MenuSongSelection;
+    import classes.SongInfo;
 
     public class MultiplayerSingleton extends Object
     {
@@ -47,7 +48,7 @@ package arc.mp
         private var autoJoin:Boolean;
 
         private var currentRoom:Room = null;
-        private var currentSong:Object = null;
+        private var currentSongInfo:SongInfo = null;
         private var currentSongFile:Song = null;
         private var currentStatus:int = 0;
 
@@ -200,8 +201,8 @@ package arc.mp
                 currentUser.gameplay = gameplay;
             }
 
-            gameplay.song = currentSong;
-            if (gameplay.song == null)
+            gameplay.songInfo = currentSongInfo;
+            if (gameplay.songInfo == null)
                 gameplay.songName = "No Song Selected";
 
             if (currentSongFile != null && !currentSongFile.isLoaded)
@@ -243,9 +244,9 @@ package arc.mp
         }
 
         // Should be called in MenuSongSelection whenever the selection changes.
-        public function gameplayPicking(song:Object):void
+        public function gameplayPicking(song:SongInfo):void
         {
-            currentSong = song;
+            currentSongInfo = song;
             currentSongFile = null;
 
             currentStatus = Multiplayer.STATUS_PICKING;
@@ -264,7 +265,7 @@ package arc.mp
         }
 
         // Called by MultiplayerPlayer when you click on the song label/name
-        public function gameplayPick(song:Object):void
+        public function gameplayPick(song:SongInfo):void
         {
             if (currentStatus >= Multiplayer.STATUS_PLAYING || song == null)
                 return;
@@ -278,7 +279,7 @@ package arc.mp
             }
             else
             {
-                if (gameplayCompareSong(song, currentSong))
+                if (gameplayCompareSong(song, currentSongInfo))
                     gameplayLoading();
                 else
                 {
@@ -312,7 +313,7 @@ package arc.mp
         {
             _gvars.options = new GameOptions();
             _gvars.options.fill();
-            currentSongFile = _gvars.getSongFile(currentSong);
+            currentSongFile = _gvars.getSongFile(currentSongInfo);
 
             currentStatus = Multiplayer.STATUS_LOADING;
             updateCurrentUserStatus();
@@ -343,7 +344,7 @@ package arc.mp
                         if (currentSongFile && currentSongFile.loadFail)
                         {
                             _gvars.removeSongFile(currentSongFile);
-                            _gvars.gameMain.addAlert(currentSong.name + " failed to load");
+                            _gvars.gameMain.addAlert(currentSongInfo.name + " failed to load");
                             currentSongFile = null;
                             currentStatus = Multiplayer.STATUS_PICKING;
                             timer.stop();
@@ -424,7 +425,7 @@ package arc.mp
 
         public function spectateGame(room:Room):void
         {
-            var song:Object = room.song;
+            var song:SongInfo = room.songInfo;
             _gvars.songQueue = [song];
             _gvars.options = new GameOptions();
             _gvars.options.mpRoom = room;
@@ -495,7 +496,7 @@ package arc.mp
             var results:GameScoreResult = null;
             for each (var result:GameScoreResult in songResults)
             {
-                if (result.song_entry == currentSong)
+                if (result.songInfo == currentSongInfo)
                 {
                     results = result;
                     break;
@@ -552,7 +553,7 @@ package arc.mp
          */
         public function gameplaySubmit(room:Room):void
         {
-            var matchSong:Object = currentSong || room.song;
+            var matchSong:SongInfo = currentSongInfo || room.songInfo;
 
             if (matchSong != null && matchSong.engine != null)
                 return;
@@ -613,7 +614,7 @@ package arc.mp
         // Call after results screen / on main menu
         public function gameplayCleanup():void
         {
-            currentSong = null;
+            currentSongInfo = null;
             currentSongFile = null;
             currentStatus = Multiplayer.STATUS_CLEANUP;
 

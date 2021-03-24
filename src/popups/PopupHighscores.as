@@ -17,6 +17,7 @@ package popups
     import flash.filters.BlurFilter;
     import flash.geom.Point;
     import menu.MenuPanel;
+    import classes.SongInfo;
 
     public class PopupHighscores extends MenuPanel
     {
@@ -35,7 +36,7 @@ package popups
         private var myUsernameText:Text;
         private var myScoreText:Text;
         private var myAVText:Text;
-        private var songDetails:Object;
+        private var songInfo:SongInfo;
         private var scorePane:Sprite;
 
         private var prevBtn:BoxButton;
@@ -43,10 +44,10 @@ package popups
         private var closeBtn:BoxButton;
         private var refreshBtn:BoxButton;
 
-        public function PopupHighscores(myParent:MenuPanel, songDetails:Object)
+        public function PopupHighscores(myParent:MenuPanel, songInfo:SongInfo)
         {
             super(myParent);
-            this.songDetails = songDetails;
+            this.songInfo = songInfo;
         }
 
         override public function stageAdd():void
@@ -68,13 +69,13 @@ package popups
             box.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
             box.activeAlpha = 0.4;
 
-            var titleDisplay:Text = new Text(box, 5, 8, songDetails.name, 20);
+            var titleDisplay:Text = new Text(box, 5, 8, songInfo.name, 20);
             titleDisplay.width = box.width - 10;
             titleDisplay.align = Text.CENTER;
 
             pageText = new Text(box, 200, box.height - 42, sprintf(_lang.string("popup_highscores_page_number"), {"page": page + 1}));
 
-            var infoRanks:Object = _gvars.activeUser.getLevelRank(songDetails);
+            var infoRanks:Object = _gvars.activeUser.getLevelRank(songInfo);
             // Username
             myUsernameText = new Text(box, 25, 345, "#" + infoRanks.rank + ": " + _gvars.activeUser.name, 16, "#D9FF9E");
             myUsernameText.width = 164;
@@ -129,7 +130,7 @@ package popups
             if (page > maxPage)
                 page = maxPage;
 
-            var highscores:Object = _gvars.getHighscores(songDetails.level);
+            var highscores:Object = _gvars.getHighscores(songInfo.level);
             if (highscores && (highscores[(10 * page) + 1] != null))
             {
                 // Username
@@ -196,7 +197,7 @@ package popups
                 throbber.start();
 
                 _gvars.addEventListener(GlobalVariables.HIGHSCORES_LOAD_COMPLETE, highscoresLoaded);
-                _gvars.loadHighscores(songDetails.level, page * 10);
+                _gvars.loadHighscores(songInfo.level, page * 10);
             }
             pageText.text = sprintf(_lang.string("popup_highscores_page_number"), {"page": page + 1});
 
@@ -229,7 +230,7 @@ package popups
 
         private function refreshPersonalRanks():void
         {
-            var infoRanks:Object = _gvars.activeUser.getLevelRank(songDetails);
+            var infoRanks:Object = _gvars.activeUser.getLevelRank(songInfo);
             myUsernameText.text = "#" + infoRanks.rank + ": " + _gvars.activeUser.name;
             myScoreText.text = NumberUtil.numberFormat(infoRanks.rawscore);
             myAVText.text = infoRanks.results;

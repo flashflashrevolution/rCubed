@@ -2,7 +2,8 @@ package classes.filter
 {
     import classes.Language;
     import classes.User;
-    import sql.SQLSongDetails;
+    import sql.SQLSongUserInfo;
+    import classes.SongInfo;
 
     public class EngineLevelFilter
     {
@@ -81,11 +82,11 @@ package classes.filter
         /**
          * Process the engine level to see if it has passed the requirements of the filters currently set.
          *
-         * @param	songData	Engine Level to be processed.
+         * @param	songInfo	Engine Level to be processed.
          * @param	userData	User Data from comparisons.
          * @return	Song passed filter.
          */
-        public function process(songData:Object, userData:User):Boolean
+        public function process(songInfo:SongInfo, userData:User):Boolean
         {
             switch (type)
             {
@@ -96,7 +97,7 @@ package classes.filter
                     // Check ALL Sub Filters Pass
                     for each (var filter_and:EngineLevelFilter in filters)
                     {
-                        if (!filter_and.process(songData, userData))
+                        if (!filter_and.process(songInfo, userData))
                             return false;
                     }
                     return true;
@@ -109,73 +110,73 @@ package classes.filter
                     // Check if any Sub Filters Pass
                     for each (var filter_or:EngineLevelFilter in filters)
                     {
-                        if (filter_or.process(songData, userData))
+                        if (filter_or.process(songInfo, userData))
                             out = true;
                     }
                     return out;
 
                 case FILTER_ID:
-                    return compareNumber(songData.level, input_number);
+                    return compareNumber(songInfo.level, input_number);
 
                 case FILTER_NAME:
-                    return compareString(songData.name, input_string);
+                    return compareString(songInfo.name, input_string);
 
                 case FILTER_STYLE:
-                    return compareString(songData.style, input_string);
+                    return compareString(songInfo.style, input_string);
 
                 case FILTER_ARTIST:
-                    return compareString(songData.author, input_string);
+                    return compareString(songInfo.author, input_string);
 
                 case FILTER_STEPARTIST:
-                    return compareString(songData.stepauthor, input_string);
+                    return compareString(songInfo.stepauthor, input_string);
 
                 case FILTER_BPM:
                     return true; // TODO: compareNumber(songData.bpm, input_number);
 
                 case FILTER_DIFFICULTY:
-                    return compareNumber(songData.difficulty, input_number);
+                    return compareNumber(songInfo.difficulty, input_number);
 
                 case FILTER_ARROWCOUNT:
-                    return compareNumber(songData.arrows, input_number);
+                    return compareNumber(songInfo.noteCount, input_number);
 
                 case FILTER_MIN_NPS:
-                    return compareNumber(songData.min_nps, input_number);
+                    return compareNumber(songInfo.minNps, input_number);
 
                 case FILTER_MAX_NPS:
-                    return compareNumber(songData.max_nps, input_number);
+                    return compareNumber(songInfo.maxNps, input_number);
 
                 case FILTER_RANK:
-                    return compareNumber(userData.getLevelRank(songData).rank, input_number);
+                    return compareNumber(userData.getLevelRank(songInfo).rank, input_number);
 
                 case FILTER_SCORE:
-                    return compareNumber(userData.getLevelRank(songData).score, input_number);
+                    return compareNumber(userData.getLevelRank(songInfo).score, input_number);
 
                 case FILTER_STATS:
-                    return compareNumber(userData.getLevelRank(songData)[input_stat], input_number);
+                    return compareNumber(userData.getLevelRank(songInfo)[input_stat], input_number);
 
                 case FILTER_TIME:
-                    return compareNumber(songData.timeSecs, input_number);
+                    return compareNumber(songInfo.timeSecs, input_number);
 
                 case FILTER_SONG_RATING:
-                    return compareNumber(songData.song_rating, input_number);
+                    return compareNumber(songInfo.songRating, input_number);
 
                 case FILTER_PERSONAL_SONG_RATING:
-                    return compareNumber(userData.getSongRating(songData), input_number);
+                    return compareNumber(userData.getSongRating(songInfo), input_number);
 
                 case FILTER_SONG_FLAGS:
-                    return compareSongFlag(GlobalVariables.getSongIconIndexBitmask(songData, userData.getLevelRank(songData)), (Math.pow(2, input_number) / 2));
+                    return compareSongFlag(GlobalVariables.getSongIconIndexBitmask(songInfo, userData.getLevelRank(songInfo)), (Math.pow(2, input_number) / 2));
 
                 case FILTER_SONG_ACCESS:
-                    return compareNumberEqual(songData.access, input_number);
+                    return compareNumberEqual(songInfo.access, input_number);
 
                 case FILTER_SONG_TYPE:
-                    return compareSongType(songData, input_number);
+                    return compareSongType(songInfo, input_number);
 
                 case FILTER_SONG_GENRE:
-                    return compareNumberEqual(songData.genre, input_number + 1);
+                    return compareNumberEqual(songInfo.genre, input_number + 1);
 
                 case FILTER_FAVORITE:
-                    var details:SQLSongDetails = SQLQueries.getSongDetailsEntry(songData);
+                    var details:SQLSongUserInfo = SQLQueries.getSongUserInfo(songInfo);
                     if (details)
                         return compareNumberEqual(details.song_favorite ? 0 : 1, input_number);
                     return compareNumberEqual(1, input_number);
@@ -183,9 +184,9 @@ package classes.filter
             return true;
         }
 
-        private function compareSongType(songData:Object, value:Number):Boolean
+        private function compareSongType(songInfo:SongInfo, value:Number):Boolean
         {
-            var out:Boolean = songData["song_type"] == value;
+            var out:Boolean = songInfo.songType == value;
             return inverse ? !out : out;
         }
 

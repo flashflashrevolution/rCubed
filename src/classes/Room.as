@@ -23,7 +23,7 @@ package classes
         public var mode:Object
         public var scoreMode:Object
         public var ranked:Object
-        public var song:Object
+        public var songInfo:SongInfo
         public var connection:Multiplayer;
 
         /**
@@ -40,7 +40,8 @@ package classes
 
         /**
          * Maps indexes to players. This map is 1-based.
-         * For example:
+         *
+         * @example
          * ```
          * _players[2] = someUser;
          * var someUser:User = _players[2];
@@ -50,7 +51,8 @@ package classes
 
         /**
          * Maps ids to users.
-         * For example:
+         *
+         * @example
          * ```
          * _users[1234224] = someUser;
          * var someUser:User = _users[1234224];
@@ -234,11 +236,11 @@ package classes
             if (_playerCount == 1)
                 return true;
 
-            var songP1:Object = getPlayer(1).gameplay.song;
+            var songP1:SongInfo = getPlayer(1).gameplay.songInfo;
 
             for each (var player:User in _players)
             {
-                if (player.gameplay.song != songP1)
+                if (player.gameplay.songInfo != songP1)
                     return false;
             }
 

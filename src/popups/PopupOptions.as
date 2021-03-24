@@ -55,6 +55,7 @@ package popups
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import classes.Room;
+    import classes.SongInfo;
 
     public class PopupOptions extends MenuPanel
     {
@@ -1371,7 +1372,12 @@ package popups
                 _gvars.options = new GameOptions();
                 _gvars.options.isEditor = true;
                 _gvars.options.mpRoom = e.target.editor_multiplayer;
-                _gvars.options.song = new Song({level: 1337, type: "EDITOR"});
+
+                var tempSongInfo:SongInfo = new SongInfo();
+                tempSongInfo.level = 1337;
+                tempSongInfo.chartType = "EDITOR";
+                _gvars.options.song = new Song(tempSongInfo);
+
                 _gvars.options.fill();
                 removePopup();
                 _gvars.gameMain.switchTo(Main.GAME_PLAY_PANEL);
