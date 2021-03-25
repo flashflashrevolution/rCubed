@@ -265,28 +265,28 @@ package arc.mp
         }
 
         // Called by MultiplayerPlayer when you click on the song label/name
-        public function gameplayPick(song:SongInfo):void
+        public function gameplayPick(songInfo:SongInfo):void
         {
-            if (currentStatus >= Multiplayer.STATUS_PLAYING || song == null)
+            if (currentStatus >= Multiplayer.STATUS_PLAYING || songInfo == null)
                 return;
 
             var playlistEngineID:Object = Playlist.instance.engine ? Playlist.instance.engine.id : null;
-            if (playlistEngineID == (song.engine ? song.engine.id : null))
+            if (playlistEngineID == (songInfo.engine ? songInfo.engine.id : null))
             {
                 var mmenu:MainMenu = _gvars.gameMain.activePanel as MainMenu;
                 mmenu.switchTo(MainMenu.MENU_SONGSELECTION);
-                (mmenu._MenuSingleplayer as MenuSongSelection).multiplayerSelect(song.name, song);
+                (mmenu._MenuSingleplayer as MenuSongSelection).multiplayerSelect(songInfo.name, songInfo);
             }
             else
             {
-                if (gameplayCompareSong(song, currentSongInfo))
+                if (gameplayCompareSong(songInfo, currentSongInfo))
                     gameplayLoading();
                 else
                 {
-                    if (song.engine)
-                        gameplayPicking(song);
-                    else if (_gvars.checkSongAccess(song) == GlobalVariables.SONG_ACCESS_PLAYABLE)
-                        gameplayPicking(song);
+                    if (songInfo.engine)
+                        gameplayPicking(songInfo);
+                    else if (_gvars.checkSongAccess(songInfo) == GlobalVariables.SONG_ACCESS_PLAYABLE)
+                        gameplayPicking(songInfo);
                 }
             }
         }

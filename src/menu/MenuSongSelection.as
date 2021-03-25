@@ -494,7 +494,7 @@ package menu
             //- Init Variables
             var i:uint;
             var yOffset:int = 0;
-            var song:SongInfo;
+            var songInfo:SongInfo;
             var sI:SongItem;
 
             //- Set Song array based on selected genre
@@ -523,8 +523,8 @@ package menu
             else if (options.activeGenre == PLAYLIST_ALL)
             {
                 songList = [];
-                for each (var songInfo:SongInfo in _playlist.indexList)
-                    songList.push(songInfo);
+                for each (var _songInfo:SongInfo in _playlist.indexList)
+                    songList.push(_songInfo);
 
                 // Song List Filters
                 songList = filterSongListLegacy(songList);
@@ -602,14 +602,14 @@ package menu
             //- Build Playlist
             for (var sX:int = 0; sX < songList.length; sX++)
             {
-                song = songList[sX];
+                songInfo = songList[sX];
                 sI = new SongItem();
-                sI.setData(song, _gvars.activeUser.getLevelRank(song));
+                sI.setData(songInfo, _gvars.activeUser.getLevelRank(songInfo));
                 sI.noteEnabled = _gvars.activeUser.DISPLAY_SONG_NOTE;
                 sI.setContextMenu(songItemContextMenu);
                 sI.y = yOffset;
                 sI.index = sX;
-                songItems[songItems.length] = sI;
+                songItems.push(sI);
                 pane.content.addChild(sI);
                 yOffset += sI.height + 2;
             }
@@ -629,8 +629,8 @@ package menu
             var hasSelected:Boolean = false;
             for (sX = 0; sX < songList.length; sX++)
             {
-                song = songList[sX];
-                if (options.activeSongID == song.level)
+                songInfo = songList[sX];
+                if (options.activeSongID == songInfo.level)
                 {
                     setActiveIndex(sX, -1, false, false);
                     hasSelected = true;

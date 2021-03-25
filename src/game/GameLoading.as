@@ -43,10 +43,10 @@ package game
             //- Set Active Song
             if (_gvars.songQueue.length > 0)
             {
-                var songEntry:SongInfo = _gvars.songQueue[0];
+                var songInfo:SongInfo = _gvars.songQueue[0];
                 _gvars.songQueue.shift();
 
-                song = _gvars.getSongFile(songEntry, _gvars.options.loadPreview);
+                song = _gvars.getSongFile(songInfo, _gvars.options.loadPreview);
                 _gvars.options.song = song;
             }
             else if (_gvars.options.song)
@@ -102,7 +102,23 @@ package game
         private function updatePreloader(e:Event):void
         {
             loadTimer++;
-            namedisplay.htmlText = (song.songInfo.name ? songName + " - " + song.progress + "%  --- " + (song.bytesTotal > 0 ? "(" + NumberUtil.bytesToString(song.bytesLoaded) + " / " + NumberUtil.bytesToString(song.bytesTotal) + ")" : "Connecting...") + (song.loadFail ? " --- <font color=\"#FFC4C4\">[Loading Failed]</font>" : "") : songName);
+
+            // TODO: use localized strings here
+            if (song.songInfo.name)
+            {
+                namedisplay.htmlText += songName + " - " + song.progress + "%  --- ";
+
+                if (song.bytesTotal > 0)
+                    namedisplay.htmlText += "(" + NumberUtil.bytesToString(song.bytesLoaded) + " / " + NumberUtil.bytesToString(song.bytesTotal) + ")";
+                else
+                    namedisplay.htmlText += "Connecting..."
+
+                if (song.loadFail)
+                    namedisplay.htmlText += " --- <font color=\"#FFC4C4\">[Loading Failed]</font>";
+            }
+            else
+                namedisplay.htmlText += songName;
+
             preloader.update(song.progress);
 
             if ((loadTimer >= 60 || song.loadFail) && !cancelLoadButton && !_gvars.flashvars.replay)

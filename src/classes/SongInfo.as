@@ -8,14 +8,6 @@ package classes
         public static const SONG_TYPE_PURCHASED:int = 2;
         public static const SONG_TYPE_SECRET:int = 3;
 
-        /**
-         * Maps source names to this class' variable names
-         */
-        public static const FIELD_MAP:Object = {"arrows": "noteCount",
-                "min_nps": "minNps",
-                "max_nps": "maxNps",
-                "song_rating": "songRating"};
-
         public var access:int; //GlobalVariables.SONG_ACCESS_PLAYABLE
         public var noteCount:int; //0
         public var author:String = ""; //"Luka Megurine"

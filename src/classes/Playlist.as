@@ -152,94 +152,135 @@ package classes
                 _instanceCanon.generatedQueues = generatedQueues;
             }
 
-            for (var a:Object in data)
+            for each (var dynamicSongInfo:Object in data)
             {
-                var genre:int = data[a].genre;
-                if (genreList[genre] == undefined)
-                {
-                    genreList[genre] = [];
-                    generatedQueues[genre] = [];
-                }
+                var songInfo:SongInfo;
 
-                var songInfo:SongInfo = new SongInfo();
-                for (var b:* in data[a])
+                if (dynamicSongInfo is SongInfo)
                 {
-                    try
+                    songInfo = dynamicSongInfo as SongInfo;
+
+                    if (genreList[songInfo.genre] == undefined)
                     {
-                        songInfo[b] = data[a][b];
-                    }
-                    catch (Error)
-                    {
-                        songInfo[SongInfo.FIELD_MAP[b]] = data[a][b];
-                    }
-                }
-
-                // Song Time
-                if (songInfo.time == null)
-                {
-                    songInfo.time = "0:00";
-                }
-
-                // Note Count
-                if (isNaN(Number(songInfo.noteCount)))
-                {
-                    songInfo.noteCount = 0;
-                }
-
-                // Extra Info
-                songInfo.index = genreList[genre].length;
-                songInfo.timeSecs = (Number(songInfo.time.split(":")[0]) * 60) + Number(songInfo.time.split(":")[1]);
-
-                // Author with URL
-                if (songInfo.authorURL != null && songInfo.authorURL.length > 7)
-                {
-                    songInfo.authorwithurl = "<a href=\"" + songInfo.authorURL + "\">" + songInfo.author + "</a>";
-                }
-                else
-                {
-                    songInfo.authorwithurl = songInfo.author;
-                }
-
-                // Multiple Step Authors
-                if (songInfo.stepauthor != null && songInfo.stepauthor.indexOf(" & ") !== false)
-                {
-                    var stepAuthors:Array = songInfo.stepauthor.split(" & ");
-                    songInfo.stepauthorwithurl = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(stepAuthors[0]) + "\">" + stepAuthors[0] + "</a>";
-                    for (var i:int = 1; i < stepAuthors.length; i++)
-                    {
-                        songInfo.stepauthorwithurl += " & <a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(stepAuthors[i]) + "\">" + stepAuthors[i] + "</a>";
+                        genreList[songInfo.genre] = [];
+                        generatedQueues[songInfo.genre] = [];
                     }
                 }
                 else
                 {
-                    songInfo.stepauthorwithurl = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(songInfo.stepauthor) + "\">" + songInfo.stepauthor + "</a>";
+                    var genre:int = dynamicSongInfo.genre;
+                    if (genreList[genre] == undefined)
+                    {
+                        genreList[genre] = [];
+                        generatedQueues[genre] = [];
+                    }
+
+                    // Important to note that the dynamic fields aren't all exactly the same name
+                    var newSongInfo:SongInfo = new SongInfo();
+                    newSongInfo.access = dynamicSongInfo.access;
+                    newSongInfo.author = dynamicSongInfo.author;
+                    newSongInfo.authorURL = dynamicSongInfo.authorURL;
+                    newSongInfo.authorwithurl = dynamicSongInfo.authorwithurl;
+                    newSongInfo.chartType = dynamicSongInfo.chartType;
+                    newSongInfo.credits = dynamicSongInfo.credits;
+                    newSongInfo.difficulty = dynamicSongInfo.difficulty;
+                    newSongInfo.engine = dynamicSongInfo.engine;
+                    newSongInfo.genre = dynamicSongInfo.genre;
+                    newSongInfo.index = dynamicSongInfo.index;
+                    newSongInfo.length = dynamicSongInfo.length;
+                    newSongInfo.level = dynamicSongInfo.level;
+                    newSongInfo.levelid = dynamicSongInfo.levelid;
+                    newSongInfo.minNps = dynamicSongInfo.min_nps;
+                    newSongInfo.maxNps = dynamicSongInfo.max_nps;
+                    newSongInfo.name = dynamicSongInfo.name;
+                    newSongInfo.noteCount = dynamicSongInfo.arrows;
+                    newSongInfo.order = dynamicSongInfo.order;
+                    newSongInfo.playhash = dynamicSongInfo.playhash;
+                    newSongInfo.prerelease = dynamicSongInfo.prerelease;
+                    newSongInfo.previewhash = dynamicSongInfo.previewhash;
+                    newSongInfo.price = dynamicSongInfo.price;
+                    newSongInfo.releasedate = dynamicSongInfo.releasedate;
+                    newSongInfo.scoreRaw = dynamicSongInfo.scoreRaw;
+                    newSongInfo.scoreTotal = dynamicSongInfo.scoreTotal;
+                    newSongInfo.songRating = dynamicSongInfo.song_rating;
+                    newSongInfo.songType = dynamicSongInfo.songType;
+                    newSongInfo.stepauthor = dynamicSongInfo.stepauthor;
+                    newSongInfo.stepauthorURL = dynamicSongInfo.stepauthorURL;
+                    newSongInfo.stepauthorwithurl = dynamicSongInfo.stepauthorwithurl;
+                    newSongInfo.style = dynamicSongInfo.style;
+                    newSongInfo.sync = dynamicSongInfo.sync;
+                    newSongInfo.time = dynamicSongInfo.time;
+                    newSongInfo.timeSecs = dynamicSongInfo.timeSecs;
+
+                    // Song Time
+                    if (newSongInfo.time == null)
+                    {
+                        newSongInfo.time = "0:00";
+                    }
+
+                    // Note Count
+                    if (isNaN(Number(newSongInfo.noteCount)))
+                    {
+                        newSongInfo.noteCount = 0;
+                    }
+
+                    // Extra Info
+                    newSongInfo.index = genreList[genre].length;
+                    newSongInfo.timeSecs = (Number(newSongInfo.time.split(":")[0]) * 60) + Number(newSongInfo.time.split(":")[1]);
+
+                    // Author with URL
+                    if (newSongInfo.authorURL != null && newSongInfo.authorURL.length > 7)
+                    {
+                        newSongInfo.authorwithurl = "<a href=\"" + newSongInfo.authorURL + "\">" + newSongInfo.author + "</a>";
+                    }
+                    else
+                    {
+                        newSongInfo.authorwithurl = newSongInfo.author;
+                    }
+
+                    // Multiple Step Authors
+                    if (newSongInfo.stepauthor != null && newSongInfo.stepauthor.indexOf(" & ") !== false)
+                    {
+                        var stepAuthors:Array = newSongInfo.stepauthor.split(" & ");
+                        newSongInfo.stepauthorwithurl = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(stepAuthors[0]) + "\">" + stepAuthors[0] + "</a>";
+                        for (var i:int = 1; i < stepAuthors.length; i++)
+                        {
+                            newSongInfo.stepauthorwithurl += " & <a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(stepAuthors[i]) + "\">" + stepAuthors[i] + "</a>";
+                        }
+                    }
+                    else
+                    {
+                        newSongInfo.stepauthorwithurl = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(newSongInfo.stepauthor) + "\">" + newSongInfo.stepauthor + "</a>";
+                    }
+
+                    // Song Price
+                    if (isNaN(Number(newSongInfo.price)))
+                    {
+                        newSongInfo.price = -1;
+                    }
+
+                    // Secret Credits
+                    if (isNaN(Number(newSongInfo.credits)))
+                    {
+                        newSongInfo.credits = -1;
+                    }
+
+                    // Max Score Totals
+                    newSongInfo.scoreTotal = newSongInfo.noteCount * 1550;
+                    newSongInfo.scoreRaw = newSongInfo.noteCount * 50;
+
+                    // Legacy Sync
+                    if (!legacy && isNaN(newSongInfo.sync))
+                        newSongInfo.sync = oldOffsets(newSongInfo.level);
+
+                    songInfo = newSongInfo;
                 }
-
-                // Song Price
-                if (isNaN(Number(songInfo.price)))
-                {
-                    songInfo.price = -1;
-                }
-
-                // Secret Credits
-                if (isNaN(Number(songInfo.credits)))
-                {
-                    songInfo.credits = -1;
-                }
-
-                // Max Score Totals
-                songInfo.scoreTotal = songInfo.noteCount * 1550;
-                songInfo.scoreRaw = songInfo.noteCount * 50;
-
-                // Legacy Sync
-                if (!legacy && isNaN(songInfo.sync))
-                    songInfo.sync = oldOffsets(songInfo.level);
 
                 // Add to lists
                 playList[songInfo.level] = songInfo;
                 indexList.push(songInfo);
-                genreList[genre].push(songInfo);
-                generatedQueues[genre].push(songInfo.level);
+                genreList[songInfo.genre].push(songInfo);
+                generatedQueues[songInfo.genre].push(songInfo.level);
                     //_gvars.songQueue.push(songData);
             }
             indexList.sort(compareSongLevel);

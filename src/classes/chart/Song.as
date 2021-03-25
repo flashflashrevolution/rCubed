@@ -2,6 +2,7 @@ package classes.chart
 {
     import arc.NoteMod;
     import by.blooddy.crypto.MD5;
+    import classes.SongInfo;
     import classes.chart.parse.ChartFFRLegacy;
     import com.flashfla.media.MP3Extraction;
     import com.flashfla.media.SwfSilencer;
@@ -25,7 +26,6 @@ package classes.chart
     import flash.net.URLRequest;
     import flash.utils.ByteArray;
     import game.GameOptions;
-    import classes.SongInfo;
 
     public class Song extends EventDispatcher
     {

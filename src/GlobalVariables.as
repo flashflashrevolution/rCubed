@@ -261,10 +261,9 @@ package
             {
                 for (var s:int = 0; s < songData.length; s++)
                 {
-                    if (songData[s].level == songInfo.level && songData[s].file != null)
-                    {
-                        return songData[s].file;
-                    }
+                    var song:Song = songData[s];
+                    if (song != null && song.songInfo.level == songInfo.level)
+                        return song;
                 }
             }
 
@@ -276,16 +275,16 @@ package
             //- Only Cache 10 Songs
             var engineCache:Boolean = (songInfo.engine == Playlist.instance.engine) && (!songInfo.engine || !songInfo.engine.ignoreCache);
             if (!preview && songData.length > 10 && engineCache)
-                songData.pop().file = null;
+                songData.pop();
 
             //- Make new Song
-            var newSong:Song = new Song(songInfo, preview);
+            var song:Song = new Song(songInfo, preview);
 
             //- Push to cache
             if (!preview && engineCache)
-                songData.push(songInfo);
+                songData.push(song);
 
-            return newSong;
+            return song;
         }
 
         public function removeSongFile(song:Song):void
@@ -295,8 +294,7 @@ package
                 if (songData[s] == song)
                 {
                     song.unload();
-                    songData[s].file = null;
-                    songData.splice(s, 1);
+                    songData.removeAt(s);
                 }
             }
         }
@@ -304,7 +302,7 @@ package
         public function removeSongFiles():void
         {
             for (var s:int = 0; s < songData.length; s++)
-                songData[s].file.unload();
+                songData[s].unload();
 
             songData = [];
         }

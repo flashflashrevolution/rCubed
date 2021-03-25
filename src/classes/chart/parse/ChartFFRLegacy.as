@@ -45,7 +45,7 @@ package classes.chart.parse
                 var u:String = sprintf(engine.songURL, songInfo);
                 return sprintf(engine.songURL, songInfo);
             }
-            return engine.songURL + "level_" + songInfo.levelid + ".swf";
+            return engine.songURL + "level_" + songInfo.level + ".swf";
         }
 
         public static function validURL(url:String):Boolean
@@ -147,42 +147,42 @@ package classes.chart.parse
             var xml:XML = new XML(data);
             var nodes:XMLList = xml.children();
             var count:int = nodes.length();
-            var songs:Array = new Array();
+            var songs:Array = [];
             for (var i:int = 0; i < count; i++)
             {
                 var node:XML = nodes[i];
-                var song:SongInfo = new SongInfo();
-                song.genre = int(node.@genre.toString());
-                song.name = node.songname.toString();
-                song.difficulty = int(node.songdifficulty.toString());
-                song.style = node.songstyle.toString();
-                song.time = node.songlength.toString();
-                song.levelid = node.level.toString();
-                if (isNaN(song.levelid))
-                    song.level = i + 1;
+                var songInfo:SongInfo = new SongInfo();
+                songInfo.genre = int(node.@genre.toString());
+                songInfo.name = node.songname.toString();
+                songInfo.difficulty = int(node.songdifficulty.toString());
+                songInfo.style = node.songstyle.toString();
+                songInfo.time = node.songlength.toString();
+                songInfo.level = node.level.toString();
+                if (isNaN(songInfo.level) || songInfo.level == 0)
+                    songInfo.level = i + 1;
                 else
-                    song.level = int(song.levelid);
-                song.order = int(node.order.toString());
-                song.noteCount = int(node.arrows.toString());
-                song.author = node.songauthor.toString();
-                song.authorURL = node.songauthorURL.toString();
-                song.stepauthor = node.songstepauthor.toString();
-                song.stepauthorURL = node.songstepauthorurl.toString();
-                song.playhash = node.playhash.toString();
-                song.previewhash = node.previewhash.toString();
-                song.minNps = int(node.min_nps.toString());
-                song.maxNps = int(node.max_nps.toString());
-                song.credits = int(node.secretcredits.toString());
-                song.price = int(node.price.toString());
-                song.chartType = NoteChart.FFR_LEGACY;
-                song.engine = engine;
+                    songInfo.level = int(songInfo.levelid);
+                songInfo.order = int(node.order.toString());
+                songInfo.noteCount = int(node.arrows.toString());
+                songInfo.author = node.songauthor.toString();
+                songInfo.authorURL = node.songauthorURL.toString();
+                songInfo.stepauthor = node.songstepauthor.toString();
+                songInfo.stepauthorURL = node.songstepauthorurl.toString();
+                songInfo.playhash = node.playhash.toString();
+                songInfo.previewhash = node.previewhash.toString();
+                songInfo.minNps = int(node.min_nps.toString());
+                songInfo.maxNps = int(node.max_nps.toString());
+                songInfo.credits = int(node.secretcredits.toString());
+                songInfo.price = int(node.price.toString());
+                songInfo.chartType = NoteChart.FFR_LEGACY;
+                songInfo.engine = engine;
 
                 if (Boolean(node.arc_sync.toString()))
-                    song.sync = int(node.arc_sync.toString());
+                    songInfo.sync = int(node.arc_sync.toString());
                 else if (engine.sync)
-                    song.sync = engine.sync(song);
+                    songInfo.sync = engine.sync(songInfo);
 
-                songs.push(song);
+                songs.push(songInfo);
             }
             return songs;
         }
