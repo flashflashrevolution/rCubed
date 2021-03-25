@@ -212,69 +212,55 @@ package classes
                     newSongInfo.time = dynamicSongInfo.time;
                     newSongInfo.timeSecs = dynamicSongInfo.timeSecs;
 
-                    // Song Time
-                    if (newSongInfo.time == null)
-                    {
-                        newSongInfo.time = "0:00";
-                    }
-
-                    // Note Count
-                    if (isNaN(Number(newSongInfo.noteCount)))
-                    {
-                        newSongInfo.noteCount = 0;
-                    }
-
-                    // Extra Info
-                    newSongInfo.index = genreList[genre].length;
-                    newSongInfo.timeSecs = (Number(newSongInfo.time.split(":")[0]) * 60) + Number(newSongInfo.time.split(":")[1]);
-
-                    // Author with URL
-                    if (newSongInfo.authorURL != null && newSongInfo.authorURL.length > 7)
-                    {
-                        newSongInfo.authorwithurl = "<a href=\"" + newSongInfo.authorURL + "\">" + newSongInfo.author + "</a>";
-                    }
-                    else
-                    {
-                        newSongInfo.authorwithurl = newSongInfo.author;
-                    }
-
-                    // Multiple Step Authors
-                    if (newSongInfo.stepauthor != null && newSongInfo.stepauthor.indexOf(" & ") !== false)
-                    {
-                        var stepAuthors:Array = newSongInfo.stepauthor.split(" & ");
-                        newSongInfo.stepauthorwithurl = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(stepAuthors[0]) + "\">" + stepAuthors[0] + "</a>";
-                        for (var i:int = 1; i < stepAuthors.length; i++)
-                        {
-                            newSongInfo.stepauthorwithurl += " & <a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(stepAuthors[i]) + "\">" + stepAuthors[i] + "</a>";
-                        }
-                    }
-                    else
-                    {
-                        newSongInfo.stepauthorwithurl = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(newSongInfo.stepauthor) + "\">" + newSongInfo.stepauthor + "</a>";
-                    }
-
-                    // Song Price
-                    if (isNaN(Number(newSongInfo.price)))
-                    {
-                        newSongInfo.price = -1;
-                    }
-
-                    // Secret Credits
-                    if (isNaN(Number(newSongInfo.credits)))
-                    {
-                        newSongInfo.credits = -1;
-                    }
-
-                    // Max Score Totals
-                    newSongInfo.scoreTotal = newSongInfo.noteCount * 1550;
-                    newSongInfo.scoreRaw = newSongInfo.noteCount * 50;
-
-                    // Legacy Sync
-                    if (!legacy && isNaN(newSongInfo.sync))
-                        newSongInfo.sync = oldOffsets(newSongInfo.level);
 
                     songInfo = newSongInfo;
                 }
+
+                // Song Time
+                if (songInfo.time == null)
+                    songInfo.time = "0:00";
+
+                // Note Count
+                if (isNaN(Number(songInfo.noteCount)))
+                    songInfo.noteCount = 0;
+
+                // Extra Info
+                //songInfo.index = genreList[genre].length;
+                songInfo.timeSecs = (Number(songInfo.time.split(":")[0]) * 60) + Number(songInfo.time.split(":")[1]);
+
+                // Author with URL
+                if (songInfo.authorURL != null && songInfo.authorURL.length > 7)
+                    songInfo.authorwithurl = "<a href=\"" + songInfo.authorURL + "\">" + songInfo.author + "</a>";
+                else
+                    songInfo.authorwithurl = songInfo.author;
+
+                // Multiple Step Authors
+                if (songInfo.stepauthor != null && songInfo.stepauthor.indexOf(" & ") !== false)
+                {
+                    var stepAuthors:Array = songInfo.stepauthor.split(" & ");
+                    songInfo.stepauthorwithurl = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(stepAuthors[0]) + "\">" + stepAuthors[0] + "</a>";
+
+                    for (var i:int = 1; i < stepAuthors.length; i++)
+                        songInfo.stepauthorwithurl += " & <a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(stepAuthors[i]) + "\">" + stepAuthors[i] + "</a>";
+                }
+                else
+                    songInfo.stepauthorwithurl = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(songInfo.stepauthor) + "\">" + songInfo.stepauthor + "</a>";
+
+                // Song Price
+                if (isNaN(Number(songInfo.price)))
+                    songInfo.price = -1;
+
+                // Secret Credits
+                if (isNaN(Number(songInfo.credits)))
+                    songInfo.credits = -1;
+
+                // Max Score Totals
+                songInfo.scoreTotal = songInfo.noteCount * 1550;
+                songInfo.scoreRaw = songInfo.noteCount * 50;
+
+                // Legacy Sync
+                if (!legacy && isNaN(songInfo.sync))
+                    songInfo.sync = oldOffsets(songInfo.level);
 
                 // Add to lists
                 playList[songInfo.level] = songInfo;

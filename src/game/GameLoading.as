@@ -107,7 +107,7 @@ package game
             namedisplay.htmlText = "";
             if (song.songInfo.name)
             {
-                namedisplay.htmlText += songName + " - " + song.progress + "%  --- ";
+                namedisplay.htmlText += song.songInfo.name + " - " + song.progress + "%  --- ";
 
                 if (song.bytesTotal > 0)
                     namedisplay.htmlText += "(" + NumberUtil.bytesToString(song.bytesLoaded) + " / " + NumberUtil.bytesToString(song.bytesTotal) + ")";

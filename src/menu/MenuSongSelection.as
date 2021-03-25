@@ -793,7 +793,10 @@ package menu
 
             // Update Multiplayer Selection
             if (mpUpdate && options.activeSongId != -1)
-                _mp.gameplayPicking(_playlist.getSongInfo(options.activeSongId));
+            {
+                var songInfo:SongInfo = _playlist.getSongInfo(options.activeSongId);
+                _mp.gameplayPicking(songInfo);
+            }
         }
 
         /**
