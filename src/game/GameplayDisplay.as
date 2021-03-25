@@ -266,8 +266,8 @@ package game
             SOCKET_SONG_MESSAGE = {"player": {
                         "settings": options.settingsEncode(),
                         "name": _gvars.activeUser.name,
-                        "userid": _gvars.activeUser.id,
-                        "avatar": Constant.USER_AVATAR_URL + "?uid=" + _gvars.activeUser.id,
+                        "userid": _gvars.activeUser.siteId,
+                        "avatar": Constant.USER_AVATAR_URL + "?uid=" + _gvars.activeUser.siteId,
                         "skill_rating": _gvars.activeUser.skillRating,
                         "skill_level": _gvars.activeUser.skillLevel,
                         "game_rank": _gvars.activeUser.gameRank,
@@ -426,7 +426,7 @@ package game
 
             // Song
             song.updateMusicDelay();
-            legacyMode = (song.songInfo.chartType == NoteChart.FFR || song.songInfo.chartType == NoteChart.FFR_RAW || song.songInfo.chartType == NoteChart.FFR_LEGACY);
+            legacyMode = (song.type == NoteChart.FFR || song.type == NoteChart.FFR_RAW || song.type == NoteChart.FFR_LEGACY);
             if (song.music && (legacyMode || !options.modEnabled("nobackground")))
             {
                 song_background = song.music as MovieClip;

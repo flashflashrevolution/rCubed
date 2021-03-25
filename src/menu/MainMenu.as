@@ -120,7 +120,7 @@ package menu
             //- Add Main Panel to Stage
             var targetMenu:String = "";
             // Guests
-            if (GlobalVariables.instance.activeUser.isGuest || GlobalVariables.instance.activeUser.id == 2 || (_gvars.options && _gvars.options.singleplayer))
+            if (GlobalVariables.instance.activeUser.isGuest || (_gvars.options && _gvars.options.singleplayer))
             {
                 targetMenu = MENU_SONGSELECTION;
             }

@@ -123,7 +123,7 @@ package
         public function loadUserSongData():void
         {
             // Export SQL to JSON
-            var db_name:String = "dbinfo/" + (activeUser != null && activeUser.id > 0 ? activeUser.id : "0") + "_info.";
+            var db_name:String = "dbinfo/" + (activeUser != null && activeUser.siteId > 0 ? activeUser.siteId : "0") + "_info.";
             var sql_file:File = new File(AirContext.getAppPath(db_name + "db"));
             var json_file:File = new File(AirContext.getAppPath(db_name + "json"));
 
@@ -169,7 +169,7 @@ package
 
         public function writeUserSongData():void
         {
-            var db_name:String = "dbinfo/" + (activeUser != null && activeUser.id > 0 ? activeUser.id : "0") + "_info.";
+            var db_name:String = "dbinfo/" + (activeUser != null && activeUser.siteId > 0 ? activeUser.siteId : "0") + "_info.";
             var json_file:File = new File(AirContext.getAppPath(db_name + "json"));
             SQLQueries.writeFile(json_file);
         }

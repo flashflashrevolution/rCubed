@@ -99,7 +99,7 @@ package classes.replay
             this.user = new User(loadUser, false, data.userid);
             this.user.addEventListener(GlobalVariables.LOAD_COMPLETE, userLoad);
             if (!loadUser)
-                this.user.id = data.userid;
+                this.user.siteId = data.userid;
             this.level = data.replaylevelid;
             this.timestamp = data.timestamp;
 
@@ -202,10 +202,9 @@ package classes.replay
                 return;
 
             //- Level Details
-            this.user = new User(loadUser, false, data.user_id);
+            this.user = new User(loadUser, false);
             this.user.addEventListener(GlobalVariables.LOAD_COMPLETE, userLoad);
-            if (!loadUser)
-                this.user.id = data.user_id;
+            this.user.siteId = data.user_id;
             this.level = data.song_id;
             this.timestamp = data.timestamp;
 
@@ -341,7 +340,7 @@ package classes.replay
             {
                 var sT:Number = (perfect * 550) + (good * 275) + (average * 55) + (maxcombo * 1000) - (miss * 310) - (boo * 20);
                 var o:Object = {};
-                o.userid = this.user.id;
+                o.userid = this.user.siteId;
                 o.replaylevelid = this.level;
                 o.replaysettings = JSON.stringify(this.settings);
                 o.replayscore = (sT + "|" + perfect + "|" + good + "|" + average + "|" + miss + "|" + boo + "|" + maxcombo);

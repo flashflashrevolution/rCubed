@@ -648,7 +648,7 @@ package game
             dataSerial += "replay:" + result.replay + ",";
             dataSerial += "level:" + result.level + ",";
             dataSerial += "session:" + result.session + ",";
-            dataSerial += "uid:" + _gvars.activeUser.id + ",";
+            dataSerial += "uid:" + _gvars.activeUser.siteId + ",";
             dataSerial += "ses:" + _gvars.activeUser.hash + ",";
             dataSerial += R3::HASH_STRING;
             return SHA1.hash(dataSerial);
@@ -858,8 +858,8 @@ package game
             var ret:Boolean = false;
             ret ||= valid_score && !result.options.isScoreValid(true, false);
             ret ||= valid_replay && !result.options.isScoreValid(false, true);
-            ret ||= check_replay && (_gvars.flashvars.replay || result.replayData.length <= 0 || result.score <= 0 || (result.options.replay && result.options.replay.isEdited) || result.user.id != _gvars.playerUser.id)
-            ret ||= check_alt_engine && (result.user.id <= 2 || result.songInfo.engine != null);
+            ret ||= check_replay && (_gvars.flashvars.replay || result.replayData.length <= 0 || result.score <= 0 || (result.options.replay && result.options.replay.isEdited) || result.user.siteId != _gvars.playerUser.siteId)
+            ret ||= check_alt_engine && (result.user.isGuest || result.songInfo.engine != null);
             return !ret;
         }
 
@@ -879,8 +879,8 @@ package game
             var ret:Boolean = false;
             ret ||= valid_score && !result.options.isScoreUpdated(true, false);
             ret ||= valid_replay && !result.options.isScoreUpdated(false, true);
-            ret ||= check_replay && (_gvars.flashvars.replay || result.replayData.length <= 0 || result.score <= 0 || (result.options.replay && result.options.replay.isEdited) || result.user.id != _gvars.playerUser.id)
-            ret ||= check_alt_engine && (result.user.id <= 2 || result.songInfo.engine != null);
+            ret ||= check_replay && (_gvars.flashvars.replay || result.replayData.length <= 0 || result.score <= 0 || (result.options.replay && result.options.replay.isEdited) || result.user.siteId != _gvars.playerUser.siteId)
+            ret ||= check_alt_engine && (result.user.isGuest || result.songInfo.engine != null);
             return !ret;
         }
 
@@ -1339,7 +1339,7 @@ package game
             scoreSender.session = _gvars.userSession;
             scoreSender.start_time = gameResult.start_time;
             scoreSender.start_hash = gameResult.start_hash;
-            scoreSender.hash = SHA1.hash(scoreSender.replay + _gvars.activeUser.id);
+            scoreSender.hash = SHA1.hash(scoreSender.replay + _gvars.activeUser.siteId);
 
             // Set Request
             req.data = scoreSender;

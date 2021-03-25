@@ -225,7 +225,7 @@ package classes
                     songInfo.noteCount = 0;
 
                 // Extra Info
-                //songInfo.index = genreList[genre].length;
+                songInfo.index = genreList[songInfo.genre].length;
                 songInfo.timeSecs = (Number(songInfo.time.split(":")[0]) * 60) + Number(songInfo.time.split(":")[1]);
 
                 // Author with URL

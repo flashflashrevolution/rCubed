@@ -381,7 +381,7 @@ package classes
         public function loadAvatar():void
         {
             this.avatar = new Loader();
-            if (isActiveUser && this.id > 2)
+            if (isActiveUser && this.siteId > 2)
             {
                 this.avatar.contentLoaderInfo.addEventListener(Event.COMPLETE, avatarLoadComplete);
 
@@ -391,7 +391,7 @@ package classes
                     avatar.removeEventListener(Event.COMPLETE, avatarLoadComplete);
                 }
             }
-            this.avatar.load(new URLRequest(Constant.USER_AVATAR_URL + "?uid=" + this.id + "&cHeight=99&cWidth=99"));
+            this.avatar.load(new URLRequest(Constant.USER_AVATAR_URL + "?uid=" + this.siteId + "&cHeight=99&cWidth=99"));
         }
 
         ///- Level Ranks
@@ -625,7 +625,7 @@ package classes
 
         public function save(returnObject:Boolean = false):Object
         {
-            if (id <= 2 && !returnObject)
+            if (isGuest && !returnObject)
                 return {};
 
             var gameSave:Object = {};

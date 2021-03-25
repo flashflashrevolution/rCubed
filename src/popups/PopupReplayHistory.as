@@ -613,7 +613,7 @@ internal class ReplayBox extends Sprite
             box.color = 0xff0000;
 
         //- Name
-        nameText = new Text(box, 5, 0, (replay.user && replay.user.id != _gvars.playerUser.id && replay.user.name ? replay.user.name + " - " : "") + (songInfo["engine"] && !replay.fileReplay ? songInfo["engine"]["name"] + ": " : "") + songInfo["name"], 14);
+        nameText = new Text(box, 5, 0, (replay.user && replay.user.siteId != _gvars.playerUser.siteId && replay.user.name ? replay.user.name + " - " : "") + (songInfo["engine"] && !replay.fileReplay ? songInfo["engine"]["name"] + ": " : "") + songInfo["name"], 14);
         nameText.setAreaParams(525, 27);
         nameText.mouseEnabled = false;
 
@@ -677,7 +677,7 @@ internal class ReplayBox extends Sprite
             return;
         }
         if (!replay.user.isLoaded())
-            replay.user.loadUser(replay.user.id);
+            replay.user.loadUser(replay.user.siteId);
 
         _gvars.options = new GameOptions();
         _gvars.options.isolation = false;

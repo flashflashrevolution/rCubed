@@ -22,8 +22,8 @@ package classes
 
             this.level = songData.level;
 
-            this.user = new User(false, false, 1743546);
-            this.user.id = 1743546;
+            this.user = new User(false, false);
+            this.user.siteId = 1743546;
             this.user.name = "Song Preview";
             this.user.skillLevel = _gvars.MAX_DIFFICULTY;
             this.user.loadAvatar();
