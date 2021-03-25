@@ -189,7 +189,7 @@ package classes
                     newSongInfo.index = dynamicSongInfo.index;
                     newSongInfo.length = dynamicSongInfo.length;
                     newSongInfo.level = dynamicSongInfo.level;
-                    newSongInfo.levelid = dynamicSongInfo.levelid;
+                    newSongInfo.levelId = dynamicSongInfo.levelid;
                     newSongInfo.minNps = dynamicSongInfo.min_nps;
                     newSongInfo.maxNps = dynamicSongInfo.max_nps;
                     newSongInfo.name = dynamicSongInfo.name;
@@ -283,7 +283,7 @@ package classes
                 generatedQueues[songInfo.genre].push(songInfo.level);
                     //_gvars.songQueue.push(songData);
             }
-            indexList.sort(compareSongLevel);
+            //indexList.sort(compareSongLevel);
             _isLoaded = true;
             _loadError = false;
             this.dispatchEvent(new Event(GlobalVariables.LOAD_COMPLETE));

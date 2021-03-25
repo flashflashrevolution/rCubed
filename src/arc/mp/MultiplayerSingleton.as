@@ -244,9 +244,9 @@ package arc.mp
         }
 
         // Should be called in MenuSongSelection whenever the selection changes.
-        public function gameplayPicking(song:SongInfo):void
+        public function gameplayPicking(songInfo:SongInfo):void
         {
-            currentSongInfo = song;
+            currentSongInfo = songInfo;
             currentSongFile = null;
 
             currentStatus = Multiplayer.STATUS_PICKING;
@@ -270,8 +270,8 @@ package arc.mp
             if (currentStatus >= Multiplayer.STATUS_PLAYING || songInfo == null)
                 return;
 
-            var playlistEngineID:Object = Playlist.instance.engine ? Playlist.instance.engine.id : null;
-            if (playlistEngineID == (songInfo.engine ? songInfo.engine.id : null))
+            var playlistEngineId:Object = Playlist.instance.engine ? Playlist.instance.engine.id : null;
+            if (playlistEngineId == (songInfo.engine ? songInfo.engine.id : null))
             {
                 var mmenu:MainMenu = _gvars.gameMain.activePanel as MainMenu;
                 mmenu.switchTo(MainMenu.MENU_SONGSELECTION);

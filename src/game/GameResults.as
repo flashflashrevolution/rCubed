@@ -1134,7 +1134,7 @@ package game
                     "difficulty": gameResult.songInfo.difficulty,
                     "genre": gameResult.songInfo.genre,
                     "level": gameResult.songInfo.level,
-                    "levelid": gameResult.songInfo.levelid,
+                    "levelid": gameResult.songInfo.levelId,
                     "name": gameResult.songInfo.name,
                     "stepauthor": gameResult.songInfo.stepauthor,
                     "time": gameResult.songInfo.time};
@@ -1282,7 +1282,7 @@ package game
                 try
                 {
                     var path:String = AirContext.getReplayPath(result.song);
-                    path += (result.song.songInfo.levelid ? result.song.songInfo.levelid : result.song.id.toString())
+                    path += (result.song.songInfo.levelId ? result.song.songInfo.levelId : result.song.id.toString())
                     path += "_" + (new Date().getTime())
                     path += "_" + (result.pa_string + "-" + result.max_combo);
 

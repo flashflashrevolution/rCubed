@@ -5,7 +5,7 @@ package menu
     {
         public var activeGenre:int = 0;
         public var activeIndex:int = -1;
-        public var activeSongID:int = -1;
+        public var activeSongId:int = -1;
         public var pageNumber:int = 0;
         public var infoTab:int = 0;
 

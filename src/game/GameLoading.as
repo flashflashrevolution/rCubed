@@ -104,6 +104,7 @@ package game
             loadTimer++;
 
             // TODO: use localized strings here
+            namedisplay.htmlText = "";
             if (song.songInfo.name)
             {
                 namedisplay.htmlText += songName + " - " + song.progress + "%  --- ";

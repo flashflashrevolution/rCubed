@@ -464,7 +464,7 @@ package menu
                 options.isFilter = false;
                 options.activeGenre = e.target.index;
                 options.activeIndex = -1;
-                options.activeSongID = -1;
+                options.activeSongId = -1;
                 options.scroll_position = 0;
 
                 resetFilterOptions();
@@ -588,7 +588,7 @@ package menu
             if (songList == null || songList.length <= 0)
             {
                 options.activeIndex = -1;
-                options.activeSongID = -1;
+                options.activeSongId = -1;
                 return;
             }
 
@@ -630,7 +630,7 @@ package menu
             for (sX = 0; sX < songList.length; sX++)
             {
                 songInfo = songList[sX];
-                if (options.activeSongID == songInfo.level)
+                if (options.activeSongId == songInfo.level)
                 {
                     setActiveIndex(sX, -1, false, false);
                     hasSelected = true;
@@ -642,7 +642,7 @@ package menu
             if (!hasSelected)
             {
                 options.activeIndex = -1;
-                options.activeSongID = -1;
+                options.activeSongId = -1;
             }
 
             // No song selected, select the first in the list if valid.
@@ -757,7 +757,7 @@ package menu
             if (songItems.length <= 0 || index < 0 || index >= songItems.length)
             {
                 options.activeIndex = -1;
-                options.activeSongID = -1;
+                options.activeSongId = -1;
                 return;
             }
 
@@ -772,7 +772,7 @@ package menu
             }
 
             // Set Song
-            options.activeSongID = songItems[index].level;
+            options.activeSongId = songItems[index].level;
 
             // Set Active Highlights
             songItems[index].active = true;
@@ -792,8 +792,8 @@ package menu
             }
 
             // Update Multiplayer Selection
-            if (mpUpdate && options.activeSongID != -1)
-                _mp.gameplayPicking(_playlist.getSongInfo(options.activeSongID));
+            if (mpUpdate && options.activeSongId != -1)
+                _mp.gameplayPicking(_playlist.getSongInfo(options.activeSongId));
         }
 
         /**
@@ -955,7 +955,7 @@ package menu
         {
             for (var i:int = 0; i < songItems.length; i++)
             {
-                if (options.activeSongID == songItems[i].level)
+                if (options.activeSongId == songItems[i].level)
                 {
                     songItems[i].updateOrShow();
                     if (options.infoTab == TAB_PLAYLIST)
@@ -980,7 +980,7 @@ package menu
                 optionsBox.getChildAt(bti).alpha = 0.75;
 
             // Get Song Details
-            var songInfo:SongInfo = _playlist.getSongInfo(options.activeSongID);
+            var songInfo:SongInfo = _playlist.getSongInfo(options.activeSongId);
 
             //- Cleanup old Info Box
             infoBox.removeChildren();
@@ -1444,7 +1444,7 @@ package menu
         {
             var searchTypeParam:String = searchTypeBox.selectedItem["data"];
             options.activeGenre = PLAYLIST_SEARCH;
-            options.activeSongID = -1;
+            options.activeSongId = -1;
             options.activeIndex = -1;
             options.pageNumber = 0;
             options.isFilter = true;
@@ -1474,7 +1474,7 @@ package menu
         {
             saveSearchTextAndType();
             options.activeGenre = PLAYLIST_SEARCH;
-            options.activeSongID = (songInfo != null && songInfo.level) ? songInfo.level : -1;
+            options.activeSongId = (songInfo != null && songInfo.level) ? songInfo.level : -1;
             options.pageNumber = 0;
             options.isFilter = true;
             if (songInfo)
@@ -1494,7 +1494,7 @@ package menu
 
             for (var i:int = 0; i < songItems.length; i++)
             {
-                if (songItems[i].level == options.activeSongID)
+                if (songItems[i].level == options.activeSongId)
                     setActiveIndex(i, -1, true);
             }
         }
@@ -1528,7 +1528,7 @@ package menu
             {
                 options.pageNumber = 0;
                 options.activeIndex = -1;
-                options.activeSongID = -1;
+                options.activeSongId = -1;
                 options.scroll_position = 0;
             }
             options.activeGenre = (options.infoTab == TAB_QUEUE ? PLAYLIST_QUEUE : 0);
@@ -1658,7 +1658,7 @@ package menu
                 {
                     if (options.pageNumber != targetPage)
                     {
-                        options.activeSongID = -1;
+                        options.activeSongId = -1;
                         options.activeIndex = -1;
                         options.pageNumber = targetPage;
                         options.infoTab = TAB_PLAYLIST;
@@ -1697,7 +1697,7 @@ package menu
                 options.scroll_position = 0;
                 options.activeGenre = 0;
                 options.activeIndex = -1;
-                options.activeSongID = -1;
+                options.activeSongId = -1;
                 options.infoTab = TAB_PLAYLIST;
                 buildGenreList();
                 buildPlayList();
@@ -1852,7 +1852,7 @@ package menu
                     resetFilterOptions();
                     options.scroll_position = 0;
                     options.activeIndex = -1;
-                    options.activeSongID = -1;
+                    options.activeSongId = -1;
                     options.activeGenre = options.activeGenre + (e.ctrlKey ? -1 : 1);
                     options.infoTab = TAB_PLAYLIST;
                     if (options.activeGenre < -1)
@@ -1865,12 +1865,12 @@ package menu
                     return;
 
                 case Keyboard.ENTER:
-                    if (!((stage.focus is PushButton) || (stage.focus is TextField)) && options.activeSongID >= 0)
+                    if (!((stage.focus is PushButton) || (stage.focus is TextField)) && options.activeSongId >= 0)
                     {
                         if (_mp.gameplayHasOpponent())
-                            multiplayerLoad(options.activeSongID);
+                            multiplayerLoad(options.activeSongId);
                         else
-                            playSong(options.activeSongID);
+                            playSong(options.activeSongId);
                     }
                     return;
 
@@ -1985,7 +1985,7 @@ package menu
                 _gvars.gameMain.addAlert(_lang.string("song_purchase_error_" + response["status"]), 120, Alert.RED);
             }
 
-            if (options.activeSongID == level_id && options.infoTab == TAB_PLAYLIST)
+            if (options.activeSongId == level_id && options.infoTab == TAB_PLAYLIST)
             {
                 buildInfoBox();
             }
@@ -2002,7 +2002,7 @@ package menu
             {
                 if (pur_loader.loader == e.target)
                 {
-                    if (options.activeSongID == pur_loader.level && options.infoTab == TAB_PLAYLIST)
+                    if (options.activeSongId == pur_loader.level && options.infoTab == TAB_PLAYLIST)
                     {
                         buildInfoBox();
                     }

@@ -672,6 +672,9 @@ package classes.chart
 
         public function get noteSteps():int
         {
+            if (!chart)
+                return NaN;
+
             return chart.framerate + 1;
         }
 

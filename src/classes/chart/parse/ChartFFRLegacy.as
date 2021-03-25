@@ -45,23 +45,21 @@ package classes.chart.parse
                 var u:String = sprintf(engine.songURL, songInfo);
                 return sprintf(engine.songURL, songInfo);
             }
-            return engine.songURL + "level_" + songInfo.level + ".swf";
+            return engine.songURL + "level_" + songInfo.levelId + ".swf";
         }
 
         public static function validURL(url:String):Boolean
         {
             var pieces:Array = StringUtil.getURLPieces(url);
             var urls:Array = Site.instance.data["alt_engine_list"];
+
             if (urls.indexOf("c1de69f4b4e024a4a943348b8e5e56d6") != -1)
-            {
                 return false;
-            }
+
             for each (var item:String in pieces)
             {
                 if (urls.indexOf(MD5.hash(item.toLowerCase())) != -1)
-                {
                     return false;
-                }
             }
             return true;
         }
@@ -73,8 +71,10 @@ package classes.chart.parse
                 GlobalVariables.instance.gameMain.addAlert("Incorrect legacy URL");
                 return;
             }
+
             var time:Number = new Date().getTime();
             var loader:URLLoader = new URLLoader();
+
             loader.addEventListener(Event.COMPLETE, function(event:Event):void
             {
                 try
@@ -103,9 +103,9 @@ package classes.chart.parse
                             engine.songURLMode = node.songURLMode.toString();
                         if (engine.legacySync)
                         {
-                            engine.legacySyncLevel = int(node.@legacySyncLevel.toString());
-                            engine.legacySyncLow = int(node.@legacySyncLow.toString());
-                            engine.legacySyncHigh = int(node.@legacySyncHigh.toString());
+                            engine.legacySyncLevel = parseInt(node.@legacySyncLevel.toString());
+                            engine.legacySyncLow = parseInt(node.@legacySyncLow.toString());
+                            engine.legacySyncHigh = parseInt(node.@legacySyncHigh.toString());
                             setEngineSync(engine);
                         }
                         if (CONFIG::debug || node.@nocrossdomain != "true")
@@ -144,24 +144,27 @@ package classes.chart.parse
         {
             if (engine == null)
                 engine = ArcGlobals.instance.configLegacy;
+
             var xml:XML = new XML(data);
             var nodes:XMLList = xml.children();
             var count:int = nodes.length();
             var songs:Array = [];
+
             for (var i:int = 0; i < count; i++)
             {
                 var node:XML = nodes[i];
                 var songInfo:SongInfo = new SongInfo();
+
                 songInfo.genre = int(node.@genre.toString());
                 songInfo.name = node.songname.toString();
                 songInfo.difficulty = int(node.songdifficulty.toString());
                 songInfo.style = node.songstyle.toString();
                 songInfo.time = node.songlength.toString();
-                songInfo.level = node.level.toString();
-                if (isNaN(songInfo.level) || songInfo.level == 0)
+                songInfo.levelId = node.level.toString();
+                if (isNaN(parseInt(songInfo.levelId)))
                     songInfo.level = i + 1;
                 else
-                    songInfo.level = int(songInfo.levelid);
+                    songInfo.level = int(songInfo.levelId);
                 songInfo.order = int(node.order.toString());
                 songInfo.noteCount = int(node.arrows.toString());
                 songInfo.author = node.songauthor.toString();

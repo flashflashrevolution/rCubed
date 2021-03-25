@@ -74,7 +74,7 @@ package
         public var VISUAL_MODS:Array = ["mirror", "dark", "hide", "mini", "columncolour", "halftime", "----", "nobackground"];
         public var songStartTime:String = "0";
         public var songStartHash:String = "0";
-        public var songData:Array = [];
+        public var songCache:Array = [];
         public var songHighscores:Object = {};
 
         ///- User Vars
@@ -259,9 +259,9 @@ package
         {
             if (!preview && songInfo.engine == Playlist.instance.engine && (!songInfo.engine || !songInfo.engine.ignoreCache))
             {
-                for (var s:int = 0; s < songData.length; s++)
+                for (var s:int = 0; s < songCache.length; s++)
                 {
-                    var song:Song = songData[s];
+                    var song:Song = songCache[s];
                     if (song != null && song.songInfo.level == songInfo.level)
                         return song;
                 }
@@ -274,37 +274,37 @@ package
         {
             //- Only Cache 10 Songs
             var engineCache:Boolean = (songInfo.engine == Playlist.instance.engine) && (!songInfo.engine || !songInfo.engine.ignoreCache);
-            if (!preview && songData.length > 10 && engineCache)
-                songData.pop();
+            if (!preview && songCache.length > 10 && engineCache)
+                songCache.pop();
 
             //- Make new Song
             var song:Song = new Song(songInfo, preview);
 
             //- Push to cache
             if (!preview && engineCache)
-                songData.push(song);
+                songCache.push(song);
 
             return song;
         }
 
         public function removeSongFile(song:Song):void
         {
-            for (var s:int = 0; s < songData.length; s++)
+            for (var s:int = 0; s < songCache.length; s++)
             {
-                if (songData[s] == song)
+                if (songCache[s] == song)
                 {
                     song.unload();
-                    songData.removeAt(s);
+                    songCache.removeAt(s);
                 }
             }
         }
 
         public function removeSongFiles():void
         {
-            for (var s:int = 0; s < songData.length; s++)
-                songData[s].unload();
+            for (var s:int = 0; s < songCache.length; s++)
+                songCache[s].unload();
 
-            songData = [];
+            songCache = [];
         }
 
         public static const SONG_ACCESS_PLAYABLE:int = 0;
