@@ -220,7 +220,10 @@ package com.flashfla.net
 
             var playerIdx:int = room.getPlayerIndex(user);
             if (playerIdx <= 0)
+            {
                 user.gameplay = null;
+                return;
+            }
 
             var gameplay:Gameplay;
             if (user.gameplay)
@@ -231,13 +234,24 @@ package com.flashfla.net
                 gameplay = user.gameplay;
             }
 
-            var roomVars:Object = room.variables;
             var stats:Array;
             var previousStatus:int = gameplay.status;
 
             var prefix:String = "P" + playerIdx;
 
-            stats = String(roomVars[prefix + "_GAMESCORES"]).split(":");
+            gameplay.status = int(room.variables[prefix + "_STATE"]);
+            if (gameplay.status <= STATUS_CLEANUP)
+            {
+                if (previousStatus != gameplay.status)
+                {
+                    gameplay.reset();
+                    room.variables["arc_engine" + playerIdx] = null;
+                    eventUserUpdate(user);
+                }
+                return;
+            }
+
+            stats = String(room.variables[prefix + "_GAMESCORES"]).split(":");
             gameplay.score = int(stats[0]);
             gameplay.amazing = int(stats[1]);
             gameplay.perfect = int(stats[2]);
@@ -247,22 +261,16 @@ package com.flashfla.net
             gameplay.boo = int(stats[6]);
             gameplay.combo = int(stats[7]);
             gameplay.maxCombo = int(stats[8]);
-            gameplay.status = int(roomVars[prefix + "_STATE"]);
-            gameplay.songId = int(roomVars[prefix + "_SONGID"]);
-            gameplay.statusLoading = int(roomVars[prefix + "_SONGID_PROGRESS"]);
-            gameplay.life = int(roomVars[prefix + "_GAMELIFE"]);
+            gameplay.songId = int(room.variables[prefix + "_SONGID"]);
+            gameplay.statusLoading = int(room.variables[prefix + "_SONGID_PROGRESS"]);
+            gameplay.life = int(room.variables[prefix + "_GAMELIFE"]);
 
-            if (previousStatus != gameplay.status && gameplay.status == STATUS_CLEANUP)
-                gameplay.reset();
-
-            var engine:String = roomVars["arc_engine" + playerIdx];
+            var engine:String = room.variables["arc_engine" + playerIdx];
             if (engine)
             {
                 gameplay.songInfo = ArcGlobals.instance.legacyDecode(JSON.parse(engine));
                 if (gameplay.songInfo)
                 {
-                    //if (!gameplay.song.name)
-                    //    gameplay.song.name = gameplay.songName;
                     if (!("level" in gameplay.songInfo) || gameplay.songInfo.level < 0)
                         gameplay.songInfo.level = gameplay.songId || -1;
                 }
@@ -272,20 +280,9 @@ package com.flashfla.net
                 var playlist:Playlist = Playlist.instanceCanon;
                 if (gameplay.songId)
                     gameplay.songInfo = playlist.playList[gameplay.songId];
-                /*if (!gameplay.song)
-                   {
-                   for each (var song:Object in playlist.playList)
-                   {
-                   if (song.name == gameplay.songName)
-                   {
-                   gameplay.song = song;
-                   break;
-                   }
-                   }
-                   }*/
             }
 
-            var replayString:String = roomVars["arc_replay" + playerIdx];
+            var replayString:String = room.variables["arc_replay" + playerIdx];
             if (replayString)
                 gameplay.encodedReplay = replayString;
         }
@@ -353,12 +350,19 @@ package com.flashfla.net
 
                 // Update each player's gameplay
                 var anyUserStatusChanged:Boolean = false;
+                var anyUserSongNameChanged:Boolean = false;
                 for each (var user:User in roomPlayers)
                 {
-                    var previousUserStatus:int = user.gameplay ? user.gameplay.status : -1;
+                    var previousUserStatus:int = user.gameplay ? user.gameplay.status ? user.gameplay.status : -1 : -1;
+                    var previousSongName:String = user.gameplay ? user.gameplay.songInfo ? user.gameplay.songInfo.name : "" : "";
+
                     updateUserGameplayFromRoom(room, user);
+
                     if (previousUserStatus != user.gameplay.status)
                         anyUserStatusChanged = true;
+
+                    if (previousSongName != (user.gameplay.songInfo ? user.gameplay.songInfo.name : ""))
+                        eventUserUpdate(user);
                 }
 
                 // Process gameplay status changes for game start/end
@@ -378,6 +382,8 @@ package com.flashfla.net
                     {
                         reportSongEnd(room);
                         eventGameResults(room);
+
+                        eventUserUpdate(currentUser);
                     }
                 }
             }
@@ -515,7 +521,7 @@ package com.flashfla.net
                 return;
 
             if (room.isGameRoom)
-                asPlayer &&= room.userCount - room.specCount > Room.MAX_PLAYERS;
+                asPlayer &&= room.userCount < Room.MAX_PLAYERS;
 
             server.joinRoom(room.id, password, !asPlayer, true);
         }
@@ -961,6 +967,9 @@ package com.flashfla.net
             user.playerIdx = -1;
             user.gameplay = null;
 
+            room.specCount += 1;
+            room.userCount -= 1;
+
             updateRoom(room);
 
             eventRoomUserStatus(room, user);
@@ -983,6 +992,9 @@ package com.flashfla.net
 
             if (user == currentUser)
                 sendCurrentUserRoomVariables(room);
+
+            room.specCount -= 1;
+            room.userCount += 1;
 
             updateRoom(room);
 
@@ -1017,6 +1029,13 @@ package com.flashfla.net
                 var room:Room = getRoom(evtRoom);
                 if (!room)
                     addRoom(evtRoom);
+                else
+                {
+                    room.userCount = evtRoom.userCount;
+                    room.specCount = evtRoom.specCount;
+
+                    eventRoomUpdate(room);
+                }
             }
 
             eventRoomList();
@@ -1098,7 +1117,8 @@ package com.flashfla.net
                     currentUser.gameplay = null;
                 }
 
-                room.removeUser(currentUser.id);
+                room.clearPlayers();
+                room.clearUsers();
             }
 
             updateRoom(room);
@@ -1140,6 +1160,7 @@ package com.flashfla.net
                 else
                 {
                     applyUserVariables(user);
+
                     room.addUser(user);
 
                     // If the user has a positive playerIdx, insert it in the room's players
@@ -1149,7 +1170,10 @@ package com.flashfla.net
             }
 
             updateRoom(room);
+
             sendCurrentUserRoomVariables(room);
+            if (room.isPlayer(currentUser))
+                sendCurrentUserStatus(room);
 
             // Propagate the events
             eventUserUpdate(currentUser);

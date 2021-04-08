@@ -350,9 +350,9 @@ package arc.mp
         }
 
         public function updateWindowTitle(room:Room):void
-        { // Minus 2 Rooms due to The Entrence (Fake) and Lobby
+        {
             if (room != null)
-                window.title = Multiplayer.GAME_VERSION + " " + room.name + " - Rooms: " + (connection.rooms.length - 2) + " - Players: " + room.playerCount;
+                window.title = Multiplayer.GAME_VERSION + " " + room.name + " - Rooms: " + (connection.rooms.length - 2) + " - Players: " + room.userCount;
         }
 
         private function nameRoom(room:Room):String
@@ -365,7 +365,7 @@ package arc.mp
             const roomName:String = "(" + title + ")";
             const spectatorString:String = (room.specCount > 0) ? "+" + room.specCount + " " : "";
 
-            return MultiplayerChat.textFormatSize(room.playerCount + "/2 " + spectatorString, "-1") + MultiplayerChat.textFormatColour(MultiplayerChat.textEscape((room.isPrivate ? "!" : "") + roomName), "#" + dulledColour) + " " + room.name;
+            return MultiplayerChat.textFormatSize(room.userCount + "/2 " + spectatorString, "-1") + MultiplayerChat.textFormatColour(MultiplayerChat.textEscape((room.isPrivate ? "!" : "") + roomName), "#" + dulledColour) + " " + room.name;
         }
 
         public function setParent(value:MenuPanel):void

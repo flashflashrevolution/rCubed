@@ -4,6 +4,7 @@ package arc.mp
     import classes.Playlist;
     import classes.Room;
     import classes.User;
+    import classes.SongInfo;
     import classes.Gameplay;
     import classes.chart.Song;
     import classes.replay.Replay;
@@ -21,7 +22,6 @@ package arc.mp
     import com.flashfla.net.events.GameUpdateEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
     import com.flashfla.utils.StringUtil;
-    import com.flashfla.utils.NumberUtil;
     import flash.events.Event;
     import flash.events.TimerEvent;
     import flash.net.URLLoader;
@@ -34,7 +34,6 @@ package arc.mp
     import menu.MainMenu;
     import menu.MenuPanel;
     import menu.MenuSongSelection;
-    import classes.SongInfo;
 
     public class MultiplayerSingleton extends Object
     {
@@ -202,8 +201,6 @@ package arc.mp
             }
 
             gameplay.songInfo = currentSongInfo;
-            if (gameplay.songInfo == null)
-                gameplay.songName = "No Song Selected";
 
             if (currentSongFile != null && !currentSongFile.isLoaded)
                 gameplay.statusLoading = currentSongFile.progress;
@@ -291,7 +288,7 @@ package arc.mp
             }
         }
 
-        private function gameplayCompareSong(s1:Object, s2:Object):Boolean
+        private function gameplayCompareSong(s1:SongInfo, s2:SongInfo):Boolean
         {
             if (!s1 || !s2)
                 return false;
@@ -302,7 +299,7 @@ package arc.mp
             if (s1.level > 0 && s2.level > 0 && s1.level != s2.level)
                 return false;
 
-            if (s1.levelid && s2.levelid && s1.levelid != s2.levelid)
+            if (s1.levelId && s2.levelId && s1.levelId != s2.levelId)
                 return false;
 
             return true;

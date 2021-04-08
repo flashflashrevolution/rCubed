@@ -538,17 +538,15 @@ package it.gotoandplay.smartfoxserver.handlers
                 else if (vType == "x")
                     value = null;
 
-                if (variables[vName] != value)
+                if (variables[vName] != value || vType == "x")
                 {
                     if (changedVars != null)
                     {
                         changedVars.push(vName);
                         changedVars[vName] = true;
                     }
-                    if (value == null)
-                        delete variables[vName];
-                    else
-                        variables[vName] = value;
+
+                    variables[vName] = value;
                 }
             }
         }

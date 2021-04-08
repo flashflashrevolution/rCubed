@@ -24,14 +24,6 @@ package classes
         public var songId:int;
         public var songInfo:SongInfo;
 
-        // Flags
-        public var statusChanged:Boolean = false;
-
-        /**
-         * Only used in Legacy engine
-         */
-        public var songName:String;
-
         public function Gameplay()
         {
         }
@@ -55,14 +47,6 @@ package classes
 
             status = Multiplayer.STATUS_NONE;
             statusLoading = 0;
-
-            statusChanged = false;
-        }
-
-        public function setStatus(status:int):void
-        {
-            this.status = status;
-            statusChanged = true;
         }
     }
 }

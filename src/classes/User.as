@@ -381,7 +381,7 @@ package classes
         public function loadAvatar():void
         {
             this.avatar = new Loader();
-            if (isActiveUser && this.siteId > 2)
+            if (isActiveUser && !isGuest)
             {
                 this.avatar.contentLoaderInfo.addEventListener(Event.COMPLETE, avatarLoadComplete);
 

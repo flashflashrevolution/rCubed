@@ -165,19 +165,19 @@ package classes
             return playerVec
         }
 
+        public function clearPlayers():void
+        {
+            _players = {}
+            _playerCount = 0;
+        }
+
         public function addUser(user:User):void
         {
-            if (getUser(user.id))
-                return;
-
             _users[user.id] = user
         }
 
         public function removeUser(userId:int):void
         {
-            if (!getUser(userId))
-                return;
-
             delete _users[userId]
         }
 
@@ -210,8 +210,6 @@ package classes
         public function clearUsers():void
         {
             this._users = {}
-            this.userCount = 0
-            this.specCount = 0
         }
 
         public function isAllPlayersInStatus(status:int):Boolean
