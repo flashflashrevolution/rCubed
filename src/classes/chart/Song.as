@@ -76,7 +76,7 @@ package classes.chart
             this.songInfo = songInfo;
             this.id = songInfo.level;
             this.preview = isPreview;
-            this.type = (songInfo.chartType != null ? songInfo.chartType : NoteChart.FFR);
+            this.type = songInfo.chartType || NoteChart.FFR;
             this.chartType = songInfo.chartType || NoteChart.FFR_LEGACY;
 
             options = _gvars.options;
