@@ -85,7 +85,7 @@ package game.controls
                [4] = Black Flag,
                [5] = Average Flag,
                [6] = Boo Flag,
-               [7] = Miss Flag
+               [7] = Miss Flag,
                [8] = Raw Goods
              */
 
@@ -95,6 +95,11 @@ package game.controls
                 {
                     field.textColor = colors[2];
                     fieldShadow.textColor = colors_dark[2];
+                }
+                else if (colors_enabled[6] && boo == 1 && good + average + miss == 0) // Display Boo Flag color
+                {
+                    field.textColor = colors[6];
+                    fieldShadow.textColor = colors_dark[6];
                 }
                 else if (colors_enabled[4] && good == 1 && average + boo + miss == 0) // Display Black Flag color
                 {
@@ -106,17 +111,12 @@ package game.controls
                     field.textColor = colors[5];
                     fieldShadow.textColor = colors_dark[5];
                 }
-                else if (colors_enabled[6] && boo == 1 && good + average + miss == 0) // Display Boo Flag color
-                {
-                    field.textColor = colors[6];
-                    fieldShadow.textColor = colors_dark[6];
-                }
                 else if (colors_enabled[7] && miss == 1 && good + average + boo == 0) // Display Miss Flag color
                 {
                     field.textColor = colors[7];
                     fieldShadow.textColor = colors_dark[7];
                 }
-                else if (colors_enabled[8] && raw_goods <= options.rawGoodTracker) // Display color for raw good tracker
+                else if (colors_enabled[8] && raw_goods >= options.rawGoodTracker) // Display color for raw good tracker
                 {
                     field.textColor = colors[8];
                     fieldShadow.textColor = colors_dark[8];
