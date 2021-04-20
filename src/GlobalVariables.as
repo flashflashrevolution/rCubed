@@ -36,6 +36,7 @@ package
     import flash.utils.ByteArray;
     import game.GameOptions;
     import game.GameScoreResult;
+    import classes.SongInfo;
 
     public class GlobalVariables extends EventDispatcher
     {
@@ -73,7 +74,7 @@ package
         public var VISUAL_MODS:Array = ["mirror", "dark", "hide", "mini", "columncolour", "halftime", "----", "nobackground"];
         public var songStartTime:String = "0";
         public var songStartHash:String = "0";
-        public var songData:Array = [];
+        public var songCache:Array = [];
         public var songHighscores:Object = {};
 
         ///- User Vars
@@ -122,7 +123,7 @@ package
         public function loadUserSongData():void
         {
             // Export SQL to JSON
-            var db_name:String = "dbinfo/" + (activeUser != null && activeUser.id > 0 ? activeUser.id : "0") + "_info.";
+            var db_name:String = "dbinfo/" + (activeUser != null && activeUser.siteId > 0 ? activeUser.siteId : "0") + "_info.";
             var sql_file:File = new File(AirContext.getAppPath(db_name + "db"));
             var json_file:File = new File(AirContext.getAppPath(db_name + "json"));
 
@@ -168,7 +169,7 @@ package
 
         public function writeUserSongData():void
         {
-            var db_name:String = "dbinfo/" + (activeUser != null && activeUser.id > 0 ? activeUser.id : "0") + "_info.";
+            var db_name:String = "dbinfo/" + (activeUser != null && activeUser.siteId > 0 ? activeUser.siteId : "0") + "_info.";
             var json_file:File = new File(AirContext.getAppPath(db_name + "json"));
             SQLQueries.writeFile(json_file);
         }
@@ -254,58 +255,56 @@ package
 
         ///- Public
         //- Song Data
-        public function getSongFile(song:Object, preview:Boolean = false):Song
+        public function getSongFile(songInfo:SongInfo, preview:Boolean = false):Song
         {
-            if (!preview && song.engine == Playlist.instance.engine && (!song.engine || !song.engine.ignoreCache))
+            if (!preview && songInfo.engine == Playlist.instance.engine && (!songInfo.engine || !songInfo.engine.ignoreCache))
             {
-                for (var s:int = 0; s < songData.length; s++)
+                for (var s:int = 0; s < songCache.length; s++)
                 {
-                    if (songData[s].level == song.level && songData[s].file != null)
-                    {
-                        return songData[s].file;
-                    }
+                    var song:Song = songCache[s];
+                    if (song != null && song.songInfo.level == songInfo.level)
+                        return song;
                 }
             }
 
-            return loadSongFile(song, preview);
+            return loadSongFile(songInfo, preview);
         }
 
-        private function loadSongFile(song:Object, preview:Boolean = false):Song
+        private function loadSongFile(songInfo:SongInfo, preview:Boolean = false):Song
         {
             //- Only Cache 10 Songs
-            var engineCache:Boolean = (song.engine == Playlist.instance.engine) && (!song.engine || !song.engine.ignoreCache);
-            if (!preview && songData.length > 10 && engineCache)
-                songData.pop().file = null;
+            var engineCache:Boolean = (songInfo.engine == Playlist.instance.engine) && (!songInfo.engine || !songInfo.engine.ignoreCache);
+            if (!preview && songCache.length > 10 && engineCache)
+                songCache.pop();
 
             //- Make new Song
-            var newSong:Song = new Song(song, preview);
-            song.file = newSong;
+            var song:Song = new Song(songInfo, preview);
 
             //- Push to cache
             if (!preview && engineCache)
-                songData.push(song);
+                songCache.push(song);
 
-            return newSong;
+            return song;
         }
 
-        public function removeSongFile(song:Object):void
+        public function removeSongFile(song:Song):void
         {
-            for (var s:int = 0; s < songData.length; s++)
+            for (var s:int = 0; s < songCache.length; s++)
             {
-                if (songData[s] == song)
+                if (songCache[s] == song)
                 {
                     song.unload();
-                    songData[s].file = null;
-                    songData.splice(s, 1);
+                    songCache.removeAt(s);
                 }
             }
         }
 
         public function removeSongFiles():void
         {
-            for (var s:int = 0; s < songData.length; s++)
-                songData[s].file.unload();
-            songData = new Array();
+            for (var s:int = 0; s < songCache.length; s++)
+                songCache[s].unload();
+
+            songCache = [];
         }
 
         public static const SONG_ACCESS_PLAYABLE:int = 0;
@@ -315,28 +314,28 @@ package
         public static const SONG_ACCESS_VETERAN:int = 4;
         public static const SONG_ACCESS_BANNED:int = 5;
 
-        public function checkSongAccess(song:Object):int
+        public function checkSongAccess(songInfo:SongInfo):int
         {
-            if (song == null || isNaN(song.level))
+            if (songInfo == null || isNaN(songInfo.level))
                 return SONG_ACCESS_BANNED;
-            if (song.credits > 0 && activeUser.credits < song.credits)
+            if (songInfo.credits > 0 && activeUser.credits < songInfo.credits)
                 return SONG_ACCESS_CREDITS;
-            if (song.price > 0 && playerUser.purchased[song.index] != 1)
+            if (songInfo.price > 0 && (songInfo.index >= playerUser.purchased.length || !playerUser.purchased[songInfo.index]))
                 return SONG_ACCESS_PURCHASED;
-            if (song.engine == null && TOKENS[song.level] != null && TOKENS[song.level].unlock == 0)
+            if (songInfo.engine == null && TOKENS[songInfo.level] != null && TOKENS[songInfo.level].unlock == 0)
                 return SONG_ACCESS_TOKEN;
-            if (song.prerelease && !playerUser.isVeteran)
+            if (songInfo.prerelease && !playerUser.isVeteran)
                 return SONG_ACCESS_VETERAN;
             return SONG_ACCESS_PLAYABLE;
         }
 
-        public static function getSongIconIndex(_song:Object, _rank:Object):int
+        public static function getSongIconIndex(_songInfo:SongInfo, _rank:Object):int
         {
             var songIcon:int = 0;
             if (_rank)
             {
-                var arrows:int = _song.arrows;
-                var scoreRaw:int = _song.scoreRaw;
+                var arrows:int = _songInfo.noteCount;
+                var scoreRaw:int = _songInfo.scoreRaw;
                 if (_rank.arrows > 0)
                 {
                     arrows = _rank.arrows;
@@ -378,13 +377,13 @@ package
         }
 
 
-        public static function getSongIconIndexBitmask(_song:Object, _rank:Object):int
+        public static function getSongIconIndexBitmask(_songInfo:SongInfo, _rank:Object):int
         {
             var songIcon:int = 0;
             if (_rank)
             {
-                var arrows:int = _song.arrows;
-                var scoreRaw:int = _song.scoreRaw;
+                var arrows:int = _songInfo.noteCount;
+                var scoreRaw:int = _songInfo.scoreRaw;
                 if (_rank.arrows > 0)
                 {
                     arrows = _rank.arrows;
@@ -428,9 +427,9 @@ package
         public static const SONG_ICON_TEXT_FLAG:Array = ["Unplayed", "Played", "Full Combo",
             "Single Digit Good", "Blackflag", "Booflag", "AAA", "Full Combo*"];
 
-        public static function getSongIcon(_song:Object, _rank:Object):String
+        public static function getSongIcon(_songInfo:SongInfo, _rank:Object):String
         {
-            return SONG_ICON_TEXT[getSongIconIndex(_song, _rank)];
+            return SONG_ICON_TEXT[getSongIconIndex(_songInfo, _rank)];
         }
 
         //- Hiscores
@@ -442,9 +441,8 @@ package
         public function getHighscores(lvlID:int):Object
         {
             if (songHighscores[lvlID])
-            {
                 return songHighscores[lvlID];
-            }
+
             return null;
         }
 
@@ -476,10 +474,10 @@ package
             var lvlID:int = e.target.level;
             var data:Object = JSON.parse(e.target.data);
             var hiscores:Object = songHighscores[lvlID];
+
             if (!hiscores)
-            {
-                songHighscores[lvlID] = new Object();
-            }
+                songHighscores[lvlID] = {};
+
             if (data.error == null)
             {
                 for each (var item:Object in data)

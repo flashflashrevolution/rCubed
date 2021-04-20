@@ -1,6 +1,7 @@
 package game
 {
     import classes.User;
+    import classes.SongInfo;
     import classes.chart.Song;
     import classes.replay.Base64Encoder;
     import classes.replay.ReplayPack;
@@ -11,7 +12,7 @@ package game
         public var game_index:int;
         public var level:int;
         public var song:Song;
-        public var song_entry:Object;
+        public var songInfo:SongInfo;
         public var note_count:int;
 
         public var is_preview:Boolean = false;
@@ -67,7 +68,7 @@ package game
         }
 
         // Replay v3
-        public var replay:Array;
+        public var replayData:Array; // Probably array of ReplayNote
         public var replay_hit:Array;
 
         // Binary Replays (aka Replay v4)
@@ -75,7 +76,7 @@ package game
         public var replay_bin_boos:Array;
         private var _replay_bin:ByteArray;
 
-        public function get replay_bin():ByteArray
+        public function get replayBin():ByteArray
         {
             if (_replay_bin == null)
             {
@@ -88,11 +89,11 @@ package game
 
         public function get replay_bin_encoded():String
         {
-            if (replay_bin == null || replay_bin.length == 0)
+            if (replayBin == null || replayBin.length == 0)
                 return null;
 
             var enc:Base64Encoder = new Base64Encoder();
-            enc.encodeBytes(replay_bin);
+            enc.encodeBytes(replayBin);
             return ReplayPack.MAGIC + "|" + enc.toString();
         }
 
@@ -188,7 +189,7 @@ package game
         {
             var rateString:String = options.songRate != 1 ? " (" + options.songRate + "x Rate)" : "";
 
-            return "R^3 - " + song_entry.name + rateString + " - " + score + " - " + pa_string;
+            return "R^3 - " + songInfo.name + rateString + " - " + score + " - " + pa_string;
         }
     }
 }

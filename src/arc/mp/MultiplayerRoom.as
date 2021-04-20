@@ -6,136 +6,89 @@ package arc.mp
     import com.bit101.components.PushButton;
     import com.bit101.components.Window;
     import com.flashfla.net.Multiplayer;
-    import flash.display.DisplayObjectContainer;
-    import flash.events.Event;
-    import flash.events.MouseEvent;
-    import menu.MainMenu;
     import com.flashfla.net.events.GameStartEvent;
     import com.flashfla.net.events.ConnectionEvent;
     import com.flashfla.net.events.RoomLeftEvent;
     import com.flashfla.net.events.RoomUserEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
+    import flash.display.DisplayObjectContainer;
+    import flash.events.Event;
+    import flash.events.MouseEvent;
+    import menu.MainMenu;
+    import classes.Room;
+    import classes.User;
 
     public class MultiplayerRoom extends Window
     {
-        public var controlChat:MultiplayerChat;
+        private var controlChat:MultiplayerChat;
         private var controlUsers:MultiplayerUsers;
         private var controlSpectate:PushButton;
         private var controlPlayer1:MultiplayerPlayer;
         private var controlPlayer2:MultiplayerPlayer;
 
         private var connection:Multiplayer;
-        private var spectating:Boolean;
 
-        public var room:Object;
+        public var room:Room;
 
-        public function MultiplayerRoom(parent:DisplayObjectContainer, roomValue:Object)
+        public function MultiplayerRoom(parent:DisplayObjectContainer, room:Room)
         {
             super(parent);
 
-            this.room = roomValue;
-            this.spectating = false;
-            var self:MultiplayerRoom = this;
-
+            this.room = room;
             connection = room.connection;
             title = room.name;
 
+            // Player 1 display
             controlPlayer1 = new MultiplayerPlayer(this, room, 1);
             controlPlayer1.move(0, 0);
 
+            // Player 2 display
             controlPlayer2 = new MultiplayerPlayer(this, room, 2);
             controlPlayer2.move(controlPlayer1.x + controlPlayer1.width, controlPlayer1.y);
 
-            controlChat = new MultiplayerChat(this, room, parent);
+            // Room chat display
+            controlChat = new MultiplayerChat(this, room);
             controlChat.move(controlPlayer1.x, controlPlayer1.y + controlPlayer1.height);
             controlChat.setSize(controlPlayer2.x + controlPlayer2.width - controlPlayer1.x, controlPlayer1.height * 1.4);
             controlChat.resize();
+            controlChat.textAreaAddLine(MultiplayerChat.textFormatJoin(room));
 
+            // Room user list display
             controlUsers = new MultiplayerUsers(this, room, parent, controlChat);
             controlUsers.move(controlChat.x + controlChat.width, controlPlayer1.y);
             controlUsers.setSize(controlUsers.width - 10, controlChat.y + controlChat.height - controlPlayer1.y - controlChat.controlInput.height);
             controlUsers.resize();
             controlUsers.updateUsers();
 
+            // Player state button
             controlSpectate = new PushButton();
-            controlSpectate.label = room.user.isPlayer ? "Spectate" : (room.playerCount < 2 ? "Join Game" : "Start Spectating");
+            controlSpectate.label = room.isPlayer(currentUser) ? "Spectate" : (room.playerCount < 2 ? "Join Game" : "Start Spectating");
             controlSpectate.setSize(controlUsers.width, controlChat.controlInput.height);
             controlSpectate.move(controlUsers.x, controlUsers.y + controlUsers.height);
-            controlSpectate.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void
-            {
-                if (!room)
-                    return;
-                if (room.user.isPlayer || room.playerCount < 2)
-                {
-                    connection.switchRole(room);
-                    spectating = false;
-                }
-                else
-                {
-                    spectating = !spectating;
-                    GlobalVariables.instance.gameMain.addAlert(spectating ? "Now spectating games in " + room.name : "No longer spectating games in " + room.name);
-                    controlSpectate.label = spectating ? "Stop Spectating" : "Start Spectating";
-                    if (room.match.song != null && spectating && room.match.status >= Multiplayer.STATUS_LOADED && room.match.status < Multiplayer.STATUS_RESULTS)
-                        MultiplayerSingleton.getInstance().spectateGame(room);
-                }
-            });
+            controlSpectate.addEventListener(MouseEvent.CLICK, onStateButtonClick);
             addChild(controlSpectate);
 
-            connection.addEventListener(Multiplayer.EVENT_GAME_START, function(event:GameStartEvent):void
-            {
-                if (spectating && event.room == room && !room.user.isPlayer && GlobalVariables.instance.gameMain.activePanel is MainMenu)
-                    MultiplayerSingleton.getInstance().spectateGame(room);
-            });
-
+            // Add listeners to update this display
+            connection.addEventListener(Multiplayer.EVENT_GAME_START, onGameStart);
             connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, onRoomUserStatus);
             connection.addEventListener(Multiplayer.EVENT_ROOM_USER, onRoomUser);
+            connection.addEventListener(Multiplayer.EVENT_CONNECTION, onConnectionUpdate);
+            connection.addEventListener(Multiplayer.EVENT_ROOM_LEFT, onLeftRoom);
 
-            connection.addEventListener(Multiplayer.EVENT_CONNECTION, function(event:ConnectionEvent):void
-            {
-                if (!connection.connected)
-                    room = null;
-            });
-
-            connection.addEventListener(Multiplayer.EVENT_ROOM_LEFT, function(event:RoomLeftEvent):void
-            {
-                if (event.room == room)
-                {
-                    if (self.parent == parent)
-                        parent.removeChild(self);
-                    room = null;
-                }
-            });
-
-            controlChat.textAreaAddLine(MultiplayerChat.textFormatJoin(room));
-
+            // Set display layout and properties
             hasCloseButton = true;
             hasMinimizeButton = true;
             setSize(controlUsers.x + controlUsers.width, titleBar.height + controlChat.y + controlChat.height);
             move(parent.width / 2 - width / 2, parent.height / 2 - height / 2);
             controlChat.focus();
 
-            addEventListener(Event.CLOSE, function(event:Event):void
-            {
-                if (self.room == null || !self.room.isJoined)
-                {
-                    parent.removeChild(self);
-                    return;
-                }
+            // Listener for closing the display with the top right Close button
+            addEventListener(Event.CLOSE, onCloseRoom);
+        }
 
-                var inGame:Boolean = false;
-                for each (var room:Object in connection.rooms)
-                {
-                    if (room.isJoined && room != self.room)
-                        inGame = true;
-                }
-                if (inGame)
-                    connection.leaveRoom(self.room)
-                else
-                {
-                    connection.joinLobby();
-                    connection.leaveRoom(self.room)
-                }
-            });
+        public function get currentUser():User
+        {
+            return connection.currentUser;
         }
 
         public function redraw():void
@@ -145,20 +98,72 @@ package arc.mp
             controlChat.redraw(true);
         }
 
+        private function onCloseRoom(event:Event):void
+        {
+            if (room == null || !room.hasUser(currentUser))
+            {
+                parent.removeChild(this);
+                return;
+            }
+
+            var inGame:Boolean = false;
+            for each (var _room:Room in connection.rooms)
+            {
+                if (_room.hasUser(currentUser) && _room != room)
+                    inGame = true;
+            }
+            if (inGame)
+                connection.leaveRoom(room)
+            else
+            {
+                connection.joinLobby();
+                connection.leaveRoom(room)
+            }
+        }
+
+        private function onStateButtonClick(event:MouseEvent):void
+        {
+            if (connection.switchRole(room))
+                updateRoomDisplay();
+        }
+
+        private function onGameStart(event:GameStartEvent):void
+        {
+            // If the current room has started gameplay, enter spectating view
+            if (event.room == room && GlobalVariables.instance.gameMain.activePanel is MainMenu)
+                MultiplayerSingleton.getInstance().spectateGame(room);
+        }
+
+        private function onConnectionUpdate(event:ConnectionEvent):void
+        {
+            if (!connection.connected)
+                room = null;
+        }
+
+        private function onLeftRoom(event:RoomLeftEvent):void
+        {
+            if (event.room == room)
+            {
+                parent.removeChild(this);
+                room = null;
+            }
+        }
+
         private function onRoomUserStatus(event:RoomUserStatusEvent):void
         {
-            updateRoom(event.room);
+            if (event.room == room)
+                updateRoomDisplay();
         }
 
         private function onRoomUser(event:RoomUserEvent):void
         {
-            updateRoom(event.room);
+            if (event.room == room)
+                updateRoomDisplay();
         }
 
-        private function updateRoom(roomToUpdate:Object):void
+        private function updateRoomDisplay():void
         {
-            if (roomToUpdate == room)
-                controlSpectate.label = room.user.isPlayer ? "Spectate" : (room.playerCount < 2 ? "Join Game" : (spectating ? "Stop Spectating" : "Start Spectating"));
+            controlSpectate.label = room.isPlayer(currentUser) ? "Spectate" : "Join Game";
         }
     }
 }

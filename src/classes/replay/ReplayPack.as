@@ -363,8 +363,8 @@ package classes.replay
 
             // Get Alt engine Settings
             var settings:Object = options.settingsEncode();
-            if (options.song.entry.engine)
-                settings.arc_engine = ArcGlobals.instance.legacyEncode(options.song.entry);
+            if (options.song.songInfo.engine)
+                settings.arc_engine = ArcGlobals.instance.legacyEncode(options.song.songInfo);
 
             var timestamp:Number = Math.floor(new Date().getTime() / 1000);
             var settingsEncode:String = JSON.stringify(settings);
@@ -373,7 +373,7 @@ package classes.replay
             binReplay.writeByte(MAJOR_VER); // Major Version
             binReplay.writeByte(MINOR_VER); // Minor Version
             binReplay.writeByte(1); // Header Flag
-            binReplay.writeUnsignedInt(activeUser.id); // Userid
+            binReplay.writeUnsignedInt(activeUser.siteId); // Userid
             binReplay.writeUnsignedInt(options.song.id); // Song ID
             binReplay.writeFloat(options.songRate) // Song Rate
             binReplay.writeUnsignedInt(timestamp);
@@ -471,9 +471,9 @@ package classes.replay
                 trace("MINOR_VER failed comparison", MINOR_VER, test.MINOR_VER);
                 return false;
             }
-            if (activeUser.id != test.user_id)
+            if (activeUser.siteId != test.user_id)
             {
-                trace("user_id failed comparison", activeUser.id, test.user_id);
+                trace("user_id failed comparison", activeUser.siteId, test.user_id);
                 return false;
             }
             if (options.song.id != test.song_id)

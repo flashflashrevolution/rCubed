@@ -2,6 +2,7 @@ package classes.chart
 {
     import arc.NoteMod;
     import by.blooddy.crypto.MD5;
+    import classes.SongInfo;
     import classes.chart.parse.ChartFFRLegacy;
     import com.flashfla.media.MP3Extraction;
     import com.flashfla.media.SwfSilencer;
@@ -34,7 +35,7 @@ package classes.chart
         private var chartLoader:URLLoader;
 
         public var id:uint;
-        public var entry:Object;
+        public var songInfo:SongInfo;
         public var type:String;
         public var chartType:String;
         public var preview:Boolean;
@@ -70,13 +71,13 @@ package classes.chart
         private var localFileData:ByteArray = null;
         private var localFileHash:String = "";
 
-        public function Song(song:Object, isPreview:Boolean = false):void
+        public function Song(songInfo:SongInfo, isPreview:Boolean = false):void
         {
-            this.entry = song;
-            this.id = song.level;
+            this.songInfo = songInfo;
+            this.id = songInfo.level;
             this.preview = isPreview;
-            this.type = (song.type != null ? song.type : NoteChart.FFR);
-            this.chartType = song.type || NoteChart.FFR_LEGACY;
+            this.type = songInfo.chartType || NoteChart.FFR;
+            this.chartType = songInfo.chartType || NoteChart.FFR_LEGACY;
 
             options = _gvars.options;
             noteMod = new NoteMod(this, options);
@@ -84,7 +85,13 @@ package classes.chart
             rateRate = options.songRate;
 
             if (type == "EDITOR")
-                chart = NoteChart.parseChart(NoteChart.FFR_BEATBOX, {type: NoteChart.FFR_BEATBOX, level: this.id}, '_root.beatBox = [];');
+            {
+                var editorSongInfo:SongInfo = new SongInfo();
+                editorSongInfo.chartType = NoteChart.FFR_BEATBOX;
+                editorSongInfo.level = this.id;
+
+                chart = NoteChart.parseChart(NoteChart.FFR_BEATBOX, editorSongInfo, '_root.beatBox = [];');
+            }
             else if (options.songRate != 1 || options.frameRate > 30 || rateReverse || options.forceNewJudge)
                 this.type = NoteChart.FFR_MP3;
 
@@ -125,11 +132,11 @@ package classes.chart
             var url_file_hash:String = "";
             if ((_gvars.air_useLocalFileCache) && AirContext.doesFileExist(AirContext.getSongCachePath(this) + "data.bin"))
             {
-                localFileData = AirContext.readFile(AirContext.getAppPath(AirContext.getSongCachePath(this) + "data.bin"), (this.entry.engine ? 0 : this.id));
+                localFileData = AirContext.readFile(AirContext.getAppPath(AirContext.getSongCachePath(this) + "data.bin"), (this.songInfo.engine ? 0 : this.id));
                 localFileHash = MD5.hashBytes(localFileData);
                 url_file_hash = "hash=" + localFileHash + "&";
 
-                if (this.entry.engine && localFileData && type == NoteChart.FFR_MP3)
+                if (this.songInfo.engine && localFileData && type == NoteChart.FFR_MP3)
                 {
                     removeLoaderListeners();
                     musicLoader = new Loader();
@@ -188,15 +195,15 @@ package classes.chart
 
         private function urlGen(fileType:String, fileHash:String = ""):String
         {
-            switch (entry.type || type)
+            switch (songInfo.chartType || type)
             {
                 case NoteChart.FFR:
                 case NoteChart.FFR_RAW:
                 case NoteChart.FFR_MP3:
-                    return Constant.SONG_DATA_URL + "?" + fileHash + "id=" + (preview ? entry.previewhash : entry.playhash) + (preview ? "&mode=2" : "") + (_gvars.userSession != "0" ? "&session=" + _gvars.userSession : "") + "&type=" + NoteChart.FFR + "_" + fileType;
+                    return Constant.SONG_DATA_URL + "?" + fileHash + "id=" + (preview ? songInfo.previewhash : songInfo.playhash) + (preview ? "&mode=2" : "") + (_gvars.userSession != "0" ? "&session=" + _gvars.userSession : "") + "&type=" + NoteChart.FFR + "_" + fileType;
 
                 case NoteChart.FFR_LEGACY:
-                    return ChartFFRLegacy.songUrl(entry);
+                    return ChartFFRLegacy.songUrl(songInfo);
 
                 default:
                     return Constant.SONG_DATA_URL;
@@ -276,7 +283,7 @@ package classes.chart
                 if (_gvars.air_useLocalFileCache)
                 { // && !this.entry.engine) {
                     // Alt Engine has Data
-                    if (this.entry.engine && localFileData)
+                    if (this.songInfo.engine && localFileData)
                     {
 
                     }
@@ -292,12 +299,12 @@ package classes.chart
                     }
                     else
                     {
-                        storeChartData = AirContext.encodeData(chartData, (this.entry.engine ? 0 : this.id));
+                        storeChartData = AirContext.encodeData(chartData, (this.songInfo.engine ? 0 : this.id));
                     }
                 }
 
                 // Generate SWF Containing a MP3 as class "SoundClass".
-                var metadata:Object = new Object();
+                var metadata:Object = {};
                 var bytes:ByteArray = MP3Extraction.extractSound(chartData, metadata);
                 bytes.position = 0;
                 mp3Frame = metadata.frame - 2;
@@ -358,7 +365,7 @@ package classes.chart
 
             if (chartType == NoteChart.FFR_LEGACY)
             {
-                chart = NoteChart.parseChart(chartType, entry, chartData);
+                chart = NoteChart.parseChart(chartType, songInfo, chartData);
                 chartLoadComplete(e);
             }
 
@@ -471,21 +478,21 @@ package classes.chart
             {
                 case NoteChart.FFR:
                 case NoteChart.FFR_MP3:
-                    chart = NoteChart.parseChart(NoteChart.FFR, entry, Crypt.ROT255(Crypt.B64Decode(e.target.data)));
+                    chart = NoteChart.parseChart(NoteChart.FFR, songInfo, Crypt.ROT255(Crypt.B64Decode(e.target.data)));
                     break;
 
                 case NoteChart.FFR_BEATBOX:
                 case NoteChart.FFR_RAW:
-                    chart = NoteChart.parseChart(chartType, entry, e.target.data);
+                    chart = NoteChart.parseChart(chartType, songInfo, e.target.data);
                     break;
 
                 case NoteChart.FFR_LEGACY:
-                    if (entry.arrows == 0)
-                        entry.arrows = chart.Notes.length;
+                    if (songInfo.noteCount == 0)
+                        songInfo.noteCount = chart.Notes.length;
                     break;
 
                 case NoteChart.THIRDSTYLE:
-                    chart = NoteChart.parseChart(chartType, entry, e.target.data);
+                    chart = NoteChart.parseChart(chartType, songInfo, e.target.data);
                     break;
 
                 default:
@@ -665,6 +672,9 @@ package classes.chart
 
         public function get noteSteps():int
         {
+            if (!chart)
+                return NaN;
+
             return chart.framerate + 1;
         }
 

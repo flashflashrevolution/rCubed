@@ -54,6 +54,8 @@ package popups
     import menu.MainMenu;
     import menu.MenuPanel;
     import menu.MenuSongSelection;
+    import classes.Room;
+    import classes.SongInfo;
 
     public class PopupOptions extends MenuPanel
     {
@@ -263,19 +265,53 @@ package popups
             editorOptions = new BoxButton(null, box.width - 265, box.height - 42, 80, 27, _lang.string("menu_editor"));
             editorOptions.editor_multiplayer = null;
 
+            // Fake entities for filling gameplay elements
+            var fakePlayer1:User = new User();
+            fakePlayer1.id = -1;
+            fakePlayer1.isPlayer = true;
+            fakePlayer1.name = "Player1";
+            fakePlayer1.siteId = 1830376;
+
+            var fakePlayer2:User = new User();
+            fakePlayer2.id = -2;
+            fakePlayer2.isPlayer = true;
+            fakePlayer2.name = "Player2";
+            fakePlayer2.siteId = 249481;
+
+            var fakeSpectator:User = new User();
+            fakeSpectator.id = -3;
+            fakeSpectator.isPlayer = false;
+            fakeSpectator.name = "Spectator";
+            fakeSpectator.siteId = 0;
+
+            var fakeMP1:Multiplayer = new Multiplayer();
+            fakeMP1.currentUser = fakePlayer1;
+
+            var fakeMP2:Multiplayer = new Multiplayer();
+            fakeMP1.currentUser = fakeSpectator;
+
             //- Editor - MP
+            var mpEditorRoom:Room = new Room(0);
+            mpEditorRoom.connection = fakeMP1;
+            mpEditorRoom.addUser(fakePlayer1);
+            mpEditorRoom.addUser(fakePlayer2);
+            mpEditorRoom.addPlayer(fakePlayer1);
+            mpEditorRoom.addPlayer(fakePlayer2);
+
             editorOptionsMP = new BoxButton(null, editorOptions.x - 130 - 5, editorOptions.y, 130, 27, _lang.string("menu_editor_mp"));
-            editorOptionsMP.editor_multiplayer = {playerCount: 2,
-                    connection: {mode: Multiplayer.GAME_R3, currentUser: {userID: 1}},
-                    user: {userID: 1, playerID: 1, isPlayer: true},
-                    players: [{playerID: 1, userID: 1830376, userName: "arcnmx"}, {playerID: 2, userID: 249481, userName: "Velocity"}]};
+            editorOptionsMP.editor_multiplayer = mpEditorRoom;
 
             //- Editor - MP Spectate
+            var mpSpectateEditorRoom:Room = new Room(0);
+            mpSpectateEditorRoom.connection = fakeMP2;
+            mpSpectateEditorRoom.addUser(fakePlayer1);
+            mpSpectateEditorRoom.addUser(fakePlayer2);
+            mpSpectateEditorRoom.addUser(fakeSpectator);
+            mpSpectateEditorRoom.addPlayer(fakePlayer1);
+            mpSpectateEditorRoom.addPlayer(fakePlayer2);
+
             editorOptionsMPSpec = new BoxButton(null, editorOptionsMP.x - 130 - 5, editorOptionsMP.y, 130, 27, _lang.string("menu_editor_mp_spec"));
-            editorOptionsMPSpec.editor_multiplayer = {playerCount: 2,
-                    connection: {mode: Multiplayer.GAME_R3, currentUser: {userID: 0}},
-                    user: {userID: 0, playerID: -1, isPlayer: false},
-                    players: [{playerID: -1, userID: 0}, {playerID: 1, userID: 1830376, userName: "arcnmx"}, {playerID: 2, userID: 249481, userName: "Velocity"}]};
+            editorOptionsMPSpec.editor_multiplayer = null;
 
             warningOptions = new Text(null, editorOptions.x, editorOptions.y - 25, _lang.string("options_warning_save"), 14, "#f06868");
 
@@ -1335,8 +1371,13 @@ package popups
             {
                 _gvars.options = new GameOptions();
                 _gvars.options.isEditor = true;
-                _gvars.options.multiplayer = e.target.editor_multiplayer;
-                _gvars.options.song = new Song({level: 1337, type: "EDITOR"});
+                _gvars.options.mpRoom = e.target.editor_multiplayer;
+
+                var tempSongInfo:SongInfo = new SongInfo();
+                tempSongInfo.level = 1337;
+                tempSongInfo.chartType = "EDITOR";
+                _gvars.options.song = new Song(tempSongInfo);
+
                 _gvars.options.fill();
                 removePopup();
                 _gvars.gameMain.switchTo(Main.GAME_PLAY_PANEL);

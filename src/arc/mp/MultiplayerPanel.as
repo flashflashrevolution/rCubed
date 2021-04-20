@@ -9,19 +9,13 @@ package arc.mp
     import classes.ui.Prompt;
     import classes.ui.Text;
     import classes.ui.Throbber;
+    import classes.Room;
+    import classes.User;
     import com.bit101.components.List;
     import com.bit101.components.PushButton;
     import com.bit101.components.Style;
     import com.bit101.components.Window;
     import com.flashfla.net.Multiplayer;
-    import flash.events.ContextMenuEvent;
-    import flash.events.Event;
-    import flash.events.MouseEvent;
-    import flash.events.TimerEvent;
-    import flash.ui.ContextMenu;
-    import flash.ui.ContextMenuItem;
-    import flash.utils.Timer;
-    import menu.MenuPanel;
     import com.flashfla.net.events.ServerMessageEvent;
     import com.flashfla.net.events.ConnectionEvent;
     import com.flashfla.net.events.LoginEvent;
@@ -30,6 +24,14 @@ package arc.mp
     import com.flashfla.net.events.RoomListEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
     import com.flashfla.net.events.RoomUpdateEvent;
+    import flash.events.ContextMenuEvent;
+    import flash.events.Event;
+    import flash.events.MouseEvent;
+    import flash.events.TimerEvent;
+    import flash.ui.ContextMenu;
+    import flash.ui.ContextMenuItem;
+    import flash.utils.Timer;
+    import menu.MenuPanel;
 
     public class MultiplayerPanel extends MenuPanel
     {
@@ -40,8 +42,6 @@ package arc.mp
 
         private var textLogin:Text;
         private var buttonMP:BoxButton;
-        private var buttonLegacy:BoxButton;
-        private var buttonVelocity:BoxButton;
         private var buttonDisconnect:BoxButton;
         private var buttonLobby:BoxButton;
         private var throbber:Throbber;
@@ -62,7 +62,6 @@ package arc.mp
             // Connect immediately if logged in
             if (!GlobalVariables.instance.activeUser.isGuest && GlobalVariables.instance.activeUser.id != 2)
             {
-                connection.mode = Multiplayer.GAME_R3;
                 connection.connect();
             }
             else
@@ -85,18 +84,11 @@ package arc.mp
             controlRooms.autoHideScrollBar = true;
             controlRooms.move(0, 0);
             controlRooms.setSize(200, 350);
-            controlRooms.addEventListener(MouseEvent.DOUBLE_CLICK, function(event:MouseEvent):void
-            {
-                if (controlRooms.selectedItem != null && controlRooms.selectedItem.data != null)
-                {
-                    var room:Object = controlRooms.selectedItem.data;
-                    joinRoom(room, room.playerCount < room.maxPlayerCount);
-                }
-            });
+            controlRooms.addEventListener(MouseEvent.DOUBLE_CLICK, onRoomDoubleClick);
             window.addChild(controlRooms);
             buildContextMenu();
 
-            controlChat = new MultiplayerChat(window, connection.lobby, this);
+            controlChat = new MultiplayerChat(window, connection.lobby);
             controlChat.move(controlRooms.x + controlRooms.width, controlRooms.y);
             controlChat.setSize(365, controlRooms.height + controlChat.controlInput.height);
             controlChat.resize();
@@ -110,147 +102,27 @@ package arc.mp
             controlCreate.label = "Create Room";
             controlCreate.setSize(controlRooms.width, controlChat.controlInput.height);
             controlCreate.move(controlRooms.x, controlRooms.y + controlRooms.height);
-            controlCreate.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void
-            {
-                function e_createRoom(roomName:String, password:String):void
-                {
-                    connection.createRoom(roomName, password);
-                }
-
-                new MPCreateRoomPrompt(self, 320, 120, e_createRoom);
-            });
+            controlCreate.addEventListener(MouseEvent.CLICK, onCreateRoomClick);
             window.addChild(controlCreate);
 
             window.width = controlUsers.x + controlUsers.width;
             window.height = window.titleBar.height + controlChat.y + controlChat.height;
 
-            connection.addEventListener(Multiplayer.EVENT_SERVER_MESSAGE, function(event:ServerMessageEvent):void
-            {
-                GlobalVariables.instance.gameMain.addAlert("Server Message: " + event.message);
-            });
-            connection.addEventListener(Multiplayer.EVENT_CONNECTION, function(event:ConnectionEvent):void
-            {
-                showButton(buttonDisconnect, connection.connected);
-                showButton(buttonMP, !connection.connected);
-                showButton(buttonLobby, false);
-                if (!connection.connected)
-                    hideThrobber();
-            });
-            connection.addEventListener(Multiplayer.EVENT_LOGIN, function(event:LoginEvent):void
-            {
-                buildContextMenu();
-            });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_JOINED, function(event:RoomJoinedEvent):void
-            {
-                if (event.room == connection.lobby)
-                {
-                    showButton(buttonLobby, false);
-                    openWindow();
-                    updateWindowTitle(event.room);
-                    hideThrobber();
-                }
-                else
-                {
-                    new MultiplayerRoom(self, event.room);
-                    updateRoom(event.room);
-                }
-            });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_LEFT, function(event:RoomLeftEvent):void
-            {
-                if (event.room == connection.lobby)
-                {
-                    showButton(buttonLobby, true);
-                    closeWindow();
-                }
-            });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_LIST, function(event:RoomListEvent):void
-            {
-                updateRooms();
+            connection.addEventListener(Multiplayer.EVENT_SERVER_MESSAGE, onServerMessageEvent);
+            connection.addEventListener(Multiplayer.EVENT_CONNECTION, onConnectionEvent);
+            connection.addEventListener(Multiplayer.EVENT_LOGIN, onLoginEvent);
+            connection.addEventListener(Multiplayer.EVENT_ROOM_JOINED, onRoomJoinedEvent);
+            connection.addEventListener(Multiplayer.EVENT_ROOM_LEFT, onRoomLeftEvent);
+            connection.addEventListener(Multiplayer.EVENT_ROOM_LIST, onRoomListEvent);
+            connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, onRoomUserStatusEvent);
+            connection.addEventListener(Multiplayer.EVENT_ROOM_UPDATE, onRoomUpdateEvent);
 
-                controlChat.room = connection.lobby;
-                controlUsers.room = connection.lobby;
-            });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, function(event:RoomUserStatusEvent):void
-            {
-                updateRoom(event.room);
-            });
-            connection.addEventListener(Multiplayer.EVENT_ROOM_UPDATE, function(event:RoomUpdateEvent):void
-            {
-                if (event.roomList == true)
-                    updateRoom(event.room);
-            });
-            window.addEventListener(Event.CLOSE, function(event:Event):void
-            {
-                if (!connection.connected)
-                {
-                    closeWindow();
-                    return;
-                }
-                var inGame:Boolean = false;
-                for each (var room:Object in connection.rooms)
-                {
-                    if (room.isJoined && room != connection.lobby)
-                        inGame = true;
-                }
-                if (inGame)
-                    connection.leaveRoom(connection.lobby);
-                else
-                {
-                    closeWindow();
-                    connection.disconnect();
-                }
-            });
+            window.addEventListener(Event.CLOSE, onCloseEvent);
 
-            function clickMP(event:MouseEvent):void
-            {
-                if (connection.connected)
-                    connection.disconnect();
-                connection.mode = Multiplayer.GAME_R3;
-                connection.connect();
-                showThrobber();
-            }
-
-            function clickLegacy(event:MouseEvent):void
-            {
-                if (connection.connected)
-                    connection.disconnect();
-                connection.mode = Multiplayer.GAME_LEGACY;
-                connection.connect();
-                showThrobber();
-            }
-
-            function clickVelocity(event:MouseEvent):void
-            {
-                if (connection.connected)
-                    connection.disconnect();
-                connection.mode = Multiplayer.GAME_VELOCITY;
-                connection.connect();
-                showThrobber();
-            }
-
-            function clickDisconnect(event:MouseEvent):void
-            {
-                if (connection.connected)
-                    connection.disconnect();
-            }
-
-            function clickJoinLobby(event:MouseEvent):void
-            {
-                connection.joinLobby();
-            }
-
-            buttonMP = new BoxButton(this, 5, Main.GAME_HEIGHT - 30, 130, 25, "Connect", 12, clickMP);
+            buttonMP = new BoxButton(this, 5, Main.GAME_HEIGHT - 30, 130, 25, "Connect", 12, onClickMP);
             showButton(buttonMP, false);
 
-            buttonLegacy = new BoxButton(this, buttonMP.x, buttonMP.y + buttonMP.height + 10, 140, 40, "Connect to Legacy", 12, clickLegacy);
-            showButton(buttonLegacy, false);
-
-            buttonVelocity = new BoxButton(this, buttonLegacy.x, buttonLegacy.y + buttonLegacy.height + 10, buttonLegacy.width, buttonLegacy.height, "Connect to Velocity", 12, clickVelocity);
-            showButton(buttonVelocity, false);
-
-            buttonDisconnect = new BoxButton(null, buttonMP.x, buttonMP.y, buttonMP.width, buttonMP.height, "Disconnect", 12, clickDisconnect);
-
-            buttonLobby = new BoxButton(null, buttonDisconnect.x, buttonDisconnect.y + buttonDisconnect.height + 10, buttonLegacy.width, buttonLegacy.height, "Join Lobby", 12, clickJoinLobby);
+            buttonDisconnect = new BoxButton(null, buttonMP.x, buttonMP.y, buttonMP.width, buttonMP.height, "Disconnect", 12, onClickDisconnect);
 
             throbber = new Throbber();
             throbber.x = Main.GAME_WIDTH / 2;
@@ -259,16 +131,144 @@ package arc.mp
             addChild(throbber);
 
             updateTimer = new Timer(5000);
-            updateTimer.addEventListener(TimerEvent.TIMER, function(event:TimerEvent):void
-            {
-                if (connection.connected)
-                {
-                    updateWindowTitle(connection.lobby);
+            updateTimer.addEventListener(TimerEvent.TIMER, onUpdateTimer);
+        }
 
-                    if (!MultiplayerSingleton.getInstance().gameplayPlayingStatus())
-                        connection.refreshRooms();
-                }
-            });
+        public function get currentUser():User
+        {
+            return connection.currentUser;
+        }
+
+        private function onRoomDoubleClick(event:MouseEvent):void
+        {
+            if (controlRooms.selectedItem != null && controlRooms.selectedItem.data != null)
+            {
+                var room:Room = controlRooms.selectedItem.data;
+                joinRoom(room, true);
+            }
+        }
+
+        private function onCreateRoomClick(event:MouseEvent):void
+        {
+            function e_createRoom(roomName:String, password:String):void
+            {
+                connection.createRoom(roomName, password);
+            }
+
+            new MPCreateRoomPrompt(this, 320, 120, e_createRoom);
+        }
+
+        private function onServerMessageEvent(event:ServerMessageEvent):void
+        {
+            GlobalVariables.instance.gameMain.addAlert("Server Message: " + event.message);
+        }
+
+        private function onConnectionEvent(event:ConnectionEvent):void
+        {
+            showButton(buttonDisconnect, connection.connected);
+            showButton(buttonMP, !connection.connected);
+            if (!connection.connected)
+                hideThrobber();
+        }
+
+        private function onLoginEvent(event:LoginEvent):void
+        {
+            buildContextMenu();
+        }
+
+        private function onRoomJoinedEvent(event:RoomJoinedEvent):void
+        {
+            if (event.room == connection.lobby)
+            {
+                openWindow();
+                updateWindowTitle(event.room);
+                hideThrobber();
+            }
+            else
+            {
+                updateRoomPanel(event.room);
+                new MultiplayerRoom(this, event.room);
+            }
+        }
+
+        private function onRoomLeftEvent(event:RoomLeftEvent):void
+        {
+            if (event.room == connection.lobby)
+            {
+                closeWindow();
+            }
+        }
+
+        private function onRoomListEvent(event:RoomListEvent):void
+        {
+            updateRooms();
+
+            controlChat.room = connection.lobby;
+            controlUsers.room = connection.lobby;
+        }
+
+        private function onRoomUserStatusEvent(event:RoomUserStatusEvent):void
+        {
+            updateRoomPanel(event.room);
+        }
+
+        private function onRoomUpdateEvent(event:RoomUpdateEvent):void
+        {
+            if (event.roomList == true)
+                updateRoomPanel(event.room);
+        }
+
+        private function onCloseEvent(event:Event):void
+        {
+            if (!connection.connected)
+            {
+                closeWindow();
+                return;
+            }
+            var inGame:Boolean = false;
+            for each (var room:Room in connection.rooms)
+            {
+                if (room.hasUser(currentUser) && room != connection.lobby)
+                    inGame = true;
+            }
+            if (inGame)
+                connection.leaveRoom(connection.lobby);
+            else
+            {
+                closeWindow();
+                connection.disconnect();
+            }
+        }
+
+        private function onClickMP(event:MouseEvent):void
+        {
+            if (connection.connected)
+                connection.disconnect();
+
+            connection.connect();
+            showThrobber();
+        }
+
+        private function onClickDisconnect(event:MouseEvent):void
+        {
+            if (connection.connected)
+                connection.disconnect();
+        }
+
+        private function onClickJoinLobby(event:MouseEvent):void
+        {
+            connection.joinLobby();
+        }
+
+        private function onUpdateTimer(event:TimerEvent):void
+        {
+            if (connection.connected)
+            {
+                updateWindowTitle(connection.lobby);
+
+                if (!MultiplayerSingleton.getInstance().gameplayPlayingStatus())
+                    connection.refreshRooms();
+            }
         }
 
         public function buildContextMenu():void
@@ -277,16 +277,26 @@ package arc.mp
             var roomItem:ContextMenuItem = new ContextMenuItem("Spectate");
             roomItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, function(event:ContextMenuEvent):void
             {
-                var room:Object = event.mouseTarget["data"]["data"];
+                var item:Object = event.mouseTarget["data"];
+
+                if (!item)
+                    return;
+
+                var room:Room = item["data"];
                 joinRoom(room, false);
             });
             roomMenu.customItems.push(roomItem);
-            if (connection.currentUser.isModerator)
+            if (currentUser.isModerator)
             {
                 roomItem = new ContextMenuItem("Nuke Room");
                 roomItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, function(event:ContextMenuEvent):void
                 {
-                    var room:Object = event.mouseTarget["data"]["data"];
+                    var item:Object = event.mouseTarget["data"];
+
+                    if (!item)
+                        return;
+
+                    var room:Room = item["data"];
                     connection.nukeRoom(room);
                 });
                 roomMenu.customItems.push(roomItem);
@@ -294,20 +304,20 @@ package arc.mp
             controlRooms.contextMenu = roomMenu;
         }
 
-        private function joinRoom(room:Object, player:Boolean):void
+        private function joinRoom(room:Room, asPlayer:Boolean):void
         {
             function e_joinRoomPassword(password:String):void
             {
-                connection.joinRoom(room, player, password);
+                connection.joinRoom(room, asPlayer, password);
             }
 
             if (room.isPrivate)
                 new Prompt(this, 320, "Password: " + room.name, 100, "SUBMIT", e_joinRoomPassword, true);
             else
-                connection.joinRoom(room, player);
+                connection.joinRoom(room, asPlayer);
         }
 
-        private function updateRoom(room:Object):void
+        private function updateRoomPanel(room:Room):void
         {
             if (window.parent == null)
                 return;
@@ -323,12 +333,15 @@ package arc.mp
             }
         }
 
+        /**
+         * Updates the rooms list
+         */
         private function updateRooms():void
         {
-            var items:Array = new Array();
-            for each (var room:Object in connection.rooms)
+            var items:Array = [];
+            for each (var room:Room in connection.rooms)
             {
-                if (room.isGame)
+                if (room.isGameRoom)
                     items.push({label: nameRoom(room), labelhtml: true, data: room});
             }
             updateWindowTitle(connection.lobby);
@@ -336,41 +349,23 @@ package arc.mp
             controlRooms.listItemClass = controlRooms.listItemClass;
         }
 
-        public function updateWindowTitle(room:Object):void
-        { // Minus 2 Rooms due to The Entrence (Fake) and Lobby
-            window.title = Multiplayer.GAME_VERSIONS[connection.mode] + " " + room.name + " - Rooms: " + (connection.rooms.length - 2) + " - Players: " + room.playerCount;
+        public function updateWindowTitle(room:Room):void
+        {
+            if (room != null)
+                window.title = Multiplayer.GAME_VERSION + " " + room.name + " - Rooms: " + (connection.rooms.length - 2) + " - Players: " + room.userCount;
         }
 
-        private function nameRoom(room:Object):String
+        private function nameRoom(room:Room):String
         {
-            /*
-               var colour:String;
-               if (room.playerCount < room.maxPlayerCount) {
-               if (room.playerCount > 0)
-               colour = "#109010";
-               else
-               colour = "#909090";
-               } else if (room.spectatorCount >= room.maxSpectatorCount)
-               colour = "#a81818";
-               else {
-               var gameplay:Object = connection.getRoomGameplay(room);
-               var p1:Object = gameplay["player1"];
-               var p2:Object = gameplay["player2"];
-               if (p1 && p2 && p1.status == p2.status && p1.status == Multiplayer.STATUS_PLAYING)
-               colour = "#101090";
-               else
-               colour = "#101010";
-               }
-             */
             const level:int = room.level;
             const color:int = ArcGlobals.getDivisionColor(level);
             const title:String = ArcGlobals.getDivisionTitle(level);
 
             const dulledColour:String = MultiplayerChat.textDullColour(color, 1).toString(16);
             const roomName:String = "(" + title + ")";
-            const spectatorString:String = (room.spectatorCount > 0) ? "+" + room.spectatorCount + " " : "";
+            const spectatorString:String = (room.specCount > 0) ? "+" + room.specCount + " " : "";
 
-            return MultiplayerChat.textFormatSize(room.playerCount + "/2 " + spectatorString, "-1") + MultiplayerChat.textFormatColour(MultiplayerChat.textEscape((room.isPrivate ? "!" : "") + roomName), "#" + dulledColour) + " " + room.name;
+            return MultiplayerChat.textFormatSize(room.userCount + "/2 " + spectatorString, "-1") + MultiplayerChat.textFormatColour(MultiplayerChat.textEscape((room.isPrivate ? "!" : "") + roomName), "#" + dulledColour) + " " + room.name;
         }
 
         public function setParent(value:MenuPanel):void
@@ -392,42 +387,36 @@ package arc.mp
         public function hideBackground(show:Boolean = false):void
         {
             if (buttonMP != null)
-            {
                 buttonMP.visible = show;
-                buttonLegacy.visible = show;
-                buttonVelocity.visible = show;
-                buttonDisconnect.visible = show;
-                buttonLobby.visible = show;
-            }
             if (textLogin != null)
                 textLogin.visible = show;
             if (window != null)
                 window.visible = show;
         }
 
-        private function foreachroom(foreach:Function):void
+        private function forEachRoom(func:Function):void
         {
             for (var i:int = 0; i < numChildren; i++)
             {
-                var room:Object = getChildAt(i);
-                if (room is MultiplayerRoom)
-                    foreach(room);
+                var container:Object = getChildAt(i);
+                if (container is MultiplayerRoom)
+                    func(container);
             }
         }
 
-        public function hideRooms(show:Boolean = false):void
+        public function setRoomsVisibility(visible:Boolean = false):void
         {
-            foreachroom(function(room:MultiplayerRoom):void
+            forEachRoom(function(room:MultiplayerRoom):void
             {
-                room.visible = show;
-                if (show)
+                room.visible = visible;
+                if (visible)
                     room.redraw();
             });
         }
 
-        public function hideRoom(room:Object, show:Boolean = false):void
+        public function hideRoom(room:Room, show:Boolean = false):void
         {
-            foreachroom(function(mproom:MultiplayerRoom):void
+            forEachRoom(function(mproom:MultiplayerRoom):void
             {
                 if (mproom.room == room)
                 {

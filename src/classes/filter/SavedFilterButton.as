@@ -3,6 +3,7 @@ package classes.filter
     import assets.GameBackgroundColor;
     import classes.Alert;
     import classes.Language;
+    import classes.filter.EngineLevelFilter;
     import classes.ui.Box;
     import classes.ui.BoxButton;
     import classes.ui.BoxCheck;
@@ -14,6 +15,7 @@ package classes.filter
     import flash.events.Event;
     import flash.events.MouseEvent;
     import popups.PopupFilterManager;
+    import com.flashfla.utils.VectorUtil;
 
     public class SavedFilterButton extends Box
     {
@@ -115,7 +117,7 @@ package classes.filter
 
         private function e_deleteClick(e:Event):void
         {
-            if (ArrayUtil.remove(filter, _gvars.activeUser.filters))
+            if (VectorUtil.removeFirst(filter, _gvars.activeUser.filters))
                 updater.draw();
         }
 

@@ -8,6 +8,8 @@ package game
     import classes.GameNote;
     import classes.Language;
     import classes.Noteskins;
+    import classes.User;
+    import classes.Gameplay;
     import classes.chart.LevelScriptRuntime;
     import classes.chart.Note;
     import classes.chart.NoteChart;
@@ -19,9 +21,13 @@ package game
     import com.flashfla.utils.Average;
     import com.flashfla.utils.RollingAverage;
     import com.flashfla.utils.TimeUtil;
+    import com.flashfla.net.events.GameUpdateEvent;
+    import com.flashfla.net.events.GameResultsEvent;
     import flash.display.GradientType;
     import flash.display.MovieClip;
     import flash.display.Sprite;
+    import flash.display.BitmapData;
+    import flash.display.Bitmap;
     import flash.events.Event;
     import flash.events.IOErrorEvent;
     import flash.events.KeyboardEvent;
@@ -47,13 +53,9 @@ package game
     import game.controls.Score;
     import menu.MenuPanel;
     import menu.MenuSongSelection;
-    import sql.SQLSongDetails;
-    import flash.display.BitmapData;
-    import flash.display.Bitmap;
-    import com.flashfla.net.events.GameUpdateEvent;
-    import com.flashfla.net.events.GameResultsEvent;
+    import sql.SQLSongUserInfo;
 
-    public class GamePlay extends MenuPanel
+    public class GameplayDisplay extends MenuPanel
     {
         public static const GAME_DISPOSE:int = -1;
         public static const GAME_PLAY:int = 0;
@@ -187,7 +189,7 @@ package game
         private var GPU_PIXEL_BMD:BitmapData;
         private var GPU_PIXEL_BITMAP:Bitmap;
 
-        public function GamePlay(myParent:MenuPanel)
+        public function GameplayDisplay(myParent:MenuPanel)
         {
             super(myParent);
         }
@@ -209,7 +211,7 @@ package game
             }
 
             // --- Per Song Options
-            var perSongOptions:SQLSongDetails = SQLQueries.getSongDetailsEntry(song.entry);
+            var perSongOptions:SQLSongUserInfo = SQLQueries.getSongUserInfo(song.songInfo);
             if (perSongOptions != null && !options.isEditor && !options.replay)
             {
                 options.fill(); // Reset
@@ -264,40 +266,41 @@ package game
             SOCKET_SONG_MESSAGE = {"player": {
                         "settings": options.settingsEncode(),
                         "name": _gvars.activeUser.name,
-                        "userid": _gvars.activeUser.id,
-                        "avatar": Constant.USER_AVATAR_URL + "?uid=" + _gvars.activeUser.id,
+                        "userid": _gvars.activeUser.siteId,
+                        "avatar": Constant.USER_AVATAR_URL + "?uid=" + _gvars.activeUser.siteId,
                         "skill_rating": _gvars.activeUser.skillRating,
                         "skill_level": _gvars.activeUser.skillLevel,
                         "game_rank": _gvars.activeUser.gameRank,
                         "game_played": _gvars.activeUser.gamesPlayed,
                         "game_grand_total": _gvars.activeUser.grandTotal
                     },
-                    "engine": (song.entry.engine == null ? null : {"id": song.entry.engine.id,
-                            "name": song.entry.engine.name,
-                            "config": song.entry.engine.config_url,
-                            "domain": song.entry.engine.domain})
+                    "engine": (song.songInfo.engine == null ? null : {"id": song.songInfo.engine.id,
+                            "name": song.songInfo.engine.name,
+                            "config": song.songInfo.engine.config_url,
+                            "domain": song.songInfo.engine.domain})
                     ,
                     "song": {
-                        "name": song.entry.name,
-                        "level": song.entry.level,
-                        "difficulty": song.entry.difficulty,
-                        "style": song.entry.style,
-                        "author": song.entry.author,
-                        "author_url": song.entry.author_url,
-                        "stepauthor": song.entry.stepauthor,
-                        "credits": song.entry.credits,
-                        "genre": song.entry.genre,
-                        "nps_min": song.entry.min_nps,
-                        "nps_max": song.entry.max_nps,
-                        "release_date": song.entry.releasedate,
-                        "song_rating": song.entry.song_rating,
+                        "name": song.songInfo.name,
+                        "level": song.songInfo.level,
+                        "difficulty": song.songInfo.difficulty,
+                        "style": song.songInfo.style,
+                        "author": song.songInfo.author,
+                        "author_url": song.songInfo.stepauthorURL,
+                        "stepauthor": song.songInfo.stepauthor,
+                        "credits": song.songInfo.credits,
+                        "genre": song.songInfo.genre,
+                        "nps_min": song.songInfo.minNps,
+                        "nps_max": song.songInfo.maxNps,
+                        // TODO: Check these fields
+                        //"release_date": song.songInfo.releasedate,
+                        //"song_rating": song.songInfo.song_rating,
                         // Trust the chart, not the playlist.
                         "time": song.chartTimeFormatted,
                         "time_seconds": song.chartTime,
                         "note_count": song.totalNotes,
                         "nps_avg": (song.totalNotes / song.chartTime)
                     },
-                    "best_score": _gvars.activeUser.getLevelRank(song.entry)};
+                    "best_score": _gvars.activeUser.getLevelRank(song.songInfo)};
 
             SOCKET_SCORE_MESSAGE = {"amazing": 0,
                     "perfect": 0,
@@ -332,15 +335,15 @@ package game
             }
 
             // Setup MP Things
-            if (options.multiplayer)
+            if (options.mpRoom)
             {
                 MultiplayerSingleton.getInstance().gameplayPlaying(this);
                 if (!options.isEditor)
                 {
                     options.singleplayer = false; // Back to multiplayer lobby
-                    options.multiplayer.connection.addEventListener(Multiplayer.EVENT_GAME_UPDATE, onMultiplayerUpdate);
+                    options.mpRoom.connection.addEventListener(Multiplayer.EVENT_GAME_UPDATE, onMultiplayerUpdate);
                     if (mpSpectate)
-                        options.multiplayer.connection.addEventListener(Multiplayer.EVENT_GAME_RESULTS, onMultiplayerResults);
+                        options.mpRoom.connection.addEventListener(Multiplayer.EVENT_GAME_RESULTS, onMultiplayerResults);
                 }
             }
             else
@@ -356,8 +359,8 @@ package game
             if (!options.isEditor && !options.replay && !mpSpectate)
                 Mouse.hide();
 
-            if (song.entry && song.entry.name)
-                stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE + " - " + song.entry.name;
+            if (song.songInfo && song.songInfo.name)
+                stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE + " - " + song.songInfo.name;
 
             // Add onEnterFrame Listeners
             if (options.isEditor)
@@ -391,10 +394,10 @@ package game
                 stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyboardKeyDown, true);
                 stage.removeEventListener(KeyboardEvent.KEY_UP, keyboardKeyUp, true);
 
-                if (options.multiplayer)
+                if (options.mpRoom)
                 {
-                    options.multiplayer.connection.removeEventListener(Multiplayer.EVENT_GAME_UPDATE, onMultiplayerUpdate);
-                    options.multiplayer.connection.removeEventListener(Multiplayer.EVENT_GAME_RESULTS, onMultiplayerResults);
+                    options.mpRoom.connection.removeEventListener(Multiplayer.EVENT_GAME_UPDATE, onMultiplayerUpdate);
+                    options.mpRoom.connection.removeEventListener(Multiplayer.EVENT_GAME_RESULTS, onMultiplayerResults);
                 }
             }
 
@@ -552,7 +555,7 @@ package game
                 buildHealth();
             }
 
-            if (options.multiplayer)
+            if (options.mpRoom)
                 buildMultiplayer();
 
             if (options.isEditor)
@@ -606,21 +609,19 @@ package game
             judgeOffset = options.offsetJudge * 1000 / 30;
             autoJudgeOffset = options.autoJudgeOffset;
 
-            mpSpectate = (options.multiplayer && !options.multiplayer.user.isPlayer);
+            mpSpectate = (options.mpRoom && !options.mpRoom.connection.currentUser.isPlayer);
             if (mpSpectate)
             {
                 options.displayCombo = options.displayComboTotal = options.displayPA = false;
-                if (options.multiplayer.connection.mode != Multiplayer.GAME_R3)
-                    options.displayAmazing = false;
             }
-            else if (options.multiplayer)
+            else if (options.mpRoom)
                 options.displayComboTotal = false;
         }
 
         private function initVars(postStart:Boolean = true):void
         {
             // Post Start Time
-            if (postStart && !_gvars.activeUser.isGuest && !options.replay && !options.isEditor && song.entry.engine == null && !mpSpectate)
+            if (postStart && !_gvars.activeUser.isGuest && !options.replay && !options.isEditor && song.songInfo.engine == null && !mpSpectate)
             {
                 _loader = new URLLoader();
                 addLoaderListeners();
@@ -878,9 +879,9 @@ package game
         {
             var lowIndex:int = 0;
             var highIndex:int = 0;
-            for each (var user:Object in options.multiplayer.players)
+            for each (var user:User in options.mpRoom.players)
             {
-                var gameplay:Object = user.gameplay;
+                var gameplay:Gameplay = user.gameplay;
                 var index:int = gameplay.amazing + gameplay.perfect + gameplay.good + gameplay.average + gameplay.miss;
                 if (!lowIndex || (index && index < lowIndex))
                     lowIndex = index;
@@ -1091,7 +1092,7 @@ package game
             }
 
             // Game Restart
-            if (keyCode == _gvars.playerUser.keyRestart && !options.multiplayer)
+            if (keyCode == _gvars.playerUser.keyRestart && !options.mpRoom)
             {
                 GAME_STATE = GAME_RESTART;
             }
@@ -1285,7 +1286,7 @@ package game
                 newGameResults.game_index = _gvars.gameIndex++;
                 newGameResults.level = song.id;
                 newGameResults.song = song;
-                newGameResults.song_entry = song.entry;
+                newGameResults.songInfo = song.songInfo;
                 newGameResults.note_count = song.totalNotes;
                 newGameResults.amazing = hitAmazing;
                 newGameResults.perfect = hitPerfect;
@@ -1301,7 +1302,7 @@ package game
                 newGameResults.accuracy_deviation = accuracy.deviation;
                 newGameResults.options = this.options;
                 newGameResults.restart_stats = _gvars.songStats.data;
-                newGameResults.replay = gameReplay.concat();
+                newGameResults.replayData = gameReplay.concat();
                 newGameResults.replay_hit = gameReplayHit.concat();
                 newGameResults.replay_bin_notes = binReplayNotes;
                 newGameResults.replay_bin_boos = binReplayBoos;
@@ -1362,7 +1363,9 @@ package game
             // Cleanup
             initVars(false);
 
-            song.stop();
+            if (song != null)
+                song.stop();
+
             song = null;
 
             if (song_background)
@@ -1650,33 +1653,33 @@ package game
             if (!options.displayMP && !mpSpectate)
                 return;
 
-            for each (var user:Object in options.multiplayer.players)
+            for each (var user:User in options.mpRoom.players)
             {
-                if (user.userID == options.multiplayer.connection.currentUser.userID)
+                if (user.id == options.mpRoom.connection.currentUser.id)
                     continue;
 
                 if (options.displayMPPA)
                 {
                     var pa:PAWindow = new PAWindow(options);
                     addChild(pa);
-                    mpPA[user.playerID] = pa;
+                    mpPA[user.id] = pa;
                 }
 
                 if (mpSpectate)
                 {
                     var header:MPHeader = new MPHeader(user);
                     if (options.displayMPPA)
-                        mpPA[user.playerID].addChild(header);
+                        mpPA[user.id].addChild(header);
                     else
                         addChild(header);
-                    mpHeader[user.playerID] = header;
+                    mpHeader[user.id] = header;
                 }
 
                 if (options.displayMPCombo)
                 {
                     var combo:Combo = new Combo(options);
                     addChild(combo);
-                    mpCombo[user.playerID] = combo;
+                    mpCombo[user.id] = combo;
                 }
 
                 // Hide opponent's judge
@@ -1685,7 +1688,7 @@ package game
                     //if (options.displayMPJudge) {
                     var judge:Judge = new Judge(options);
                     addChild(judge);
-                    mpJudge[user.playerID] = judge;
+                    mpJudge[user.id] = judge;
                     if (options.isEditor)
                         judge.showJudge(100, true);
                 }
@@ -1779,12 +1782,12 @@ package game
                 interfaceEditor(comboTotalStatic, interfaceLayout(LAYOUT_COMBO_TOTAL_STATIC, false));
             }
 
-            if (options.multiplayer)
+            if (options.mpRoom)
             {
                 var index:int = 0;
-                for (var id:int = 1; id < options.multiplayer.playerCount + 1; id++)
+                for (var id:int = 1; id < options.mpRoom.playerCount + 1; id++)
                 {
-                    if (id == options.multiplayer.user.playerID)
+                    if (id == options.mpRoom.connection.currentUser.id)
                         continue;
 
                     index++;
@@ -2103,7 +2106,7 @@ package game
 
             updateFieldVars();
 
-            if (options.multiplayer)
+            if (options.mpRoom)
             {
                 dispatchEvent(new GameUpdateEvent({gameScore: gameScore,
                         gameLife: gameLife,
@@ -2203,27 +2206,27 @@ package game
             return diff;
         }
 
-        private var multiplayerResults:Array = new Array();
+        private var multiplayerResults:Array = [];
 
         public function onMultiplayerUpdate(event:GameUpdateEvent):void
         {
-            var user:Object = event.user;
-            var data:Object = user.gameplay;
+            var user:User = event.user;
+            var gameplay:Gameplay = user.gameplay;
 
-            if (options.multiplayer != event.room || !data || user.userID == options.multiplayer.connection.currentUser.userID)
+            if (!gameplay || options.mpRoom.isPlayer(user) || user.id == options.mpRoom.connection.currentUser.id)
                 return;
 
-            var diff:Object = multiplayerDiff(user.playerID, data);
+            var diff:Object = multiplayerDiff(user.id, gameplay);
 
-            var combo:Combo = mpCombo[user.playerID];
+            var combo:Combo = mpCombo[user.id];
             if (combo)
-                combo.update(data.combo, data.amazing, data.perfect, data.good, data.average, data.miss, data.boo);
+                combo.update(gameplay.combo, gameplay.amazing, gameplay.perfect, gameplay.good, gameplay.average, gameplay.miss, gameplay.boo);
 
-            var pa:PAWindow = mpPA[user.playerID];
+            var pa:PAWindow = mpPA[user.id];
             if (pa)
-                pa.update(data.amazing, data.perfect, data.good, data.average, data.miss, data.boo);
+                pa.update(gameplay.amazing, gameplay.perfect, gameplay.good, gameplay.average, gameplay.miss, gameplay.boo);
 
-            var judge:Judge = mpJudge[user.playerID];
+            var judge:Judge = mpJudge[user.id];
             if (judge)
             {
                 var value:int = 0;
@@ -2243,16 +2246,16 @@ package game
                     judge.showJudge(value);
             }
 
-            if (data.status == Multiplayer.STATUS_RESULTS && !multiplayerResults[user.userID])
+            if (gameplay.status == Multiplayer.STATUS_RESULTS && !multiplayerResults[user.id])
             {
-                multiplayerResults[user.userID] = true;
-                _gvars.gameMain.addAlert(user.userName + " finished playing the song", 240, Alert.RED);
+                multiplayerResults[user.id] = true;
+                _gvars.gameMain.addAlert(user.name + " finished playing the song", 240, Alert.RED);
             }
         }
 
         public function onMultiplayerResults(event:GameResultsEvent):void
         {
-            if (event.room == options.multiplayer)
+            if (event.room == options.mpRoom)
                 GAME_STATE = GAME_END;
         }
 

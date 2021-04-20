@@ -5,10 +5,11 @@ package
     import flash.events.Event;
     import flash.events.SQLErrorEvent;
     import flash.events.SQLEvent;
-    import sql.SQLSongDetails;
+    import sql.SQLSongUserInfo;
     import flash.data.SQLResult;
     import flash.filesystem.File;
     import com.flashfla.utils.ObjectUtil;
+    import classes.SongInfo;
 
     public class SQLQueries
     {
@@ -59,7 +60,7 @@ package
                     for (var level_id:String in engine)
                     {
                         if (engine[level_id] != null && ObjectUtil.count(engine[level_id]) > 0)
-                            parsed_data.song_details[engine_id][level_id] = new SQLSongDetails(engine_id, level_id, engine[level_id]);
+                            parsed_data.song_details[engine_id][level_id] = new SQLSongUserInfo(engine_id, level_id, engine[level_id]);
                     }
                 }
             }
@@ -67,12 +68,12 @@ package
             sql_data = parsed_data;
         }
 
-        public static function getSongDetailsEntry(entry:Object):SQLSongDetails
+        public static function getSongUserInfo(songInfo:SongInfo):SQLSongUserInfo
         {
-            if (entry.engine != null)
-                return getSongDetails(entry.engine.id, entry.level);
+            if (songInfo.engine != null)
+                return getSongDetails(songInfo.engine.id, songInfo.levelId);
 
-            return getSongDetails(Constant.BRAND_NAME_SHORT_LOWER, entry.level);
+            return getSongDetails(Constant.BRAND_NAME_SHORT_LOWER, songInfo.levelId);
         }
 
         /**
@@ -81,12 +82,12 @@ package
          * @param level_id
          * @return
          */
-        public static function getSongDetails(engine_id:String, level_id:String):SQLSongDetails
+        public static function getSongDetails(engine_id:String, level_id:String):SQLSongUserInfo
         {
             if (sql_data.song_details[engine_id] == null || sql_data.song_details[engine_id][level_id] == null)
                 return null;
 
-            return (sql_data.song_details[engine_id][level_id] as SQLSongDetails);
+            return (sql_data.song_details[engine_id][level_id] as SQLSongUserInfo);
         }
 
         /**
@@ -96,15 +97,15 @@ package
          * @param level_id
          * @return
          */
-        public static function getSongDetailsSafe(engine_id:String, level_id:String):SQLSongDetails
+        public static function getSongDetailsSafe(engine_id:String, level_id:String):SQLSongUserInfo
         {
             if (sql_data.song_details[engine_id] == null)
                 sql_data.song_details[engine_id] = {};
 
             if (sql_data.song_details[engine_id][level_id] == null)
-                sql_data.song_details[engine_id][level_id] = new SQLSongDetails(engine_id, level_id, null);
+                sql_data.song_details[engine_id][level_id] = new SQLSongUserInfo(engine_id, level_id, null);
 
-            return (sql_data.song_details[engine_id][level_id] as SQLSongDetails);
+            return (sql_data.song_details[engine_id][level_id] as SQLSongUserInfo);
         }
 
         /**

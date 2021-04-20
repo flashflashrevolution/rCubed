@@ -1,6 +1,7 @@
 package classes.chart
 {
     import classes.chart.parse.*;
+    import classes.SongInfo;
 
     public class NoteChart
     {
@@ -18,9 +19,9 @@ package classes.chart
         public var type:String;
         public var id:Number = 0;
         public var gap:Number = 0;
-        public var BPMs:Array = new Array();
-        public var Stops:Array = new Array();
-        public var Notes:Array = new Array();
+        public var BPMs:Array = [];
+        public var Stops:Array = [];
+        public var Notes:Array = [];
         public var chartData:Object;
         public var framerate:int = 60;
         protected var frameOffset:int = 0;
@@ -41,24 +42,24 @@ package classes.chart
          * @return	NoteChart of the type expected.
          */
 
-        public static function parseChart(type:String, entry:Object, inData:Object, framerate:int = 60):NoteChart
+        public static function parseChart(type:String, songInfo:SongInfo, inData:Object, framerate:int = 60):NoteChart
         {
             switch (type)
             {
                 case THIRDSTYLE:
-                    return new ChartThirdstyle(entry.level, String(inData), framerate);
+                    return new ChartThirdstyle(songInfo.level, String(inData), framerate);
 
                 case SM:
-                    return new ChartStepmania(entry.level, String(inData), framerate);
+                    return new ChartStepmania(songInfo.level, String(inData), framerate);
 
                 case FFR_LEGACY:
-                    return new ChartFFRLegacy(entry, inData, 30);
+                    return new ChartFFRLegacy(songInfo, inData, 30);
 
                 case FFR_BEATBOX:
-                    return new ChartFFRBeatbox(entry.level, String(inData), 30);
+                    return new ChartFFRBeatbox(songInfo.level, String(inData), 30);
 
                 default:
-                    return new ChartFFR(entry.level, String(inData), 30);
+                    return new ChartFFR(songInfo.level, String(inData), 30);
             }
         }
 

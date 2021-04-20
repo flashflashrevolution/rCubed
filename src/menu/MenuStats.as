@@ -1,16 +1,15 @@
 package menu
 {
-    import assets.menu.ScrollBackground;
-    import assets.menu.ScrollDragger;
     import assets.menu.SongSelectionBackground;
     import classes.Language;
     import classes.Playlist;
-    import com.flashfla.components.ScrollBar;
-    import com.flashfla.components.ScrollPane;
-    import com.flashfla.utils.ObjectUtil;
+    import classes.ui.ScrollPane;
+    import com.bit101.components.ScrollBar;
+    import com.bit101.components.Slider;
     import flash.display.Sprite;
     import flash.events.Event;
     import flash.events.MouseEvent;
+    import classes.SongInfo;
 
     public class MenuStats extends MenuPanel
     {
@@ -32,10 +31,10 @@ package menu
             super(myParent);
         }
 
-        override public function init():void
+        override public function init():Boolean
         {
             //- Setup Settings
-            options = new Object();
+            options = {};
             options.activeIndex = -1;
             options.totalItems = 0;
 
@@ -46,7 +45,7 @@ package menu
             this.addChild(background);
 
             //- Add ScrollPane
-            pane = new ScrollPane(578, 351);
+            pane = new ScrollPane(this, 578, 351);
             pane.x = 155; // 332
             pane.y = 64;
             var border:Sprite = new Sprite();
@@ -59,13 +58,15 @@ package menu
             this.addChild(pane);
 
             //- Add ScrollBar
-            scrollbar = new ScrollBar(21, 325, new ScrollDragger(), new ScrollBackground());
+            scrollbar = new ScrollBar(Slider.VERTICAL, this, 21, 325);
             scrollbar.x = 744;
             scrollbar.y = 81;
             this.addChild(scrollbar);
 
             //- Add Content
             buildStats();
+
+            return true;
         }
 
         override public function dispose():void
@@ -102,7 +103,7 @@ package menu
         public function buildStats():void
         {
             //- Clear out old MC in content pane
-            scrollbar.reset();
+            //scrollbar.reset();
             pane.clear();
 
             statBoxItems = [];
@@ -111,10 +112,11 @@ package menu
             var sX:int = 0;
             for (var sO:String in _gvars.playerUser.level_ranks)
             {
-                var song:Object = _playlist.getSong(Number(sO));
-                if (song.error != null)
+                var songInfo:SongInfo = _playlist.getSongInfo(Number(sO));
+                if (songInfo == null)
                     continue;
-                sI = new StatItem(_gvars.playerUser.level_ranks[sO], song);
+
+                sI = new StatItem(_gvars.playerUser.level_ranks[sO], songInfo);
                 sI.y = yOffset;
                 sI.index = sX;
                 sI.addEventListener(MouseEvent.CLICK, statItemClick, false, 0, true);
@@ -124,8 +126,8 @@ package menu
                 sX += 1;
             }
             options.totalItems = sX;
-            pane.scrollTo(scrollbar.scroll, false);
-            scrollbar.draggerVisibility = (yOffset > pane.height);
+            pane.scrollTo(scrollbar.value, false);
+            scrollbar.visible = (yOffset > pane.height);
         }
 
         private function statItemClick(e:Event = null):void
@@ -144,9 +146,9 @@ package menu
 
         private function mouseWheelMoved(e:MouseEvent):void
         {
-            var dist:Number = scrollbar.scroll + (pane.scrollFactorVertical / 2) * (e.delta > 0 ? -1 : 1);
+            var dist:Number = scrollbar.value + (pane.scrollFactorVertical / 2) * (e.delta > 0 ? -1 : 1);
             pane.scrollTo(dist);
-            scrollbar.scrollTo(dist);
+            //scrollbar.scrollTo(dist);
         }
 
         private function scrollBarMoved(e:Event):void

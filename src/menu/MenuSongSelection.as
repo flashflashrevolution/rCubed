@@ -53,6 +53,7 @@ package menu
     import popups.PopupFilterManager;
     import popups.PopupQueueManager;
     import popups.PopupSongNotes;
+    import classes.SongInfo;
 
     public class MenuSongSelection extends MenuPanel
     {
@@ -463,7 +464,7 @@ package menu
                 options.isFilter = false;
                 options.activeGenre = e.target.index;
                 options.activeIndex = -1;
-                options.activeSongID = -1;
+                options.activeSongId = -1;
                 options.scroll_position = 0;
 
                 resetFilterOptions();
@@ -493,7 +494,7 @@ package menu
             //- Init Variables
             var i:uint;
             var yOffset:int = 0;
-            var song:Array;
+            var songInfo:SongInfo;
             var sI:SongItem;
 
             //- Set Song array based on selected genre
@@ -511,7 +512,7 @@ package menu
                 // Doing search, build array based on case-insensitive match
                 if (options.isFilter)
                 {
-                    songList = _playlist.indexList.filter(filterSongListOptionsFilter);
+                    songList = getFilteredSongInfoArrayFromVec(_playlist.indexList, filterSongListOptionsFilter);
 
                     genreLength = songList.length;
                     songList = songList.slice(options.pageNumber * ITEM_PER_PAGE, (options.pageNumber + 1) * ITEM_PER_PAGE);
@@ -521,7 +522,9 @@ package menu
             // DM_ALL
             else if (options.activeGenre == PLAYLIST_ALL)
             {
-                songList = _playlist.indexList;
+                songList = [];
+                for each (var _songInfo:SongInfo in _playlist.indexList)
+                    songList.push(_songInfo);
 
                 // Song List Filters
                 songList = filterSongListLegacy(songList);
@@ -540,11 +543,11 @@ package menu
                     // Difficulty Filter
                     if (options.activeGenre == _gvars.DIFFICULTY_RANGES.length - 1)
                     {
-                        songList = _playlist.indexList.filter(filterSongListDifficultyMax);
+                        songList = getFilteredSongInfoArrayFromVec(_playlist.indexList, filterSongListDifficultyMax);
                     }
                     else
                     {
-                        songList = _playlist.indexList.filter(filterSongListDifficultyRange);
+                        songList = getFilteredSongInfoArrayFromVec(_playlist.indexList, filterSongListDifficultyRange);
                     }
 
                     // Song List Filters
@@ -558,7 +561,7 @@ package menu
                 else if (GENRE_MODE == GENRE_SONGFLAGS)
                 {
                     // Song Flag Filter
-                    songList = _playlist.indexList.filter(filterSongListSongFlags);
+                    songList = getFilteredSongInfoArrayFromVec(_playlist.indexList, filterSongListSongFlags);
 
                     // Song List Filters
                     songList = filterSongListLegacy(songList);
@@ -585,7 +588,7 @@ package menu
             if (songList == null || songList.length <= 0)
             {
                 options.activeIndex = -1;
-                options.activeSongID = -1;
+                options.activeSongId = -1;
                 return;
             }
 
@@ -599,14 +602,14 @@ package menu
             //- Build Playlist
             for (var sX:int = 0; sX < songList.length; sX++)
             {
-                song = songList[sX];
+                songInfo = songList[sX];
                 sI = new SongItem();
-                sI.setData(song, _gvars.activeUser.getLevelRank(song));
+                sI.setData(songInfo, _gvars.activeUser.getLevelRank(songInfo));
                 sI.noteEnabled = _gvars.activeUser.DISPLAY_SONG_NOTE;
                 sI.setContextMenu(songItemContextMenu);
                 sI.y = yOffset;
                 sI.index = sX;
-                songItems[songItems.length] = sI;
+                songItems.push(sI);
                 pane.content.addChild(sI);
                 yOffset += sI.height + 2;
             }
@@ -626,8 +629,8 @@ package menu
             var hasSelected:Boolean = false;
             for (sX = 0; sX < songList.length; sX++)
             {
-                song = songList[sX];
-                if (options.activeSongID == song.level)
+                songInfo = songList[sX];
+                if (options.activeSongId == songInfo.level)
                 {
                     setActiveIndex(sX, -1, false, false);
                     hasSelected = true;
@@ -639,7 +642,7 @@ package menu
             if (!hasSelected)
             {
                 options.activeIndex = -1;
-                options.activeSongID = -1;
+                options.activeSongId = -1;
             }
 
             // No song selected, select the first in the list if valid.
@@ -650,17 +653,33 @@ package menu
         }
 
         /**
-         * Array filter for difficulty ranges. This one handles everything at and above the top range and the special case for difficulty 0.
+         * Filters the `_playlist.indexList` vector of SongInfo into an Array given a specific filter function.
          */
-        private function filterSongListDifficultyMax(item:Object, index:int, array:Array):Boolean
+        private function getFilteredSongInfoArrayFromVec(vec:Vector.<SongInfo>, filter:Function):Array
+        {
+            var filteredArray:Array = [];
+
+            var filteredSongInfos:Vector.<SongInfo>;
+            filteredSongInfos = _playlist.indexList.filter(filter);
+
+            for each (var songInfo:SongInfo in filteredSongInfos)
+                filteredArray.push(songInfo);
+
+            return filteredArray;
+        }
+
+        /**
+         * Vector filter for difficulty ranges. This one handles everything at and above the top range and the special case for difficulty 0.
+         */
+        private function filterSongListDifficultyMax(item:SongInfo, index:int, vec:Vector.<SongInfo>):Boolean
         {
             return item.difficulty <= 0 || item.difficulty >= _gvars.DIFFICULTY_RANGES[options.activeGenre][0];
         }
 
         /**
-         * Array filter for difficulty ranges. This one handles the range between two difficulty points.
+         * Vector filter for difficulty ranges. This one handles the range between two difficulty points.
          */
-        private function filterSongListDifficultyRange(item:Object, index:int, array:Array):Boolean
+        private function filterSongListDifficultyRange(item:SongInfo, index:int, vec:Vector.<SongInfo>):Boolean
         {
             return item.difficulty >= _gvars.DIFFICULTY_RANGES[options.activeGenre][0] && item.difficulty <= _gvars.DIFFICULTY_RANGES[options.activeGenre][1];
         }
@@ -668,7 +687,7 @@ package menu
         /**
          * Array filter for song flags.
          */
-        private function filterSongListSongFlags(item:Object, index:int, array:Array):Boolean
+        private function filterSongListSongFlags(item:SongInfo, index:int, vec:Vector.<SongInfo>):Boolean
         {
             return GlobalVariables.getSongIconIndex(item, _gvars.activeUser.getLevelRank(item)) == options.activeGenre;
         }
@@ -676,7 +695,7 @@ package menu
         /**
          * Array filter for options.filter
          */
-        private function filterSongListOptionsFilter(item:Object, index:int, array:Array):Boolean
+        private function filterSongListOptionsFilter(item:SongInfo, index:int, vec:Vector.<SongInfo>):Boolean
         {
             return options.filter(item);
         }
@@ -688,9 +707,7 @@ package menu
         private function filterSongListLegacy(songList:Array):Array
         {
             if (!_playlist.engine && !_gvars.activeUser.DISPLAY_LEGACY_SONGS)
-            {
                 songList = songList.filter(filterSongListLegacyFilter);
-            }
 
             return songList;
         }
@@ -698,7 +715,7 @@ package menu
         /**
          * Array filter for filterSongListLegacy.
          */
-        private function filterSongListLegacyFilter(item:Object, index:int, array:Array):Boolean
+        private function filterSongListLegacyFilter(item:SongInfo, index:int, array:Array):Boolean
         {
             return item.genre != Constant.LEGACY_GENRE;
         }
@@ -710,16 +727,15 @@ package menu
         private function filterSongListUser(songList:Array):Array
         {
             if (_gvars.activeFilter != null)
-            {
                 songList = songList.filter(filterSongListUserFilter);
-            }
+
             return songList;
         }
 
         /**
          * Array filter for filterSongListUser.
          */
-        private function filterSongListUserFilter(item:Object, index:int, array:Array):Boolean
+        private function filterSongListUserFilter(item:SongInfo, index:int, array:Array):Boolean
         {
             return _gvars.activeFilter.process(item, _gvars.activeUser);
         }
@@ -741,7 +757,7 @@ package menu
             if (songItems.length <= 0 || index < 0 || index >= songItems.length)
             {
                 options.activeIndex = -1;
-                options.activeSongID = -1;
+                options.activeSongId = -1;
                 return;
             }
 
@@ -756,7 +772,7 @@ package menu
             }
 
             // Set Song
-            options.activeSongID = songItems[index].level;
+            options.activeSongId = songItems[index].level;
 
             // Set Active Highlights
             songItems[index].active = true;
@@ -776,8 +792,11 @@ package menu
             }
 
             // Update Multiplayer Selection
-            if (mpUpdate && options.activeSongID != -1)
-                _mp.gameplayPicking(_playlist.getSong(options.activeSongID));
+            if (mpUpdate && options.activeSongId != -1)
+            {
+                var songInfo:SongInfo = _playlist.getSongInfo(options.activeSongId);
+                _mp.gameplayPicking(songInfo);
+            }
         }
 
         /**
@@ -822,11 +841,10 @@ package menu
         private function e_songOptionsContextSelect(e:ContextMenuEvent):void
         {
             var songItem:SongItem = (e.contextMenuOwner as SongItem);
-            var songData:Object = _playlist.getSong(songItem.level);
-            if (songData.error == null)
-            {
-                _gvars.gameMain.addPopup(new PopupSongNotes(this, songData));
-            }
+            var songInfo:SongInfo = _playlist.getSongInfo(songItem.level);
+
+            if (songInfo != null)
+                _gvars.gameMain.addPopup(new PopupSongNotes(this, songInfo));
         }
 
         /**
@@ -840,10 +858,10 @@ package menu
             _gvars.options = new GameOptions();
             _gvars.options.fill();
             var songItem:SongItem = (e.contextMenuOwner as SongItem);
-            var songData:Object = _playlist.getSong(songItem.level);
-            if (songData.error == null)
+            var songInfo:SongInfo = _playlist.getSongInfo(songItem.level);
+            if (songInfo != null)
             {
-                var song:Song = _gvars.getSongFile(songData);
+                var song:Song = _gvars.getSongFile(songInfo);
                 if (song.isLoaded)
                 {
                     writeMenuMusicBytes(song);
@@ -851,7 +869,7 @@ package menu
                 }
                 else
                 {
-                    _gvars.gameMain.addAlert(sprintf(_lang.string("song_selection_load_music_for"), {"name": songData["name"]}), 90);
+                    _gvars.gameMain.addAlert(sprintf(_lang.string("song_selection_load_music_for"), {"name": songInfo.name}), 90);
                     song.addEventListener(Event.COMPLETE, e_menuMusicConvertSongLoad);
                 }
             }
@@ -868,14 +886,14 @@ package menu
 
             if (!_gvars.options.replay.isLoaded)
             {
-                (_gvars.options.replay as SongPreview).setupSongPreview((e.contextMenuOwner as SongItem).songData);
+                (_gvars.options.replay as SongPreview).setupSongPreview((e.contextMenuOwner as SongItem).songInfo);
             }
 
             if (_gvars.options.replay.isLoaded)
             {
                 // Setup Vars
                 _gvars.songQueue = [];
-                _gvars.songQueue.push(Playlist.instance.getSong(_gvars.options.replay.level));
+                _gvars.songQueue.push(Playlist.instance.getSongInfo(_gvars.options.replay.level));
 
                 // Switch to game
                 _gvars.gameMain.addAlert(_lang.string("song_selection_load_play_chart_preview"));
@@ -894,17 +912,17 @@ package menu
             _gvars.options.fill();
 
             var songItem:SongItem = (e.contextMenuOwner as SongItem);
-            var songData:Object = _playlist.getSong(songItem.level);
-            if (songData.error == null)
+            var songInfo:SongInfo = _playlist.getSongInfo(songItem.level);
+            if (songInfo != null)
             {
-                var song:Song = _gvars.getSongFile(songData);
+                var song:Song = _gvars.getSongFile(songInfo);
                 if (song.isLoaded)
                 {
                     playSongPreview(song);
                 }
                 else
                 {
-                    _gvars.gameMain.addAlert(sprintf(_lang.string("song_selection_load_music_for"), {"name": songData["name"]}), 90);
+                    _gvars.gameMain.addAlert(sprintf(_lang.string("song_selection_load_music_for"), {"name": songInfo.name}), 90);
                     song.addEventListener(Event.COMPLETE, e_songPreviewConvertSongLoad);
                 }
             }
@@ -940,7 +958,7 @@ package menu
         {
             for (var i:int = 0; i < songItems.length; i++)
             {
-                if (options.activeSongID == songItems[i].level)
+                if (options.activeSongId == songItems[i].level)
                 {
                     songItems[i].updateOrShow();
                     if (options.infoTab == TAB_PLAYLIST)
@@ -965,13 +983,13 @@ package menu
                 optionsBox.getChildAt(bti).alpha = 0.75;
 
             // Get Song Details
-            var songDetails:Object = _playlist.getSong(options.activeSongID);
+            var songInfo:SongInfo = _playlist.getSongInfo(options.activeSongId);
 
             //- Cleanup old Info Box
             infoBox.removeChildren();
 
             //- Sanity
-            if (songDetails.error != null && options.infoTab != TAB_QUEUE && options.infoTab != TAB_SEARCH)
+            if (songInfo == null && options.infoTab != TAB_QUEUE && options.infoTab != TAB_SEARCH)
                 return;
 
             //- Build Info Box
@@ -985,15 +1003,15 @@ package menu
 
             // Song Ranks
             else if (options.infoTab == TAB_HIGHSCORES)
-                buildInfoBoxHighscores(songDetails);
+                buildInfoBoxHighscores(songInfo);
 
             // Song Details
             else
-                buildInfoBoxSongDetails(songDetails);
+                buildInfoBoxSongDetails(songInfo);
 
             // Action Buttons for Songs
             if (options.infoTab == TAB_PLAYLIST || options.infoTab == TAB_HIGHSCORES)
-                buildInfoBoxSongActionButtons(songDetails);
+                buildInfoBoxSongActionButtons(songInfo);
 
             // For search, set focus on search box:
             if (options.infoTab == TAB_SEARCH)
@@ -1123,9 +1141,8 @@ package menu
 
         /**
          * Builds the Highscore Display for the InfoBox for the given song.
-         * @param songDetails Song Object
          */
-        public function buildInfoBoxHighscores(songDetails:Object):void
+        public function buildInfoBoxHighscores(songInfo:SongInfo):void
         {
             var infoTitle:Text;
             var infoDetails:Text;
@@ -1138,8 +1155,8 @@ package menu
             // Refresh button
             var refreshBtn:BoxButton = new BoxButton(infoBox, infoBox.width - 19 - 2, 2, 19, 19, "R", 12, refreshHighscoresClick);
 
-            var infoRanks:Object = _gvars.activeUser.getLevelRank(songDetails) || {};
-            var highscores:Object = _gvars.getHighscores(songDetails.level);
+            var infoRanks:Object = _gvars.activeUser.getLevelRank(songInfo) || {};
+            var highscores:Object = _gvars.getHighscores(songInfo.level);
             if (highscores && highscores["1"]) // Check for rank 1 entry.
             {
                 var lastRank:int = 0;
@@ -1202,30 +1219,29 @@ package menu
                 throbber.start();
 
                 _gvars.addEventListener(GlobalVariables.HIGHSCORES_LOAD_COMPLETE, highscoresLoaded);
-                _gvars.loadHighscores(songDetails.level);
+                _gvars.loadHighscores(songInfo.level);
             }
         }
 
         /**
          * Builds the Song Details and Information Display for the InfoBox for the given song.
-         * @param songDetails Song Object
          */
-        public function buildInfoBoxSongDetails(songDetails:Object):void
+        public function buildInfoBoxSongDetails(songInfo:SongInfo):void
         {
             var infoTitle:Text;
             var infoDetails:Text;
             var tY:int = 0;
 
-            var infoRanks:Object = _gvars.activeUser.getLevelRank(songDetails) || {};
-            var infoDisplay:Array = [["song", songDetails['name']],
-                ["author", songDetails['author']],
-                ["stepfile", songDetails['stepauthor']],
-                ["length", (songDetails['arrows'] > 0 ? sprintf(_lang.string("song_selection_song_panel_length_value"), {"time": songDetails['time'], "note_count": songDetails['arrows']}) : songDetails['time'])],
-                ["style", songDetails['style']],
+            var infoRanks:Object = _gvars.activeUser.getLevelRank(songInfo) || {};
+            var infoDisplay:Array = [["song", songInfo.name],
+                ["author", songInfo.author],
+                ["stepfile", songInfo.stepauthor],
+                ["length", (songInfo.noteCount > 0 ? sprintf(_lang.string("song_selection_song_panel_length_value"), {"time": songInfo.time, "note_count": songInfo.noteCount}) : songInfo.time)],
+                ["style", songInfo.style],
                 ["best", (infoRanks.score > 0 ? "\n" + NumberUtil.numberFormat(infoRanks.score) + "\n" + infoRanks.results : _lang.string("song_selection_song_panel_unplayed"))]];
 
             // Get User Star Rating
-            var starRating:Number = _gvars.playerUser.getSongRating(songDetails);
+            var starRating:Number = _gvars.playerUser.getSongRating(songInfo);
             if (starRating > 0)
             {
                 var ratingDisplay:StarSelector = new StarSelector(infoBox, 109, 5, false);
@@ -1245,7 +1261,7 @@ package menu
                 tY += 16;
 
                 // Info Display
-                infoDetails = new Text(infoBox, 5, tY, infoDisplay[item][1]);
+                infoDetails = new Text(infoBox, 5, tY, infoDisplay[item][1] || "");
                 infoDetails.width = 164;
                 tY += 23;
             }
@@ -1254,29 +1270,29 @@ package menu
         /**
          * Add the buttons for Adding to Queue, Highscores, and Play
          */
-        public function buildInfoBoxSongActionButtons(songDetails:Object):void
+        public function buildInfoBoxSongActionButtons(songInfo:SongInfo):void
         {
-            var accessLevel:int = _gvars.checkSongAccess(songDetails);
-            var isCanonEngine:Boolean = !songDetails.engine;
+            var accessLevel:int = _gvars.checkSongAccess(songInfo);
+            var isCanonEngine:Boolean = !songInfo.engine;
             if (accessLevel == GlobalVariables.SONG_ACCESS_PLAYABLE)
             {
                 var buttonWidth:int = isCanonEngine ? 51.5 : 79.5;
 
                 //- Make Display
                 var songQueueButton:BoxIcon = new BoxIcon(infoBox, 5, 256, buttonWidth, 27, new iconList(), songQueueClick);
-                songQueueButton.level = songDetails.level;
+                songQueueButton.level = songInfo.level;
                 songQueueButton.setHoverText(_lang.string("song_selection_song_panel_hover_queue"));
 
                 if (isCanonEngine)
                 {
                     var songHighscoresButton:BoxIcon = new BoxIcon(infoBox, 5 + buttonWidth + 5, 256, buttonWidth + 1, 27, new iconTrophy(), clickHandler);
-                    songHighscoresButton.level = songDetails.level;
+                    songHighscoresButton.level = songInfo.level;
                     songHighscoresButton.action = "highscores";
                     songHighscoresButton.setHoverText((options.infoTab == TAB_HIGHSCORES ? _lang.string("song_selection_song_panel_hover_info") : _lang.string("song_selection_song_panel_hover_scores")));
                 }
 
                 var songOptionsButton:BoxIcon = new BoxIcon(infoBox, 5 + buttonWidth + 6 + (isCanonEngine ? (buttonWidth + 5) : 0), 256, buttonWidth, 27, new iconGear(), clickHandler);
-                songOptionsButton.level = songDetails.level;
+                songOptionsButton.level = songInfo.level;
                 songOptionsButton.action = "songOptions";
                 songOptionsButton.setHoverText(_lang.string("song_selection_song_panel_hover_song_options"));
 
@@ -1285,22 +1301,22 @@ package menu
                 {
                     buttonWidth = 79.5;
                     var songLoadButton:BoxButton = new BoxButton(infoBox, 89.5, 288, 79.5, 27, _lang.string("song_selection_song_panel_mp_load"), 14, songLoadClick);
-                    songLoadButton.level = songDetails.level;
+                    songLoadButton.level = songInfo.level;
                 }
                 var songStartButton:BoxButton = new BoxButton(infoBox, 5, 288, buttonWidth, 27, _lang.string("song_selection_song_panel_play"), 14, songStartClick);
-                songStartButton.level = songDetails.level;
+                songStartButton.level = songInfo.level;
             }
             else
             {
                 if (isCanonEngine)
                 {
-                    var song_price:Number = songDetails.price;
+                    var song_price:Number = songInfo.price;
                     if (!isNaN(song_price) && song_price >= 0)
                     {
                         var hasEnoughCredits:Boolean = (_gvars.activeUser.credits >= song_price);
 
                         var purchasedSongButtonLocked:BoxButton = new BoxButton(infoBox, 5, 256, 164, 27, sprintf(_lang.string("song_selection_song_panel_purchase"), {"song_price": song_price}), 12, clickHandler);
-                        purchasedSongButtonLocked.song_details = songDetails;
+                        purchasedSongButtonLocked.song_details = songInfo;
                         purchasedSongButtonLocked.action = "purchase";
                         purchasedSongButtonLocked.enabled = hasEnoughCredits;
 
@@ -1309,7 +1325,7 @@ package menu
                         {
                             for each (var request:WebRequest in purchasedWebRequests)
                             {
-                                if (request.level == songDetails.level)
+                                if (request.level == songInfo.level)
                                 {
                                     purchasedSongButtonLocked.enabled = false;
                                     break;
@@ -1327,7 +1343,7 @@ package menu
                     }
 
                     var songHighscoresButtonLocked:BoxButton = new BoxButton(infoBox, 5, 288, 164, 27, (options.infoTab == TAB_HIGHSCORES ? _lang.string("song_selection_song_panel_info") : _lang.string("song_selection_song_panel_scores")), 12, clickHandler);
-                    songHighscoresButtonLocked.level = songDetails.level;
+                    songHighscoresButtonLocked.level = songInfo.level;
                     songHighscoresButtonLocked.action = "highscores";
                 }
             }
@@ -1338,8 +1354,8 @@ package menu
          */
         private function songQueueClick(e:Event):void
         {
-            _gvars.gameMain.addAlert(sprintf(_lang.string("song_selection_add_to_queue"), {song_name: _playlist.getSong(e.target.level).name}), 90);
-            _gvars.songQueue.push(_playlist.getSong(e.target.level));
+            _gvars.gameMain.addAlert(sprintf(_lang.string("song_selection_add_to_queue"), {song_name: _playlist.getSongInfo(e.target.level).name}), 90);
+            _gvars.songQueue.push(_playlist.getSongInfo(e.target.level));
             saveQueuePlaylist();
             if (options.activeGenre == PLAYLIST_QUEUE)
                 buildPlayList();
@@ -1373,7 +1389,7 @@ package menu
             if (level < 0)
                 return;
 
-            _mp.gameplayPicking(_playlist.getSong(level));
+            _mp.gameplayPicking(_playlist.getSongInfo(level));
             _mp.gameplayLoading();
             switchTo(MainMenu.MENU_MULTIPLAYER);
         }
@@ -1388,10 +1404,10 @@ package menu
                 return;
 
             _gvars.songQueue = [];
-            var songData:Object = _playlist.getSong(level);
-            if (songData.error == null)
+            var songInfo:SongInfo = _playlist.getSongInfo(level);
+            if (songInfo != null)
             {
-                _gvars.songQueue.push(songData);
+                _gvars.songQueue.push(songInfo);
                 playQueue();
             }
         }
@@ -1407,7 +1423,7 @@ package menu
             if (queueIndex != 0)
                 _gvars.songQueue = _gvars.songQueue.slice(queueIndex);
 
-            _gvars.songQueue = _gvars.songQueue.filter(function(item:Object, index:int, array:Array):Boolean
+            _gvars.songQueue = _gvars.songQueue.filter(function(item:SongInfo, index:int, array:Array):Boolean
             {
                 return (_gvars.checkSongAccess(item) == GlobalVariables.SONG_ACCESS_PLAYABLE);
             });
@@ -1431,13 +1447,13 @@ package menu
         {
             var searchTypeParam:String = searchTypeBox.selectedItem["data"];
             options.activeGenre = PLAYLIST_SEARCH;
-            options.activeSongID = -1;
+            options.activeSongId = -1;
             options.activeIndex = -1;
             options.pageNumber = 0;
             options.isFilter = true;
-            options.filter = function(song:Object):Boolean
+            options.filter = function(songInfo:SongInfo):Boolean
             {
-                return song[searchTypeParam].toLowerCase().indexOf(search_term.toLowerCase()) > -1;
+                return songInfo[searchTypeParam].toLowerCase().indexOf(search_term.toLowerCase()) > -1;
             };
             options.scroll_position = 0;
 
@@ -1455,24 +1471,24 @@ package menu
          * It will use a song object first to make level ids first, and if none
          * given, will look for an exact match on the song name instead.
          * @param songName Song Name
-         * @param song Song Object
+         * @param songInfo SongInfo Object
          */
-        public function multiplayerSelect(songName:String, song:Object):void
+        public function multiplayerSelect(songName:String, songInfo:SongInfo):void
         {
             saveSearchTextAndType();
             options.activeGenre = PLAYLIST_SEARCH;
-            options.activeSongID = (song != null && song.level != null) ? song.level : -1;
+            options.activeSongId = (songInfo != null && songInfo.level) ? songInfo.level : -1;
             options.pageNumber = 0;
             options.isFilter = true;
-            if (song)
-                options.filter = function(fsong:Object):Boolean
+            if (songInfo)
+                options.filter = function(_songInfo:SongInfo):Boolean
                 {
-                    return fsong.level == song.level;
+                    return _songInfo.level == songInfo.level;
                 };
             else
-                options.filter = function(fsong:Object):Boolean
+                options.filter = function(_songInfo:SongInfo):Boolean
                 {
-                    return fsong.name == songName;
+                    return _songInfo.name == songName;
                 };
             options.infoTab = TAB_PLAYLIST;
             buildGenreList();
@@ -1481,7 +1497,7 @@ package menu
 
             for (var i:int = 0; i < songItems.length; i++)
             {
-                if (songItems[i].level == options.activeSongID)
+                if (songItems[i].level == options.activeSongId)
                     setActiveIndex(i, -1, true);
             }
         }
@@ -1515,7 +1531,7 @@ package menu
             {
                 options.pageNumber = 0;
                 options.activeIndex = -1;
-                options.activeSongID = -1;
+                options.activeSongId = -1;
                 options.scroll_position = 0;
             }
             options.activeGenre = (options.infoTab == TAB_QUEUE ? PLAYLIST_QUEUE : 0);
@@ -1645,7 +1661,7 @@ package menu
                 {
                     if (options.pageNumber != targetPage)
                     {
-                        options.activeSongID = -1;
+                        options.activeSongId = -1;
                         options.activeIndex = -1;
                         options.pageNumber = targetPage;
                         options.infoTab = TAB_PLAYLIST;
@@ -1684,7 +1700,7 @@ package menu
                 options.scroll_position = 0;
                 options.activeGenre = 0;
                 options.activeIndex = -1;
-                options.activeSongID = -1;
+                options.activeSongId = -1;
                 options.infoTab = TAB_PLAYLIST;
                 buildGenreList();
                 buildPlayList();
@@ -1734,11 +1750,10 @@ package menu
                 }
                 else if (clickAction == "songOptions")
                 {
-                    var songData:Object = _playlist.getSong(e.target.level);
-                    if (songData.error == null)
-                    {
-                        _gvars.gameMain.addPopup(new PopupSongNotes(this, songData));
-                    }
+                    var songInfo:SongInfo = _playlist.getSongInfo(e.target.level);
+
+                    if (songInfo != null)
+                        _gvars.gameMain.addPopup(new PopupSongNotes(this, songInfo));
                 }
                 else if (clickAction == "clearQueue")
                 {
@@ -1771,7 +1786,7 @@ package menu
                 }
                 else if (clickAction == "doFilterRandom")
                 {
-                    var randomList:Array = songList.filter(function(item:Object, index:int, array:Array):Boolean
+                    var randomList:Array = songList.filter(function(item:SongInfo, index:int, array:Array):Boolean
                     {
                         return (_gvars.activeFilter ? _gvars.activeFilter.process(item, _gvars.activeUser) : true) && _gvars.checkSongAccess(item) == GlobalVariables.SONG_ACCESS_PLAYABLE;
                     });
@@ -1840,7 +1855,7 @@ package menu
                     resetFilterOptions();
                     options.scroll_position = 0;
                     options.activeIndex = -1;
-                    options.activeSongID = -1;
+                    options.activeSongId = -1;
                     options.activeGenre = options.activeGenre + (e.ctrlKey ? -1 : 1);
                     options.infoTab = TAB_PLAYLIST;
                     if (options.activeGenre < -1)
@@ -1853,12 +1868,12 @@ package menu
                     return;
 
                 case Keyboard.ENTER:
-                    if (!((stage.focus is PushButton) || (stage.focus is TextField)) && options.activeSongID >= 0)
+                    if (!((stage.focus is PushButton) || (stage.focus is TextField)) && options.activeSongId >= 0)
                     {
                         if (_mp.gameplayHasOpponent())
-                            multiplayerLoad(options.activeSongID);
+                            multiplayerLoad(options.activeSongId);
                         else
-                            playSong(options.activeSongID);
+                            playSong(options.activeSongId);
                     }
                     return;
 
@@ -1958,7 +1973,7 @@ package menu
 
             if (response["status"] == 0)
             {
-                var songDetails:Object = _playlist.getSong(level_id);
+                var songDetails:Object = _playlist.getSongInfo(level_id);
                 if (songDetails != null && songDetails.error == null)
                     _gvars.gameMain.addAlert(sprintf(_lang.string("song_purchase_complete"), {"name": songDetails.name}), 120, Alert.DARK_GREEN);
 
@@ -1973,7 +1988,7 @@ package menu
                 _gvars.gameMain.addAlert(_lang.string("song_purchase_error_" + response["status"]), 120, Alert.RED);
             }
 
-            if (options.activeSongID == level_id && options.infoTab == TAB_PLAYLIST)
+            if (options.activeSongId == level_id && options.infoTab == TAB_PLAYLIST)
             {
                 buildInfoBox();
             }
@@ -1990,7 +2005,7 @@ package menu
             {
                 if (pur_loader.loader == e.target)
                 {
-                    if (options.activeSongID == pur_loader.level && options.infoTab == TAB_PLAYLIST)
+                    if (options.activeSongId == pur_loader.level && options.infoTab == TAB_PLAYLIST)
                     {
                         buildInfoBox();
                     }
@@ -2035,7 +2050,7 @@ package menu
         {
             _gvars.gameMain.addAlert(_lang.string("song_selection_playing_menu_music"));
 
-            LocalStore.setVariable("menu_music", song.entry.name);
+            LocalStore.setVariable("menu_music", song.songInfo.name);
             var par:MainMenu = ((this.my_Parent) as MainMenu);
             par.drawMenuMusicControls();
             par.updateMenuMusicControls();

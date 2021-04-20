@@ -1,17 +1,13 @@
 package com.flashfla.net
 {
     import flash.events.EventDispatcher;
-    import flash.xml.XMLDocument;
-    import flash.xml.XMLNode;
-    import flash.xml.XMLNodeType;
-
-    import it.gotoandplay.smartfoxserver.SmartFoxClient;
-    import it.gotoandplay.smartfoxserver.SFSEvent;
-    import it.gotoandplay.smartfoxserver.data.Room;
-    import it.gotoandplay.smartfoxserver.data.User;
 
     import arc.ArcGlobals;
     import classes.Playlist;
+    import classes.Room
+    import classes.User;
+    import classes.Gameplay;
+
     import it.gotoandplay.smartfoxserver.SFSEvents.AdminMessageSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.ExtensionResponseSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.DebugMessageSFSEvent;
@@ -26,15 +22,17 @@ package com.flashfla.net
     import it.gotoandplay.smartfoxserver.SFSEvents.RoomVariablesUpdateSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.RoomAddedSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.RoomDeletedSFSEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.RoomLeftSFSEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.LeftRoomSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.JoinedRoomSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.JoinRoomErrorSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.UserCountChangeSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.UserEnterRoomSFSEvent;
-    import it.gotoandplay.smartfoxserver.SFSEvents.UserLeaveRoomSFSEvent;
+    import it.gotoandplay.smartfoxserver.SFSEvents.UserLeftRoomSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.UserVariablesUpdateSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.ConnectionLostSFSEvent;
+    import it.gotoandplay.smartfoxserver.SmartFoxClient;
+    import it.gotoandplay.smartfoxserver.SFSEvent;
     import com.flashfla.net.events.ConnectionEvent;
     import com.flashfla.net.events.LoginEvent;
     import com.flashfla.net.events.ErrorEvent;
@@ -47,10 +45,10 @@ package com.flashfla.net
     import com.flashfla.net.events.RoomListEvent;
     import com.flashfla.net.events.UserUpdateEvent;
     import com.flashfla.net.events.GameStartEvent;
-    import com.flashfla.net.events.GameUpdateEvent;
     import com.flashfla.net.events.GameResultsEvent;
     import com.flashfla.net.events.ExtensionResponseEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
+    import com.flashfla.utils.StringUtil;
 
     public class Multiplayer extends EventDispatcher
     {
@@ -84,13 +82,12 @@ package com.flashfla.net
         public static const CLASS_MP_MOD:int = 5;
         public static const CLASS_LEGEND:int = 6;
         public static const CLASS_AUTHOR:int = 7; // R1 Music Producer, R1 Simfile Author
-        public static const CLASS_VETERAN:int = 8; // Subscriber
+        public static const CLASS_VETERAN:int = 8;
         public static const CLASS_USER:int = 9;
         public static const CLASS_BANNED:int = 10;
         public static const CLASS_ANONYMOUS:int = 11;
 
         public static const COLOURS:Array = [0x000000, 0xFF0000, 0x000000, 0x91FF00, 0x91FF00, 0x91FF00, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000];
-        public static const CLASS_LEGACY:Array = [0, CLASS_ADMIN, CLASS_BAND, CLASS_FORUM_MOD, CLASS_CHAT_MOD, CLASS_MP_MOD, CLASS_AUTHOR, CLASS_VETERAN, CLASS_USER, CLASS_BANNED, CLASS_ANONYMOUS];
 
         public static const STATUS_NONE:int = 0;
         public static const STATUS_CLEANUP:int = 1;
@@ -100,77 +97,34 @@ package com.flashfla.net
         public static const STATUS_PLAYING:int = 5;
         public static const STATUS_RESULTS:int = 6;
 
-        public static const STATUS_VELOCITY:Array = [STATUS_NONE, STATUS_CLEANUP, STATUS_PICKING, STATUS_LOADING, STATUS_LOADED, STATUS_PLAYING, STATUS_RESULTS];
-        public static const STATUS_LEGACY:Array = [STATUS_NONE, STATUS_PLAYING, STATUS_PICKING, STATUS_LOADING, STATUS_RESULTS, STATUS_LOADED];
-
-        public static const GAME_UNKNOWN:int = -1;
-        public static const GAME_LEGACY:int = 1;
-        public static const GAME_VELOCITY:int = 2;
-        public static const GAME_R3:int = 3;
-
         public static const MODE_NORMAL:int = 0;
         public static const MODE_BATTLE:int = 1;
         public static const MODE_SCORE_RAW:int = 0;
         public static const MODE_SCORE_COMBO:int = 1;
 
-        public static const GAME_VERSIONS:Array = ["Prochat", "Legacy", "Velocity", "R^3"];
-        public static const SERVER_ZONES:Array = ["ffr_embedd", "ffr_mp", "ffr_mp_velocity", "ffr_multiplayer"];
-        public static const SERVER_EXTENSIONS:Array = ["ffr_embeddZoneExt", "ffr_MPZoneExt", "ffr_MPZoneExtVelo", "FFR_EXT"];
+        public static const GAME_VERSION:String = "R^3";
+        public static const SERVER_ZONE:String = "ffr_multiplayer";
+        public static const SERVER_EXTENSION:String = "FFR_EXT";
 
         private var server:SmartFoxClient;
 
+        private var _rooms:Object;
+        private var _lobby:Room;
+
         public var connected:Boolean;
-        public var currentUser:Object;
-        public var rooms:Array;
-        public var ghostRooms:Array;
-        public var lobby:Object;
+        public var currentUser:User;
+
+        public var ghostRooms:Vector.<Room>;
+
         public var inSolo:Boolean;
 
-        public var mode:int;
-
-        /* currentUser:
-         * loggedIn:Boolean
-         * userName:String
-         * userClass:int
-         * userLevel:int
-         * userID:int
-         * siteID:int
-         */
-
-        /* room:
-         * roomID
-         * maxPlayerCount
-         * maxSpectatorCount
-         * name
-         * users:Array
-         * isGame
-         * isPrivate
-         * isTemp
-         * isLimbo
-         * playerID (your playerID in the room)
-         * playerCount
-         * spectatorCount
-         * variables:Object
-         * isJoined (if you're in the room)
-         */
-
-        /* user
-         * room:Room
-         * userID
-         * userName
-         * playerID
-         * variables:Object
-         * isPlayer
-         */
-
-        public function Multiplayer(_mode:int = GAME_R3)
+        public function Multiplayer()
         {
-            currentUser = new Object();
-            rooms = new Array();
-            ghostRooms = new Array();
-            mode = _mode;
+            _rooms = {};
+            currentUser = new User(false, true);
+            ghostRooms = new <Room>[];
 
-            server = new SmartFoxClient(false); // CONFIG::debug);
+            server = new SmartFoxClient(true); // CONFIG::debug);
 
             CONFIG::debug
             {
@@ -191,14 +145,268 @@ package com.flashfla.net
             server.addEventListener(SFSEvent.onRoomVariablesUpdate, onRoomVariablesUpdate);
             server.addEventListener(SFSEvent.onRoomAdded, onRoomAdded);
             server.addEventListener(SFSEvent.onRoomDeleted, onRoomDeleted);
-            server.addEventListener(SFSEvent.onRoomLeft, onRoomLeft);
-            server.addEventListener(SFSEvent.onJoinRoom, onJoinRoom);
+            server.addEventListener(SFSEvent.onRoomLeft, onLeftRoom);
+            server.addEventListener(SFSEvent.onJoinRoom, onJoinedRoom);
             server.addEventListener(SFSEvent.onJoinRoomError, onJoinRoomError);
             server.addEventListener(SFSEvent.onUserCountChange, onUserCountChange);
             server.addEventListener(SFSEvent.onUserEnterRoom, onUserEnterRoom);
-            server.addEventListener(SFSEvent.onUserLeaveRoom, onUserLeaveRoom);
+            server.addEventListener(SFSEvent.onUserLeaveRoom, onUserLeftRoom);
             server.addEventListener(SFSEvent.onUserVariablesUpdate, onUserVariablesUpdate);
         }
+
+
+        // =================================================== //
+        // STATE ENCAPSULATION
+        // =================================================== //
+
+        public function get rooms():Vector.<Room>
+        {
+            var roomsVec:Vector.<Room> = new <Room>[];
+
+            for (var idx:int in _rooms)
+                roomsVec.push(_rooms[idx]);
+
+            return roomsVec;
+        }
+
+        private function getRoom(room:Room):Room
+        {
+            return _rooms[room.id];
+        }
+
+        private function getRoomById(roomId:int):Room
+        {
+            return _rooms[roomId];
+        }
+
+        /**
+         * The lobby room, if it exists.
+         */
+        public function get lobby():Room
+        {
+            if (_lobby)
+                return _lobby;
+
+            for each (var room:Room in rooms)
+            {
+                if (room.name == "Lobby")
+                {
+                    _lobby = room
+                    return _lobby
+                }
+            }
+
+            return null
+        }
+
+        public function set lobby(room:Room):void
+        {
+            _lobby = room;
+        }
+
+
+        // =================================================== //
+        // STATE MANAGEMENT
+        // =================================================== //
+
+        /**
+         * Updates a user's gameplay object from a given room's state
+         * If the user isn't a player in that room, does nothing.
+         */
+        private function updateUserGameplayFromRoom(room:Room, user:User):void
+        {
+            if (!user)
+                return;
+
+            var playerIdx:int = room.getPlayerIndex(user);
+            if (playerIdx <= 0)
+            {
+                user.gameplay = null;
+                return;
+            }
+
+            var gameplay:Gameplay;
+            if (user.gameplay)
+                gameplay = user.gameplay;
+            else
+            {
+                user.gameplay = new Gameplay();
+                gameplay = user.gameplay;
+            }
+
+            var stats:Array;
+            var previousStatus:int = gameplay.status;
+
+            var prefix:String = "P" + playerIdx;
+
+            gameplay.status = int(room.variables[prefix + "_STATE"]);
+            if (gameplay.status <= STATUS_CLEANUP)
+            {
+                if (previousStatus != gameplay.status)
+                {
+                    gameplay.reset();
+                    room.variables["arc_engine" + playerIdx] = null;
+                    eventUserUpdate(user);
+                }
+                return;
+            }
+
+            stats = String(room.variables[prefix + "_GAMESCORES"]).split(":");
+            gameplay.score = int(stats[0]);
+            gameplay.amazing = int(stats[1]);
+            gameplay.perfect = int(stats[2]);
+            gameplay.good = int(stats[3]);
+            gameplay.average = int(stats[4]);
+            gameplay.miss = int(stats[5]);
+            gameplay.boo = int(stats[6]);
+            gameplay.combo = int(stats[7]);
+            gameplay.maxCombo = int(stats[8]);
+            gameplay.songId = int(room.variables[prefix + "_SONGID"]);
+            gameplay.statusLoading = int(room.variables[prefix + "_SONGID_PROGRESS"]);
+            gameplay.life = int(room.variables[prefix + "_GAMELIFE"]);
+
+            var engine:String = room.variables["arc_engine" + playerIdx];
+            if (engine)
+            {
+                gameplay.songInfo = ArcGlobals.instance.legacyDecode(JSON.parse(engine));
+                if (gameplay.songInfo)
+                {
+                    if (!("level" in gameplay.songInfo) || gameplay.songInfo.level < 0)
+                        gameplay.songInfo.level = gameplay.songId || -1;
+                }
+            }
+            else
+            {
+                var playlist:Playlist = Playlist.instanceCanon;
+                if (gameplay.songId)
+                    gameplay.songInfo = playlist.playList[gameplay.songId];
+            }
+
+            var replayString:String = room.variables["arc_replay" + playerIdx];
+            if (replayString)
+                gameplay.encodedReplay = replayString;
+        }
+
+        /**
+         * Sets the `vars` of the current user.
+         */
+        private function setCurrentUserVariables():void
+        {
+            var vars:Array = [];
+
+            vars["UID"] = currentUser.id;
+            vars["GAME_VER"] = GAME_VERSION;
+            vars["MP_LEVEL"] = currentUser.userLevel;
+            vars["MP_CLASS"] = currentUser.userClass;
+            vars["MP_COLOR"] = currentUser.userColor;
+            vars["MP_STATUS"] = currentUser.userStatus;
+
+            currentUser.variables = vars;
+        }
+
+        /**
+         * Applies the user's `variables` values to its corresponding fields.
+         */
+        private function applyUserVariables(user:User):void
+        {
+            if (user != null)
+            {
+                var vars:Object = user.variables;
+
+                user.siteId = vars["UID"];
+                user.userLevel = vars["MP_LEVEL"];
+                user.userClass = vars["MP_CLASS"];
+                user.userColor = vars["MP_COLOR"];
+                user.userStatus = vars["MP_STATUS"];
+            }
+        }
+
+        private function removeRoom(room:Room):void
+        {
+            delete _rooms[room.id];
+        }
+
+        private function addRoom(room:Room):void
+        {
+            room.connection = this;
+            _rooms[room.id] = room;
+
+            if (room.name == "Lobby")
+                lobby = room;
+
+            updateRoom(room);
+        }
+
+        private function updateRoom(room:Room):void
+        {
+            if (room == null)
+                return;
+
+            // Do more specific updates if user is in room
+            if (room.hasUser(currentUser))
+            {
+                var currentUserIsPlayer:Boolean = room.isPlayer(currentUser);
+                var roomPlayers:Vector.<User> = room.players;
+
+                // Update each player's gameplay
+                var anyUserStatusChanged:Boolean = false;
+                var anyUserSongNameChanged:Boolean = false;
+                for each (var user:User in roomPlayers)
+                {
+                    var previousUserStatus:int = user.gameplay ? user.gameplay.status ? user.gameplay.status : -1 : -1;
+                    var previousSongName:String = user.gameplay ? user.gameplay.songInfo ? user.gameplay.songInfo.name : "" : "";
+
+                    updateUserGameplayFromRoom(room, user);
+
+                    if (previousUserStatus != user.gameplay.status)
+                        anyUserStatusChanged = true;
+
+                    if (previousSongName != (user.gameplay.songInfo ? user.gameplay.songInfo.name : ""))
+                        eventUserUpdate(user);
+                }
+
+                // Process gameplay status changes for game start/end
+                if (anyUserStatusChanged)
+                {
+                    if (room.isAllPlayersInStatus(STATUS_LOADED) && room.isAllPlayersSameSong())
+                    {
+                        currentUser.gameplay.status = STATUS_PLAYING;
+
+                        reportSongStart(room);
+                        sendCurrentUserStatus(room);
+
+                        if (currentUserIsPlayer)
+                            eventGameStart(room);
+                    }
+                    else if (currentUserIsPlayer && currentUser.gameplay.status == STATUS_RESULTS)
+                    {
+                        reportSongEnd(room);
+                        eventGameResults(room);
+
+                        eventUserUpdate(currentUser);
+                    }
+                }
+            }
+
+            // Update room metadata
+            room.level = room.variables["GAME_LEVEL"];
+            room.mode = room.variables["GAME_MODE"];
+            room.scoreMode = room.variables["GAME_SCORE"];
+            room.ranked = room.variables["GAME_RANKED"];
+        }
+
+        private function getRoomUserById(room:Room, userId:int):User
+        {
+            if (room == null)
+                return null;
+
+            return room.getUser(userId);
+        }
+
+
+        // =================================================== //
+        // SERVER REQUESTS
+        // =================================================== //
 
         public function connect():void
         {
@@ -214,7 +422,7 @@ package com.flashfla.net
         public function login(username:String, password:String):void
         {
             if (connected)
-                server.login(SERVER_ZONES[mode], username, password);
+                server.login(SERVER_ZONE, username, password);
         }
 
         public function logout():void
@@ -230,28 +438,28 @@ package com.flashfla.net
                 if (target == null)
                     server.sendModeratorMessage(message, SmartFoxClient.MODMSG_TO_ZONE);
                 else if (target.userID != null)
-                    server.sendModeratorMessage(message, SmartFoxClient.MODMSG_TO_USER, target.userID);
+                    server.sendModeratorMessage(message, SmartFoxClient.MODMSG_TO_USER, target.id);
                 else if (target.roomID != null)
-                    server.sendModeratorMessage(message, SmartFoxClient.MODMSG_TO_ROOM, target.roomID);
+                    server.sendModeratorMessage(message, SmartFoxClient.MODMSG_TO_ROOM, target.id);
             }
         }
 
-        public function nukeRoom(room:Object):void
+        public function nukeRoom(room:Room):void
         {
             if (connected && room)
-                server.sendXtMessage(SERVER_EXTENSIONS[mode], "nuke_room", {"room": room.roomID}, SmartFoxClient.XTMSG_TYPE_XML, lobby.roomID);
+                server.sendXtMessage(SERVER_EXTENSION, "nuke_room", {"room": room.id}, SmartFoxClient.XTMSG_TYPE_XML, lobby.id);
         }
 
-        public function muteUser(user:Object, time:int = 2, ipBan:Boolean = false):void
+        public function muteUser(user:User, time:int = 2, ipBan:Boolean = false):void
         {
             if (connected && user)
-                server.sendXtMessage(SERVER_EXTENSIONS[mode], "mute_user", {"user": user.userName, "bantime": time, "ip": (ipBan ? 1 : 0)}, SmartFoxClient.XTMSG_TYPE_XML, lobby.roomID);
+                server.sendXtMessage(SERVER_EXTENSION, "mute_user", {"user": user.name, "bantime": time, "ip": (ipBan ? 1 : 0)}, SmartFoxClient.XTMSG_TYPE_XML, lobby.id);
         }
 
-        public function banUser(user:Object, time:int = 2, ipBan:Boolean = false):void
+        public function banUser(user:User, time:int = 2, ipBan:Boolean = false):void
         {
             if (connected && user)
-                server.sendXtMessage(SERVER_EXTENSIONS[mode], "ban_user", {"user": user.userName, "bantime": time, "ip": (ipBan ? 1 : 0)}, SmartFoxClient.XTMSG_TYPE_XML, lobby.roomID);
+                server.sendXtMessage(SERVER_EXTENSION, "ban_user", {"user": user.name, "bantime": time, "ip": (ipBan ? 1 : 0)}, SmartFoxClient.XTMSG_TYPE_XML, lobby.id);
         }
 
         public function sendHTMLMessage(message:String, target:Object = null):void
@@ -259,42 +467,42 @@ package com.flashfla.net
             if (connected)
             {
                 if (target == null)
-                    server.sendXtMessage(SERVER_EXTENSIONS[mode], "html_message", {"m": message, "t": SmartFoxClient.MODMSG_TO_ZONE, "v": null});
-                else if (target.userID != null)
-                    server.sendXtMessage(SERVER_EXTENSIONS[mode], "html_message", {"m": message, "t": SmartFoxClient.MODMSG_TO_USER, "v": target.userID});
-                else if (target.roomID != null)
-                    server.sendXtMessage(SERVER_EXTENSIONS[mode], "html_message", {"m": message, "t": SmartFoxClient.MODMSG_TO_ROOM, "v": target.roomID});
+                    server.sendXtMessage(SERVER_EXTENSION, "html_message", {"m": message, "t": SmartFoxClient.MODMSG_TO_ZONE, "v": null});
+                else if (target.id != null)
+                    server.sendXtMessage(SERVER_EXTENSION, "html_message", {"m": message, "t": SmartFoxClient.MODMSG_TO_USER, "v": target.id});
+                else if (target.id != null)
+                    server.sendXtMessage(SERVER_EXTENSION, "html_message", {"m": message, "t": SmartFoxClient.MODMSG_TO_ROOM, "v": target.id});
             }
         }
 
-        public function getUserList(room:Object):void
+        public function getUserList(room:Room):void
         {
             if (connected && room)
-                server.sendXtMessage(SERVER_EXTENSIONS[mode], "getUserList", {"room": room.roomID});
+                server.sendXtMessage(SERVER_EXTENSION, "getUserList", {"room": room.id});
         }
 
         public function getUserVariables(... users):void
         {
             if (connected)
-                server.sendXtMessage(SERVER_EXTENSIONS[mode], "getUserVariables", {"users": users});
+                server.sendXtMessage(SERVER_EXTENSION, "getUserVariables", {"users": users});
         }
 
         public function getMultiplayerLevel():void
         {
             if (connected)
-                server.sendXtMessage(SERVER_EXTENSIONS[mode], "getMultiplayerLevel", {});
+                server.sendXtMessage(SERVER_EXTENSION, "getMultiplayerLevel", {});
         }
 
-        public function reportSongStart(room:Object):void
+        public function reportSongStart(room:Room):void
         {
-            if (connected && mode == GAME_R3)
-                server.sendXtMessage(SERVER_EXTENSIONS[mode], "playerStart", {}, "xml", room.roomID);
+            if (connected)
+                server.sendXtMessage(SERVER_EXTENSION, "playerStart", {}, "xml", room.id);
         }
 
-        public function reportSongEnd(room:Object):void
+        public function reportSongEnd(room:Room):void
         {
-            if (connected && mode == GAME_R3)
-                server.sendXtMessage(SERVER_EXTENSIONS[mode], "playerFinish", {}, "xml", room.roomID);
+            if (connected)
+                server.sendXtMessage(SERVER_EXTENSION, "playerFinish", {}, "xml", room.id);
         }
 
         public function refreshRooms():void
@@ -303,592 +511,256 @@ package com.flashfla.net
                 server.getRoomList();
         }
 
-        public function joinRoom(room:Object, player:Boolean = true, password:String = ""):void
+        /**
+         * Sends a request to the server to join a specific room as a player or not.
+         * Optionally, provide a password.
+         */
+        public function joinRoom(room:Room, asPlayer:Boolean = true, password:String = ""):void
         {
-            player &&= !currentUser.room;
-            if (connected && room)
-                server.joinRoom(room.roomID, password, !player, true);
+            if (!connected || !room)
+                return;
+
+            if (room.isGameRoom)
+                asPlayer &&= room.userCount < Room.MAX_PLAYERS;
+
+            server.joinRoom(room.id, password, !asPlayer, true);
         }
 
-        public function leaveRoom(room:Object):void
+        public function joinLobby():void
+        {
+            joinRoom(lobby, true);
+        }
+
+        /**
+         * Sends a request to the server to leave a specific room.
+         */
+        public function leaveRoom(room:Room):void
         {
             if (connected && room)
             {
-                clearRoomPlayer(room);
-                server.leaveRoom(room.roomID);
+                clearCurrentUserRoomVariables(room);
+                server.leaveRoom(room.id);
             }
         }
 
-        public function switchRole(room:Object):void
+        /**
+         * Attempts to switch the current user's state (player/spectator) in the given room.
+         * If the user is trying to become a player, it must currently be a spectator
+         * and not playing in any other room.
+         */
+        public function switchRole(room:Room):void
         {
-            if (connected && room && room.isJoined)
+            if (!connected || !room)
+                return;
+
+            if (room.isPlayer(currentUser))
             {
-                if (room.user.isPlayer)
-                    server.switchPlayer(room.roomID);
-                else
+                // Cannot switch mode while playing
+                if (currentUser.gameplay.status == STATUS_PLAYING)
+                    return;
+
+                server.switchPlayer(room.id);
+            }
+            else
+            {
+                // Cannot switch to player if already a player in another room
+                if (currentUser.isPlayer)
                 {
-                    if (currentUser.room)
-                        eventError("You cannot be a player in more than one game");
-                    else
-                        server.switchSpectator(room.roomID);
+                    eventError("You cannot be a player in more than one game");
+                    return;
                 }
+
+                // Cannot switch to player if player slots are filled
+                if (room.playerCount >= 2)
+                    return;
+
+                server.switchSpectator(room.id);
             }
         }
 
+        /**
+         * Builds a request to create a new room and sends it to the server.
+         */
         public function createRoom(name:String, password:String = "", maxUsers:int = 2, maxSpectators:int = 100):void
         {
             if (connected && name)
             {
-                var params:Object = new Object();
-                params.name = (mode == GAME_R3) ? name : "(Non-R3) " + name;
+                var params:Object = {};
+                params.name = name;
                 params.password = password;
                 params.maxUsers = maxUsers;
                 params.maxSpectators = maxSpectators;
                 params.isGame = true;
                 params.exitCurrentRoom = false;
                 params.uCount = true;
-                params.joinAsSpectator = currentUser.room;
-                if (mode == GAME_R3)
-                {
-                    params.vars = [{name: "GAME_LEVEL", val: currentUser.userLevel, persistent: true},
-                        {name: "GAME_MODE", val: MODE_NORMAL, persistent: true},
-                        {name: "GAME_SCORE", val: MODE_SCORE_RAW, persistent: true},
-                        {name: "GAME_RANKED", val: true, persistent: true}];
-                }
+                params.joinAsSpectator = currentUser.isPlayer;
+                params.vars = [{name: "GAME_LEVEL", val: currentUser.userLevel, persistent: true},
+                    {name: "GAME_MODE", val: MODE_NORMAL, persistent: true},
+                    {name: "GAME_SCORE", val: MODE_SCORE_RAW, persistent: true},
+                    {name: "GAME_RANKED", val: true, persistent: true}];
+
                 server.createRoom(params);
             }
         }
 
-        public function joinLobby():void
-        {
-            joinRoom(lobby);
-        }
-
-        public function sendMessage(room:Object, message:String, escape:Boolean = true):void
+        public function sendMessage(room:Room, message:String, escape:Boolean = true):void
         {
             if (connected && room && message)
-                server.sendPublicMessage(escape ? htmlEscape(message) : message, room.roomID);
+                server.sendPublicMessage(escape ? StringUtil.htmlEscape(message) : message, room.id);
         }
 
-        public function sendPrivateMessage(user:Object, message:String, room:Object = null):void
+        public function sendPrivateMessage(user:User, message:String, room:Room = null):void
         {
             if (connected && user && message)
-                server.sendPrivateMessage(htmlEscape(message), user.userID, (room ? room.roomID : -1));
+                server.sendPrivateMessage(StringUtil.htmlEscape(message), user.id, (room ? room.id : -1));
         }
 
-        public function getRoomGameplay(room:Object):Object
+        /**
+         * Formats and sends the room variables for the currentUser to the server.
+         */
+        public function sendRoomVariables(room:Room, data:Object, changeOwnership:Boolean = true):void
         {
-            var vars:Object = new Object();
-            for each (var user:Object in room.users)
-            {
-                if (user.isPlayer)
-                    vars["player" + user.playerID] = parseRoomVariablesForUser(room, user);
-            }
-            return vars;
-        }
-
-        public static function hex2dec(hex:String):int
-        {
-            return hex ? parseInt(hex, 16) : 0;
-        }
-
-        public static function dec2hex(dec:int):String
-        {
-            return dec.toString(16).toUpperCase();
-        }
-
-        private function parseRoomVariablesForUser(room:Object, user:Object):Object
-        {
-            var ret:Object = new Object();
-            var vars:Object = room.variables;
-            var stats:Array;
-            switch (mode)
-            {
-                case GAME_VELOCITY:
-                    var prefix:String = "p" + user.playerID;
-                    ret.maxCombo = hex2dec(vars[prefix + "_maxcombo"]);
-                    ret.combo = hex2dec(vars[prefix + "_combo"]);
-                    ret.perfect = hex2dec(vars[prefix + "_perfect"]);
-                    ret.good = hex2dec(vars[prefix + "_good"]);
-                    ret.average = hex2dec(vars[prefix + "_average"]);
-                    ret.boo = hex2dec(vars[prefix + "_boo"]);
-                    ret.miss = hex2dec(vars[prefix + "_miss"]);
-                    ret.songID = hex2dec(vars[prefix + "_levelid"]);
-                    ret.statusLoading = hex2dec(vars[prefix + "_levelloading"]);
-                    ret.status = STATUS_VELOCITY[hex2dec(vars[prefix + "_state"])];
-                    user.siteID = ret.siteID = hex2dec(vars[prefix + "_uid"]);
-                    ret.userName = vars[prefix + "_name"];
-                    ret.score = ret.perfect * 50 + ret.good * 25 + ret.average * 5 - ret.miss * 10 - ret.boo * 5;
-                    ret.amazing = 0;
-                    ret.life = 24;
-                    break;
-                case GAME_LEGACY:
-                    stats = String(vars["mpstats" + user.playerID]).split(":");
-                    ret.songName = stats[0] || "No Song Selected";
-                    ret.score = int(stats[1]);
-                    ret.life = int(stats[2]);
-                    ret.maxCombo = int(stats[3]);
-                    ret.combo = int(stats[4]);
-                    ret.perfect = int(stats[5]);
-                    ret.good = int(stats[6]);
-                    ret.average = int(stats[7]);
-                    ret.miss = int(stats[8]);
-                    ret.boo = int(stats[9]);
-                    ret.status = STATUS_LEGACY[int(stats[10])];
-                    ret.amazing = 0;
-                    var loading:Object = vars["arc_status_loading" + user.playerID];
-                    if (loading != null)
-                        ret.statusLoading = int(loading);
-                    break;
-                case GAME_R3:
-                    stats = String(vars["P" + user.playerID + "_GAMESCORES"]).split(":");
-                    ret.score = int(stats[0]);
-                    ret.amazing = int(stats[1]);
-                    ret.perfect = int(stats[2]);
-                    ret.good = int(stats[3]);
-                    ret.average = int(stats[4]);
-                    ret.miss = int(stats[5]);
-                    ret.boo = int(stats[6]);
-                    ret.combo = int(stats[7]);
-                    ret.maxCombo = int(stats[8]);
-                    ret.status = int(vars["P" + user.playerID + "_STATE"]);
-                    ret.songID = int(vars["P" + user.playerID + "_SONGID"]);
-                    ret.statusLoading = int(vars["P" + user.playerID + "_SONGID_PROGRESS"]);
-                    ret.life = int(vars["P" + user.playerID + "_GAMELIFE"]);
-                    break;
-            }
-
-            var engine:String = vars["arc_engine" + user.playerID];
-            if (engine)
-            {
-                ret.song = ArcGlobals.instance.legacyDecode(JSON.parse(engine));
-                if (ret.song)
-                {
-                    if (!ret.song.name)
-                        ret.song.name = ret.songName;
-                    if (!("level" in ret.song) || ret.song.level < 0)
-                        ret.song.level = ret.songID || -1;
-                }
-            }
-            else
-            {
-                var playlist:Playlist = Playlist.instanceCanon;
-                if (ret.songID)
-                    ret.song = playlist.playList[ret.songID];
-                if (!ret.song)
-                {
-                    for each (var song:Object in playlist.playList)
-                    {
-                        if (song.name == ret.songName)
-                        {
-                            ret.song = song;
-                            break;
-                        }
-                    }
-                }
-            }
-            var replay:Object = vars["arc_replay" + user.playerID];
-            if (replay)
-                ret.replay = replay;
-
-            ret.room = room;
-            ret.user = user;
-
-            return ret;
-        }
-
-        public function setRoomVariables(room:Object, data:Object, changeOwnership:Boolean = true):void
-        {
-            var varArray:Array = new Array();
+            var varArray:Array = [];
             for (var name:String in data)
                 varArray.push({name: name, val: data[name]});
+
             if (varArray.length > 0)
-                server.setRoomVariables(varArray, room.roomID, changeOwnership);
+                server.setRoomVariables(varArray, room.id, changeOwnership);
         }
 
-        private function clearRoomPlayer(room:Object):void
+        /**
+         * Formats empty room variables for the currentUser and sends them to the server.
+         */
+        private function clearCurrentUserRoomVariables(room:Room):void
         {
-            var vars:Object = new Object();
-            if (room.isGame && room.isJoined && room.user.isPlayer)
-            {
-                var prefix:String = room.user.playerID;
-                switch (mode)
-                {
-                    case GAME_R3:
-                        prefix = "P" + prefix;
-                        vars[prefix + "_NAME"] = null;
-                        vars[prefix + "_UID"] = null;
-                        break;
-                    case GAME_VELOCITY:
-                        prefix = "p" + prefix;
-                        vars[prefix + "_name"] = null;
-                        vars[prefix + "_uid"] = null;
-                        break;
-                    case GAME_LEGACY:
-                        vars["player" + prefix] = null;
-                        vars["mpstats" + prefix] = null;
-                        break;
-                }
-                vars["arc_engine" + room.user.playerID] = null;
-                vars["arc_replay" + room.user.playerID] = null;
-            }
-            setRoomVariables(room, vars);
-        }
-
-        private function setRoomPlayer(room:Object):void
-        {
-            var vars:Object = new Object();
-            if (room.isGame && room.isJoined && room.user.isPlayer)
-            {
-                var prefix:String = room.user.playerID;
-                switch (mode)
-                {
-                    case GAME_R3:
-                        prefix = "P" + prefix;
-                        vars[prefix + "_NAME"] = currentUser.userName;
-                        vars[prefix + "_UID"] = currentUser.siteID;
-                        var opponent:Boolean = false;
-                        for each (var user:Object in room.users)
-                        {
-                            if (user.isPlayer && user.userID != currentUser.userID)
-                                opponent = true;
-                        }
-                        if (!opponent)
-                            setRoomVariables(room, {"GAME_LEVEL": currentUser.userLevel}, false);
-                        break;
-                    case GAME_VELOCITY:
-                        prefix = "p" + prefix;
-                        vars[prefix + "_name"] = currentUser.userName;
-                        vars[prefix + "_uid"] = dec2hex(currentUser.siteID);
-                        break;
-                    case GAME_LEGACY:
-                        vars["player" + prefix] = currentUser.userName;
-                        vars["mpstats" + prefix] = "No Song Selected:0:0:0:0:0:0:0:0:0:0";
-                        break;
-                }
-            }
-            setRoomVariables(room, vars);
-        }
-
-        private function updateUserVariables():void
-        {
-            var vars:Object = new Object();
-            switch (mode)
-            {
-                case GAME_R3:
-                    vars["UID"] = currentUser.siteID;
-                    vars["GAME_VER"] = GAME_VERSIONS[GAME_R3];
-                    vars["MP_LEVEL"] = currentUser.userLevel;
-                    vars["MP_CLASS"] = currentUser.userClass;
-                    vars["MP_COLOR"] = currentUser.userColour;
-                    vars["MP_STATUS"] = currentUser.userStatus;
-                    break;
-                default:
-                    vars["MP_Level"] = currentUser.userLevel;
-                    vars["MP_Class"] = CLASS_LEGACY.indexOf(currentUser.userClass);
-                    vars["MP_Color"] = currentUser.userColour;
-                    break;
-            }
-            server.setUserVariables(vars);
-
-            var foundSfsUser:User = null;
-            for each (var sfsRoom:Room in server.getAllRooms())
-            {
-                for each (var sfsUser:User in sfsRoom.getUserList())
-                {
-                    if (sfsUser.getId() == currentUser.userID)
-                    {
-                        foundSfsUser = sfsUser;
-                        break;
-                    }
-                }
-            }
-            updateUser(foundSfsUser);
-
-            var found:Object = null;
-            for each (var room:Object in rooms)
-            {
-                for each (var user:Object in room.users)
-                {
-                    if (user.userID == currentUser.userID)
-                    {
-                        found = user;
-                        break;
-                    }
-                }
-                if (found != null)
-                    break;
-            }
-            eventUserUpdate(found);
-        }
-
-        public function setRoomGameplay(room:Object, data:Object):void
-        {
-            var vars:Object = new Object();
-            if (room.isJoined && room.user.isPlayer)
-            {
-                switch (mode)
-                {
-                    case GAME_VELOCITY:
-                        var prefix:String = "p" + room.user.playerID;
-                        vars[prefix + "_maxcombo"] = dec2hex(data.maxCombo);
-                        vars[prefix + "_combo"] = dec2hex(data.combo);
-                        vars[prefix + "_perfect"] = dec2hex(data.amazing + data.perfect);
-                        vars[prefix + "_good"] = dec2hex(data.good);
-                        vars[prefix + "_average"] = dec2hex(data.average);
-                        vars[prefix + "_boo"] = dec2hex(data.boo);
-                        vars[prefix + "_miss"] = dec2hex(data.miss);
-                        vars[prefix + "_levelid"] = dec2hex(data.song == null ? data.songID : int(data.song.level));
-                        var statusLoading:int = data.statusLoading;
-                        vars[prefix + "_levelloading"] = dec2hex(statusLoading);
-                        vars[prefix + "_state"] = dec2hex(STATUS_VELOCITY.indexOf(data.status));
-                        if (data.gameScoreRecorded != null)
-                            vars["gameScoreRecorded"] = data.gameScoreRecorded;
-                        break;
-                    case GAME_LEGACY:
-                        var status:int = data.status;
-                        switch (status)
-                        {
-                            case STATUS_LOADED:
-                                status = STATUS_PLAYING;
-                                break;
-                            case STATUS_PICKING:
-                                status = STATUS_NONE;
-                                break;
-                        }
-                        vars["mpstats" + room.user.playerID] = String((data.songName != null ? data.songName : data.song.name)).replace(/:/g, "") + ":" + int(data.score) + ":" + int(data.life) + ":" + int(data.maxCombo) + ":" + int(data.combo) + ":" + int(data.amazing + data.perfect) + ":" + int(data.good) + ":" + int(data.average) + ":" + int(data.miss) + ":" + int(data.boo) + ":" + STATUS_LEGACY.indexOf(status);
-                        if (data.statusLoading != null)
-                            vars["arc_status_loading" + room.user.playerID] = int(data.statusLoading);
-                        else
-                            vars["arc_status_loading" + room.user.playerID] = null;
-                        break;
-                    case GAME_R3:
-                        vars["P" + room.user.playerID + "_GAMESCORES"] = int(data.score) + ":" + int(data.amazing) + ":" + int(data.perfect) + ":" + int(data.good) + ":" + int(data.average) + ":" + int(data.miss) + ":" + int(data.boo) + ":" + int(data.combo) + ":" + int(data.maxCombo);
-                        vars["P" + room.user.playerID + "_STATE"] = int(data.status);
-                        vars["P" + room.user.playerID + "_GAMELIFE"] = int(data.life * 24 / 100);
-                        vars["P" + room.user.playerID + "_SONGID"] = (data.song == null ? data.songID : int(data.song.level));
-                        vars["P" + room.user.playerID + "_SONGID_PROGRESS"] = int(data.statusLoading);
-                        break;
-                }
-                var engine:Object = ArcGlobals.instance.legacyEncode(data.song);
-                if (engine)
-                {
-                    if (mode == GAME_LEGACY)
-                        delete engine.songName;
-                    vars["arc_engine" + room.user.playerID] = JSON.stringify(engine);
-                }
-                else if (data.song === null || (data.song && !data.song.engine))
-                    vars["arc_engine" + room.user.playerID] = null;
-                vars["arc_replay" + room.user.playerID] = data.replay || null;
-            }
-            setRoomVariables(room, vars);
-        }
-
-        private function parseUserVariables(user:Object):void
-        {
-            var vars:Object = user.variables;
-            switch (mode)
-            {
-                case GAME_R3:
-                    user.siteID = vars["UID"];
-                    user.gameVersion = GAME_VERSIONS.indexOf(vars["GAME_VER"]);
-                    user.userLevel = vars["MP_LEVEL"];
-                    user.userClass = vars["MP_CLASS"];
-                    user.userColour = vars["MP_COLOR"];
-                    user.userStatus = vars["MP_STATUS"];
-                    break;
-                default:
-                    user.userLevel = vars["MP_Level"];
-                    user.userClass = CLASS_LEGACY[vars["MP_Class"]];
-                    user.userColor = vars["MP_Color"];
-                    break;
-            }
-        }
-
-        private function parseRoomUserVariables(room:Object, user:Object):void
-        {
-            user.gameplay = parseRoomVariablesForUser(room, user);
-        }
-
-        private function clearRooms():void
-        {
-            rooms = new Array();
-        }
-
-        private function removeRoom(sfsRoom:*):void
-        {
-            var room:Object = getRoom(sfsRoom);
-            var index:int = rooms.indexOf(room);
-            if (index >= 0)
-                rooms.splice(index, 1);
-        }
-
-        private function addRoom(sfsRoom:*):void
-        {
-            if (!(sfsRoom is Room))
-                sfsRoom = server.getRoom(sfsRoom);
-
-            var room:Object = new Object();
-            room.connection = this;
-            room.roomID = sfsRoom.getId();
-            room.maxSpectatorCount = sfsRoom.getMaxSpectators();
-            room.maxPlayerCount = sfsRoom.getMaxUsers();
-            room.name = sfsRoom.getName();
-            room.users = new Array();
-            room.players = new Array();
-            room.isGame = sfsRoom.isGame();
-            room.isPrivate = sfsRoom.isPrivate();
-            room.isTemp = sfsRoom.isTemp();
-            room.isLimbo = sfsRoom.isLimbo();
-            room.match = {status: STATUS_NONE, players: [], gameplay: [], playerStatus: []};
-            rooms.push(room);
-
-            if (room.name == "Lobby")
-                lobby = room;
-
-            updateRoom(sfsRoom);
-        }
-
-        private function updateRoom(sfsRoom:*):void
-        {
-            if (!(sfsRoom is Room))
-                sfsRoom = server.getRoom(sfsRoom);
-
-            var room:Object = getRoom(sfsRoom);
-            var user:Object;
-
-            if (room == null)
+            if (!room.isGameRoom)
                 return;
 
-            if (currentUser.room == room)
-                currentUser.room = null;
+            var vars:Object = {};
+            var currentUserIdx:int = room.getPlayerIndex(currentUser);
 
-            room.playerCount = sfsRoom.getUserCount();
-            room.spectatorCount = sfsRoom.getSpectatorCount();
-            room.variables = sfsRoom.getVariables();
-            room.isJoined = false;
-            room.user = null;
-            room.players.splice(0);
-            room.users = room.users.filter(function(item:*, index:int, array:Array):Boolean
+            if (currentUserIdx > 0)
             {
-                var ret:Boolean = sfsRoom.getUser(item.userID) != null;
-                if (!ret)
-                    item.room = null;
-                return ret;
-            });
-            for each (var sfsUser:User in sfsRoom.getUserList())
-            {
-                if (getUser(room.roomID, sfsUser) == null)
-                {
-                    user = new Object();
-                    user.room = room;
-                    user.userID = sfsUser.getId();
-                    user.userName = sfsUser.getName();
-                    user.isModerator = sfsUser.isModerator();
-                    user.variables = sfsUser.getVariables();
-                    parseUserVariables(user);
-                    room.users.push(user);
-                }
+                var prefix:String = "P" + currentUserIdx;
+
+                vars[prefix + "_NAME"] = null;
+                vars[prefix + "_UID"] = null;
+                vars[prefix + "_SONGID_PROGRESS"] = null;
+                vars[prefix + "_SONGID"] = null;
+
+                vars["arc_engine" + currentUser.id] = null;
+                vars["arc_replay" + currentUser.id] = null;
             }
-            for each (user in room.users)
-            {
-                sfsUser = sfsRoom.getUser(user.userID);
-                user.playerID = sfsUser.getPlayerId();
-                user.isPlayer = room.isGame && !sfsUser.isSpectator();
-                if (user.userID == currentUser.userID)
-                {
-                    room.isJoined = true;
-                    room.user = user;
-                    if (user.isPlayer)
-                        currentUser.room = room;
-                }
-                if (user.isPlayer)
-                {
-                    room.players[user.playerID] = user;
-                    parseRoomUserVariables(room, user);
-                }
-            }
-            if (mode == GAME_R3)
-            {
-                room.level = room.variables["GAME_LEVEL"];
-                room.mode = room.variables["GAME_MODE"];
-                room.scoreMode = room.variables["GAME_SCORE"];
-                room.ranked = room.variables["GAME_RANKED"];
-            }
-            else
-            {
-                var name:Array = new RegExp("\\[(\\d+)\\] (.+)").exec(sfsRoom.getName());
-                if (name)
-                {
-                    room.name = name[2];
-                    room.level = parseInt(name[1]);
-                }
-            }
+
+            // Send room vars to server
+            sendRoomVariables(room, vars);
         }
 
-        private function updateUser(sfsUser:User):void
+        /**
+         * Sends the current user's "player" variables (if any) to the server.
+         */
+        private function sendCurrentUserRoomVariables(room:Room):void
         {
-            for each (var room:Object in rooms)
+            if (!room.isGameRoom)
+                return;
+
+            var vars:Object = {};
+            var currentUserIdx:int = room.getPlayerIndex(currentUser);
+
+            if (currentUserIdx > 0)
             {
-                for each (var user:Object in room.users)
-                {
-                    if (user.userID == sfsUser.getId())
-                    {
-                        user.variables = sfsUser.getVariables();
-                        parseUserVariables(user);
-                    }
-                }
+                var prefix:String = "P" + currentUserIdx;
+
+                vars[prefix + "_NAME"] = currentUser.name;
+                vars[prefix + "_UID"] = currentUser.id;
+
+                // If no opponents, set the room's level to the currentUser's level
+                if (!room.playerCount > 1)
+                    vars["GAME_LEVEL"] = currentUser.userLevel;
+
+                sendRoomVariables(room, vars);
             }
         }
 
-        private function findUser(sfsUser:User):Object
+        /**
+         * Builds a request to update the current user's gameplay status
+         * in the specified room and sends it to the server.
+         */
+        public function sendCurrentUserStatus(room:Room):void
         {
-            for each (var room:Object in rooms)
-            {
-                for each (var user:Object in room.users)
-                {
-                    if (user.userID == sfsUser.getId())
-                        return user;
-                }
-            }
+            if (!room.hasUser(currentUser))
+                return;
 
-            return null;
+            var vars:Object = {};
+            var user:User = currentUser;
+            var gameplay:Gameplay = currentUser.gameplay;
+            var songEngine:Object = ArcGlobals.instance.legacyEncode(gameplay.songInfo);
+
+            var prefix:String = "P" + user.playerIdx;
+
+            // Ordering is important
+            var gamescores:Array = [gameplay.score,
+                gameplay.amazing,
+                gameplay.perfect,
+                gameplay.good,
+                gameplay.average,
+                gameplay.miss,
+                gameplay.boo,
+                gameplay.combo,
+                gameplay.maxCombo];
+
+            vars[prefix + "_GAMESCORES"] = StringUtil.join(":", gamescores);
+            vars[prefix + "_STATE"] = int(gameplay.status);
+            vars[prefix + "_GAMELIFE"] = int(gameplay.life * 24 / 100);
+            vars[prefix + "_SONGID"] = (gameplay.songInfo == null ? gameplay.songId : int(gameplay.songInfo.level));
+            vars[prefix + "_SONGID_PROGRESS"] = int(gameplay.statusLoading);
+
+            if (songEngine)
+                vars["arc_engine" + user.playerIdx] = JSON.stringify(songEngine);
+            else if (gameplay.songInfo === null || (gameplay.songInfo && !gameplay.songInfo.engine))
+                vars["arc_engine" + user.playerIdx] = null;
+
+            vars["arc_replay" + user.playerIdx] = gameplay.encodedReplay || null;
+
+            sendRoomVariables(room, vars);
         }
 
-        private function getRoom(sfsRoom:*):Object
+        /**
+         * Builds a request to update the current user's gameplay score
+         * in the specified room and sends it to the server.
+         */
+        public function sendCurrentUserScore(room:Room):void
         {
-            var roomId:int;
-            if (sfsRoom is Room)
-                roomId = Room(sfsRoom).getId();
-            else
-                roomId = int(sfsRoom);
+            if (!room.hasUser(currentUser))
+                return;
 
-            for each (var room:Object in rooms)
-            {
-                if (room.roomID == roomId)
-                    return room;
-            }
+            var vars:Object = {};
+            var user:User = currentUser;
+            var gameplay:Gameplay = currentUser.gameplay;
 
-            return null;
+            var prefix:String = "P" + user.playerIdx;
+
+            // Ordering is important
+            var gamescores:Array = [gameplay.score,
+                gameplay.amazing,
+                gameplay.perfect,
+                gameplay.good,
+                gameplay.average,
+                gameplay.miss,
+                gameplay.boo,
+                gameplay.combo,
+                gameplay.maxCombo];
+
+            vars[prefix + "_GAMESCORES"] = StringUtil.join(":", gamescores);
+            vars[prefix + "_GAMELIFE"] = int(gameplay.life * 24 / 100);
+
+            sendRoomVariables(room, vars);
         }
 
-        private function getUser(sfsRoom:*, sfsUser:*):Object
-        {
-            var room:Object = getRoom(sfsRoom);
-            var userId:int;
-            if (sfsUser is User)
-                userId = User(sfsUser).getId();
-            else
-                userId = int(sfsUser);
 
-            for each (var user:Object in room.users)
-            {
-                if (user.userID == userId)
-                    return user;
-            }
-
-            return null;
-        }
+        // =================================================== //
+        // MP EVENT DISPATCHERS
+        // =================================================== //
 
         private function eventError(message:String):void
         {
@@ -905,37 +777,37 @@ package com.flashfla.net
             dispatchEvent(new LoginEvent());
         }
 
-        private function eventServerMessage(message:String, user:Object = null):void
+        private function eventServerMessage(message:String, user:User = null):void
         {
-            dispatchEvent(new ServerMessageEvent({message: stripMessage(message), user: user}));
+            dispatchEvent(new ServerMessageEvent({message: StringUtil.stripMessage(message), user: user}));
         }
 
-        private function eventMessage(type:int, room:Object, user:Object, message:String):void
+        private function eventMessage(type:int, room:Room, user:User, message:String):void
         {
-            dispatchEvent(new MessageEvent({msgType: type, room: room, user: user, message: stripMessage(message)}));
+            dispatchEvent(new MessageEvent({msgType: type, room: room, user: user, message: StringUtil.stripMessage(message)}));
         }
 
-        private function eventRoomUserStatus(room:Object, user:Object):void
+        private function eventRoomUserStatus(room:Room, user:User):void
         {
             dispatchEvent(new RoomUserStatusEvent({room: room, user: user}));
         }
 
-        private function eventRoomJoined(room:Object):void
+        private function eventRoomJoined(room:Room):void
         {
             dispatchEvent(new RoomJoinedEvent({room: room}));
         }
 
-        private function eventRoomLeft(room:Object):void
+        private function eventRoomLeft(room:Room):void
         {
             dispatchEvent(new RoomLeftEvent({room: room}));
         }
 
-        private function eventRoomUpdate(room:Object, roomList:Boolean = false, changed:Array = null):void
+        private function eventRoomUpdate(room:Room, roomList:Boolean = false):void
         {
-            dispatchEvent(new RoomUpdateEvent({room: room, roomList: roomList, changed: (changed || [])}));
+            dispatchEvent(new RoomUpdateEvent({room: room, roomList: roomList}));
         }
 
-        private function eventRoomUser(room:Object, user:Object):void
+        private function eventRoomUser(room:Room, user:User):void
         {
             dispatchEvent(new RoomUserEvent({room: room, user: user}));
         }
@@ -945,25 +817,25 @@ package com.flashfla.net
             dispatchEvent(new RoomListEvent());
         }
 
-        private function eventUserUpdate(user:Object, changed:Array = null):void
+        private function eventUserUpdate(user:User):void
         {
-            dispatchEvent(new UserUpdateEvent({user: user, changed: (changed || [])}));
+            dispatchEvent(new UserUpdateEvent({user: user}));
         }
 
-        private function eventGameStart(room:Object):void
+        private function eventGameStart(room:Room):void
         {
             dispatchEvent(new GameStartEvent({room: room}));
         }
 
-        private function eventGameUpdate(room:Object, user:Object):void
-        {
-            dispatchEvent(new GameUpdateEvent({room: room, user: user}));
-        }
-
-        private function eventGameResults(room:Object):void
+        private function eventGameResults(room:Room):void
         {
             dispatchEvent(new GameResultsEvent({room: room}));
         }
+
+
+        // =================================================== //
+        // SFS EVENT HANDLERS
+        // =================================================== //
 
         private function onConnection(event:ConnectionSFSEvent):void
         {
@@ -971,9 +843,9 @@ package com.flashfla.net
 
             if (connected)
             {
-                currentUser = new Object();
-                rooms = new Array();
-                ghostRooms = new Array();
+                _rooms = {};
+                currentUser = new User();
+                ghostRooms = new <Room>[];
             }
 
             eventConnection();
@@ -988,9 +860,7 @@ package com.flashfla.net
 
             eventConnection();
             if (inSolo == false)
-            {
                 eventError("Multiplayer Connection Lost");
-            }
         }
 
         CONFIG::debug
@@ -1013,18 +883,21 @@ package com.flashfla.net
             {
                 case "logOK":
                     currentUser.loggedIn = true;
-                    currentUser.userName = data.name;
-                    currentUser.userClass = (mode == GAME_R3 ? data.userclass : CLASS_LEGACY[data.userclass]);
-                    currentUser.userColour = data.usercolor;
+                    currentUser.name = data.name;
+                    currentUser.userClass = data.userclass;
+                    currentUser.userColor = data.usercolor;
                     currentUser.userLevel = data.userlevel;
-                    currentUser.userID = data.userID;
-                    currentUser.siteID = data.siteID;
+                    currentUser.id = data.userID;
+                    currentUser.siteId = int(data.siteID);
                     currentUser.isModerator = (data.mod || data.userclass == CLASS_ADMIN || data.userclass == CLASS_FORUM_MOD || data.userclass == CLASS_CHAT_MOD || data.userclass == CLASS_MP_MOD);
                     currentUser.isAdmin = (data.userclass == CLASS_ADMIN);
                     currentUser.userStatus = 0;
 
-                    server.myUserId = currentUser.userID;
-                    server.myUserName = currentUser.userName;
+                    setCurrentUserVariables();
+
+                    // TODO: Check the usage of these and if they're absolutely needed internally for SFS
+                    server.myUserId = currentUser.id;
+                    server.myUserName = currentUser.name;
                     server.amIModerator = currentUser.isModerator;
                     server.playerId = -1;
 
@@ -1051,7 +924,7 @@ package com.flashfla.net
                     //data.n; // username
                     break;
                 case "html_message":
-                    data.uid = getUser(data.rid, data.uid);
+                    data.uid = getRoomUserById(data.rid, data.uid);
                     data.rid = getRoom(data.rid);
                     dispatchEvent(new ExtensionResponseEvent({data: data}));
                     break;
@@ -1066,167 +939,129 @@ package com.flashfla.net
 
         private function onAdminMessage(event:AdminMessageSFSEvent):void
         {
-            eventServerMessage(htmlUnescape(event.message));
+            eventServerMessage(StringUtil.htmlUnescape(event.message));
         }
 
         private function onModeratorMessage(event:ModerationMessageSFSEvent):void
         {
-            var user:Object = null;
-            if (event.sender != null)
-                user = findUser(event.sender);
-            eventServerMessage(htmlUnescape(event.message), user);
+            if (event.userId)
+            {
+                var user:User = getRoomById(event.roomId).getUser(event.userId);
+                eventServerMessage(StringUtil.htmlUnescape(event.message), user);
+            }
         }
 
         private function onPlayerSwitched(event:PlayerSwitchedSFSEvent):void
         {
-            if (event.success)
-            {
-                var room:Object = getRoom(event.room);
-                var user:Object = getUser(event.room, event.userId);
-                if (user.userID == currentUser.userID)
-                    clearRoomPlayer(room);
-                updateRoom(event.room);
-                eventRoomUserStatus(room, user);
-            }
-            // TODO: Check userId
-            else if (event.userId == currentUser.userID)
-            {
-                eventError("Spectate Failed");
-            }
+            var room:Room = getRoomById(event.roomId);
+            var user:User = event.userId == 0 ? currentUser : getRoomUserById(room, event.userId);
+
+            if (!user)
+                return;
+
+            if (user == currentUser)
+                clearCurrentUserRoomVariables(room);
+
+            room.removePlayer(user.playerIdx);
+            user.isPlayer = false;
+            user.playerIdx = -1;
+            user.gameplay = null;
+
+            room.specCount += 1;
+            room.userCount -= 1;
+
+            updateRoom(room);
+
+            eventRoomUserStatus(room, user);
         }
 
         private function onSpectatorSwitched(event:SpectatorSwitchedSFSEvent):void
         {
-            if (event.success)
+            var room:Room = getRoomById(event.roomId);
+            var user:User = event.userId == 0 ? currentUser : getRoomUserById(room, event.userId);
+
+            if (!user)
+                return;
+
+            var newPlayerIdx:int = room.addPlayer(user);
+            if (newPlayerIdx > 0)
             {
-                var room:Object = getRoom(event.room);
-                var user:Object = getUser(event.room, event.userId);
-                updateRoom(event.room);
-                if (user.userID == currentUser.userID)
-                    setRoomPlayer(room);
-                eventRoomUserStatus(room, user);
+                user.isPlayer = true;
+                user.playerIdx = newPlayerIdx;
             }
-            else if (event.userId == currentUser.userID)
-            {
-                eventError("Join Failed");
-            }
+
+            if (user == currentUser)
+                sendCurrentUserRoomVariables(room);
+
+            room.specCount -= 1;
+            room.userCount += 1;
+
+            updateRoom(room);
+
+            eventRoomUserStatus(room, user);
         }
 
         private function onPrivateMessage(event:PrivateMessageSFSEvent):void
         {
-            if (event.userId == currentUser.userID)
-                return; // XXX: Ignore PM events sent by yourself because they don't include the recipient for some stupid reason
-            var room:Room = server.getRoom(event.roomId);
-            var user:User = event.sender;
-            if (user == null)
-                user = room.getUser(event.userId);
-            eventMessage(MESSAGE_PRIVATE, getRoom(room), getUser(room, user), htmlUnescape(event.message));
+            if (event.userId == currentUser.id)
+                return; // Ignore PM events sent by yourself because they don't include the recipient for some stupid reason
+
+            var room:Room = getRoomById(event.roomId);
+            var user:User = getRoomUserById(room, event.userId);
+
+            if (user)
+                eventMessage(MESSAGE_PRIVATE, room, user, StringUtil.htmlUnescape(event.message));
         }
 
         private function onPublicMessage(event:PublicMessageSFSEvent):void
         {
-            var room:Room = server.getRoom(event.roomId);
-            var user:User = event.sender;
-            if (user == null)
-                user = room.getUser(event.userId);
-            eventMessage(MESSAGE_PUBLIC, getRoom(room), getUser(room, user), htmlUnescape(event.message));
+            var room:Room = getRoomById(event.roomId);
+            var user:User = getRoomUserById(room, event.userId);
+
+            if (user)
+                eventMessage(MESSAGE_PUBLIC, room, user, StringUtil.htmlUnescape(event.message));
         }
 
         private function onRoomListUpdate(event:RoomListUpdateSFSEvent):void
         {
-            clearRooms();
-            for each (var room:Room in event.roomList)
-                addRoom(room);
+            for each (var evtRoom:Room in event.roomList)
+            {
+                var room:Room = getRoom(evtRoom);
+                if (!room)
+                    addRoom(evtRoom);
+                else
+                {
+                    room.userCount = evtRoom.userCount;
+                    room.specCount = evtRoom.specCount;
+
+                    eventRoomUpdate(room);
+                }
+            }
+
             eventRoomList();
         }
 
         private function onRoomVariablesUpdate(event:RoomVariablesUpdateSFSEvent):void
         {
-            var room:Object = getRoom(event.room);
-            updateRoom(event.room);
-            // TODO: Check roomList param validity
-            eventRoomUpdate(room, true, event.changedVars);
+            var room:Room = getRoom(event.room);
 
-            if (!room.isGame)
+            if (!room)
                 return;
 
-            var status:int = -1;
-            var istatus:int = STATUS_NONE;
-            var song:Object = null;
-            var songMatch:Boolean = room.playerCount > 0;
-            for each (var user:Object in room.players)
-            {
-                var gameplay:Object = user.gameplay;
-                if (gameplay)
-                {
-                    var pstatus:int = room.match.playerStatus[user.userID] || STATUS_NONE;
-                    var newstatus:Boolean = false;
-                    if (gameplay.status > pstatus)
-                    {
-                        room.match.playerStatus[user.userID] = gameplay.status;
-                        pstatus = gameplay.status;
-                        newstatus = true;
-                    }
-                    if (status < 0 || status > pstatus)
-                        status = pstatus;
-                    if (gameplay.status > istatus)
-                        istatus = gameplay.status;
+            // Apply new vars to the room from the event
+            room.applyVariablesFromOtherRoom(event.room);
 
-                    if (gameplay.status == STATUS_PLAYING)
-                        eventGameUpdate(room, user);
-                    if (newstatus && gameplay.status == STATUS_RESULTS)
-                    {
-                        room.match.players[user.playerID] = user;
-                        room.match.gameplay[user.userID] = gameplay;
-                        eventGameUpdate(room, user);
-                    }
+            // If the current user is not in the room, dont bother updating states further
+            if (!room.hasUser(currentUser))
+                return;
+            // If the room isn't a game room, nothing else needs to be done
+            if (!room.isGameRoom)
+                return;
 
-                    if (!song)
-                        song = gameplay.song;
-                    if (song)
-                        songMatch &&= gameplay.song && ((song.level >= 0 && song.level == gameplay.song.level || (song.levelid && song.levelid == gameplay.song.levelid)) && ((!song.engine && !gameplay.song.engine) || song.engine.id == gameplay.song.engine.id));
-                }
-            }
-
-            var eventReport:int = 0;
-            if (status > room.match.status)
-            {
-                if (status == STATUS_RESULTS)
-                {
-                    eventReport = 2;
-                    if (room.user.isPlayer)
-                        reportSongEnd(room);
-                }
-                else if (status == STATUS_LOADED || (status == STATUS_PLAYING && room.match.status < STATUS_LOADED))
-                {
-                    if (room.playerCount > 1 && songMatch)
-                    {
-                        eventReport = 1;
-                        if (room.user.isPlayer)
-                            reportSongStart(room);
-                        status = STATUS_PLAYING;
-                    }
-                    else
-                        status = STATUS_PICKING;
-                }
-            }
-            if (istatus < STATUS_PLAYING)
-            {
-                room.match.status = STATUS_NONE;
-                room.match.players.splice(0);
-                room.match.gameplay.splice(0);
-                room.match.playerStatus.splice(0);
-            }
-
-            if (status > room.match.status)
-                room.match.status = status;
-            if (songMatch)
-                room.match.song = song;
-
-            if (eventReport == 1)
-                eventGameStart(room);
-            else if (eventReport == 2)
-                eventGameResults(room);
+            // Update the room state
+            updateRoom(room);
+            // TODO: Check roomList param validity
+            eventRoomUpdate(room, true);
         }
 
         private function onRoomAdded(event:RoomAddedSFSEvent):void
@@ -1237,44 +1072,111 @@ package com.flashfla.net
 
         private function onRoomDeleted(event:RoomDeletedSFSEvent):void
         {
-            var room:Object = getRoom(event.room);
-            removeRoom(event.room);
-            if (room.isJoined)
+            var room:Room = getRoomById(event.roomId);
+
+            if (room.getPlayerIndex(currentUser) > 0)
+            {
+                currentUser.isPlayer = false;
+                currentUser.playerIdx = -1;
+            }
+
+            removeRoom(room);
+            if (room.hasUser(currentUser))
                 ghostRooms.push(room);
+
             eventRoomList();
         }
 
-        private function onRoomLeft(event:RoomLeftSFSEvent):void
+        /**
+         * Called when the current player has left a room
+         */
+        private function onLeftRoom(event:LeftRoomSFSEvent):void
         {
-            var room:Object = getRoom(event.roomId);
+            var room:Room = getRoomById(event.roomId);
             if (room == null)
             {
-                for each (var ghost:Object in ghostRooms)
+                for each (var ghost:Room in ghostRooms)
                 {
-                    if (ghost.roomID == event.roomId)
+                    if (ghost.id == event.roomId)
                     {
                         room = ghost;
-                        ghostRooms = ghostRooms.filter(function(item:*, index:int, array:Array):Boolean
+                        ghostRooms = ghostRooms.filter(function(item:Room, index:int, vec:Vector.<Room>):Boolean
                         {
-                            return item.roomID != ghost.roomID;
+                            return item.id != ghost.id;
                         });
                         break;
                     }
                 }
             }
-            updateRoom(event.roomId);
-            room.isJoined = false;
-            currentUser.room = null;
+            else
+            {
+                if (room.removePlayer(currentUser.playerIdx))
+                {
+                    currentUser.isPlayer = false;
+                    currentUser.playerIdx = -1;
+                    currentUser.gameplay = null;
+                }
+
+                room.clearPlayers();
+                room.clearUsers();
+            }
+
+            updateRoom(room);
+
             eventRoomLeft(room);
         }
 
-        private function onJoinRoom(event:JoinRoomSFSEvent):void
+        /**
+         * Called when the current player has joined a room.
+         * This event populates the joined room with a user list.
+         */
+        private function onJoinedRoom(event:JoinedRoomSFSEvent):void
         {
-            updateRoom(event.room);
-            var room:Object = getRoom(event.room);
-            setRoomPlayer(room);
-            updateUserVariables();
-            updateUser(event.room.getUserList()[currentUser.userID]);
+            var room:Room = getRoom(event.room);
+
+            // Adds the users to the room
+            for each (var user:User in event.users)
+            {
+                if (user.id == currentUser.id)
+                {
+                    // This is necessary since the server does not provide `vars` for the logged in user
+                    // on `joinOK` events. These `vars` are only provided in the `logOK` part of a `xtRes` event.
+                    server.setUserVariables(currentUser.variables);
+
+                    room.addUser(currentUser);
+
+                    // Current user always gets -1 as a playerIdx on room join, so attempt to add it to players
+                    if (room.isGameRoom && !currentUser.isPlayer)
+                    {
+                        var newPlayerIdx:int = room.addPlayer(currentUser);
+
+                        if (newPlayerIdx > 0)
+                        {
+                            currentUser.isPlayer = true;
+                            currentUser.playerIdx = newPlayerIdx;
+                        }
+                    }
+                }
+                else
+                {
+                    applyUserVariables(user);
+
+                    room.addUser(user);
+
+                    // If the user has a positive playerIdx, insert it in the room's players
+                    if (room.isGameRoom && user.playerIdx > 0)
+                        room.setPlayer(user.playerIdx, user);
+                }
+            }
+
+            updateRoom(room);
+
+            sendCurrentUserRoomVariables(room);
+            if (room.isPlayer(currentUser))
+                sendCurrentUserStatus(room);
+
+            // Propagate the events
+            eventUserUpdate(currentUser);
             eventRoomJoined(room);
         }
 
@@ -1285,58 +1187,66 @@ package com.flashfla.net
 
         private function onUserCountChange(event:UserCountChangeSFSEvent):void
         {
-            updateRoom(event.room);
-            eventRoomUpdate(getRoom(event.room));
+            // TODO: See if this is necessary
         }
 
+        /**
+         * Called when another user enters any room that the current user is in
+         */
         private function onUserEnterRoom(event:UserEnterRoomSFSEvent):void
         {
-            updateRoom(event.roomId);
-            eventRoomUser(getRoom(event.roomId), getUser(event.roomId, event.user));
-            eventRoomUpdate(getRoom(event.roomId));
+            var room:Room = getRoomById(event.roomId);
+            var user:User = event.user;
+
+            // TODO: Check if actually needed, since uVars is called right after
+            applyUserVariables(user);
+
+            room.addUser(user);
+
+            // Always attempt to add a new user to a room as a player
+            if (room.isGameRoom)
+                if (room.setPlayer(user.playerIdx, user))
+                    updateUserGameplayFromRoom(room, user);
+
+            eventRoomUser(room, user);
+            eventRoomUpdate(room);
         }
 
-        private function onUserLeaveRoom(event:UserLeaveRoomSFSEvent):void
+        /**
+         * Called when another user leaves any room that the current user is in
+         */
+        private function onUserLeftRoom(event:UserLeftRoomSFSEvent):void
         {
-            var user:Object = getUser(event.roomId, event.userId);
-            var room:Object = getRoom(event.roomId);
-            updateRoom(event.roomId);
+            var room:Room = getRoomById(event.roomId);
+            var user:User = getRoomUserById(room, event.userId);
+
+            if (user)
+            {
+                var playerIdx:int = room.getPlayerIndex(user);
+                if (playerIdx > 0 && room.removePlayer(playerIdx))
+                    user.playerIdx = -1;
+
+                room.removeUser(user.id);
+            }
+
             eventRoomUser(room, user);
             eventRoomUpdate(room);
         }
 
         private function onUserVariablesUpdate(event:UserVariablesUpdateSFSEvent):void
         {
-            updateUser(event.user);
-            eventUserUpdate(findUser(event.user), event.changedVars);
-        }
-
-        public static function htmlUnescape(str:String):String
-        {
-            try
+            for each (var room:Room in rooms)
             {
-                return new XMLDocument(str).firstChild.nodeValue;
-            }
-            catch (error:Error)
-            {
-            }
-            return str;
-        }
+                var user:User = room.getUser(event.user.id);
+                if (!user)
+                    continue;
 
-        public static function htmlEscape(str:String):String
-        {
-            return XML(new XMLNode(XMLNodeType.TEXT_NODE, str)).toXMLString();
-        }
+                user.setVariables(event.user.variables)
+                applyUserVariables(user);
 
-        private static function stripMessage(str:String):String
-        {
-            if (str == null)
-                return "";
-            while (str.length && str.charAt(str.length - 1) == '\n')
-                str = str.substr(0, str.length - 1);
-            while (str.length && str.charAt(0) == '\n')
-                str = str.substr(1);
-            return str;
+                eventUserUpdate(user);
+                return;
+            }
         }
     }
 }

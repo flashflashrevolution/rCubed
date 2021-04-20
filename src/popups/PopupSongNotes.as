@@ -3,6 +3,7 @@ package popups
     import assets.GameBackgroundColor;
     import classes.Language;
     import classes.Playlist;
+    import classes.SongInfo;
     import classes.ui.Box;
     import classes.ui.BoxButton;
     import classes.ui.BoxCheck;
@@ -27,7 +28,7 @@ package popups
     import menu.MainMenu;
     import menu.MenuPanel;
     import menu.MenuSongSelection;
-    import sql.SQLSongDetails;
+    import sql.SQLSongUserInfo;
 
     public class PopupSongNotes extends MenuPanel
     {
@@ -41,8 +42,8 @@ package popups
         private var bmd:BitmapData;
         private var bmp:Bitmap;
 
-        private var sObject:Object;
-        private var sDetails:SQLSongDetails;
+        private var songInfo:Object;
+        private var sDetails:SQLSongUserInfo;
 
         private var sRating:StarSelector;
         private var sFavorite:HeartSelector;
@@ -62,15 +63,15 @@ package popups
 
         public var songRatingValue:Number;
 
-        public function PopupSongNotes(myParent:MenuPanel, song:Object)
+        public function PopupSongNotes(myParent:MenuPanel, songInfo:SongInfo)
         {
             super(myParent);
-            sObject = song;
+            this.songInfo = songInfo;
 
-            var engine_id:String = song.engine != null ? song.engine.id : Constant.BRAND_NAME_SHORT_LOWER;
-            sDetails = SQLQueries.getSongDetailsSafe(engine_id, song.level);
+            var engineId:String = songInfo.engine != null ? songInfo.engine.id : Constant.BRAND_NAME_SHORT_LOWER;
+            sDetails = SQLQueries.getSongDetailsSafe(engineId, String(songInfo.level));
 
-            songRatingValue = _gvars.playerUser.getSongRating(sObject);
+            songRatingValue = _gvars.playerUser.getSongRating(songInfo);
         }
 
         override public function stageAdd():void
@@ -91,7 +92,7 @@ package popups
             box.setSize(bgbox.width, bgbox.height);
             box.activeAlpha = 0.4;
 
-            var titleDisplay:Text = new Text(box, 5, 20, "- " + sObject["name"] + " -", 20);
+            var titleDisplay:Text = new Text(box, 5, 20, "- " + songInfo["name"] + " -", 20);
             titleDisplay.width = box.width - 10;
             titleDisplay.align = Text.CENTER;
 
@@ -283,7 +284,7 @@ package popups
                     if (mmmenu.panel != null && (mmmenu.panel is MenuSongSelection))
                     {
                         var msmenu:MenuSongSelection = (mmmenu.panel as MenuSongSelection);
-                        msmenu.updateSongItemNote(sObject.level);
+                        msmenu.updateSongItemNote(songInfo.level);
                     }
                 }
 
@@ -310,7 +311,7 @@ package popups
             if (sDetails.engine != Constant.BRAND_NAME_SHORT_LOWER)
                 sDetails.song_rating = sRating.value;
             else
-                _gvars.playerUser.songRatings[sObject["level"]] = sRating.value;
+                _gvars.playerUser.songRatings[songInfo["level"]] = sRating.value;
 
             _gvars.writeUserSongData();
         }
@@ -327,7 +328,7 @@ package popups
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.session = _gvars.userSession;
-            requestVars.id = sObject["level"];
+            requestVars.id = songInfo["level"];
             requestVars.song_rating = sRating.value;
             requestVars.chart_rating = 2.5;
             req.data = requestVars;
@@ -350,11 +351,11 @@ package popups
                 var _data:Object = JSON.parse(e.target.data);
                 if (_data["result"] && _data["result"] == "success")
                 {
-                    _gvars.playerUser.songRatings[sObject["level"]] = sRating.value;
+                    _gvars.playerUser.songRatings[songInfo["level"]] = sRating.value;
                     //_gvars.gameMain.addAlert("Saved rating for " + sObject["name"] + "!", 120, Alert.GREEN);
                     if (_data["type"] && _data["type"] == 1)
                     {
-                        _playlist.playList[sObject["level"]]["song_rating"] = _data["new_value"];
+                        _playlist.playList[songInfo["level"]]["song_rating"] = _data["new_value"];
                     }
                 }
                 else

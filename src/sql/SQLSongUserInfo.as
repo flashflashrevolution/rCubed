@@ -1,7 +1,7 @@
 package sql
 {
 
-    public class SQLSongDetails
+    public class SQLSongUserInfo
     {
         public var engine:String;
         public var level_id:String;
@@ -13,7 +13,7 @@ package sql
         public var song_rating:Number = 0;
         public var song_favorite:Boolean = false;
 
-        public function SQLSongDetails(source_engine:String, source_id:String, source_data:Object):void
+        public function SQLSongUserInfo(source_engine:String, source_id:String, source_data:Object):void
         {
             // Engine and Level Source
             engine = source_engine;

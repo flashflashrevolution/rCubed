@@ -31,7 +31,7 @@ package classes
         public var generatedQueues:Array;
         public var genreList:Array;
         public var playList:Array;
-        public var indexList:Array;
+        public var indexList:Vector.<SongInfo>;
         public var engine:Object;
 
         ///- Constructor
@@ -137,10 +137,10 @@ package classes
                 this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
                 return;
             }
-            generatedQueues = new Array();
-            genreList = new Array();
-            playList = new Array();
-            indexList = new Array();
+            generatedQueues = [];
+            genreList = [];
+            playList = [];
+            indexList = new <SongInfo>[];
 
             if (_instanceCanon == null && !legacy)
             {
@@ -152,93 +152,137 @@ package classes
                 _instanceCanon.generatedQueues = generatedQueues;
             }
 
-            for (var a:Object in data)
+            for each (var dynamicSongInfo:Object in data)
             {
-                var genre:int = data[a].genre;
-                if (genreList[genre] == undefined)
-                {
-                    genreList[genre] = [];
-                    generatedQueues[genre] = [];
-                }
+                var songInfo:SongInfo;
 
-                var songData:Array = [];
-                for (var b:* in data[a])
+                if (dynamicSongInfo is SongInfo)
                 {
-                    songData[b] = data[a][b];
-                }
+                    songInfo = dynamicSongInfo as SongInfo;
 
-                // Song Time
-                if (songData.time == null)
-                {
-                    songData.time = "0:00";
-                }
-
-                // Note Count
-                if (songData.arrows == null || isNaN(Number(songData.arrows)))
-                {
-                    songData.arrows = 0;
-                }
-
-                // Extra Info
-                songData.index = genreList[genre].length;
-                songData.timeSecs = (Number(songData.time.split(":")[0]) * 60) + Number(songData.time.split(":")[1]);
-
-                // Author with URL
-                if (songData["authorURL"] != null && songData["authorURL"].length > 7)
-                {
-                    songData.authorwithurl = "<a href=\"" + songData["authorURL"] + "\">" + songData["author"] + "</a>";
-                }
-                else
-                {
-                    songData.authorwithurl = songData["author"];
-                }
-
-                // Multiple Step Authors
-                if (songData["stepauthor"].indexOf(" & ") !== false)
-                {
-                    var stepAuthors:Array = songData["stepauthor"].split(" & ");
-                    songData.stepauthorwithurl = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(stepAuthors[0]) + "\">" + stepAuthors[0] + "</a>";
-                    for (var i:int = 1; i < stepAuthors.length; i++)
+                    if (genreList[songInfo.genre] == undefined)
                     {
-                        songData.stepauthorwithurl += " & <a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(stepAuthors[i]) + "\">" + stepAuthors[i] + "</a>";
+                        genreList[songInfo.genre] = [];
+                        generatedQueues[songInfo.genre] = [];
                     }
                 }
                 else
                 {
-                    songData.stepauthorwithurl = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(songData["stepauthor"]) + "\">" + songData["stepauthor"] + "</a>";
+                    var genre:int = dynamicSongInfo.genre;
+                    if (genreList[genre] == undefined)
+                    {
+                        genreList[genre] = [];
+                        generatedQueues[genre] = [];
+                    }
+
+                    // Important to note that the dynamic fields aren't all exactly the same name
+                    var newSongInfo:SongInfo = new SongInfo();
+                    newSongInfo.access = dynamicSongInfo.access;
+                    newSongInfo.author = dynamicSongInfo.author;
+                    newSongInfo.authorURL = dynamicSongInfo.authorURL;
+                    newSongInfo.authorwithurl = dynamicSongInfo.authorwithurl;
+                    newSongInfo.chartType = dynamicSongInfo.chartType;
+                    newSongInfo.credits = dynamicSongInfo.credits;
+                    newSongInfo.difficulty = dynamicSongInfo.difficulty;
+                    newSongInfo.engine = dynamicSongInfo.engine;
+                    newSongInfo.genre = dynamicSongInfo.genre;
+                    newSongInfo.index = dynamicSongInfo.index;
+                    newSongInfo.length = dynamicSongInfo.length;
+                    newSongInfo.level = dynamicSongInfo.level;
+                    newSongInfo.levelId = dynamicSongInfo.levelid;
+                    newSongInfo.minNps = dynamicSongInfo.min_nps;
+                    newSongInfo.maxNps = dynamicSongInfo.max_nps;
+                    newSongInfo.name = dynamicSongInfo.name;
+                    newSongInfo.noteCount = dynamicSongInfo.arrows;
+                    newSongInfo.order = dynamicSongInfo.order;
+                    newSongInfo.playhash = dynamicSongInfo.playhash;
+                    newSongInfo.prerelease = dynamicSongInfo.prerelease;
+                    newSongInfo.previewhash = dynamicSongInfo.previewhash;
+                    newSongInfo.price = dynamicSongInfo.price;
+                    newSongInfo.releasedate = dynamicSongInfo.releasedate;
+                    newSongInfo.scoreRaw = dynamicSongInfo.scoreRaw;
+                    newSongInfo.scoreTotal = dynamicSongInfo.scoreTotal;
+                    newSongInfo.songRating = dynamicSongInfo.song_rating;
+                    newSongInfo.songType = dynamicSongInfo.songType;
+                    newSongInfo.stepauthor = dynamicSongInfo.stepauthor;
+                    newSongInfo.stepauthorURL = dynamicSongInfo.stepauthorURL;
+                    newSongInfo.stepauthorwithurl = dynamicSongInfo.stepauthorwithurl;
+                    newSongInfo.style = dynamicSongInfo.style;
+                    newSongInfo.sync = dynamicSongInfo.sync;
+                    newSongInfo.time = dynamicSongInfo.time;
+                    newSongInfo.timeSecs = dynamicSongInfo.timeSecs;
+
+
+                    songInfo = newSongInfo;
                 }
+
+                // Song Time
+                if (songInfo.time == null)
+                    songInfo.time = "0:00";
+
+                // Note Count
+                if (isNaN(Number(songInfo.noteCount)))
+                    songInfo.noteCount = 0;
+
+                // Extra Info
+                songInfo.index = genreList[songInfo.genre].length;
+                songInfo.timeSecs = (Number(songInfo.time.split(":")[0]) * 60) + Number(songInfo.time.split(":")[1]);
+
+                // Author with URL
+                if (songInfo.authorURL != null && songInfo.authorURL.length > 7)
+                    songInfo.authorwithurl = "<a href=\"" + songInfo.authorURL + "\">" + songInfo.author + "</a>";
+                else
+                    songInfo.authorwithurl = songInfo.author;
+
+                // Multiple Step Authors
+                if (songInfo.stepauthor != null && songInfo.stepauthor.indexOf(" & ") !== false)
+                {
+                    var stepAuthors:Array = songInfo.stepauthor.split(" & ");
+                    songInfo.stepauthorwithurl = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(stepAuthors[0]) + "\">" + stepAuthors[0] + "</a>";
+
+                    for (var i:int = 1; i < stepAuthors.length; i++)
+                        songInfo.stepauthorwithurl += " & <a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(stepAuthors[i]) + "\">" + stepAuthors[i] + "</a>";
+                }
+                else
+                    songInfo.stepauthorwithurl = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(songInfo.stepauthor) + "\">" + songInfo.stepauthor + "</a>";
 
                 // Song Price
-                if (isNaN(Number(songData.price)))
-                {
-                    songData.price = -1;
-                }
+                if (isNaN(Number(songInfo.price)))
+                    songInfo.price = -1;
 
                 // Secret Credits
-                if (isNaN(Number(songData.credits)))
-                {
-                    songData.credits = -1;
-                }
+                if (isNaN(Number(songInfo.credits)))
+                    songInfo.credits = -1;
 
                 // Max Score Totals
-                songData.scoreTotal = songData.arrows * 1550;
-                songData.scoreRaw = songData.arrows * 50;
+                songInfo.scoreTotal = songInfo.noteCount * 1550;
+                songInfo.scoreRaw = songInfo.noteCount * 50;
 
                 // Legacy Sync
-                if (!legacy && isNaN(songData.sync))
-                    songData.sync = oldOffsets(songData.level);
+                if (!legacy && isNaN(songInfo.sync))
+                    songInfo.sync = oldOffsets(songInfo.level);
 
                 // Add to lists
-                playList[songData.level] = songData;
-                indexList.push(songData);
-                genreList[genre].push(songData);
-                generatedQueues[genre].push(songData.level);
+                playList[songInfo.level] = songInfo;
+                indexList.push(songInfo);
+                genreList[songInfo.genre].push(songInfo);
+                generatedQueues[songInfo.genre].push(songInfo.level);
                     //_gvars.songQueue.push(songData);
             }
-            indexList.sortOn("level", Array.NUMERIC);
+            //indexList.sort(compareSongLevel);
             _isLoaded = true;
             _loadError = false;
             this.dispatchEvent(new Event(GlobalVariables.LOAD_COMPLETE));
+        }
+
+        private function compareSongLevel(songInfo1:SongInfo, songInfo2:SongInfo):Number
+        {
+            if (songInfo1.level < songInfo2.level)
+                return -1;
+            else if (songInfo1.level > songInfo2.level)
+                return 1;
+            else
+                return 0;
         }
 
         private function playlistLoadError(e:Event = null):void
@@ -263,10 +307,10 @@ package classes
             _loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, playlistLoadError);
         }
 
-        public function getSong(genre:int, index:int = -1):Object
+        public function getSongInfo(genre:int, index:int = -1):SongInfo
         {
             // Returns the indexed song for the All genre
-            if (genre <= -1 && indexList[index] != null)
+            if (genre <= -1 && index >= 0 && index < indexList.length && indexList[index] != null)
                 return indexList[index];
 
             // If a index is set, use the genre list to get the correct song.
@@ -277,7 +321,7 @@ package classes
             else if (playList[genre] != null)
                 return playList[genre];
 
-            return {error: "not_found"};
+            return null;
         }
 
         public function updateSongAccess():void
@@ -294,8 +338,8 @@ package classes
                 if (indexList[i].credits > 0)
                     songType = 3;
 
-                indexList[i]["access"] = _gvars.checkSongAccess(indexList[i]);
-                indexList[i]["song_type"] = songType;
+                indexList[i].access = _gvars.checkSongAccess(indexList[i]);
+                indexList[i].songType = songType;
             }
         }
 
@@ -303,7 +347,7 @@ package classes
         {
             var s:Site = Site.instance;
             _gvars.TOTAL_SONGS = indexList.length;
-            _gvars.TOTAL_PUBLIC_SONGS = indexList.filter(function(item:*, index:int, array:Array):Boolean
+            _gvars.TOTAL_PUBLIC_SONGS = indexList.filter(function(item:SongInfo, index:int, vec:Vector.<SongInfo>):Boolean
             {
                 return !ArrayUtil.in_array([item.genre], _gvars.NONPUBLIC_GENRES)
             }).length;

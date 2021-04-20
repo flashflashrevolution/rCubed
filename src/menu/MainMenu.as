@@ -82,7 +82,7 @@ package menu
         override public function init():Boolean
         {
             //- Setup Options
-            options = new Object();
+            options = {};
             options.activePanel = -1;
 
             //- Add Logo
@@ -115,12 +115,12 @@ package menu
                 }
             }
 
-            MultiplayerSingleton.getInstance().gameplayReset();
+            MultiplayerSingleton.getInstance().gameplayCleanup();
 
             //- Add Main Panel to Stage
             var targetMenu:String = "";
             // Guests
-            if (GlobalVariables.instance.activeUser.isGuest || GlobalVariables.instance.activeUser.id == 2 || (_gvars.options && _gvars.options.singleplayer))
+            if (GlobalVariables.instance.activeUser.isGuest || (_gvars.options && _gvars.options.singleplayer))
             {
                 targetMenu = MENU_SONGSELECTION;
             }

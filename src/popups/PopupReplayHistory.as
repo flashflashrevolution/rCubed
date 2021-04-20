@@ -24,6 +24,7 @@ package popups
     import flash.geom.Point;
     import flash.utils.getTimer;
     import menu.MenuPanel;
+    import classes.SongInfo;
 
     public class PopupReplayHistory extends MenuPanel
     {
@@ -503,14 +504,14 @@ package popups
             var yOffset:int = 0;
             var sI:ReplayBox;
             var sX:int = 0;
-            var song:Object;
+            var song:SongInfo;
             var searchText:String = engine_search.text.toLowerCase();
 
             for each (var r:Replay in EXTERNAL_REPLAYS[ENGINE_EXTERNAL_ID])
             {
-                song = r.settings.arc_engine ? ArcGlobals.instance.legacyDecode(r.settings.arc_engine) : Playlist.instanceCanon.getSong(r.level);
+                song = r.settings.arc_engine ? ArcGlobals.instance.legacyDecode(r.settings.arc_engine) : Playlist.instanceCanon.getSongInfo(r.level);
 
-                if (song.error != null)
+                if (song == null)
                     continue;
 
                 if (searchText.length >= 3 && song.name.toLowerCase().indexOf(searchText) == -1)
@@ -539,7 +540,7 @@ package popups
             var yOffset:int = 0;
             var sI:ReplayBox;
             var sX:int = 0;
-            var song:Object;
+            var songInfo:SongInfo;
             var searchText:String = engine_search.text.toLowerCase();
 
             for each (var r:Replay in _gvars.replayHistory)
@@ -548,15 +549,15 @@ package popups
                 if (ENGINE_RECENT_ID != "all" && ENGINE_RECENT_ID != engineID)
                     continue;
 
-                song = r.settings.arc_engine ? ArcGlobals.instance.legacyDecode(r.settings.arc_engine) : Playlist.instanceCanon.getSong(r.level);
+                songInfo = r.settings.arc_engine ? ArcGlobals.instance.legacyDecode(r.settings.arc_engine) : Playlist.instanceCanon.getSongInfo(r.level);
 
-                if (song.error != null)
+                if (songInfo == null)
                     continue;
 
-                if (searchText.length >= 3 && song.name.toLowerCase().indexOf(searchText) == -1)
+                if (searchText.length >= 3 && songInfo.name.toLowerCase().indexOf(searchText) == -1)
                     continue;
 
-                sI = new ReplayBox(this, r, song);
+                sI = new ReplayBox(this, r, songInfo);
                 sI.y = yOffset;
                 sI.index = sX;
                 scrollpane.content.addChild(sI);
@@ -580,6 +581,7 @@ import flash.display.Sprite;
 import flash.events.MouseEvent;
 import game.GameOptions;
 import popups.PopupReplayHistory;
+import classes.SongInfo;
 
 internal class ReplayBox extends Sprite
 {
@@ -593,16 +595,16 @@ internal class ReplayBox extends Sprite
     private var copyBtn:BoxButton;
     private var deleteBtn:BoxButton;
     private var replay:Replay;
-    private var song:Object;
+    private var songInfo:SongInfo;
     public var index:Number;
     public var box:Box;
     public var popup:PopupReplayHistory;
 
-    public function ReplayBox(p:PopupReplayHistory, r:Replay, s:Object):void
+    public function ReplayBox(p:PopupReplayHistory, r:Replay, s:SongInfo):void
     {
         this.popup = p;
         this.replay = r;
-        this.song = s;
+        this.songInfo = s;
 
         //- Make Display
         box = new Box(this, 0, 0, false);
@@ -611,7 +613,7 @@ internal class ReplayBox extends Sprite
             box.color = 0xff0000;
 
         //- Name
-        nameText = new Text(box, 5, 0, (replay.user && replay.user.id != _gvars.playerUser.id && replay.user.name ? replay.user.name + " - " : "") + (song["engine"] && !replay.fileReplay ? song["engine"]["name"] + ": " : "") + song["name"], 14);
+        nameText = new Text(box, 5, 0, (replay.user && replay.user.siteId != _gvars.playerUser.siteId && replay.user.name ? replay.user.name + " - " : "") + (songInfo["engine"] && !replay.fileReplay ? songInfo["engine"]["name"] + ": " : "") + songInfo["name"], 14);
         nameText.setAreaParams(525, 27);
         nameText.mouseEnabled = false;
 
@@ -669,13 +671,13 @@ internal class ReplayBox extends Sprite
 
     private function playReplay():void
     {
-        if (song.error != null)
+        if (songInfo == null)
         {
             _gvars.gameMain.addAlert(_lang.string("popup_replay_missing_song_data"));
             return;
         }
         if (!replay.user.isLoaded())
-            replay.user.loadUser(replay.user.id);
+            replay.user.loadUser(replay.user.siteId);
 
         _gvars.options = new GameOptions();
         _gvars.options.isolation = false;
@@ -685,7 +687,7 @@ internal class ReplayBox extends Sprite
         _gvars.options.fillFromArcGlobals();
 
         _gvars.songResults.length = 0;
-        _gvars.songQueue = [song];
+        _gvars.songQueue = [songInfo];
 
         _gvars.gameMain.removePopup();
 

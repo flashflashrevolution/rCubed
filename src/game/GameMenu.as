@@ -85,7 +85,7 @@ package game
                 case GAME_PLAY:
                     _gvars.gameMain.bg.visible = false;
                     _gvars.gameMain.ver.visible = false;
-                    panel = new GamePlay(this);
+                    panel = new GameplayDisplay(this);
                     isFound = true;
                     break;
 

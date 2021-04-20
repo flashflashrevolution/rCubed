@@ -1,7 +1,7 @@
 package classes.chart
 {
     import game.GameOptions;
-    import game.GamePlay;
+    import game.GameplayDisplay;
 
     /**
      * @author FictionVoid
@@ -22,7 +22,7 @@ package classes.chart
         function setNotePool(enabled:Boolean):void;
 
         function getOptions():GameOptions;
-        function getGameplay():GamePlay;
+        function getGameplay():GameplayDisplay;
     }
 
 }

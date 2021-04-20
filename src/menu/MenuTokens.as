@@ -192,7 +192,7 @@ package menu
             {
                 if (level > 0)
                 {
-                    var songData:Object = _playlist.getSong(level);
+                    var songData:Object = _playlist.getSongInfo(level);
                     if (songData.error == null)
                         token_songs.push(songData);
                 }

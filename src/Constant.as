@@ -40,7 +40,6 @@ package
         public static const SONG_PURCHASE_URL:String = ROOT_URL + "game/r3/r3-songPurchase.php";
         public static const ALT_SONG_SAVE_URL:String = ROOT_URL + "game/r3/r3-songSaveOther.php";
         public static const MULTIPLAYER_SUBMIT_URL:String = ROOT_URL + "game/ffr-legacy_multiplayer.php";
-        public static const MULTIPLAYER_SUBMIT_URL_VELOCITY:String = ROOT_URL + "game/ffr-velocity_multiplayer.php";
 
         // User URLs
         public static const USER_REGISTER_URL:String = ROOT_URL + "vbz/register.php";

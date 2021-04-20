@@ -435,7 +435,7 @@ package
                         this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
 
                         // Setup Vars
-                        _gvars.songQueue.push(Playlist.instance.getSong(_gvars.options.replay.level));
+                        _gvars.songQueue.push(Playlist.instance.getSongInfo(_gvars.options.replay.level));
 
                         // Switch to game
                         switchTo(GAME_PLAY_PANEL);

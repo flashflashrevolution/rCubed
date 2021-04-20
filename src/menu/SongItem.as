@@ -16,7 +16,8 @@ package menu
     import flash.text.TextFieldAutoSize;
     import flash.ui.ContextMenu;
     import flash.utils.Timer;
-    import sql.SQLSongDetails;
+    import sql.SQLSongUserInfo;
+    import classes.SongInfo;
 
     public class SongItem extends Sprite
     {
@@ -48,8 +49,8 @@ package menu
         private var _active:Boolean = false;
 
         // Song Data
-        private var _songData:Object;
-        private var _songDetails:SQLSongDetails;
+        private var _songInfo:SongInfo;
+        private var _songUserInfo:SQLSongUserInfo;
         private var _level:int = 0;
         public var isLocked:Boolean = false;
         public var isFavorite:Boolean = false;
@@ -131,7 +132,7 @@ package menu
                 if (highlight && _hoverEnabled)
                 {
                     // Have a song note, show note.
-                    if (_songDetails != null && _songDetails.notes.length > 0)
+                    if (_songUserInfo != null && _songUserInfo.notes.length > 0)
                     {
                         if (!_hoverTimer)
                             _hoverTimer = new Timer(500, 1);
@@ -233,11 +234,11 @@ package menu
         public function updateOrShow():void
         {
             // Check for Changes
-            if (_songDetails == null)
-                _songDetails = SQLQueries.getSongDetailsEntry(songData);
+            if (_songUserInfo == null)
+                _songUserInfo = SQLQueries.getSongUserInfo(songInfo);
 
             // Update Favorite
-            isFavorite = (_songDetails != null && _songDetails.song_favorite);
+            isFavorite = (_songUserInfo != null && _songUserInfo.song_favorite);
             _lblSongDifficulty.text = getDifficultyText();
             draw();
 
@@ -255,34 +256,34 @@ package menu
         {
             if (_hoverSprite != null)
             {
-                _hoverSprite.message = "<font face=\"" + Language.UNI_FONT_NAME + "\" >" + _songDetails.notes + "</font>";
+                _hoverSprite.message = "<font face=\"" + Language.UNI_FONT_NAME + "\" >" + _songUserInfo.notes + "</font>";
             }
         }
 
         ////////////////////////////////////////////////////////////////////////
         //- Getters / Setters
-        public function setData(song:Object, rank:Object):void
+        public function setData(songInfo:SongInfo, rank:Object):void
         {
-            _songData = song;
-            _level = song.level;
-            isLocked = !(!song["access"] || song["access"] == GlobalVariables.SONG_ACCESS_PLAYABLE);
+            _songInfo = songInfo;
+            _level = songInfo.level;
+            isLocked = !(!songInfo.access || songInfo.access == GlobalVariables.SONG_ACCESS_PLAYABLE);
 
             // Song Details
-            _songDetails = SQLQueries.getSongDetailsEntry(song);
-            isFavorite = (_songDetails != null && _songDetails.song_favorite);
+            _songUserInfo = SQLQueries.getSongUserInfo(songInfo);
+            isFavorite = (_songUserInfo != null && _songUserInfo.song_favorite);
 
             // Song Name
-            var songname:String = song["name"];
+            var songname:String = songInfo.name;
 
-            if (!song["engine"] && song["genre"] == Constant.LEGACY_GENRE)
+            if (!songInfo.engine && songInfo.genre == Constant.LEGACY_GENRE)
                 songname = '<font color="#004587">[L]</font> ' + songname;
 
-            _lblSongName = new Text(this, 0, 0, songname, 14);
+            _lblSongName = new Text(this, 0, 0, songname || "", 14);
 
             // Locked Song Item, basically anything but playable songs.
             if (isLocked)
             {
-                this.mouseChildren = (song["access"] == GlobalVariables.SONG_ACCESS_TOKEN);
+                this.mouseChildren = (songInfo.access == GlobalVariables.SONG_ACCESS_TOKEN);
 
                 var _message:String = getSongLockText();
 
@@ -320,10 +321,10 @@ package menu
                 _lblSongDifficulty.setAreaParams(30, 27, Text.CENTER);
 
                 // Song Flag
-                var FLAG_TEXT:String = GlobalVariables.getSongIcon(_songData, rank);
+                var FLAG_TEXT:String = GlobalVariables.getSongIcon(_songInfo, rank);
                 if (FLAG_TEXT != "")
                 {
-                    _lblSongFlag = new Text(this, 296, 0, GlobalVariables.getSongIcon(_songData, rank), 14);
+                    _lblSongFlag = new Text(this, 296, 0, GlobalVariables.getSongIcon(_songInfo, rank), 14);
                     _lblSongFlag.setAreaParams(100, 27, Text.RIGHT);
 
                     // Adjust Song Name to not overlap song flag.
@@ -350,7 +351,7 @@ package menu
 
         public function getDifficultyText():String
         {
-            return isFavorite ? '<font color="#f7b9e4">' + _songData["difficulty"] + '</font>' : _songData["difficulty"];
+            return isFavorite ? '<font color="#f7b9e4">' + _songInfo["difficulty"] + '</font>' : _songInfo["difficulty"];
         }
 
         public function getSongLockText():String
@@ -359,27 +360,31 @@ package menu
             var _gvars:GlobalVariables = GlobalVariables.instance;
             var _lang:Language = Language.instance;
 
-            switch (songData["access"])
+            switch (songInfo.access)
             {
                 case GlobalVariables.SONG_ACCESS_CREDITS:
-                    return sprintf(_lang.string("song_selection_banned_credits"), {"more_needed": NumberUtil.numberFormat(songData.credits - _gvars.activeUser.credits),
+                    return sprintf(_lang.string("song_selection_banned_credits"), {"more_needed": NumberUtil.numberFormat(songInfo.credits - _gvars.activeUser.credits),
                             "user_credits": NumberUtil.numberFormat(_gvars.activeUser.credits),
-                            "song_price": NumberUtil.numberFormat(songData.credits)});
+                            "song_price": NumberUtil.numberFormat(songInfo.credits)});
+
                 case GlobalVariables.SONG_ACCESS_PURCHASED:
-                    return sprintf(_lang.string("song_selection_banned_purchased"), {"song_price": NumberUtil.numberFormat(songData.price)});
+                    return sprintf(_lang.string("song_selection_banned_purchased"), {"song_price": NumberUtil.numberFormat(songInfo.price)});
+
                 case GlobalVariables.SONG_ACCESS_VETERAN:
                     return _lang.string("song_selection_banned_veteran");
+
                 case GlobalVariables.SONG_ACCESS_TOKEN:
-                    return _gvars.TOKENS[songData.level].info;
+                    return _gvars.TOKENS[songInfo.level].info;
+
                 case GlobalVariables.SONG_ACCESS_BANNED:
                     return _lang.string("song_selection_banned_invalid");
             }
-            return sprintf(_lang.string("song_selection_banned_unknown"), {"access": songData["access"]});
+            return sprintf(_lang.string("song_selection_banned_unknown"), {"access": songInfo.access});
         }
 
-        public function get songData():Object
+        public function get songInfo():SongInfo
         {
-            return _songData;
+            return _songInfo;
         }
 
         public function get level():int
