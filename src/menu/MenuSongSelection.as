@@ -19,6 +19,7 @@ package menu
     import classes.Alert;
     import classes.Language;
     import classes.Playlist;
+    import classes.SongInfo;
     import classes.SongPlayerBytes;
     import classes.SongPreview;
     import classes.SongQueueItem;
@@ -53,7 +54,6 @@ package menu
     import popups.PopupFilterManager;
     import popups.PopupQueueManager;
     import popups.PopupSongNotes;
-    import classes.SongInfo;
 
     public class MenuSongSelection extends MenuPanel
     {
@@ -869,7 +869,7 @@ package menu
                 }
                 else
                 {
-                    _gvars.gameMain.addAlert(sprintf(_lang.string("song_selection_load_music_for"), {"name": songInfo.name}), 90);
+                    Alert.add(sprintf(_lang.string("song_selection_load_music_for"), {"name": songInfo.name}), 90);
                     song.addEventListener(Event.COMPLETE, e_menuMusicConvertSongLoad);
                 }
             }
@@ -896,7 +896,7 @@ package menu
                 _gvars.songQueue.push(Playlist.instance.getSongInfo(_gvars.options.replay.level));
 
                 // Switch to game
-                _gvars.gameMain.addAlert(_lang.string("song_selection_load_play_chart_preview"));
+                Alert.add(_lang.string("song_selection_load_play_chart_preview"));
                 switchTo(Main.GAME_PLAY_PANEL);
             }
         }
@@ -922,7 +922,7 @@ package menu
                 }
                 else
                 {
-                    _gvars.gameMain.addAlert(sprintf(_lang.string("song_selection_load_music_for"), {"name": songInfo.name}), 90);
+                    Alert.add(sprintf(_lang.string("song_selection_load_music_for"), {"name": songInfo.name}), 90);
                     song.addEventListener(Event.COMPLETE, e_songPreviewConvertSongLoad);
                 }
             }
@@ -1354,7 +1354,7 @@ package menu
          */
         private function songQueueClick(e:Event):void
         {
-            _gvars.gameMain.addAlert(sprintf(_lang.string("song_selection_add_to_queue"), {song_name: _playlist.getSongInfo(e.target.level).name}), 90);
+            Alert.add(sprintf(_lang.string("song_selection_add_to_queue"), {song_name: _playlist.getSongInfo(e.target.level).name}), 90);
             _gvars.songQueue.push(_playlist.getSongInfo(e.target.level));
             saveQueuePlaylist();
             if (options.activeGenre == PLAYLIST_QUEUE)
@@ -1801,7 +1801,7 @@ package menu
                     }
                     else
                     {
-                        _gvars.gameMain.addAlert(_lang.string("song_selection_no_songs_random"), 120, Alert.RED);
+                        Alert.add(_lang.string("song_selection_no_songs_random"), 120, Alert.RED);
                     }
                 }
             }
@@ -1975,7 +1975,7 @@ package menu
             {
                 var songDetails:Object = _playlist.getSongInfo(level_id);
                 if (songDetails != null && songDetails.error == null)
-                    _gvars.gameMain.addAlert(sprintf(_lang.string("song_purchase_complete"), {"name": songDetails.name}), 120, Alert.DARK_GREEN);
+                    Alert.add(sprintf(_lang.string("song_purchase_complete"), {"name": songDetails.name}), 120, Alert.DARK_GREEN);
 
                 _gvars.activeUser.setPurchasedString(response["purchased"]);
                 _gvars.activeUser.credits = response["credits"];
@@ -1985,7 +1985,7 @@ package menu
             }
             else
             {
-                _gvars.gameMain.addAlert(_lang.string("song_purchase_error_" + response["status"]), 120, Alert.RED);
+                Alert.add(_lang.string("song_purchase_error_" + response["status"]), 120, Alert.RED);
             }
 
             if (options.activeSongId == level_id && options.infoTab == TAB_PLAYLIST)
@@ -2048,7 +2048,7 @@ package menu
          */
         private function playMenuMusicSong(song:Song):void
         {
-            _gvars.gameMain.addAlert(_lang.string("song_selection_playing_menu_music"));
+            Alert.add(_lang.string("song_selection_playing_menu_music"));
 
             LocalStore.setVariable("menu_music", song.songInfo.name);
             var par:MainMenu = ((this.my_Parent) as MainMenu);
@@ -2071,7 +2071,7 @@ package menu
          */
         private function playSongPreview(song:Song):void
         {
-            _gvars.gameMain.addAlert(_lang.string("song_selection_playing_song_preview"));
+            Alert.add(_lang.string("song_selection_playing_song_preview"));
 
             if (_gvars.menuMusic)
                 _gvars.menuMusic.stop();
@@ -2096,7 +2096,9 @@ package menu
 
 
 import assets.GameBackgroundColor;
+
 import classes.ui.Text;
+
 import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.events.Event;

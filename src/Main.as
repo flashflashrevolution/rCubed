@@ -83,8 +83,6 @@ package
         public var retryLoadButton:BoxButton;
         public var disablePopups:Boolean = false;
 
-        private var activeAlert:Alert;
-        private var alertsQueue:Array = [];
         private var popupQueue:Array = [];
         private var lastPanel:MenuPanel;
         public var activePanel:MenuPanel;
@@ -141,6 +139,9 @@ package
             {
                 this.removeEventListener(Event.ADDED_TO_STAGE, gameInit);
             }
+
+            //- Static Class Init
+            Alert.init(stage);
 
             //- Setup Tween Override mode
             TweenPlugin.activate([TintPlugin, AutoAlphaPlugin]);
@@ -242,7 +243,7 @@ package
             //- No Reason
             CONFIG::debug
             {
-                addAlert("Development Build - " + CONFIG::timeStamp + " - NOT FOR RELEASE", 120, Alert.RED);
+                Alert.add("Development Build - " + CONFIG::timeStamp + " - NOT FOR RELEASE", 120, Alert.RED);
             }
         }
 
@@ -458,7 +459,7 @@ package
 
         private function e_retryClick(e:Event):void
         {
-            addAlert("Reloading incomplete scripts...");
+            Alert.add("Reloading incomplete scripts...");
             if (!_playlist.isLoaded())
             {
                 _playlist.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
@@ -703,52 +704,6 @@ package
                     this.removeChildAt(i);
                     break;
                 }
-            }
-        }
-
-        ///- Game Alerts
-        public function addAlert(message:String, age:int = 120, color:uint = 0x000000):void
-        {
-            if (activeAlert == null)
-            {
-                activeAlert = new Alert(message, age, color);
-                activeAlert.x = GAME_WIDTH - activeAlert.width - 5;
-                activeAlert.y = GAME_HEIGHT - activeAlert.height - 5;
-                this.addChild(activeAlert);
-
-                this.addEventListener(Event.ENTER_FRAME, alertOnFrame);
-            }
-            else
-            {
-                alertsQueue.push({ms: message, ag: age, col: color});
-            }
-        }
-
-        private function alertOnFrame(e:Event):void
-        {
-            // Progress Active Alert
-            if (activeAlert)
-            {
-                activeAlert.progress();
-                if (activeAlert.time > activeAlert.age)
-                {
-                    this.removeChild(activeAlert);
-                    activeAlert = null;
-                    this.removeEventListener(Event.ENTER_FRAME, alertOnFrame);
-                }
-            }
-
-            // Add new alert if the old alert is finished
-            if (activeAlert == null && alertsQueue.length >= 1)
-            {
-                var newAlert:Object = alertsQueue.splice(0, 1)[0];
-                addAlert(newAlert.ms, newAlert.ag, newAlert.col);
-            }
-
-            // General cleanup in case
-            if (activeAlert == null && alertsQueue.length == 0)
-            {
-                this.removeEventListener(Event.ENTER_FRAME, alertOnFrame);
             }
         }
 

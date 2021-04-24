@@ -200,7 +200,7 @@ package game
             song = options.song;
             if (!options.isEditor && song.chart.Notes.length == 0)
             {
-                _gvars.gameMain.addAlert("Chart has no notes, returning to main menu...", 120, Alert.RED);
+                Alert.add("Chart has no notes, returning to main menu...", 120, Alert.RED);
                 var screen:int = _gvars.activeUser.startUpScreen;
                 if (!_gvars.activeUser.isGuest && (screen == 0 || screen == 1) && !MultiplayerSingleton.getInstance().connection.connected)
                 {
@@ -367,15 +367,15 @@ package game
             {
                 options.isAutoplay = true;
                 stage.frameRate = options.frameRate;
-                stage.addEventListener(Event.ENTER_FRAME, editorOnEnterFrame, false, int.MAX_VALUE, true);
-                stage.addEventListener(KeyboardEvent.KEY_DOWN, editorKeyboardKeyDown, false, int.MAX_VALUE, true);
+                stage.addEventListener(Event.ENTER_FRAME, editorOnEnterFrame, false, int.MAX_VALUE - 10, true);
+                stage.addEventListener(KeyboardEvent.KEY_DOWN, editorKeyboardKeyDown, false, int.MAX_VALUE - 10, true);
             }
             else
             {
                 stage.frameRate = song.frameRate;
-                stage.addEventListener(Event.ENTER_FRAME, onEnterFrame, false, int.MAX_VALUE, true);
-                stage.addEventListener(KeyboardEvent.KEY_DOWN, keyboardKeyDown, true, int.MAX_VALUE, true);
-                stage.addEventListener(KeyboardEvent.KEY_UP, keyboardKeyUp, true, int.MAX_VALUE, true);
+                stage.addEventListener(Event.ENTER_FRAME, onEnterFrame, false, int.MAX_VALUE - 10, true);
+                stage.addEventListener(KeyboardEvent.KEY_DOWN, keyboardKeyDown, true, int.MAX_VALUE - 10, true);
+                stage.addEventListener(KeyboardEvent.KEY_UP, keyboardKeyUp, true, int.MAX_VALUE - 10, true);
             }
         }
 
@@ -721,7 +721,7 @@ package game
         private function siteLoadError(e:Event = null):void
         {
             removeLoaderListeners();
-            //_gvars.gameMain.addAlert("Error sending game start, score may not save", 60, Alert.RED);
+            //Alert.add("Error sending game start, score may not save", 60, Alert.RED);
         }
 
         /*#########################################################################################*\
@@ -1128,7 +1128,7 @@ package game
             else if (keyCode == Keyboard.F8 && (CONFIG::debug || _gvars.playerUser.isDeveloper || _gvars.playerUser.isAdmin))
             {
                 options.isAutoplay = !options.isAutoplay;
-                _gvars.gameMain.addAlert("Bot Play: " + options.isAutoplay, 60);
+                Alert.add("Bot Play: " + options.isAutoplay, 60);
             }
 
             e.stopImmediatePropagation();
@@ -2249,7 +2249,7 @@ package game
             if (gameplay.status == Multiplayer.STATUS_RESULTS && !multiplayerResults[user.id])
             {
                 multiplayerResults[user.id] = true;
-                _gvars.gameMain.addAlert(user.name + " finished playing the song", 240, Alert.RED);
+                Alert.add(user.name + " finished playing the song", 240, Alert.RED);
             }
         }
 

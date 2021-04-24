@@ -902,7 +902,7 @@ package game
 
             if (!canSendScore(gameResult, true, true, false, false))
             {
-                _gvars.gameMain.addAlert(_lang.string("game_result_error_enabled_mods"), 90, Alert.RED);
+                Alert.add(_lang.string("game_result_error_enabled_mods"), 90, Alert.RED);
                 return;
             }
 
@@ -963,12 +963,12 @@ package game
 
             if (data.result == 0)
             {
-                _gvars.gameMain.addAlert(_lang.string("game_result_save_success"), 90, Alert.DARK_GREEN);
+                Alert.add(_lang.string("game_result_save_success"), 90, Alert.DARK_GREEN);
 
                 // Server Message
                 if (data.gServerMessage != null)
                 {
-                    _gvars.gameMain.addAlert(data.gServerMessage, 360);
+                    Alert.add(data.gServerMessage, 360);
                 }
 
                 // Server Message Popup
@@ -998,7 +998,7 @@ package game
                     // Check Old vs New Rankings.
                     if (data.new_ranking < data.old_ranking && data.old_ranking > 0)
                     {
-                        _gvars.gameMain.addAlert("New Best Rank: " + data.old_ranking + "->" + data.new_ranking + " (" + ((data.old_ranking - data.new_ranking) * -1) + ")", 240, Alert.DARK_GREEN);
+                        Alert.add("New Best Rank: " + data.old_ranking + "->" + data.new_ranking + " (" + ((data.old_ranking - data.new_ranking) * -1) + ")", 240, Alert.DARK_GREEN);
                     }
 
                     // Check raw score vs level ranks and update.
@@ -1069,7 +1069,7 @@ package game
             else
             {
                 if (!data.ignore)
-                    _gvars.gameMain.addAlert("Failed to save results. (ERR: " + data.result + ")", 360, Alert.RED);
+                    Alert.add("Failed to save results. (ERR: " + data.result + ")", 360, Alert.RED);
 
                 if (resultsDisplay != null)
                     resultsDisplay.result_rank.htmlText = data.ignore ? "" : "Score save failed!";
@@ -1082,7 +1082,7 @@ package game
         private function siteLoadError(e:Event = null):void
         {
             removeLoaderListeners(siteLoadComplete, siteLoadError);
-            _gvars.gameMain.addAlert(_lang.string("error_server_connection_failure"), 120, Alert.RED);
+            Alert.add(_lang.string("error_server_connection_failure"), 120, Alert.RED);
 
             if (resultsDisplay != null)
                 resultsDisplay.result_rank.htmlText = "Score save failed!";
@@ -1191,12 +1191,12 @@ package game
                 {
                     if (data.result == 0)
                     {
-                        //_gvars.gameMain.addAlert("Score Saved successfully!", 90);
+                        //Alert.add("Score Saved successfully!", 90);
 
                         // Server Message
                         if (data.gServerMessage != null)
                         {
-                            _gvars.gameMain.addAlert(data.gServerMessage, 360);
+                            Alert.add(data.gServerMessage, 360);
                         }
 
                         // Server Message Popup
@@ -1272,7 +1272,7 @@ package game
             // Display F2 Shortcut key only once per session.
             if (!Flags.VALUES[Flags.F2_REPLAYS])
             {
-                _gvars.gameMain.addAlert("Replay saved to History. (Press F2)", 150);
+                Alert.add("Replay saved to History. (Press F2)", 150);
                 Flags.VALUES[Flags.F2_REPLAYS] = true;
             }
 
@@ -1358,7 +1358,7 @@ package game
 
             var data:Object = JSON.parse(e.target.data);
 
-            _gvars.gameMain.addAlert(_lang.string("replay_save_status_" + data.result), 90, (data.result == 0 ? Alert.GREEN : Alert.RED));
+            Alert.add(_lang.string("replay_save_status_" + data.result), 90, (data.result == 0 ? Alert.GREEN : Alert.RED));
         }
 
         /**
@@ -1367,7 +1367,7 @@ package game
         private function replayLoadError(e:Event = null):void
         {
             removeLoaderListeners(replayLoadComplete, replayLoadError);
-            _gvars.gameMain.addAlert(_lang.string("error_server_connection_failure"), 120, Alert.RED);
+            Alert.add(_lang.string("error_server_connection_failure"), 120, Alert.RED);
         }
 
     }

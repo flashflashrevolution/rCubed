@@ -1,25 +1,27 @@
 package arc.mp
 {
     import arc.mp.MultiplayerPanel;
+
+    import classes.Alert;
+    import classes.Gameplay;
     import classes.Playlist;
     import classes.Room;
-    import classes.User;
     import classes.SongInfo;
-    import classes.Gameplay;
+    import classes.User;
     import classes.chart.Song;
     import classes.replay.Replay;
     import com.flashfla.net.Multiplayer;
-    import com.flashfla.net.events.ErrorEvent;
     import com.flashfla.net.events.ConnectionEvent;
-    import com.flashfla.net.events.LoginEvent;
-    import com.flashfla.net.events.RoomListEvent;
-    import com.flashfla.net.events.RoomJoinedEvent;
-    import com.flashfla.net.events.RoomLeftEvent;
-    import com.flashfla.net.events.RoomUserEvent;
-    import com.flashfla.net.events.MessageEvent;
+    import com.flashfla.net.events.ErrorEvent;
     import com.flashfla.net.events.GameResultsEvent;
     import com.flashfla.net.events.GameStartEvent;
     import com.flashfla.net.events.GameUpdateEvent;
+    import com.flashfla.net.events.LoginEvent;
+    import com.flashfla.net.events.MessageEvent;
+    import com.flashfla.net.events.RoomJoinedEvent;
+    import com.flashfla.net.events.RoomLeftEvent;
+    import com.flashfla.net.events.RoomListEvent;
+    import com.flashfla.net.events.RoomUserEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
     import com.flashfla.utils.StringUtil;
     import flash.events.Event;
@@ -108,7 +110,7 @@ package arc.mp
 
         private function onError(event:ErrorEvent):void
         {
-            _gvars.gameMain.addAlert("MP Error: " + event.message);
+            Alert.add("MP Error: " + event.message);
         }
 
         private function onConnection(event:ConnectionEvent):void
@@ -167,13 +169,13 @@ package arc.mp
         private function updateRoomUser(room:Room, user:User):void
         {
             if (user != null && room.isGameRoom && user.id != currentUser.id && room.isPlayer(currentUser) && room.isPlayer(user))
-                _gvars.gameMain.addAlert("A Challenger Appears! " + user.name);
+                Alert.add("A Challenger Appears! " + user.name);
         }
 
         private function onMessage(event:MessageEvent):void
         {
             if (event.msgType == Multiplayer.MESSAGE_PRIVATE)
-                _gvars.gameMain.addAlert("*** " + event.user.name + ": " + event.message);
+                Alert.add("*** " + event.user.name + ": " + event.message);
         }
 
         private function forEachRoom(func:Function):void
@@ -341,7 +343,7 @@ package arc.mp
                         if (currentSongFile && currentSongFile.loadFail)
                         {
                             _gvars.removeSongFile(currentSongFile);
-                            _gvars.gameMain.addAlert(currentSongInfo.name + " failed to load");
+                            Alert.add(currentSongInfo.name + " failed to load");
                             currentSongFile = null;
                             currentStatus = Multiplayer.STATUS_PICKING;
                             timer.stop();

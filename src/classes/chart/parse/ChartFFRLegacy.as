@@ -2,19 +2,20 @@ package classes.chart.parse
 {
     import arc.ArcGlobals;
     import by.blooddy.crypto.MD5;
+    import classes.Alert;
+    import classes.Site;
+    import classes.SongInfo;
     import classes.chart.Note;
     import classes.chart.NoteChart;
-    import classes.Site;
+    import com.flashfla.media.Beatbox;
     import com.flashfla.utils.StringUtil;
     import com.flashfla.utils.sprintf;
-    import flash.utils.ByteArray;
-    import flash.net.URLRequest;
-    import flash.net.URLLoader;
     import flash.events.Event;
     import flash.events.IOErrorEvent;
     import flash.events.SecurityErrorEvent;
-    import com.flashfla.media.Beatbox;
-    import classes.SongInfo;
+    import flash.net.URLLoader;
+    import flash.net.URLRequest;
+    import flash.utils.ByteArray;
 
     public class ChartFFRLegacy extends NoteChart
     {
@@ -68,7 +69,7 @@ package classes.chart.parse
         {
             if (!validURL(url))
             {
-                GlobalVariables.instance.gameMain.addAlert("Incorrect legacy URL");
+                Alert.add("Incorrect legacy URL");
                 return;
             }
 
@@ -82,7 +83,7 @@ package classes.chart.parse
                     var xml:XML = new XML(event.target.data);
                     if (xml.localName() != "arc_engines")
                     {
-                        GlobalVariables.instance.gameMain.addAlert("Incorrect legacy URL");
+                        Alert.add("Incorrect legacy URL");
                         return;
                     }
                     for each (var node:XML in xml.children())
@@ -137,7 +138,7 @@ package classes.chart.parse
 
         private static function parseEngineError(event:Event = null):void
         {
-            GlobalVariables.instance.gameMain.addAlert("Error loading legacy engine");
+            Alert.add("Error loading legacy engine");
         }
 
         public static function parsePlaylist(data:Object, engine:Object = null):Array

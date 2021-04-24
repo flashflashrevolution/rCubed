@@ -9,7 +9,9 @@ package
     import be.aboutme.airserver.endpoints.socket.handlers.websocket.WebSocketClientHandlerFactory;
     import be.aboutme.airserver.messages.Message;
     import by.blooddy.crypto.image.PNGEncoder;
+    import classes.Alert;
     import classes.Playlist;
+    import classes.SongInfo;
     import classes.SongPlayerBytes;
     import classes.StatTracker;
     import classes.User;
@@ -36,7 +38,6 @@ package
     import flash.utils.ByteArray;
     import game.GameOptions;
     import game.GameScoreResult;
-    import classes.SongInfo;
 
     public class GlobalVariables extends EventDispatcher
     {
@@ -525,7 +526,7 @@ package
             }
             catch (e:Error)
             {
-                gameMain.addAlert("ERROR: Unable to save image.", 120);
+                Alert.add("ERROR: Unable to save image.", 120);
             }
         }
 

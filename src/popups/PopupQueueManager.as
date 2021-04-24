@@ -355,11 +355,11 @@ internal class QueueBox extends Sprite
         var success:Boolean = SystemUtil.setClipboard(queueString);
         if (success)
         {
-            _gvars.gameMain.addAlert(_lang.string("clipboard_success"), 120, Alert.GREEN);
+            Alert.add(_lang.string("clipboard_success"), 120, Alert.GREEN);
         }
         else
         {
-            _gvars.gameMain.addAlert(_lang.string("clipboard_failure"), 120, Alert.RED);
+            Alert.add(_lang.string("clipboard_failure"), 120, Alert.RED);
         }
     }
 

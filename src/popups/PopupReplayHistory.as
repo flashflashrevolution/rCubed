@@ -2,9 +2,11 @@ package popups
 {
     import arc.ArcGlobals;
     import assets.GameBackgroundColor;
+    import classes.Alert;
     import classes.FileTracker;
     import classes.Language;
     import classes.Playlist;
+    import classes.SongInfo;
     import classes.replay.Replay;
     import classes.ui.Box;
     import classes.ui.BoxButton;
@@ -24,7 +26,6 @@ package popups
     import flash.geom.Point;
     import flash.utils.getTimer;
     import menu.MenuPanel;
-    import classes.SongInfo;
 
     public class PopupReplayHistory extends MenuPanel
     {
@@ -331,7 +332,7 @@ package popups
             var r:Replay = new Replay(new Date().getTime());
             r.parseEncode(replayString);
             if (r.isEdited)
-                _gvars.gameMain.addAlert(_lang.string("popup_replay_import_edited"), 180);
+                Alert.add(_lang.string("popup_replay_import_edited"), 180);
             if (r.isValid())
             {
                 _gvars.replayHistory.unshift(r);
@@ -346,7 +347,7 @@ package popups
                 renderReplays();
             }
             else
-                _gvars.gameMain.addAlert(_lang.string("popup_replay_import_invalid"));
+                Alert.add(_lang.string("popup_replay_import_invalid"));
         }
 
         private function e_boxClickHandler(e:MouseEvent):void
@@ -570,6 +571,7 @@ package popups
 
 import classes.Alert;
 import classes.Language;
+import classes.SongInfo;
 import classes.replay.Replay;
 import classes.ui.Box;
 import classes.ui.BoxButton;
@@ -581,7 +583,6 @@ import flash.display.Sprite;
 import flash.events.MouseEvent;
 import game.GameOptions;
 import popups.PopupReplayHistory;
-import classes.SongInfo;
 
 internal class ReplayBox extends Sprite
 {
@@ -655,11 +656,11 @@ internal class ReplayBox extends Sprite
         var success:Boolean = SystemUtil.setClipboard(replayString);
         if (success)
         {
-            _gvars.gameMain.addAlert(_lang.string("clipboard_success"), 120, Alert.GREEN);
+            Alert.add(_lang.string("clipboard_success"), 120, Alert.GREEN);
         }
         else
         {
-            _gvars.gameMain.addAlert(_lang.string("clipboard_failure"), 120, Alert.RED);
+            Alert.add(_lang.string("clipboard_failure"), 120, Alert.RED);
         }
     }
 
@@ -673,7 +674,7 @@ internal class ReplayBox extends Sprite
     {
         if (songInfo == null)
         {
-            _gvars.gameMain.addAlert(_lang.string("popup_replay_missing_song_data"));
+            Alert.add(_lang.string("popup_replay_missing_song_data"));
             return;
         }
         if (!replay.user.isLoaded())
