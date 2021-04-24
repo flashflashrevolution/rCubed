@@ -362,7 +362,7 @@ package classes
                 case GlobalVariables.LOAD_ERROR:
                     ArcGlobals.instance.configLegacy = null;
                     load();
-                    _gvars.gameMain.addAlert("Error loading playlist");
+                    Alert.add("Error loading playlist");
                     break;
                 case GlobalVariables.LOAD_COMPLETE:
                     if (_gvars.gameMain.activePanel is MainMenu)

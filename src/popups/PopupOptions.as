@@ -8,6 +8,8 @@ package popups
     import classes.Noteskins;
     import classes.NoteskinsStruct;
     import classes.Playlist;
+    import classes.Room;
+    import classes.SongInfo;
     import classes.User;
     import classes.chart.Song;
     import classes.chart.parse.ChartFFRLegacy;
@@ -54,8 +56,6 @@ package popups
     import menu.MainMenu;
     import menu.MenuPanel;
     import menu.MenuSongSelection;
-    import classes.Room;
-    import classes.SongInfo;
 
     public class PopupOptions extends MenuPanel
     {
@@ -210,11 +210,11 @@ package popups
             var success:Boolean = SystemUtil.setClipboard(optionsString);
             if (success)
             {
-                _gvars.gameMain.addAlert(_lang.string("clipboard_success"), 120, Alert.GREEN);
+                Alert.add(_lang.string("clipboard_success"), 120, Alert.GREEN);
             }
             else
             {
-                _gvars.gameMain.addAlert(_lang.string("clipboard_failure"), 120, Alert.RED);
+                Alert.add(_lang.string("clipboard_failure"), 120, Alert.RED);
             }
         }
 
@@ -229,12 +229,12 @@ package popups
             {
                 var item:Object = JSON.parse(optionsJSON);
                 _gvars.activeUser.settings = item;
-                _gvars.gameMain.addAlert("Settings Imported!", 120, Alert.GREEN);
+                Alert.add("Settings Imported!", 120, Alert.GREEN);
                 renderOptions();
             }
             catch (e:Error)
             {
-                _gvars.gameMain.addAlert("Import Fail...", 120, Alert.GREEN);
+                Alert.add("Import Fail...", 120, Alert.GREEN);
             }
         }
 
@@ -1293,9 +1293,9 @@ package popups
             {
                 var success:Boolean = SystemUtil.setClipboard(noteskinsString());
                 if (success)
-                    GlobalVariables.instance.gameMain.addAlert(_lang.string("clipboard_success"), 120, Alert.GREEN);
+                    Alert.add(_lang.string("clipboard_success"), 120, Alert.GREEN);
                 else
-                    GlobalVariables.instance.gameMain.addAlert(_lang.string("clipboard_failure"), 120, Alert.RED);
+                    Alert.add(_lang.string("clipboard_failure"), 120, Alert.RED);
                 return;
             }
 
@@ -1476,7 +1476,7 @@ package popups
                     _gvars.air_useVSync = !_gvars.air_useVSync;
                     LocalStore.setVariable("air_useVSync", _gvars.air_useVSync);
                     stage.vsyncEnabled = _gvars.air_useVSync;
-                    _gvars.gameMain.addAlert("Set VSYNC: " + stage.vsyncEnabled, 120, Alert.RED);
+                    Alert.add("Set VSYNC: " + stage.vsyncEnabled, 120, Alert.RED);
                 }
             }
 
@@ -1499,7 +1499,7 @@ package popups
                     }
                     else
                     {
-                        _gvars.gameMain.addAlert(_lang.string("air_options_unable_to_start_websockets"), 120, Alert.RED);
+                        Alert.add(_lang.string("air_options_unable_to_start_websockets"), 120, Alert.RED);
                     }
                 }
             }
@@ -1611,7 +1611,7 @@ package popups
 
         private function engineAdd(engine:Object):void
         {
-            _gvars.gameMain.addAlert("Engine Loaded: " + engine.name, 80);
+            Alert.add("Engine Loaded: " + engine.name, 80);
             for (var i:int = 0; i < _avars.legacyEngines.length; i++)
             {
                 if (_avars.legacyEngines[i].id == engine.id)
@@ -1645,7 +1645,7 @@ package popups
                     continue;
                 if (engine["config_url"] == null)
                 {
-                    _gvars.gameMain.addAlert("Please re-add " + engine["name"] + ", missing required information.", 240, Alert.RED);
+                    Alert.add("Please re-add " + engine["name"] + ", missing required information.", 240, Alert.RED);
                     continue;
                 }
                 engineCombo.addItem(item);
@@ -1676,7 +1676,7 @@ package popups
                 }
                 LocalStore.setVariable("custom_noteskin", noteskinsString(), 20971520); // 20MB Mins size requested.
                 Noteskins.instance.loadCustomNoteskin();
-                GlobalVariables.instance.gameMain.addAlert(_lang.string("popup_noteskin_saved"), 90, Alert.GREEN);
+                Alert.add(_lang.string("popup_noteskin_saved"), 90, Alert.GREEN);
             }
             catch (e:Error)
             {
@@ -1905,9 +1905,9 @@ package popups
             }
             _avars.configJudge = judge;
             if (judge)
-                _gvars.gameMain.addAlert("Judge window set, score saving disabled");
+                Alert.add("Judge window set, score saving disabled");
             else
-                _gvars.gameMain.addAlert("Judge window cleared");
+                Alert.add("Judge window cleared");
         }
 
         private function arcJudgeMenu():ContextMenu

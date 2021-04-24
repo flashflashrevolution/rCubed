@@ -1,5 +1,6 @@
 package
 {
+    import classes.Alert;
     import classes.Language;
     import classes.Playlist;
     import classes.ui.Box;
@@ -282,7 +283,7 @@ package
             if (_data.result == 4)
             {
                 isLoading = false;
-                _gvars.gameMain.addAlert(_lang.string("login_invalid_session"));
+                Alert.add(_lang.string("login_invalid_session"));
                 changeUserEvent(e);
             }
             else if (_data.result >= 1 && _data.result <= 3)

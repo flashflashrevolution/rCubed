@@ -486,7 +486,7 @@ package menu
 
             function c_rankFail(e:*):void
             {
-                _gvars.gameMain.addAlert(_lang.string("skill_rank_update_fail"), 90, Alert.RED);
+                Alert.add(_lang.string("skill_rank_update_fail"), 90, Alert.RED);
                 if (_gvars.gameMain.activePanel is MainMenu)
                 {
                     rankUpdateThrobber.stop();

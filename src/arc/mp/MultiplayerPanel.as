@@ -4,26 +4,27 @@ package arc.mp
     import arc.mp.ListItemDoubleClick;
     import arc.mp.MultiplayerChat;
     import arc.mp.MultiplayerUsers;
+    import classes.Alert;
+    import classes.Room;
+    import classes.User;
     import classes.ui.BoxButton;
     import classes.ui.MPCreateRoomPrompt;
     import classes.ui.Prompt;
     import classes.ui.Text;
     import classes.ui.Throbber;
-    import classes.Room;
-    import classes.User;
     import com.bit101.components.List;
     import com.bit101.components.PushButton;
     import com.bit101.components.Style;
     import com.bit101.components.Window;
     import com.flashfla.net.Multiplayer;
-    import com.flashfla.net.events.ServerMessageEvent;
     import com.flashfla.net.events.ConnectionEvent;
     import com.flashfla.net.events.LoginEvent;
     import com.flashfla.net.events.RoomJoinedEvent;
     import com.flashfla.net.events.RoomLeftEvent;
     import com.flashfla.net.events.RoomListEvent;
-    import com.flashfla.net.events.RoomUserStatusEvent;
     import com.flashfla.net.events.RoomUpdateEvent;
+    import com.flashfla.net.events.RoomUserStatusEvent;
+    import com.flashfla.net.events.ServerMessageEvent;
     import flash.events.ContextMenuEvent;
     import flash.events.Event;
     import flash.events.MouseEvent;
@@ -160,7 +161,7 @@ package arc.mp
 
         private function onServerMessageEvent(event:ServerMessageEvent):void
         {
-            GlobalVariables.instance.gameMain.addAlert("Server Message: " + event.message);
+            Alert.add("Server Message: " + event.message);
         }
 
         private function onConnectionEvent(event:ConnectionEvent):void
