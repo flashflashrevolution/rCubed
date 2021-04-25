@@ -28,6 +28,8 @@ R^3 is the third and latest game engine for **[Flash Flash Revolution](http://ww
     - [Fork the Repo](#fork-the-repo)
     - [Configure Git](#configure-git)
     - [Clone your Repo](#clone-your-repo)
+    - [Bootstrap the AirSDK](#bootstrap-the-airsdk)
+      - [Running the Script](#running-the-script)
     - [Create custom Workspace](#create-custom-workspace)
     - [Install Workspace Extensions](#install-workspace-extensions)
     - [Use AIR SDK](#use-air-sdk)
@@ -73,6 +75,22 @@ Next you'll need to clone your forked repo to your computer:
 - Press <kbd>CTRL+SHIFT+P</kbd> and search for `Git: Clone`.
   - Enter `https://github.com/YOUR_GITHUB_USERNAME/rCubed.git`.
 - If successful, a popup will prompt you to open the cloned repo.
+
+### Bootstrap the AirSDK
+
+This prevents an inconsistent compiler error caused by bad air tooling.
+
+#### Running the Script
+
+- Pressing the <kbd>Windows</kbd> key.
+- Typing `powershell`.
+- Hit enter or click on the application.
+- Navigate to your repository directory.
+  - ex. `cd L:\git\flashflashrevolution\games\rCubed`
+- Run the bootstrapper
+  - ex. `.\bootstrap.ps1 "C:\airsdk\32.0.0.116\frameworks\flex-config.xml"`
+
+---
 
 ### Create custom Workspace
 
