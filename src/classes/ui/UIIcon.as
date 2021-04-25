@@ -33,6 +33,14 @@ package classes.ui
                 parent.addChild(this);
         }
 
+        public function disposeIcon():void
+        {
+            if (icon != null)
+            {
+                this.removeChild(icon);
+            }
+        }
+
         public function setSize(w:Number, h:Number):void
         {
             if (icon != null)

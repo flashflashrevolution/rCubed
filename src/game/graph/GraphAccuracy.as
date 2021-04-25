@@ -10,6 +10,7 @@ package game.graph
     import flash.events.MouseEvent;
     import flash.geom.Rectangle;
     import game.GameScoreResult;
+    import assets.menu.icons.fa.iconSmallT;
 
     public class GraphAccuracy extends GraphBase
     {
@@ -34,6 +35,8 @@ package game.graph
 
         public var columnFilter:int = 0;
         private const COLUMN_FILTERS:Array = ["A", "L", "D", "U", "R", "LD", "UR"]
+        private const COLUMN_ICONS:Array = [iconSmallA, iconSmallL, iconSmallD, iconSmallU, iconSmallLD, iconSmallUR];
+        private var filterColumnBtn:BoxIcon;
 
         public function GraphAccuracy(target:Sprite, overlay:Sprite, result:GameScoreResult):void
         {
@@ -75,7 +78,7 @@ package game.graph
             flipGraphBtn.padding = 6;
             flipGraphBtn.setHoverText(_lang.string("game_results_flip_graph"), "right");
 
-            var filterColumnBtn:BoxIcon = new BoxIcon(buttons, -20, 78, 16, 18, new iconSmallF, e_filterColumn);
+            filterColumnBtn = new BoxIcon(buttons, -20, 78, 16, 18, new iconSmallF, e_filterColumn);
             filterColumnBtn.padding = 6;
             filterColumnBtn.setHoverText(_lang.string("game_results_filter_column"), "right");
             
@@ -237,7 +240,7 @@ package game.graph
 
             // Store Current Index to prevent redraws.
             var nearest_cross_index:int = nearest_cross + (nearest_boo ? 1000000 : 0); // Give boo a shift to prevent potential index overlaps.
-            if (last_nearest_index == nearest_cross_index)
+            if (last_nearest_index == nearest_cross_index || player_timings_length <= 0)
             {
                 return;
             }
@@ -442,10 +445,13 @@ package game.graph
         private function e_filterColumn(event:MouseEvent):void
         {
             columnFilter = (columnFilter >= COLUMN_FILTERS.length) ? 0 : columnFilter + 1; 
-            //filterColumnBtn.txt = COLUMN_FILTERS[columnFilter]
-            generateGraph();
-            draw();
-            drawOverlay(overlay.stage.mouseX - overlay.x, overlay.stage.mouseY - overlay.y);
+            filterColumnBtn.setIcon(new iconSmallT);
+            if(player_timings_length > 0)
+            {
+                generateGraph();
+                draw();
+                drawOverlay(overlay.stage.mouseX - overlay.x, overlay.stage.mouseY - overlay.y);
+            }
         }
     }
 }
