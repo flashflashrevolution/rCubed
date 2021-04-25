@@ -394,7 +394,14 @@ package game.graph
                 if (flipGraph)
                     pos_y = graphHeight - pos_y;
 
-                cross_points[cross_points.length] = new GraphCrossPoint(i, pos_x, pos_y, timing, draw_color, timing_score, player_timings[i]["d"]);
+                if(player_timings[i] != null)
+                {
+                    cross_points[cross_points.length] = new GraphCrossPoint(i, pos_x, pos_y, timing, draw_color, timing_score, player_timings[i]["d"]);
+                }
+                else
+                {
+                    cross_points[cross_points.length] = new GraphCrossPoint(i, pos_x, pos_y, timing, draw_color, timing_score, "M");
+                }
             }
 
             // Fill in Misses, Overlay uses cross point length.
