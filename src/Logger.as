@@ -30,6 +30,14 @@ package
 
         public static function init():void
         {
+            // Check for special file to enable file logging.
+            if (new File(AirContext.getAppPath("logging.txt")).exists)
+            {
+                trace("Logging Flag Found, enabling.")
+                file_log = true;
+                enabled = true;
+            }
+
             if (file_log && LOG_STREAM == null)
             {
                 var now:Date = new Date();
