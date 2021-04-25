@@ -809,7 +809,7 @@ package game
                 // Remove Old note
                 if (gameProgress - curNote.PROGRESS + player1JudgeOffset >= 6)
                 {
-                    binReplayNotes[curNote.ID] = null;
+                    binReplayNotes[curNote.ID] = {"d": curNote.DIR, "t": null};
                     commitJudge(curNote.DIR, gameProgress, -10);
                     noteBox.removeNote(curNote.ID);
                     n--;
@@ -1902,7 +1902,7 @@ package game
                 commitJudge(dir, frame + note.PROGRESS - player1JudgeOffset, score);
                 noteBox.removeNote(note.ID);
                 accuracy.addValue(note.POSITION - position);
-                binReplayNotes[note.ID] = (positionJudged - note.POSITION);
+                binReplayNotes[note.ID] = {"d": dir, "t": (positionJudged - note.POSITION)};
             }
             else
             {

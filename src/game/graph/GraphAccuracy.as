@@ -32,6 +32,9 @@ package game.graph
 
         public var flipGraph:Boolean = false;
 
+        public var columnFilter:int = 0;
+        private const COLUMN_FILTERS:Array = ["A", "L", "D", "U", "R", "LD", "UR"]
+
         public function GraphAccuracy(target:Sprite, overlay:Sprite, result:GameScoreResult):void
         {
             super(target, overlay, result);
@@ -72,6 +75,10 @@ package game.graph
             flipGraphBtn.padding = 6;
             flipGraphBtn.setHoverText(_lang.string("game_results_flip_graph"), "right");
 
+            var filterColumnBtn:BoxIcon = new BoxIcon(buttons, -20, 78, 16, 18, new iconSmallF, e_filterColumn);
+            filterColumnBtn.padding = 6;
+            filterColumnBtn.setHoverText(_lang.string("game_results_filter_column"), "right");
+            
             judgeMinTime = new Text(buttons, 0, 0, sprintf(_lang.string("game_results_graph_graph_early"), {"value": ((result.MIN_TIME > 0 ? "+" : "") + (result.MIN_TIME + 1))})); // It's greater then, so it's off by 1.
             judgeMinTime.alpha = 0.2;
 
@@ -122,11 +129,26 @@ package game.graph
 
             // Draw Crosses
             var point:GraphCrossPoint;
+            var red:uint
+            var green:uint
+            var blue:uint
             for each (point in cross_points)
             {
                 if (point.index >= player_timings_length)
                     break;
 
+                if(columnFilter != 0 
+                && ((columnFilter < 5 && point.column != COLUMN_FILTERS[columnFilter])
+                || (columnFilter == 5 && (point.column == "U" || point.column == "R"))
+                || (columnFilter == 6 && (point.column == "D" || point.column == "L"))))
+                {
+                    //filter then divide by 4 and round then return to color bits
+                    red = (point.color >> 18) << 16; 
+                    green = ((point.color  & 0x00ff00) >> 10) << 8;
+                    blue = (point.color & 0x0000ff) >> 2;
+                    point.color = red | green | blue;
+                }
+                
                 graph.graphics.lineStyle(1, point.color, 1);
                 graph.graphics.moveTo(point.x - 2, point.y - 2);
                 graph.graphics.lineTo(point.x + 2, point.y + 2);
@@ -137,6 +159,18 @@ package game.graph
             // Draw Crosses
             for each (point in boo_points)
             {
+                if(columnFilter != 0 
+                && ((columnFilter < 5 && point.column != COLUMN_FILTERS[columnFilter])
+                || (columnFilter == 5 && (point.column == "U" || point.column == "R"))
+                || (columnFilter == 6 && (point.column == "D" || point.column == "L"))))
+                {
+                    //filter then divide by 4 and round then return to right bit
+                    red = (point.color >> 18) << 16; 
+                    green = ((point.color  & 0x00ff00) >> 10) << 8;
+                    blue = (point.color & 0x0000ff) >> 2;
+                    point.color = red | green | blue;
+                }
+
                 graph.graphics.lineStyle(1, point.color, 1);
                 graph.graphics.moveTo(point.x - 2, point.y - 2);
                 graph.graphics.lineTo(point.x + 2, point.y + 2);
@@ -341,15 +375,15 @@ package game.graph
                 timing_score = 0;
 
                 // Judge Timing uses null for misses.
-                if (player_timings[i] != null)
+                if (player_timings[i] != null && player_timings[i]["t"] != null)
                 {
-                    note_judge = result.getJudgeRegion(player_timings[i]);
+                    note_judge = result.getJudgeRegion(player_timings[i]["t"]);
 
                     if (JUDGE_WINDOW_CROSS_COLORS[note_judge.s] != null && note_judge.s > 0)
                     {
-                        pos_y = (player_timings[i] - result.MIN_TIME) * ratio_y;
+                        pos_y = (player_timings[i]["t"] - result.MIN_TIME) * ratio_y;
                         draw_color = JUDGE_WINDOW_CROSS_COLORS[note_judge.s];
-                        timing = player_timings[i];
+                        timing = player_timings[i]["t"];
                         timing_score = note_judge.s;
                     }
                 }
@@ -365,16 +399,16 @@ package game.graph
                 if (flipGraph)
                     pos_y = graphHeight - pos_y;
 
-                cross_points[cross_points.length] = new GraphCrossPoint(i, pos_x, pos_y, timing, draw_color, timing_score);
+                cross_points[cross_points.length] = new GraphCrossPoint(i, pos_x, pos_y, timing, draw_color, timing_score, player_timings[i]["d"]);
             }
 
             // Fill in Misses, Overlay uses cross point length.
             if (result.note_count > 0)
             {
-                while (cross_points.length < result.note_count)
+                while (cross_points.length < result.last_note)
                 {
                     pos_x = cross_points.length * ratio_x;
-                    cross_points[cross_points.length] = new GraphCrossPoint(cross_points.length, pos_x, (flipGraph ? graphHeight : 0), 0, JUDGE_WINDOW_CROSS_COLORS["0"], 0);
+                    cross_points[cross_points.length] = new GraphCrossPoint(cross_points.length, pos_x, (flipGraph ? graphHeight : 0), 0, JUDGE_WINDOW_CROSS_COLORS["0"], 0, player_timings[i]["d"]);
                 }
             }
 
@@ -385,7 +419,7 @@ package game.graph
             {
                 boo = result.replay_bin_boos[i];
                 pos_x = (boo.t / 1000) * ratio_x;
-                boo_points[boo_points.length] = new GraphCrossPoint(boo_points.length, pos_x, (flipGraph ? 0 : graphHeight), Number((boo.t / 1000).toFixed(2)), JUDGE_WINDOW_CROSS_COLORS["-5"], -5);
+                boo_points[boo_points.length] = new GraphCrossPoint(boo_points.length, pos_x, (flipGraph ? 0 : graphHeight), Number((boo.t / 1000).toFixed(2)), JUDGE_WINDOW_CROSS_COLORS["-5"], -5, boo["d"]);
             }
         }
 
@@ -397,6 +431,18 @@ package game.graph
             flipGraph = !flipGraph;
             LocalStore.setVariable("result_flip_graph", flipGraph);
             last_nearest_index = -1;
+            generateGraph();
+            draw();
+            drawOverlay(overlay.stage.mouseX - overlay.x, overlay.stage.mouseY - overlay.y);
+        }
+
+        /**
+         * Changes currently filtered column.
+         */
+        private function e_filterColumn(event:MouseEvent):void
+        {
+            columnFilter = (columnFilter >= COLUMN_FILTERS.length) ? 0 : columnFilter + 1; 
+            //filterColumnBtn.txt = COLUMN_FILTERS[columnFilter]
             generateGraph();
             draw();
             drawOverlay(overlay.stage.mouseX - overlay.x, overlay.stage.mouseY - overlay.y);
