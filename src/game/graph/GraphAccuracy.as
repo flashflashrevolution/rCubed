@@ -3,6 +3,7 @@ package game.graph
     import assets.menu.icons.fa.iconSmallF;
     import classes.Language;
     import classes.ui.BoxIcon;
+    import classes.ui.BoxButton;
     import classes.ui.Text;
     import com.flashfla.utils.sprintf;
     import flash.display.DisplayObjectContainer;
@@ -35,8 +36,7 @@ package game.graph
 
         public var columnFilter:int = 0;
         private const COLUMN_FILTERS:Array = ["A", "L", "D", "U", "R", "LD", "UR"]
-        private const COLUMN_ICONS:Array = [iconSmallA, iconSmallL, iconSmallD, iconSmallU, iconSmallLD, iconSmallUR];
-        private var filterColumnBtn:BoxIcon;
+        private var filterColumnBtn:BoxButton;
 
         public function GraphAccuracy(target:Sprite, overlay:Sprite, result:GameScoreResult):void
         {
@@ -78,9 +78,9 @@ package game.graph
             flipGraphBtn.padding = 6;
             flipGraphBtn.setHoverText(_lang.string("game_results_flip_graph"), "right");
 
-            filterColumnBtn = new BoxIcon(buttons, -20, 78, 16, 18, new iconSmallF, e_filterColumn);
+            filterColumnBtn = new BoxButton(buttons, -20, 78, 16, 18, "C", 16, e_filterColumn);
             filterColumnBtn.padding = 6;
-            filterColumnBtn.setHoverText(_lang.string("game_results_filter_column"), "right");
+            filterColumnBtn.setHoverText(_lang.string("game_results_filter_column_" + COLUMN_FILTERS[0]), "right");
             
             judgeMinTime = new Text(buttons, 0, 0, sprintf(_lang.string("game_results_graph_graph_early"), {"value": ((result.MIN_TIME > 0 ? "+" : "") + (result.MIN_TIME + 1))})); // It's greater then, so it's off by 1.
             judgeMinTime.alpha = 0.2;
@@ -132,9 +132,7 @@ package game.graph
 
             // Draw Crosses
             var point:GraphCrossPoint;
-            var red:uint
-            var green:uint
-            var blue:uint
+            var alpha:Number = 0.2;
             for each (point in cross_points)
             {
                 if (point.index >= player_timings_length)
@@ -145,14 +143,11 @@ package game.graph
                 || (columnFilter == 5 && (point.column == "U" || point.column == "R"))
                 || (columnFilter == 6 && (point.column == "D" || point.column == "L"))))
                 {
-                    //filter then divide by 4 and round then return to color bits
-                    red = (point.color >> 18) << 16; 
-                    green = ((point.color  & 0x00ff00) >> 10) << 8;
-                    blue = (point.color & 0x0000ff) >> 2;
-                    point.color = red | green | blue;
+                    alpha = 0.2;
                 }
+                else alpha = 1.0;
                 
-                graph.graphics.lineStyle(1, point.color, 1);
+                graph.graphics.lineStyle(1, point.color, alpha);
                 graph.graphics.moveTo(point.x - 2, point.y - 2);
                 graph.graphics.lineTo(point.x + 2, point.y + 2);
                 graph.graphics.moveTo(point.x + 2, point.y - 2);
@@ -167,14 +162,11 @@ package game.graph
                 || (columnFilter == 5 && (point.column == "U" || point.column == "R"))
                 || (columnFilter == 6 && (point.column == "D" || point.column == "L"))))
                 {
-                    //filter then divide by 4 and round then return to right bit
-                    red = (point.color >> 18) << 16; 
-                    green = ((point.color  & 0x00ff00) >> 10) << 8;
-                    blue = (point.color & 0x0000ff) >> 2;
-                    point.color = red | green | blue;
+                    alpha = 0.2;
                 }
+                else alpha = 1.0;
 
-                graph.graphics.lineStyle(1, point.color, 1);
+                graph.graphics.lineStyle(1, point.color, alpha);
                 graph.graphics.moveTo(point.x - 2, point.y - 2);
                 graph.graphics.lineTo(point.x + 2, point.y + 2);
                 graph.graphics.moveTo(point.x + 2, point.y - 2);
@@ -444,8 +436,8 @@ package game.graph
          */
         private function e_filterColumn(event:MouseEvent):void
         {
-            columnFilter = (columnFilter >= COLUMN_FILTERS.length) ? 0 : columnFilter + 1; 
-            filterColumnBtn.setIcon(new iconSmallT);
+            columnFilter = (columnFilter >= COLUMN_FILTERS.length - 1) ? 0 : columnFilter + 1; 
+            filterColumnBtn.setHoverText(_lang.string("game_results_filter_column_" + COLUMN_FILTERS[columnFilter]), "right");
             if(player_timings_length > 0)
             {
                 generateGraph();

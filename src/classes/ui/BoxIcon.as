@@ -54,16 +54,6 @@ package classes.ui
             super.dispose();
         }
 
-        public function setIcon(icon:Sprite):void
-        {
-            if (_icon != null)
-            {
-                _icon.disposeIcon();
-            }
-            _icon = new UIIcon(this, icon, width / 2 + 1, height / 2 + 1);
-            _icon.setSize(width - _iconPadding, height - _iconPadding);
-        }
-
         public function setIconColor(color:String):void
         {
             if (_icon != null)
