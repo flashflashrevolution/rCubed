@@ -35,7 +35,7 @@ package game.graph
         public var flipGraph:Boolean = false;
 
         public var columnFilter:int = 0;
-        private const COLUMN_FILTERS:Array = ["A", "L", "D", "U", "R", "LD", "UR"]
+        private const COLUMN_FILTERS:Array = ["A", "L", "D", "U", "R", "LHS", "RHS"]
         private var filterColumnBtn:BoxButton;
 
         public function GraphAccuracy(target:Sprite, overlay:Sprite, result:GameScoreResult):void
