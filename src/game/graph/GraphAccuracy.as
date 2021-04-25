@@ -132,7 +132,7 @@ package game.graph
 
             // Draw Crosses
             var point:GraphCrossPoint;
-            var alpha:Number = 0.2;
+            var alpha:Number = 1.0;
             for each (point in cross_points)
             {
                 if (point.index >= player_timings_length)
@@ -143,7 +143,7 @@ package game.graph
                 || (columnFilter == 5 && (point.column == "U" || point.column == "R"))
                 || (columnFilter == 6 && (point.column == "D" || point.column == "L"))))
                 {
-                    alpha = 0.2;
+                    alpha = 0.1;
                 }
                 else alpha = 1.0;
                 
@@ -162,7 +162,7 @@ package game.graph
                 || (columnFilter == 5 && (point.column == "U" || point.column == "R"))
                 || (columnFilter == 6 && (point.column == "D" || point.column == "L"))))
                 {
-                    alpha = 0.2;
+                    alpha = 0.1;
                 }
                 else alpha = 1.0;
 
