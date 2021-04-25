@@ -141,6 +141,7 @@ package
             }
 
             //- Static Class Init
+            Logger.init();
             Alert.init(stage);
 
             //- Setup Tween Override mode
@@ -151,7 +152,7 @@ package
             //- Load Air Items
             _gvars.loadAirOptions();
             stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE;
-            NativeApplication.nativeApplication.addEventListener(Event.EXITING, _gvars.onNativeProcessClose);
+            NativeApplication.nativeApplication.addEventListener(Event.EXITING, e_onNativeShutdown);
 
             //- Load Menu Music
             _gvars.loadMenuMusic();
@@ -247,6 +248,12 @@ package
             }
         }
 
+        private function e_onNativeShutdown(e:Event):void
+        {
+            Logger.destroy();
+            _gvars.onNativeProcessClose(e);
+        }
+
         public function buildContextMenu():void
         {
             //- Backup Menu incase
@@ -328,7 +335,6 @@ package
 
         private function gameScriptLoad(e:Event = null):void
         {
-            trace("0:Loaded: " + e.target);
             e.target.removeEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
             e.target.removeEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
             loadScripts++;
@@ -339,7 +345,6 @@ package
 
         private function gameScriptLoadError(e:Event = null):void
         {
-            trace("0:Load Error: " + e.target);
             e.target.removeEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
             e.target.removeEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
 

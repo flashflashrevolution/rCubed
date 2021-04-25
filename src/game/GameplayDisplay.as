@@ -28,6 +28,7 @@ package game
     import flash.display.Sprite;
     import flash.display.BitmapData;
     import flash.display.Bitmap;
+    import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.IOErrorEvent;
     import flash.events.KeyboardEvent;
@@ -623,6 +624,7 @@ package game
             // Post Start Time
             if (postStart && !_gvars.activeUser.isGuest && !options.replay && !options.isEditor && song.songInfo.engine == null && !mpSpectate)
             {
+                Logger.debug(this, "Posting Start of level " + song.id);
                 _loader = new URLLoader();
                 addLoaderListeners();
 
@@ -711,6 +713,7 @@ package game
         {
             removeLoaderListeners();
             var data:URLVariables = e.target.data;
+            Logger.debug(this, "Post Start Load Success = " + data.result);
             if (data.result == "success")
             {
                 _gvars.songStartTime = data.current_date;
@@ -718,8 +721,9 @@ package game
             }
         }
 
-        private function siteLoadError(e:Event = null):void
+        private function siteLoadError(err:ErrorEvent = null):void
         {
+            Logger.error(this, "Post Start Load Failure: " + Logger.event_error(err));
             removeLoaderListeners();
             //Alert.add("Error sending game start, score may not save", 60, Alert.RED);
         }
@@ -993,6 +997,9 @@ package game
                             threshold = 1;
                         if (options.replay)
                             threshold = 0x7fffffff;
+
+                        //Logger.debug("GP", "lAP: " + lastAbsolutePosition + " | aP: " + absolutePosition + " | sDS: " + songDelayStarted + " | sD: " + songDelay + " | sOv: " + songOffset.value + " | sGP: " + song.getPosition() + " | sP: " + songPosition + " | gP: " + gamePosition + " | tP: " + targetProgress + " | t: " + threshold);
+
                         while (gameProgress < targetProgress && threshold-- > 0)
                             logicTick();
 

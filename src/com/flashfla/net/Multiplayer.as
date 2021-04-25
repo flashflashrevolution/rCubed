@@ -124,7 +124,7 @@ package com.flashfla.net
             currentUser = new User(false, true);
             ghostRooms = new <Room>[];
 
-            server = new SmartFoxClient(true); // CONFIG::debug);
+            server = new SmartFoxClient(false); // CONFIG::debug);
 
             CONFIG::debug
             {

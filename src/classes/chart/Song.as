@@ -8,16 +8,17 @@ package classes.chart
     import com.flashfla.media.SwfSilencer;
     import com.flashfla.net.ForcibleLoader;
     import com.flashfla.utils.Crypt;
+    import com.flashfla.utils.TimeUtil;
     import flash.display.Loader;
     import flash.display.LoaderInfo;
     import flash.display.MovieClip;
+    import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.events.IOErrorEvent;
     import flash.events.ProgressEvent;
     import flash.events.SampleDataEvent;
     import flash.events.SecurityErrorEvent;
-    import flash.filesystem.File;
     import flash.media.Sound;
     import flash.media.SoundChannel;
     import flash.media.SoundMixer;
@@ -266,6 +267,7 @@ package classes.chart
 
         private function musicCompleteHandler(e:Event):void
         {
+            Logger.info(this, "Music Load Success");
             var chartData:ByteArray;
             if (type == NoteChart.FFR_MP3)
             {
@@ -339,11 +341,12 @@ package classes.chart
                 {
                     try
                     {
-                        var cacheFile:File = AirContext.writeFile(AirContext.getAppPath(AirContext.getSongCachePath(this) + "data.bin"), storeChartData);
-                        trace("Saving SWF for " + this.id + ": " + cacheFile.nativePath);
+                        Logger.info(this, "Saving Cache File for " + this.id);
+                        AirContext.writeFile(AirContext.getAppPath(AirContext.getSongCachePath(this) + "data.bin"), storeChartData);
                     }
-                    catch (e:Error)
+                    catch (err:Error)
                     {
+                        Logger.error(this, "Cache write failed: " + Logger.exception_error(err));
                     }
                 }
 
@@ -473,6 +476,7 @@ package classes.chart
 
         private function chartLoadComplete(e:Event):void
         {
+            Logger.info(this, "Chart Load Success");
             isChartLoaderLoading = false;
             switch (chartType)
             {
@@ -505,19 +509,23 @@ package classes.chart
                 generateModNotes();
             }
 
+            Logger.info(this, "Chart parsed with " + chart.Notes.length + " notes, " + (chart.Notes.length > 0 ? TimeUtil.convertToHHMMSS(chart.Notes[chart.Notes.length - 1].time) : "00:00") + " length.");
+
             loadComplete();
         }
 
-        private function musicLoadError(e:Event = null):void
+        private function musicLoadError(err:ErrorEvent = null):void
         {
+            Logger.error(this, "Music Load Error: " + Logger.event_error(err));
             isMusicLoaderLoading = false;
             //_gvars.gameMain.addPopup(new PopupMessage(_gvars.gameMain, "An error occured while loading the music.", "ERROR"));
             removeLoaderListeners();
             loadFail = true;
         }
 
-        private function chartLoadError(e:Event = null):void
+        private function chartLoadError(err:ErrorEvent = null):void
         {
+            Logger.error(this, "Chart Load Error: " + Logger.event_error(err));
             //_gvars.gameMain.addPopup(new PopupMessage(_gvars.gameMain, "An error occured while loading the chart file.", "ERROR"));
             isChartLoaderLoading = false;
             removeLoaderListeners();

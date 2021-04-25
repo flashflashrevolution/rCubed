@@ -1,9 +1,11 @@
 package classes
 {
+    import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.events.IOErrorEvent;
     import flash.events.SecurityErrorEvent;
+    import flash.filesystem.File;
     import flash.net.URLLoader;
     import flash.net.URLRequest;
     import flash.net.URLRequestMethod;
@@ -76,45 +78,59 @@ package classes
 
         private function siteLoadComplete(e:Event):void
         {
+            Logger.info(this, "Data Loaded");
             removeLoaderListeners();
+
+            // Parse Response
+            var siteDataString:String = e.target.data;
             try
             {
-                data = JSON.parse(e.target.data);
-                _gvars.TOTAL_GENRES = data.game_totalgenres;
-                _gvars.MAX_CREDITS = data.game_maxcredits;
-                _gvars.SCORE_PER_CREDIT = data.game_scorepercredit;
-                _gvars.MAX_DIFFICULTY = data.game_maxdifficulty;
-                _gvars.DIFFICULTY_RANGES = data.game_difficulty_range;
-                _gvars.NONPUBLIC_GENRES = data.game_nonpublic_genres;
-
-                _gvars.TOKENS = {};
-                var tokens:Object = {};
-                for each (var tok:Object in data.game_tokens_all)
-                {
-                    if (!tokens[tok.type])
-                    {
-                        tokens[tok.type] = [];
-                    }
-                    tokens[tok.type][tok.id] = tok;
-
-                    if (tok.level)
-                        _gvars.TOKENS[tok.level] = tok;
-                }
-                _gvars.TOKENS_TYPE = tokens;
-
-                _isLoaded = true;
-                _loadError = false;
-                this.dispatchEvent(new Event(GlobalVariables.LOAD_COMPLETE));
+                data = JSON.parse(siteDataString);
             }
-            catch (e:Error)
+            catch (err:Error)
             {
+                Logger.error(this, "Parse Failure: " + Logger.exception_error(err));
+                Logger.error(this, "Wrote invalid response data to log folder. [logs/site.txt]");
+                AirContext.writeText("logs/site.txt", siteDataString);
+
                 _loadError = true;
                 this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
+                return;
             }
+
+            // Has Response
+            _gvars.TOTAL_GENRES = data.game_totalgenres;
+            _gvars.MAX_CREDITS = data.game_maxcredits;
+            _gvars.SCORE_PER_CREDIT = data.game_scorepercredit;
+            _gvars.MAX_DIFFICULTY = data.game_maxdifficulty;
+            _gvars.DIFFICULTY_RANGES = data.game_difficulty_range;
+            _gvars.NONPUBLIC_GENRES = data.game_nonpublic_genres;
+
+            _gvars.TOKENS = {};
+            var tokens:Object = {};
+            for each (var tok:Object in data.game_tokens_all)
+            {
+                if (!tokens[tok.type])
+                {
+                    tokens[tok.type] = [];
+                }
+                tokens[tok.type][tok.id] = tok;
+
+                if (tok.level)
+                    _gvars.TOKENS[tok.level] = tok;
+            }
+            _gvars.TOKENS_TYPE = tokens;
+
+            _isLoaded = true;
+            _loadError = false;
+            Logger.info(this, "Parse Complete");
+            this.dispatchEvent(new Event(GlobalVariables.LOAD_COMPLETE));
+
         }
 
-        private function siteLoadError(e:Event = null):void
+        private function siteLoadError(err:ErrorEvent = null):void
         {
+            Logger.error(this, "Load Failure: " + Logger.event_error(err));
             removeLoaderListeners();
             this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
         }

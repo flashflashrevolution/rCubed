@@ -5,6 +5,7 @@
 package classes
 {
     import classes.ui.Text;
+    import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.events.IOErrorEvent;
@@ -146,20 +147,28 @@ package classes
 
         private function languageLoadComplete(e:Event):void
         {
+            Logger.info(this, "Data Loaded");
             removeLoaderListeners();
 
+            // Parse Response
+            var siteDataString:String = e.target.data;
             try
             {
-                var xmlMain:XML = new XML(e.target.data);
+                var xmlMain:XML = new XML(siteDataString);
                 var xmlChildren:XMLList = xmlMain.children();
             }
-            catch (e:Error)
+            catch (err:Error)
             {
+                Logger.error(this, "Parse Failure: " + Logger.exception_error(err));
+                Logger.error(this, "Wrote invalid response data to log folder. [logs/language.txt]");
+                AirContext.writeText("logs/language.txt", siteDataString);
+
                 _loadError = true;
                 this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
                 return;
             }
 
+            // Has Response
             data = new Object();
             indexed = new Array();
 
@@ -189,6 +198,7 @@ package classes
             }
             _isLoaded = true;
             _loadError = false;
+            Logger.info(this, "Parse Complete");
             checkCompleteLoad();
         }
 
@@ -200,8 +210,9 @@ package classes
             }
         }
 
-        private function languageLoadError(e:Event = null):void
+        private function languageLoadError(err:ErrorEvent = null):void
         {
+            Logger.error(this, "Load Failure: " + Logger.event_error(err));
             removeLoaderListeners();
             this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
         }
