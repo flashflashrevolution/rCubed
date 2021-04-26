@@ -11,7 +11,6 @@ package game.graph
     import flash.events.MouseEvent;
     import flash.geom.Rectangle;
     import game.GameScoreResult;
-    import assets.menu.icons.fa.iconSmallT;
 
     public class GraphAccuracy extends GraphBase
     {
