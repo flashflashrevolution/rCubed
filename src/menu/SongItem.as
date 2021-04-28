@@ -311,8 +311,6 @@ package menu
             // Playable Song
             else
             {
-                this.mouseChildren = false;
-
                 // Song Name
                 _lblSongName.x = 36;
 
@@ -324,7 +322,7 @@ package menu
                 var FLAG_TEXT:String = GlobalVariables.getSongIcon(_songInfo, rank);
                 if (FLAG_TEXT != "")
                 {
-                    _lblSongFlag = new Text(this, 296, 0, GlobalVariables.getSongIcon(_songInfo, rank), 14);
+                    _lblSongFlag = new Text(this, 296, 0, FLAG_TEXT, 14);
                     _lblSongFlag.setAreaParams(100, 27, Text.RIGHT);
 
                     // Adjust Song Name to not overlap song flag.
@@ -343,10 +341,7 @@ package menu
 
         public function setContextMenu(val:ContextMenu):void
         {
-            if (!isLocked)
-            {
-                this.contextMenu = val;
-            }
+            this.contextMenu = val;
         }
 
         public function getDifficultyText():String

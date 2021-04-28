@@ -44,7 +44,7 @@ package menu
             if (!(token_levels is Array) || token_levels.length == 0)
                 token_levels = [0];
 
-            //
+            // Token unlock conditions
             if (token_levels.length > 1)
             {
                 if (token_levels[0] == 0)
