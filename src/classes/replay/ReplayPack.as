@@ -104,7 +104,7 @@ package classes.replay
                 if (binNotes[nx] == null)
                     binReplay.writeByte(0x7F);
                 else
-                    binReplay.writeByte(binNotes[nx]);
+                    binReplay.writeByte(binNotes[nx]["t"]);
             }
 
             // Write Boos
