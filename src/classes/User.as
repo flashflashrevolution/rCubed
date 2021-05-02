@@ -1,14 +1,12 @@
-/**
- * @author Jonathan (Velocity)
- */
-
 package classes
 {
     import arc.ArcGlobals;
     import assets.GameBackgroundColor;
     import classes.filter.EngineLevelFilter;
+    import com.flashfla.utils.VectorUtil;
     import flash.display.Loader;
     import flash.display.LoaderInfo;
+    import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.events.IOErrorEvent;
@@ -21,7 +19,6 @@ package classes
     import flash.net.URLVariables;
     import flash.ui.Keyboard;
     import sql.SQLSongUserInfo;
-    import com.flashfla.utils.VectorUtil;
 
     public class User extends EventDispatcher
     {
@@ -233,6 +230,7 @@ package classes
                 _loader.close();
             }
 
+            Logger.info(this, "Main User Load Requested");
             _isLoaded = false;
             _loadError = false;
             _loader = new URLLoader();
@@ -250,6 +248,7 @@ package classes
 
         public function loadUser(userid:int):void
         {
+            Logger.info(this, "Secondary User Load Requested");
             _isLoaded = false;
             _loader = new URLLoader();
             addLoaderListeners();
@@ -266,28 +265,38 @@ package classes
 
         private function profileLoadComplete(e:Event):void
         {
+            Logger.info(this, "Profile Load Success");
             removeLoaderListeners();
+
+            // Parse Response
+            var _data:Object;
+            var siteDataString:String = e.target.data;
             try
             {
-                var _data:Object = JSON.parse(e.target.data);
-
-                loadUserData(_data);
-
-                if (isActiveUser)
-                {
-                    loadLevelRanks();
-                }
-                else
-                {
-                    _isLoaded = true;
-                    this.dispatchEvent(new Event(GlobalVariables.LOAD_COMPLETE));
-                }
+                _data = JSON.parse(siteDataString);
             }
             catch (err:Error)
             {
+                Logger.error(this, "Profile Parse Failure: " + Logger.exception_error(err));
+                Logger.error(this, "Wrote invalid response data to log folder. [logs/user_main.txt]");
+                AirContext.writeText("logs/user_main.txt", siteDataString);
+
                 _loadError = true;
-                _gvars.logDebugError("profileLoadCompleteFailure", err);
                 this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
+                return;
+            }
+
+            // Has Response
+            loadUserData(_data);
+
+            if (isActiveUser)
+            {
+                loadLevelRanks();
+            }
+            else
+            {
+                _isLoaded = true;
+                this.dispatchEvent(new Event(GlobalVariables.LOAD_COMPLETE));
             }
         }
 
@@ -322,7 +331,14 @@ package classes
             // Setup Settings from server or local
             if (_data["settings"] != null && !this.isGuest)
             {
-                settings = JSON.parse(_data.settings);
+                try
+                {
+                    settings = JSON.parse(_data.settings);
+                }
+                catch (err:Error)
+                {
+                    Logger.error(this, "Settings Parse Failure: " + Logger.exception_error(err));
+                }
             }
             else
             {
@@ -339,8 +355,9 @@ package classes
             }
         }
 
-        private function profileLoadError(e:Event = null):void
+        private function profileLoadError(err:ErrorEvent = null):void
         {
+            Logger.error(this, "Profile Load Failure: " + Logger.event_error(err));
             removeLoaderListeners();
             _loadError = true;
             this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
@@ -410,6 +427,7 @@ package classes
 
         private function ranksLoadComplete(e:Event):void
         {
+            Logger.info(this, "Ranks Load Success");
             removeLoaderRanksListeners();
             level_ranks = new Object();
 
@@ -448,8 +466,9 @@ package classes
             this.dispatchEvent(new Event(GlobalVariables.LOAD_COMPLETE));
         }
 
-        private function ranksLoadError(e:Event = null):void
+        private function ranksLoadError(err:ErrorEvent = null):void
         {
+            Logger.error(this, "Ranks Load Failure: " + Logger.event_error(err));
             removeLoaderRanksListeners();
             this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
         }
@@ -696,13 +715,14 @@ package classes
 
         private function settingSaveComplete(e:Event):void
         {
+            Logger.debug(this, "Settings Save Success");
             removeLoaderSaveListeners();
-            trace("2:User Settings Saved!");
             this.dispatchEvent(new Event(GlobalVariables.LOAD_COMPLETE));
         }
 
-        private function settingLoadError(e:Event = null):void
+        private function settingLoadError(err:ErrorEvent = null):void
         {
+            Logger.error(this, "Settings Save Failure: " + Logger.event_error(err));
             removeLoaderSaveListeners();
             this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
         }

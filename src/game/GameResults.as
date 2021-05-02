@@ -24,6 +24,7 @@ package game
     import com.flashfla.utils.sprintf;
     import flash.display.DisplayObject;
     import flash.display.Sprite;
+    import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.IOErrorEvent;
     import flash.events.KeyboardEvent;
@@ -953,13 +954,36 @@ package game
          */
         private function siteLoadComplete(e:Event):void
         {
+            Logger.info(this, "Canon Data Loaded");
             removeLoaderListeners(siteLoadComplete, siteLoadError);
 
+            // Parse Response
+            var siteDataString:String = e.target.data;
+            var data:Object;
+            try
+            {
+                data = JSON.parse(siteDataString);
+            }
+            catch (err:Error)
+            {
+                Logger.error(this, "Canon Parse Failure: " + Logger.exception_error(err));
+                Logger.error(this, "Wrote invalid response data to log folder. [logs/c_result.txt]");
+                AirContext.writeText("logs/c_result.txt", siteDataString);
+
+                Alert.add("Failed to save results. (ERR: JSON_ERROR)", 360, Alert.RED);
+
+                if (resultsDisplay != null)
+                    resultsDisplay.result_rank.htmlText = "Score save failed!";
+
+                return;
+            }
+
+            // Has Reponse
             var result:Object = e.target.postData;
-            var data:Object = JSON.parse(e.target.data);
             var songInfo:SongInfo = e.target.song;
             var gameResult:GameScoreResult = e.target.results;
             var totalScore:int = e.target.resultsTotal;
+            Logger.debug(this, "Score Save Result: " + data.result);
 
             if (data.result == 0)
             {
@@ -1079,8 +1103,9 @@ package game
         /**
          * Loader Event: Site Score Save Failure
          */
-        private function siteLoadError(e:Event = null):void
+        private function siteLoadError(e:ErrorEvent = null):void
         {
+            Logger.error(this, "Canon Score Save Failure: " + Logger.event_error(e));
             removeLoaderListeners(siteLoadComplete, siteLoadError);
             Alert.add(_lang.string("error_server_connection_failure"), 120, Alert.RED);
 
@@ -1179,59 +1204,71 @@ package game
          */
         private function altSiteLoadComplete(e:Event):void
         {
+            Logger.info(this, "Alt Data Loaded");
             removeLoaderListeners(altSiteLoadComplete, altSiteLoadError);
+
+            // Parse Response
+            var siteDataString:String = e.target.data;
+            var data:Object;
             try
             {
-                var result:Object = JSON.parse(e.target.postData.data);
-                var songInfo:SongInfo = e.target.song;
-                var totalScore:int = e.target.resultsTotal;
-                var data:Object = JSON.parse(e.target.data);
-                var gameResult:GameScoreResult = e.target.results;
-                if (data)
-                {
-                    if (data.result == 0)
-                    {
-                        //Alert.add("Score Saved successfully!", 90);
-
-                        // Server Message
-                        if (data.gServerMessage != null)
-                        {
-                            Alert.add(data.gServerMessage, 360);
-                        }
-
-                        // Server Message Popup
-                        if (data.gServerMessageFull != null)
-                        {
-                            _gvars.gameMain.addPopupQueue(new PopupMessage(this, data.gServerMessageFull, data.gServerMessageTitle ? data.gServerMessageTitle : ""));
-                        }
-
-                        // Token Unlock
-                        if (data.tUnlock != null)
-                        {
-                            _gvars.gameMain.addPopupQueue(new PopupTokenUnlock(this, data.tType, data.tID, data.tText, data.tName, data.tMessage));
-                        }
-
-                        // Update Judge Offset
-                        updateJudgeOffset(gameResult);
-
-                        // Display Popup Queue
-                        if (resultsDisplay != null)
-                        {
-                            _gvars.gameMain.displayPopupQueue();
-                        }
-                    }
-                }
+                data = JSON.parse(siteDataString);
             }
-            catch (e:Error)
+            catch (err:Error)
             {
+                Logger.error(this, "Alt Parse Failure: " + Logger.exception_error(err));
+                Logger.error(this, "Wrote invalid response data to log folder. [logs/a_result.txt]");
+                AirContext.writeText("logs/a_result.txt", siteDataString);
+                return;
+            }
+
+            // Has Reponse
+            var result:Object = JSON.parse(e.target.postData.data);
+            var songInfo:SongInfo = e.target.song;
+            var totalScore:int = e.target.resultsTotal;
+            var gameResult:GameScoreResult = e.target.results;
+
+            Logger.debug(this, "Alt Score Save Result: " + data.result);
+
+            if (data.result == 0)
+            {
+                //Alert.add("Score Saved successfully!", 90);
+
+                // Server Message
+                if (data.gServerMessage != null)
+                {
+                    Alert.add(data.gServerMessage, 360);
+                }
+
+                // Server Message Popup
+                if (data.gServerMessageFull != null)
+                {
+                    _gvars.gameMain.addPopupQueue(new PopupMessage(this, data.gServerMessageFull, data.gServerMessageTitle ? data.gServerMessageTitle : ""));
+                }
+
+                // Token Unlock
+                if (data.tUnlock != null)
+                {
+                    _gvars.gameMain.addPopupQueue(new PopupTokenUnlock(this, data.tType, data.tID, data.tText, data.tName, data.tMessage));
+                }
+
+                // Update Judge Offset
+                updateJudgeOffset(gameResult);
+
+                // Display Popup Queue
+                if (resultsDisplay != null)
+                {
+                    _gvars.gameMain.displayPopupQueue();
+                }
             }
         }
 
         /**
          * Loader Event: Alt Engine Score Save Failure
          */
-        private function altSiteLoadError(e:Event = null):void
+        private function altSiteLoadError(err:ErrorEvent = null):void
         {
+            Logger.error(this, "Alt Score Save Failure: " + Logger.event_error(err));
             removeLoaderListeners(altSiteLoadComplete, altSiteLoadError);
         }
 
@@ -1298,8 +1335,9 @@ package game
                         fileStream.close();
                     }
                 }
-                catch (e:Error)
+                catch (err:Error)
                 {
+                    Logger.error(this, "Local Replay Save Error: " + Logger.exception_error(err));
                 }
             }
         }

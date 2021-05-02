@@ -584,8 +584,14 @@ package
 
         public function unlockTokenById(type:String, id:String):void
         {
-            if (TOKENS_TYPE && TOKENS_TYPE[type] && TOKENS_TYPE[type][id] && TOKENS && TOKENS[TOKENS_TYPE[type][id].level])
+            try
+            {
                 TOKENS[TOKENS_TYPE[type][id].level].unlock = 1;
+            }
+            catch (err:Error)
+            {
+                Logger.error(this, "Attempted Unlock of Unknown Token: " + type + ", " + id);
+            }
         }
 
         public static function get instance():GlobalVariables

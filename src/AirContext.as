@@ -54,13 +54,13 @@ package
             return 0;
         }
 
-        public static function createFileName(file_name:String):String
+        public static function createFileName(file_name:String, replace:String = ""):String
         {
             // Remove chars not allowed in Windows filename \ / : * ? " < > |
-            file_name = file_name.replace(/[~\\\/:\*\?"<>\|]/g, "");
+            file_name = file_name.replace(/[~\\\/:\*\?"<>\|]/g, replace);
 
             // Trim leading and trailing whitespace.
-            file_name = file_name.replace(/^\s+|\s+$/gs, "");
+            file_name = file_name.replace(/^\s+|\s+$/gs, replace);
 
             return file_name;
         }
@@ -182,6 +182,13 @@ package
             fileStream.close();
 
             return file;
+        }
+
+        static public function writeText(path:String, data:String, errorCallback:Function = null):File
+        {
+            var writeFile:File = new File(getAppPath(path));
+            writeTextFile(writeFile, data, errorCallback);
+            return writeFile;
         }
 
         static public function deleteFile(appPath:String):Boolean

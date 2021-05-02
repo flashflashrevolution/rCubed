@@ -40,9 +40,7 @@ package popups
             tType = tokenType;
             tID = tokenID;
             uText = unlockText;
-            tObject = _gvars.TOKENS_TYPE[tType][tID];
-            if (!tObject)
-                tObject = {};
+            tObject = _gvars.TOKENS_TYPE[tType][tID] || {};
             if (tokenName)
                 tObject["name"] = tokenName;
             if (tokenMessage)
