@@ -3,6 +3,7 @@
     "compilerOptions": {
         "debug": false,
         "source-path": [
+            "./AachenLight/src",
             "./BebasNeue/src",
             "./BreeSerifRegular/src",
             "./Ultra/src",
@@ -11,6 +12,7 @@
             "./NotoSans/src"
         ],
         "include-sources": [
+            "./AachenLight/src",
             "./BebasNeue/src",
             "./BreeSerifRegular/src",
             "./Ultra/src",
