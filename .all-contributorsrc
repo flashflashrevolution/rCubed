@@ -175,6 +175,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "silentsputnik",
+      "name": "silentsputnik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/56483448?v=4",
+      "profile": "https://github.com/silentsputnik",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
