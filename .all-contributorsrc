@@ -37,7 +37,14 @@
       "contributions": [
         "code",
         "ideas",
-        "bug"
+        "bug",
+        "doc",
+        "infra",
+        "maintenance",
+        "mentoring",
+        "projectManagement",
+        "review",
+        "tool"
       ]
     },
     {
