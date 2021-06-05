@@ -389,6 +389,8 @@ package arc.mp
         {
             if (buttonMP != null)
                 buttonMP.visible = show;
+            if (buttonDisconnect != null)
+                buttonDisconnect.visible = show;
             if (textLogin != null)
                 textLogin.visible = show;
             if (window != null)
