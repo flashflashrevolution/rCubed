@@ -644,6 +644,7 @@ package com.flashfla.net
                 vars[prefix + "_UID"] = null;
                 vars[prefix + "_SONGID_PROGRESS"] = null;
                 vars[prefix + "_SONGID"] = null;
+                vars[prefix + "_STATE"] = null;
 
                 vars["arc_engine" + currentUser.id] = null;
                 vars["arc_replay" + currentUser.id] = null;
