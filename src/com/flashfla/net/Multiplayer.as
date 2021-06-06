@@ -366,25 +366,22 @@ package com.flashfla.net
                 }
 
                 // Process gameplay status changes for game start/end
-                if (anyUserStatusChanged)
+                if (room.isAllPlayersInStatus(STATUS_LOADED) && room.isAllPlayersSameSong())
                 {
-                    if (room.isAllPlayersInStatus(STATUS_LOADED) && room.isAllPlayersSameSong())
-                    {
-                        currentUser.gameplay.status = STATUS_PLAYING;
+                    currentUser.gameplay.status = STATUS_PLAYING;
 
-                        reportSongStart(room);
-                        sendCurrentUserStatus(room);
+                    reportSongStart(room);
+                    sendCurrentUserStatus(room);
 
-                        if (currentUserIsPlayer)
-                            eventGameStart(room);
-                    }
-                    else if (currentUserIsPlayer && currentUser.gameplay.status == STATUS_RESULTS)
-                    {
-                        reportSongEnd(room);
-                        eventGameResults(room);
+                    if (currentUserIsPlayer)
+                        eventGameStart(room);
+                }
+                else if (currentUserIsPlayer && currentUser.gameplay.status == STATUS_RESULTS)
+                {
+                    reportSongEnd(room);
+                    eventGameResults(room);
 
-                        eventUserUpdate(currentUser);
-                    }
+                    eventUserUpdate(currentUser);
                 }
             }
 
