@@ -350,6 +350,7 @@ package com.flashfla.net
 
                 // Update each player's gameplay
                 var anyUserStatusChanged:Boolean = false;
+                var anyPlayerStatusChanged:Boolean = false;
                 var anyUserSongNameChanged:Boolean = false;
                 for each (var user:User in roomPlayers)
                 {
@@ -359,32 +360,33 @@ package com.flashfla.net
                     updateUserGameplayFromRoom(room, user);
 
                     if (previousUserStatus != user.gameplay.status)
+                    {
                         anyUserStatusChanged = true;
+                        if(room.isPlayer(user))
+                            anyPlayerStatusChanged = true;
+                    }
 
                     if (previousSongName != (user.gameplay.songInfo ? user.gameplay.songInfo.name : ""))
                         eventUserUpdate(user);
                 }
 
                 // Process gameplay status changes for game start/end
-                if (anyUserStatusChanged)
+                if (currentUserIsPlayer && room.isAllPlayersInStatus(STATUS_LOADED) && room.isAllPlayersSameSong())
                 {
-                    if (room.isAllPlayersInStatus(STATUS_LOADED) && room.isAllPlayersSameSong())
-                    {
-                        currentUser.gameplay.status = STATUS_PLAYING;
+                    currentUser.gameplay.status = STATUS_PLAYING;
 
-                        reportSongStart(room);
-                        sendCurrentUserStatus(room);
+                    reportSongStart(room);
+                    sendCurrentUserStatus(room);
 
-                        if (currentUserIsPlayer)
-                            eventGameStart(room);
-                    }
-                    else if (currentUserIsPlayer && currentUser.gameplay.status == STATUS_RESULTS)
-                    {
-                        reportSongEnd(room);
-                        eventGameResults(room);
+                    if (currentUserIsPlayer)
+                        eventGameStart(room);
+                }
+                else if (currentUserIsPlayer && room.isAllPlayersInStatus(STATUS_RESULTS) && anyPlayerStatusChanged)
+                {
+                    reportSongEnd(room);
+                    eventGameResults(room);
 
-                        eventUserUpdate(currentUser);
-                    }
+                    eventUserUpdate(currentUser);
                 }
             }
 
@@ -647,6 +649,7 @@ package com.flashfla.net
                 vars[prefix + "_UID"] = null;
                 vars[prefix + "_SONGID_PROGRESS"] = null;
                 vars[prefix + "_SONGID"] = null;
+                vars[prefix + "_STATE"] = null;
 
                 vars["arc_engine" + currentUser.id] = null;
                 vars["arc_replay" + currentUser.id] = null;
