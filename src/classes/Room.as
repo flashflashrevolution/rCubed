@@ -242,6 +242,13 @@ package classes
             return true;
         }
 
+        public function getPlayersSong():SongInfo
+        {
+            if(isAllPlayersSameSong()) return getPlayer(1).gameplay.songInfo;
+
+            return null;
+        }
+
         public function applyVariablesFromOtherRoom(otherRoom:Room):void
         {
             for (var variable:String in otherRoom.variables)

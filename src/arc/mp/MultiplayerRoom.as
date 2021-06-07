@@ -15,6 +15,7 @@ package arc.mp
     import flash.events.Event;
     import flash.events.MouseEvent;
     import menu.MainMenu;
+    import classes.Alert;
     import classes.Room;
     import classes.User;
 
@@ -140,11 +141,20 @@ package arc.mp
         {
             if(room.isPlayer(currentUser))
             {
-                //@TODO add buffer state
+                if(currentUser.gameplay.status == Multiplayer.STATUS_LOADED)
+                {
+                    currentUser.gameplay.status = Multiplayer.STATUS_READY;
+                    connection.sendCurrentUserStatus(room);
+                }
+                else
+                {
+                    Alert.add("Load a song before readying up");
+                }
             }
             else
             {
                 currentUser.isSpec = !currentUser.isSpec;
+                Alert.add(currentUser.isSpec ? "Now spectating games in " + room.name : "No longer spectating games in " + room.name);
             }
             updateRoomDisplay();
 

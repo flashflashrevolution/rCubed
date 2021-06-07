@@ -3,6 +3,7 @@ package com.flashfla.net
     import flash.events.EventDispatcher;
 
     import arc.ArcGlobals;
+    import arc.mp.MultiplayerSingleton;
     import classes.Playlist;
     import classes.Room
     import classes.User;
@@ -93,7 +94,8 @@ package com.flashfla.net
         public static const STATUS_CLEANUP:int = 1;
         public static const STATUS_PICKING:int = 2;
         public static const STATUS_LOADING:int = 3;
-        public static const STATUS_LOADED:int = 4;
+        public static const STATUS_LOADED:int = -1; //this value CANNOT be >4 or else old versions dont work
+        public static const STATUS_READY:int = 4; //Uses 4 since older versions used 4 for loaded (their ready equiv)
         public static const STATUS_PLAYING:int = 5;
         public static const STATUS_RESULTS:int = 6;
 
@@ -371,17 +373,24 @@ package com.flashfla.net
                 }
 
                 // Process gameplay status changes for game start/end
-                if (currentUserIsPlayer && room.isAllPlayersInStatus(STATUS_LOADED) && room.isAllPlayersSameSong())
+                if (room.isAllPlayersInStatus(STATUS_READY) && room.isAllPlayersSameSong())
                 {
-                    currentUser.gameplay.status = STATUS_PLAYING;
+                    if(currentUserIsPlayer)
+                    {
+                        currentUser.gameplay.status = STATUS_PLAYING;
 
-                    reportSongStart(room);
-                    sendCurrentUserStatus(room);
+                        reportSongStart(room);
+                        sendCurrentUserStatus(room);
 
-                    if (currentUserIsPlayer)
                         eventGameStart(room);
+                    }
+                    else if(currentUser.isSpec)
+                    {
+                        room.songInfo = room.getPlayersSong()
+                        MultiplayerSingleton.getInstance().spectateGame(room)
+                    }
                 }
-                else if (currentUserIsPlayer && room.isAllPlayersInStatus(STATUS_RESULTS) && anyPlayerStatusChanged)
+                else if (room.isAllPlayersInStatus(STATUS_RESULTS) && anyPlayerStatusChanged)
                 {
                     reportSongEnd(room);
                     eventGameResults(room);
