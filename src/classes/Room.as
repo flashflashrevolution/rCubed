@@ -228,8 +228,11 @@ package classes
 
         public function isAllPlayersSameSong():Boolean
         {
-            if (_playerCount <= 1)
+            if (_playerCount < 1)
                 return false;
+
+            if (_playerCount == 1)
+                return true;
 
             var songP1:SongInfo = getPlayer(1).gameplay.songInfo;
 

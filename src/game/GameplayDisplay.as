@@ -1669,24 +1669,24 @@ package game
                 {
                     var pa:PAWindow = new PAWindow(options);
                     addChild(pa);
-                    mpPA[user.id] = pa;
+                    mpPA[user.playerIdx] = pa;
                 }
 
                 if (mpSpectate)
                 {
                     var header:MPHeader = new MPHeader(user);
                     if (options.displayMPPA)
-                        mpPA[user.id].addChild(header);
+                        mpPA[user.playerIdx].addChild(header);
                     else
                         addChild(header);
-                    mpHeader[user.id] = header;
+                    mpHeader[user.playerIdx] = header;
                 }
 
                 if (options.displayMPCombo)
                 {
                     var combo:Combo = new Combo(options);
                     addChild(combo);
-                    mpCombo[user.id] = combo;
+                    mpCombo[user.playerIdx] = combo;
                 }
 
                 // Hide opponent's judge
@@ -1695,7 +1695,7 @@ package game
                     //if (options.displayMPJudge) {
                     var judge:Judge = new Judge(options);
                     addChild(judge);
-                    mpJudge[user.id] = judge;
+                    mpJudge[user.playerIdx] = judge;
                     if (options.isEditor)
                         judge.showJudge(100, true);
                 }
@@ -1799,17 +1799,19 @@ package game
 
                     index++;
                     var indexs:String = index.toString();
-                    interfacePosition(mpJudge[id], interfaceLayout(LAYOUT_MP_JUDGE + indexs));
-                    interfacePosition(mpCombo[id], interfaceLayout(LAYOUT_MP_COMBO + indexs));
-                    interfacePosition(mpPA[id], interfaceLayout(LAYOUT_MP_PA + indexs));
-                    interfacePosition(mpHeader[id], interfaceLayout(LAYOUT_MP_HEADER + indexs));
+                    
+                    interfacePosition(mpJudge[index], interfaceLayout(LAYOUT_MP_JUDGE + indexs));
+                    interfacePosition(mpCombo[index], interfaceLayout(LAYOUT_MP_COMBO + indexs));
+                    interfacePosition(mpPA[index], interfaceLayout(LAYOUT_MP_PA + indexs));
+                    interfacePosition(mpHeader[index], interfaceLayout(LAYOUT_MP_HEADER + indexs));
+                    
 
                     if (options.isEditor)
                     {
-                        interfaceEditor(mpJudge[id], interfaceLayout(LAYOUT_MP_JUDGE + indexs, false));
-                        interfaceEditor(mpCombo[id], interfaceLayout(LAYOUT_MP_COMBO + indexs, false));
-                        interfaceEditor(mpPA[id], interfaceLayout(LAYOUT_MP_PA + indexs, false));
-                        interfaceEditor(mpHeader[id], interfaceLayout(LAYOUT_MP_HEADER + indexs, false));
+                        interfaceEditor(mpJudge[index], interfaceLayout(LAYOUT_MP_JUDGE + indexs, false));
+                        interfaceEditor(mpCombo[index], interfaceLayout(LAYOUT_MP_COMBO + indexs, false));
+                        interfaceEditor(mpPA[index], interfaceLayout(LAYOUT_MP_PA + indexs, false));
+                        interfaceEditor(mpHeader[index], interfaceLayout(LAYOUT_MP_HEADER + indexs, false));
                     }
                 }
             }
@@ -2225,15 +2227,15 @@ package game
 
             var diff:Object = multiplayerDiff(user.id, gameplay);
 
-            var combo:Combo = mpCombo[user.id];
+            var combo:Combo = mpCombo[user.playerIdx];
             if (combo)
                 combo.update(gameplay.combo, gameplay.amazing, gameplay.perfect, gameplay.good, gameplay.average, gameplay.miss, gameplay.boo);
 
-            var pa:PAWindow = mpPA[user.id];
+            var pa:PAWindow = mpPA[user.playerIdx];
             if (pa)
                 pa.update(gameplay.amazing, gameplay.perfect, gameplay.good, gameplay.average, gameplay.miss, gameplay.boo);
 
-            var judge:Judge = mpJudge[user.id];
+            var judge:Judge = mpJudge[user.playerIdx];
             if (judge)
             {
                 var value:int = 0;
@@ -2253,9 +2255,9 @@ package game
                     judge.showJudge(value);
             }
 
-            if (gameplay.status == Multiplayer.STATUS_RESULTS && !multiplayerResults[user.id])
+            if (gameplay.status == Multiplayer.STATUS_RESULTS && !multiplayerResults[user.playerIdx])
             {
-                multiplayerResults[user.id] = true;
+                multiplayerResults[user.playerIdx] = true;
                 Alert.add(user.name + " finished playing the song", 240, Alert.RED);
             }
         }

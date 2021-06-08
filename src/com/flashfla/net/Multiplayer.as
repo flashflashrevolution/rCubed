@@ -242,7 +242,7 @@ package com.flashfla.net
             var prefix:String = "P" + playerIdx;
 
             gameplay.status = int(room.variables[prefix + "_STATE"]);
-            if (gameplay.status <= STATUS_CLEANUP)
+            if (gameplay.status <= STATUS_CLEANUP && gameplay.status != STATUS_LOADED)
             {
                 if (previousStatus != gameplay.status)
                 {
