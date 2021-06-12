@@ -155,6 +155,11 @@ package arc.mp
             {
                 currentUser.isSpec = !currentUser.isSpec;
                 Alert.add(currentUser.isSpec ? "Now spectating games in " + room.name : "No longer spectating games in " + room.name);
+                if(currentUser.isSpec && room.isAllPlayersInStatus(Multiplayer.STATUS_PLAYING) && room.isAllPlayersSameSong())
+                {
+                    room.songInfo = room.getPlayersSong()
+                    MultiplayerSingleton.getInstance().spectateGame(room);
+                }
             }
             updateRoomDisplay();
 
