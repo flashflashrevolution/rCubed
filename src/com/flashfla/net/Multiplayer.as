@@ -49,6 +49,7 @@ package com.flashfla.net
     import com.flashfla.net.events.GameResultsEvent;
     import com.flashfla.net.events.ExtensionResponseEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
+    import com.flashfla.net.events.GameUpdateEvent;
     import com.flashfla.utils.StringUtil;
 
     public class Multiplayer extends EventDispatcher
@@ -819,6 +820,11 @@ package com.flashfla.net
             dispatchEvent(new RoomUpdateEvent({room: room, roomList: roomList}));
         }
 
+        private function eventGameUpdate(user:User):void
+        {
+            dispatchEvent(new GameUpdateEvent({user: user}))
+        }
+
         private function eventRoomUser(room:Room, user:User):void
         {
             dispatchEvent(new RoomUserEvent({room: room, user: user}));
@@ -1074,6 +1080,16 @@ package com.flashfla.net
             updateRoom(room);
             // TODO: Check roomList param validity
             eventRoomUpdate(room, true);
+
+            for each (var user:User in room.players)
+            {
+                var gameplay:Gameplay = user.gameplay;
+                if (gameplay && gameplay.status == STATUS_PLAYING)
+                {
+                    
+                    eventGameUpdate(user);
+                }
+            }
         }
 
         private function onRoomAdded(event:RoomAddedSFSEvent):void

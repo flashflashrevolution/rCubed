@@ -2222,7 +2222,7 @@ package game
             var user:User = event.user;
             var gameplay:Gameplay = user.gameplay;
 
-            if (!gameplay || options.mpRoom.isPlayer(user) || user.id == options.mpRoom.connection.currentUser.id)
+            if (!gameplay || !options.mpRoom.isPlayer(user) || user.id == options.mpRoom.connection.currentUser.id)
                 return;
 
             var diff:Object = multiplayerDiff(user.id, gameplay);
