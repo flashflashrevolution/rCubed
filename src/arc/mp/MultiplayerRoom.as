@@ -15,6 +15,7 @@ package arc.mp
     import flash.events.Event;
     import flash.events.MouseEvent;
     import menu.MainMenu;
+    import classes.Alert;
     import classes.Room;
     import classes.User;
 
@@ -23,6 +24,7 @@ package arc.mp
         private var controlChat:MultiplayerChat;
         private var controlUsers:MultiplayerUsers;
         private var controlSpectate:PushButton;
+        private var controlState:PushButton;
         private var controlPlayer1:MultiplayerPlayer;
         private var controlPlayer2:MultiplayerPlayer;
 
@@ -60,13 +62,21 @@ package arc.mp
             controlUsers.resize();
             controlUsers.updateUsers();
 
-            // Player state button
+            // Player spectate state button
             controlSpectate = new PushButton();
-            controlSpectate.label = room.isPlayer(currentUser) ? "Spectate" : (room.playerCount < 2 ? "Join Game" : "Start Spectating");
+            controlSpectate.label = room.isPlayer(currentUser) ? "Spectate" : (room.playerCount < 2 ? "Join Game" : "Cannot Join Game");
             controlSpectate.setSize(controlUsers.width, controlChat.controlInput.height);
             controlSpectate.move(controlUsers.x, controlUsers.y + controlUsers.height);
-            controlSpectate.addEventListener(MouseEvent.CLICK, onStateButtonClick);
+            controlSpectate.addEventListener(MouseEvent.CLICK, onSpectateButtonClick);
             addChild(controlSpectate);
+
+            // Player state button
+            controlState = new PushButton();
+            controlState.label = room.isPlayer(currentUser) ? "Ready" : (currentUser.isSpec ? "Stop Spectating" : "Start Spectating");
+            controlState.setSize(controlUsers.width, controlChat.controlInput.height);
+            controlState.move(controlUsers.x, controlUsers.y + controlUsers.height - controlChat.controlInput.height);
+            controlState.addEventListener(MouseEvent.CLICK, onStateButtonClick);
+            addChild(controlState);
 
             // Add listeners to update this display
             connection.addEventListener(Multiplayer.EVENT_GAME_START, onGameStart);
@@ -121,10 +131,38 @@ package arc.mp
             }
         }
 
-        private function onStateButtonClick(event:MouseEvent):void
+        private function onSpectateButtonClick(event:MouseEvent):void
         {
             if (connection.switchRole(room))
                 updateRoomDisplay();
+        }
+
+        private function onStateButtonClick(event:MouseEvent):void
+        {
+            if(room.isPlayer(currentUser))
+            {
+                if(currentUser.gameplay.status == Multiplayer.STATUS_LOADED)
+                {
+                    currentUser.gameplay.status = Multiplayer.STATUS_READY;
+                    connection.sendCurrentUserStatus(room);
+                }
+                else
+                {
+                    Alert.add("Load a song before readying up");
+                }
+            }
+            else
+            {
+                currentUser.isSpec = !currentUser.isSpec;
+                Alert.add(currentUser.isSpec ? "Now spectating games in " + room.name : "No longer spectating games in " + room.name);
+                if(currentUser.isSpec && room.isAllPlayersInStatus(Multiplayer.STATUS_PLAYING) && room.isAllPlayersSameSong())
+                {
+                    room.songInfo = room.getPlayersSong()
+                    MultiplayerSingleton.getInstance().spectateGame(room);
+                }
+            }
+            updateRoomDisplay();
+
         }
 
         private function onGameStart(event:GameStartEvent):void
@@ -163,7 +201,8 @@ package arc.mp
 
         private function updateRoomDisplay():void
         {
-            controlSpectate.label = room.isPlayer(currentUser) ? "Spectate" : "Join Game";
+            controlSpectate.label = room.isPlayer(currentUser) ? "Spectate" : (room.playerCount < 2 ? "Join Game" : "Cannot Join Game");
+            controlState.label = room.isPlayer(currentUser) ? "Ready" : (currentUser.isSpec ? "Stop Spectating" : "Start Spectating");
         }
     }
 }

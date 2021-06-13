@@ -319,7 +319,7 @@ package arc.mp
 
             if (gameplayLoadingStatus())
             {
-                gameplayReady();
+                gameplayLoaded();
             }
             else
             {
@@ -329,7 +329,7 @@ package arc.mp
                     songFile.removeEventListener(Event.COMPLETE, arguments.callee);
                     if (gameplayLoadingStatus() && currentSongFile == songFile)
                     {
-                        gameplayReady();
+                        gameplayLoaded();
                     }
                 });
 
@@ -383,7 +383,7 @@ package arc.mp
         }
 
         // Should be called once a song is finished loading
-        public function gameplayReady():void
+        public function gameplayLoaded():void
         {
             currentStatus = Multiplayer.STATUS_LOADED;
             updateCurrentUserStatus();

@@ -147,6 +147,9 @@ package arc.mp
                     case Multiplayer.STATUS_LOADED:
                         statusLabel.text += "Loaded";
                         break;
+                    case Multiplayer.STATUS_READY:
+                        statusLabel.text += "Ready";
+                        break;
                     case Multiplayer.STATUS_RESULTS:
                         statusLabel.text += "Results";
                         break;

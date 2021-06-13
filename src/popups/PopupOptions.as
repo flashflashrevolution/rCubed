@@ -267,19 +267,22 @@ package popups
 
             // Fake entities for filling gameplay elements
             var fakePlayer1:User = new User();
-            fakePlayer1.id = -1;
+            fakePlayer1.id = 1;
+            fakePlayer1.playerIdx = 1;
             fakePlayer1.isPlayer = true;
             fakePlayer1.name = "Player1";
             fakePlayer1.siteId = 1830376;
 
             var fakePlayer2:User = new User();
-            fakePlayer2.id = -2;
+            fakePlayer2.id = 2
+            fakePlayer2.playerIdx = 2;
             fakePlayer2.isPlayer = true;
             fakePlayer2.name = "Player2";
             fakePlayer2.siteId = 249481;
 
             var fakeSpectator:User = new User();
-            fakeSpectator.id = -3;
+            fakeSpectator.id = 3;
+            fakeSpectator.playerIdx = 3;
             fakeSpectator.isPlayer = false;
             fakeSpectator.name = "Spectator";
             fakeSpectator.siteId = 0;
@@ -311,7 +314,7 @@ package popups
             mpSpectateEditorRoom.addPlayer(fakePlayer2);
 
             editorOptionsMPSpec = new BoxButton(null, editorOptionsMP.x - 130 - 5, editorOptionsMP.y, 130, 27, _lang.string("menu_editor_mp_spec"));
-            editorOptionsMPSpec.editor_multiplayer = null;
+            editorOptionsMPSpec.editor_multiplayer = mpSpectateEditorRoom;
 
             warningOptions = new Text(null, editorOptions.x, editorOptions.y - 25, _lang.string("options_warning_save"), 14, "#f06868");
 

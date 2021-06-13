@@ -3,6 +3,7 @@ package com.flashfla.net
     import flash.events.EventDispatcher;
 
     import arc.ArcGlobals;
+    import arc.mp.MultiplayerSingleton;
     import classes.Playlist;
     import classes.Room
     import classes.User;
@@ -48,6 +49,7 @@ package com.flashfla.net
     import com.flashfla.net.events.GameResultsEvent;
     import com.flashfla.net.events.ExtensionResponseEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
+    import com.flashfla.net.events.GameUpdateEvent;
     import com.flashfla.utils.StringUtil;
 
     public class Multiplayer extends EventDispatcher
@@ -93,7 +95,8 @@ package com.flashfla.net
         public static const STATUS_CLEANUP:int = 1;
         public static const STATUS_PICKING:int = 2;
         public static const STATUS_LOADING:int = 3;
-        public static const STATUS_LOADED:int = 4;
+        public static const STATUS_LOADED:int = -1; //this value CANNOT be >4 or else old versions dont work
+        public static const STATUS_READY:int = 4; //Uses 4 since older versions used 4 for loaded (their ready equiv)
         public static const STATUS_PLAYING:int = 5;
         public static const STATUS_RESULTS:int = 6;
 
@@ -240,7 +243,7 @@ package com.flashfla.net
             var prefix:String = "P" + playerIdx;
 
             gameplay.status = int(room.variables[prefix + "_STATE"]);
-            if (gameplay.status <= STATUS_CLEANUP)
+            if (gameplay.status <= STATUS_CLEANUP && gameplay.status != STATUS_LOADED)
             {
                 if (previousStatus != gameplay.status)
                 {
@@ -350,6 +353,7 @@ package com.flashfla.net
 
                 // Update each player's gameplay
                 var anyUserStatusChanged:Boolean = false;
+                var anyPlayerStatusChanged:Boolean = false;
                 var anyUserSongNameChanged:Boolean = false;
                 for each (var user:User in roomPlayers)
                 {
@@ -359,32 +363,40 @@ package com.flashfla.net
                     updateUserGameplayFromRoom(room, user);
 
                     if (previousUserStatus != user.gameplay.status)
+                    {
                         anyUserStatusChanged = true;
+                        if(room.isPlayer(user))
+                            anyPlayerStatusChanged = true;
+                    }
 
                     if (previousSongName != (user.gameplay.songInfo ? user.gameplay.songInfo.name : ""))
                         eventUserUpdate(user);
                 }
 
                 // Process gameplay status changes for game start/end
-                if (anyUserStatusChanged)
+                if (room.isAllPlayersInStatus(STATUS_READY) && room.isAllPlayersSameSong())
                 {
-                    if (room.isAllPlayersInStatus(STATUS_LOADED) && room.isAllPlayersSameSong())
+                    if(currentUserIsPlayer)
                     {
                         currentUser.gameplay.status = STATUS_PLAYING;
 
                         reportSongStart(room);
                         sendCurrentUserStatus(room);
 
-                        if (currentUserIsPlayer)
-                            eventGameStart(room);
+                        eventGameStart(room);
                     }
-                    else if (currentUserIsPlayer && currentUser.gameplay.status == STATUS_RESULTS)
+                    else if(currentUser.isSpec)
                     {
-                        reportSongEnd(room);
-                        eventGameResults(room);
-
-                        eventUserUpdate(currentUser);
+                        room.songInfo = room.getPlayersSong()
+                        MultiplayerSingleton.getInstance().spectateGame(room)
                     }
+                }
+                else if (room.isAllPlayersInStatus(STATUS_RESULTS) && anyPlayerStatusChanged)
+                {
+                    reportSongEnd(room);
+                    eventGameResults(room);
+
+                    eventUserUpdate(currentUser);
                 }
             }
 
@@ -647,6 +659,7 @@ package com.flashfla.net
                 vars[prefix + "_UID"] = null;
                 vars[prefix + "_SONGID_PROGRESS"] = null;
                 vars[prefix + "_SONGID"] = null;
+                vars[prefix + "_STATE"] = null;
 
                 vars["arc_engine" + currentUser.id] = null;
                 vars["arc_replay" + currentUser.id] = null;
@@ -805,6 +818,11 @@ package com.flashfla.net
         private function eventRoomUpdate(room:Room, roomList:Boolean = false):void
         {
             dispatchEvent(new RoomUpdateEvent({room: room, roomList: roomList}));
+        }
+
+        private function eventGameUpdate(user:User):void
+        {
+            dispatchEvent(new GameUpdateEvent({user: user}))
         }
 
         private function eventRoomUser(room:Room, user:User):void
@@ -1060,8 +1078,17 @@ package com.flashfla.net
 
             // Update the room state
             updateRoom(room);
-            // TODO: Check roomList param validity
+
             eventRoomUpdate(room, true);
+
+            for each (var user:User in room.players)
+            {
+                var gameplay:Gameplay = user.gameplay;
+                if (gameplay && gameplay.status == STATUS_PLAYING)
+                {
+                    eventGameUpdate(user);
+                }
+            }
         }
 
         private function onRoomAdded(event:RoomAddedSFSEvent):void

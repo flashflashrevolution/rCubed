@@ -228,7 +228,7 @@ package classes
 
         public function isAllPlayersSameSong():Boolean
         {
-            if (_playerCount <= 0)
+            if (_playerCount < 1)
                 return false;
 
             if (_playerCount == 1)
@@ -243,6 +243,13 @@ package classes
             }
 
             return true;
+        }
+
+        public function getPlayersSong():SongInfo
+        {
+            if(isAllPlayersSameSong()) return getPlayer(1).gameplay.songInfo;
+
+            return null;
         }
 
         public function applyVariablesFromOtherRoom(otherRoom:Room):void
