@@ -9,6 +9,8 @@ package classes
         private var _note:MovieClip;
         public var DIR:String;
 
+        public var animationSpeed:Number = 1;
+
         public function GameReceptor(dir:String, bitmap:BitmapData)
         {
             this.DIR = dir;
@@ -27,9 +29,10 @@ package classes
         public function playAnimation(color:uint):void
         {
             _note.scaleX = _note.scaleY = 1;
-            TweenLite.to(_note, 0.1, {scaleX: 1.25, scaleY: 1.25, tint: color, useFrames: false, onUpdate: update, onComplete: function():void
+            update();
+            TweenLite.to(_note, (0.1 / animationSpeed), {scaleX: 1.25, scaleY: 1.25, tint: color, useFrames: false, onUpdate: update, onComplete: function():void
             {
-                TweenLite.to(_note, 0.066, {scaleX: 1, scaleY: 1, tint: null, useFrames: false, onUpdate: update});
+                TweenLite.to(_note, (0.066 / animationSpeed), {scaleX: 1, scaleY: 1, tint: null, useFrames: false, onUpdate: update});
             }});
         }
 

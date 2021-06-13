@@ -196,6 +196,7 @@ package classes
                 }
                 indexed[data[lang]["_index"]] = lang;
             }
+            
             _isLoaded = true;
             _loadError = false;
             Logger.info(this, "Parse Complete");
