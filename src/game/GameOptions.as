@@ -17,6 +17,7 @@ package game
         public var judgeSpeed:Number = 1;
         public var scrollSpeed:Number = 1.5;
         public var receptorSpacing:int = 80;
+        public var receptorAnimationSpeed:Number = 1;
         public var noteScale:Number = 1;
         public var screencutPosition:Number = 0.5;
         public var mods:Array = [];
@@ -32,6 +33,7 @@ package game
         public var displayGameBottomBar:Boolean = true;
         public var displayJudge:Boolean = true;
         public var displayJudgeAnimations:Boolean = true;
+        public var displayReceptorAnimations:Boolean = true;
         public var displayHealth:Boolean = true;
         public var displayScore:Boolean = true;
         public var displayCombo:Boolean = true;
@@ -93,6 +95,7 @@ package game
             judgeSpeed = user.judgeSpeed;
             scrollSpeed = user.gameSpeed;
             receptorSpacing = user.receptorGap;
+            receptorAnimationSpeed = user.receptorAnimationSpeed;
             noteScale = user.noteScale;
             screencutPosition = user.screencutPosition;
             mods = user.activeMods.concat(user.activeVisualMods);
@@ -105,6 +108,7 @@ package game
 
             displayJudge = user.DISPLAY_JUDGE;
             displayJudgeAnimations = user.DISPLAY_JUDGE_ANIMATIONS;
+            displayReceptorAnimations = user.DISPLAY_RECEPTOR_ANIMATIONS;
             displayHealth = user.DISPLAY_HEALTH;
             displayGameTopBar = user.DISPLAY_GAME_TOP_BAR;
             displayGameBottomBar = user.DISPLAY_GAME_BOTTOM_BAR;
@@ -251,6 +255,7 @@ package game
             settings["viewSongProgress"] = displaySongProgress;
             settings["speed"] = scrollSpeed;
             settings["judgeSpeed"] = judgeSpeed;
+            settings["receptorAnimationSpeed"] = receptorAnimationSpeed;
             settings["direction"] = scrollDirection;
             settings["noteskin"] = noteskin;
             settings["gap"] = receptorSpacing;

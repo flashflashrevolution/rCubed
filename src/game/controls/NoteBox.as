@@ -90,6 +90,14 @@ package game.controls
             rightReceptor = _noteskins.getReceptor(options.noteskin, "R");
             rightReceptor.KEY = "Right";
 
+            if (leftReceptor is GameReceptor)
+            {
+                (leftReceptor as GameReceptor).animationSpeed = options.receptorAnimationSpeed;
+                (downReceptor as GameReceptor).animationSpeed = options.receptorAnimationSpeed;
+                (upReceptor as GameReceptor).animationSpeed = options.receptorAnimationSpeed;
+                (rightReceptor as GameReceptor).animationSpeed = options.receptorAnimationSpeed;
+            }
+
             addChildAt(leftReceptor, 0);
             addChildAt(downReceptor, 0);
             addChildAt(upReceptor, 0);
@@ -215,6 +223,11 @@ package game.controls
 
         public function receptorFeedback(dir:String, score:int):void
         {
+            if (!options.displayReceptorAnimations)
+            {
+                return;
+            }
+
             var f:int = 2;
             var c:uint = 0;
 

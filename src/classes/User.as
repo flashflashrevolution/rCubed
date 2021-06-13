@@ -88,6 +88,7 @@ package classes
         public var AUTO_JUDGE_OFFSET:Boolean = false;
         public var DISPLAY_JUDGE:Boolean = true;
         public var DISPLAY_JUDGE_ANIMATIONS:Boolean = true;
+        public var DISPLAY_RECEPTOR_ANIMATIONS:Boolean = true;
         public var DISPLAY_HEALTH:Boolean = true;
         public var DISPLAY_GAME_TOP_BAR:Boolean = true;
         public var DISPLAY_GAME_BOTTOM_BAR:Boolean = true;
@@ -132,6 +133,7 @@ package classes
         public var judgeSpeed:Number = 1;
         public var gameSpeed:Number = 1.5;
         public var receptorGap:Number = 80;
+        public var receptorAnimationSpeed:Number = 1;
         public var noteScale:Number = 1;
         public var gameVolume:Number = 1;
         public var screencutPosition:Number = 0.5;

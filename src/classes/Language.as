@@ -196,6 +196,10 @@ package classes
                 }
                 indexed[data[lang]["_index"]] = lang;
             }
+
+            data["us"]["options_receptor_animations"] = "Show Receptors Animations";
+            data["us"]["options_receptor_speed"] = "Receptor Flash Speed:";
+            
             _isLoaded = true;
             _loadError = false;
             Logger.info(this, "Parse Complete");

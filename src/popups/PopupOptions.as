@@ -84,7 +84,7 @@ package popups
         //- Arrays
         private var keyInputs:Array = ["left", "down", "up", "right", "restart", "quit", "options"];
         private var judgeTitles:Array = ["amazing", "perfect", "good", "average", "miss", "boo"];
-        private var displayArray:Array = ["SONG_FLAG", "SONG_NOTE", "----", "JUDGE", "JUDGE_ANIMATIONS", "HEALTH", "SCORE", "COMBO", "PACOUNT", "SONGPROGRESS", "AMAZING", "PERFECT", "TOTAL", "SCREENCUT", "MP_MASK", "GAME_TOP_BAR", "GAME_BOTTOM_BAR"];
+        private var displayArray:Array = ["JUDGE", "JUDGE_ANIMATIONS", "RECEPTOR_ANIMATIONS", "SONG_FLAG", "SONG_NOTE", "HEALTH", "SCORE", "COMBO", "PACOUNT", "SONGPROGRESS", "AMAZING", "PERFECT", "TOTAL", "SCREENCUT", "MP_MASK", "GAME_TOP_BAR", "GAME_BOTTOM_BAR"];
         private var noteColorComboArray:Array = [];
         private var startUpScreenSelections:Array = [];
 
@@ -128,6 +128,8 @@ package popups
         private var optionVisualGameMods:Array;
         private var optionJudgeSpeed:BoxSlider;
         private var gameJudgeSpeedDisplay:Text;
+        private var optionReceptorAnimationSpeed:BoxSlider;
+        private var gameReceptorAnimationSpeedDisplay:Text;
         private var optionGameMods:Array;
         private var optionNoteskins:Array;
         private var optionNoteskinPreview:GameNote;
@@ -582,6 +584,20 @@ package popups
                         gameJudgeSpeedDisplay = new Text(box, xOff + 128, yOff - 5, _gvars.activeUser.judgeSpeed.toFixed(2) + "x");
                         yOff += 20;
                     }
+                    // Disabled because it doesn't function.
+                    // if (displayArray[i] == "RECEPTOR_ANIMATIONS")
+                    // {
+                    //     yOff -= 4;
+                    //     var gameReceptorAnimationSpeed:Text = new Text(box, xOff + 23, yOff, _lang.string("options_receptor_speed"));
+                    //     yOff += 23;
+
+                    //     optionReceptorAnimationSpeed = new BoxSlider(box, xOff + 23, yOff, 100, 10, changeHandler);
+                    //     optionReceptorAnimationSpeed.minValue = 0.25;
+                    //     optionReceptorAnimationSpeed.maxValue = 3;
+
+                    //     gameReceptorAnimationSpeedDisplay = new Text(box, xOff + 128, yOff - 5, _gvars.activeUser.receptorAnimationSpeed.toFixed(2) + "x");
+                    //     yOff += 20;
+                    // }
                 }
 
                 ///- Col 2
@@ -1031,6 +1047,11 @@ package popups
             {
                 _gvars.activeUser.judgeSpeed = (Math.round((optionJudgeSpeed.slideValue * 100) / 5) * 5) / 100; // Snap to 0.05 intervals.
                 gameJudgeSpeedDisplay.text = _gvars.activeUser.judgeSpeed.toFixed(2) + "x";
+            }
+            else if (e.target == optionReceptorAnimationSpeed)
+            {
+                _gvars.activeUser.receptorAnimationSpeed = (Math.round((optionReceptorAnimationSpeed.slideValue * 100) / 5) * 5) / 100; // Snap to 0.05 intervals.
+                gameReceptorAnimationSpeedDisplay.text = _gvars.activeUser.receptorAnimationSpeed.toFixed(2) + "x";
             }
             else if (e.target == optionFPS)
             {
@@ -1801,6 +1822,11 @@ package popups
                 }
 
                 optionJudgeSpeed.slideValue = _gvars.activeUser.judgeSpeed;
+
+                if (optionReceptorAnimationSpeed != null)
+                {
+                    optionReceptorAnimationSpeed.slideValue = _gvars.activeUser.receptorAnimationSpeed;
+                }
 
                 // Set Noteskin
                 for each (item in optionNoteskins)
