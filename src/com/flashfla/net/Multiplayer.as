@@ -1078,7 +1078,7 @@ package com.flashfla.net
 
             // Update the room state
             updateRoom(room);
-            // TODO: Check roomList param validity
+
             eventRoomUpdate(room, true);
 
             for each (var user:User in room.players)
@@ -1086,7 +1086,6 @@ package com.flashfla.net
                 var gameplay:Gameplay = user.gameplay;
                 if (gameplay && gameplay.status == STATUS_PLAYING)
                 {
-                    
                     eventGameUpdate(user);
                 }
             }
