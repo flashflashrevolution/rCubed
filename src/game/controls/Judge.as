@@ -10,6 +10,7 @@ package game.controls
     import game.GameOptions;
     import flash.geom.Matrix;
     import flash.utils.getTimer;
+    import AachenLight;
 
     public class Judge extends Sprite
     {
@@ -43,9 +44,7 @@ package game.controls
             labelDesc[-5] = {colour: options.judgeColours[5], title: "BOO!!"};
             labelDesc[-10] = {colour: options.judgeColours[4], title: "MISS!"};
 
-            var textFormat:TextFormat = new TextFormat(new Xolonium.Bold().fontName, 36, 0xffffff, true);
-            textFormat.kerning = true;
-            textFormat.letterSpacing = -2;
+            var textFormat:TextFormat = new TextFormat(new AachenLight().fontName, 42, 0xffffff, true);
 
             field = new TextField();
             field.defaultTextFormat = textFormat;

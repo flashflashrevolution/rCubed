@@ -1,0 +1,9 @@
+{
+    "type": "lib",
+    "files": [
+        "src/AachenLight.as"
+    ],
+    "compilerOptions": {
+        "output": "bin/AachenLight.swf"
+    }
+}

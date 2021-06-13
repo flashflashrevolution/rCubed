@@ -8,9 +8,9 @@ or when unicode characters are modified.
 ---
 
 - [R^3 Font Generators](#r3-font-generators)
+  - [Adding Unicode Range to the R3 Unicode Font](#adding-unicode-range-to-the-r3-unicode-font)
   - [Generating a new Font](#generating-a-new-font)
   - [Adding a font to the Embedded Fonts library](#adding-a-font-to-the-embedded-fonts-library)
-  - [Adding Unicode Range to the R3 Unicode Font](#adding-unicode-range-to-the-r3-unicode-font)
 
 ---
 
@@ -47,3 +47,8 @@ or when unicode characters are modified.
 
 3. Compile a release build of <asconfig.embed-fonts.json>,
    your font will appear in [bin](bin/).
+4. Note: If this fails to build due to a java heap error, try running asconfigc manually.
+
+   ```zsh
+   .\\node_modules\\.bin\\asconfigc.cmd '--sdk', 'c:\airsdk\33.0.2', '--debug=false', '--project', 'l:\git\flashflashrevolution\games\rCubed\fonts\asconfig.embed-fonts.json' '--jvmargs=-Xmx1000m'
+   ```

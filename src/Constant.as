@@ -66,6 +66,7 @@ package
         public static const SONG_CACHE_PATH:String = "song_cache/";
 
         // Embed Fonts
+        AachenLight;
         BreeSerif;
         Ultra;
         BebasNeue;
