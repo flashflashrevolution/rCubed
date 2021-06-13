@@ -183,14 +183,14 @@ package popups
 
             this.addChild(bmp);
 
-            var bgbox:Box = new Box(this, 20, 20, false, false);
-            bgbox.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
+            var bgbox:Box = new Box(this, 10, 10, false, false);
+            bgbox.setSize(Main.GAME_WIDTH - 20, Main.GAME_HEIGHT - 20);
             bgbox.color = GameBackgroundColor.BG_POPUP;
             bgbox.normalAlpha = 0.5;
             bgbox.activeAlpha = 1;
 
-            box = new Box(this, 20, 20, false, false);
-            box.setSize(Main.GAME_WIDTH - 40, Main.GAME_HEIGHT - 40);
+            box = new Box(this, 10, 10, false, false);
+            box.setSize(Main.GAME_WIDTH - 20, Main.GAME_HEIGHT - 20);
             box.activeAlpha = 0.4;
 
             // Import / Export Context Menu
