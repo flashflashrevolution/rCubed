@@ -22,7 +22,6 @@ package arc.mp
     import com.flashfla.net.events.RoomJoinedEvent;
     import com.flashfla.net.events.RoomLeftEvent;
     import com.flashfla.net.events.RoomListEvent;
-    import com.flashfla.net.events.RoomUpdateEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
     import com.flashfla.net.events.ServerMessageEvent;
     import flash.events.ContextMenuEvent;

@@ -3,7 +3,6 @@ package arc.mp
     import com.bit101.components.Label;
     import com.bit101.components.Panel;
     import com.flashfla.net.Multiplayer;
-    import com.flashfla.net.events.RoomUpdateEvent;
     import com.flashfla.net.events.RoomUserEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
     import flash.display.DisplayObjectContainer;
