@@ -359,15 +359,15 @@ package arc.mp
         private function nameRoom(room:Room):String
         {
             const level:int = room.level;
+            const spectatorString:String = (room.specCount > 0) ? "+" + room.specCount + " " : "";
 
-            if (level >= 0)
+            if (room.playerCount > 0)
             {
                 const color:int = ArcGlobals.getDivisionColor(level);
                 const titleString:String = ArcGlobals.getDivisionTitle(level);
 
                 const dulledColour:String = MultiplayerChat.textDullColour(color, 1).toString(16);
                 const titlePrefix:String = "(" + titleString + ")";
-                const spectatorString:String = (room.specCount > 0) ? "+" + room.specCount + " " : "";
 
                 return MultiplayerChat.textFormatSize(room.userCount + "/2 " + spectatorString, "-1") + MultiplayerChat.textFormatColour(MultiplayerChat.textEscape((room.isPrivate ? "!" : "") + titlePrefix), "#" + dulledColour) + " " + room.name;
             }
