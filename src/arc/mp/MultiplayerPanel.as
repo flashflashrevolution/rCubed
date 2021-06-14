@@ -361,7 +361,7 @@ package arc.mp
             const level:int = room.level;
             const spectatorString:String = (room.specCount > 0) ? "+" + room.specCount + " " : "";
 
-            if (room.playerCount > 0)
+            if (room.playerCount > 0 && level != -1)
             {
                 const color:int = ArcGlobals.getDivisionColor(level);
                 const titleString:String = ArcGlobals.getDivisionTitle(level);
