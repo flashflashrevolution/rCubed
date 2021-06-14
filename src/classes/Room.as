@@ -247,8 +247,14 @@ package classes
 
         public function getPlayersSong():SongInfo
         {
-            if(isAllPlayersSameSong()) return getPlayer(1).gameplay.songInfo;
-
+            if(isAllPlayersSameSong())
+            {
+                for each (var player:User in players)
+                {
+                    if(player.gameplay.songInfo) 
+                        return player.gameplay.songInfo;
+                }
+            }
             return null;
         }
 

@@ -31,7 +31,7 @@
             },
             {
                 "name": "CONFIG::vsync",
-                "value": true
+                "value": false
             },
             {
                 "name": "CONFIG::timeStamp",
@@ -66,8 +66,8 @@
         "default-background-color": "#000000",
         "debug": true,
         "omit-trace-statements": false,
-        "swf-version": 43,
-        "target-player": "32.0",
+        "swf-version": 26,
+        "target-player": "26.0",
         "locale": [
             "en_US"
         ]
