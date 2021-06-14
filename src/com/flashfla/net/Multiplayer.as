@@ -667,7 +667,15 @@ package com.flashfla.net
                 // If no opponents, set the room's level to the currentUser's level
                 // A player spectates and there is a player left.
                 // A player spectates and there is no players left.
-                var remainingPlayer:User = room.getPlayer(0) != null ? room.getPlayer(0) : room.getPlayer(1);
+                var remainingPlayer:User = null;
+                for each (var player:User in room.players)
+                {
+                    if (player.playerIdx != currentUserIdx)
+                    {
+                        remainingPlayer = player;
+                    }
+                }
+
                 if (remainingPlayer != null)
                 {
                     vars["GAME_LEVEL"] = remainingPlayer.userLevel;
@@ -690,7 +698,7 @@ package com.flashfla.net
         private function sendCurrentUserRoomVariables(room:Room, joining:Boolean = true):void
         {
             if (!room.isGameRoom)
-            {
+            { 
                 return;
             }
 
@@ -705,7 +713,7 @@ package com.flashfla.net
                 vars[prefix + "_UID"] = currentUser.id;
 
                 // If no opponents, set the room's level to the currentUser's level
-                if (joining && currentUser.isPlayer && room.level < currentUser.userLevel)
+                if (joining && currentUser.isPlayer && room.level <= currentUser.userLevel)
                 {
                     vars["GAME_LEVEL"] = currentUser.userLevel;
                 }
