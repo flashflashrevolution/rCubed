@@ -695,7 +695,7 @@ package com.flashfla.net
         /**
          * Sends the current user's "player" variables (if any) to the server.
          */
-        private function sendCurrentUserRoomVariables(room:Room, joining:Boolean = true):void
+        private function sendCurrentUserRoomVariables(room:Room, joining:Boolean = true, handlingLeaver:Boolean = false):void
         {
             if (!room.isGameRoom)
             { 
@@ -713,7 +713,7 @@ package com.flashfla.net
                 vars[prefix + "_UID"] = currentUser.id;
 
                 // If no opponents, set the room's level to the currentUser's level
-                if (joining && currentUser.isPlayer && room.level <= currentUser.userLevel)
+                if (joining || handlingLeaver && currentUser.isPlayer && room.level <= currentUser.userLevel)
                 {
                     vars["GAME_LEVEL"] = currentUser.userLevel;
                 }
@@ -1285,6 +1285,12 @@ package com.flashfla.net
                     user.playerIdx = -1;
 
                 room.removeUser(user.id);
+            }
+
+            if (currentUser.isPlayer)
+            {
+                var HANDLING_LEAVER:Boolean = true;
+                sendCurrentUserRoomVariables(room, !HANDLING_LEAVER, HANDLING_LEAVER);
             }
 
             eventRoomUser(room, user);
