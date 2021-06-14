@@ -119,13 +119,24 @@ package com.flashfla.net
 
         public var ghostRooms:Vector.<Room>;
 
+        public var gameUpdateCallbacks:Vector.<Function>;
+
         public var inSolo:Boolean;
+
+        public function addGameUpdateCallback(callback:Function):void
+        {
+            if (gameUpdateCallbacks.indexOf(callback) < 0)
+            {
+                gameUpdateCallbacks.push(callback);
+            }
+        }
 
         public function Multiplayer()
         {
             _rooms = {};
             currentUser = new User(false, true);
             ghostRooms = new <Room>[];
+            gameUpdateCallbacks = new <Function>[];
 
             server = new SmartFoxClient(false); // CONFIG::debug);
 
@@ -817,7 +828,10 @@ package com.flashfla.net
 
         private function eventRoomUpdate(room:Room, roomList:Boolean = false):void
         {
-            dispatchEvent(new RoomUpdateEvent({room: room, roomList: roomList}));
+            for each (var item:Function in gameUpdateCallbacks)
+            {
+                item.apply(null, [room, roomList])
+            }
         }
 
         private function eventGameUpdate(user:User):void

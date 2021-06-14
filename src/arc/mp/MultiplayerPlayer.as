@@ -49,7 +49,7 @@ package arc.mp
             height = comboLabel.y + comboLabel.height;
             width = 150;
 
-            connection.addEventListener(Multiplayer.EVENT_ROOM_UPDATE, onRoomUpdate);
+            connection.addGameUpdateCallback(onRoomUpdate);
             connection.addEventListener(Multiplayer.EVENT_ROOM_USER, onRoomUser);
             connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, onRoomUserStatus);
 
@@ -70,9 +70,9 @@ package arc.mp
             }
         }
 
-        private function onRoomUpdate(event:RoomUpdateEvent):void
+        private function onRoomUpdate(targetRoom:Room, roomList:Boolean):void
         {
-            if (event.room == room)
+            if (targetRoom == room)
                 redraw();
         }
 

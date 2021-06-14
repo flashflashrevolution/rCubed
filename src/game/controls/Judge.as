@@ -63,8 +63,6 @@ package game.controls
             field.cacheAsBitmapMatrix = new Matrix();
             addChild(field)
 
-            addEventListener(Event.ENTER_FRAME, updateJudge, false, 0, true);
-
             //updateDisplay();
 
             this.mouseChildren = false;
