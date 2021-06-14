@@ -663,7 +663,22 @@ package com.flashfla.net
 
                 vars["arc_engine" + currentUser.id] = null;
                 vars["arc_replay" + currentUser.id] = null;
+
+                // If no opponents, set the room's level to the currentUser's level
+                // A player spectates and there is a player left.
+                // A player spectates and there is no players left.
+                var remainingPlayer:User = room.getPlayer(0) != null ? room.getPlayer(0) : room.getPlayer(1);
+                if (remainingPlayer != null)
+                {
+                    vars["GAME_LEVEL"] = remainingPlayer.userLevel;
+                }
+                else
+                {
+                    vars["GAME_LEVEL"] = -1;
+                }
             }
+
+
 
             // Send room vars to server
             sendRoomVariables(room, vars);
@@ -675,7 +690,9 @@ package com.flashfla.net
         private function sendCurrentUserRoomVariables(room:Room):void
         {
             if (!room.isGameRoom)
+            {
                 return;
+            }
 
             var vars:Object = {};
             var currentUserIdx:int = room.getPlayerIndex(currentUser);
@@ -688,8 +705,10 @@ package com.flashfla.net
                 vars[prefix + "_UID"] = currentUser.id;
 
                 // If no opponents, set the room's level to the currentUser's level
-                if (!room.playerCount > 1)
+                if (room.playerCount == 1)
+                {
                     vars["GAME_LEVEL"] = currentUser.userLevel;
+                }
 
                 sendRoomVariables(room, vars);
             }
