@@ -667,7 +667,7 @@ package com.flashfla.net
                 // If no opponents, set the room's level to the currentUser's level
                 // A player spectates and there is a player left.
                 // A player spectates and there is no players left.
-                var remainingPlayer:User = room.getPlayer(1) != currentUser ? room.getPlayer(1) : room.getPlayer(2);
+                var remainingPlayer:User = room.getPlayer(0) != null ? room.getPlayer(0) : room.getPlayer(1);
                 if (remainingPlayer != null)
                 {
                     vars["GAME_LEVEL"] = remainingPlayer.userLevel;
@@ -687,7 +687,7 @@ package com.flashfla.net
         /**
          * Sends the current user's "player" variables (if any) to the server.
          */
-        private function sendCurrentUserRoomVariables(room:Room):void
+        private function sendCurrentUserRoomVariables(room:Room, joining:Boolean = true):void
         {
             if (!room.isGameRoom)
             {
@@ -705,7 +705,7 @@ package com.flashfla.net
                 vars[prefix + "_UID"] = currentUser.id;
 
                 // If no opponents, set the room's level to the currentUser's level
-                if (room.playerCount == 1)
+                if (joining && currentUser.isPlayer && room.level < currentUser.userLevel)
                 {
                     vars["GAME_LEVEL"] = currentUser.userLevel;
                 }
@@ -1028,7 +1028,10 @@ package com.flashfla.net
             }
 
             if (user == currentUser)
-                sendCurrentUserRoomVariables(room);
+            {
+                var JOINING:Boolean = true;
+                sendCurrentUserRoomVariables(room, JOINING);
+            }
 
             room.specCount -= 1;
             room.userCount += 1;
@@ -1217,7 +1220,8 @@ package com.flashfla.net
 
             updateRoom(room);
 
-            sendCurrentUserRoomVariables(room);
+            var JOINING:Boolean = true;
+            sendCurrentUserRoomVariables(room, JOINING);
             if (room.isPlayer(currentUser))
                 sendCurrentUserStatus(room);
 
