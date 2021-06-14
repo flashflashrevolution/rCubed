@@ -667,7 +667,7 @@ package com.flashfla.net
                 // If no opponents, set the room's level to the currentUser's level
                 // A player spectates and there is a player left.
                 // A player spectates and there is no players left.
-                var remainingPlayer:User = room.getPlayer(0) != null ? room.getPlayer(0) : room.getPlayer(1);
+                var remainingPlayer:User = room.getPlayer(1) != currentUser ? room.getPlayer(1) : room.getPlayer(2);
                 if (remainingPlayer != null)
                 {
                     vars["GAME_LEVEL"] = remainingPlayer.userLevel;
