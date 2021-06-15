@@ -22,7 +22,6 @@ package arc.mp
     import com.flashfla.net.events.RoomJoinedEvent;
     import com.flashfla.net.events.RoomLeftEvent;
     import com.flashfla.net.events.RoomListEvent;
-    import com.flashfla.net.events.RoomUpdateEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
     import com.flashfla.net.events.ServerMessageEvent;
     import flash.events.ContextMenuEvent;
@@ -116,7 +115,7 @@ package arc.mp
             connection.addEventListener(Multiplayer.EVENT_ROOM_LEFT, onRoomLeftEvent);
             connection.addEventListener(Multiplayer.EVENT_ROOM_LIST, onRoomListEvent);
             connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, onRoomUserStatusEvent);
-            connection.addEventListener(Multiplayer.EVENT_ROOM_UPDATE, onRoomUpdateEvent);
+            connection.addGameUpdateCallback(onRoomUpdateEvent);
 
             window.addEventListener(Event.CLOSE, onCloseEvent);
 
@@ -213,10 +212,10 @@ package arc.mp
             updateRoomPanel(event.room);
         }
 
-        private function onRoomUpdateEvent(event:RoomUpdateEvent):void
+        private function onRoomUpdateEvent(room:Room, roomList:Boolean):void
         {
-            if (event.roomList == true)
-                updateRoomPanel(event.room);
+            if (roomList == true)
+                updateRoomPanel(room);
         }
 
         private function onCloseEvent(event:Event):void

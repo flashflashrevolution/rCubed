@@ -945,6 +945,11 @@ package game
         private function onEnterFrame(e:Event):void
         {
             // XXX: HACK HACK HACK
+            if (options.displayJudge)
+            {
+                player1Judge.updateJudge(e);
+            }
+
             if (legacyMode)
             {
                 var songFrame:int = song_background.currentFrame;

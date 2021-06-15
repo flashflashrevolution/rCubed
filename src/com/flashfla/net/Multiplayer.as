@@ -42,7 +42,6 @@ package com.flashfla.net
     import com.flashfla.net.events.RoomUserEvent;
     import com.flashfla.net.events.RoomJoinedEvent;
     import com.flashfla.net.events.RoomLeftEvent;
-    import com.flashfla.net.events.RoomUpdateEvent;
     import com.flashfla.net.events.RoomListEvent;
     import com.flashfla.net.events.UserUpdateEvent;
     import com.flashfla.net.events.GameStartEvent;
@@ -66,7 +65,6 @@ package com.flashfla.net
         public static const EVENT_ROOM_LIST:String = "ARC_EVENT_ROOM_LIST";
         public static const EVENT_ROOM_USER_STATUS:String = "ARC_EVENT_ROOM_USER_STATUS";
         public static const EVENT_ROOM_USER:String = "ARC_EVENT_ROOM_USER";
-        public static const EVENT_ROOM_UPDATE:String = "ARC_EVENT_ROOM_UPDATE";
         public static const EVENT_ROOM_JOINED:String = "ARC_EVENT_ROOM_JOINED";
         public static const EVENT_ROOM_LEFT:String = "ARC_EVENT_ROOM_LEFT";
         public static const EVENT_USER_UPDATE:String = "ARC_EVENT_USER_UPDATE";
@@ -119,13 +117,24 @@ package com.flashfla.net
 
         public var ghostRooms:Vector.<Room>;
 
+        public var gameUpdateCallbacks:Vector.<Function>;
+
         public var inSolo:Boolean;
+
+        public function addGameUpdateCallback(callback:Function):void
+        {
+            if (gameUpdateCallbacks.indexOf(callback) < 0)
+            {
+                gameUpdateCallbacks.push(callback);
+            }
+        }
 
         public function Multiplayer()
         {
             _rooms = {};
             currentUser = new User(false, true);
             ghostRooms = new <Room>[];
+            gameUpdateCallbacks = new <Function>[];
 
             server = new SmartFoxClient(false); // CONFIG::debug);
 
@@ -817,7 +826,10 @@ package com.flashfla.net
 
         private function eventRoomUpdate(room:Room, roomList:Boolean = false):void
         {
-            dispatchEvent(new RoomUpdateEvent({room: room, roomList: roomList}));
+            for each (var item:Function in gameUpdateCallbacks)
+            {
+                item.apply(null, [room, roomList])
+            }
         }
 
         private function eventGameUpdate(user:User):void

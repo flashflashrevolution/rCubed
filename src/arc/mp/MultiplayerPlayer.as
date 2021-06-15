@@ -3,7 +3,6 @@ package arc.mp
     import com.bit101.components.Label;
     import com.bit101.components.Panel;
     import com.flashfla.net.Multiplayer;
-    import com.flashfla.net.events.RoomUpdateEvent;
     import com.flashfla.net.events.RoomUserEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
     import flash.display.DisplayObjectContainer;
@@ -49,7 +48,7 @@ package arc.mp
             height = comboLabel.y + comboLabel.height;
             width = 150;
 
-            connection.addEventListener(Multiplayer.EVENT_ROOM_UPDATE, onRoomUpdate);
+            connection.addGameUpdateCallback(onRoomUpdate);
             connection.addEventListener(Multiplayer.EVENT_ROOM_USER, onRoomUser);
             connection.addEventListener(Multiplayer.EVENT_ROOM_USER_STATUS, onRoomUserStatus);
 
@@ -70,9 +69,9 @@ package arc.mp
             }
         }
 
-        private function onRoomUpdate(event:RoomUpdateEvent):void
+        private function onRoomUpdate(targetRoom:Room, roomList:Boolean):void
         {
-            if (event.room == room)
+            if (targetRoom == room)
                 redraw();
         }
 
