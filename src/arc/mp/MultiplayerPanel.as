@@ -313,9 +313,13 @@ package arc.mp
             }
 
             if (room.isPrivate)
+            {
                 new Prompt(this, 320, "Password: " + room.name, 100, "SUBMIT", e_joinRoomPassword, true);
+            }
             else
+            {
                 connection.joinRoom(room, asPlayer);
+            }
         }
 
         private function updateRoomPanel(room:Room):void

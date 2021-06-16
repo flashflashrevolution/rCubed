@@ -4,8 +4,9 @@ package com.flashfla.net
 
     import arc.ArcGlobals;
     import arc.mp.MultiplayerSingleton;
+    import classes.Alert;
     import classes.Playlist;
-    import classes.Room
+    import classes.Room;
     import classes.User;
     import classes.Gameplay;
 
@@ -523,6 +524,19 @@ package com.flashfla.net
                 server.getRoomList();
         }
 
+        private function currentUserRoomCount()
+        {
+            var userId:int = server.myUserId;
+            var roomCount:int = 0;
+
+            for each (var roomIt:Room in rooms)
+            {
+                roomCount += (roomIt.getUser(userId) != null ? 1 : 0);
+            }
+
+            return roomCount;
+        }
+
         /**
          * Sends a request to the server to join a specific room as a player or not.
          * Optionally, provide a password.
@@ -530,10 +544,20 @@ package com.flashfla.net
         public function joinRoom(room:Room, asPlayer:Boolean = true, password:String = ""):void
         {
             if (!connected || !room)
+            {
                 return;
+            }
+
+            if (currentUserRoomCount() > 1)
+            {
+                Alert.add("ERROR: Cannot join two rooms at a time.", 120);
+                return;
+            }
 
             if (room.isGameRoom)
+            {
                 asPlayer &&= room.userCount < Room.MAX_PLAYERS;
+            }
 
             server.joinRoom(room.id, password, !asPlayer, true);
         }
@@ -595,6 +619,12 @@ package com.flashfla.net
          */
         public function createRoom(name:String, password:String = "", maxUsers:int = 2, maxSpectators:int = 100):void
         {
+            if (currentUserRoomCount() > 1)
+            {
+                Alert.add("ERROR: Cannot join two rooms at a time.", 120);
+                return;
+            }
+            
             if (connected && name)
             {
                 var params:Object = {};
