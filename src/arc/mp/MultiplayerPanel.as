@@ -362,22 +362,24 @@ package arc.mp
 
         private function nameRoom(room:Room):String
         {
-            const level:int = room.level;
-            const spectatorString:String = (room.specCount > 0) ? "+" + room.specCount + " " : "";
+            var level:int = room.level;
+            var spectatorString:String = (room.specCount > 0) ? "+" + room.specCount + " " : "";
 
+            var roomPopulationString:String = MultiplayerChat.textFormatSize(room.userCount + "/2 " + spectatorString, "-1");
+            var isPrivateString:String = (room.isPrivate ? "!" : "");
             if (room.playerCount > 0 && level != -1)
             {
-                const color:int = ArcGlobals.getDivisionColor(level);
-                const titleString:String = ArcGlobals.getDivisionTitle(level);
+                var color:int = ArcGlobals.getDivisionColor(level);
+                var titleString:String = ArcGlobals.getDivisionTitle(level);
 
-                const dulledColour:String = MultiplayerChat.textDullColour(color, 1).toString(16);
-                const titlePrefix:String = "(" + titleString + ")";
+                var dulledColour:String = MultiplayerChat.textDullColour(color, 1).toString(16);
+                var titlePrefix:String = "(" + titleString + ")";
 
-                return MultiplayerChat.textFormatSize(room.userCount + "/2 " + spectatorString, "-1") + MultiplayerChat.textFormatColour(MultiplayerChat.textEscape((room.isPrivate ? "!" : "") + titlePrefix), "#" + dulledColour) + " " + room.name;
+                return roomPopulationString + MultiplayerChat.textFormatColour(isPrivateString + titlePrefix, "#" + dulledColour) + " " + MultiplayerChat.textEscape(room.name);
             }
             else
             {
-                return MultiplayerChat.textFormatSize(room.userCount + "/2 " + spectatorString, "-1") + " " + MultiplayerChat.textEscape((room.isPrivate ? "!" : "") + room.name);
+                return roomPopulationString + " " + MultiplayerChat.textEscape(isPrivateString + room.name);
             }
         }
 

@@ -524,14 +524,14 @@ package com.flashfla.net
                 server.getRoomList();
         }
 
-        private function currentUserRoomCount()
+        private function currentUserRoomCount():int
         {
             var userId:int = server.myUserId;
             var roomCount:int = 0;
 
-            for each (var roomIt:Room in rooms)
+            for each (var tempRoom:Room in rooms)
             {
-                roomCount += (roomIt.getUser(userId) != null ? 1 : 0);
+                roomCount += (tempRoom.getUser(userId) != null ? 1 : 0);
             }
 
             return roomCount;
@@ -625,24 +625,26 @@ package com.flashfla.net
                 return;
             }
             
-            if (connected && name)
+            if (!connected || name.length <= 0)
             {
-                var params:Object = {};
-                params.name = name;
-                params.password = password;
-                params.maxUsers = maxUsers;
-                params.maxSpectators = maxSpectators;
-                params.isGame = true;
-                params.exitCurrentRoom = false;
-                params.uCount = true;
-                params.joinAsSpectator = currentUser.isPlayer;
-                params.vars = [{name: "GAME_LEVEL", val: currentUser.userLevel, persistent: true},
-                    {name: "GAME_MODE", val: MODE_NORMAL, persistent: true},
-                    {name: "GAME_SCORE", val: MODE_SCORE_RAW, persistent: true},
-                    {name: "GAME_RANKED", val: true, persistent: true}];
-
-                server.createRoom(params);
+                return;
             }
+
+            var params:Object = {};
+            params.name = name;
+            params.password = password;
+            params.maxUsers = maxUsers;
+            params.maxSpectators = maxSpectators;
+            params.isGame = true;
+            params.exitCurrentRoom = false;
+            params.uCount = true;
+            params.joinAsSpectator = currentUser.isPlayer;
+            params.vars = [{name: "GAME_LEVEL", val: currentUser.userLevel, persistent: true},
+                {name: "GAME_MODE", val: MODE_NORMAL, persistent: true},
+                {name: "GAME_SCORE", val: MODE_SCORE_RAW, persistent: true},
+                {name: "GAME_RANKED", val: true, persistent: true}];
+
+            server.createRoom(params);
         }
 
         public function sendMessage(room:Room, message:String, escape:Boolean = true):void
@@ -1067,8 +1069,7 @@ package com.flashfla.net
 
             if (user == currentUser)
             {
-                var JOINING:Boolean = true;
-                sendCurrentUserRoomVariables(room, JOINING);
+                sendCurrentUserRoomVariables(room, true);
             }
 
             room.specCount -= 1;
@@ -1258,8 +1259,7 @@ package com.flashfla.net
 
             updateRoom(room);
 
-            var JOINING:Boolean = true;
-            sendCurrentUserRoomVariables(room, JOINING);
+            sendCurrentUserRoomVariables(room, true);
             if (room.isPlayer(currentUser))
                 sendCurrentUserStatus(room);
 
@@ -1319,8 +1319,7 @@ package com.flashfla.net
 
             if (currentUser.isPlayer)
             {
-                var HANDLING_LEAVER:Boolean = true;
-                sendCurrentUserRoomVariables(room, !HANDLING_LEAVER, HANDLING_LEAVER);
+                sendCurrentUserRoomVariables(room, false, true);
             }
 
             eventRoomUser(room, user);
