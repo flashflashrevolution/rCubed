@@ -1311,7 +1311,7 @@ package menu
                 if (isCanonEngine)
                 {
                     var song_price:Number = songInfo.price;
-                    if (!isNaN(song_price) && song_price >= 0)
+                    if (!isNaN(song_price) && song_price > 0)
                     {
                         var hasEnoughCredits:Boolean = (_gvars.activeUser.credits >= song_price);
 
