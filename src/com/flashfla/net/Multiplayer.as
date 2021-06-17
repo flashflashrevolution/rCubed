@@ -529,9 +529,9 @@ package com.flashfla.net
             const userId:int = server.myUserId;
             var roomCount:int = 0;
 
-            for each (var tempRoom:Room in rooms)
+            for each (var room:Room in rooms)
             {
-                roomCount += (tempRoom.getUser(userId) != null ? 1 : 0);
+                roomCount += (room.getUser(userId) != null ? 1 : 0);
             }
 
             return roomCount;
@@ -539,11 +539,11 @@ package com.flashfla.net
 
         private function getCurrentRoom():Room
         {
-            for each (var tempRoom:Room in rooms)
+            for each (var room:Room in rooms)
             {
-                if (tempRoom != lobby && tempRoom.name != "The Entrance" && tempRoom.hasUser(currentUser))
+                if (room != lobby && room.name != "The Entrance" && room.hasUser(currentUser))
                 {
-                    return tempRoom;
+                    return room;
                 }
             }
 
@@ -751,7 +751,7 @@ package com.flashfla.net
          * @param joining Whether the user is joining or not.
          * @param handlingLeaver Whether the user is leaving the room or not. (Used for clearing variables)
          */
-        private function sendCurrentUserRoomVariables(room:Room, joining:Boolean = true, handlingLeaver:Boolean = false):void
+        private function sendCurrentUserRoomVariables(room:Room, joining:Boolean = true, leaving:Boolean = false):void
         {
             if (!room.isGameRoom)
             { 
@@ -769,7 +769,7 @@ package com.flashfla.net
                 vars[prefix + "_UID"] = currentUser.id;
 
                 // If no opponents, set the room's level to the currentUser's level
-                if (joining || handlingLeaver && currentUser.isPlayer && room.level <= currentUser.userLevel)
+                if (joining || leaving && currentUser.isPlayer && room.level <= currentUser.userLevel)
                 {
                     vars["GAME_LEVEL"] = currentUser.userLevel;
                 }
