@@ -18,7 +18,7 @@ package menu
     import flash.events.MouseEvent;
     import flash.net.URLRequest;
 
-    public class MenuTokens extends MenuPanel
+    public class MenuSeasons extends MenuPanel
     {
         ///- Private Locals
         private var _gvars:GlobalVariables = GlobalVariables.instance;
@@ -41,13 +41,16 @@ package menu
         private static var loadQueue:Array = [];
         private static var ACTIVE_DOWNLOAD:Object = null;
 
-        public function MenuTokens(myParent:MenuPanel)
+        public function MenuSeasons(myParent:MenuPanel)
         {
             super(myParent);
         }
 
         override public function init():Boolean
         {
+            //TODO implement seasons
+            //(this file is MenuTokens.as renamed to MenuSeasons.as)
+
             //- Setup Settings
             options = new Object();
             options.active_type = 'ski';

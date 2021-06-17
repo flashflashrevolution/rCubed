@@ -41,7 +41,7 @@ package menu
         public static const MENU_FRIENDS:String = "MenuFriends";
         public static const MENU_STATS:String = "MenuStats";
         public static const MENU_FILTERS:String = "MenuFilter";
-        public static const MENU_TOKENS:String = "MenuTokens";
+        public static const MENU_SEASONS:String = "MenuSeasons";
         public static const MENU_OPTIONS:String = "MenuOptions";
 
         private var _gvars:GlobalVariables = GlobalVariables.instance;
@@ -51,7 +51,7 @@ package menu
         private var _MenuMultiplayer:MenuPanel;
         private var _MenuFriends:MenuPanel;
         private var _MenuStats:MenuPanel;
-        private var _MenuTokens:MenuPanel;
+        private var _MenuSeasons:MenuPanel;
 
         private var hover_message:MouseTooltip;
         private var user_text:Text;
@@ -67,7 +67,7 @@ package menu
         private var statUpdaterBtn:SimpleBoxButton;
         private var rankUpdateThrobber:Throbber;
 
-        public var menuItems:Array = [["menu_play", MENU_SONGSELECTION], ["menu_multiplayer", MENU_MULTIPLAYER], ["menu_tokens", MENU_TOKENS], ["menu_filters", MENU_FILTERS], ["menu_options", MENU_OPTIONS]];
+        public var menuItems:Array = [["menu_play", MENU_SONGSELECTION], ["menu_multiplayer", MENU_MULTIPLAYER], ["menu_seasons", MENU_SEASONS], ["menu_filters", MENU_FILTERS], ["menu_options", MENU_OPTIONS]];
         public var panel:MenuPanel;
         public var options:Object;
 
@@ -239,6 +239,14 @@ package menu
                 menuItem.mouseChildren = false;
                 menuItem.useHandCursor = true;
                 menuItem.buttonMode = true;
+
+                if (menuItems[item][0] == "menu_seasons")
+                {
+                   menuItem.enabled = false;
+                   menuItem.setHoverText("Coming Soon!");
+                   menuItem.mouseEnabled = true;
+                   menuItem.removeEventListener(MouseEvent.CLICK, menuItemClick)
+                }
             }
 
             this.addChild(menuItemBox);
@@ -385,10 +393,10 @@ package menu
                    break;
                  */
 
-                case MENU_TOKENS:
-                    if (_MenuTokens == null || useNew)
-                        _MenuTokens = new MenuTokens(this);
-                    panel = _MenuTokens;
+                case MENU_SEASONS:
+                    if (_MenuSeasons == null || useNew)
+                        _MenuSeasons = new MenuSeasons(this);
+                    panel = _MenuSeasons;
                     options.activePanel = 2;
                     isFound = true;
                     break;
