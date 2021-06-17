@@ -11,7 +11,7 @@ R^3 (v1.4.0) [2021-6-TBD]
 - Remove config blocks for air and not_air. (#110)
 
 @Zageron
-- Fix MP Spectating (#292)
+- Fix MP Spectating (#292) - Co-Author
 - Remove all event listeners from the core path of FFR. (#290) - Co-Author
 - Add options and functionality for skipping receptor animations. (#289)
 - Add 'Remove Receptor Judgement Animation' button. (#287)
@@ -24,15 +24,15 @@ R^3 (v1.4.0) [2021-6-TBD]
 - Keep language strings in optioons menu up-to-date. (#117)
 
 @mat100payette
-- Typed entites. (#271)
-- Typed events. (#267)
+- Typed SFS entites. (#271)
+- Typed SFS events. (#267)
 - Fixed tab style on sfs package. (#266)
 - Fixed AIR SDK download link. (#261)
 - Added custom workspace support. (#261)
 
 @Sploder12
 - Fix MP Spectaing. (#292) - Co-Author
-- Remove all event listeners from the core path of FFR. (#290)
+- Remove all event listeners from the core path of FFR. (#290) - Co-Author
 - Add MP Ready button. (#288)
 - Add Column Filter To Results Screen. (#274)
 - Update behavior of Raw Good Flag. (#270)
