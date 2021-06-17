@@ -747,6 +747,9 @@ package com.flashfla.net
 
         /**
          * Sends the current user's "player" variables (if any) to the server.
+         * @param room The room to send variables too.
+         * @param joining Whether the user is joining or not.
+         * @param handlingLeaver Whether the user is leaving the room or not. (Used for clearing variables)
          */
         private function sendCurrentUserRoomVariables(room:Room, joining:Boolean = true, handlingLeaver:Boolean = false):void
         {
