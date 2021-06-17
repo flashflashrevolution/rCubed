@@ -1,6 +1,7 @@
 R^3 (v1.4.0) [2021-6-TBD]
 ---------------------------------------------------------------------
 @Psycast
+- Didn't include any of the improvements found in the AF2021 engine.
 - Implement File Logging. (#275)
 - Refactor Alerts. (#272)
 - Update Air SDK URL to fixed version. (#259)
