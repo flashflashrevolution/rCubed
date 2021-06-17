@@ -526,7 +526,7 @@ package com.flashfla.net
 
         private function currentUserRoomCount():int
         {
-            var userId:int = server.myUserId;
+            const userId:int = server.myUserId;
             var roomCount:int = 0;
 
             for each (var tempRoom:Room in rooms)
@@ -535,6 +535,19 @@ package com.flashfla.net
             }
 
             return roomCount;
+        }
+
+        private function getCurrentRoom():Room
+        {
+            for each (var tempRoom:Room in rooms)
+            {
+                if (tempRoom != lobby && tempRoom.name != "The Entrance" && tempRoom.hasUser(currentUser))
+                {
+                    return tempRoom;
+                }
+            }
+
+            return null;
         }
 
         /**
@@ -548,10 +561,11 @@ package com.flashfla.net
                 return;
             }
 
-            if (currentUserRoomCount() > 1)
+            var currentRoom:Room = getCurrentRoom();
+            if (currentRoom != null)
             {
-                Alert.add("ERROR: Cannot join two rooms at a time.", 120);
-                return;
+                server.leaveRoom(getCurrentRoom().id);
+                Alert.add("ERROR: Cannot join two rooms at a time. Leaving previous room.", 120);
             }
 
             if (room.isGameRoom)
@@ -619,10 +633,11 @@ package com.flashfla.net
          */
         public function createRoom(name:String, password:String = "", maxUsers:int = 2, maxSpectators:int = 100):void
         {
-            if (currentUserRoomCount() > 1)
+            const currentRoom:Room = getCurrentRoom();
+            if (currentRoom != null)
             {
-                Alert.add("ERROR: Cannot join two rooms at a time.", 120);
-                return;
+                server.leaveRoom(getCurrentRoom().id);
+                Alert.add("ERROR: Cannot join two rooms at a time. Leaving previous room.", 120);
             }
             
             if (!connected || name.length <= 0)
