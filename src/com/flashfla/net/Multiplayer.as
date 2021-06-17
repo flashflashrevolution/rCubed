@@ -562,9 +562,15 @@ package com.flashfla.net
             }
 
             var currentRoom:Room = getCurrentRoom();
+
             if (currentRoom != null)
             {
-                server.leaveRoom(getCurrentRoom().id);
+                if (currentRoom.id == room.id)
+                {
+                    return;
+                }
+
+                server.leaveRoom(currentRoom.id);
                 Alert.add("ERROR: Cannot join two rooms at a time. Leaving previous room.", 120);
             }
 
@@ -1249,7 +1255,7 @@ package com.flashfla.net
                     room.addUser(currentUser);
 
                     // Current user always gets -1 as a playerIdx on room join, so attempt to add it to players
-                    if (room.isGameRoom && !currentUser.isPlayer)
+                    if (room.isGameRoom && !currentUser.isPlayer && !user.isSpec)
                     {
                         var newPlayerIdx:int = room.addPlayer(currentUser);
 

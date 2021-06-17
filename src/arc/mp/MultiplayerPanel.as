@@ -362,17 +362,17 @@ package arc.mp
 
         private function nameRoom(room:Room):String
         {
-            const level:int = room.level;
-            const spectatorString:String = (room.specCount > 0) ? "+" + room.specCount + " " : "";
-            const roomPopulationString:String = MultiplayerChat.textFormatSize(room.userCount + "/2 " + spectatorString, "-1");
-            const isPrivateString:String = (room.isPrivate ? "!" : "");
+            var level:int = room.level;
+            var spectatorString:String = (room.specCount > 0) ? "+" + room.specCount + " " : "";
+            var roomPopulationString:String = MultiplayerChat.textFormatSize(room.userCount + "/2 " + spectatorString, "-1");
+            var isPrivateString:String = (room.isPrivate ? "!" : "");
             
-            if (room.playerCount > 0 && level != -1)
+            if (room.userCount > 0 && level != -1)
             {
-                const color:int = ArcGlobals.getDivisionColor(level);
-                const titleString:String = ArcGlobals.getDivisionTitle(level);
-                const dulledColour:String = MultiplayerChat.textDullColour(color, 1).toString(16);
-                const titlePrefix:String = "(" + titleString + ")";
+                var color:int = ArcGlobals.getDivisionColor(level);
+                var titleString:String = ArcGlobals.getDivisionTitle(level);
+                var dulledColour:String = MultiplayerChat.textDullColour(color, 1).toString(16);
+                var titlePrefix:String = "(" + titleString + ")";
 
                 return roomPopulationString + MultiplayerChat.textFormatColour(isPrivateString + titlePrefix, "#" + dulledColour) + " " + MultiplayerChat.textEscape(room.name);
             }
