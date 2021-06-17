@@ -4,8 +4,9 @@ package com.flashfla.net
 
     import arc.ArcGlobals;
     import arc.mp.MultiplayerSingleton;
+    import classes.Alert;
     import classes.Playlist;
-    import classes.Room
+    import classes.Room;
     import classes.User;
     import classes.Gameplay;
 
@@ -532,6 +533,32 @@ package com.flashfla.net
                 server.getRoomList();
         }
 
+        private function currentUserRoomCount():int
+        {
+            const userId:int = server.myUserId;
+            var roomCount:int = 0;
+
+            for each (var room:Room in rooms)
+            {
+                roomCount += (room.getUser(userId) != null ? 1 : 0);
+            }
+
+            return roomCount;
+        }
+
+        private function getCurrentRoom():Room
+        {
+            for each (var room:Room in rooms)
+            {
+                if (room != lobby && room.name != "The Entrance" && room.hasUser(currentUser))
+                {
+                    return room;
+                }
+            }
+
+            return null;
+        }
+
         /**
          * Sends a request to the server to join a specific room as a player or not.
          * Optionally, provide a password.
@@ -539,10 +566,27 @@ package com.flashfla.net
         public function joinRoom(room:Room, asPlayer:Boolean = true, password:String = ""):void
         {
             if (!connected || !room)
+            {
                 return;
+            }
+
+            var currentRoom:Room = getCurrentRoom();
+
+            if (currentRoom != null)
+            {
+                if (currentRoom.id == room.id)
+                {
+                    return;
+                }
+
+                server.leaveRoom(currentRoom.id);
+                Alert.add("ERROR: Cannot join two rooms at a time. Leaving previous room.", 120);
+            }
 
             if (room.isGameRoom)
+            {
                 asPlayer &&= room.userCount < Room.MAX_PLAYERS;
+            }
 
             server.joinRoom(room.id, password, !asPlayer, true);
         }
@@ -604,24 +648,33 @@ package com.flashfla.net
          */
         public function createRoom(name:String, password:String = "", maxUsers:int = 2, maxSpectators:int = 100):void
         {
-            if (connected && name)
+            const currentRoom:Room = getCurrentRoom();
+            if (currentRoom != null)
             {
-                var params:Object = {};
-                params.name = name;
-                params.password = password;
-                params.maxUsers = maxUsers;
-                params.maxSpectators = maxSpectators;
-                params.isGame = true;
-                params.exitCurrentRoom = false;
-                params.uCount = true;
-                params.joinAsSpectator = currentUser.isPlayer;
-                params.vars = [{name: "GAME_LEVEL", val: currentUser.userLevel, persistent: true},
-                    {name: "GAME_MODE", val: MODE_NORMAL, persistent: true},
-                    {name: "GAME_SCORE", val: MODE_SCORE_RAW, persistent: true},
-                    {name: "GAME_RANKED", val: true, persistent: true}];
-
-                server.createRoom(params);
+                server.leaveRoom(getCurrentRoom().id);
+                Alert.add("ERROR: Cannot join two rooms at a time. Leaving previous room.", 120);
             }
+            
+            if (!connected || name.length <= 0)
+            {
+                return;
+            }
+
+            var params:Object = {};
+            params.name = name;
+            params.password = password;
+            params.maxUsers = maxUsers;
+            params.maxSpectators = maxSpectators;
+            params.isGame = true;
+            params.exitCurrentRoom = false;
+            params.uCount = true;
+            params.joinAsSpectator = currentUser.isPlayer;
+            params.vars = [{name: "GAME_LEVEL", val: currentUser.userLevel, persistent: true},
+                {name: "GAME_MODE", val: MODE_NORMAL, persistent: true},
+                {name: "GAME_SCORE", val: MODE_SCORE_RAW, persistent: true},
+                {name: "GAME_RANKED", val: true, persistent: true}];
+
+            server.createRoom(params);
         }
 
         public function sendMessage(room:Room, message:String, escape:Boolean = true):void
@@ -672,7 +725,30 @@ package com.flashfla.net
 
                 vars["arc_engine" + currentUser.id] = null;
                 vars["arc_replay" + currentUser.id] = null;
+
+                // If no opponents, set the room's level to the currentUser's level
+                // A player spectates and there is a player left.
+                // A player spectates and there is no players left.
+                var remainingPlayer:User = null;
+                for each (var player:User in room.players)
+                {
+                    if (player.playerIdx != currentUserIdx)
+                    {
+                        remainingPlayer = player;
+                    }
+                }
+
+                if (remainingPlayer != null)
+                {
+                    vars["GAME_LEVEL"] = remainingPlayer.userLevel;
+                }
+                else
+                {
+                    vars["GAME_LEVEL"] = -1;
+                }
             }
+
+
 
             // Send room vars to server
             sendRoomVariables(room, vars);
@@ -680,11 +756,16 @@ package com.flashfla.net
 
         /**
          * Sends the current user's "player" variables (if any) to the server.
+         * @param room The room to send variables too.
+         * @param joining Whether the user is joining or not.
+         * @param leaving Whether the user is leaving the room or not. (Used for clearing variables)
          */
-        private function sendCurrentUserRoomVariables(room:Room):void
+        private function sendCurrentUserRoomVariables(room:Room, joining:Boolean = true, leaving:Boolean = false):void
         {
             if (!room.isGameRoom)
+            { 
                 return;
+            }
 
             var vars:Object = {};
             var currentUserIdx:int = room.getPlayerIndex(currentUser);
@@ -697,8 +778,10 @@ package com.flashfla.net
                 vars[prefix + "_UID"] = currentUser.id;
 
                 // If no opponents, set the room's level to the currentUser's level
-                if (!room.playerCount > 1)
+                if (joining || leaving && currentUser.isPlayer && room.level <= currentUser.userLevel)
+                {
                     vars["GAME_LEVEL"] = currentUser.userLevel;
+                }
 
                 sendRoomVariables(room, vars);
             }
@@ -1021,7 +1104,9 @@ package com.flashfla.net
             }
 
             if (user == currentUser)
-                sendCurrentUserRoomVariables(room);
+            {
+                sendCurrentUserRoomVariables(room, true);
+            }
 
             room.specCount -= 1;
             room.userCount += 1;
@@ -1185,7 +1270,7 @@ package com.flashfla.net
                     room.addUser(currentUser);
 
                     // Current user always gets -1 as a playerIdx on room join, so attempt to add it to players
-                    if (room.isGameRoom && !currentUser.isPlayer)
+                    if (room.isGameRoom && !currentUser.isPlayer && !user.isSpec)
                     {
                         var newPlayerIdx:int = room.addPlayer(currentUser);
 
@@ -1210,7 +1295,7 @@ package com.flashfla.net
 
             updateRoom(room);
 
-            sendCurrentUserRoomVariables(room);
+            sendCurrentUserRoomVariables(room, true);
             if (room.isPlayer(currentUser))
                 sendCurrentUserStatus(room);
 
@@ -1266,6 +1351,11 @@ package com.flashfla.net
                     user.playerIdx = -1;
 
                 room.removeUser(user.id);
+            }
+
+            if (currentUser.isPlayer)
+            {
+                sendCurrentUserRoomVariables(room, false, true);
             }
 
             eventRoomUser(room, user);

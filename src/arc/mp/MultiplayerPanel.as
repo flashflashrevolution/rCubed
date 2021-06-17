@@ -312,9 +312,13 @@ package arc.mp
             }
 
             if (room.isPrivate)
+            {
                 new Prompt(this, 320, "Password: " + room.name, 100, "SUBMIT", e_joinRoomPassword, true);
+            }
             else
+            {
                 connection.joinRoom(room, asPlayer);
+            }
         }
 
         private function updateRoomPanel(room:Room):void
@@ -358,14 +362,23 @@ package arc.mp
         private function nameRoom(room:Room):String
         {
             const level:int = room.level;
-            const color:int = ArcGlobals.getDivisionColor(level);
-            const title:String = ArcGlobals.getDivisionTitle(level);
-
-            const dulledColour:String = MultiplayerChat.textDullColour(color, 1).toString(16);
-            const roomName:String = "(" + title + ")";
             const spectatorString:String = (room.specCount > 0) ? "+" + room.specCount + " " : "";
+            const roomPopulationString:String = MultiplayerChat.textFormatSize(room.userCount + "/2 " + spectatorString, "-1");
+            const isPrivateString:String = (room.isPrivate ? "!" : "");
+            
+            if (room.userCount > 0 && level != -1)
+            {
+                const color:int = ArcGlobals.getDivisionColor(level);
+                const titleString:String = ArcGlobals.getDivisionTitle(level);
+                const dulledColour:String = MultiplayerChat.textDullColour(color, 1).toString(16);
+                const titlePrefix:String = "(" + titleString + ")";
 
-            return MultiplayerChat.textFormatSize(room.userCount + "/2 " + spectatorString, "-1") + MultiplayerChat.textFormatColour(MultiplayerChat.textEscape((room.isPrivate ? "!" : "") + roomName), "#" + dulledColour) + " " + room.name;
+                return roomPopulationString + MultiplayerChat.textFormatColour(isPrivateString + titlePrefix, "#" + dulledColour) + " " + MultiplayerChat.textEscape(room.name);
+            }
+            else
+            {
+                return roomPopulationString + " " + MultiplayerChat.textEscape(isPrivateString + room.name);
+            }
         }
 
         public function setParent(value:MenuPanel):void
