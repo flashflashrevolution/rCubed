@@ -1,3 +1,43 @@
+R^3 (v1.4.0) [2021-6-TBD]
+---------------------------------------------------------------------
+@Psycast
+- Didn't include any of the improvements found in the AF2021 engine.
+- Implement File Logging. (#275)
+- Refactor Alerts. (#272)
+- Update Air SDK URL to fixed version. (#259)
+- Add missing png sources for noteskins 8, 9, 10. (#258)
+- Invalid Auto-Music Offsets. (#257)
+- Fixes warning in console about finding a function while expecting a boolean. (#256)
+- Remove config blocks for air and not_air. (#110)
+
+@Zageron
+- Fix MP Spectating (#292) - Co-Author
+- Remove all event listeners from the core path of FFR. (#290) - Co-Author
+- Add options and functionality for skipping receptor animations. (#289)
+- Add 'Remove Receptor Judgement Animation' button. (#287)
+- Restore Aachen Light as judge font. (#276)
+- Add signed script that modifies the flex-config.xml to prevent compiler errors. (#273)
+
+@G-Flat
+- Use full commit SHA hash for workflows. (#264)
+- Allow previewing locked songs. (#263)
+- Keep language strings in optioons menu up-to-date. (#117)
+
+@mat100payette
+- Typed SFS entites. (#271)
+- Typed SFS events. (#267)
+- Fixed tab style on sfs package. (#266)
+- Fixed AIR SDK download link. (#261)
+- Added custom workspace support. (#261)
+
+@Sploder12
+- Fix MP Spectaing. (#292) - Co-Author
+- Remove all event listeners from the core path of FFR. (#290) - Co-Author
+- Add MP Ready button. (#288)
+- Add Column Filter To Results Screen. (#274)
+- Update behavior of Raw Good Flag. (#270)
+- Change Date Format to yyyy/MM/dd. (#268)
+
 R^3 (v1.3.1) [2020-12-24]
 ---------------------------------------------------------------------
 @Psycast
@@ -18,7 +58,7 @@ R^3 (v1.3.1) [2020-12-24]
 - Embed Readme images into repo. (#247) - Co-Author
 - Edit url prefix. (#245)
 
-@Trevor
+@Sploder12
 - Add combo colour for raw goods (#253)
 
 @Fission
