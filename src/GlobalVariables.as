@@ -4,6 +4,7 @@
 
 package
 {
+    import arc.mp.MultiplayerSingleton;
     import be.aboutme.airserver.AIRServer;
     import be.aboutme.airserver.endpoints.socket.SocketEndPoint;
     import be.aboutme.airserver.endpoints.socket.handlers.websocket.WebSocketClientHandlerFactory;
@@ -306,6 +307,12 @@ package
                 songCache[s].unload();
 
             songCache = [];
+
+            const mpInstance:MultiplayerSingleton = MultiplayerSingleton.getInstance();
+            if(mpInstance != null)
+            {
+                mpInstance.clearStatus();
+            }
         }
 
         public static const SONG_ACCESS_PLAYABLE:int = 0;

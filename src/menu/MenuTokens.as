@@ -193,8 +193,10 @@ package menu
                 if (level > 0)
                 {
                     var songData:Object = _playlist.getSongInfo(level);
-                    if (songData.error == null)
+                    if (!songData.hasOwnProperty("error"))
+                    {
                         token_songs.push(songData);
+                    }
                 }
             }
 

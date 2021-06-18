@@ -1311,7 +1311,7 @@ package menu
                 if (isCanonEngine)
                 {
                     var song_price:Number = songInfo.price;
-                    if (!isNaN(song_price) && song_price >= 0)
+                    if (!isNaN(song_price) && song_price > 0)
                     {
                         var hasEnoughCredits:Boolean = (_gvars.activeUser.credits >= song_price);
 
@@ -1982,7 +1982,7 @@ package menu
             if (response["status"] == 0)
             {
                 var songDetails:Object = _playlist.getSongInfo(level_id);
-                if (songDetails != null && songDetails.error == null)
+                if (songDetails != null && !songDetails.hasOwnProperty("error"))
                     Alert.add(sprintf(_lang.string("song_purchase_complete"), {"name": songDetails.name}), 120, Alert.DARK_GREEN);
 
                 _gvars.activeUser.setPurchasedString(response["purchased"]);

@@ -658,6 +658,7 @@ package classes
             gameSave.viewJudge = this.DISPLAY_JUDGE;
             gameSave.viewHealth = this.DISPLAY_HEALTH;
             gameSave.viewJudgeAnimations = this.DISPLAY_JUDGE_ANIMATIONS;
+            gameSave.viewReceptorAnimations = this.DISPLAY_RECEPTOR_ANIMATIONS;
             gameSave.viewGameTopBar = this.DISPLAY_GAME_TOP_BAR;
             gameSave.viewGameBottomBar = this.DISPLAY_GAME_BOTTOM_BAR;
             gameSave.viewScore = this.DISPLAY_SCORE;

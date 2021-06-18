@@ -242,6 +242,12 @@ package arc.mp
             }
         }
 
+        public function clearStatus():void
+        {
+            currentStatus = Multiplayer.STATUS_NONE;
+            updateCurrentUserStatus();
+        }
+
         // Should be called in MenuSongSelection whenever the selection changes.
         public function gameplayPicking(songInfo:SongInfo):void
         {
