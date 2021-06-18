@@ -22,7 +22,7 @@ package classes
         private static var _instance:Language = null;
 
         ///- Private Locals
-        private static var _gvars:GlobalVariables = null;
+        private var _gvars:GlobalVariables = _gvars = GlobalVariables.instance;
         private var _loader:URLLoader;
         private var _isLoaded:Boolean = false;
         private var _isLoading:Boolean = false;
@@ -38,8 +38,6 @@ package classes
             {
                 throw Error("Multi-Instance Blocked");
             }
-
-            _gvars = GlobalVariables.instance
         }
 
         public static function get instance():Language
