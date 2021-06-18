@@ -277,19 +277,7 @@ package arc.mp
             var roomItem:ContextMenuItem = new ContextMenuItem("Spectate");
             roomItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, function(event:ContextMenuEvent):void
             {
-                var item:Object = event.mouseTarget["data"];
-
-                if (!item)
-                    return;
-
-                var room:Room = item["data"];
-                joinRoom(room, false);
-            });
-            roomMenu.customItems.push(roomItem);
-            if (currentUser.isModerator)
-            {
-                roomItem = new ContextMenuItem("Nuke Room");
-                roomItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, function(event:ContextMenuEvent):void
+                if (event.mouseTarget.hasOwnProperty("data"))
                 {
                     var item:Object = event.mouseTarget["data"];
 
@@ -297,7 +285,25 @@ package arc.mp
                         return;
 
                     var room:Room = item["data"];
-                    connection.nukeRoom(room);
+                    joinRoom(room, false);
+                }
+            });
+            roomMenu.customItems.push(roomItem);
+            if (currentUser.isModerator)
+            {
+                roomItem = new ContextMenuItem("Nuke Room");
+                roomItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, function(event:ContextMenuEvent):void
+                {
+                    if (event.mouseTarget.hasOwnProperty("data"))
+                    {
+                        var item:Object = event.mouseTarget["data"];
+
+                        if (!item)
+                            return;
+
+                        var room:Room = item["data"];
+                        connection.nukeRoom(room);
+                    }
                 });
                 roomMenu.customItems.push(roomItem);
             }

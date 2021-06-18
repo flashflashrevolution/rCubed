@@ -778,7 +778,7 @@ package com.flashfla.net
                 vars[prefix + "_UID"] = currentUser.id;
 
                 // If no opponents, set the room's level to the currentUser's level
-                if (joining || leaving && currentUser.isPlayer && room.level <= currentUser.userLevel)
+                if (joining && currentUserIdx == 1 || (leaving && currentUser.isPlayer && room.level <= currentUser.userLevel))
                 {
                     vars["GAME_LEVEL"] = currentUser.userLevel;
                 }
@@ -1256,6 +1256,8 @@ package com.flashfla.net
          */
         private function onJoinedRoom(event:JoinedRoomSFSEvent):void
         {
+            updateRoom(event.room);
+
             var room:Room = getRoom(event.room);
 
             // Adds the users to the room
