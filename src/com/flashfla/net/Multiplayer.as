@@ -634,7 +634,7 @@ package com.flashfla.net
                 // Cannot switch to player if already a player in another room
                 if (currentUser.isPlayer)
                 {
-                    eventError(lang.string("mp_error_multiple_room_player_restriction"));
+                    eventError(_lang.string("mp_error_multiple_room_player_restriction"));
                     return;
                 }
 
