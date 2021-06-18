@@ -464,7 +464,8 @@ package
 
         private function e_retryClick(e:Event):void
         {
-            Alert.add("Reloading incomplete scripts...");
+            Alert.add(_lang.string("reload_scripts"));
+
             if (!_playlist.isLoaded())
             {
                 _playlist.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);

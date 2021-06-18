@@ -5,6 +5,7 @@ package com.flashfla.net
     import arc.ArcGlobals;
     import arc.mp.MultiplayerSingleton;
     import classes.Alert;
+    import classes.Language;
     import classes.Playlist;
     import classes.Room;
     import classes.User;
@@ -54,6 +55,8 @@ package com.flashfla.net
 
     public class Multiplayer extends EventDispatcher
     {
+        private var _lang:Language = Language.instance;
+
         private static const serverAddress:String = "flashflashrevolution.com";
         private static const serverPort:int = 8082;
 
@@ -580,7 +583,7 @@ package com.flashfla.net
                 }
 
                 server.leaveRoom(currentRoom.id);
-                Alert.add("ERROR: Cannot join two rooms at a time. Leaving previous room.", 120);
+                Alert.add(_lang.string("mp_error_multiple_room_restriction"), 120);
             }
 
             if (room.isGameRoom)
@@ -631,7 +634,7 @@ package com.flashfla.net
                 // Cannot switch to player if already a player in another room
                 if (currentUser.isPlayer)
                 {
-                    eventError("You cannot be a player in more than one game");
+                    eventError(lang.string("mp_error_multiple_room_player_restriction"));
                     return;
                 }
 
@@ -652,7 +655,7 @@ package com.flashfla.net
             if (currentRoom != null)
             {
                 server.leaveRoom(getCurrentRoom().id);
-                Alert.add("ERROR: Cannot join two rooms at a time. Leaving previous room.", 120);
+                Alert.add(_lang.string("mp_error_multiple_room_restriction"), 120);
             }
             
             if (!connected || name.length <= 0)

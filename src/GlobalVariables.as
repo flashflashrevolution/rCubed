@@ -11,6 +11,7 @@ package
     import by.blooddy.crypto.image.PNGEncoder;
     import classes.Alert;
     import classes.Playlist;
+    import classes.Language;
     import classes.SongInfo;
     import classes.SongPlayerBytes;
     import classes.StatTracker;
@@ -44,6 +45,7 @@ package
         ///- Singleton Instance
         private static var _instance:GlobalVariables = null;
         private var _loader:DynamicURLLoader;
+        private var _lang:Language = Language.instance;
 
         ///- Constants
         public static const LOAD_COMPLETE:String = "LoadComplete";
@@ -526,7 +528,7 @@ package
             }
             catch (e:Error)
             {
-                Alert.add("ERROR: Unable to save image.", 120);
+                Alert.add(_lang.string("save_image_error"), 120);
             }
         }
 

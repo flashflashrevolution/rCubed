@@ -1932,11 +1932,17 @@ package popups
                 }
                 judge.push({t: parseInt(items[0]), s: parseInt(items[1])});
             }
+
             _avars.configJudge = judge;
+            
             if (judge)
-                Alert.add("Judge window set, score saving disabled");
+            {
+                Alert.add(_lang.string("judge_window_set"));
+            }
             else
-                Alert.add("Judge window cleared");
+            {
+                Alert.add(_lang.string("judge_window_cleared"));
+            }
         }
 
         private function arcJudgeMenu():ContextMenu

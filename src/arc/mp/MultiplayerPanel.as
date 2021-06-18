@@ -5,6 +5,7 @@ package arc.mp
     import arc.mp.MultiplayerChat;
     import arc.mp.MultiplayerUsers;
     import classes.Alert;
+    import classes.Language;
     import classes.Room;
     import classes.User;
     import classes.ui.BoxButton;
@@ -35,6 +36,8 @@ package arc.mp
 
     public class MultiplayerPanel extends MenuPanel
     {
+        public var _lang:Language = Language.instance;
+
         private var controlChat:MultiplayerChat;
         private var controlUsers:MultiplayerUsers;
         private var controlRooms:List;
@@ -160,7 +163,7 @@ package arc.mp
 
         private function onServerMessageEvent(event:ServerMessageEvent):void
         {
-            Alert.add("Server Message: " + event.message);
+            Alert.add(_lang.string("mp_server_message") + event.message);
         }
 
         private function onConnectionEvent(event:ConnectionEvent):void

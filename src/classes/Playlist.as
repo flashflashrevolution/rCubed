@@ -22,6 +22,7 @@ package classes
 
         ///- Private Locals
         private var _gvars:GlobalVariables = GlobalVariables.instance;
+        private var _lang:Language = Language.instance;
         private var _loader:URLLoader;
         private var _isLoaded:Boolean = false;
         private var _isLoading:Boolean = false;
@@ -362,7 +363,7 @@ package classes
                 case GlobalVariables.LOAD_ERROR:
                     ArcGlobals.instance.configLegacy = null;
                     load();
-                    Alert.add("Error loading playlist");
+                    Alert.add(_lang.string("error_loading_playlist"));
                     break;
                 case GlobalVariables.LOAD_COMPLETE:
                     if (_gvars.gameMain.activePanel is MainMenu)

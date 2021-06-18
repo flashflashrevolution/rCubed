@@ -970,7 +970,7 @@ package game
                 Logger.error(this, "Wrote invalid response data to log folder. [logs/c_result.txt]");
                 AirContext.writeText("logs/c_result.txt", siteDataString);
 
-                Alert.add("Failed to save results. (ERR: JSON_ERROR)", 360, Alert.RED);
+                Alert.add(_lang.string("error_failed_to_save_results") + " (ERR: JSON_ERROR)", 360, Alert.RED);
 
                 if (resultsDisplay != null)
                     resultsDisplay.result_rank.htmlText = "Score save failed!";
@@ -1022,7 +1022,7 @@ package game
                     // Check Old vs New Rankings.
                     if (data.new_ranking < data.old_ranking && data.old_ranking > 0)
                     {
-                        Alert.add("New Best Rank: " + data.old_ranking + "->" + data.new_ranking + " (" + ((data.old_ranking - data.new_ranking) * -1) + ")", 240, Alert.DARK_GREEN);
+                        Alert.add(_lang.string("new_best_rank") + data.old_ranking + "->" + data.new_ranking + " (" + ((data.old_ranking - data.new_ranking) * -1) + ")", 240, Alert.DARK_GREEN);
                     }
 
                     // Check raw score vs level ranks and update.
@@ -1093,7 +1093,9 @@ package game
             else
             {
                 if (!data.ignore)
-                    Alert.add("Failed to save results. (ERR: " + data.result + ")", 360, Alert.RED);
+                {
+                    Alert.add(_lang.string("error_failed_to_save_results") + " (ERR: " + data.result + ")", 360, Alert.RED);
+                }
 
                 if (resultsDisplay != null)
                     resultsDisplay.result_rank.htmlText = data.ignore ? "" : "Score save failed!";
@@ -1232,8 +1234,6 @@ package game
 
             if (data.result == 0)
             {
-                //Alert.add("Score Saved successfully!", 90);
-
                 // Server Message
                 if (data.gServerMessage != null)
                 {
@@ -1309,7 +1309,7 @@ package game
             // Display F2 Shortcut key only once per session.
             if (!Flags.VALUES[Flags.F2_REPLAYS])
             {
-                Alert.add("Replay saved to History. (Press F2)", 150);
+                Alert.add(_lang.string("replay_save_success"), 150);
                 Flags.VALUES[Flags.F2_REPLAYS] = true;
             }
 

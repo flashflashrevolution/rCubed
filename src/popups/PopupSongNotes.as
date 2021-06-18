@@ -352,7 +352,9 @@ package popups
                 if (_data["result"] && _data["result"] == "success")
                 {
                     _gvars.playerUser.songRatings[songInfo["level"]] = sRating.value;
+                    
                     //Alert.add("Saved rating for " + sObject["name"] + "!", 120, Alert.GREEN);
+                    
                     if (_data["type"] && _data["type"] == 1)
                     {
                         _playlist.playList[songInfo["level"]]["song_rating"] = _data["new_value"];
