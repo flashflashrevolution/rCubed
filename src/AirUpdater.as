@@ -27,7 +27,7 @@ package
     public class AirUpdater extends MenuPanel
     {
         private var _site:Site = Site.instance;
-        private var _lang:Language = _lang = Language.instance;
+        private var _lang:Language = Language.instance;
 
         private var os:String = Capabilities.os.toLowerCase();
 

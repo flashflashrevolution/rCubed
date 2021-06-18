@@ -40,7 +40,6 @@ package
         ///- Singleton Instance
         private static var _instance:GlobalVariables = null;
         private var _loader:DynamicURLLoader;
-        private var _screenshot:Screenshots = new Screenshots();
 
         ///- Constants
         public static const LOAD_COMPLETE:String = "LoadComplete";
@@ -521,7 +520,7 @@ package
          */
         public function takeScreenShot(filename:String = null):void
         {
-            _screenshot.takeScreenShot(gameMain, filename);
+            Screenshots.takeScreenshot(gameMain, filename);
         }
 
         public function logDebugError(id:String, params:Object = null):void

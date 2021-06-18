@@ -13,16 +13,12 @@ package com.flashfla.utils
 
     public class Screenshots
     {
-        private var _lang:Language = null;
-
         //- ScreenShot Handling
         /**
          * Takes a screenshot of the stage and saves it to disk.
          */
-        public function takeScreenShot(gameMain:Main, filename:String = null):void
+        public static function takeScreenshot(gameMain:Main, filename:String = null):void
         {
-            _lang = Language.instance;
-
             // Create Bitmap of Stage
             var b:BitmapData = new BitmapData(Main.GAME_WIDTH, Main.GAME_HEIGHT, false, 0x000000);
             b.draw(gameMain.stage);
@@ -34,7 +30,7 @@ package com.flashfla.utils
             }
             catch (e:Error)
             {
-                Alert.add(_lang.string("save_image_error"), 120);
+                Alert.add(Language.instance.string("save_image_error"), 120);
             }
         }
     }
