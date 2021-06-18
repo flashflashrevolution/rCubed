@@ -22,7 +22,7 @@ package classes
         private static var _instance:Language = null;
 
         ///- Private Locals
-        private var _gvars:GlobalVariables = _gvars = GlobalVariables.instance;
+        private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _loader:URLLoader;
         private var _isLoaded:Boolean = false;
         private var _isLoading:Boolean = false;

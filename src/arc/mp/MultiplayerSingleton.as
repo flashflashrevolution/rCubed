@@ -24,6 +24,7 @@ package arc.mp
     import com.flashfla.net.events.RoomListEvent;
     import com.flashfla.net.events.RoomUserEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
+    import com.flashfla.utils.sprintf;
     import com.flashfla.utils.StringUtil;
     import flash.events.Event;
     import flash.events.TimerEvent;
@@ -172,7 +173,7 @@ package arc.mp
         {
             if (user != null && room.isGameRoom && user.id != currentUser.id && room.isPlayer(currentUser) && room.isPlayer(user))
             {
-                Alert.add(user.name + " " + _lang.string("mp_user_joins_room_alert"));
+                Alert.add(sprintf(_lang.string("mp_user_joins_room_alert"), {"username": user.name}));
             }
         }
 
