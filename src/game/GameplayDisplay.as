@@ -1761,13 +1761,13 @@ package game
                     defaultLayout[LAYOUT_MP_HEADER + "1"] = {x: 6, y: 190};
             }
 
-            defaultLayout[LAYOUT_MP_COMBO + (mpSpectate ? "2" : "1")] = defaultLayout[LAYOUT_COMBO_TOTAL];
-            defaultLayout[LAYOUT_MP_JUDGE + (mpSpectate ? "2" : "1")] = {x: 568, y: 102};
-            defaultLayout[LAYOUT_MP_PA + (mpSpectate ? "2" : "1")] = {x: 645, y: (mpSpectate ? 190 : 96)};
+            defaultLayout[LAYOUT_MP_COMBO + "2"] = defaultLayout[LAYOUT_COMBO_TOTAL];
+            defaultLayout[LAYOUT_MP_JUDGE + "2"] = {x: 568, y: 102};
+            defaultLayout[LAYOUT_MP_PA + "2"] = {x: 645, y: (mpSpectate ? 190 : 96)};
             if (options.displayMPPA)
-                defaultLayout[LAYOUT_MP_HEADER + (mpSpectate ? "2" : "1")] = {x: 25, y: -35, properties: {alignment: MPHeader.ALIGN_RIGHT}};
+                defaultLayout[LAYOUT_MP_HEADER + "2"] = {x: 25, y: -35, properties: {alignment: MPHeader.ALIGN_RIGHT}};
             else
-                defaultLayout[LAYOUT_MP_HEADER + (mpSpectate ? "2" : "1")] = {x: 690, y: 190, properties: {alignment: MPHeader.ALIGN_RIGHT}};
+                defaultLayout[LAYOUT_MP_HEADER + "2"] = {x: 690, y: 190, properties: {alignment: MPHeader.ALIGN_RIGHT}};
 
             noteBoxPositionDefault = interfaceLayout(LAYOUT_RECEPTORS);
 
