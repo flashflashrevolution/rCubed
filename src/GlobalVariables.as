@@ -113,13 +113,15 @@ package
 
         public function loadAirOptions():void
         {
-            air_useLocalFileCache = LocalStore.getVariable("air_useLocalFileCache", false);
-            air_autoSaveLocalReplays = LocalStore.getVariable("air_autoSaveLocalReplays", false);
+            air_useLocalFileCache = LocalStore.getVariable("air_useLocalFileCache", true);
+            air_autoSaveLocalReplays = LocalStore.getVariable("air_autoSaveLocalReplays", true);
             air_useVSync = LocalStore.getVariable("air_useVSync", false);
             air_useWebsockets = LocalStore.getVariable("air_useWebsockets", false);
 
             if (air_useWebsockets)
+            {
                 initWebsocketServer();
+            }
         }
 
         public function loadUserSongData():void
