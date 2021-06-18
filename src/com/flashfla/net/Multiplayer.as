@@ -307,7 +307,7 @@ package com.flashfla.net
         {
             var vars:Array = [];
 
-            vars["UID"] = currentUser.id;
+            vars["UID"] = currentUser.siteId;
             vars["GAME_VER"] = GAME_VERSION;
             vars["MP_LEVEL"] = currentUser.userLevel;
             vars["MP_CLASS"] = currentUser.userClass;
