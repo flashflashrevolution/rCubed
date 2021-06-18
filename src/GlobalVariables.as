@@ -8,10 +8,7 @@ package
     import be.aboutme.airserver.endpoints.socket.SocketEndPoint;
     import be.aboutme.airserver.endpoints.socket.handlers.websocket.WebSocketClientHandlerFactory;
     import be.aboutme.airserver.messages.Message;
-    import by.blooddy.crypto.image.PNGEncoder;
-    import classes.Alert;
     import classes.Playlist;
-    import classes.Language;
     import classes.SongInfo;
     import classes.SongPlayerBytes;
     import classes.StatTracker;
@@ -21,8 +18,6 @@ package
     import com.flashfla.loader.DataEvent;
     import com.flashfla.net.DynamicURLLoader;
     import com.flashfla.utils.Screenshots;
-    import com.flashfla.utils.DateUtil;
-    import flash.display.BitmapData;
     import flash.display.StageDisplayState;
     import flash.events.Event;
     import flash.events.EventDispatcher;
@@ -30,7 +25,6 @@ package
     import flash.events.SecurityErrorEvent;
     import flash.filesystem.File;
     import flash.media.SoundTransform;
-    import flash.net.FileReference;
     import flash.net.URLLoader;
     import flash.net.URLLoaderDataFormat;
     import flash.net.URLRequest;
@@ -46,7 +40,7 @@ package
         ///- Singleton Instance
         private static var _instance:GlobalVariables = null;
         private var _loader:DynamicURLLoader;
-        private var _screenshot:Screenshots;
+        private var _screenshot:Screenshots = new Screenshots();
 
         ///- Constants
         public static const LOAD_COMPLETE:String = "LoadComplete";

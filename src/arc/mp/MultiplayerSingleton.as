@@ -172,7 +172,7 @@ package arc.mp
         {
             if (user != null && room.isGameRoom && user.id != currentUser.id && room.isPlayer(currentUser) && room.isPlayer(user))
             {
-                Alert.add("A Challenger Appears! " + user.name);
+                Alert.add(user.name + " " + _lang.string("mp_user_joins_room_alert"));
             }
         }
 
