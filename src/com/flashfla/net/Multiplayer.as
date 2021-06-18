@@ -877,7 +877,7 @@ package com.flashfla.net
 
         private function eventConnection():void
         {
-            dispatchEvent(new ConnectionEvent());
+            dispatchEvent(new ConnectionEvent(inSolo));
         }
 
         private function eventLogin():void
@@ -902,7 +902,7 @@ package com.flashfla.net
 
         private function eventRoomJoined(room:Room):void
         {
-            dispatchEvent(new RoomJoinedEvent({room: room}));
+            dispatchEvent(new RoomJoinedEvent({room: room}, inSolo));
         }
 
         private function eventRoomLeft(room:Room):void
