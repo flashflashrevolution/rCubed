@@ -201,7 +201,8 @@ package game
             song = options.song;
             if (!options.isEditor && song.chart.Notes.length == 0)
             {
-                Alert.add("Chart has no notes, returning to main menu...", 120, Alert.RED);
+                Alert.add(_lang.string("error_chart_has_no_notes"), 120, Alert.RED);
+
                 var screen:int = _gvars.activeUser.startUpScreen;
                 if (!_gvars.activeUser.isGuest && (screen == 0 || screen == 1) && !MultiplayerSingleton.getInstance().connection.connected)
                 {
@@ -725,7 +726,6 @@ package game
         {
             Logger.error(this, "Post Start Load Failure: " + Logger.event_error(err));
             removeLoaderListeners();
-            //Alert.add("Error sending game start, score may not save", 60, Alert.RED);
         }
 
         /*#########################################################################################*\

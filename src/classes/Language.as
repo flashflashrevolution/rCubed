@@ -35,13 +35,18 @@ package classes
         public function Language(en:SingletonEnforcer)
         {
             if (en == null)
+            {
                 throw Error("Multi-Instance Blocked");
+            }
         }
 
         public static function get instance():Language
         {
             if (_instance == null)
+            {
                 _instance = new Language(new SingletonEnforcer());
+            }
+            
             return _instance;
         }
 

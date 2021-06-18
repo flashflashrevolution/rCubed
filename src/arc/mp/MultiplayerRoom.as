@@ -16,11 +16,14 @@ package arc.mp
     import flash.events.MouseEvent;
     import menu.MainMenu;
     import classes.Alert;
+    import classes.Language;
     import classes.Room;
     import classes.User;
 
     public class MultiplayerRoom extends Window
     {
+        public var _lang:Language = Language.instance;
+        
         private var controlChat:MultiplayerChat;
         private var controlUsers:MultiplayerUsers;
         private var controlSpectate:PushButton;
@@ -148,7 +151,7 @@ package arc.mp
                 }
                 else
                 {
-                    Alert.add("Load a song before readying up");
+                    Alert.add(_lang.string("mp_load_song_before_ready"));
                 }
             }
             else

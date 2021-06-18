@@ -4,6 +4,7 @@ package arc.mp
 
     import classes.Alert;
     import classes.Gameplay;
+    import classes.Language;
     import classes.Playlist;
     import classes.Room;
     import classes.SongInfo;
@@ -23,6 +24,7 @@ package arc.mp
     import com.flashfla.net.events.RoomListEvent;
     import com.flashfla.net.events.RoomUserEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
+    import com.flashfla.utils.sprintf;
     import com.flashfla.utils.StringUtil;
     import flash.events.Event;
     import flash.events.TimerEvent;
@@ -40,6 +42,7 @@ package arc.mp
     public class MultiplayerSingleton extends Object
     {
         private var _gvars:GlobalVariables = GlobalVariables.instance;
+        private var _lang:Language = Language.instance;
 
         public var connection:Multiplayer;
 
@@ -110,7 +113,7 @@ package arc.mp
 
         private function onError(event:ErrorEvent):void
         {
-            Alert.add("MP Error: " + event.message);
+            Alert.add(_lang.string("mp_error") + event.message);
         }
 
         private function onConnection(event:ConnectionEvent):void
@@ -169,13 +172,17 @@ package arc.mp
         private function updateRoomUser(room:Room, user:User):void
         {
             if (user != null && room.isGameRoom && user.id != currentUser.id && room.isPlayer(currentUser) && room.isPlayer(user))
-                Alert.add("A Challenger Appears! " + user.name);
+            {
+                Alert.add(sprintf(_lang.string("mp_user_joins_room_alert"), {"username": user.name}));
+            }
         }
 
         private function onMessage(event:MessageEvent):void
         {
             if (event.msgType == Multiplayer.MESSAGE_PRIVATE)
+            {
                 Alert.add("*** " + event.user.name + ": " + event.message);
+            }
         }
 
         private function forEachRoom(func:Function):void

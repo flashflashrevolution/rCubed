@@ -9,8 +9,6 @@ package
     import be.aboutme.airserver.endpoints.socket.SocketEndPoint;
     import be.aboutme.airserver.endpoints.socket.handlers.websocket.WebSocketClientHandlerFactory;
     import be.aboutme.airserver.messages.Message;
-    import by.blooddy.crypto.image.PNGEncoder;
-    import classes.Alert;
     import classes.Playlist;
     import classes.SongInfo;
     import classes.SongPlayerBytes;
@@ -20,8 +18,7 @@ package
     import classes.filter.EngineLevelFilter;
     import com.flashfla.loader.DataEvent;
     import com.flashfla.net.DynamicURLLoader;
-    import com.flashfla.utils.DateUtil;
-    import flash.display.BitmapData;
+    import com.flashfla.utils.Screenshots;
     import flash.display.StageDisplayState;
     import flash.events.Event;
     import flash.events.EventDispatcher;
@@ -29,7 +26,6 @@ package
     import flash.events.SecurityErrorEvent;
     import flash.filesystem.File;
     import flash.media.SoundTransform;
-    import flash.net.FileReference;
     import flash.net.URLLoader;
     import flash.net.URLLoaderDataFormat;
     import flash.net.URLRequest;
@@ -110,6 +106,15 @@ package
 
         private var websocket_server:AIRServer;
         private static var websocket_message:Message = new Message();
+
+        ///- Constructor
+        public function GlobalVariables(en:SingletonEnforcer)
+        {
+            if (en == null)
+            {
+                throw Error("Multi-Instance Blocked");
+            }
+        }
 
         public function loadAirOptions():void
         {
@@ -524,19 +529,7 @@ package
          */
         public function takeScreenShot(filename:String = null):void
         {
-            // Create Bitmap of Stage
-            var b:BitmapData = new BitmapData(Main.GAME_WIDTH, Main.GAME_HEIGHT, false, 0x000000);
-            b.draw(gameMain.stage);
-
-            try
-            {
-                var _file:FileReference = new FileReference();
-                _file.save(PNGEncoder.encode(b), AirContext.createFileName((filename != null ? filename : "R^3 - " + DateUtil.toRFC822(new Date()).replace(/:/g, ".")) + ".png"));
-            }
-            catch (e:Error)
-            {
-                Alert.add("ERROR: Unable to save image.", 120);
-            }
+            Screenshots.takeScreenshot(gameMain, filename);
         }
 
         public function logDebugError(id:String, params:Object = null):void
@@ -582,14 +575,7 @@ package
             }
         }
 
-        ///- Constructor
-        public function GlobalVariables(en:SingletonEnforcer)
-        {
-            if (en == null)
-            {
-                throw Error("Multi-Instance Blocked");
-            }
-        }
+
 
         public function unlockTokenById(type:String, id:String):void
         {
@@ -609,6 +595,7 @@ package
             {
                 _instance = new GlobalVariables(new SingletonEnforcer());
             }
+
             return _instance;
         }
     }

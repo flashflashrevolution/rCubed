@@ -53,7 +53,6 @@ package
             super(myParent);
 
             updateList = [];
-
         }
 
         override public function stageAdd():void

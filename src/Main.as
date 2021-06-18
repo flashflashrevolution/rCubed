@@ -67,10 +67,10 @@ package
         public static const POPUP_REPLAY_HISTORY:String = "PopupReplayHistory";
         public static const EVENT_PANEL_SWITCHED:String = "maineventswitched";
 
+        public var _lang:Language = Language.instance;
         public var _gvars:GlobalVariables = GlobalVariables.instance;
         public var _site:Site = Site.instance;
         public var _playlist:Playlist = Playlist.instance;
-        public var _lang:Language = Language.instance;
         //public var _friends:Friends = Friends.instance;
         public var _noteskins:Noteskins = Noteskins.instance;
 
@@ -464,7 +464,8 @@ package
 
         private function e_retryClick(e:Event):void
         {
-            Alert.add("Reloading incomplete scripts...");
+            Alert.add(_lang.string("reload_scripts"));
+
             if (!_playlist.isLoaded())
             {
                 _playlist.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
