@@ -775,7 +775,7 @@ package com.flashfla.net
                 var prefix:String = "P" + currentUserIdx;
 
                 vars[prefix + "_NAME"] = currentUser.name;
-                vars[prefix + "_UID"] = currentUser.id;
+                vars[prefix + "_UID"] = currentUser.siteId;
 
                 // If no opponents, set the room's level to the currentUser's level
                 if (joining && currentUserIdx == 1 || (leaving && currentUser.isPlayer && room.level <= currentUser.userLevel))

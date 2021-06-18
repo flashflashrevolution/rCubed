@@ -945,7 +945,7 @@ package game
         private function onEnterFrame(e:Event):void
         {
             // XXX: HACK HACK HACK
-            if (options.displayJudge)
+            if (options.displayJudge && player1Judge != null)
             {
                 player1Judge.updateJudge(e);
             }
