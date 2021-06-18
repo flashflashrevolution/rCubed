@@ -1022,7 +1022,14 @@ package game
                     // Check Old vs New Rankings.
                     if (data.new_ranking < data.old_ranking && data.old_ranking > 0)
                     {
-                        Alert.add(_lang.string("new_best_rank") + data.old_ranking + "->" + data.new_ranking + " (" + ((data.old_ranking - data.new_ranking) * -1) + ")", 240, Alert.DARK_GREEN);
+                        Alert.add(
+                            sprintf(
+                                _lang.string("new_best_rank"),
+                                {"old": data.old_ranking, "new": data.new_ranking, "diff": ((data.old_ranking - data.new_ranking) * -1)}
+                            ),
+                            240,
+                            Alert.DARK_GREEN
+                        );
                     }
 
                     // Check raw score vs level ranks and update.
