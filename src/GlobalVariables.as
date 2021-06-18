@@ -20,6 +20,7 @@ package
     import classes.filter.EngineLevelFilter;
     import com.flashfla.loader.DataEvent;
     import com.flashfla.net.DynamicURLLoader;
+    import com.flashfla.utils.Screenshots;
     import com.flashfla.utils.DateUtil;
     import flash.display.BitmapData;
     import flash.display.StageDisplayState;
@@ -45,7 +46,7 @@ package
         ///- Singleton Instance
         private static var _instance:GlobalVariables = null;
         private var _loader:DynamicURLLoader;
-        private var _lang:Language = Language.instance;
+        private var _screenshot:Screenshots;
 
         ///- Constants
         public static const LOAD_COMPLETE:String = "LoadComplete";
@@ -111,6 +112,15 @@ package
 
         private var websocket_server:AIRServer;
         private static var websocket_message:Message = new Message();
+
+        ///- Constructor
+        public function GlobalVariables(en:SingletonEnforcer)
+        {
+            if (en == null)
+            {
+                throw Error("Multi-Instance Blocked");
+            }
+        }
 
         public function loadAirOptions():void
         {
@@ -517,19 +527,7 @@ package
          */
         public function takeScreenShot(filename:String = null):void
         {
-            // Create Bitmap of Stage
-            var b:BitmapData = new BitmapData(Main.GAME_WIDTH, Main.GAME_HEIGHT, false, 0x000000);
-            b.draw(gameMain.stage);
-
-            try
-            {
-                var _file:FileReference = new FileReference();
-                _file.save(PNGEncoder.encode(b), AirContext.createFileName((filename != null ? filename : "R^3 - " + DateUtil.toRFC822(new Date()).replace(/:/g, ".")) + ".png"));
-            }
-            catch (e:Error)
-            {
-                Alert.add(_lang.string("save_image_error"), 120);
-            }
+            _screenshot.takeScreenShot(gameMain, filename);
         }
 
         public function logDebugError(id:String, params:Object = null):void
@@ -575,14 +573,7 @@ package
             }
         }
 
-        ///- Constructor
-        public function GlobalVariables(en:SingletonEnforcer)
-        {
-            if (en == null)
-            {
-                throw Error("Multi-Instance Blocked");
-            }
-        }
+
 
         public function unlockTokenById(type:String, id:String):void
         {
@@ -602,6 +593,7 @@ package
             {
                 _instance = new GlobalVariables(new SingletonEnforcer());
             }
+
             return _instance;
         }
     }

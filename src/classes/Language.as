@@ -22,7 +22,7 @@ package classes
         private static var _instance:Language = null;
 
         ///- Private Locals
-        private var _gvars:GlobalVariables = GlobalVariables.instance;
+        private static var _gvars:GlobalVariables = null;
         private var _loader:URLLoader;
         private var _isLoaded:Boolean = false;
         private var _isLoading:Boolean = false;
@@ -35,13 +35,20 @@ package classes
         public function Language(en:SingletonEnforcer)
         {
             if (en == null)
+            {
                 throw Error("Multi-Instance Blocked");
+            }
+
+            _gvars = GlobalVariables.instance
         }
 
         public static function get instance():Language
         {
             if (_instance == null)
+            {
                 _instance = new Language(new SingletonEnforcer());
+            }
+            
             return _instance;
         }
 

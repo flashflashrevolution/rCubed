@@ -27,7 +27,7 @@ package
     public class AirUpdater extends MenuPanel
     {
         private var _site:Site = Site.instance;
-        private var _lang:Language = Language.instance;
+        private var _lang:Language = null;
 
         private var os:String = Capabilities.os.toLowerCase();
 
@@ -50,10 +50,11 @@ package
 
         public function AirUpdater(myParent:MenuPanel)
         {
+            _lang = Language.instance;
+
             super(myParent);
 
             updateList = [];
-
         }
 
         override public function stageAdd():void

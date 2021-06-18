@@ -31,7 +31,7 @@ package
     public class LoginMenu extends MenuPanel
     {
         private var _gvars:GlobalVariables = GlobalVariables.instance;
-        private var _lang:Language = Language.instance;
+        private var _lang:Language = null;
         private var _loader:URLLoader;
 
         private const STORED_NONE:int = 0;
@@ -52,6 +52,8 @@ package
 
         public function LoginMenu(myParent:MenuPanel)
         {
+            _lang = Language.instance;
+            
             super(myParent);
 
             savedInfos = loadLoginDetails();
