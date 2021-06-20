@@ -8,11 +8,13 @@ package com.flashfla.net.events
     public class RoomJoinedEvent extends TypedSFSEvent
     {
         public var room:Room;
+        public var isSolo:Boolean;
 
-        public function RoomJoinedEvent(params:Object)
+        public function RoomJoinedEvent(params:Object, _isSolo:Boolean = false)
         {
             super(Multiplayer.EVENT_ROOM_JOINED);
             room = params.room;
+            isSolo = _isSolo;
         }
     }
 }

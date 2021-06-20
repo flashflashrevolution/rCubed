@@ -123,7 +123,7 @@ package arc.mp
 
         private function onConnectionEvent(event:ConnectionEvent):void
         {
-            if (!connection.connected)
+            if (!connection.connected && !event.isSolo)
                 textAreaAddLine(textFormatDisconnect());
         }
 
@@ -134,7 +134,7 @@ package arc.mp
 
         private function onRoomJoinedEvent(event:RoomJoinedEvent):void
         {
-            if (event.room == room)
+            if (event.room == room && !event.isSolo)
                 textAreaAddLine(textFormatJoin(room));
         }
 
