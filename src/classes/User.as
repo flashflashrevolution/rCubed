@@ -515,6 +515,8 @@ package classes
                 this.DISPLAY_JUDGE = _settings.viewJudge;
             if (_settings.viewJudgeAnimations != null)
                 this.DISPLAY_JUDGE_ANIMATIONS = _settings.viewJudgeAnimations;
+            if (_settings.viewReceptorAnimations != null)
+                this.DISPLAY_RECEPTOR_ANIMATIONS = _settings.viewReceptorAnimations;
             if (_settings.viewHealth != null)
                 this.DISPLAY_HEALTH = _settings.viewHealth;
             if (_settings.viewGameTopBar != null)
