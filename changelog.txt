@@ -2,6 +2,7 @@ R^3 (v1.4.0) [2021-6-TBD]
 ---------------------------------------------------------------------
 @Psycast
 - Didn't include any of the improvements found in the AF2021 engine.
+- Fix loading of the receptor animation setting. (#312)
 - Implement File Logging. (#275)
 - Refactor Alerts. (#272)
 - Update Air SDK URL to fixed version. (#259)
@@ -11,6 +12,8 @@ R^3 (v1.4.0) [2021-6-TBD]
 - Remove config blocks for air and not_air. (#110)
 
 @Zageron
+- Sync room variables. (#321)
+- Resolve spectating issues when leaving and joining rooms. (#319)
 - Add a bunch of new strings. (#307)
 - Enable local file cache and local replays by default. (#304)
 - Fix MP Spectating. (#292) - Co-Author
@@ -33,6 +36,7 @@ R^3 (v1.4.0) [2021-6-TBD]
 - Added custom workspace support. (#261)
 
 @Sploder12
+- Stop MP disconnect/reconnect message spam. (#311)
 - Fix clearing songs properly in mp. (#303)
 - Fix MP Spectating. (#292) - Co-Author
 - Remove all event listeners from the core path of FFR. (#290) - Co-Author
