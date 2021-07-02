@@ -75,7 +75,7 @@ package arc.mp
 
             // Player state button
             controlState = new PushButton();
-            controlState.label = room.isPlayer(currentUser) ? "Ready" : (currentUser.isSpec ? "Stop Spectating" : "Start Spectating");
+            controlState.label = room.isPlayer(currentUser) ? "Ready" : (currentUser.wantsToWatch ? "Stop Spectating" : "Start Spectating");
             controlState.setSize(controlUsers.width, controlChat.controlInput.height);
             controlState.move(controlUsers.x, controlUsers.y + controlUsers.height - controlChat.controlInput.height);
             controlState.addEventListener(MouseEvent.CLICK, onStateButtonClick);
@@ -156,11 +156,12 @@ package arc.mp
             }
             else
             {
-                currentUser.isSpec = !currentUser.isSpec;
-                Alert.add(currentUser.isSpec ? "Now spectating games in " + room.name : "No longer spectating games in " + room.name);
-                if(currentUser.isSpec && room.isAllPlayersInStatus(Multiplayer.STATUS_PLAYING) && room.isAllPlayersSameSong())
+                currentUser.wantsToWatch = !currentUser.wantsToWatch;
+                Alert.add(currentUser.wantsToWatch ? "Now spectating games in " + room.name : "No longer spectating games in " + room.name);
+                if(currentUser.wantsToWatch && room.isAllPlayersInStatus(Multiplayer.STATUS_PLAYING) && room.isAllPlayersSameSong())
                 {
                     room.songInfo = room.getPlayersSong()
+                    connection.lastRoomGamePlayerCount = room.playerCount;
                     MultiplayerSingleton.getInstance().spectateGame(room);
                 }
             }
@@ -172,7 +173,10 @@ package arc.mp
         {
             // If the current room has started gameplay, enter spectating view
             if (event.room == room && GlobalVariables.instance.gameMain.activePanel is MainMenu)
+            {
+                connection.lastRoomGamePlayerCount = room.playerCount;
                 MultiplayerSingleton.getInstance().spectateGame(room);
+            }
         }
 
         private function onConnectionUpdate(event:ConnectionEvent):void
@@ -205,7 +209,7 @@ package arc.mp
         private function updateRoomDisplay():void
         {
             controlSpectate.label = room.isPlayer(currentUser) ? "Spectate" : (room.playerCount < 2 ? "Join Game" : "Cannot Join Game");
-            controlState.label = room.isPlayer(currentUser) ? "Ready" : (currentUser.isSpec ? "Stop Spectating" : "Start Spectating");
+            controlState.label = room.isPlayer(currentUser) ? "Ready" : (currentUser.wantsToWatch ? "Stop Spectating" : "Start Spectating");
         }
     }
 }
