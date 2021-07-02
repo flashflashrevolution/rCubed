@@ -2,6 +2,7 @@ R^3 (v1.4.0) [2021-6-TBD]
 ---------------------------------------------------------------------
 @Psycast
 - Didn't include any of the improvements found in the AF2021 engine.
+- Fix loading of the receptor animation setting. (#312)
 - Implement File Logging. (#275)
 - Refactor Alerts. (#272)
 - Update Air SDK URL to fixed version. (#259)
@@ -11,7 +12,11 @@ R^3 (v1.4.0) [2021-6-TBD]
 - Remove config blocks for air and not_air. (#110)
 
 @Zageron
-- Fix MP Spectating (#292) - Co-Author
+- Sync room variables. (#321)
+- Resolve spectating issues when leaving and joining rooms. (#319)
+- Add a bunch of new strings. (#307)
+- Enable local file cache and local replays by default. (#304)
+- Fix MP Spectating. (#292) - Co-Author
 - Remove all event listeners from the core path of FFR. (#290) - Co-Author
 - Add options and functionality for skipping receptor animations. (#289)
 - Add 'Remove Receptor Judgement Animation' button. (#287)
@@ -21,17 +26,19 @@ R^3 (v1.4.0) [2021-6-TBD]
 @G-Flat
 - Use full commit SHA hash for workflows. (#264)
 - Allow previewing locked songs. (#263)
-- Keep language strings in optioons menu up-to-date. (#117)
+- Keep language strings in options menu up-to-date. (#117)
 
 @mat100payette
-- Typed SFS entites. (#271)
+- Typed SFS entities. (#271)
 - Typed SFS events. (#267)
 - Fixed tab style on sfs package. (#266)
 - Fixed AIR SDK download link. (#261)
 - Added custom workspace support. (#261)
 
 @Sploder12
-- Fix MP Spectaing. (#292) - Co-Author
+- Stop MP disconnect/reconnect message spam. (#311)
+- Fix clearing songs properly in mp. (#303)
+- Fix MP Spectating. (#292) - Co-Author
 - Remove all event listeners from the core path of FFR. (#290) - Co-Author
 - Add MP Ready button. (#288)
 - Add Column Filter To Results Screen. (#274)
