@@ -1263,6 +1263,9 @@ package com.flashfla.net
 
             var room:Room = getRoom(event.room);
 
+            // Make sure the room variables are up to date with the variables from event.room
+            room.variables = event.room.variables;
+
             // Adds the users to the room
             for each (var user:User in event.users)
             {
