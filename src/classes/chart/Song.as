@@ -133,7 +133,7 @@ package classes.chart
             var url_file_hash:String = "";
             if ((_gvars.air_useLocalFileCache) && AirContext.doesFileExist(AirContext.getSongCachePath(this) + "data.bin"))
             {
-                localFileData = AirContext.readFile(AirContext.getAppPath(AirContext.getSongCachePath(this) + "data.bin"), (this.songInfo.engine ? 0 : this.id));
+                localFileData = AirContext.readFile(AirContext.getAppFile(AirContext.getSongCachePath(this) + "data.bin"), (this.songInfo.engine ? 0 : this.id));
                 localFileHash = MD5.hashBytes(localFileData);
                 url_file_hash = "hash=" + localFileHash + "&";
 
@@ -341,7 +341,7 @@ package classes.chart
                     try
                     {
                         Logger.info(this, "Saving Cache File for " + this.id);
-                        AirContext.writeFile(AirContext.getAppPath(AirContext.getSongCachePath(this) + "data.bin"), storeChartData);
+                        AirContext.writeFile(AirContext.getAppFile(AirContext.getSongCachePath(this) + "data.bin"), storeChartData);
                     }
                     catch (err:Error)
                     {

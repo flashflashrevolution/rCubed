@@ -281,7 +281,7 @@ package classes
             {
                 Logger.error(this, "Profile Parse Failure: " + Logger.exception_error(err));
                 Logger.error(this, "Wrote invalid response data to log folder. [logs/user_main.txt]");
-                AirContext.writeText("logs/user_main.txt", siteDataString);
+                AirContext.writeTextFile(AirContext.getAppFile("logs/user_main.txt"), siteDataString);
 
                 _loadError = true;
                 this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));

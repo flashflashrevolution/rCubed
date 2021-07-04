@@ -12,6 +12,7 @@ package game
     import classes.Alert;
     import classes.Language;
     import classes.Playlist;
+    import classes.SongInfo;
     import classes.replay.Replay;
     import classes.ui.BoxButton;
     import classes.ui.BoxIcon;
@@ -30,9 +31,6 @@ package game
     import flash.events.KeyboardEvent;
     import flash.events.MouseEvent;
     import flash.events.SecurityErrorEvent;
-    import flash.filesystem.File;
-    import flash.filesystem.FileMode;
-    import flash.filesystem.FileStream;
     import flash.net.URLRequest;
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
@@ -45,7 +43,6 @@ package game
     import popups.PopupMessage;
     import popups.PopupSongNotes;
     import popups.PopupTokenUnlock;
-    import classes.SongInfo;
 
     public class GameResults extends MenuPanel
     {
@@ -968,7 +965,7 @@ package game
             {
                 Logger.error(this, "Canon Parse Failure: " + Logger.exception_error(err));
                 Logger.error(this, "Wrote invalid response data to log folder. [logs/c_result.txt]");
-                AirContext.writeText("logs/c_result.txt", siteDataString);
+                AirContext.writeTextFile(AirContext.getAppFile("logs/c_result.txt"), siteDataString);
 
                 Alert.add(_lang.string("error_failed_to_save_results") + " (ERR: JSON_ERROR)", 360, Alert.RED);
 
@@ -1022,14 +1019,7 @@ package game
                     // Check Old vs New Rankings.
                     if (data.new_ranking < data.old_ranking && data.old_ranking > 0)
                     {
-                        Alert.add(
-                            sprintf(
-                                _lang.string("new_best_rank"),
-                                {"old": data.old_ranking, "new": data.new_ranking, "diff": ((data.old_ranking - data.new_ranking) * -1)}
-                            ),
-                            240,
-                            Alert.DARK_GREEN
-                        );
+                        Alert.add(sprintf(_lang.string("new_best_rank"), {"old": data.old_ranking, "new": data.new_ranking, "diff": ((data.old_ranking - data.new_ranking) * -1)}), 240, Alert.DARK_GREEN);
                     }
 
                     // Check raw score vs level ranks and update.
@@ -1227,7 +1217,7 @@ package game
             {
                 Logger.error(this, "Alt Parse Failure: " + Logger.exception_error(err));
                 Logger.error(this, "Wrote invalid response data to log folder. [logs/a_result.txt]");
-                AirContext.writeText("logs/a_result.txt", siteDataString);
+                AirContext.writeTextFile(AirContext.getAppFile("logs/a_result.txt"), siteDataString);
                 return;
             }
 
@@ -1330,16 +1320,10 @@ package game
                     path += "_" + (new Date().getTime())
                     path += "_" + (result.pa_string + "-" + result.max_combo);
 
-                    var fileStream:FileStream;
-
                     // Store Bin Encoded Replay
                     if (!AirContext.doesFileExist(path + ".txt"))
                     {
-                        var replayFileText:File = new File(AirContext.getAppPath(path + ".txt"));
-                        fileStream = new FileStream();
-                        fileStream.open(replayFileText, FileMode.WRITE);
-                        fileStream.writeUTFBytes(nR.getEncode());
-                        fileStream.close();
+                        AirContext.writeTextFile(AirContext.getAppFile(path + ".txt"), nR.getEncode());
                     }
                 }
                 catch (err:Error)

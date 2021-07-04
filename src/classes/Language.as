@@ -46,7 +46,7 @@ package classes
             {
                 _instance = new Language(new SingletonEnforcer());
             }
-            
+
             return _instance;
         }
 
@@ -166,7 +166,7 @@ package classes
             {
                 Logger.error(this, "Parse Failure: " + Logger.exception_error(err));
                 Logger.error(this, "Wrote invalid response data to log folder. [logs/language.txt]");
-                AirContext.writeText("logs/language.txt", siteDataString);
+                AirContext.writeTextFile(AirContext.getAppFile("logs/language.txt"), siteDataString);
 
                 _loadError = true;
                 this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
@@ -201,7 +201,7 @@ package classes
                 }
                 indexed[data[lang]["_index"]] = lang;
             }
-            
+
             _isLoaded = true;
             _loadError = false;
             Logger.info(this, "Parse Complete");

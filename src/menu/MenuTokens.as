@@ -252,7 +252,6 @@ package menu
 
         private function mouseWheelMoved(e:MouseEvent):void
         {
-
             var dist:Number = scrollbar.scroll + (pane.scrollFactorVertical / 2) * (e.delta > 0 ? -1 : 1);
             pane.scrollTo(dist);
             scrollbar.scrollTo(dist);

@@ -1,7 +1,3 @@
-/**
- * @author Jonathan (Velocity)
- */
-
 package
 {
     import arc.mp.MultiplayerSingleton;
@@ -133,8 +129,8 @@ package
         {
             // Export SQL to JSON
             var db_name:String = "dbinfo/" + (activeUser != null && activeUser.siteId > 0 ? activeUser.siteId : "0") + "_info.";
-            var sql_file:File = new File(AirContext.getAppPath(db_name + "db"));
-            var json_file:File = new File(AirContext.getAppPath(db_name + "json"));
+            var sql_file:File = AirContext.getAppFile(db_name + "db");
+            var json_file:File = AirContext.getAppFile(db_name + "json");
 
             // Use JSON first
             if (json_file.exists)
@@ -161,7 +157,7 @@ package
                     writeUserSongData();
 
                     // Create Backup File
-                    var backupFile:File = new File(AirContext.getAppPath(db_name + "db.bak"));
+                    var backupFile:File = AirContext.getAppFile(db_name + "db.bak");
                     for (var i:int = 0; i < 10; i++)
                     {
                         if (!backupFile.exists)
@@ -170,7 +166,7 @@ package
                             break;
                         }
 
-                        backupFile = new File(AirContext.getAppPath(db_name + "db.bak" + i));
+                        backupFile = AirContext.getAppFile(db_name + "db.bak" + i);
                     }
                 });
             }
@@ -179,7 +175,7 @@ package
         public function writeUserSongData():void
         {
             var db_name:String = "dbinfo/" + (activeUser != null && activeUser.siteId > 0 ? activeUser.siteId : "0") + "_info.";
-            var json_file:File = new File(AirContext.getAppPath(db_name + "json"));
+            var json_file:File = AirContext.getAppFile(db_name + "json");
             SQLQueries.writeFile(json_file);
         }
 
@@ -244,7 +240,7 @@ package
             // Load Existing Menu Music SWF
             if (AirContext.doesFileExist(Constant.MENU_MUSIC_PATH))
             {
-                var file_bytes:ByteArray = AirContext.readFile(AirContext.getAppPath(Constant.MENU_MUSIC_PATH));
+                var file_bytes:ByteArray = AirContext.readFile(AirContext.getAppFile(Constant.MENU_MUSIC_PATH));
                 if (file_bytes && file_bytes.length > 0)
                 {
                     menuMusic = new SongPlayerBytes(file_bytes);
@@ -253,7 +249,7 @@ package
             // Convert MP3 if exist.
             else if (AirContext.doesFileExist(Constant.MENU_MUSIC_MP3_PATH))
             {
-                var mp3Bytes:ByteArray = AirContext.readFile(AirContext.getAppPath(Constant.MENU_MUSIC_MP3_PATH));
+                var mp3Bytes:ByteArray = AirContext.readFile(AirContext.getAppFile(Constant.MENU_MUSIC_MP3_PATH));
                 if (mp3Bytes && mp3Bytes.length > 0)
                 {
                     menuMusic = new SongPlayerBytes(mp3Bytes, true);
@@ -316,7 +312,7 @@ package
             songCache = [];
 
             const mpInstance:MultiplayerSingleton = MultiplayerSingleton.getInstance();
-            if(mpInstance != null)
+            if (mpInstance != null)
             {
                 mpInstance.clearStatus();
             }

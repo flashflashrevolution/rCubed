@@ -1,7 +1,3 @@
-/**
- * @author Jonathan (Velocity)
- */
-
 package menu
 {
     import arc.ArcGlobals;
@@ -2097,7 +2093,7 @@ package menu
          */
         private function writeMenuMusicBytes(song:Song):void
         {
-            AirContext.writeFile(AirContext.getAppPath(Constant.MENU_MUSIC_PATH), song.bytesSWF);
+            AirContext.writeFile(AirContext.getAppFile(Constant.MENU_MUSIC_PATH), song.bytesSWF);
         }
     }
 }

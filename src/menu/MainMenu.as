@@ -1,7 +1,3 @@
-/**
- * @author Jonathan (Velocity)
- */
-
 package menu
 {
     import arc.ArcGlobals;
@@ -319,7 +315,7 @@ package menu
                 _gvars.menuMusic = null;
                 menuMusicControls.parent.removeChild(menuMusicControls);
 
-                AirContext.deleteFile(AirContext.getAppPath(Constant.MENU_MUSIC_PATH));
+                AirContext.deleteFile(AirContext.getAppFile(Constant.MENU_MUSIC_PATH));
             }
         }
 

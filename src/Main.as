@@ -142,6 +142,7 @@ package
 
             //- Static Class Init
             Logger.init();
+            AirContext.initFolders();
             Alert.init(stage);
 
             //- Setup Tween Override mode

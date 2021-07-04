@@ -91,7 +91,7 @@ package classes
             {
                 Logger.error(this, "Parse Failure: " + Logger.exception_error(err));
                 Logger.error(this, "Wrote invalid response data to log folder. [logs/site.txt]");
-                AirContext.writeText("logs/site.txt", siteDataString);
+                AirContext.writeTextFile(AirContext.getAppFile("logs/site.txt"), siteDataString);
 
                 _loadError = true;
                 this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));

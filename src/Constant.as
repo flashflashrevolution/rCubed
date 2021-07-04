@@ -62,6 +62,7 @@ package
         // File Constants
         public static const MENU_MUSIC_PATH:String = "menu_music.swf";
         public static const MENU_MUSIC_MP3_PATH:String = "menu_music.mp3"
+        public static const NOTESKIN_PATH:String = "noteskins/";
         public static const REPLAY_PATH:String = "replays/";
         public static const SONG_CACHE_PATH:String = "song_cache/";
 
