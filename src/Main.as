@@ -395,29 +395,32 @@ package
 
                 buildContextMenu();
 
-                CONFIG::release
+                CONFIG::updater
                 {
-                    // Do Air Update Check
-                    if (!Flags.VALUES[Flags.DID_AIR_UPDATE_CHECK])
+                    CONFIG::release
                     {
-                        Flags.VALUES[Flags.DID_AIR_UPDATE_CHECK] = true;
-                        var airUpdateCheck:int = AirContext.serverVersionHigher(_site.data["game_r3air_version"]);
-                        //addAlert(_site.data["game_r3air_version"] + " " + (airUpdateCheck == -1 ? "&gt;" : (airUpdateCheck == 1 ? "&lt;" : "==")) + " " + Constant.AIR_VERSION, 240);
-                        if (airUpdateCheck == -1)
+                        // Do Air Update Check
+                        if (!Flags.VALUES[Flags.DID_AIR_UPDATE_CHECK])
                         {
-                            loadScripts = 0;
-                            preloader.remove();
-                            removeChild(loadStatus);
-                            removeChild(epilepsyWarning);
-                            this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
+                            Flags.VALUES[Flags.DID_AIR_UPDATE_CHECK] = true;
+                            var airUpdateCheck:int = AirContext.serverVersionHigher(_site.data["game_r3air_version"]);
+                            //addAlert(_site.data["game_r3air_version"] + " " + (airUpdateCheck == -1 ? "&gt;" : (airUpdateCheck == 1 ? "&lt;" : "==")) + " " + Constant.AIR_VERSION, 240);
+                            if (airUpdateCheck == -1)
+                            {
+                                loadScripts = 0;
+                                preloader.remove();
+                                removeChild(loadStatus);
+                                removeChild(epilepsyWarning);
+                                this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
 
-                            // Switch to game
-                            switchTo(GAME_UPDATE_PANEL);
-                            return;
-                        }
-                        else
-                        {
-                            LocalStore.deleteVariable("air_update_checks");
+                                // Switch to game
+                                switchTo(GAME_UPDATE_PANEL);
+                                return;
+                            }
+                            else
+                            {
+                                LocalStore.deleteVariable("air_update_checks");
+                            }
                         }
                     }
                 }
