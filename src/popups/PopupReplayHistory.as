@@ -200,7 +200,7 @@ package popups
                 if (eT - sT > 25) // 25ms, prevent UI freezing.
                     break;
 
-                var txt:String = AirContext.readFile(FILE_TRACK.file_paths.shift()).toString();
+                var txt:String = AirContext.readFile(AirContext.getAppFile(FILE_TRACK.file_paths.shift())).toString();
                 var r:Replay = new Replay(new Date().getTime() + loadCount);
                 r.parseEncode(txt, false);
                 r.fileReplay = true;
