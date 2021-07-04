@@ -11,6 +11,7 @@ package assets
         static public var BG_DARK:int = 0x033242;
         static public var BG_STATIC:int = 0x0C6A88;
         static public var BG_POPUP:int = 0x074B62;
+        static public var BG_STAGE:int = 0x000000;
 
         public function GameBackgroundColor()
         {

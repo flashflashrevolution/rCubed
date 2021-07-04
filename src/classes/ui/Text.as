@@ -44,6 +44,8 @@ package classes.ui
             _textTF.embedFonts = true;
             _textTF.antiAliasType = AntiAliasType.ADVANCED;
             _textTF.autoSize = "left";
+            //_textTF.border = true;
+            //_textTF.borderColor = 0xFF0000;
             this.addChild(_textTF);
 
             draw();
@@ -154,6 +156,7 @@ package classes.ui
                 if (_width > 0)
                 {
                     //- Fit Witin Area
+                    _textTF.scaleX = _textTF.scaleY = 1;
                     if (_textTF.width > _width)
                         _textTF.scaleX = _textTF.scaleY = _width / _textTF.width;
 
