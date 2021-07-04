@@ -450,6 +450,8 @@ package game
             GPU_PIXEL_BITMAP = new Bitmap(GPU_PIXEL_BMD);
             this.addChild(GPU_PIXEL_BITMAP);
 
+            stage.color = GameBackgroundColor.BG_STAGE;
+
             // if (!displayBlackBG)
             // {
             //     displayBlackBG = new Sprite();

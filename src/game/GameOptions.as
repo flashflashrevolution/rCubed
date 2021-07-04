@@ -1,10 +1,10 @@
 package game
 {
+    import arc.ArcGlobals;
+    import classes.Room;
     import classes.User;
     import classes.chart.Song;
     import classes.replay.Replay;
-    import arc.ArcGlobals;
-    import classes.Room;
 
     public class GameOptions extends Object
     {
@@ -52,10 +52,10 @@ package game
         public var judgeColours:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
         public var comboColours:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000, 0xDC00C2]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag, RawGood
         public var enableComboColors:Vector.<Boolean> = new <Boolean>[true, true, true, false, false, false, false, false, false];
-        public var gameColours:Array = [0x1495BD, 0x033242, 0x0C6A88, 0x074B62];
+        public var gameColours:Array = [0x1495BD, 0x033242, 0x0C6A88, 0x074B62, 0x000000];
         public var noteDirections:Array = ["D", "L", "U", "R"];
         public var noteColors:Array = ["red", "blue", "purple", "yellow", "pink", "orange", "cyan", "green", "white"];
-        public var noteSwapColours:Object = {"red": "red", "blue": "blue", "purple": "purple", "yellow": "yellow", "pink": "pink", "orange": "orange", "cyan": "cyan", "green": "green", "white": "white"};
+        public var noteSwapColors:Object = {"red": "red", "blue": "blue", "purple": "purple", "yellow": "yellow", "pink": "pink", "orange": "orange", "cyan": "cyan", "green": "green", "white": "white"};
         public var rawGoodTracker:Number = 0;
 
         public var layout:Object = {};
@@ -125,12 +125,12 @@ package game
             judgeColours = user.judgeColours.concat();
             comboColours = user.comboColours.concat();
             enableComboColors = user.enableComboColors.concat();
-            gameColours = user.gameColours.concat();
+            gameColours = user.gameColors.concat();
             rawGoodTracker = user.rawGoodTracker;
 
             for (var i:int = 0; i < noteColors.length; i++)
             {
-                noteSwapColours[noteColors[i]] = user.noteColours[i];
+                noteSwapColors[noteColors[i]] = user.noteColors[i];
             }
 
             autofail = [user.autofailAmazing,
@@ -213,7 +213,7 @@ package game
             {
                 for (var i:int = 0; i < noteColors.length; i++)
                 {
-                    noteSwapColours[noteColors[i]] = settings["noteSwapColours"][i];
+                    noteSwapColors[noteColors[i]] = settings["noteSwapColours"][i];
                 }
             }
         }
@@ -279,7 +279,7 @@ package game
             settings["noteSwapColours"] = [];
             for (var i:int = 0; i < noteColors.length; i++)
             {
-                settings["noteSwapColours"][i] = noteSwapColours[noteColors[i]];
+                settings["noteSwapColours"][i] = noteSwapColors[noteColors[i]];
             }
 
             var user:User = GlobalVariables.instance.activeUser;
@@ -316,7 +316,7 @@ package game
 
         public function getNewNoteColor(color:String):String
         {
-            return noteSwapColours[color];
+            return noteSwapColors[color];
         }
     }
 }
