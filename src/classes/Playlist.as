@@ -270,7 +270,7 @@ package classes
                 generatedQueues[songInfo.genre].push(songInfo.level);
                     //_gvars.songQueue.push(songData);
             }
-            //indexList.sort(compareSongLevel);
+            indexList.sort(compareSongLevel);
             _isLoaded = true;
             _loadError = false;
             this.dispatchEvent(new Event(GlobalVariables.LOAD_COMPLETE));
