@@ -2,14 +2,15 @@ package game
 {
     import arc.ArcGlobals;
     import arc.mp.MultiplayerSingleton;
+    import assets.GameBackgroundColor;
     import assets.gameplay.viewLR;
     import assets.gameplay.viewUD;
     import classes.Alert;
     import classes.GameNote;
+    import classes.Gameplay;
     import classes.Language;
     import classes.Noteskins;
     import classes.User;
-    import classes.Gameplay;
     import classes.chart.LevelScriptRuntime;
     import classes.chart.Note;
     import classes.chart.NoteChart;
@@ -18,16 +19,16 @@ package game
     import classes.ui.BoxButton;
     import classes.ui.ProgressBar;
     import com.flashfla.net.Multiplayer;
+    import com.flashfla.net.events.GameResultsEvent;
+    import com.flashfla.net.events.GameUpdateEvent;
     import com.flashfla.utils.Average;
     import com.flashfla.utils.RollingAverage;
     import com.flashfla.utils.TimeUtil;
-    import com.flashfla.net.events.GameUpdateEvent;
-    import com.flashfla.net.events.GameResultsEvent;
+    import flash.display.Bitmap;
+    import flash.display.BitmapData;
     import flash.display.GradientType;
     import flash.display.MovieClip;
     import flash.display.Sprite;
-    import flash.display.BitmapData;
-    import flash.display.Bitmap;
     import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.IOErrorEvent;
@@ -509,6 +510,9 @@ package game
             if (!options.displayGameBottomBar)
                 gameplayUI.bottom_bar.visible = false;
 
+            if (!options.displayGameTopBar && !options.displayGameBottomBar)
+                gameplayUI.visible = false;
+
             if (options.displayPA)
             {
                 paWindow = new PAWindow(options);
@@ -547,7 +551,7 @@ package game
 
             if (options.displaySongProgress || options.replay)
             {
-                progressDisplay = new ProgressBar(gameplayUI, 161, 9.35, 458, 20, 4, 0x545454, 0.1);
+                progressDisplay = new ProgressBar(this, 161, 9.35, 458, 20, 4, 0x545454, 0.1);
 
                 if (options.replay)
                     progressDisplay.addEventListener(MouseEvent.CLICK, progressMouseClick);
@@ -1408,7 +1412,7 @@ package game
             }
             if (progressDisplay)
             {
-                gameplayUI.removeChild(progressDisplay);
+                this.removeChild(progressDisplay);
                 progressDisplay = null;
             }
             if (player1Life)
@@ -1806,12 +1810,11 @@ package game
 
                     index++;
                     var indexs:String = index.toString();
-                    
+
                     interfacePosition(mpJudge[index], interfaceLayout(LAYOUT_MP_JUDGE + indexs));
                     interfacePosition(mpCombo[index], interfaceLayout(LAYOUT_MP_COMBO + indexs));
                     interfacePosition(mpPA[index], interfaceLayout(LAYOUT_MP_PA + indexs));
                     interfacePosition(mpHeader[index], interfaceLayout(LAYOUT_MP_HEADER + indexs));
-                    
 
                     if (options.isEditor)
                     {
