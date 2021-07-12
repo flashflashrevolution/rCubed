@@ -7,11 +7,9 @@ package popups
     import classes.ui.Box;
     import classes.ui.BoxButton;
     import com.flashdynamix.utils.SWFProfiler;
+    import com.flashfla.utils.SpriteUtil;
     import flash.display.Bitmap;
-    import flash.display.BitmapData;
     import flash.events.MouseEvent;
-    import flash.filters.BlurFilter;
-    import flash.geom.Point;
     import flash.profiler.showRedrawRegions;
     import game.GameMenu;
     import menu.MenuPanel;
@@ -28,7 +26,6 @@ package popups
 
         //- Background
         private var box:Box;
-        private var bmd:BitmapData;
         private var bmp:Bitmap;
 
         public function PopupContextMenu(myParent:MenuPanel)
@@ -38,11 +35,7 @@ package popups
 
         override public function stageAdd():void
         {
-            bmd = new BitmapData(Main.GAME_WIDTH, Main.GAME_HEIGHT, false, 0x000000);
-            bmd.draw(stage);
-            bmd.applyFilter(bmd, bmd.rect, new Point(), new BlurFilter(16, 16, 3));
-            bmp = new Bitmap(bmd);
-
+            bmp = SpriteUtil.getBitmapSprite(stage);
             this.addChild(bmp);
 
             var bgbox:Box = new Box(this, (Main.GAME_WIDTH - 230) / 2, 20, false, false);
@@ -105,7 +98,6 @@ package popups
             box.dispose();
             this.removeChild(box);
             this.removeChild(bmp);
-            bmd = null;
             bmp = null;
             box = null;
         }

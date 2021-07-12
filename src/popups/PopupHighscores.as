@@ -2,6 +2,7 @@ package popups
 {
     import assets.GameBackgroundColor;
     import classes.Language;
+    import classes.SongInfo;
     import classes.ui.Box;
     import classes.ui.BoxButton;
     import classes.ui.Text;
@@ -9,15 +10,12 @@ package popups
     import com.flashfla.loader.DataEvent;
     import com.flashfla.utils.NumberUtil;
     import com.flashfla.utils.ObjectUtil;
+    import com.flashfla.utils.SpriteUtil;
     import com.flashfla.utils.sprintf;
     import flash.display.Bitmap;
-    import flash.display.BitmapData;
     import flash.display.Sprite;
     import flash.events.MouseEvent;
-    import flash.filters.BlurFilter;
-    import flash.geom.Point;
     import menu.MenuPanel;
-    import classes.SongInfo;
 
     public class PopupHighscores extends MenuPanel
     {
@@ -26,7 +24,6 @@ package popups
 
         //- Background
         private var box:Box;
-        private var bmd:BitmapData;
         private var bmp:Bitmap;
 
         private var page:int = 0;
@@ -52,11 +49,7 @@ package popups
 
         override public function stageAdd():void
         {
-            bmd = new BitmapData(Main.GAME_WIDTH, Main.GAME_HEIGHT, false, 0x000000);
-            bmd.draw(stage);
-            bmd.applyFilter(bmd, bmd.rect, new Point(), new BlurFilter(16, 16, 3));
-            bmp = new Bitmap(bmd);
-
+            bmp = SpriteUtil.getBitmapSprite(stage);
             this.addChild(bmp);
 
             var bgbox:Box = new Box(this, 20, 20, false, false);
@@ -246,7 +239,6 @@ package popups
             box.dispose();
             this.removeChild(box);
             this.removeChild(bmp);
-            bmd = null;
             bmp = null;
             box = null;
         }

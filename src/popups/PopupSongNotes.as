@@ -11,14 +11,12 @@ package popups
     import classes.ui.StarSelector;
     import classes.ui.Text;
     import classes.ui.ValidatedText;
+    import com.flashfla.utils.SpriteUtil;
     import flash.display.Bitmap;
-    import flash.display.BitmapData;
     import flash.events.Event;
     import flash.events.IOErrorEvent;
     import flash.events.MouseEvent;
     import flash.events.SecurityErrorEvent;
-    import flash.filters.BlurFilter;
-    import flash.geom.Point;
     import flash.net.URLLoader;
     import flash.net.URLRequest;
     import flash.net.URLRequestMethod;
@@ -39,7 +37,6 @@ package popups
 
         //- Background
         private var box:Box;
-        private var bmd:BitmapData;
         private var bmp:Bitmap;
 
         private var songInfo:Object;
@@ -76,10 +73,7 @@ package popups
 
         override public function stageAdd():void
         {
-            bmd = new BitmapData(Main.GAME_WIDTH, Main.GAME_HEIGHT, false, 0x000000);
-            bmd.draw(stage);
-            bmd.applyFilter(bmd, bmd.rect, new Point(), new BlurFilter(16, 16, 3));
-            bmp = new Bitmap(bmd);
+            bmp = SpriteUtil.getBitmapSprite(stage);
             this.addChild(bmp);
 
             var bgbox:Box = new Box(this, (Main.GAME_WIDTH - 390) / 2, -1, false, false);
@@ -191,7 +185,7 @@ package popups
 
         private function refreshFields():void
         {
-            if (bmd != null && sDetails != null)
+            if (sDetails != null)
             {
                 sRating.value = songRatingValue;
                 sFavorite.checked = sDetails.song_favorite;
@@ -346,7 +340,7 @@ package popups
         private function ratingLoadComplete(e:Event):void
         {
             removeLoaderListeners();
-            
+
             try
             {
                 var _data:Object = JSON.parse(e.target.data);
@@ -355,7 +349,7 @@ package popups
                     _gvars.playerUser.songRatings[songInfo["level"]] = sRating.value;
 
                     //Alert.add("Saved rating for " + sObject["name"] + "!", 120, Alert.GREEN);
-                    
+
                     if (_data["type"] && _data["type"] == 1)
                     {
                         _playlist.playList[songInfo["level"]]["song_rating"] = _data["new_value"];

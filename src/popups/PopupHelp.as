@@ -5,11 +5,9 @@ package popups
     import classes.ui.Box;
     import classes.ui.BoxButton;
     import classes.ui.Text;
+    import com.flashfla.utils.SpriteUtil;
     import flash.display.Bitmap;
-    import flash.display.BitmapData;
     import flash.events.MouseEvent;
-    import flash.filters.BlurFilter;
-    import flash.geom.Point;
     import flash.text.AntiAliasType;
     import flash.text.StyleSheet;
     import flash.text.TextField;
@@ -22,7 +20,6 @@ package popups
 
         //- Background
         private var box:Box;
-        private var bmd:BitmapData;
         private var bmp:Bitmap;
 
         private var titleDisplay:Text;
@@ -37,11 +34,7 @@ package popups
 
         override public function stageAdd():void
         {
-            bmd = new BitmapData(Main.GAME_WIDTH, Main.GAME_HEIGHT, false, 0x000000);
-            bmd.draw(stage);
-            bmd.applyFilter(bmd, bmd.rect, new Point(), new BlurFilter(16, 16, 3));
-            bmp = new Bitmap(bmd);
-
+            bmp = SpriteUtil.getBitmapSprite(stage);
             this.addChild(bmp);
 
             var bgbox:Box = new Box(this, 20, 20, false, false);
@@ -91,7 +84,6 @@ package popups
             titleDisplay.dispose();
             this.removeChild(box);
             this.removeChild(bmp);
-            bmd = null;
             bmp = null;
             box = null;
         }
