@@ -6,6 +6,7 @@ package game
     import classes.replay.Base64Encoder;
     import classes.replay.ReplayPack;
     import flash.utils.ByteArray;
+    import classes.replay.ReplayBinFrame;
 
     public class GameScoreResult
     {
@@ -72,8 +73,8 @@ package game
         public var replay_hit:Array;
 
         // Binary Replays (aka Replay v4)
-        public var replay_bin_notes:Array;
-        public var replay_bin_boos:Array;
+        public var replay_bin_notes:Vector.<ReplayBinFrame>;
+        public var replay_bin_boos:Vector.<ReplayBinFrame>;
         private var _replay_bin:ByteArray;
 
         public function get replayBin():ByteArray

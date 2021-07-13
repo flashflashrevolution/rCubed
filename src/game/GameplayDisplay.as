@@ -56,6 +56,7 @@ package game
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import sql.SQLSongUserInfo;
+    import classes.replay.ReplayBinFrame;
 
     public class GameplayDisplay extends MenuPanel
     {
@@ -162,8 +163,8 @@ package game
          */
         private var gameReplayHit:Array;
 
-        private var binReplayNotes:Array;
-        private var binReplayBoos:Array;
+        private var binReplayNotes:Vector.<ReplayBinFrame>;
+        private var binReplayBoos:Vector.<ReplayBinFrame>;
 
         private var replayPressCount:Number = 0;
 
@@ -655,8 +656,8 @@ package game
             gameReplay = [];
             gameReplayHit = [];
 
-            binReplayNotes = [];
-            binReplayBoos = [];
+            binReplayNotes = new Vector.<ReplayBinFrame>(song.totalNotes, true);
+            binReplayBoos = new <ReplayBinFrame>[];
 
             replayPressCount = 0;
 
@@ -819,7 +820,7 @@ package game
                 // Remove Old note
                 if (gameProgress - curNote.PROGRESS + player1JudgeOffset >= 6)
                 {
-                    binReplayNotes[curNote.ID] = {"d": curNote.DIR, "t": null};
+                    binReplayNotes[curNote.ID] = new ReplayBinFrame(NaN, curNote.DIR);
                     commitJudge(curNote.DIR, gameProgress, -10);
                     noteBox.removeNote(curNote.ID);
                     n--;
@@ -842,12 +843,12 @@ package game
                         var repCurNote:GameNote = notes[rn];
 
                         // Missed Note
-                        if (repCurNote.ID >= cutOffReplayNote || options.replay.generationReplayNotes[repCurNote.ID] == null)
+                        if (repCurNote.ID >= cutOffReplayNote || (options.replay.generationReplayNotes[repCurNote.ID] == null || isNaN(options.replay.generationReplayNotes[repCurNote.ID].time)))
                         {
                             continue;
                         }
 
-                        var diffValue:int = options.replay.generationReplayNotes[repCurNote.ID] + repCurNote.POSITION;
+                        var diffValue:int = options.replay.generationReplayNotes[repCurNote.ID].time + repCurNote.POSITION;
                         if ((gamePosition + readAheadTime >= diffValue) || gamePosition >= diffValue)
                         {
                             judgeScorePosition(repCurNote.DIR, diffValue);
@@ -859,7 +860,10 @@ package game
                     while (newPress != null && gamePosition >= newPress.time)
                     {
                         if (newPress.frame == -2)
+                        {
                             commitJudge(newPress.direction, gameProgress, -5);
+                            binReplayBoos[binReplayBoos.length] = new ReplayBinFrame(newPress.time, newPress.direction, binReplayBoos.length);
+                        }
                         replayPressCount++;
                         newPress = options.replay.getPress(replayPressCount);
                     }
@@ -1921,7 +1925,7 @@ package game
                 commitJudge(dir, frame + note.PROGRESS - player1JudgeOffset, score);
                 noteBox.removeNote(note.ID);
                 accuracy.addValue(note.POSITION - position);
-                binReplayNotes[note.ID] = {"d": dir, "t": (positionJudged - note.POSITION)};
+                binReplayNotes[note.ID] = new ReplayBinFrame(diff, dir);
             }
             else
             {
@@ -1940,8 +1944,10 @@ package game
                         note = noteBox.notes[noteIndex++] || noteBox.spawnNextNote();
                     }
                 }
+
                 if (booFrame >= gameFirstNoteFrame)
-                    binReplayBoos.push({"d": dir, "t": position, "i": binReplayBoos.length});
+                    binReplayBoos[binReplayBoos.length] = new ReplayBinFrame(position, dir, binReplayBoos.length);
+
                 commitJudge(dir, booFrame, -5);
             }
 

@@ -15,8 +15,8 @@ package classes.replay
         public var raw_judgements:String;
         public var settings:Object;
         public var raw_settings:String;
-        public var rep_notes:Array;
-        public var rep_boos:Array;
+        public var rep_notes:Vector.<ReplayBinFrame>;
+        public var rep_boos:Vector.<ReplayBinFrame>;
         public var checksum:uint;
         public var rechecksum:uint;
         public var replay_bin:ByteArray;
@@ -31,7 +31,7 @@ package classes.replay
             {
                 for (i = 0; i < rep_notes.length; i++)
                 {
-                    rep_notes[i] = rep_notes[i] * -1;
+                    rep_notes[i].time = rep_notes[i].time * -1;
                 }
 
                 MAJOR_VER = 1;

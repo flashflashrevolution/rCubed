@@ -89,7 +89,7 @@ package classes.replay
         static public const MAJOR_VER:uint = 1;
         static public const MINOR_VER:uint = 1;
 
-        public static function pack(binNotes:Array, binBoos:Array):ByteArray
+        public static function pack(binNotes:Vector.<ReplayBinFrame>, binBoos:Vector.<ReplayBinFrame>):ByteArray
         {
             // Generate Bin Replay Format
             var binReplay:ByteArray = new ByteArray();
@@ -101,16 +101,16 @@ package classes.replay
             binReplay.writeInt(binNotes.length);
             for (var nx:int = 0; nx < binNotes.length; nx++)
             {
-                if (binNotes[nx] == null)
+                if (binNotes[nx] == null || isNaN(binNotes[nx].time))
                     binReplay.writeByte(0x7F);
                 else
-                    binReplay.writeByte(binNotes[nx]["t"]);
+                    binReplay.writeByte(binNotes[nx].time);
             }
 
             // Write Boos
             var booCount:int = 0;
             var booPosition:uint = binReplay.position;
-            binBoos.sortOn("t", Array.NUMERIC);
+            binBoos.sort(compareTime);
             binReplay.writeInt(0);
 
             var LAST_TIME:int = 0;
@@ -120,9 +120,9 @@ package classes.replay
                 var FRAME_HEADER:int = 0;
                 var EXTENDED_HEADER:int = 0;
 
-                var CUR_TIME:uint = binBoos[nx]["t"];
-                var DIR_BIT:int = getDirectionBit(binBoos[nx]["d"]);
-                var DIR_CHECK:Boolean = isExtendedDirection(binBoos[nx]["d"]);
+                var CUR_TIME:uint = binBoos[nx].time;
+                var DIR_BIT:int = getDirectionBit(binBoos[nx].direction);
+                var DIR_CHECK:Boolean = isExtendedDirection(binBoos[nx].direction);
 
                 if (CUR_TIME < 0)
                     CUR_TIME = 0; // Should Never Happen!
@@ -141,10 +141,10 @@ package classes.replay
                 // Find Matching Time Boos, set bit if not set.
                 while (nx < binBoos.length - 1)
                 {
-                    if (binBoos[nx + 1]["t"] == CUR_TIME)
+                    if (binBoos[nx + 1].time == CUR_TIME)
                     {
-                        var TEMP_DIR_BIT:int = getDirectionBit(binBoos[nx + 1]["d"]);
-                        var TEMP_DIR_CHECK:Boolean = isExtendedDirection(binBoos[nx + 1]["d"]);
+                        var TEMP_DIR_BIT:int = getDirectionBit(binBoos[nx + 1].direction);
+                        var TEMP_DIR_CHECK:Boolean = isExtendedDirection(binBoos[nx + 1].direction);
 
                         // Check time and if the frame direction bit isn't set.
                         if (TEMP_DIR_CHECK && (TEMP_DIR_BIT & EXTENDED_HEADER) == 0)
@@ -207,8 +207,8 @@ package classes.replay
 
         public static function unpack(ba:ByteArray, judgeOffset:int = 0):Object
         {
-            var note_array:Array = [];
-            var boo_array:Array = [];
+            var note_array:Vector.<ReplayBinFrame> = new <ReplayBinFrame>[];
+            var boo_array:Vector.<ReplayBinFrame> = new <ReplayBinFrame>[];
 
             try
             {
@@ -220,15 +220,16 @@ package classes.replay
 
                 // Get Notes
                 var total_notes:int = ba.readInt();
+                note_array.length = total_notes;
                 for (var n:int = 0; n < total_notes; n++)
                 {
                     if (ba[ba.position] == 0x7F)
                     {
-                        note_array.push(null);
+                        note_array[n] = new ReplayBinFrame(NaN);
                         ba.readByte();
                     }
                     else
-                        note_array.push(ba.readByte() + judgeOffset);
+                        note_array[n] = new ReplayBinFrame(ba.readByte() - judgeOffset);
                 }
 
                 // Get Boos
@@ -254,32 +255,32 @@ package classes.replay
 
                     // Fill Boo Array
                     if ((header & BIT_P1_LEFT) != 0)
-                        boo_array.push({"t": boo_time, "d": "L"});
+                        boo_array.push(new ReplayBinFrame(boo_time, "L"));
                     if ((header & BIT_P1_DOWN) != 0)
-                        boo_array.push({"t": boo_time, "d": "D"});
+                        boo_array.push(new ReplayBinFrame(boo_time, "D"));
                     if ((header & BIT_P1_UP) != 0)
-                        boo_array.push({"t": boo_time, "d": "U"});
+                        boo_array.push(new ReplayBinFrame(boo_time, "U"));
                     if ((header & BIT_P1_RIGHT) != 0)
-                        boo_array.push({"t": boo_time, "d": "R"});
+                        boo_array.push(new ReplayBinFrame(boo_time, "R"));
 
                     if ((header & BIT_FRAME_EXTEND) != 0)
                     { // TODO: Actually finish the directions for these, we don't have a set standard yet.
                         if ((ext & BIT_P1_KEY_5) != 0)
-                            boo_array.push({"t": boo_time, "d": "X"});
+                            boo_array.push(new ReplayBinFrame(boo_time, "X"));
                         if ((ext & BIT_P1_KEY_6) != 0)
-                            boo_array.push({"t": boo_time, "d": "X"});
+                            boo_array.push(new ReplayBinFrame(boo_time, "X"));
                         if ((ext & BIT_P2_LEFT) != 0)
-                            boo_array.push({"t": boo_time, "d": "X"});
+                            boo_array.push(new ReplayBinFrame(boo_time, "X"));
                         if ((ext & BIT_P2_DOWN) != 0)
-                            boo_array.push({"t": boo_time, "d": "X"});
+                            boo_array.push(new ReplayBinFrame(boo_time, "X"));
                         if ((ext & BIT_P2_UP) != 0)
-                            boo_array.push({"t": boo_time, "d": "X"});
+                            boo_array.push(new ReplayBinFrame(boo_time, "X"));
                         if ((ext & BIT_P2_RIGHT) != 0)
-                            boo_array.push({"t": boo_time, "d": "X"});
+                            boo_array.push(new ReplayBinFrame(boo_time, "X"));
                         if ((ext & BIT_P2_KEY_5) != 0)
-                            boo_array.push({"t": boo_time, "d": "X"});
+                            boo_array.push(new ReplayBinFrame(boo_time, "X"));
                         if ((ext & BIT_P2_KEY_6) != 0)
-                            boo_array.push({"t": boo_time, "d": "X"});
+                            boo_array.push(new ReplayBinFrame(boo_time, "X"));
                     }
                 }
             }
@@ -335,7 +336,7 @@ package classes.replay
             return cc;
         }
 
-        static public function writeSiteReplay(binReplayNotes:Array, binReplayBoos:Array):ByteArray
+        static public function writeSiteReplay(binReplayNotes:Vector.<ReplayBinFrame>, binReplayBoos:Vector.<ReplayBinFrame>):ByteArray
         {
             // No replay to make.
             if (binReplayNotes.length == 0 && binReplayBoos.length == 0)
@@ -351,7 +352,7 @@ package classes.replay
             return binReplay;
         }
 
-        static public function writeReplay(activeUser:User, options:GameOptions, judgements:String, binReplayNotes:Array, binReplayBoos:Array):ByteArray
+        static public function writeReplay(activeUser:User, options:GameOptions, judgements:String, binReplayNotes:Vector.<ReplayBinFrame>, binReplayBoos:Vector.<ReplayBinFrame>):ByteArray
         {
             // No replay to make.
             if (binReplayNotes.length == 0 && binReplayBoos.length == 0)
@@ -447,7 +448,7 @@ package classes.replay
             return replay;
         }
 
-        static private function verifyReplayWrite(binReplay:ByteArray, activeUser:User, options:GameOptions, judgements:String, binReplayNotes:Array, binReplayBoos:Array, settingsEncode:String, timestamp:Number):Boolean
+        static private function verifyReplayWrite(binReplay:ByteArray, activeUser:User, options:GameOptions, judgements:String, binReplayNotes:Vector.<ReplayBinFrame>, binReplayBoos:Vector.<ReplayBinFrame>, settingsEncode:String, timestamp:Number):Boolean
         {
             // Read Replay to Verify Write
             var test:ReplayPacked = readReplay(binReplay, true);
@@ -516,9 +517,18 @@ package classes.replay
             var compareFailure:int = 0;
             for (var i:int = 0; i < binReplayNotes.length; i++)
             {
-                if (binReplayNotes[i] != test.rep_notes[i])
+                if ((binReplayNotes[i] == null && test.rep_notes[i] != null) || (binReplayNotes[i] != null && test.rep_notes[i] == null))
                 {
-                    trace("rep_notes[" + i + "]", binReplayNotes[i], "!=", test.rep_notes[i]);
+                    trace("rep_notes[" + i + "] & binReplayNotes[" + i + "] have different NULL states.");
+                    compareFailure++;
+                }
+                else if (binReplayNotes[i] == null && test.rep_notes[i] == null)
+                {
+                    continue;
+                }
+                else if (binReplayNotes[i].time != test.rep_notes[i].time)
+                {
+                    trace("rep_notes[" + i + "].time", binReplayNotes[i].time, "!=", test.rep_notes[i].time);
                     compareFailure++;
                 }
             }
@@ -563,6 +573,16 @@ package classes.replay
                }
              */
             return true;
+        }
+
+        private static function compareTime(frame1:ReplayBinFrame, frame2:ReplayBinFrame):Number
+        {
+            if (frame1.time < frame2.time)
+                return -1;
+            else if (frame1.time > frame2.time)
+                return 1;
+            else
+                return 0;
         }
 
     }

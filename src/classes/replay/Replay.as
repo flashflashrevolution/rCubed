@@ -24,8 +24,10 @@ package classes.replay
         public var isLoaded:Boolean = false;
         public var isEdited:Boolean = false;
         public var isPreview:Boolean = false;
-        public var generationReplayNotes:Array;
+
         public var needsBeatboxGeneration:Boolean = false;
+        public var generationReplayBoos:Vector.<ReplayBinFrame>;
+        public var generationReplayNotes:Vector.<ReplayBinFrame>;
 
         public var id:Number;
         public var user:User;
@@ -221,8 +223,8 @@ package classes.replay
 
             //- Replay
             this.replayData = [];
-            for each (var item:Object in data.rep_boos)
-                this.replayData.push(new ReplayNote(item["d"], -2, item["t"]));
+            for each (var item:ReplayBinFrame in data.rep_boos)
+                this.replayData.push(new ReplayNote(item.direction, -2, item.time));
 
             //- Edited Check
             if (data.checksum != data.rechecksum)
@@ -230,6 +232,7 @@ package classes.replay
 
             this.replayBin = data.replay_bin;
             this.generationReplayNotes = data.rep_notes;
+            this.generationReplayBoos = data.rep_boos;
             this.needsBeatboxGeneration = true;
         }
 
