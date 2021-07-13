@@ -466,7 +466,7 @@ package com.flashfla.net
             {
                 if (target == null)
                     server.sendModeratorMessage(message, SmartFoxClient.MODMSG_TO_ZONE);
-                else if (target.userID != null)
+                else if (target.siteId != null)
                     server.sendModeratorMessage(message, SmartFoxClient.MODMSG_TO_USER, target.id);
                 else if (target.roomID != null)
                     server.sendModeratorMessage(message, SmartFoxClient.MODMSG_TO_ROOM, target.id);
