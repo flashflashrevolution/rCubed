@@ -135,7 +135,7 @@ package game
         private var accuracy:Average;
         private var judgeOffset:int = 0;
         private var autoJudgeOffset:Boolean = false;
-        private var judgeSettings:Array;
+        private var judgeSettings:Vector.<JudgeNode>;
 
         private var quitDoubleTap:int = -1;
 
@@ -612,9 +612,9 @@ package game
             globalOffset = (options.offsetGlobal - globalOffsetRounded) * 1000 / 30;
 
             if (options.judgeWindow)
-                judgeSettings = options.judgeWindow;
+                judgeSettings = buildJudgeNodes(options.judgeWindow);
             else
-                judgeSettings = Constant.JUDGE_WINDOW;
+                judgeSettings = buildJudgeNodes(Constant.JUDGE_WINDOW);
             judgeOffset = options.offsetJudge * 1000 / 30;
             autoJudgeOffset = options.autoJudgeOffset;
 
@@ -1879,6 +1879,16 @@ package game
          *							  |_|            |___/
            \*#########################################################################################*/
 
+        private function buildJudgeNodes(src:Array):Vector.<JudgeNode>
+        {
+            var out:Vector.<JudgeNode> = new Vector.<JudgeNode>(src.length, true);
+            for (var i:int = 0; i < src.length; i++)
+            {
+                out[i] = new JudgeNode(src[i].t, src[i].s, src[i].f);
+            }
+            return out;
+        }
+
         /**
          * Judge a note score based on the current song position in ms.
          * @param dir Note Direction
@@ -1899,16 +1909,17 @@ package game
                 if (note.DIR != dir)
                     continue;
 
+                var acc:Number = note.POSITION - position;
                 var diff:Number = positionJudged - note.POSITION;
-                var lastJudge:Object = null;
-                for each (var j:Object in judgeSettings)
+                var lastJudge:JudgeNode = null;
+                for each (var j:JudgeNode in judgeSettings)
                 {
-                    if (diff > j.t)
+                    if (diff > j.time)
                         lastJudge = j;
                 }
-                score = lastJudge ? lastJudge.s : 0;
+                score = lastJudge ? lastJudge.score : 0;
                 if (score)
-                    frame = lastJudge.f;
+                    frame = lastJudge.frame;
                 if (!_avars.configJudge && !score)
                 {
                     var pdiff:int = gameProgress - note.PROGRESS + player1JudgeOffset;
@@ -1917,14 +1928,14 @@ package game
                 }
                 if (score > 0)
                     break;
-                else if (diff <= judgeSettings[0].t)
+                else if (diff <= judgeSettings[0].time)
                     break;
             }
             if (score)
             {
                 commitJudge(dir, frame + note.PROGRESS - player1JudgeOffset, score);
                 noteBox.removeNote(note.ID);
-                accuracy.addValue(note.POSITION - position);
+                accuracy.addValue(acc);
                 binReplayNotes[note.ID] = new ReplayBinFrame(diff, dir);
             }
             else
@@ -2307,5 +2318,19 @@ package game
         {
             this[key] = val;
         }
+    }
+}
+
+internal class JudgeNode
+{
+    public var time:Number;
+    public var frame:Number;
+    public var score:Number;
+
+    public function JudgeNode(time:Number, score:Number, frame:Number = -1)
+    {
+        this.time = time;
+        this.score = score;
+        this.frame = frame;
     }
 }
