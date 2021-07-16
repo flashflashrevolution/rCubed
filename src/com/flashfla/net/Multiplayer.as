@@ -125,6 +125,9 @@ package com.flashfla.net
 
         public var inSolo:Boolean;
 
+        public var lastRoomGamePlayerCount:int = 0;
+
+
         public function addGameUpdateCallback(callback:Function):void
         {
             if (gameUpdateCallbacks.indexOf(callback) < 0)
@@ -398,9 +401,10 @@ package com.flashfla.net
 
                         eventGameStart(room);
                     }
-                    else if(currentUser.isSpec)
+                    else if(currentUser.wantsToWatch)
                     {
                         room.songInfo = room.getPlayersSong()
+                        lastRoomGamePlayerCount = room.playerCount;
                         MultiplayerSingleton.getInstance().spectateGame(room)
                     }
                 }
@@ -582,7 +586,7 @@ package com.flashfla.net
                     return;
                 }
 
-                server.leaveRoom(currentRoom.id);
+                leaveRoom(currentRoom);
                 Alert.add(_lang.string("mp_error_multiple_room_restriction"), 120);
             }
 
@@ -606,6 +610,7 @@ package com.flashfla.net
         {
             if (connected && room)
             {
+                currentUser.wantsToWatch = false;
                 clearCurrentUserRoomVariables(room);
                 server.leaveRoom(room.id);
             }
@@ -654,7 +659,7 @@ package com.flashfla.net
             const currentRoom:Room = getCurrentRoom();
             if (currentRoom != null)
             {
-                server.leaveRoom(getCurrentRoom().id);
+                leaveRoom(currentRoom);
                 Alert.add(_lang.string("mp_error_multiple_room_restriction"), 120);
             }
             
@@ -945,7 +950,8 @@ package com.flashfla.net
 
         private function eventGameResults(room:Room):void
         {
-            dispatchEvent(new GameResultsEvent({room: room}));
+            dispatchEvent(new GameResultsEvent({room: room, playerCount: lastRoomGamePlayerCount}));
+            lastRoomGamePlayerCount = 0;
         }
 
 
@@ -1262,6 +1268,9 @@ package com.flashfla.net
             updateRoom(event.room);
 
             var room:Room = getRoom(event.room);
+
+            // Make sure the room variables are up to date with the variables from event.room
+            room.variables = event.room.variables;
 
             // Adds the users to the room
             for each (var user:User in event.users)

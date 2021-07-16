@@ -141,7 +141,9 @@ package arc.mp
         private function onGameResultsEvent(event:GameResultsEvent):void
         {
             if (event.room == room)
-                textAreaAddLine(textFormatGameResults(room));
+            {
+                textAreaAddLine(textFormatGameResults(event));
+            }
         }
 
         private function checkRedraw(event:Event):void
@@ -217,6 +219,11 @@ package arc.mp
 
         public function textAreaAddLine(message:String):void
         {
+            if (message == null)
+            {
+                return;
+            }
+            
             chatScrollV = controlChat.textField.scrollV;
             chatScroll ||= (chatScrollV == controlChat.textField.maxScrollV);
             chatFrameDelay = 0;
@@ -339,10 +346,19 @@ package arc.mp
             return textFormatBold(textFormatColour("* " + nameUser(user, false) + " has been banned for " + minutes + " minutes.", "#901000"));
         }
 
-        public static function textFormatGameResults(room:Room):String
+        public static function textFormatGameResults(event:GameResultsEvent):String
         {
+            var room:Room = event.room;
+
             if (room == null)
+            {
                 return null;
+            }
+
+            if (event.initialPlayerCount <= 1)
+            {
+                return null;
+            }
 
             var p1:User = room.getPlayer(1);
             var p2:User = room.getPlayer(2);

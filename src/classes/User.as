@@ -44,8 +44,9 @@ package classes
 
         //- SFS vars
         public var id:int;
-        public var variables:Array
-        public var isSpec:Boolean
+        public var variables:Array;
+        public var isSpec:Boolean;
+        public var wantsToWatch:Boolean;
 
         //- User Vars
         public var name:String;
@@ -175,6 +176,7 @@ package classes
             this.id = sfsId;
             this.variables = [];
             this.isSpec = false;
+            this.wantsToWatch = false;
             this.isActiveUser = isActiveUser;
 
             if (loadData)
@@ -523,6 +525,9 @@ package classes
 
             if (_settings.viewJudgeAnimations != null)
                 this.DISPLAY_JUDGE_ANIMATIONS = _settings.viewJudgeAnimations;
+
+            if (_settings.viewReceptorAnimations != null)
+                this.DISPLAY_RECEPTOR_ANIMATIONS = _settings.viewReceptorAnimations;
 
             if (_settings.viewHealth != null)
                 this.DISPLAY_HEALTH = _settings.viewHealth;
