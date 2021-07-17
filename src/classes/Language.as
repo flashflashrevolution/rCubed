@@ -2,8 +2,7 @@
  * @author Jonathan (Velocity)
  */
 
-package classes
-{
+package classes {
     import classes.ui.Text;
     import flash.events.ErrorEvent;
     import flash.events.Event;
@@ -12,9 +11,9 @@ package classes
     import flash.events.SecurityErrorEvent;
     import flash.net.URLLoader;
     import flash.net.URLRequest;
+    import flash.events.HTTPStatusEvent;
 
-    public class Language extends EventDispatcher
-    {
+    public class Language extends EventDispatcher {
         public static const FONT_NAME:String = new NotoSans.Bold().fontName;
         public static const UNI_FONT_NAME:String = new NotoSans.CJKBold().fontName;
 
@@ -32,67 +31,52 @@ package classes
         public var indexed:Array;
 
         ///- Constructor
-        public function Language(en:SingletonEnforcer)
-        {
-            if (en == null)
-            {
+        public function Language(en:SingletonEnforcer) {
+            if (en == null) {
                 throw Error("Multi-Instance Blocked");
             }
         }
 
-        public static function get instance():Language
-        {
-            if (_instance == null)
-            {
+        public static function get instance():Language {
+            if (_instance == null) {
                 _instance = new Language(new SingletonEnforcer());
             }
-            
+
             return _instance;
         }
 
-        public function isLoaded():Boolean
-        {
+        public function isLoaded():Boolean {
             return _isLoaded && !_loadError;
         }
 
-        public function isError():Boolean
-        {
+        public function isError():Boolean {
             return _loadError;
         }
 
         ///- Public Functions
-        public function font(testStr:String = ""):String
-        {
+        public function font(testStr:String = ""):String {
             return Text.isUnicode(testStr) ? UNI_FONT_NAME : FONT_NAME;
         }
 
-        public function wrapFont(text:String):String
-        {
+        public function wrapFont(text:String):String {
             return "<font face=\"" + font(text) + "\">" + text + "</font>";
         }
 
-        public function string(id:String, defaultValue:String = null):String
-        {
+        public function string(id:String, defaultValue:String = null):String {
             var lang_str:String = string2(id, _gvars.playerUser ? _gvars.playerUser.language : "us");
             if (defaultValue != null && lang_str.indexOf(id) != -1)
                 lang_str = lang_str.replace(id, defaultValue);
             return lang_str;
         }
 
-        public function string2(id:String, lang:String):String
-        {
+        public function string2(id:String, lang:String):String {
             // Get Text
             var text:String = id;
-            if (!data)
-            {
+            if (!data) {
 
-            }
-            else if (data[lang] && data[lang][id])
-            {
+            } else if (data[lang] && data[lang][id]) {
                 text = data[lang][id];
-            }
-            else if (data["us"][id] != null)
-            {
+            } else if (data["us"][id] != null) {
                 text = data["us"][id];
             }
             if (data && text == id)
@@ -100,28 +84,21 @@ package classes
             return wrapFont(text);
         }
 
-        public function stringSimple(id:String, defaultValue:String = null):String
-        {
+        public function stringSimple(id:String, defaultValue:String = null):String {
             var lang_str:String = string2Simple(id, _gvars.playerUser ? _gvars.playerUser.language : "us");
             if (defaultValue != null && lang_str == id)
                 lang_str = defaultValue;
             return lang_str;
         }
 
-        public function string2Simple(id:String, lang:String):String
-        {
+        public function string2Simple(id:String, lang:String):String {
             // Get Text
             var text:String = id;
-            if (!data)
-            {
+            if (!data) {
 
-            }
-            else if (data[lang] && data[lang][id])
-            {
+            } else if (data[lang] && data[lang][id]) {
                 text = data[lang][id];
-            }
-            else if (data["us"][id] != null)
-            {
+            } else if (data["us"][id] != null) {
                 text = data["us"][id];
             }
             if (data && text == id)
@@ -130,11 +107,9 @@ package classes
         }
 
         ///- Language Loading
-        public function load():void
-        {
+        public function load():void {
             // Kill old Loading Stream
-            if (_loader && _isLoading)
-            {
+            if (_loader && _isLoading) {
                 removeLoaderListeners();
                 _loader.close();
             }
@@ -150,20 +125,16 @@ package classes
             _isLoading = true;
         }
 
-        private function languageLoadComplete(e:Event):void
-        {
+        private function languageLoadComplete(e:Event):void {
             Logger.info(this, "Data Loaded");
             removeLoaderListeners();
 
             // Parse Response
             var siteDataString:String = e.target.data;
-            try
-            {
+            try {
                 var xmlMain:XML = new XML(siteDataString);
                 var xmlChildren:XMLList = xmlMain.children();
-            }
-            catch (err:Error)
-            {
+            } catch (err:Error) {
                 Logger.error(this, "Parse Failure: " + Logger.exception_error(err));
                 Logger.error(this, "Wrote invalid response data to log folder. [logs/language.txt]");
                 AirContext.writeText("logs/language.txt", siteDataString);
@@ -177,70 +148,67 @@ package classes
             data = new Object();
             indexed = new Array();
 
-            for (var a:uint = 0; a < xmlChildren.length(); ++a)
-            {
+            for (var a:uint = 0; a < xmlChildren.length(); ++a) {
                 // Check for Language Object, if not, create one.
                 var lang:String = xmlChildren[a].attribute("id").toString();
-                if (data[lang] == null)
-                {
+                if (data[lang] == null) {
                     data[lang] = new Object();
                 }
 
                 // Add Attributes to Object
                 var langAttr:XMLList = xmlChildren[a].attributes();
-                for (var b:uint = 0; b < langAttr.length(); b++)
-                {
+                for (var b:uint = 0; b < langAttr.length(); b++) {
                     data[lang]["_" + langAttr[b].name()] = langAttr[b].toString();
                 }
 
                 // Add Text to Object
                 var langNodes:XMLList = xmlChildren[a].children();
-                for (var c:uint = 0; c < langNodes.length(); c++)
-                {
+                for (var c:uint = 0; c < langNodes.length(); c++) {
                     data[lang][langNodes[c].attribute("id").toString()] = langNodes[c].children()[0].toString().replace(/\r\n/gi, "\n");
                 }
                 indexed[data[lang]["_index"]] = lang;
             }
-            
+
             _isLoaded = true;
             _loadError = false;
             Logger.info(this, "Parse Complete");
             checkCompleteLoad();
         }
 
-        private function checkCompleteLoad():void
-        {
-            if (isLoaded())
-            {
+        private function checkCompleteLoad():void {
+            if (isLoaded()) {
                 this.dispatchEvent(new Event(GlobalVariables.LOAD_COMPLETE));
             }
         }
 
-        private function languageLoadError(err:ErrorEvent = null):void
-        {
+        private function languageLoadError(err:ErrorEvent = null):void {
             Logger.error(this, "Load Failure: " + Logger.event_error(err));
             removeLoaderListeners();
             this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
         }
 
-        private function addLoaderListeners():void
-        {
+        private function httpStatusHandler(event:HTTPStatusEvent):void {
+            Logger.error(this, "Load Status: " + Logger.http_status_event(event));
+        }
+
+        private function addLoaderListeners():void {
             _loader.addEventListener(Event.COMPLETE, languageLoadComplete);
             _loader.addEventListener(IOErrorEvent.IO_ERROR, languageLoadError);
             _loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, languageLoadError);
+            _loader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpStatusHandler);
         }
 
-        private function removeLoaderListeners():void
-        {
+        private function removeLoaderListeners():void {
             _loadError = true;
             _loader.removeEventListener(Event.COMPLETE, languageLoadComplete);
             _loader.removeEventListener(IOErrorEvent.IO_ERROR, languageLoadError);
             _loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, languageLoadError);
+            _loader.removeEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpStatusHandler);
         }
+
     }
 
 }
 
-class SingletonEnforcer
-{
+class SingletonEnforcer {
 }

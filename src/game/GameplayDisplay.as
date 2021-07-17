@@ -1,5 +1,4 @@
-package game
-{
+package game {
     import arc.ArcGlobals;
     import arc.mp.MultiplayerSingleton;
     import assets.gameplay.viewLR;
@@ -55,9 +54,9 @@ package game
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import sql.SQLSongUserInfo;
+    import flash.events.HTTPStatusEvent;
 
-    public class GameplayDisplay extends MenuPanel
-    {
+    public class GameplayDisplay extends MenuPanel {
         public static const GAME_DISPOSE:int = -1;
         public static const GAME_PLAY:int = 0;
         public static const GAME_END:int = 1;
@@ -190,22 +189,18 @@ package game
         private var GPU_PIXEL_BMD:BitmapData;
         private var GPU_PIXEL_BITMAP:Bitmap;
 
-        public function GameplayDisplay(myParent:MenuPanel)
-        {
+        public function GameplayDisplay(myParent:MenuPanel) {
             super(myParent);
         }
 
-        override public function init():Boolean
-        {
+        override public function init():Boolean {
             options = _gvars.options;
             song = options.song;
-            if (!options.isEditor && song.chart.Notes.length == 0)
-            {
+            if (!options.isEditor && song.chart.Notes.length == 0) {
                 Alert.add(_lang.string("error_chart_has_no_notes"), 120, Alert.RED);
 
                 var screen:int = _gvars.activeUser.startUpScreen;
-                if (!_gvars.activeUser.isGuest && (screen == 0 || screen == 1) && !MultiplayerSingleton.getInstance().connection.connected)
-                {
+                if (!_gvars.activeUser.isGuest && (screen == 0 || screen == 1) && !MultiplayerSingleton.getInstance().connection.connected) {
                     MultiplayerSingleton.getInstance().connection.connect();
                 }
                 switchTo(Main.GAME_MENU_PANEL);
@@ -214,20 +209,17 @@ package game
 
             // --- Per Song Options
             var perSongOptions:SQLSongUserInfo = SQLQueries.getSongUserInfo(song.songInfo);
-            if (perSongOptions != null && !options.isEditor && !options.replay)
-            {
+            if (perSongOptions != null && !options.isEditor && !options.replay) {
                 options.fill(); // Reset
 
                 // Custom Offsets
-                if (perSongOptions.set_custom_offsets)
-                {
+                if (perSongOptions.set_custom_offsets) {
                     options.offsetJudge = perSongOptions.offset_judge;
                     options.offsetGlobal = perSongOptions.offset_music;
                 }
 
                 // Invert Mirror Mod
-                if (perSongOptions.set_mirror_invert)
-                {
+                if (perSongOptions.set_mirror_invert) {
                     if (options.modEnabled("mirror"))
                         delete options.modCache["mirror"];
                     else
@@ -245,8 +237,7 @@ package game
         //     //context3D.createProgram()		
         // }
 
-        override public function stageAdd():void
-        {
+        override public function stageAdd():void {
             if (_gvars.menuMusic)
                 _gvars.menuMusic.stop();
 
@@ -317,8 +308,7 @@ package game
                     "last_hit": null};
 
             // Set Defaults for Editor Mode
-            if (options.isEditor)
-            {
+            if (options.isEditor) {
                 SOCKET_SONG_MESSAGE["song"]["name"] = "Editor Mode";
                 SOCKET_SONG_MESSAGE["song"]["author"] = "rCubed Engine";
                 SOCKET_SONG_MESSAGE["song"]["difficulty"] = 0;
@@ -331,25 +321,20 @@ package game
             initVars();
 
             // Preload next Song
-            if (_gvars.songQueue.length > 0)
-            {
+            if (_gvars.songQueue.length > 0) {
                 _gvars.getSongFile(_gvars.songQueue[0]);
             }
 
             // Setup MP Things
-            if (options.mpRoom)
-            {
+            if (options.mpRoom) {
                 MultiplayerSingleton.getInstance().gameplayPlaying(this);
-                if (!options.isEditor)
-                {
+                if (!options.isEditor) {
                     options.singleplayer = false; // Back to multiplayer lobby
                     options.mpRoom.connection.addEventListener(Multiplayer.EVENT_GAME_UPDATE, onMultiplayerUpdate);
                     if (mpSpectate)
                         options.mpRoom.connection.addEventListener(Multiplayer.EVENT_GAME_RESULTS, onMultiplayerResults);
                 }
-            }
-            else
-            {
+            } else {
                 options.singleplayer = true; // Back to song selection
             }
             stage.focus = this.stage;
@@ -365,15 +350,12 @@ package game
                 stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE + " - " + song.songInfo.name;
 
             // Add onEnterFrame Listeners
-            if (options.isEditor)
-            {
+            if (options.isEditor) {
                 options.isAutoplay = true;
                 stage.frameRate = options.frameRate;
                 stage.addEventListener(Event.ENTER_FRAME, editorOnEnterFrame, false, int.MAX_VALUE - 10, true);
                 stage.addEventListener(KeyboardEvent.KEY_DOWN, editorKeyboardKeyDown, false, int.MAX_VALUE - 10, true);
-            }
-            else
-            {
+            } else {
                 stage.frameRate = song.frameRate;
                 stage.addEventListener(Event.ENTER_FRAME, onEnterFrame, false, int.MAX_VALUE - 10, true);
                 stage.addEventListener(KeyboardEvent.KEY_DOWN, keyboardKeyDown, true, int.MAX_VALUE - 10, true);
@@ -381,23 +363,18 @@ package game
             }
         }
 
-        override public function stageRemove():void
-        {
+        override public function stageRemove():void {
             stage.frameRate = 60;
-            if (options.isEditor)
-            {
+            if (options.isEditor) {
                 _gvars.activeUser.screencutPosition = options.screencutPosition;
                 stage.removeEventListener(Event.ENTER_FRAME, editorOnEnterFrame);
                 stage.removeEventListener(KeyboardEvent.KEY_DOWN, editorKeyboardKeyDown);
-            }
-            else
-            {
+            } else {
                 stage.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
                 stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyboardKeyDown, true);
                 stage.removeEventListener(KeyboardEvent.KEY_UP, keyboardKeyUp, true);
 
-                if (options.mpRoom)
-                {
+                if (options.mpRoom) {
                     options.mpRoom.connection.removeEventListener(Multiplayer.EVENT_GAME_UPDATE, onMultiplayerUpdate);
                     options.mpRoom.connection.removeEventListener(Multiplayer.EVENT_GAME_RESULTS, onMultiplayerResults);
                 }
@@ -420,8 +397,7 @@ package game
          *
            \*#########################################################################################*/
 
-        private function initCore():void
-        {
+        private function initCore():void {
             // Bound Isolation Note Mod
             if (options.isolationOffset >= song.chart.Notes.length)
                 options.isolationOffset = song.chart.Notes.length - 1;
@@ -429,8 +405,7 @@ package game
             // Song
             song.updateMusicDelay();
             legacyMode = (song.type == NoteChart.FFR || song.type == NoteChart.FFR_RAW || song.type == NoteChart.FFR_LEGACY);
-            if (song.music && (legacyMode || !options.modEnabled("nobackground")))
-            {
+            if (song.music && (legacyMode || !options.modEnabled("nobackground"))) {
                 song_background = song.music as MovieClip;
                 gameSongFrames = song_background.totalFrames;
                 song_background.x = 115;
@@ -443,8 +418,7 @@ package game
             songDelay = song.mp3Frame / options.songRate * 1000 / 30 - globalOffset;
         }
 
-        private function initBackground():void
-        {
+        private function initBackground():void {
             // Anti-GPU Rampdown Hack
             GPU_PIXEL_BMD = new BitmapData(1, 1, false, 0x010101);
             GPU_PIXEL_BITMAP = new Bitmap(GPU_PIXEL_BMD);
@@ -459,14 +433,12 @@ package game
             // }
         }
 
-        private function initUI():void
-        {
+        private function initUI():void {
             noteBox = new NoteBox(song, options);
             noteBox.position();
             this.addChild(noteBox);
 
-            if (!options.isEditor && MultiplayerSingleton.getInstance().connection.connected && !MultiplayerSingleton.getInstance().isInRoom())
-            {
+            if (!options.isEditor && MultiplayerSingleton.getInstance().connection.connected && !MultiplayerSingleton.getInstance().isInRoom()) {
                 var isInSoloMode:Boolean = true;
                 MultiplayerSingleton.getInstance().connection.disconnect(isInSoloMode);
             }
@@ -507,22 +479,19 @@ package game
             if (!options.displayGameBottomBar)
                 gameplayUI.bottom_bar.visible = false;
 
-            if (options.displayPA)
-            {
+            if (options.displayPA) {
                 paWindow = new PAWindow(options);
                 if (sideScroll)
                     paWindow.alternateLayout();
                 this.addChild(paWindow);
             }
 
-            if (options.displayScore)
-            {
+            if (options.displayScore) {
                 score = new Score(options);
                 this.addChild(score);
             }
 
-            if (options.displayCombo)
-            {
+            if (options.displayCombo) {
                 combo = new Combo(options);
                 if (!sideScroll)
                     combo.alignment = Combo.ALIGN_RIGHT;
@@ -532,8 +501,7 @@ package game
                 this.addChild(comboStatic);
             }
 
-            if (options.displayComboTotal)
-            {
+            if (options.displayComboTotal) {
                 comboTotal = new Combo(options);
                 if (sideScroll)
                     comboTotal.alignment = Combo.ALIGN_RIGHT;
@@ -543,16 +511,14 @@ package game
                 this.addChild(comboTotalStatic);
             }
 
-            if (options.displaySongProgress || options.replay)
-            {
+            if (options.displaySongProgress || options.replay) {
                 progressDisplay = new ProgressBar(gameplayUI, 161, 9.35, 458, 20, 4, 0x545454, 0.1);
 
                 if (options.replay)
                     progressDisplay.addEventListener(MouseEvent.CLICK, progressMouseClick);
             }
 
-            if (!mpSpectate)
-            {
+            if (!mpSpectate) {
                 buildJudge();
                 buildHealth();
             }
@@ -560,23 +526,19 @@ package game
             if (options.mpRoom)
                 buildMultiplayer();
 
-            if (options.isEditor)
-            {
+            if (options.isEditor) {
                 gameplayUI.mouseChildren = false;
                 gameplayUI.mouseEnabled = false;
 
-                function closeEditor(e:MouseEvent):void
-                {
+                function closeEditor(e:MouseEvent):void {
                     GAME_STATE = GAME_END;
-                    if (!options.replay)
-                    {
+                    if (!options.replay) {
                         _gvars.activeUser.saveLocal();
                         _gvars.activeUser.save();
                     }
                 }
 
-                function resetLayout(e:MouseEvent):void
-                {
+                function resetLayout(e:MouseEvent):void {
                     for (var key:String in options.layout)
                         delete options.layout[key];
                     _avars.interfaceSave();
@@ -588,11 +550,9 @@ package game
             }
         }
 
-        private function initPlayerVars():void
-        {
+        private function initPlayerVars():void {
             // Force no Judge on SongPreviews
-            if (options.replay && options.replay.isPreview)
-            {
+            if (options.replay && options.replay.isPreview) {
                 options.offsetJudge = 0;
                 options.offsetGlobal = 0;
                 options.isAutoplay = true;
@@ -612,19 +572,15 @@ package game
             autoJudgeOffset = options.autoJudgeOffset;
 
             mpSpectate = (options.mpRoom && !options.mpRoom.connection.currentUser.isPlayer);
-            if (mpSpectate)
-            {
+            if (mpSpectate) {
                 options.displayCombo = options.displayComboTotal = options.displayPA = false;
-            }
-            else if (options.mpRoom)
+            } else if (options.mpRoom)
                 options.displayComboTotal = false;
         }
 
-        private function initVars(postStart:Boolean = true):void
-        {
+        private function initVars(postStart:Boolean = true):void {
             // Post Start Time
-            if (postStart && !_gvars.activeUser.isGuest && !options.replay && !options.isEditor && song.songInfo.engine == null && !mpSpectate)
-            {
+            if (postStart && !_gvars.activeUser.isGuest && !options.replay && !options.isEditor && song.songInfo.engine == null && !mpSpectate) {
                 Logger.debug(this, "Posting Start of level " + song.id);
                 _loader = new URLLoader();
                 addLoaderListeners();
@@ -664,8 +620,7 @@ package game
             hitMaxCombo = 0;
 
             updateHealth(0);
-            if (song != null && song.totalNotes > 0)
-            {
+            if (song != null && song.totalNotes > 0) {
                 gameLastNoteFrame = song.getNote(song.totalNotes - 1).frame;
                 gameFirstNoteFrame = song.getNote(0).frame;
             }
@@ -677,8 +632,7 @@ package game
             gamePosition = 0;
             gameProgress = 0;
             absolutePosition = 0;
-            if (song != null)
-            {
+            if (song != null) {
                 songOffset = new RollingAverage(song.frameRate * 4, _avars.configMusicOffset);
                 frameRate = new RollingAverage(song.frameRate * 4, song.frameRate);
             }
@@ -686,13 +640,11 @@ package game
 
             songDelayStarted = false;
 
-            if (postStart)
-            {
+            if (postStart) {
                 updateFieldVars();
 
                 // Websocket
-                if (_gvars.air_useWebsockets)
-                {
+                if (_gvars.air_useWebsockets) {
                     SOCKET_SCORE_MESSAGE["amazing"] = hitAmazing;
                     SOCKET_SCORE_MESSAGE["perfect"] = hitPerfect;
                     SOCKET_SCORE_MESSAGE["good"] = hitGood;
@@ -710,22 +662,23 @@ package game
             }
         }
 
-        private function siteLoadComplete(e:Event):void
-        {
+        private function siteLoadComplete(e:Event):void {
             removeLoaderListeners();
             var data:URLVariables = e.target.data;
             Logger.debug(this, "Post Start Load Success = " + data.result);
-            if (data.result == "success")
-            {
+            if (data.result == "success") {
                 _gvars.songStartTime = data.current_date;
                 _gvars.songStartHash = data.current_time;
             }
         }
 
-        private function siteLoadError(err:ErrorEvent = null):void
-        {
+        private function siteLoadError(err:ErrorEvent = null):void {
             Logger.error(this, "Post Start Load Failure: " + Logger.event_error(err));
             removeLoaderListeners();
+        }
+
+        private function httpStatusHandler(event:HTTPStatusEvent):void {
+            Logger.error(this, "Load Status: " + Logger.http_status_event(event));
         }
 
         /*#########################################################################################*\
@@ -737,16 +690,14 @@ package game
          *
            \*#########################################################################################*/
 
-        private function stopClips(clip:MovieClip, frame:int):void
-        {
+        private function stopClips(clip:MovieClip, frame:int):void {
             if (!clip)
                 return;
 
             if (frame < 2)
                 frame = 2;
 
-            switch (clip.currentFrame - frame + 1)
-            {
+            switch (clip.currentFrame - frame + 1) {
                 case 0:
                     clip.nextFrame();
                 case 1:
@@ -760,8 +711,7 @@ package game
                 stopClips(clip.getChildAt(i) as MovieClip, frame);
         }
 
-        private function logicTick():void
-        {
+        private function logicTick():void {
             gameProgress++;
 
             // Anti-GPU Rampdown Hack:
@@ -769,8 +719,7 @@ package game
             // top left, the GPU is kept active on laptops. This fixes the issue when a skip can
             // appear to happen when the GPU re-awakes to begin drawing updates after a break in
             // a song.
-            if (gameProgress % 15 == 0)
-            {
+            if (gameProgress % 15 == 0) {
                 if ((gameProgress & 1) == 0)
                     GPU_PIXEL_BMD.setPixel(0, 0, 0x010101);
                 else
@@ -780,39 +729,33 @@ package game
             if (levelScript != null)
                 levelScript.doProgressTick(gameProgress);
 
-            if (quitDoubleTap > 0)
-            {
+            if (quitDoubleTap > 0) {
                 quitDoubleTap--;
             }
 
-            if (gameProgress >= gameLastNoteFrame + 20 || quitDoubleTap == 0)
-            {
+            if (gameProgress >= gameLastNoteFrame + 20 || quitDoubleTap == 0) {
                 GAME_STATE = GAME_END;
                 return;
             }
 
             var nextNote:Note = noteBox.nextNote;
-            while (nextNote && nextNote.frame <= gameProgress + player1JudgeOffset + 5)
-            {
+            while (nextNote && nextNote.frame <= gameProgress + player1JudgeOffset + 5) {
                 noteBox.spawnArrow(nextNote, (gameProgress + player1JudgeOffset + 5) / 30 * 1000);
                 nextNote = noteBox.nextNote;
             }
 
             var notes:Array = noteBox.notes;
-            for (var n:int = 0; n < notes.length; n++)
-            {
+            for (var n:int = 0; n < notes.length; n++) {
                 var curNote:GameNote = notes[n];
 
                 // Game Bot
-                if (options.isAutoplay && (gameProgress - curNote.PROGRESS + player1JudgeOffset) == 0)
-                {
+                if (options.isAutoplay && (gameProgress - curNote.PROGRESS + player1JudgeOffset) == 0) {
                     judgeScore(curNote.DIR, gameProgress);
                     n--;
                 }
 
                 // Remove Old note
-                if (gameProgress - curNote.PROGRESS + player1JudgeOffset >= 6)
-                {
+                if (gameProgress - curNote.PROGRESS + player1JudgeOffset >= 6) {
                     binReplayNotes[curNote.ID] = {"d": curNote.DIR, "t": null};
                     commitJudge(curNote.DIR, gameProgress, -10);
                     noteBox.removeNote(curNote.ID);
@@ -821,48 +764,39 @@ package game
             }
 
             // Replays
-            if (options.replay && !options.replay.isPreview)
-            {
+            if (options.replay && !options.replay.isPreview) {
                 var newPress:ReplayNote = options.replay.getPress(replayPressCount);
-                if (options.replay.needsBeatboxGeneration)
-                {
+                if (options.replay.needsBeatboxGeneration) {
                     var oldPosition:int = gamePosition;
                     gamePosition = (gameProgress + 0.5) * 1000 / 30;
                     var cutOffReplayNote:uint = options.replay.generationReplayNotes.length;
                     var readAheadTime:Number = (1 / frameRate.value) * 1000;
                     // Note Hits
-                    for (var rn:int = 0; rn < notes.length; rn++)
-                    {
+                    for (var rn:int = 0; rn < notes.length; rn++) {
                         var repCurNote:GameNote = notes[rn];
 
                         // Missed Note
-                        if (repCurNote.ID >= cutOffReplayNote || options.replay.generationReplayNotes[repCurNote.ID] == null)
-                        {
+                        if (repCurNote.ID >= cutOffReplayNote || options.replay.generationReplayNotes[repCurNote.ID] == null) {
                             continue;
                         }
 
                         var diffValue:int = options.replay.generationReplayNotes[repCurNote.ID] + repCurNote.POSITION;
-                        if ((gamePosition + readAheadTime >= diffValue) || gamePosition >= diffValue)
-                        {
+                        if ((gamePosition + readAheadTime >= diffValue) || gamePosition >= diffValue) {
                             judgeScorePosition(repCurNote.DIR, diffValue);
                             rn--;
                         }
                     }
 
                     // Boo Handling
-                    while (newPress != null && gamePosition >= newPress.time)
-                    {
+                    while (newPress != null && gamePosition >= newPress.time) {
                         if (newPress.frame == -2)
                             commitJudge(newPress.direction, gameProgress, -5);
                         replayPressCount++;
                         newPress = options.replay.getPress(replayPressCount);
                     }
                     gamePosition = oldPosition;
-                }
-                else
-                {
-                    while (newPress != null && newPress.frame == gameProgress)
-                    {
+                } else {
+                    while (newPress != null && newPress.frame == gameProgress) {
                         judgeScore(newPress.direction, newPress.frame);
 
                         replayPressCount++;
@@ -879,12 +813,10 @@ package game
         private var mpHighProgress:int = 0;
         private var mpHighProgressTime:int = 0;
 
-        private function spectateSync():void
-        {
+        private function spectateSync():void {
             var lowIndex:int = 0;
             var highIndex:int = 0;
-            for each (var user:User in options.mpRoom.players)
-            {
+            for each (var user:User in options.mpRoom.players) {
                 var gameplay:Gameplay = user.gameplay;
                 var index:int = gameplay.amazing + gameplay.perfect + gameplay.good + gameplay.average + gameplay.miss;
                 if (!lowIndex || (index && index < lowIndex))
@@ -900,14 +832,12 @@ package game
             var highProgress:int = song.getNote(highIndex).frame;
 
             var currentTime:int = getTimer();
-            if (lowIndex > mpLowProgress)
-            {
+            if (lowIndex > mpLowProgress) {
                 mpLowIndex = lowIndex;
                 mpLowProgress = lowProgress;
                 mpLowProgressTime = currentTime;
             }
-            if (highIndex > mpHighProgress)
-            {
+            if (highIndex > mpHighProgress) {
                 mpHighIndex = highIndex;
                 mpHighProgress = highProgress;
                 mpHighProgressTime = currentTime;
@@ -916,8 +846,7 @@ package game
             lowIndex = mpLowProgressTime ? (mpLowProgress + (currentTime - mpLowProgressTime) * 30 / 1000) : 0;
             highIndex = mpHighProgressTime ? (mpHighProgress + (currentTime - mpHighProgressTime) * 30 / 1000) : 0;
 
-            if (gameProgress < lowIndex - 30)
-            {
+            if (gameProgress < lowIndex - 30) {
                 if (highIndex - lowIndex < 60)
                     lowIndex = lowIndex + (highIndex - lowIndex) / 2;
                 else
@@ -928,9 +857,7 @@ package game
                 noteBox.resetNoteCount(mpLowIndex);
                 while (gameProgress < lowIndex)
                     logicTick();
-            }
-            else if (gameProgress > highIndex + 30 || (!lowIndex && !highIndex))
-            {
+            } else if (gameProgress > highIndex + 30 || (!lowIndex && !highIndex)) {
                 if (highIndex - lowIndex < 60)
                     highIndex = lowIndex + (highIndex - lowIndex) / 2;
                 else if (highIndex > 15)
@@ -942,45 +869,34 @@ package game
             }
         }
 
-        private function onEnterFrame(e:Event):void
-        {
+        private function onEnterFrame(e:Event):void {
             // XXX: HACK HACK HACK
-            if (options.displayJudge && player1Judge != null)
-            {
+            if (options.displayJudge && player1Judge != null) {
                 player1Judge.updateJudge(e);
             }
 
-            if (legacyMode)
-            {
+            if (legacyMode) {
                 var songFrame:int = song_background.currentFrame;
                 if (songFrame == gameSongFrames - 1)
                     song.stop();
             }
 
-            switch (GAME_STATE)
-            {
+            switch (GAME_STATE) {
                 case GAME_PLAY:
-                    if (legacyMode)
-                    {
+                    if (legacyMode) {
                         logicTick();
                         gamePosition = (gameProgress + 0.5) * 1000 / 30;
 
                         if (mpSpectate)
                             spectateSync();
-                    }
-                    else
-                    {
+                    } else {
                         var lastAbsolutePosition:int = absolutePosition;
                         absolutePosition = getTimer() - absoluteStart;
 
-                        if (!songDelayStarted)
-                        {
-                            if (absolutePosition < songDelay)
-                            {
+                        if (!songDelayStarted) {
+                            if (absolutePosition < songDelay) {
                                 song.stop();
-                            }
-                            else
-                            {
+                            } else {
                                 songDelayStarted = true;
                                 song.start();
                             }
@@ -1017,8 +933,7 @@ package game
                             stopClips(song_background, 2 + song.musicDelay - globalOffsetRounded + gameProgress * options.songRate);
                     }
 
-                    if (options.modEnabled("tap_pulse"))
-                    {
+                    if (options.modEnabled("tap_pulse")) {
                         noteBoxOffset.x = Math.max(Math.min(Math.abs(noteBoxOffset.x) < 0.5 ? 0 : (noteBoxOffset.x * 0.992), noteBox.positionOffsetMax.max_x), noteBox.positionOffsetMax.min_x);
                         noteBoxOffset.y = Math.max(Math.min(Math.abs(noteBoxOffset.y) < 0.5 ? 0 : (noteBoxOffset.y * 0.992), noteBox.positionOffsetMax.max_y), noteBox.positionOffsetMax.min_y);
 
@@ -1042,8 +957,7 @@ package game
             e.stopImmediatePropagation();
         }
 
-        private function keyboardKeyUp(e:KeyboardEvent):void
-        {
+        private function keyboardKeyUp(e:KeyboardEvent):void {
             var keyCode:int = e.keyCode;
 
             // Set Key as used.
@@ -1052,13 +966,11 @@ package game
             e.stopImmediatePropagation();
         }
 
-        private function keyboardKeyDown(e:KeyboardEvent):void
-        {
+        private function keyboardKeyDown(e:KeyboardEvent):void {
             var keyCode:int = e.keyCode;
 
             // Don't allow key presses unless the key is up.
-            if (_keys[keyCode])
-            {
+            if (_keys[keyCode]) {
                 return;
             }
 
@@ -1066,13 +978,10 @@ package game
             _keys[keyCode] = true;
 
             // Handle judgement of key presses.
-            if (gameLife > 0)
-            {
-                if (!options.replay)
-                {
+            if (gameLife > 0) {
+                if (!options.replay) {
                     var dir:String = null;
-                    switch (keyCode)
-                    {
+                    switch (keyCode) {
                         case _gvars.activeUser.keyLeft:
                             //case Keyboard.NUMPAD_4:
                             dir = "L";
@@ -1093,8 +1002,7 @@ package game
                             dir = "D";
                             break;
                     }
-                    if (dir)
-                    {
+                    if (dir) {
                         if (legacyMode)
                             judgeScore(dir, gameProgress);
                         else
@@ -1104,41 +1012,31 @@ package game
             }
 
             // Game Restart
-            if (keyCode == _gvars.playerUser.keyRestart && !options.mpRoom)
-            {
+            if (keyCode == _gvars.playerUser.keyRestart && !options.mpRoom) {
                 GAME_STATE = GAME_RESTART;
             }
 
             // Quit
-            else if (keyCode == _gvars.playerUser.keyQuit)
-            {
-                if (_gvars.songQueue.length > 0)
-                {
-                    if (quitDoubleTap > 0)
-                    {
+            else if (keyCode == _gvars.playerUser.keyQuit) {
+                if (_gvars.songQueue.length > 0) {
+                    if (quitDoubleTap > 0) {
                         _gvars.songQueue = [];
                         GAME_STATE = GAME_END;
-                    }
-                    else
-                    {
+                    } else {
                         quitDoubleTap = options.frameRate / 4;
                     }
-                }
-                else
-                {
+                } else {
                     GAME_STATE = GAME_END;
                 }
             }
 
             // Pause
-            else if (keyCode == 19 && (CONFIG::debug || _gvars.playerUser.isAdmin || _gvars.playerUser.isDeveloper || options.replay))
-            {
+            else if (keyCode == 19 && (CONFIG::debug || _gvars.playerUser.isAdmin || _gvars.playerUser.isDeveloper || options.replay)) {
                 togglePause();
             }
 
             // Auto-Play
-            else if (keyCode == Keyboard.F8 && (CONFIG::debug || _gvars.playerUser.isDeveloper || _gvars.playerUser.isAdmin))
-            {
+            else if (keyCode == Keyboard.F8 && (CONFIG::debug || _gvars.playerUser.isDeveloper || _gvars.playerUser.isAdmin)) {
                 options.isAutoplay = !options.isAutoplay;
                 Alert.add("Bot Play: " + options.isAutoplay, 60);
             }
@@ -1146,8 +1044,7 @@ package game
             e.stopImmediatePropagation();
         }
 
-        private function progressMouseClick(e:MouseEvent):void
-        {
+        private function progressMouseClick(e:MouseEvent):void {
             var seek:int = (e.localX / e.target.width) * gameLastNoteFrame;
             if (seek < gameProgress)
                 restartGame();
@@ -1159,45 +1056,38 @@ package game
             songDelayStarted = true;
         }
 
-        private function editorOnEnterFrame(e:Event):void
-        {
+        private function editorOnEnterFrame(e:Event):void {
             // State 0 = Gameplay
-            if (GAME_STATE == GAME_PLAY)
-            {
+            if (GAME_STATE == GAME_PLAY) {
                 gamePosition = getTimer() - absoluteStart;
                 var targetProgress:int = Math.round(gamePosition * 30 / 1000);
 
                 // Update Notes
-                while (gameProgress < targetProgress)
-                {
+                while (gameProgress < targetProgress) {
                     logicTick();
                 }
 
                 noteBox.update(gamePosition);
             }
             // State 1 = End Game
-            else if (GAME_STATE == GAME_END)
-            {
+            else if (GAME_STATE == GAME_END) {
                 endGame();
                 return;
             }
         }
 
-        private function editorKeyboardKeyDown(e:KeyboardEvent):void
-        {
+        private function editorKeyboardKeyDown(e:KeyboardEvent):void {
             if (noteBox == null)
                 return;
 
             var keyCode:int = e.keyCode;
             var dir:String = "";
 
-            if (keyCode == _gvars.playerUser.keyQuit)
-            {
+            if (keyCode == _gvars.playerUser.keyQuit) {
                 GAME_STATE = GAME_END;
             }
 
-            switch (keyCode)
-            {
+            switch (keyCode) {
                 case _gvars.playerUser.keyLeft:
                     //case Keyboard.NUMPAD_4:
                     dir = "L";
@@ -1219,8 +1109,7 @@ package game
                     break;
             }
 
-            if (dir != "")
-            {
+            if (dir != "") {
                 noteBox.spawnArrow(new Note(dir, (gameProgress + 31) / 30, "red", gameProgress + 31), (gameProgress + player1JudgeOffset + 5) / 30 * 1000);
             }
         }
@@ -1234,34 +1123,27 @@ package game
          *
            \*#########################################################################################*/
 
-        public function togglePause():void
-        {
-            if (GAME_STATE == GAME_PLAY)
-            {
+        public function togglePause():void {
+            if (GAME_STATE == GAME_PLAY) {
                 GAME_STATE = GAME_PAUSE;
                 songPausePosition = getTimer();
                 song.pause();
 
-                if (_gvars.air_useWebsockets)
-                {
+                if (_gvars.air_useWebsockets) {
                     _gvars.websocketSend("SONG_PAUSE", SOCKET_SONG_MESSAGE);
                 }
-            }
-            else if (GAME_STATE == GAME_PAUSE)
-            {
+            } else if (GAME_STATE == GAME_PAUSE) {
                 GAME_STATE = GAME_PLAY;
                 absoluteStart += (getTimer() - songPausePosition);
                 song.resume();
 
-                if (_gvars.air_useWebsockets)
-                {
+                if (_gvars.air_useWebsockets) {
                     _gvars.websocketSend("SONG_RESUME", SOCKET_SONG_MESSAGE);
                 }
             }
         }
 
-        private function endGame():void
-        {
+        private function endGame():void {
             if (levelScript)
                 levelScript.destroy();
 
@@ -1270,8 +1152,7 @@ package game
                 song.stop();
 
             // Play through to the end of a replay
-            if (options.replay)
-            {
+            if (options.replay) {
                 GAME_STATE = GAME_PLAY;
                 while (gameLife > 0 && GAME_STATE == GAME_PLAY)
                     logicTick();
@@ -1279,10 +1160,8 @@ package game
             }
 
             // Fill missing notes from replay.
-            if (gameReplayHit.length > 0)
-            { // fix crash when spectating game ends
-                while (gameReplayHit.length < song.totalNotes)
-                {
+            if (gameReplayHit.length > 0) { // fix crash when spectating game ends
+                while (gameReplayHit.length < song.totalNotes) {
                     gameReplayHit.push(-5);
                 }
             }
@@ -1292,8 +1171,7 @@ package game
             var noteCount:int = hitAmazing + hitPerfect + hitGood + hitAverage + hitMiss;
 
             // Save results for display
-            if (!mpSpectate && !options.isEditor)
-            {
+            if (!mpSpectate && !options.isEditor) {
                 var newGameResults:GameScoreResult = new GameScoreResult();
                 newGameResults.game_index = _gvars.gameIndex++;
                 newGameResults.level = song.id;
@@ -1327,8 +1205,7 @@ package game
                 newGameResults.playtime_secs = ((getTimer() - msStartTime) / 1000);
 
                 // Set Note Counts for Preview Songs
-                if (options.replay && options.replay.isPreview)
-                {
+                if (options.replay && options.replay.isPreview) {
                     newGameResults.is_preview = true;
                     newGameResults.score = song.totalNotes * 50;
                     newGameResults.amazing = song.totalNotes;
@@ -1342,13 +1219,11 @@ package game
             _gvars.sessionStats.addFromStats(_gvars.songStats);
             _gvars.songStats.reset();
 
-            if (!legacyMode && !options.replay && !options.isEditor && !mpSpectate)
-            {
+            if (!legacyMode && !options.replay && !options.isEditor && !mpSpectate) {
                 _avars.configMusicOffset = (_avars.configMusicOffset * 0.85) + songOffset.value * 0.15;
 
                 // Cap between 5 seconds for sanity.
-                if (Math.abs(_avars.configMusicOffset) >= 5000)
-                {
+                if (Math.abs(_avars.configMusicOffset) >= 5000) {
                     _avars.configMusicOffset = Math.max(-5000, Math.min(5000, _avars.configMusicOffset));
                 }
 
@@ -1356,8 +1231,7 @@ package game
             }
 
             // Websocket
-            if (_gvars.air_useWebsockets)
-            {
+            if (_gvars.air_useWebsockets) {
                 SOCKET_SCORE_MESSAGE["amazing"] = hitAmazing;
                 SOCKET_SCORE_MESSAGE["perfect"] = hitPerfect;
                 SOCKET_SCORE_MESSAGE["good"] = hitGood;
@@ -1380,72 +1254,59 @@ package game
 
             song = null;
 
-            if (song_background)
-            {
+            if (song_background) {
                 this.removeChild(song_background);
                 song_background = null;
             }
 
             // Remove Notes
-            if (noteBox != null)
-            {
+            if (noteBox != null) {
                 noteBox.reset();
             }
 
             // Remove UI
-            if (GPU_PIXEL_BITMAP)
-            {
+            if (GPU_PIXEL_BITMAP) {
                 this.removeChild(GPU_PIXEL_BITMAP);
                 GPU_PIXEL_BITMAP = null;
                 GPU_PIXEL_BMD = null;
             }
-            if (displayBlackBG)
-            {
+            if (displayBlackBG) {
                 this.removeChild(displayBlackBG);
                 displayBlackBG = null;
             }
-            if (progressDisplay)
-            {
+            if (progressDisplay) {
                 gameplayUI.removeChild(progressDisplay);
                 progressDisplay = null;
             }
-            if (player1Life)
-            {
+            if (player1Life) {
                 this.removeChild(player1Life);
                 player1Life = null;
             }
-            if (player1Judge)
-            {
+            if (player1Judge) {
                 this.removeChild(player1Judge);
                 player1Judge = null;
             }
-            if (gameplayUI)
-            {
+            if (gameplayUI) {
                 this.removeChild(gameplayUI);
                 gameplayUI = null;
             }
-            if (noteBox)
-            {
+            if (noteBox) {
                 this.removeChild(noteBox);
                 noteBox = null;
             }
-            if (displayBlackBG)
-            {
+            if (displayBlackBG) {
                 this.removeChild(displayBlackBG);
                 displayBlackBG = null;
             }
-            if (flashLight)
-            {
+            if (flashLight) {
                 this.removeChild(flashLight);
                 flashLight = null;
             }
-            if (screenCut)
-            {
+            if (screenCut) {
                 this.removeChild(screenCut);
                 screenCut = null;
             }
-            if (exitEditor)
-            {
+            if (exitEditor) {
                 exitEditor.dispose();
                 this.removeChild(exitEditor);
                 exitEditor = null;
@@ -1454,8 +1315,7 @@ package game
             GAME_STATE = GAME_DISPOSE;
 
             var screen:int = _gvars.activeUser.startUpScreen;
-            if (!_gvars.activeUser.isGuest && (screen == 0 || screen == 1) && !MultiplayerSingleton.getInstance().connection.connected)
-            {
+            if (!_gvars.activeUser.isGuest && (screen == 0 || screen == 1) && !MultiplayerSingleton.getInstance().connection.connected) {
                 MultiplayerSingleton.getInstance().connection.connect();
             }
 
@@ -1463,8 +1323,7 @@ package game
             switchTo((options.isEditor || mpSpectate) ? Main.GAME_MENU_PANEL : GameMenu.GAME_RESULTS);
         }
 
-        private function restartGame():void
-        {
+        private function restartGame():void {
             // Remove Notes
             noteBox.reset();
 
@@ -1497,8 +1356,7 @@ package game
             _gvars.songRestarts++;
 
             // Websocket
-            if (_gvars.air_useWebsockets)
-            {
+            if (_gvars.air_useWebsockets) {
                 SOCKET_SCORE_MESSAGE["restarts"] = _gvars.songRestarts;
                 _gvars.websocketSend("NOTE_JUDGE", SOCKET_SCORE_MESSAGE);
                 _gvars.websocketSend("SONG_RESTART", SOCKET_SONG_MESSAGE);
@@ -1513,12 +1371,9 @@ package game
          *	 \___/\____/   \____/_|  \___|\__,_|\__|_|\___/|_| |_|
          *
            \*#########################################################################################*/
-        private function buildFlashlight():void
-        {
-            if (options.modEnabled("flashlight"))
-            {
-                if (flashLight == null)
-                {
+        private function buildFlashlight():void {
+            if (options.modEnabled("flashlight")) {
+                if (flashLight == null) {
                     var _matrix:Matrix = new Matrix();
                     _matrix.createGradientBox(Main.GAME_WIDTH, Main.GAME_HEIGHT, 1.5707963267948966);
                     flashLight = new Sprite();
@@ -1529,20 +1384,16 @@ package game
                 }
                 if (!contains(flashLight))
                     addChild(flashLight);
-            }
-            else if (flashLight != null && this.contains(flashLight))
-            {
+            } else if (flashLight != null && this.contains(flashLight)) {
                 removeChild(flashLight);
             }
         }
 
-        private function buildScreenCut():void
-        {
+        private function buildScreenCut():void {
             if (!options.displayScreencut && !options.isEditor)
                 return;
 
-            if (screenCut)
-            {
+            if (screenCut) {
                 if (this.contains(screenCut))
                     this.removeChild(screenCut);
                 screenCut = null;
@@ -1551,21 +1402,17 @@ package game
             screenCut.graphics.lineStyle(3, 0x39C4E1, 1);
             screenCut.graphics.beginFill(0x000000);
 
-            switch (options.scrollDirection)
-            {
+            switch (options.scrollDirection) {
                 case "down":
                     screenCut.x = 0;
                     screenCut.y = options.screencutPosition * Main.GAME_HEIGHT;
                     screenCut.graphics.drawRect(-Main.GAME_WIDTH, -(Main.GAME_HEIGHT * 3), Main.GAME_WIDTH * 3, Main.GAME_HEIGHT * 3);
 
-                    if (options.isEditor)
-                    {
-                        screenCut.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void
-                        {
+                    if (options.isEditor) {
+                        screenCut.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void {
                             screenCut.startDrag(false, new Rectangle(0, 5, 0, Main.GAME_HEIGHT - 7));
                         });
-                        screenCut.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void
-                        {
+                        screenCut.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void {
                             screenCut.stopDrag();
                             options.screencutPosition = (screenCut.y / Main.GAME_HEIGHT);
                         });
@@ -1576,14 +1423,11 @@ package game
                     screenCut.y = 0;
                     screenCut.graphics.drawRect(-Main.GAME_WIDTH * 3, -Main.GAME_HEIGHT, Main.GAME_WIDTH * 3, Main.GAME_HEIGHT * 3);
 
-                    if (options.isEditor)
-                    {
-                        screenCut.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void
-                        {
+                    if (options.isEditor) {
+                        screenCut.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void {
                             screenCut.startDrag(false, new Rectangle(0, 0, Main.GAME_WIDTH - 7, 0));
                         });
-                        screenCut.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void
-                        {
+                        screenCut.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void {
                             screenCut.stopDrag();
                             options.screencutPosition = (screenCut.x / Main.GAME_WIDTH);
                         });
@@ -1594,14 +1438,11 @@ package game
                     screenCut.y = 0;
                     screenCut.graphics.drawRect(0, -Main.GAME_HEIGHT, Main.GAME_WIDTH * 3, Main.GAME_HEIGHT * 3);
 
-                    if (options.isEditor)
-                    {
-                        screenCut.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void
-                        {
+                    if (options.isEditor) {
+                        screenCut.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void {
                             screenCut.startDrag(false, new Rectangle(0, 0, Main.GAME_WIDTH - 7, 0));
                         });
-                        screenCut.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void
-                        {
+                        screenCut.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void {
                             screenCut.stopDrag();
                             options.screencutPosition = 1 - (screenCut.x / Main.GAME_WIDTH);
                         });
@@ -1612,14 +1453,11 @@ package game
                     screenCut.y = Main.GAME_HEIGHT - (options.screencutPosition * Main.GAME_HEIGHT);
                     screenCut.graphics.drawRect(-Main.GAME_WIDTH, 0, Main.GAME_WIDTH * 3, Main.GAME_HEIGHT * 3);
 
-                    if (options.isEditor)
-                    {
-                        screenCut.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void
-                        {
+                    if (options.isEditor) {
+                        screenCut.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void {
                             screenCut.startDrag(false, new Rectangle(0, 5, 0, Main.GAME_HEIGHT - 7));
                         });
-                        screenCut.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void
-                        {
+                        screenCut.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void {
                             screenCut.stopDrag();
                             options.screencutPosition = 1 - (screenCut.y / Main.GAME_HEIGHT);
                         });
@@ -1627,16 +1465,14 @@ package game
                     break;
             }
             screenCut.graphics.endFill();
-            if (options.isEditor)
-            {
+            if (options.isEditor) {
                 screenCut.buttonMode = true;
                 screenCut.useHandCursor = true;
             }
             this.addChild(screenCut);
         }
 
-        private function buildJudge():void
-        {
+        private function buildJudge():void {
             if (!options.displayJudge)
                 return;
             player1Judge = new Judge(options);
@@ -1645,8 +1481,7 @@ package game
                 player1Judge.showJudge(100, true);
         }
 
-        private function buildHealth():void
-        {
+        private function buildHealth():void {
             if (!options.displayHealth)
                 return;
             player1Life = new LifeBar();
@@ -1655,8 +1490,7 @@ package game
             addChild(player1Life);
         }
 
-        private function buildMultiplayer():void
-        {
+        private function buildMultiplayer():void {
             mpJudge = new Array();
             mpPA = new Array();
             mpCombo = new Array();
@@ -1665,20 +1499,17 @@ package game
             if (!options.displayMP && !mpSpectate)
                 return;
 
-            for each (var user:User in options.mpRoom.players)
-            {
+            for each (var user:User in options.mpRoom.players) {
                 if (user.id == options.mpRoom.connection.currentUser.id)
                     continue;
 
-                if (options.displayMPPA)
-                {
+                if (options.displayMPPA) {
                     var pa:PAWindow = new PAWindow(options);
                     addChild(pa);
                     mpPA[user.playerIdx] = pa;
                 }
 
-                if (mpSpectate)
-                {
+                if (mpSpectate) {
                     var header:MPHeader = new MPHeader(user);
                     if (options.displayMPPA)
                         mpPA[user.playerIdx].addChild(header);
@@ -1687,16 +1518,14 @@ package game
                     mpHeader[user.playerIdx] = header;
                 }
 
-                if (options.displayMPCombo)
-                {
+                if (options.displayMPCombo) {
                     var combo:Combo = new Combo(options);
                     addChild(combo);
                     mpCombo[user.playerIdx] = combo;
                 }
 
                 // Hide opponent's judge
-                if (mpSpectate)
-                {
+                if (mpSpectate) {
                     //if (options.displayMPJudge) {
                     var judge:Judge = new Judge(options);
                     addChild(judge);
@@ -1707,10 +1536,8 @@ package game
             }
         }
 
-        private function interfaceLayout(key:String, defaults:Boolean = true):Object
-        {
-            if (defaults)
-            {
+        private function interfaceLayout(key:String, defaults:Boolean = true):Object {
+            if (defaults) {
                 var ret:Object = new Object();
                 var def:Object = defaultLayout[key];
                 for (var i:String in def)
@@ -1719,29 +1546,24 @@ package game
                 for (i in layout)
                     ret[i] = layout[i];
                 return ret;
-            }
-            else if (!options.layout[key])
+            } else if (!options.layout[key])
                 options.layout[key] = new Object();
             return options.layout[key];
         }
 
-        private function interfaceSetup():void
-        {
+        private function interfaceSetup():void {
             defaultLayout = new Object();
             defaultLayout[LAYOUT_JUDGE] = {x: 392, y: 228};
             defaultLayout[LAYOUT_HEALTH] = {x: Main.GAME_WIDTH - 37, y: 71.5};
             defaultLayout[LAYOUT_RECEPTORS] = {x: 230, y: 0};
-            if (sideScroll)
-            {
+            if (sideScroll) {
                 defaultLayout[LAYOUT_PA] = {x: 16, y: 418};
                 defaultLayout[LAYOUT_SCORE] = {x: 392, y: 24};
                 defaultLayout[LAYOUT_COMBO] = {x: 508, y: 388};
                 defaultLayout[LAYOUT_COMBO_TOTAL] = {x: 770, y: 420, properties: {alignment: Combo.ALIGN_RIGHT}};
                 defaultLayout[LAYOUT_COMBO_STATIC] = {x: 512, y: 438};
                 defaultLayout[LAYOUT_COMBO_TOTAL_STATIC] = {x: 734, y: 414};
-            }
-            else
-            {
+            } else {
                 defaultLayout[LAYOUT_PA] = {x: 6, y: 96};
                 defaultLayout[LAYOUT_SCORE] = {x: 392, y: 440};
                 defaultLayout[LAYOUT_COMBO] = {x: 222, y: 402, properties: {alignment: Combo.ALIGN_RIGHT}};
@@ -1750,8 +1572,7 @@ package game
                 defaultLayout[LAYOUT_COMBO_TOTAL_STATIC] = {x: 502, y: 436};
             }
 
-            if (mpSpectate)
-            {
+            if (mpSpectate) {
                 defaultLayout[LAYOUT_MP_COMBO + "1"] = defaultLayout[LAYOUT_COMBO];
                 defaultLayout[LAYOUT_MP_JUDGE + "1"] = {x: 208, y: 102};
                 defaultLayout[LAYOUT_MP_PA + "1"] = {x: 6, y: 190};
@@ -1781,8 +1602,7 @@ package game
             interfacePosition(comboStatic, interfaceLayout(LAYOUT_COMBO_STATIC));
             interfacePosition(comboTotalStatic, interfaceLayout(LAYOUT_COMBO_TOTAL_STATIC));
 
-            if (options.isEditor)
-            {
+            if (options.isEditor) {
                 interfaceEditor(noteBox, interfaceLayout(LAYOUT_RECEPTORS, false));
                 interfaceEditor(player1Judge, interfaceLayout(LAYOUT_JUDGE, false));
                 interfaceEditor(player1Life, interfaceLayout(LAYOUT_HEALTH, false));
@@ -1794,25 +1614,22 @@ package game
                 interfaceEditor(comboTotalStatic, interfaceLayout(LAYOUT_COMBO_TOTAL_STATIC, false));
             }
 
-            if (options.mpRoom)
-            {
+            if (options.mpRoom) {
                 var index:int = 0;
-                for (var id:int = 1; id < options.mpRoom.playerCount + 1; id++)
-                {
+                for (var id:int = 1; id < options.mpRoom.playerCount + 1; id++) {
                     if (id == options.mpRoom.connection.currentUser.id)
                         continue;
 
                     index++;
                     var indexs:String = index.toString();
-                    
+
                     interfacePosition(mpJudge[index], interfaceLayout(LAYOUT_MP_JUDGE + indexs));
                     interfacePosition(mpCombo[index], interfaceLayout(LAYOUT_MP_COMBO + indexs));
                     interfacePosition(mpPA[index], interfaceLayout(LAYOUT_MP_PA + indexs));
                     interfacePosition(mpHeader[index], interfaceLayout(LAYOUT_MP_HEADER + indexs));
-                    
 
-                    if (options.isEditor)
-                    {
+
+                    if (options.isEditor) {
                         interfaceEditor(mpJudge[index], interfaceLayout(LAYOUT_MP_JUDGE + indexs, false));
                         interfaceEditor(mpCombo[index], interfaceLayout(LAYOUT_MP_COMBO + indexs, false));
                         interfaceEditor(mpPA[index], interfaceLayout(LAYOUT_MP_PA + indexs, false));
@@ -1822,8 +1639,7 @@ package game
             }
         }
 
-        private function interfacePosition(sprite:Sprite, layout:Object):void
-        {
+        private function interfacePosition(sprite:Sprite, layout:Object):void {
             if (!sprite)
                 return;
 
@@ -1839,8 +1655,7 @@ package game
                 sprite[p] = layout.properties[p];
         }
 
-        private function interfaceEditor(sprite:Sprite, layout:Object):void
-        {
+        private function interfaceEditor(sprite:Sprite, layout:Object):void {
             if (!sprite)
                 return;
 
@@ -1848,12 +1663,10 @@ package game
             sprite.buttonMode = true;
             sprite.useHandCursor = true;
 
-            sprite.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void
-            {
+            sprite.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void {
                 sprite.startDrag(false);
             });
-            sprite.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void
-            {
+            sprite.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void {
                 sprite.stopDrag();
                 layout["x"] = sprite.x;
                 layout["y"] = sprite.y;
@@ -1876,8 +1689,7 @@ package game
          * @param position Time in MS.
          * @return
          */
-        private function judgeScorePosition(dir:String, position:int):Boolean
-        {
+        private function judgeScorePosition(dir:String, position:int):Boolean {
             if (position < 0)
                 position = 0;
             var positionJudged:int = position + judgeOffset;
@@ -1885,23 +1697,20 @@ package game
             var score:int = 0;
             var frame:int = 0;
             var booConflict:Boolean = false;
-            for each (var note:GameNote in noteBox.notes)
-            {
+            for each (var note:GameNote in noteBox.notes) {
                 if (note.DIR != dir)
                     continue;
 
                 var diff:Number = positionJudged - note.POSITION;
                 var lastJudge:Object = null;
-                for each (var j:Object in judgeSettings)
-                {
+                for each (var j:Object in judgeSettings) {
                     if (diff > j.t)
                         lastJudge = j;
                 }
                 score = lastJudge ? lastJudge.s : 0;
                 if (score)
                     frame = lastJudge.f;
-                if (!_avars.configJudge && !score)
-                {
+                if (!_avars.configJudge && !score) {
                     var pdiff:int = gameProgress - note.PROGRESS + player1JudgeOffset;
                     if (pdiff >= -3 && pdiff <= 3)
                         booConflict = true;
@@ -1911,22 +1720,17 @@ package game
                 else if (diff <= judgeSettings[0].t)
                     break;
             }
-            if (score)
-            {
+            if (score) {
                 commitJudge(dir, frame + note.PROGRESS - player1JudgeOffset, score);
                 noteBox.removeNote(note.ID);
                 accuracy.addValue(note.POSITION - position);
                 binReplayNotes[note.ID] = {"d": dir, "t": (positionJudged - note.POSITION)};
-            }
-            else
-            {
+            } else {
                 var booFrame:int = gameProgress;
-                if (booConflict)
-                {
+                if (booConflict) {
                     var noteIndex:int = 0;
                     note = noteBox.notes[noteIndex++] || noteBox.spawnNextNote();
-                    while (note)
-                    {
+                    while (note) {
                         if (booFrame + player1JudgeOffset < note.PROGRESS - 3)
                             break;
                         if (note.DIR == dir)
@@ -1940,8 +1744,7 @@ package game
                 commitJudge(dir, booFrame, -5);
             }
 
-            if (options.modEnabled("tap_pulse"))
-            {
+            if (options.modEnabled("tap_pulse")) {
                 if (dir == "L")
                     noteBoxOffset.x -= Math.abs(options.receptorSpacing * 0.20);
                 if (dir == "R")
@@ -1955,17 +1758,14 @@ package game
             return Boolean(score);
         }
 
-        private function judgeScore(dir:String, frame:int):Boolean
-        {
+        private function judgeScore(dir:String, frame:int):Boolean {
             var score:int = 0;
-            for each (var note:GameNote in noteBox.notes)
-            {
+            for each (var note:GameNote in noteBox.notes) {
                 if (note.DIR != dir)
                     continue;
 
                 var diff:int = frame + player1JudgeOffset - note.PROGRESS;
-                switch (diff)
-                {
+                switch (diff) {
                     case -3:
                         score = 5;
                         break;
@@ -1996,8 +1796,7 @@ package game
                     break;
             }
 
-            if (options.modEnabled("tap_pulse"))
-            {
+            if (options.modEnabled("tap_pulse")) {
                 if (dir == "L")
                     noteBoxOffset.x -= Math.abs(options.receptorSpacing * 0.20);
                 if (dir == "R")
@@ -2008,36 +1807,29 @@ package game
                     noteBoxOffset.y += Math.abs(options.receptorSpacing * 0.15);
             }
 
-            if (score)
-            {
+            if (score) {
                 commitJudge(dir, frame, score);
                 noteBox.removeNote(note.ID);
                 accuracy.addValue((note.PROGRESS - frame) * 1000 / 30);
-            }
-            else
+            } else
                 commitJudge(dir, frame, -5);
 
             return Boolean(score);
         }
 
-        private function commitJudge(dir:String, frame:int, score:int):void
-        {
+        private function commitJudge(dir:String, frame:int, score:int):void {
             var health:int = 0;
             var jscore:int = score;
             noteBox.receptorFeedback(dir, score);
-            switch (score)
-            {
+            switch (score) {
                 case 100:
                     hitAmazing++;
                     hitCombo++;
                     gameScore += 50;
                     health = 1;
-                    if (options.displayAmazing)
-                    {
+                    if (options.displayAmazing) {
                         checkAutofail(options.autofail[0], hitAmazing);
-                    }
-                    else
-                    {
+                    } else {
                         jscore = 50;
                         checkAutofail(options.autofail[0] + options.autofail[1], hitAmazing + hitPerfect);
                     }
@@ -2090,8 +1882,7 @@ package game
                     break;
             }
 
-            if (options.isAutoplay)
-            {
+            if (options.isAutoplay) {
                 gameScore = 0;
                 hitAmazing = 0;
                 hitPerfect = 0;
@@ -2120,8 +1911,7 @@ package game
 
             updateFieldVars();
 
-            if (options.mpRoom)
-            {
+            if (options.mpRoom) {
                 dispatchEvent(new GameUpdateEvent({gameScore: gameScore,
                         gameLife: gameLife,
                         hitMaxCombo: hitMaxCombo,
@@ -2135,8 +1925,7 @@ package game
             }
 
             // Websocket
-            if (_gvars.air_useWebsockets)
-            {
+            if (_gvars.air_useWebsockets) {
                 SOCKET_SCORE_MESSAGE["amazing"] = hitAmazing;
                 SOCKET_SCORE_MESSAGE["perfect"] = hitPerfect;
                 SOCKET_SCORE_MESSAGE["good"] = hitGood;
@@ -2151,8 +1940,7 @@ package game
             }
         }
 
-        private function checkAutofail(autofail:Number, hit:Number):void
-        {
+        private function checkAutofail(autofail:Number, hit:Number):void {
             if (autofail > 0 && hit >= autofail)
                 GAME_STATE = GAME_END;
         }
@@ -2166,23 +1954,18 @@ package game
          *									  |_|
            \*#########################################################################################*/
 
-        private function updateHealth(val:int):void
-        {
+        private function updateHealth(val:int):void {
             gameLife += val;
-            if (gameLife <= 0)
-            {
+            if (gameLife <= 0) {
                 GAME_STATE = GAME_END;
-            }
-            else if (gameLife > 100)
-            {
+            } else if (gameLife > 100) {
                 gameLife = 100;
             }
             if (player1Life)
                 player1Life.health = gameLife;
         }
 
-        private function updateFieldVars():void
-        {
+        private function updateFieldVars():void {
             //gameplayUI.sDisplay_score.text = gameScore.toString();
 
             if (paWindow)
@@ -2197,8 +1980,7 @@ package game
 
         private var previousDiffs:Array = new Array();
 
-        private function multiplayerDiff(id:int, data:Object):Object
-        {
+        private function multiplayerDiff(id:int, data:Object):Object {
             var previousDiff:Object = previousDiffs[id];
             if (!previousDiff)
                 previousDiff = (previousDiffs[id] = {amazing: 0, perfect: 0, good: 0, average: 0, miss: 0, boo: 0});
@@ -2222,8 +2004,7 @@ package game
 
         private var multiplayerResults:Array = [];
 
-        public function onMultiplayerUpdate(event:GameUpdateEvent):void
-        {
+        public function onMultiplayerUpdate(event:GameUpdateEvent):void {
             var user:User = event.user;
             var gameplay:Gameplay = user.gameplay;
 
@@ -2241,8 +2022,7 @@ package game
                 pa.update(gameplay.amazing, gameplay.perfect, gameplay.good, gameplay.average, gameplay.miss, gameplay.boo);
 
             var judge:Judge = mpJudge[user.playerIdx];
-            if (judge)
-            {
+            if (judge) {
                 var value:int = 0;
                 if (diff.miss > 0)
                     value = -10;
@@ -2260,40 +2040,36 @@ package game
                     judge.showJudge(value);
             }
 
-            if (gameplay.status == Multiplayer.STATUS_RESULTS && !multiplayerResults[user.playerIdx])
-            {
+            if (gameplay.status == Multiplayer.STATUS_RESULTS && !multiplayerResults[user.playerIdx]) {
                 multiplayerResults[user.playerIdx] = true;
                 Alert.add(user.name + " finished playing the song", 240, Alert.RED);
             }
         }
 
-        public function onMultiplayerResults(event:GameResultsEvent):void
-        {
+        public function onMultiplayerResults(event:GameResultsEvent):void {
             if (event.room == options.mpRoom)
                 GAME_STATE = GAME_END;
         }
 
-        private function addLoaderListeners():void
-        {
+        private function addLoaderListeners():void {
             _loader.addEventListener(Event.COMPLETE, siteLoadComplete);
             _loader.addEventListener(IOErrorEvent.IO_ERROR, siteLoadError);
             _loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, siteLoadError);
+            _loader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpStatusHandler);
         }
 
-        private function removeLoaderListeners():void
-        {
+        private function removeLoaderListeners():void {
             _loader.removeEventListener(Event.COMPLETE, siteLoadComplete);
             _loader.removeEventListener(IOErrorEvent.IO_ERROR, siteLoadError);
             _loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, siteLoadError);
+            _loader.removeEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpStatusHandler);
         }
 
-        public function getScriptVariable(key:String):*
-        {
+        public function getScriptVariable(key:String):* {
             return this[key];
         }
 
-        public function setScriptVariable(key:String, val:*):void
-        {
+        public function setScriptVariable(key:String, val:*):void {
             this[key] = val;
         }
     }
