@@ -57,7 +57,7 @@ package game
             //- Check Parent Function first.
             if (super.switchTo(_panel, useNew))
             {
-                _gvars.gameMain.bg.visible = true;
+                _gvars.gameMain.bg.updateDisplay();
                 _gvars.gameMain.ver.visible = true;
                 return true;
             }
@@ -77,20 +77,20 @@ package game
             {
                 case GAME_LOADING:
                     panel = new GameLoading(this);
-                    _gvars.gameMain.bg.visible = true;
+                    _gvars.gameMain.bg.updateDisplay();
                     _gvars.gameMain.ver.visible = true;
                     isFound = true;
                     break;
 
                 case GAME_PLAY:
-                    _gvars.gameMain.bg.visible = false;
+                    _gvars.gameMain.bg.updateDisplay(true);
                     _gvars.gameMain.ver.visible = false;
                     panel = new GameplayDisplay(this);
                     isFound = true;
                     break;
 
                 case GAME_REPLAY:
-                    _gvars.gameMain.bg.visible = false;
+                    _gvars.gameMain.bg.updateDisplay(true);
                     _gvars.gameMain.ver.visible = false;
                     panel = new GameReplay(this);
                     isFound = true;

@@ -524,7 +524,7 @@ package
             if (_panel == "none")
             {
                 // Make background force displayed.
-                bg.visible = true;
+                bg.updateDisplay();
                 ver.visible = true;
 
                 //- Remove last panel if exist
