@@ -891,6 +891,9 @@ package game
             // Get last score
             var gameResult:GameScoreResult = songResults[songResults.length - 1];
 
+            // Update Judge Offset
+            updateJudgeOffset(gameResult);
+
             // Alt Engine Score
             if (gameResult.songInfo.engine)
             {
@@ -1080,9 +1083,6 @@ package game
 
                 Playlist.instanceCanon.updateSongAccess();
 
-                // Update Judge Offset
-                updateJudgeOffset(gameResult);
-
                 // Display Popup Queue
                 if (resultsDisplay != null)
                     _gvars.gameMain.displayPopupQueue();
@@ -1248,9 +1248,6 @@ package game
                 {
                     _gvars.gameMain.addPopupQueue(new PopupTokenUnlock(this, data.tType, data.tID, data.tText, data.tName, data.tMessage));
                 }
-
-                // Update Judge Offset
-                updateJudgeOffset(gameResult);
 
                 // Display Popup Queue
                 if (resultsDisplay != null)
