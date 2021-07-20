@@ -73,7 +73,7 @@ package
             if (songInfo.engine != null)
                 return getSongDetails(songInfo.engine.id, songInfo.levelId);
 
-            return getSongDetails(Constant.BRAND_NAME_SHORT_LOWER, songInfo.levelId);
+            return getSongDetails(Constant.BRAND_NAME_SHORT_LOWER, songInfo.level.toString());
         }
 
         /**
