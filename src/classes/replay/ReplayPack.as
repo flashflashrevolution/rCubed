@@ -517,6 +517,7 @@ package classes.replay
             var compareFailure:int = 0;
             for (var i:int = 0; i < binReplayNotes.length; i++)
             {
+                // null compare
                 if ((binReplayNotes[i] == null && test.rep_notes[i] != null) || (binReplayNotes[i] != null && test.rep_notes[i] == null))
                 {
                     trace("rep_notes[" + i + "] & binReplayNotes[" + i + "] have different NULL states.");
@@ -526,6 +527,17 @@ package classes.replay
                 {
                     continue;
                 }
+                // NaN compare (NaN != NaN)
+                else if ((isNaN(binReplayNotes[i].time) && !isNaN(test.rep_notes[i].time)) || (!isNaN(binReplayNotes[i].time) && isNaN(test.rep_notes[i].time)))
+                {
+                    trace("rep_notes[" + i + "].time & binReplayNotes[" + i + "].time have different NaN states.");
+                    compareFailure++;
+                }
+                else if (isNaN(binReplayNotes[i].time) && isNaN(test.rep_notes[i].time))
+                {
+                    continue;
+                }
+                // time compare
                 else if (binReplayNotes[i].time != test.rep_notes[i].time)
                 {
                     trace("rep_notes[" + i + "].time", binReplayNotes[i].time, "!=", test.rep_notes[i].time);

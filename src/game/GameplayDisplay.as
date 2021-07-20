@@ -15,6 +15,7 @@ package game
     import classes.chart.Note;
     import classes.chart.NoteChart;
     import classes.chart.Song;
+    import classes.replay.ReplayBinFrame;
     import classes.replay.ReplayNote;
     import classes.ui.BoxButton;
     import classes.ui.ProgressBar;
@@ -56,7 +57,6 @@ package game
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import sql.SQLSongUserInfo;
-    import classes.replay.ReplayBinFrame;
 
     public class GameplayDisplay extends MenuPanel
     {
@@ -659,6 +659,10 @@ package game
             binReplayNotes = new Vector.<ReplayBinFrame>(song.totalNotes, true);
             binReplayBoos = new <ReplayBinFrame>[];
 
+            // Prefill Replay
+            for (var i:int = song.totalNotes - 1; i >= 0; i--)
+                binReplayNotes[i] = new ReplayBinFrame(NaN, song.getNote(i).direction, i);
+
             replayPressCount = 0;
 
             hitAmazing = 0;
@@ -820,7 +824,6 @@ package game
                 // Remove Old note
                 if (gameProgress - curNote.PROGRESS + player1JudgeOffset >= 6)
                 {
-                    binReplayNotes[curNote.ID] = new ReplayBinFrame(NaN, curNote.DIR);
                     commitJudge(curNote.DIR, gameProgress, -10);
                     noteBox.removeNote(curNote.ID);
                     n--;
@@ -1936,7 +1939,7 @@ package game
                 commitJudge(dir, frame + note.PROGRESS - player1JudgeOffset, score);
                 noteBox.removeNote(note.ID);
                 accuracy.addValue(acc);
-                binReplayNotes[note.ID] = new ReplayBinFrame(diff, dir);
+                binReplayNotes[note.ID].time = diff;
             }
             else
             {
