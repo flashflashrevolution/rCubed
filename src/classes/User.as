@@ -96,6 +96,7 @@ package classes
         public var DISPLAY_SCORE:Boolean = true;
         public var DISPLAY_COMBO:Boolean = true;
         public var DISPLAY_PACOUNT:Boolean = true;
+        public var DISPLAY_ACCURACY_BAR:Boolean = true;
         public var DISPLAY_AMAZING:Boolean = true;
         public var DISPLAY_PERFECT:Boolean = true;
         public var DISPLAY_TOTAL:Boolean = true;
@@ -547,6 +548,9 @@ package classes
             if (_settings.viewPACount != null)
                 this.DISPLAY_PACOUNT = _settings.viewPACount;
 
+            if (_settings.viewAccGraph != null)
+                this.DISPLAY_ACCURACY_BAR = _settings.viewAccBar;
+
             if (_settings.viewAmazing != null)
                 this.DISPLAY_AMAZING = _settings.viewAmazing;
 
@@ -711,6 +715,7 @@ package classes
             gameSave.viewScore = this.DISPLAY_SCORE;
             gameSave.viewCombo = this.DISPLAY_COMBO;
             gameSave.viewPACount = this.DISPLAY_PACOUNT;
+            gameSave.viewAccBar = this.DISPLAY_ACCURACY_BAR;
             gameSave.viewAmazing = this.DISPLAY_AMAZING;
             gameSave.viewPerfect = this.DISPLAY_PERFECT;
             gameSave.viewTotal = this.DISPLAY_TOTAL;
