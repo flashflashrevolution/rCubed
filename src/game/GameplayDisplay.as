@@ -46,6 +46,7 @@ package game
     import flash.ui.Keyboard;
     import flash.ui.Mouse;
     import flash.utils.getTimer;
+    import game.controls.AccuracyBar;
     import game.controls.Combo;
     import game.controls.ComboStatic;
     import game.controls.Judge;
@@ -74,6 +75,7 @@ package game
         public static const LAYOUT_COMBO_TOTAL:String = "combototal";
         public static const LAYOUT_COMBO_STATIC:String = "combostatic";
         public static const LAYOUT_COMBO_TOTAL_STATIC:String = "combototalstatic";
+        public static const LAYOUT_ACCURACY_BAR:String = "accuracybar";
         public static const LAYOUT_PA:String = "pa";
 
         public static const LAYOUT_MP_JUDGE:String = "mpjudge";
@@ -106,6 +108,7 @@ package game
         private var comboTotal:Combo;
         private var comboStatic:ComboStatic;
         private var comboTotalStatic:ComboStatic;
+        private var accBar:AccuracyBar;
         private var screenCut:Sprite;
         private var flashLight:Sprite;
         private var exitEditor:BoxButton;
@@ -548,6 +551,12 @@ package game
 
                 comboTotalStatic = new ComboStatic(_lang.string("game_combo_total"));
                 this.addChild(comboTotalStatic);
+            }
+
+            if (!legacyMode && options.displayAccuracyBar)
+            {
+                accBar = new AccuracyBar(options);
+                this.addChild(accBar);
             }
 
             if (options.displaySongProgress || options.replay)
@@ -1484,6 +1493,9 @@ package game
             if (paWindow)
                 paWindow.reset();
 
+            if (accBar)
+                accBar.onResetSignal();
+
             noteBoxOffset = {"x": 0, "y": 0};
 
             // Track
@@ -1742,6 +1754,7 @@ package game
         {
             defaultLayout = new Object();
             defaultLayout[LAYOUT_JUDGE] = {x: 392, y: 228};
+            defaultLayout[LAYOUT_ACCURACY_BAR] = {x: (Main.GAME_WIDTH / 2), y: 328};
             defaultLayout[LAYOUT_HEALTH] = {x: Main.GAME_WIDTH - 37, y: 71.5};
             defaultLayout[LAYOUT_RECEPTORS] = {x: 230, y: 0};
             if (sideScroll)
@@ -1786,6 +1799,7 @@ package game
 
             interfacePosition(noteBox, interfaceLayout(LAYOUT_RECEPTORS));
             interfacePosition(player1Judge, interfaceLayout(LAYOUT_JUDGE));
+            interfacePosition(accBar, interfaceLayout(LAYOUT_ACCURACY_BAR));
             interfacePosition(player1Life, interfaceLayout(LAYOUT_HEALTH));
             interfacePosition(score, interfaceLayout(LAYOUT_SCORE));
             interfacePosition(combo, interfaceLayout(LAYOUT_COMBO));
@@ -1798,6 +1812,7 @@ package game
             {
                 interfaceEditor(noteBox, interfaceLayout(LAYOUT_RECEPTORS, false));
                 interfaceEditor(player1Judge, interfaceLayout(LAYOUT_JUDGE, false));
+                interfaceEditor(accBar, interfaceLayout(LAYOUT_ACCURACY_BAR, false));
                 interfaceEditor(player1Life, interfaceLayout(LAYOUT_HEALTH, false));
                 interfaceEditor(score, interfaceLayout(LAYOUT_SCORE, false));
                 interfaceEditor(combo, interfaceLayout(LAYOUT_COMBO, false));
@@ -1940,6 +1955,9 @@ package game
                 noteBox.removeNote(note.ID);
                 accuracy.addValue(acc);
                 binReplayNotes[note.ID].time = diff;
+
+                if (accBar != null)
+                    accBar.onScoreSignal(score, diff);
             }
             else
             {

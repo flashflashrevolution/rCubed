@@ -38,6 +38,7 @@ package game
         public var displayScore:Boolean = true;
         public var displayCombo:Boolean = true;
         public var displayComboTotal:Boolean = true;
+        public var displayAccuracyBar:Boolean = true;
         public var displayPA:Boolean = true;
         public var displayAmazing:Boolean = true;
         public var displayPerfect:Boolean = true;
@@ -116,6 +117,7 @@ package game
             displayCombo = user.DISPLAY_COMBO;
             displayComboTotal = user.DISPLAY_TOTAL;
             displayPA = user.DISPLAY_PACOUNT;
+            displayAccuracyBar = user.DISPLAY_ACCURACY_BAR;
             displayAmazing = user.DISPLAY_AMAZING;
             displayPerfect = user.DISPLAY_PERFECT;
             displayScreencut = user.DISPLAY_SCREENCUT;
