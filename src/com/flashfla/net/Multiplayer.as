@@ -381,7 +381,7 @@ package com.flashfla.net
                     if (previousUserStatus != user.gameplay.status)
                     {
                         anyUserStatusChanged = true;
-                        if(room.isPlayer(user))
+                        if (room.isPlayer(user))
                             anyPlayerStatusChanged = true;
                     }
 
@@ -392,7 +392,7 @@ package com.flashfla.net
                 // Process gameplay status changes for game start/end
                 if (room.isAllPlayersInStatus(STATUS_READY) && room.isAllPlayersSameSong())
                 {
-                    if(currentUserIsPlayer)
+                    if (currentUserIsPlayer)
                     {
                         currentUser.gameplay.status = STATUS_PLAYING;
 
@@ -401,7 +401,7 @@ package com.flashfla.net
 
                         eventGameStart(room);
                     }
-                    else if(currentUser.wantsToWatch)
+                    else if (currentUser.wantsToWatch)
                     {
                         room.songInfo = room.getPlayersSong()
                         lastRoomGamePlayerCount = room.playerCount;
@@ -451,7 +451,7 @@ package com.flashfla.net
         public function login(username:String, password:String):void
         {
             if (connected)
-                server.login(SERVER_ZONE, username, password);
+                server.login(SERVER_ZONE, escape(username), password);
         }
 
         public function logout():void
@@ -662,7 +662,7 @@ package com.flashfla.net
                 leaveRoom(currentRoom);
                 Alert.add(_lang.string("mp_error_multiple_room_restriction"), 120);
             }
-            
+
             if (!connected || name.length <= 0)
             {
                 return;
@@ -771,7 +771,7 @@ package com.flashfla.net
         private function sendCurrentUserRoomVariables(room:Room, joining:Boolean = true, leaving:Boolean = false):void
         {
             if (!room.isGameRoom)
-            { 
+            {
                 return;
             }
 
