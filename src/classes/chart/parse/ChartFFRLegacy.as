@@ -196,11 +196,19 @@ package classes.chart.parse
             var beatbox:Array = Beatbox.parseBeatbox(data);
             if (beatbox)
             {
-                for each (var beat:Object in beatbox)
+                for each (var beat:Array in beatbox)
                 {
-                    var beatPos:int = beat[0] + (songInfo.sync || 0);
                     if (ChartFFRBeatbox.isValidDirection(beat[1]))
-                        Notes.push(new Note(beat[1], beatPos / framerate, beat[2] || "blue", beatPos));
+                    {
+                        var beatPos:int = beat[0] + (songInfo.sync || 0);
+                        var beatPosMS:Number = beatPos / framerate;
+
+                        // has ms timing data
+                        if (beat.length >= 4)
+                            beatPosMS = (beat[3] / 1000);
+
+                        Notes.push(new Note(beat[1], beatPosMS, beat[2] || "blue", beatPos));
+                    }
                 }
             }
         }

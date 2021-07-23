@@ -33,6 +33,7 @@ package arc
         public var modJudgeWindow:Boolean;
 
         private var reverseLastFrame:int;
+        private var reverseLastPos:Number;
 
         public function NoteMod(song:Song, options:GameOptions)
         {
@@ -61,6 +62,7 @@ package arc
             modJudgeWindow = Boolean(options.judgeWindow);
 
             reverseLastFrame = -1;
+            reverseLastPos = -1;
         }
 
         public function start(options:GameOptions):void
@@ -117,7 +119,10 @@ package arc
             {
                 index = notes.length - 1 - index;
                 if (reverseLastFrame < 0)
+                {
                     reverseLastFrame = notes[notes.length - 1].frame - song.musicDelay * 2;
+                    reverseLastPos = notes[notes.length - 1].time - ((song.musicDelay * 2) / 30);
+                }
             }
 
             var note:Note = notes[index];
@@ -126,12 +131,17 @@ package arc
 
             var pos:Number = note.time;
             var colour:String = note.colour;
-            var frame:Number = note.frame - song.musicDelay;
+            var frame:Number = note.frame;
             var dir:int = valueOfDirection(note.direction);
 
+            frame -= song.musicDelay;
+            pos -= (song.musicDelay / 30);
+
             if (modReverse)
+            {
                 frame = reverseLastFrame - frame + song.mp3Frame + 60;
-            pos = frame / 30;
+                pos = reverseLastPos - pos + (song.mp3Frame + 60) / 30;
+            }
 
             if (modRate)
             {

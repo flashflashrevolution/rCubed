@@ -279,10 +279,17 @@ package classes.chart
                 bytesLoaded = bytesTotal = chartData.length; // Update Progress Bar in case.
                 isMusic2Loaded = false;
 
+                // Check 404 Response
+                if (chartData.length == 3 && chartData.readUTFBytes(3) == "404")
+                {
+                    loadFail = true;
+                    return;
+                }
+
                 // Check for server response for matching hash. Encode Compressed SWF Data
                 var storeChartData:ByteArray;
                 if (_gvars.air_useLocalFileCache)
-                { // && !this.entry.engine) {
+                {
                     // Alt Engine has Data
                     if (this.songInfo.engine && localFileData)
                     {
@@ -292,6 +299,11 @@ package classes.chart
                     {
                         chartData.position = 0;
                         var code:String = chartData.readUTFBytes(3);
+                        if (code == "404")
+                        {
+                            loadFail = true;
+                            return;
+                        }
                         if (code == "403")
                         {
                             chartData = localFileData;
