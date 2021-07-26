@@ -182,7 +182,7 @@ package com.flashfla.net
         {
             var roomsVec:Vector.<Room> = new <Room>[];
 
-            for (var idx:int in _rooms)
+            for (var idx:String in _rooms)
                 roomsVec.push(_rooms[idx]);
 
             return roomsVec;
