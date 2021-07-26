@@ -55,9 +55,9 @@ package menu
         private var logo:Logo;
 
         public var menuMusicControls:Box;
-        private const mmc_icons:Array = new Array(new iconPlay(), new iconPause(), new iconStop(), new iconDelete());
-        private const mmc_functions:Array = new Array(playMusic, pauseMusic, stopMusic, deleteMusic);
-        private var mmc_buttons:Array = new Array(4);
+        private const mmc_icons:Array = [new iconPlay(), new iconPause(), new iconStop(), new iconDelete()];
+        private const mmc_functions:Array = [playMusic, pauseMusic, stopMusic, deleteMusic];
+        private var mmc_buttons:Array = [];
         private const mmc_strings:Array = ["play", "pause", "stop", "remove"];
 
         private var statUpdaterBtn:SimpleBoxButton;
@@ -228,10 +228,10 @@ package menu
             menuItemBox.y = 8;
 
             //- Add Menu Buttons
-            for (var item:String in menuItems)
+            for (var i:int = 0; i < menuItems.length; i++)
             {
-                var menuItem:MenuButton = new MenuButton(menuItemBox, Number(item) * 122, 0, _lang.string(menuItems[item][0]), item == options.activePanel, menuItemClick);
-                menuItem.panel = menuItems[item][1];
+                var menuItem:MenuButton = new MenuButton(menuItemBox, i * 122, 0, _lang.string(menuItems[i][0]), i == options.activePanel, menuItemClick);
+                menuItem.panel = menuItems[i][1];
                 menuItem.mouseChildren = false;
                 menuItem.useHandCursor = true;
                 menuItem.buttonMode = true;
