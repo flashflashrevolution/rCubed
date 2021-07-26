@@ -553,7 +553,7 @@ package game
                 this.addChild(comboTotalStatic);
             }
 
-            if (!legacyMode && options.displayAccuracyBar)
+            if (options.displayAccuracyBar)
             {
                 accBar = new AccuracyBar(options);
                 this.addChild(accBar);
@@ -2056,6 +2056,9 @@ package game
                 commitJudge(dir, frame, score);
                 noteBox.removeNote(note.ID);
                 accuracy.addValue((note.PROGRESS - frame) * 1000 / 30);
+
+                if (accBar != null)
+                    accBar.onScoreSignal(score, diff * 33.3333 - 1);
             }
             else
                 commitJudge(dir, frame, -5);
