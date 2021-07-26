@@ -25,7 +25,7 @@ package
         public static const ROOT_URL:String = "https://" + R3::ROOT_URL + "/";
 
         // Site URLs
-        public static const SITE_DATA_URL:String = ROOT_URL + "game/r3/r3-siteData.v3.php";
+        public static const SITE_DATA_URL:String = ROOT_URL + "game/r3/r3-siteData.v2.php";
         public static const SITE_PLAYLIST_URL:String = ROOT_URL + "game/r3/r3-playlist.php";
         public static const SITE_LANGUAGE_URL:String = ROOT_URL + "game/r3/r3-language.php";
         public static const SITE_HISCORES_URL:String = ROOT_URL + "game/r3/r3-hiscores.php";

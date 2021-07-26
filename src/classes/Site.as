@@ -1,11 +1,11 @@
 package classes
 {
+    import arc.ArcGlobals;
     import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.events.IOErrorEvent;
     import flash.events.SecurityErrorEvent;
-    import flash.filesystem.File;
     import flash.net.URLLoader;
     import flash.net.URLRequest;
     import flash.net.URLRequestMethod;
@@ -106,6 +106,16 @@ package classes
             _gvars.DIFFICULTY_RANGES = data.game_difficulty_range;
             _gvars.NONPUBLIC_GENRES = data.game_nonpublic_genres;
 
+            // MP Divisions
+            ArcGlobals.divisionLevel = data.division_levels;
+            ArcGlobals.divisionTitle = data.division_titles;
+
+            var divisionColors:Array = [];
+            for each (var value:String in data.division_colors)
+                divisionColors.push(parseInt(value.substring(1), 16));
+            ArcGlobals.divisionColor = divisionColors;
+
+            // Tokens
             _gvars.TOKENS = {};
             var tokens:Object = {};
             for each (var tok:Object in data.game_tokens_all)
