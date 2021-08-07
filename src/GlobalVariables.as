@@ -360,7 +360,7 @@ package
                 if (_rank.score == 0)
                     songIcon = 0;
 
-                // No Score
+                // Played
                 if (_rank.score > 0)
                     songIcon = 1;
 
