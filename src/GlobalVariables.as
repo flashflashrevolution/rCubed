@@ -410,7 +410,7 @@ package
 
                 // FC* - When current score isn't FC but a FC has been achieved before.
                 if (_rank.fcs > 0)
-                    songIcon |= (1 << 7);
+                    songIcon |= (1 << 6);
 
                 // FC
                 if (_rank.perfect + _rank.good + _rank.average == arrows && _rank.miss == 0 && _rank.maxcombo == arrows)
