@@ -164,7 +164,7 @@ package classes.filter
                     return compareNumber(userData.getSongRating(songInfo), input_number);
 
                 case FILTER_SONG_FLAGS:
-                    return compareSongFlag(GlobalVariables.getSongIconIndexBitmask(songInfo, userData.getLevelRank(songInfo)), (Math.pow(2, input_number) / 2));
+                    return compareSongFlag(GlobalVariables.getSongIconIndexBitmask(songInfo, userData.getLevelRank(songInfo)), (Math.pow(2, input_number)));
 
                 case FILTER_SONG_ACCESS:
                     return compareNumberEqual(songInfo.access, input_number);
