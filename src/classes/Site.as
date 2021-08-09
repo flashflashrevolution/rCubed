@@ -1,4 +1,5 @@
-package classes {
+package classes
+{
     import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.EventDispatcher;
@@ -9,9 +10,9 @@ package classes {
     import flash.net.URLRequest;
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
-    import flash.events.HTTPStatusEvent;
 
-    public class Site extends EventDispatcher {
+    public class Site extends EventDispatcher
+    {
         ///- Singleton Instance
         private static var _instance:Site = null;
 
@@ -26,29 +27,35 @@ package classes {
         public var data:Object;
 
         ///- Constructor
-        public function Site(en:SingletonEnforcer) {
+        public function Site(en:SingletonEnforcer)
+        {
             if (en == null)
                 throw Error("Multi-Instance Blocked");
         }
 
-        public static function get instance():Site {
+        public static function get instance():Site
+        {
             if (_instance == null)
                 _instance = new Site(new SingletonEnforcer());
             return _instance;
         }
 
-        public function isLoaded():Boolean {
+        public function isLoaded():Boolean
+        {
             return _isLoaded && !_loadError;
         }
 
-        public function isError():Boolean {
+        public function isError():Boolean
+        {
             return _loadError;
         }
 
         ///- Site Loading
-        public function load():void {
+        public function load():void
+        {
             // Kill old Loading Stream
-            if (_loader && _isLoading) {
+            if (_loader && _isLoading)
+            {
                 removeLoaderListeners();
                 _loader.close();
             }
@@ -69,15 +76,19 @@ package classes {
             _isLoading = true;
         }
 
-        private function siteLoadComplete(e:Event):void {
+        private function siteLoadComplete(e:Event):void
+        {
             Logger.info(this, "Data Loaded");
             removeLoaderListeners();
 
             // Parse Response
             var siteDataString:String = e.target.data;
-            try {
+            try
+            {
                 data = JSON.parse(siteDataString);
-            } catch (err:Error) {
+            }
+            catch (err:Error)
+            {
                 Logger.error(this, "Parse Failure: " + Logger.exception_error(err));
                 Logger.error(this, "Wrote invalid response data to log folder. [logs/site.txt]");
                 AirContext.writeText("logs/site.txt", siteDataString);
@@ -97,8 +108,10 @@ package classes {
 
             _gvars.TOKENS = {};
             var tokens:Object = {};
-            for each (var tok:Object in data.game_tokens_all) {
-                if (!tokens[tok.type]) {
+            for each (var tok:Object in data.game_tokens_all)
+            {
+                if (!tokens[tok.type])
+                {
                     tokens[tok.type] = [];
                 }
                 tokens[tok.type][tok.id] = tok;
@@ -115,32 +128,30 @@ package classes {
 
         }
 
-        private function siteLoadError(err:ErrorEvent = null):void {
+        private function siteLoadError(err:ErrorEvent = null):void
+        {
             Logger.error(this, "Load Failure: " + Logger.event_error(err));
             removeLoaderListeners();
             this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
         }
 
-        private function httpStatusHandler(event:HTTPStatusEvent):void {
-            Logger.error(this, "Load Status: " + Logger.http_status_event(event));
-        }
-
-        private function addLoaderListeners():void {
+        private function addLoaderListeners():void
+        {
             _loader.addEventListener(Event.COMPLETE, siteLoadComplete);
             _loader.addEventListener(IOErrorEvent.IO_ERROR, siteLoadError);
             _loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, siteLoadError);
-            _loader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpStatusHandler);
         }
 
-        private function removeLoaderListeners():void {
+        private function removeLoaderListeners():void
+        {
             _isLoading = false;
             _loader.removeEventListener(Event.COMPLETE, siteLoadComplete);
             _loader.removeEventListener(IOErrorEvent.IO_ERROR, siteLoadError);
             _loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, siteLoadError);
-            _loader.removeEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpStatusHandler);
         }
     }
 }
 
-class SingletonEnforcer {
+class SingletonEnforcer
+{
 }

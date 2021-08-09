@@ -1,4 +1,5 @@
-package classes {
+package classes
+{
     import arc.ArcGlobals;
     import assets.GameBackgroundColor;
     import classes.filter.EngineLevelFilter;
@@ -18,9 +19,9 @@ package classes {
     import flash.net.URLVariables;
     import flash.ui.Keyboard;
     import sql.SQLSongUserInfo;
-    import flash.events.HTTPStatusEvent;
 
-    public class User extends EventDispatcher {
+    public class User extends EventDispatcher
+    {
         //- Constants
         public static const ADMIN_ID:int = 6;
         public static const DEVELOPER_ID:int = 83;
@@ -170,34 +171,43 @@ package classes {
          * @param	isActiveUser Sets the active user flag.
          * @tiptext
          */
-        public function User(loadData:Boolean = false, isActiveUser:Boolean = false, sfsId:int = -1):void {
+        public function User(loadData:Boolean = false, isActiveUser:Boolean = false, sfsId:int = -1):void
+        {
             this.id = sfsId;
             this.variables = [];
             this.isSpec = false;
             this.wantsToWatch = false;
             this.isActiveUser = isActiveUser;
 
-            if (loadData) {
-                if (sfsId > -1) {
+            if (loadData)
+            {
+                if (sfsId > -1)
+                {
                     loadUser(sfsId);
-                } else {
+                }
+                else
+                {
                     load();
                 }
             }
         }
 
-        public function refreshUser():void {
+        public function refreshUser():void
+        {
             _gvars.userSession = "0";
             _gvars.playerUser = new User(true, true);
             _gvars.activeUser = _gvars.playerUser;
         }
 
         ///- Public
-        public function calculateAverageRank():void {
+        public function calculateAverageRank():void
+        {
             var rankTotal:int = 0;
-            for each (var levelRank:Object in this.level_ranks) {
+            for each (var levelRank:Object in this.level_ranks)
+            {
                 var genre:int = levelRank.genre;
-                if (genre != 10 && genre != 12 && genre != 23) {
+                if (genre != 10 && genre != 12 && genre != 23)
+                {
                     rankTotal += levelRank.rank;
                 }
             }
@@ -205,17 +215,21 @@ package classes {
         }
 
         ///- Profile Loading
-        public function isLoaded():Boolean {
+        public function isLoaded():Boolean
+        {
             return _isLoaded && !_loadError;
         }
 
-        public function isError():Boolean {
+        public function isError():Boolean
+        {
             return _loadError;
         }
 
-        public function load():void {
+        public function load():void
+        {
             // Kill old Loading Stream
-            if (_loader && _isLoading) {
+            if (_loader && _isLoading)
+            {
                 removeLoaderListeners();
                 _loader.close();
             }
@@ -238,7 +252,8 @@ package classes {
             _isLoading = true;
         }
 
-        public function loadUser(userid:int):void {
+        public function loadUser(userid:int):void
+        {
             Logger.info(this, "Secondary User Load Requested");
             _isLoaded = false;
             _loader = new URLLoader();
@@ -256,16 +271,20 @@ package classes {
             _isLoading = true;
         }
 
-        private function profileLoadComplete(e:Event):void {
+        private function profileLoadComplete(e:Event):void
+        {
             Logger.info(this, "Profile Load Success");
             removeLoaderListeners();
 
             // Parse Response
             var _data:Object;
             var siteDataString:String = e.target.data;
-            try {
+            try
+            {
                 _data = JSON.parse(siteDataString);
-            } catch (err:Error) {
+            }
+            catch (err:Error)
+            {
                 Logger.error(this, "Profile Parse Failure: " + Logger.exception_error(err));
                 Logger.error(this, "Wrote invalid response data to log folder. [logs/user_main.txt]");
                 AirContext.writeText("logs/user_main.txt", siteDataString);
@@ -278,17 +297,22 @@ package classes {
             // Has Response
             loadUserData(_data);
 
-            if (isActiveUser) {
+            if (isActiveUser)
+            {
                 loadLevelRanks();
-            } else {
+            }
+            else
+            {
                 _isLoaded = true;
                 this.dispatchEvent(new Event(GlobalVariables.LOAD_COMPLETE));
             }
         }
 
-        public function loadUserData(_data:Object):void {
+        public function loadUserData(_data:Object):void
+        {
             // Private
-            if (isActiveUser) {
+            if (isActiveUser)
+            {
                 this.hash = _data.hash;
                 this.credits = _data.credits;
                 setPurchasedString(_data["purchased"]);
@@ -313,51 +337,57 @@ package classes {
             loadAvatar();
 
             // Setup Settings from server or local
-            if (_data["settings"] != null && !this.isGuest) {
-                try {
+            if (_data["settings"] != null && !this.isGuest)
+            {
+                try
+                {
                     settings = JSON.parse(_data.settings);
-                } catch (err:Error) {
+                }
+                catch (err:Error)
+                {
                     Logger.error(this, "Settings Parse Failure: " + Logger.exception_error(err));
                 }
-            } else {
+            }
+            else
+            {
                 loadLocal();
             }
         }
 
-        public function setPurchasedString(str:String):void {
+        public function setPurchasedString(str:String):void
+        {
             this.purchased = new <Boolean>[];
-            for (var x:int = 1; x < str.length; x++) {
+            for (var x:int = 1; x < str.length; x++)
+            {
                 this.purchased.push(str.charAt(x) == "1");
             }
         }
 
-        private function profileLoadError(err:ErrorEvent = null):void {
+        private function profileLoadError(err:ErrorEvent = null):void
+        {
             Logger.error(this, "Profile Load Failure: " + Logger.event_error(err));
             removeLoaderListeners();
             _loadError = true;
             this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
         }
 
-        private function httpStatusHandler(event:HTTPStatusEvent):void {
-            Logger.error(this, "Load Status: " + Logger.http_status_event(event));
-        }
-
-        private function addLoaderListeners():void {
+        private function addLoaderListeners():void
+        {
             _loader.addEventListener(Event.COMPLETE, profileLoadComplete);
             _loader.addEventListener(IOErrorEvent.IO_ERROR, profileLoadError);
             _loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, profileLoadError);
-            _loader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpStatusHandler);
         }
 
-        private function removeLoaderListeners():void {
+        private function removeLoaderListeners():void
+        {
             _isLoaded = false;
             _loader.removeEventListener(Event.COMPLETE, profileLoadComplete);
             _loader.removeEventListener(IOErrorEvent.IO_ERROR, profileLoadError);
             _loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, profileLoadError);
-            _loader.removeEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpStatusHandler);
         }
 
-        private function setupPermissions():void {
+        private function setupPermissions():void
+        {
             this.isGuest = (this.siteId <= 2);
             this.isVeteran = VectorUtil.inVector(this.groups, new <Number>[VETERAN_ID]);
             this.isAdmin = VectorUtil.inVector(this.groups, new <Number>[ADMIN_ID]);
@@ -372,12 +402,15 @@ package classes {
             this.isSimArtist = VectorUtil.inVector(this.groups, new <Number>[SIM_AUTHOR_ID]);
         }
 
-        public function loadAvatar():void {
+        public function loadAvatar():void
+        {
             this.avatar = new Loader();
-            if (isActiveUser && !isGuest) {
+            if (isActiveUser && !isGuest)
+            {
                 this.avatar.contentLoaderInfo.addEventListener(Event.COMPLETE, avatarLoadComplete);
 
-                function avatarLoadComplete(e:Event):void {
+                function avatarLoadComplete(e:Event):void
+                {
                     LocalStore.setVariable("uAvatar", LoaderInfo(e.target).bytes);
                     avatar.removeEventListener(Event.COMPLETE, avatarLoadComplete);
                 }
@@ -386,7 +419,8 @@ package classes {
         }
 
         ///- Level Ranks
-        public function loadLevelRanks():void {
+        public function loadLevelRanks():void
+        {
             _loader = new URLLoader();
             addLoaderRanksListeners();
 
@@ -399,16 +433,19 @@ package classes {
             _loader.load(req);
         }
 
-        private function ranksLoadComplete(e:Event):void {
+        private function ranksLoadComplete(e:Event):void
+        {
             Logger.info(this, "Ranks Load Success");
             removeLoaderRanksListeners();
             level_ranks = new Object();
 
             // Check Level ranks for Non-empty
-            if (e.target.data != "") {
+            if (e.target.data != "")
+            {
                 var ranksTemp:Array = e.target.data.split(",");
                 var rankLength:int = ranksTemp.length;
-                for (var x:int = 0; x < rankLength; x++) {
+                for (var x:int = 0; x < rankLength; x++)
+                {
                     // [0] = Level ID : [1] = Rank : [2] = Score : [3] = Genre : [4] = Results : [5] = Play Count : [6] = AAA Count : [7] = FC Count
                     var rankSplit:Array = ranksTemp[x].split(":");
 
@@ -437,30 +474,35 @@ package classes {
             this.dispatchEvent(new Event(GlobalVariables.LOAD_COMPLETE));
         }
 
-        private function ranksLoadError(err:ErrorEvent = null):void {
+        private function ranksLoadError(err:ErrorEvent = null):void
+        {
             Logger.error(this, "Ranks Load Failure: " + Logger.event_error(err));
             removeLoaderRanksListeners();
             this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
         }
 
-        private function addLoaderRanksListeners():void {
+        private function addLoaderRanksListeners():void
+        {
             _loader.addEventListener(Event.COMPLETE, ranksLoadComplete);
             _loader.addEventListener(IOErrorEvent.IO_ERROR, ranksLoadError);
             _loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, ranksLoadError);
         }
 
-        private function removeLoaderRanksListeners():void {
+        private function removeLoaderRanksListeners():void
+        {
             _loader.removeEventListener(Event.COMPLETE, ranksLoadComplete);
             _loader.removeEventListener(IOErrorEvent.IO_ERROR, ranksLoadError);
             _loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, ranksLoadError);
         }
 
         ///- Settings
-        public function get settings():Object {
+        public function get settings():Object
+        {
             return save(true);
         }
 
-        public function set settings(_settings:Object):void {
+        public function set settings(_settings:Object):void
+        {
             if (_settings == null)
                 return;
             if (_settings.language != null)
@@ -547,14 +589,18 @@ package classes {
                 this.activeVisualMods = _settings.visual;
             if (_settings.judgeColours != null)
                 this.judgeColours = _settings.judgeColours;
-            if (_settings.comboColours != null) {
+            if (_settings.comboColours != null)
+            {
                 var comboColorCount:int = Math.min(this.comboColours.length, _settings.comboColours.length);
-                for (var i:int = 0; i < comboColorCount; i++) {
+                for (var i:int = 0; i < comboColorCount; i++)
+                {
                     this.comboColours[i] = _settings.comboColours[i];
                 }
             }
-            if (_settings.enableComboColors != null) {
-                for (i = 0; i < enableComboColors.length; i++) {
+            if (_settings.enableComboColors != null)
+            {
+                for (i = 0; i < enableComboColors.length; i++)
+                {
                     this.enableComboColors[i] = _settings.enableComboColors[i];
                 }
             }
@@ -577,29 +623,36 @@ package classes {
             if (_settings.filters != null)
                 this.filters = doImportFilters(_settings.filters);
 
-            if (_settings.songQueues != null) {
+            if (_settings.songQueues != null)
+            {
                 this.songQueues = new <Object>[];
-                for each (var queueItem:Object in _settings.songQueues) {
+                for each (var queueItem:Object in _settings.songQueues)
+                {
                     this.songQueues.push(new SongQueueItem(queueItem.name, queueItem.items));
                 }
             }
 
-            if (isActiveUser) {
+            if (isActiveUser)
+            {
                 SoundMixer.soundTransform = new SoundTransform(this.gameVolume);
 
                 // Setup Background Colours
-                try { // Patch for old Loaders
+                try
+                { // Patch for old Loaders
                     GameBackgroundColor.BG_LIGHT = gameColours[0];
                     GameBackgroundColor.BG_DARK = gameColours[1];
                     GameBackgroundColor.BG_STATIC = gameColours[2];
                     GameBackgroundColor.BG_POPUP = gameColours[3];
                     (_gvars.gameMain.getChildAt(0) as GameBackgroundColor).redraw();
-                } catch (err:Error) {
+                }
+                catch (err:Error)
+                {
                 }
             }
         }
 
-        public function save(returnObject:Boolean = false):Object {
+        public function save(returnObject:Boolean = false):Object
+        {
             if (isGuest && !returnObject)
                 return {};
 
@@ -671,47 +724,58 @@ package classes {
             return {};
         }
 
-        private function settingSaveComplete(e:Event):void {
+        private function settingSaveComplete(e:Event):void
+        {
             Logger.debug(this, "Settings Save Success");
             removeLoaderSaveListeners();
             this.dispatchEvent(new Event(GlobalVariables.LOAD_COMPLETE));
         }
 
-        private function settingLoadError(err:ErrorEvent = null):void {
+        private function settingLoadError(err:ErrorEvent = null):void
+        {
             Logger.error(this, "Settings Save Failure: " + Logger.event_error(err));
             removeLoaderSaveListeners();
             this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
         }
 
-        private function addLoaderSaveListeners():void {
+        private function addLoaderSaveListeners():void
+        {
             _loader.addEventListener(Event.COMPLETE, settingSaveComplete);
             _loader.addEventListener(IOErrorEvent.IO_ERROR, settingLoadError);
             _loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, settingLoadError);
         }
 
-        private function removeLoaderSaveListeners():void {
+        private function removeLoaderSaveListeners():void
+        {
             _loader.removeEventListener(Event.COMPLETE, settingSaveComplete);
             _loader.removeEventListener(IOErrorEvent.IO_ERROR, settingLoadError);
             _loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, settingLoadError);
         }
 
-        public function saveLocal():void {
+        public function saveLocal():void
+        {
             LocalStore.setVariable("sEncode", JSON.stringify(save(true)));
             LocalStore.flush();
         }
 
-        public function loadLocal():void {
+        public function loadLocal():void
+        {
             var encodedSettings:String = LocalStore.getVariable("sEncode", null);
-            if (encodedSettings != null) {
-                try {
+            if (encodedSettings != null)
+            {
+                try
+                {
                     settings = JSON.parse(encodedSettings);
-                } catch (e:Error) {
+                }
+                catch (e:Error)
+                {
 
                 }
             }
         }
 
-        public function getLevelRank(songInfo:SongInfo):Object {
+        public function getLevelRank(songInfo:SongInfo):Object
+        {
             if (songInfo.engine)
                 return ArcGlobals.instance.legacyLevelRanksGet(songInfo);
 
@@ -734,8 +798,10 @@ package classes {
             return level_ranks[songInfo.level];
         }
 
-        public function getSongRating(songInfo:SongInfo):Number {
-            if (songInfo.engine != null) {
+        public function getSongRating(songInfo:SongInfo):Number
+        {
+            if (songInfo.engine != null)
+            {
                 var sDetails:SQLSongUserInfo = SQLQueries.getSongDetails(songInfo.engine.id, songInfo.levelId);
                 if (sDetails)
                     return sDetails.song_rating;
@@ -750,18 +816,21 @@ package classes {
          * @param	filtersIn Array of Filter objects.
          * @return Array of EngineLevelFilters.
          */
-        private function doImportFilters(filtersIn:Array):Vector.<EngineLevelFilter> {
+        private function doImportFilters(filtersIn:Array):Vector.<EngineLevelFilter>
+        {
             if (isActiveUser)
                 _gvars.activeFilter = null;
 
             var newFilters:Vector.<EngineLevelFilter> = new <EngineLevelFilter>[];
             var filter:EngineLevelFilter;
-            for each (var item:Object in filtersIn) {
+            for each (var item:Object in filtersIn)
+            {
                 filter = new EngineLevelFilter();
                 filter.setup(item);
                 newFilters.push(filter);
 
-                if (filter.is_default) {
+                if (filter.is_default)
+                {
                     if (_gvars.activeFilter == null && isActiveUser)
                         _gvars.activeFilter = filter;
                     else
@@ -776,9 +845,11 @@ package classes {
          * @param	filtersOut Array of EngineLevelFilter to export.
          * @return	Array of Filter Object.
          */
-        private function doExportFilters(filtersOut:Vector.<EngineLevelFilter>):Array {
+        private function doExportFilters(filtersOut:Vector.<EngineLevelFilter>):Array
+        {
             var filters:Array = [];
-            for each (var item:EngineLevelFilter in filtersOut) {
+            for each (var item:EngineLevelFilter in filtersOut)
+            {
                 var exportFilter:Object = item.export();
                 if (exportFilter["filters"] && exportFilter["filters"].length > 0) // Don't export blank filters.
                     filters.push(exportFilter);
@@ -793,11 +864,13 @@ package classes {
          *
          * @exclude
          */
-        public function setVariables(o:Object):void {
+        public function setVariables(o:Object):void
+        {
             /*
              * TODO: only string, number (int, uint) and boolean should be allowed
              */
-            for (var key:String in o) {
+            for (var key:String in o)
+            {
                 var v:* = o[key];
                 if (v != null)
                     this.variables[key] = v;

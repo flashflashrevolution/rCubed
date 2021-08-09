@@ -1,4 +1,5 @@
-package {
+package
+{
     import com.flashfla.utils.TimeUtil;
     import flash.utils.getTimer;
     import flash.filesystem.File;
@@ -8,9 +9,9 @@ package {
     import flash.events.IOErrorEvent;
     import flash.filesystem.FileMode;
     import flash.events.ErrorEvent;
-    import flash.events.HTTPStatusEvent;
 
-    public class Logger {
+    public class Logger
+    {
         private static var LOG_FILE:File;
         private static var LOG_STREAM:FileStream;
         public static const DEBUG_LINES:Array = ["Info: ", "Debug: ", "Warning: ", "Error: ", "Fatal: "];
@@ -20,22 +21,25 @@ package {
         public static const ERROR:Number = 3; // Red
         public static const NOTICE:Number = 4; // Purple
 
-        public static var enabled:Boolean = CONFIG::release || CONFIG::debug;
-        public static var file_log:Boolean = true;
+        public static var enabled:Boolean = CONFIG::debug;
+        public static var file_log:Boolean = false;
         public static var history:Array = [];
 
         private static var file_log_buffer:String = "";
         private static var file_log_buffer_time:Number = 0;
 
-        public static function init():void {
+        public static function init():void
+        {
             // Check for special file to enable file logging.
-            if (new File(AirContext.getAppPath("logging.txt")).exists) {
+            if (new File(AirContext.getAppPath("logging.txt")).exists)
+            {
                 trace("Logging Flag Found, enabling.")
                 file_log = true;
                 enabled = true;
             }
 
-            if (file_log && LOG_STREAM == null) {
+            if (file_log && LOG_STREAM == null)
+            {
                 var now:Date = new Date();
                 var filename:String = AirContext.createFileName(now.toLocaleString(), " ");
                 LOG_FILE = new File(AirContext.getAppPath("logs/" + filename + ".txt"));
@@ -48,7 +52,8 @@ package {
                 LOG_STREAM.close();
             }
 
-            function e_logFileFail(e:Event):void {
+            function e_logFileFail(e:Event):void
+            {
                 trace("Unable to use file logging.");
                 LOG_STREAM.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, e_logFileFail);
                 LOG_STREAM.removeEventListener(IOErrorEvent.IO_ERROR, e_logFileFail);
@@ -57,31 +62,38 @@ package {
             }
         }
 
-        public static function divider(clazz:*):void {
+        public static function divider(clazz:*):void
+        {
             log(clazz, WARNING, "------------------------------------------------------------------------------------------------", true);
         }
 
-        public static function info(clazz:*, text:*, simple:Boolean = false):void {
+        public static function info(clazz:*, text:*, simple:Boolean = false):void
+        {
             log(clazz, INFO, text, simple);
         }
 
-        public static function debug(clazz:*, text:*, simple:Boolean = false):void {
+        public static function debug(clazz:*, text:*, simple:Boolean = false):void
+        {
             log(clazz, DEBUG, text, simple);
         }
 
-        public static function warning(clazz:*, text:*, simple:Boolean = false):void {
+        public static function warning(clazz:*, text:*, simple:Boolean = false):void
+        {
             log(clazz, WARNING, text, simple);
         }
 
-        public static function error(clazz:*, text:*, simple:Boolean = false):void {
+        public static function error(clazz:*, text:*, simple:Boolean = false):void
+        {
             log(clazz, ERROR, text, simple);
         }
 
-        public static function notice(clazz:*, text:*, simple:Boolean = false):void {
+        public static function notice(clazz:*, text:*, simple:Boolean = false):void
+        {
             log(clazz, NOTICE, text, simple);
         }
 
-        public static function log(clazz:*, level:int, text:*, simple:Boolean = false):void {
+        public static function log(clazz:*, level:int, text:*, simple:Boolean = false):void
+        {
             // Check if Logger Enabled
             if (!enabled)
                 return;
@@ -94,10 +106,13 @@ package {
 
             // Create Log Message
             var msg:String = "";
-            if (text is Error) {
+            if (text is Error)
+            {
                 var err:Error = (text as Error);
                 msg = "Error: " + exception_error(err);
-            } else {
+            }
+            else
+            {
                 msg = text;
             }
 
@@ -106,11 +121,13 @@ package {
             // Display
             trace(level + ":" + msg);
 
-            if (LOG_STREAM != null) {
+            if (LOG_STREAM != null)
+            {
                 file_log_buffer += (msg + "\n");
 
                 // Buffer file writes if within the last 150ms of a write to prevent file writing bottlenecks.
-                if (currentTime - file_log_buffer_time > 150) {
+                if (currentTime - file_log_buffer_time > 150)
+                {
                     LOG_STREAM.open(LOG_FILE, FileMode.APPEND);
                     LOG_STREAM.writeUTFBytes(file_log_buffer);
                     LOG_STREAM.close();
@@ -121,9 +138,12 @@ package {
             }
         }
 
-        public static function destroy():void {
-            if (LOG_STREAM != null) {
-                if (file_log_buffer.length > 0) {
+        public static function destroy():void
+        {
+            if (LOG_STREAM != null)
+            {
+                if (file_log_buffer.length > 0)
+                {
                     LOG_STREAM.open(LOG_FILE, FileMode.APPEND);
                     LOG_STREAM.writeUTFBytes(file_log_buffer);
                     LOG_STREAM.close();
@@ -131,19 +151,18 @@ package {
             }
         }
 
-        public static function exception_error(err:Error):String {
+        public static function exception_error(err:Error):String
+        {
             return err.name + "\n" + err.message + "\n" + err.errorID + "\n" + err.getStackTrace();
         }
 
-        public static function event_error(e:ErrorEvent):String {
+        public static function event_error(e:ErrorEvent):String
+        {
             return "(" + e.type + ") " + e.errorID + ": " + e.text;
         }
 
-        public static function http_status_event(e:HTTPStatusEvent):String {
-            return (e.redirected ? "HTTP Request Redirected." : "") + " " + "(" + e.responseURL + ") " + e.status;
-        }
-
-        public static function class_name(clazz:*):String {
+        public static function class_name(clazz:*):String
+        {
             if (clazz is String)
                 return clazz;
             var t:String = (Object(clazz).constructor).toString();
