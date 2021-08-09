@@ -241,8 +241,6 @@ package classes
             addLoaderListeners();
 
             var req:URLRequest = new URLRequest(Constant.USER_INFO_URL + "?d=" + new Date().getTime());
-            req.useCache = false;
-            req.requestHeaders = ["Location: /game/r3/r3-userInfo.php?d=" + new Date().getTime()]
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.session = _gvars.userSession;
@@ -259,9 +257,7 @@ package classes
             _loader = new URLLoader();
             addLoaderListeners();
 
-            var req:URLRequest = new URLRequest(Constant.USER_INFO_LITE_URL);
-            req.useCache = false;
-            req.requestHeaders = ["Location: /game/r3/r3-userSmallInfo.php?d=" + new Date().getTime()]
+            var req:URLRequest = new URLRequest(Constant.USER_INFO_LITE_URL + "?d=" + new Date().getTime());
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.userid = userid;
