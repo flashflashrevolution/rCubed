@@ -47,6 +47,7 @@ package
         public static const LOAD_ERROR:String = "LoadError";
         public static const HIGHSCORES_LOAD_COMPLETE:String = "HighscoresLoadComplete";
         public static const HIGHSCORES_LOAD_ERROR:String = "HighscoresLoadError";
+
         public var flashvars:Object;
         public var gameMain:Main;
 
@@ -316,7 +317,7 @@ package
             songCache = [];
 
             const mpInstance:MultiplayerSingleton = MultiplayerSingleton.getInstance();
-            if(mpInstance != null)
+            if (mpInstance != null)
             {
                 mpInstance.clearStatus();
             }
@@ -344,6 +345,15 @@ package
             return SONG_ACCESS_PLAYABLE;
         }
 
+        private static const SONG_ICON_NO_SCORE:int = 0;
+        private static const SONG_ICON_PLAYED:int = 1;
+        private static const SONG_ICON_FC:int = 2;
+        private static const SONG_ICON_SDG:int = 3;
+        private static const SONG_ICON_BLACKFLAG:int = 4;
+        private static const SONG_ICON_BOOFLAG:int = 5;
+        private static const SONG_ICON_AAA:int = 6;
+        private static const SONG_ICON_FC_STAR:int = 7;
+
         public static function getSongIconIndex(_songInfo:SongInfo, _rank:Object):int
         {
             var songIcon:int = 0;
@@ -358,43 +368,42 @@ package
                 }
                 // No Score
                 if (_rank.score == 0)
-                    songIcon = 0;
+                    songIcon = SONG_ICON_NO_SCORE;
 
-                // No Score
+                // Played
                 if (_rank.score > 0)
-                    songIcon = 1;
+                    songIcon = SONG_ICON_PLAYED;
 
                 // FC* - When current score isn't FC but a FC has been achieved before.
                 if (_rank.fcs > 0)
-                    songIcon = 7;
+                    songIcon = SONG_ICON_FC_STAR;
 
                 // FC
                 if (_rank.perfect + _rank.good + _rank.average == arrows && _rank.miss == 0 && _rank.maxcombo == arrows)
-                    songIcon = 2;
+                    songIcon = SONG_ICON_FC;
 
                 // SDG
                 if (scoreRaw - _rank.rawscore < 250)
-                    songIcon = 3;
+                    songIcon = SONG_ICON_SDG;
 
                 // BlackFlag
                 if (_rank.perfect == arrows - 1 && _rank.good == 1 && _rank.average == 0 && _rank.miss == 0 && _rank.boo == 0 && _rank.maxcombo == arrows)
-                    songIcon = 4;
+                    songIcon = SONG_ICON_BLACKFLAG;
 
                 // BooFlag
                 if (_rank.perfect == arrows && _rank.good == 0 && _rank.average == 0 && _rank.miss == 0 && _rank.boo == 1 && _rank.maxcombo == arrows)
-                    songIcon = 5;
+                    songIcon = SONG_ICON_BOOFLAG;
 
                 // AAA
                 if (_rank.rawscore == scoreRaw)
-                    songIcon = 6;
+                    songIcon = SONG_ICON_AAA;
             }
             return songIcon;
         }
 
-
         public static function getSongIconIndexBitmask(_songInfo:SongInfo, _rank:Object):int
         {
-            var songIcon:int = 0;
+            var songIcon:int = SONG_ICON_NO_SCORE;
             if (_rank)
             {
                 var arrows:int = _songInfo.noteCount;
@@ -406,31 +415,31 @@ package
                 }
                 // Played
                 if (_rank.score > 0)
-                    songIcon |= (1 << 0);
+                    songIcon |= (1 << SONG_ICON_PLAYED);
 
                 // FC* - When current score isn't FC but a FC has been achieved before.
                 if (_rank.fcs > 0)
-                    songIcon |= (1 << 7);
+                    songIcon |= (1 << SONG_ICON_FC_STAR);
 
                 // FC
                 if (_rank.perfect + _rank.good + _rank.average == arrows && _rank.miss == 0 && _rank.maxcombo == arrows)
-                    songIcon |= (1 << 1);
+                    songIcon |= (1 << SONG_ICON_FC);
 
                 // SDG
                 if (scoreRaw - _rank.rawscore < 250)
-                    songIcon |= (1 << 2);
+                    songIcon |= (1 << SONG_ICON_SDG);
 
                 // BlackFlag
                 if (_rank.perfect == arrows - 1 && _rank.good == 1 && _rank.average == 0 && _rank.miss == 0 && _rank.boo == 0 && _rank.maxcombo == arrows)
-                    songIcon |= (1 << 3);
+                    songIcon |= (1 << SONG_ICON_BLACKFLAG);
 
                 // BooFlag
                 if (_rank.perfect == arrows && _rank.good == 0 && _rank.average == 0 && _rank.miss == 0 && _rank.boo == 1 && _rank.maxcombo == arrows)
-                    songIcon |= (1 << 4);
+                    songIcon |= (1 << SONG_ICON_BOOFLAG);
 
                 // AAA
                 if (_rank.rawscore == scoreRaw)
-                    songIcon |= (1 << 5);
+                    songIcon |= (1 << SONG_ICON_AAA);
             }
             return songIcon;
         }
