@@ -46,7 +46,7 @@ package
     import menu.MenuPanel;
     import popups.PopupContextMenu;
     import popups.PopupHelp;
-    import popups.PopupOptions;
+    import options.SettingsWindow;
     import popups.PopupReplayHistory;
 
     CONFIG::vsync
@@ -653,7 +653,7 @@ package
                     switch (_panel)
                     {
                         case POPUP_OPTIONS:
-                            current_popup = new PopupOptions(this);
+                            current_popup = new SettingsWindow(this);
                             break;
                         case POPUP_HELP:
                             current_popup = new PopupHelp(this);
@@ -742,7 +742,7 @@ package
                 // Options
                 if (keyCode == _gvars.playerUser.keyOptions && (stage.focus == null || !(stage.focus is TextField)))
                 {
-                    if (current_popup is PopupOptions)
+                    if (current_popup is SettingsWindow)
                     {
                         removePopup();
                     }
