@@ -13,6 +13,7 @@ package classes
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
     import menu.MainMenu;
+    import menu.MenuSongSelection;
 
     public class Playlist extends EventDispatcher
     {
@@ -376,7 +377,11 @@ package classes
                                 reload = true;
                             mainmenu._MenuSingleplayer = null;
                             if (reload)
+                            {
+                                MenuSongSelection.options.pageNumber = 0;
+                                MenuSongSelection.options.scroll_position = 0;
                                 mainmenu.switchTo(MainMenu.MENU_SONGSELECTION);
+                            }
                             _gvars.removeSongFiles();
                         }
                     }

@@ -461,6 +461,7 @@ package menu
                 options.activeGenre = e.target.index;
                 options.activeIndex = -1;
                 options.activeSongId = -1;
+                options.pageNumber = 0;
                 options.scroll_position = 0;
 
                 resetFilterOptions();
@@ -1569,7 +1570,6 @@ package menu
             if (pages == null)
             {
                 pages = new Sprite();
-                pages.y = 424;
                 pages.addEventListener(MouseEvent.CLICK, pageClicked, false, 0, true);
                 this.addChild(pages);
             }
@@ -1610,6 +1610,9 @@ package menu
          */
         private function buildPages(totalPages:int, isBigPage:Boolean):void
         {
+            if (isBigPage && totalPages > 16)
+                isBigPage = false;
+
             var pBox:PageBox;
             var page_width:int = (isBigPage) ? 72 : 27;
             var page_height:int = 16;
@@ -1628,9 +1631,7 @@ package menu
                 page_str = (pY + 1).toString();
 
                 if (isBigPage)
-                {
                     page_str = ((pY * ITEM_PER_PAGE) + 1) + " - " + (((pY + 1) * ITEM_PER_PAGE) > genreLength ? genreLength : ((pY + 1) * ITEM_PER_PAGE));
-                }
 
                 pBox = new PageBox(pages, page_x, page_y);
                 pBox.page = pY;
@@ -1640,6 +1641,7 @@ package menu
             }
 
             pages.x = 145 + ((610 - pages.width) / 2);
+            pages.y = pages.height > 26 ? 417 : 424;
         }
 
         /**
