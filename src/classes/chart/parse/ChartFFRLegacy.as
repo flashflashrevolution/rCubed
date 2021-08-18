@@ -162,10 +162,7 @@ package classes.chart.parse
                 songInfo.style = node.songstyle.toString();
                 songInfo.time = node.songlength.toString();
                 songInfo.levelId = node.level.toString();
-                if (isNaN(parseInt(songInfo.levelId)))
-                    songInfo.level = i + 1;
-                else
-                    songInfo.level = int(songInfo.levelId);
+                songInfo.level = i + 1;
                 songInfo.order = int(node.order.toString());
                 songInfo.noteCount = int(node.arrows.toString());
                 songInfo.author = node.songauthor.toString();
@@ -194,7 +191,7 @@ package classes.chart.parse
         public function parseChart(data:ByteArray):void
         {
             var beatbox:Array = Beatbox.parseBeatbox(data);
-            if (beatbox)
+            if (beatbox && beatbox.length > 0)
             {
                 for each (var beat:Array in beatbox)
                 {
