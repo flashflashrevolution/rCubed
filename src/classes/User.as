@@ -548,7 +548,7 @@ package classes
             if (_settings.viewPACount != null)
                 this.DISPLAY_PACOUNT = _settings.viewPACount;
 
-            if (_settings.viewAccGraph != null)
+            if (_settings.viewAccBar != null)
                 this.DISPLAY_ACCURACY_BAR = _settings.viewAccBar;
 
             if (_settings.viewAmazing != null)
