@@ -116,6 +116,8 @@ package menu
 
         override public function init():Boolean
         {
+            Flags.VALUES[Flags.ENABLE_GLOBAL_POPUPS] = true;
+
             // Load Default Alt Engine
             if (_avars.legacyDefaultEngine && !Flags.VALUES[Flags.LEGACY_ENGINE_DEFAULT_LOAD])
             {

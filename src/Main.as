@@ -737,7 +737,7 @@ package
         private function keyboardKeyDown(e:KeyboardEvent):void
         {
             var keyCode:int = e.keyCode;
-            if (loadComplete && !disablePopups)
+            if (Flags.VALUES[Flags.ENABLE_GLOBAL_POPUPS])
             {
                 // Options
                 if (keyCode == _gvars.playerUser.keyOptions && (stage.focus == null || !(stage.focus is TextField)))
