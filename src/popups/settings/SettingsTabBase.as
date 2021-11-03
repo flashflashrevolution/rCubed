@@ -1,4 +1,4 @@
-package options
+package popups.settings
 {
     import classes.ui.MouseTooltip;
     import classes.ui.ScrollPaneContent;

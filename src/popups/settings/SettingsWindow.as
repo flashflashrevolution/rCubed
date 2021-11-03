@@ -1,4 +1,4 @@
-package options
+package popups.settings
 {
     import arc.ArcGlobals;
     import assets.GameBackgroundColor;
@@ -387,7 +387,7 @@ import flash.text.GridFitType;
 import flash.text.TextField;
 import flash.text.TextFieldType;
 import flash.text.TextFormat;
-import options.SettingsWindow;
+import popups.settings.SettingsWindow;
 
 internal class TabButton extends Sprite
 {

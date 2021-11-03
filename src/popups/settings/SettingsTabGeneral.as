@@ -1,4 +1,4 @@
-package options
+package popups.settings
 {
     import arc.ArcGlobals;
     import classes.Alert;

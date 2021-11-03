@@ -1,4 +1,4 @@
-package options
+package popups.settings
 {
 
     public class SettingsTabDebug extends SettingsTabBase

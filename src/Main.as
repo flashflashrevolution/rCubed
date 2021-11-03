@@ -8,6 +8,10 @@ package
     {
         import flash.system.Security;
     }
+    CONFIG::vsync
+    {
+        import flash.events.VsyncStateChangeAvailabilityEvent;
+    }
 
     import assets.GameBackgroundColor;
     import classes.Alert;
@@ -46,13 +50,8 @@ package
     import menu.MenuPanel;
     import popups.PopupContextMenu;
     import popups.PopupHelp;
-    import options.SettingsWindow;
+    import popups.settings.SettingsWindow;
     import popups.PopupReplayHistory;
-
-    CONFIG::vsync
-    {
-        import flash.events.VsyncStateChangeAvailabilityEvent;
-    }
 
     public class Main extends MenuPanel
     {

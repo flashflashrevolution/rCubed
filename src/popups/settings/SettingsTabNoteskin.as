@@ -1,4 +1,4 @@
-package options
+package popups.settings
 {
     import assets.menu.icons.fa.iconRefresh;
     import classes.Alert;

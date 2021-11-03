@@ -1,4 +1,4 @@
-package options
+package popups.settings
 {
     import classes.Language;
     import classes.ui.BoxCheck;
