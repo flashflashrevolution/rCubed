@@ -1401,7 +1401,16 @@ package menu
         private function playSong(level:int):void
         {
             if (level < 0)
+            {
+                Alert.add("Invalid Level", 120, Alert.RED);
                 return;
+            }
+            
+            if (_gvars.shouldUpdateRank)
+            {
+                Alert.add("Ranks currently updating.", 120, Alert.RED);
+                return;
+            }
 
             _gvars.songQueue = [];
             var songInfo:SongInfo = _playlist.getSongInfo(level);

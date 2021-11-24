@@ -1030,6 +1030,8 @@ package game
                             240,
                             Alert.DARK_GREEN
                         );
+
+                        _gvars.shouldUpdateRank = true;
                     }
 
                     // Check raw score vs level ranks and update.

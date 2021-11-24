@@ -75,6 +75,7 @@ package
         public var songStartHash:String = "0";
         public var songCache:Array = [];
         public var songHighscores:Object = {};
+        public var shouldUpdateRank:Boolean = false;
 
         ///- User Vars
         public var userSession:String = "0";

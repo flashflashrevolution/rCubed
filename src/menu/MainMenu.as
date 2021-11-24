@@ -409,6 +409,13 @@ package menu
 
             buildMenuItems();
             SystemUtil.gc();
+
+            // Trigger the update of ranks on arrival if flag has been set.
+            if (_gvars.shouldUpdateRank)
+            {
+                e_statUpdaterClick(null);
+            }
+
             return isFound;
         }
 
@@ -465,15 +472,16 @@ package menu
                 rankUpdateThrobber.visible = false;
                 this.addChild(rankUpdateThrobber);
             }
-            if (rankUpdateThrobber.running)
-                return;
 
-            var wr:WebRequest = new WebRequest(Constant.USER_RANKS_UPDATE_URL, c_rankComplete, c_rankFail);
-            wr.load({"session": _gvars.userSession});
+            if (rankUpdateThrobber.running)
+            {
+                return;
+            }
+
             rankUpdateThrobber.visible = true;
             rankUpdateThrobber.start();
 
-            function c_rankComplete(e:* = null):void
+            var c_rankComplete:Function = function(e:* = null):void
             {
                 var resp:Object = JSON.parse(e.target.data);
                 if (_gvars.gameMain.activePanel is MainMenu)
@@ -482,9 +490,10 @@ package menu
                     rankUpdateThrobber.stop();
                     rankUpdateThrobber.visible = false;
                 }
+                _gvars.shouldUpdateRank = false;
             }
 
-            function c_rankFail(e:*):void
+            var c_rankFail:Function = function(e:* = null):void
             {
                 Alert.add(_lang.string("skill_rank_update_fail"), 90, Alert.RED);
                 if (_gvars.gameMain.activePanel is MainMenu)
@@ -492,7 +501,11 @@ package menu
                     rankUpdateThrobber.stop();
                     rankUpdateThrobber.visible = false;
                 }
+                _gvars.shouldUpdateRank = false;
             }
+
+            var wr:WebRequest = new WebRequest(Constant.USER_RANKS_UPDATE_URL, c_rankComplete, c_rankFail);
+            wr.load({"session": _gvars.userSession});
         }
     }
 }

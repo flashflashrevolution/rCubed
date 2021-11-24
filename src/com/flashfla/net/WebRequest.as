@@ -79,6 +79,7 @@ package com.flashfla.net
             active = true;
             loaded = false;
             _loader.addEventListener(Event.COMPLETE, e_loadComplete);
+            _loader.addEventListener(IOErrorEvent.NETWORK_ERROR, e_loadError)
             _loader.addEventListener(IOErrorEvent.IO_ERROR, e_loadError);
             _loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, e_loadError);
         }
@@ -88,6 +89,7 @@ package com.flashfla.net
             active = false;
             loaded = true;
             _loader.removeEventListener(Event.COMPLETE, e_loadComplete);
+            _loader.removeEventListener(IOErrorEvent.NETWORK_ERROR, e_loadError)
             _loader.removeEventListener(IOErrorEvent.IO_ERROR, e_loadError);
             _loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, e_loadError);
         }
