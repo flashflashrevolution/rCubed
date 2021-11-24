@@ -478,6 +478,7 @@ package menu
                 return;
             }
 
+            _gvars.shouldUpdateRank = true; // Prevent songs from being started while this is running.
             rankUpdateThrobber.visible = true;
             rankUpdateThrobber.start();
 
