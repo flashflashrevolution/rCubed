@@ -85,6 +85,7 @@ package menu
         private var background:SongSelectionBackground;
         private var scrollbar:ScrollBar;
         private var pane:ScrollPane;
+        private var pane_filter_text:Text;
 
         private var genreLength:int;
         private var songItems:Vector.<SongItem>;
@@ -168,6 +169,12 @@ package menu
                 pane.removeEventListener(MouseEvent.CLICK, songItemClicked);
                 pane.dispose();
                 pane = null;
+            }
+
+            if (pane_filter_text)
+            {
+                pane_filter_text.dispose();
+                pane_filter_text = null;
             }
 
             if (pages)
@@ -293,6 +300,13 @@ package menu
                 pane.graphics.moveTo(0.2, 351.5);
                 pane.graphics.lineTo(399, 351.5);
                 pane.addEventListener(MouseEvent.CLICK, songItemClicked, false, 0, true);
+            }
+
+            if (pane_filter_text == null)
+            {
+                pane_filter_text = new Text(this, 155, 64, "");
+                pane_filter_text.setAreaParams(401, 351, "center");
+                pane_filter_text.visible = false;
             }
 
             //- Add ScrollBar
@@ -489,6 +503,7 @@ package menu
 
             scrollbar.reset();
             pane.clear();
+            pane_filter_text.visible = false;
 
             //- Init Variables
             var i:uint;
@@ -496,11 +511,14 @@ package menu
             var songInfo:SongInfo;
             var sI:SongItem;
 
+            var sourceListLength:int = 0;
+
             //- Set Song array based on selected genre
             // DM_QUEUE
             if (options.activeGenre == PLAYLIST_QUEUE)
             {
                 _gvars.songQueue = options.queuePlaylist;
+                sourceListLength = _gvars.songQueue.length;
                 songList = _gvars.songQueue.slice(options.pageNumber * ITEM_PER_PAGE, (options.pageNumber + 1) * ITEM_PER_PAGE);
                 genreLength = _gvars.songQueue.length;
             }
@@ -512,7 +530,7 @@ package menu
                 if (options.isFilter)
                 {
                     songList = getFilteredSongInfoArrayFromVec(_playlist.indexList, filterSongListOptionsFilter);
-
+                    sourceListLength = songList.length;
                     genreLength = songList.length;
                     songList = songList.slice(options.pageNumber * ITEM_PER_PAGE, (options.pageNumber + 1) * ITEM_PER_PAGE);
                 }
@@ -526,6 +544,7 @@ package menu
                     songList.push(_songInfo);
 
                 // Song List Filters
+                sourceListLength = songList.length;
                 songList = filterSongListLegacy(songList);
                 songList = filterSongListUser(songList);
 
@@ -550,6 +569,7 @@ package menu
                     }
 
                     // Song List Filters
+                    sourceListLength = songList.length;
                     songList = filterSongListLegacy(songList);
                     songList = filterSongListUser(songList);
 
@@ -563,6 +583,7 @@ package menu
                     songList = getFilteredSongInfoArrayFromVec(_playlist.indexList, filterSongListSongFlags);
 
                     // Song List Filters
+                    sourceListLength = songList.length;
                     songList = filterSongListLegacy(songList);
                     songList = filterSongListUser(songList);
 
@@ -575,13 +596,42 @@ package menu
                 {
                     songList = _playlist.genreList[options.activeGenre + 1];
                     genreLength = songList ? songList.length : 0;
+                    sourceListLength = genreLength;
                 }
             }
 
             songItemRemoveQueueContext.visible = options.activeGenre == PLAYLIST_QUEUE;
 
+            // User Filter
+            if (songList != null && songList.length > 0)
+            {
+                if (options.activeGenre != PLAYLIST_ALL && options.infoTab != TAB_QUEUE)
+                {
+                    sourceListLength = Math.max(sourceListLength, songList.length);
+                    songList = filterSongListUser(songList);
+                    genreLength = songList.length;
+                }
+            }
+
             //- Pages
             drawPages();
+
+            // Error Messages
+            if (songList == null)
+            {
+                pane_filter_text.visible = true;
+                pane_filter_text.text = _lang.string("song_selection_filter_null_error");
+            }
+            else if (songList != null && songList.length == 0)
+            {
+                pane_filter_text.visible = true;
+                if (options.activeGenre == PLAYLIST_SEARCH)
+                    pane_filter_text.text = _lang.string("song_selection_filter_no_results_found");
+                else if (sourceListLength > 0)
+                    pane_filter_text.text = sprintf(_lang.string("song_selection_filter_no_results_hidden"), {"items": sourceListLength});
+                else
+                    pane_filter_text.text = _lang.string("song_selection_filter_no_results");
+            }
 
             //- Sanity
             if (songList == null || songList.length <= 0)
@@ -589,13 +639,6 @@ package menu
                 options.activeIndex = -1;
                 options.activeSongId = -1;
                 return;
-            }
-
-            // User Filter
-            if (options.activeGenre != PLAYLIST_ALL && options.infoTab != TAB_QUEUE)
-            {
-                songList = filterSongListUser(songList);
-                genreLength = songList.length;
             }
 
             //- Build Playlist
@@ -620,10 +663,6 @@ package menu
             scrollbar.draggerVisibility = (yOffset > pane.height);
 
             //- Update Selected Index
-            // No song items to select, bail.
-            if (songList.length <= 0)
-                return;
-
             // Find and select last active song id.
             var hasSelected:Boolean = false;
             for (sX = 0; sX < songList.length; sX++)
