@@ -120,7 +120,7 @@ package game
             else
                 namedisplay.htmlText += songName;
 
-            preloader.update(song.progress);
+            preloader.update(song.progress / 100);
 
             if ((loadTimer >= 60 || song.loadFail) && !cancelLoadButton && !_gvars.flashvars.replay)
             {

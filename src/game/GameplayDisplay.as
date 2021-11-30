@@ -1051,7 +1051,7 @@ package game
                     noteBox.update(gamePosition);
 
                     if (progressDisplay)
-                        progressDisplay.update((gameProgress / gameLastNoteFrame) * 100, false);
+                        progressDisplay.update(gameProgress / gameLastNoteFrame, false);
                     break;
                 case GAME_END:
                     endGame();
