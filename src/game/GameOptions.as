@@ -170,6 +170,7 @@ package game
             if (!r)
                 return;
 
+            var i:int;
             var settings:Object = r.settings;
 
             frameRate = settings["frameRate"] || 30;
@@ -203,7 +204,6 @@ package game
             displayScreencut = settings["viewScreencut"];
             displaySongProgress = settings["viewSongProgress"];
 
-            // New - November 2016 Update
             if (settings["viewScore"] != null)
                 displayScore = settings["viewScore"];
             if (settings["viewGameTopBar"] != null)
@@ -211,11 +211,24 @@ package game
             if (settings["viewGameBottomBar"] != null)
                 displayGameBottomBar = settings["viewGameBottomBar"];
 
+            if (settings["viewJudgeAnimations"] != null)
+                displayJudgeAnimations = settings["viewJudgeAnimations"];
+            if (settings["viewReceptorAnimations"] != null)
+                displayReceptorAnimations = settings["viewReceptorAnimations"];
+
             if (settings["noteSwapColours"] != null)
             {
-                for (var i:int = 0; i < noteColors.length; i++)
+                for (i = 0; i < noteColors.length; i++)
                 {
                     noteSwapColors[noteColors[i]] = settings["noteSwapColours"][i];
+                }
+            }
+
+            if (settings["judgeColors"] != null)
+            {
+                for (i = 0; i < judgeColours.length; i++)
+                {
+                    judgeColours[i] = settings["judgeColors"][i];
                 }
             }
         }
@@ -241,11 +254,14 @@ package game
 
         public function settingsEncode():Object
         {
+            var i:int;
             var settings:Object = new Object();
             settings["viewOffset"] = offsetGlobal;
             settings["judgeOffset"] = offsetJudge;
             settings["autoJudgeOffset"] = autoJudgeOffset;
             settings["viewJudge"] = displayJudge;
+            settings["viewJudgeAnimations"] = displayJudgeAnimations;
+            settings["viewReceptorAnimations"] = displayReceptorAnimations;
             settings["viewHealth"] = displayHealth;
             settings["viewScore"] = displayScore;
             settings["viewCombo"] = displayCombo;
@@ -268,20 +284,23 @@ package game
             settings["songRate"] = songRate;
             settings["visual"] = mods;
 
-
             if (isolation)
             {
                 settings["isolationOffset"] = isolationOffset;
                 settings["isolationLength"] = isolationLength;
             }
 
-            // New - November 2016 Update
             settings["viewGameTopBar"] = displayGameTopBar;
             settings["viewGameBottomBar"] = displayGameBottomBar;
             settings["noteSwapColours"] = [];
-            for (var i:int = 0; i < noteColors.length; i++)
+            for (i = 0; i < noteColors.length; i++)
             {
                 settings["noteSwapColours"][i] = noteSwapColors[noteColors[i]];
+            }
+            settings["judgeColors"] = [];
+            for (i = 0; i < judgeColours.length; i++)
+            {
+                settings["judgeColors"][i] = judgeColours[i];
             }
 
             var user:User = GlobalVariables.instance.activeUser;
