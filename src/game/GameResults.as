@@ -222,6 +222,7 @@ package game
             graphDraw = new Sprite();
             graphDraw.x = 30;
             graphDraw.y = 298;
+            graphDraw.cacheAsBitmap = true;
             this.addChild(graphDraw);
 
             graphOverlay = new Sprite();
