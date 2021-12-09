@@ -47,7 +47,7 @@ package classes.ui
             var currentBounds:Rectangle = getBounds(this);
 
             _width = currentBounds.x + currentBounds.width; //super.width;
-            _height = currentBounds.y + currentBounds.height; //super.height;
+            _height = (currentBounds.y * 2) + currentBounds.height; //super.height;
         }
 
         public function clear():void
