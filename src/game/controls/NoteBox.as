@@ -106,22 +106,11 @@ package game.controls
             // Other Stuff
             sideScroll = options.scrollDirection == "left" || options.scrollDirection == "right";
             scrollSpeed = options.scrollSpeed * (sideScroll ? 1.5 : 1);
-            readahead = (sideScroll ? Main.GAME_WIDTH : Main.GAME_HEIGHT) / 300 * 1000 / scrollSpeed;
+            readahead = ((sideScroll ? Main.GAME_WIDTH : Main.GAME_HEIGHT) / 300 * 1000 / scrollSpeed);
             receptorAlpha = 1.0;
             notes = [];
             noteCount = 0;
             totalNotes = song.totalNotes;
-        }
-
-        override public function set x(x:Number):void
-        {
-            super.x = x;
-        }
-
-        override public function set y(y:Number):void
-        {
-            readahead = (sideScroll ? _gvars.gameMain.stage.stageWidth + x : _gvars.gameMain.stage.stageHeight + y) / 300 * 1000 / scrollSpeed;
-            super.y = y;
         }
 
         public function noteRealSpawnRotation(dir:String, noteskin:int):Number
