@@ -260,7 +260,7 @@ package
             var cm:ContextMenu = new ContextMenu();
 
             //- Toggle Fullscreen
-            var fscmi:ContextMenuItem = new ContextMenuItem(_lang.stringSimple("show_menu", "Show Menu"));
+            var fscmi:ContextMenuItem = new ContextMenuItem(_lang.stringSimple("show_menu"));
             fscmi.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, toggleContextPopup);
             cm.customItems.push(fscmi);
 

@@ -69,27 +69,27 @@ package popups
             }
 
             //- Reload Engine
-            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_reload_engine_user", "Reload Engine / User"), 12, clickHandler);
+            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_reload_engine_user"), 12, clickHandler);
             cButton.action = "reload_engine";
             yOff += cButtonHeight + 5;
 
             //- Screenshot - Local
-            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_save_screenshot", "Save ScreenShot - Local"), 12, clickHandler);
+            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_save_screenshot"), 12, clickHandler);
             cButton.action = "screenshot_local";
             yOff += cButtonHeight + 5;
 
             //- Fullscreen
-            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_full_screen", "Full Screen"), 12, clickHandler);
+            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_full_screen"), 12, clickHandler);
             cButton.action = "fullscreen";
             yOff += cButtonHeight + 5;
 
             //- Switch Profile
-            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_switch_profile", "Switch Profile"), 12, clickHandler);
+            cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_switch_profile"), 12, clickHandler);
             cButton.action = "switch_profile";
             yOff += cButtonHeight + 5;
 
             //- Close
-            cButton = new BoxButton(box, 5, box.height - 27 - 5, box.width - 10, 27, _lang.string("menu_close", "CLOSE"), 12, clickHandler);
+            cButton = new BoxButton(box, 5, box.height - 27 - 5, box.width - 10, 27, _lang.string("menu_close"), 12, clickHandler);
             cButton.action = "close";
         }
 
