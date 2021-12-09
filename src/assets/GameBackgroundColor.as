@@ -96,7 +96,6 @@ package assets
             for (var i:int = 0; i < BG_IMAGE_EXT.length; i++)
             {
                 file = AirContext.getAppFile("bg_menu" + BG_IMAGE_EXT[i]);
-                Logger.debug(this, "Checking: " + file.nativePath);
                 if (file.exists)
                 {
                     Logger.debug(this, "Found " + file.name);
@@ -114,7 +113,6 @@ package assets
             for (i = 0; i < BG_IMAGE_EXT.length; i++)
             {
                 file = AirContext.getAppFile("bg_game" + BG_IMAGE_EXT[i]);
-                Logger.debug(this, "Checking: " + file.nativePath);
 
                 if (file.exists)
                 {

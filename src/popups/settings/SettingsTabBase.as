@@ -27,7 +27,7 @@ package popups.settings
 
         public function get name():String
         {
-            return null
+            return null;
         }
 
         public function openTab():void
