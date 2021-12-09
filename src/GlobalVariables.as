@@ -99,6 +99,7 @@ package
         public var air_autoSaveLocalReplays:Boolean = false;
         public var air_useVSync:Boolean = true;
         public var air_useWebsockets:Boolean = false;
+        public var file_replay_cache:FileCache = new FileCache("replays/cache.json", 1);
 
         private var websocket_server:AIRServer;
         private static var websocket_message:Message = new Message();

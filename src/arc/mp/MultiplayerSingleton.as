@@ -423,6 +423,7 @@ package arc.mp
                 {
                     var replay:Replay = new Replay(new Date().getTime());
                     replay.parseEncode(gameplay.encodedReplay);
+                    replay.loadSongInfo();
                     if (!replay.isEdited && replay.isValid())
                         _gvars.replayHistory.unshift(replay);
                 }

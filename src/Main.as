@@ -50,8 +50,8 @@ package
     import menu.MenuPanel;
     import popups.PopupContextMenu;
     import popups.PopupHelp;
+    import popups.replays.ReplayHistoryWindow;
     import popups.settings.SettingsWindow;
-    import popups.PopupReplayHistory;
 
     public class Main extends MenuPanel
     {
@@ -658,7 +658,7 @@ package
                             current_popup = new PopupHelp(this);
                             break;
                         case POPUP_REPLAY_HISTORY:
-                            current_popup = new PopupReplayHistory(this);
+                            current_popup = new ReplayHistoryWindow(this);
                             break;
                     }
                 }
@@ -767,7 +767,7 @@ package
                 // Replay History
                 else if (keyCode == Keyboard.F2)
                 {
-                    if (current_popup is PopupReplayHistory)
+                    if (current_popup is ReplayHistoryWindow)
                     {
                         removePopup();
                     }

@@ -1,7 +1,13 @@
 package classes.replay
 {
+    import arc.ArcGlobals;
     import by.blooddy.crypto.MD5;
+    import classes.Alert;
+    import classes.Language;
+    import classes.Playlist;
+    import classes.SongInfo;
     import classes.User;
+    import classes.replay.ReplayPack;
     import flash.events.Event;
     import flash.events.IOErrorEvent;
     import flash.events.SecurityErrorEvent;
@@ -10,7 +16,6 @@ package classes.replay
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
     import flash.utils.ByteArray;
-    import classes.replay.ReplayPack;
 
     public class Replay
     {
@@ -18,6 +23,7 @@ package classes.replay
         private var _loader:URLLoader;
 
         public var fileReplay:Boolean = false;
+        public var filePath:String;
 
         public var replayBin:ByteArray;
 
@@ -42,6 +48,8 @@ package classes.replay
         public var maxcombo:Number;
         public var replayData:Array;
         public var timestamp:Number;
+
+        public var song:SongInfo;
 
         public function Replay(id:Number, doLoad:Boolean = false)
         {
@@ -90,7 +98,7 @@ package classes.replay
             removeLoaderListeners();
         }
 
-        private function parseReplay(data:Object, loadUser:Boolean = true):void
+        public function parseReplay(data:Object, loadUser:Boolean = true):void
         {
             if (data == null)
                 return;
@@ -224,7 +232,7 @@ package classes.replay
             //- Replay
             this.replayData = [];
             for each (var item:ReplayBinFrame in data.rep_boos)
-                this.replayData.push(new ReplayNote(item.direction, -2, item.time));
+                this.replayData[replayData.length] = new ReplayNote(item.direction, -2, item.time);
 
             //- Edited Check
             if (data.checksum != data.rechecksum)
@@ -244,7 +252,7 @@ package classes.replay
             {
                 var dir:String = tempReplay[x].charAt(0);
                 var frame:Number = uint("0x" + tempReplay[x].substr(1));
-                replayData.push(new ReplayNote(dir, frame - 30));
+                this.replayData[replayData.length] = new ReplayNote(dir, frame - 30);
             }
 
         }
@@ -266,7 +274,7 @@ package classes.replay
                 {
                     var dir:String = getDirCol(noteDir);
                     var frame:int = uint("0x" + noteVal + game_curChar) + lastFrame;
-                    replayData.push(new ReplayNote(dir, frame - offsetf));
+                    this.replayData[replayData.length] = new ReplayNote(dir, frame - offsetf);
                     lastFrame = frame;
                 }
                 else if (game_curChar == "W" || game_curChar == "X" || game_curChar == "Y" || game_curChar == "Z")
@@ -282,24 +290,31 @@ package classes.replay
         }
 
         /////
+        public function get songname():String
+        {
+            return song.name;
+        }
+
+        public function loadSongInfo():void
+        {
+            song = settings.arc_engine ? ArcGlobals.instance.legacyDecode(settings.arc_engine) : Playlist.instanceCanon.getSongInfo(level);
+        }
+
         private function getDirCol(noteDir:String):String
         {
-            if (noteDir == "L")
-                return "L";
-            if (noteDir == "D")
-                return "D";
-            if (noteDir == "U")
-                return "U";
-            if (noteDir == "R")
-                return "R";
-            if (noteDir == "W")
-                return "L";
-            if (noteDir == "X")
-                return "D";
-            if (noteDir == "Y")
-                return "U";
-            if (noteDir == "Z")
-                return "R";
+            switch (noteDir)
+            {
+                case 'W':
+                    return 'L';
+                case 'X':
+                    return 'D';
+                case 'Y':
+                    return 'U';
+                case 'Z':
+                    return 'R';
+                default:
+                    return noteDir;
+            }
             return noteDir;
         }
 
@@ -389,7 +404,7 @@ package classes.replay
             }
             catch (e:Error)
             {
-                trace(e);
+                Alert.add(Language.instance.string("replay_parse_error"))
             }
         }
 

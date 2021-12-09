@@ -29,6 +29,7 @@ package
         public static const SITE_PLAYLIST_URL:String = ROOT_URL + "game/r3/r3-playlist.php";
         public static const SITE_LANGUAGE_URL:String = ROOT_URL + "game/r3/r3-language.php";
         public static const SITE_HISCORES_URL:String = ROOT_URL + "game/r3/r3-hiscores.php";
+        public static const SITE_REPLAYS_URL:String = ROOT_URL + "game/r3/r3-replays.php";
         public static const LEVEL_STATS_URL:String = ROOT_URL + "levelstats.php?level=";
         public static const DEBUG_LOG_URL:String = ROOT_URL + "game/r3/r3-debugLog.php";
 

@@ -1299,6 +1299,7 @@ package game
             nR.replayData = result.replayData;
             nR.replayBin = result.replayBin;
             nR.timestamp = int(new Date().getTime() / 1000);
+            nR.song = result.songInfo;
             _gvars.replayHistory.unshift(nR);
 
             // Display F2 Shortcut key only once per session.
