@@ -10,14 +10,23 @@ package arc
     {
         private static var _instance:ArcGlobals = null;
 
-        public static function get instance():ArcGlobals
-        {
-            if (_instance == null)
-            {
-                _instance = new ArcGlobals(new SingletonEnforcer());
-            }
-            return _instance;
-        }
+        public var legacyLevelRanks:Object = null;
+        public static const legacyLevelRanksName:String = "90579262-509d-4370-9c2e-835a38cf0387";
+
+        public var configMusicOffset:int = 0;
+        public var configLegacy:Object = null;
+        public var legacyEngines:Array = [];
+        public var legacyDefaultEngine:Object = null;
+
+        public var configIsolation:Boolean = false;
+        public var configIsolationStart:int = 0;
+        public var configIsolationLength:int = 0;
+
+        public var configJudge:Array;
+
+        public var configInterface:Object = {};
+
+        public var configMPSize:int = 10;
 
         public function ArcGlobals(en:SingletonEnforcer)
         {
@@ -38,13 +47,10 @@ package arc
             }
             return null;
         }
-        public var configLegacy:Object = null;
-        public var legacyEngines:Array = [];
-        public var legacyDefaultEngine:Object = null;
 
         public function legacyLoad():void
         {
-            var legacyEngineArray:* = LocalStore.getVariable("legacyEngines", null);
+            var legacyEngineArray:* = LocalOptions.getVariable("legacy_engines", null);
             for each (var engine:Object in legacyEngineArray)
             {
                 ChartFFRLegacy.setEngineSync(engine);
@@ -67,19 +73,12 @@ package arc
 
         public function legacySave():void
         {
-            LocalStore.setVariable("legacyEngines", legacyEngines);
-            LocalStore.flush();
-        }
-
-        public function legacyDefaultLoad():void
-        {
-            legacyDefaultEngine = LocalStore.getVariable("legacyDefaultEngine", null);
+            LocalOptions.setVariable("legacy_engines", legacyEngines);
         }
 
         public function legacyDefaultSave():void
         {
-            LocalStore.setVariable("legacyDefaultEngine", legacyDefaultEngine);
-            LocalStore.flush();
+            LocalOptions.setVariable("legacy_default_engine", legacyDefaultEngine);
         }
 
         /**
@@ -131,63 +130,20 @@ package arc
             return songInfo;
         }
 
-        public function resetIsolation():void
-        {
-            configIsolation = false;
-            configIsolationStart = 0;
-            configIsolationLength = 0;
-        }
-        public var configIsolation:Boolean = false;
-        public var configIsolationStart:int = 0;
-        public var configIsolationLength:int = 0;
-
-        public var configJudge:Array;
-
-        public var configInterface:Object = {};
-
-        public function interfaceLoad():void
-        {
-            configInterface = LocalStore.getVariable("arcLayout", {});
-        }
-
         public function interfaceSave():void
         {
-            LocalStore.setVariable("arcLayout", configInterface);
-            LocalStore.flush();
-        }
-
-        public var configMusicOffset:int = 0;
-
-        public function musicOffsetLoad():void
-        {
-            configMusicOffset = LocalStore.getVariable("arcMusicOffset", 0);
+            LocalOptions.setVariable("layouts", configInterface);
         }
 
         public function musicOffsetSave():void
         {
-            LocalStore.setVariable("arcMusicOffset", configMusicOffset);
-            LocalStore.flush();
-        }
-
-        public var filterLevelLow:int = 1;
-        public var filterLevelHigh:int = 120;
-
-        public var configMPSize:int = 10;
-
-
-        public function mpLoad():void
-        {
-            configMPSize = LocalStore.getVariable("arcMPSize", 10);
+            LocalOptions.setVariable("rolling_music_offset", configMusicOffset);
         }
 
         public function mpSave():void
         {
-            LocalStore.setVariable("arcMPSize", configMPSize);
-            LocalStore.flush();
+            LocalOptions.setVariable("mp_text_size", configMPSize);
         }
-
-        public var legacyLevelRanks:Object = null;
-        public static const legacyLevelRanksName:String = "90579262-509d-4370-9c2e-835a38cf0387";
 
         public function legacyLevelRanksGet(songInfo:SongInfo):Object
         {
@@ -232,32 +188,41 @@ package arc
         {
             legacyLevelRanksLoad();
             legacyLoad();
-            legacyDefaultLoad();
-            musicOffsetLoad();
-            interfaceLoad();
-            mpLoad();
+
+            legacyDefaultEngine = LocalOptions.getVariable("legacy_default_engine", null);
+            configMusicOffset = LocalOptions.getVariable("rolling_music_offset", 0);
+            configInterface = LocalOptions.getVariable("layouts", {});
+            configMPSize = LocalOptions.getVariable("mp_text_size", 10);
         }
 
         public function resetSettings():void
         {
-            LocalStore.deleteVariable("arcMPSize");
-            LocalStore.deleteVariable("arcMPTimestamp");
-            LocalStore.deleteVariable("arcMPMask");
-            LocalStore.deleteVariable("arcMusicOffset");
-            LocalStore.deleteVariable("arcLayout");
+            LocalOptions.deleteVariable("mp_text_size");
+            LocalOptions.deleteVariable("rolling_music_offset");
+            LocalOptions.deleteVariable("layouts");
 
-            LocalStore.flush();
+            resetConfig();
+            configJudge = null;
 
             load();
-            configJudge = null;
-            configIsolation = false;
-            configIsolationStart = configIsolationLength = 0;
         }
 
         public function resetConfig():void
         {
-            resetIsolation();
+            configIsolation = false;
+            configIsolationStart = 0;
+            configIsolationLength = 0;
         }
+
+        public static function get instance():ArcGlobals
+        {
+            if (_instance == null)
+            {
+                _instance = new ArcGlobals(new SingletonEnforcer());
+            }
+            return _instance;
+        }
+
     }
 }
 

@@ -64,7 +64,7 @@ package
         public static const POPUP_OPTIONS:String = "PopupOptions";
         public static const POPUP_HELP:String = "PopupHelp";
         public static const POPUP_REPLAY_HISTORY:String = "PopupReplayHistory";
-        public static const EVENT_PANEL_SWITCHED:String = "maineventswitched";
+        public static const EVENT_PANEL_SWITCHED:String = "MainEventSwitched";
 
         public var _lang:Language = Language.instance;
         public var _gvars:GlobalVariables = GlobalVariables.instance;
@@ -142,6 +142,7 @@ package
             //- Static Class Init
             Logger.init();
             AirContext.initFolders();
+            LocalOptions.init();
             Alert.init(stage);
 
             //- Setup Tween Override mode
@@ -166,6 +167,7 @@ package
             bg = new GameBackgroundColor();
             this.addChild(bg);
 
+            //- Epilepsy Warning
             epilepsyWarning = new TextField();
             epilepsyWarning.x = 10;
             epilepsyWarning.y = stage.stageHeight * 0.15;
@@ -625,7 +627,7 @@ package
             SystemUtil.gc();
         }
 
-        ///- Popupa
+        ///- Popups
         override public function addPopup(_panel:*, newLayer:Boolean = false):void
         {
             if (newLayer && _panel is MenuPanel)

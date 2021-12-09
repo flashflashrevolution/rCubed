@@ -261,7 +261,7 @@ package popups.settings
             {
                 e.target.checked = !e.target.checked;
                 _gvars.air_autoSaveLocalReplays = !_gvars.air_autoSaveLocalReplays;
-                LocalStore.setVariable("air_autoSaveLocalReplays", _gvars.air_autoSaveLocalReplays);
+                LocalOptions.setVariable("autoSaveLocalReplays", _gvars.air_autoSaveLocalReplays);
             }
 
             //- Auto Save Local Replays
@@ -269,7 +269,7 @@ package popups.settings
             {
                 e.target.checked = !e.target.checked;
                 _gvars.air_useLocalFileCache = !_gvars.air_useLocalFileCache;
-                LocalStore.setVariable("air_useLocalFileCache", _gvars.air_useLocalFileCache);
+                LocalOptions.setVariable("useLocalFileCache", _gvars.air_useLocalFileCache);
             }
 
             //- Vsync Toggle
@@ -279,7 +279,7 @@ package popups.settings
                 CONFIG::vsync
                 {
                     _gvars.gameMain.stage.vsyncEnabled = _gvars.air_useVSync = !_gvars.air_useVSync;
-                    LocalStore.setVariable("air_useVSync", _gvars.air_useVSync);
+                    LocalOptions.setVariable("vsync", _gvars.air_useVSync);
                 }
             }
 
@@ -291,7 +291,7 @@ package popups.settings
                     _gvars.destroyWebsocketServer();
                     _gvars.air_useWebsockets = false;
                     useWebsocketCheckbox.checked = false;
-                    LocalStore.setVariable("air_useWebsockets", _gvars.air_useWebsockets);
+                    LocalOptions.setVariable("useWebsockets", _gvars.air_useWebsockets);
                 }
                 else
                 {
@@ -299,7 +299,7 @@ package popups.settings
                     {
                         _gvars.air_useWebsockets = true;
                         useWebsocketCheckbox.checked = true;
-                        LocalStore.setVariable("air_useWebsockets", _gvars.air_useWebsockets);
+                        LocalOptions.setVariable("useWebsockets", _gvars.air_useWebsockets);
                         e_websocketMouseOver();
                     }
                     else
@@ -487,7 +487,5 @@ package popups.settings
                 engineCombo.addItem({label: "Clear Engines", data: engineCombo});
             engineComboIgnore = false;
         }
-
-
     }
 }

@@ -119,10 +119,10 @@ package
 
         public function loadAirOptions():void
         {
-            air_useLocalFileCache = LocalStore.getVariable("air_useLocalFileCache", true);
-            air_autoSaveLocalReplays = LocalStore.getVariable("air_autoSaveLocalReplays", true);
-            air_useVSync = LocalStore.getVariable("air_useVSync", false);
-            air_useWebsockets = LocalStore.getVariable("air_useWebsockets", false);
+            air_useLocalFileCache = LocalOptions.getVariable("useLocalFileCache", true);
+            air_autoSaveLocalReplays = LocalOptions.getVariable("autoSaveLocalReplays", true);
+            air_useVSync = LocalOptions.getVariable("vsync", false);
+            air_useWebsockets = LocalOptions.getVariable("useWebsockets", false);
 
             if (air_useWebsockets)
             {
@@ -241,7 +241,8 @@ package
 
         public function loadMenuMusic():void
         {
-            menuMusicSoundVolume = menuMusicSoundTransform.volume = LocalStore.getVariable("menuMusicSoundVolume", 1);
+            menuMusicSoundVolume = menuMusicSoundTransform.volume = LocalOptions.getVariable("menuMusicSoundVolume", 1);
+
             // Load Existing Menu Music SWF
             if (AirContext.doesFileExist(Constant.MENU_MUSIC_PATH))
             {
