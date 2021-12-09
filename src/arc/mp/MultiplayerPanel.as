@@ -374,11 +374,11 @@ package arc.mp
             const spectatorString:String = (room.specCount > 0) ? "+" + room.specCount + " " : "";
             const roomPopulationString:String = MultiplayerChat.textFormatSize(room.userCount + "/2 " + spectatorString, "-1");
             const isPrivateString:String = (room.isPrivate ? "!" : "");
-            
+
             if (room.userCount > 0 && level != -1)
             {
-                const color:int = ArcGlobals.getDivisionColor(level);
-                const titleString:String = ArcGlobals.getDivisionTitle(level);
+                const color:int = GlobalVariables.getDivisionColor(level);
+                const titleString:String = GlobalVariables.getDivisionTitle(level);
                 const dulledColour:String = MultiplayerChat.textDullColour(color, 1).toString(16);
                 const titlePrefix:String = "(" + titleString + ")";
 

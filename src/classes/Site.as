@@ -107,13 +107,13 @@ package classes
             _gvars.NONPUBLIC_GENRES = data.game_nonpublic_genres;
 
             // MP Divisions
-            ArcGlobals.divisionLevel = data.division_levels;
-            ArcGlobals.divisionTitle = data.division_titles;
+            GlobalVariables.divisionLevel = data.division_levels;
+            GlobalVariables.divisionTitle = data.division_titles;
 
             var divisionColors:Array = [];
             for each (var value:String in data.division_colors)
                 divisionColors.push(parseInt(value.substring(1), 16));
-            ArcGlobals.divisionColor = divisionColors;
+            GlobalVariables.divisionColor = divisionColors;
 
             // Tokens
             _gvars.TOKENS = {};

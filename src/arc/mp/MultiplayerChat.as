@@ -223,7 +223,7 @@ package arc.mp
             {
                 return;
             }
-            
+
             chatScrollV = controlChat.textField.scrollV;
             chatScroll ||= (chatScrollV == controlChat.textField.maxScrollV);
             chatFrameDelay = 0;
@@ -293,8 +293,8 @@ package arc.mp
         public static function textFormatLevel(user:User):String
         {
             const level:int = user.userLevel;
-            const color:int = ArcGlobals.getDivisionColor(level);
-            const title:String = ArcGlobals.getDivisionTitle(level);
+            const color:int = GlobalVariables.getDivisionColor(level);
+            const title:String = GlobalVariables.getDivisionTitle(level);
             const dulledColour:String = textDullColour(color, 1).toString(16);
             //return textFormatColour(" ", "#" + dulledColour);
             //return textFormatColour("D" + division + " [" + user.userLevel + "] ", "#" + dulledColour);
