@@ -16,7 +16,7 @@ package com.flashfla.utils
             if (date == null)
                 return "";
             var month:String = (date.getMonth() < 9 ? "0" : "") + (date.getMonth() + 1);
-            var day:String = date.getDate() < 10 ? "0" : "" + date.getDate();
+            var day:String = (date.getDate() < 10 ? "0" : "") + date.getDate();
             return date.getFullYear() + '/' + month + '/' + day + ' ' + date.toLocaleTimeString();
         }
 
