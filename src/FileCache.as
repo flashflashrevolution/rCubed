@@ -41,11 +41,11 @@ package
                         CACHE = FILE_CACHE;
                         _cacheFound = true;
                     }
-                    Logger.debug(this, "Loaded Cache \"" + CACHE_FILE_NAME);
+                    Logger.debug(this, "Loaded Cache \"" + CACHE_FILE_NAME + "\"");
                 }
                 catch (e:Error)
                 {
-                    Logger.error(this, "Error on Cache \"" + CACHE_FILE_NAME);
+                    Logger.error(this, "Error on Cache \"" + CACHE_FILE_NAME + "\"");
                 }
             }
             else
@@ -61,7 +61,7 @@ package
                 AirContext.writeTextFile(AirContext.getAppFile(CACHE_FILE_NAME), JSON.stringify(CACHE));
                 _isDirty = false;
                 _cacheFound = true;
-                Logger.debug(this, "Saving Cache \"" + CACHE_FILE_NAME);
+                Logger.debug(this, "Saving Cache \"" + CACHE_FILE_NAME + "\"");
             }
             else
             {
