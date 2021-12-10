@@ -11,7 +11,7 @@ package
 
         public static function init():void
         {
-            var json_file:File = AirContext.getAppFile(FILE_NAME);
+            var json_file:File = File.applicationStorageDirectory.resolvePath(FILE_NAME);
 
             // Use JSON first
             if (json_file.exists)
@@ -22,13 +22,17 @@ package
                     try
                     {
                         SO_OBJECT = JSON.parse(json_str);
-                        Logger.info("LocalOptions", "Loaded \"" + FILE_NAME + "\"")
+                        Logger.info("LocalOptions", "Loaded \"" + json_file.nativePath + "\"")
                     }
                     catch (e:Error)
                     {
-                        Logger.error("LocalOptions", "Error parsing \"" + FILE_NAME + "\"");
+                        Logger.error("LocalOptions", "Error parsing \"" + json_file.nativePath + "\"");
                     }
                 }
+            }
+            else
+            {
+                importFromLocalStore();
             }
         }
 
@@ -86,7 +90,18 @@ package
          */
         public static function flush(minDiskSize:int = 0):void
         {
-            AirContext.writeTextFile(AirContext.getAppFile(FILE_NAME), JSON.stringify(SO_OBJECT, null, 2));
+            AirContext.writeTextFile(File.applicationStorageDirectory.resolvePath(FILE_NAME), JSON.stringify(SO_OBJECT, null, 2));
+        }
+
+        public static function importFromLocalStore():void
+        {
+            Logger.debug("LocalOptions", "Importing from LocalStore");
+
+            SO_OBJECT["legacy_engines"] = LocalStore.getVariable("legacyEngines", null);
+            SO_OBJECT["legacy_default_engine"] = LocalStore.getVariable("legacyDefaultEngine", null);
+            SO_OBJECT["rolling_music_offset"] = LocalStore.getVariable("arcMusicOffset", 0);
+            SO_OBJECT["mp_text_size"] = LocalStore.getVariable("arcMPSize", 10);
+            SO_OBJECT["layouts"] = LocalStore.getVariable("arcLayout", {});
         }
     }
 }
