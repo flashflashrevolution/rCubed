@@ -345,7 +345,7 @@ package popups.settings
                     }
                 }
                 SoundMixer.soundTransform = new SoundTransform(_gvars.activeUser.gameVolume);
-                LocalOptions.setVariable("menuMusicSoundVolume", _gvars.menuMusicSoundVolume);
+                LocalOptions.setVariable("menu_music_volume", _gvars.menuMusicSoundVolume);
                 removePopup();
                 return;
             }

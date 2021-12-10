@@ -249,7 +249,7 @@ package
 
         public function loadMenuMusic():void
         {
-            menuMusicSoundVolume = menuMusicSoundTransform.volume = LocalOptions.getVariable("menuMusicSoundVolume", 1);
+            menuMusicSoundVolume = menuMusicSoundTransform.volume = LocalOptions.getVariable("menu_music_volume", 1);
 
             // Load Existing Menu Music SWF
             if (AirContext.doesFileExist(Constant.MENU_MUSIC_PATH))
