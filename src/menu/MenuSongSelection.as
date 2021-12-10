@@ -457,7 +457,7 @@ package menu
             var songGenre:Text = new Text(genreDisplay, 0, y, text, (isActiveGenre ? 18 : 14));
             songGenre.height = 22.6;
             songGenre.width = 130.75;
-            songGenre.mouseChildren = false;
+            songGenre.mouseEnabled = true;
             songGenre.useHandCursor = true;
             songGenre.buttonMode = true;
             songGenre.index = gindex;

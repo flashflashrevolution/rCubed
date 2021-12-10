@@ -37,6 +37,7 @@ package classes.ui
             this._fontSize = fontSize;
             this._fontColor = fontColor;
             this.mouseChildren = false;
+            this.mouseEnabled = false;
 
             // Build Text
             _textTF = new TextField();
