@@ -15,8 +15,10 @@ package popups.settings
     import com.flashfla.utils.sprintf;
     import flash.events.Event;
     import flash.events.MouseEvent;
+    import flash.events.NativeWindowBoundsEvent;
     import flash.net.URLRequest;
     import flash.net.navigateToURL;
+    import flash.system.Capabilities;
     import menu.MainMenu;
 
     public class SettingsTabMisc extends SettingsTabBase
@@ -27,27 +29,38 @@ package popups.settings
         private var _avars:ArcGlobals = ArcGlobals.instance;
         private var _playlist:Playlist = Playlist.instance;
 
-        private var startUpScreenSelections:Array = [];
-
-        private var optionFPS:ValidatedText;
-        private var forceJudgeCheck:BoxCheck;
-
-        private var optionMPSize:ValidatedText;
-        private var timestampCheck:BoxCheck;
-        private var startUpScreenCombo:ComboBox;
         private var optionGameLanguages:Array;
         private var languageCombo:ComboBox;
         private var languageComboIgnore:Boolean;
-        private var engineCombo:ComboBox;
-        private var engineDefaultCombo:ComboBox;
-        private var engineComboIgnore:Boolean;
-        private var legacySongsCheck:BoxCheck;
+        private var startUpScreenSelections:Array = [];
+        private var startUpScreenCombo:ComboBox;
 
+        private var optionMPSize:ValidatedText;
+        private var timestampCheck:BoxCheck;
+
+        private var forceJudgeCheck:BoxCheck;
         private var useCacheCheckbox:BoxCheck;
         private var autoSaveLocalCheckbox:BoxCheck;
         private var useVSyncCheckbox:BoxCheck;
         private var useWebsocketCheckbox:BoxCheck;
         private var openWebsocketOverlay:BoxButton;
+
+        private var engineCombo:ComboBox;
+        private var engineDefaultCombo:ComboBox;
+        private var engineComboIgnore:Boolean;
+        private var legacySongsCheck:BoxCheck;
+        private var optionFPS:ValidatedText;
+
+        private var windowWidthBox:ValidatedText;
+        private var windowHeightBox:ValidatedText;
+        private var windowSizeSet:BoxButton;
+        private var windowSizeReset:BoxButton;
+        private var windowSaveSizeCheck:BoxCheck;
+        private var windowXBox:ValidatedText;
+        private var windowYBox:ValidatedText;
+        private var windowPositionSet:BoxButton;
+        private var windowPositionReset:BoxButton;
+        private var windowSavePositionCheck:BoxCheck;
 
         public function SettingsTabMisc(settingsWindow:SettingsWindow):void
         {
@@ -61,6 +74,9 @@ package popups.settings
 
         override public function openTab():void
         {
+            _gvars.gameMain.stage.nativeWindow.addEventListener(NativeWindowBoundsEvent.MOVE, e_windowPropertyChange);
+            _gvars.gameMain.stage.nativeWindow.addEventListener(NativeWindowBoundsEvent.RESIZE, e_windowPropertyChange);
+
             var i:int;
             var xOff:int = 15;
             var yOff:int = 15;
@@ -114,19 +130,17 @@ package popups.settings
 
             yOff += drawSeperator(container, xOff, 250, yOff, 0, 0);
 
-            // Engine Framerate
-            new Text(container, xOff, yOff, _lang.string("options_framerate"));
+            // Multiplayer - Text Size
+            new Text(container, xOff, yOff, _lang.string("options_mp_textsize"));
             yOff += 20;
 
-            optionFPS = new ValidatedText(container, xOff, yOff, 120, 20, ValidatedText.R_INT_P, changeHandler);
+            optionMPSize = new ValidatedText(container, xOff + 3, yOff + 3, 120, 20, ValidatedText.R_INT_P, changeHandler);
             yOff += 30;
 
-            CONFIG::vsync
-            {
-                new Text(container, xOff + 23, yOff, _lang.string("air_options_use_vsync"));
-                useVSyncCheckbox = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
-                yOff += 30;
-            }
+            // Multiplayer - Timestamps
+            new Text(container, xOff + 23, yOff, _lang.string("options_mp_timestamp"));
+            timestampCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
+            yOff += 30;
 
             yOff += drawSeperator(container, xOff, 250, yOff, 0, 0);
 
@@ -193,20 +207,57 @@ package popups.settings
 
             yOff += drawSeperator(container, xOff, 250, yOff, 0, 0);
 
-            // Multiplayer - Text Size
-            new Text(container, xOff, yOff, _lang.string("options_mp_textsize"));
+            // Engine Framerate
+            new Text(container, xOff, yOff, _lang.string("options_framerate"));
             yOff += 20;
 
-            optionMPSize = new ValidatedText(container, xOff, yOff, 120, 20, ValidatedText.R_INT_P, changeHandler);
-            optionMPSize.text = "10";
+            optionFPS = new ValidatedText(container, xOff + 3, yOff + 3, 120, 20, ValidatedText.R_INT_P, changeHandler);
+            CONFIG::vsync
+            {
+                new Text(container, xOff + 163, yOff + 4, _lang.string("air_options_use_vsync"));
+                useVSyncCheckbox = new BoxCheck(container, xOff + 143, yOff + 7, clickHandler);
+            }
             yOff += 30;
 
-            // Multiplayer - Timestamps
-            new Text(container, xOff + 23, yOff, _lang.string("options_mp_timestamp"));
-            timestampCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
+            yOff += drawSeperator(container, xOff, 250, yOff, 0, 0);
+
+            // Window Size
+            new Text(container, xOff, yOff, _lang.string("air_options_window_size"));
+            yOff += 20;
+
+            windowWidthBox = new ValidatedText(container, xOff + 3, yOff + 3, 60, 20, ValidatedText.R_INT);
+            new Text(container, xOff + 73, yOff + 3, "X");
+            windowHeightBox = new ValidatedText(container, xOff + 93, yOff + 3, 60, 20, ValidatedText.R_INT);
+            windowSizeSet = new BoxButton(container, xOff + 163, yOff + 3, 51, 21, "Set", 12, clickHandler);
+            windowSizeReset = new BoxButton(container, xOff + 223, yOff + 3, 21, 21, "R", 12, clickHandler);
+            yOff += 30;
+
+            new Text(container, xOff + 23, yOff, _lang.string("air_options_save_window_size"));
+            windowSaveSizeCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
+            yOff += 30;
+
+            // Window Position
+            new Text(container, xOff, yOff, _lang.string("air_options_window_position"));
+            yOff += 20;
+
+            windowXBox = new ValidatedText(container, xOff + 3, yOff + 3, 60, 20, ValidatedText.R_INT);
+            new Text(container, xOff + 73, yOff + 3, "X");
+            windowYBox = new ValidatedText(container, xOff + 93, yOff + 3, 60, 20, ValidatedText.R_INT);
+            windowPositionSet = new BoxButton(container, xOff + 163, yOff + 3, 51, 21, "Set", 12, clickHandler);
+            windowPositionReset = new BoxButton(container, xOff + 223, yOff + 3, 21, 21, "R", 12, clickHandler);
+            yOff += 30;
+
+            new Text(container, xOff + 23, yOff, _lang.string("air_options_save_window_position"));
+            windowSavePositionCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
             yOff += 30;
 
             setTextMaxWidth(245);
+        }
+
+        override public function closeTab():void
+        {
+            _gvars.gameMain.stage.nativeWindow.removeEventListener(NativeWindowBoundsEvent.MOVE, e_windowPropertyChange);
+            _gvars.gameMain.stage.nativeWindow.removeEventListener(NativeWindowBoundsEvent.RESIZE, e_windowPropertyChange);
         }
 
         override public function setValues():void
@@ -231,6 +282,14 @@ package popups.settings
             {
                 useVSyncCheckbox.checked = _gvars.air_useVSync;
             }
+
+            windowWidthBox.text = _gvars.air_windowProperties.width;
+            windowHeightBox.text = _gvars.air_windowProperties.height;
+            windowXBox.text = _gvars.air_windowProperties.x;
+            windowYBox.text = _gvars.air_windowProperties.y;
+
+            windowSavePositionCheck.checked = _gvars.air_saveWindowPosition;
+            windowSaveSizeCheck.checked = _gvars.air_saveWindowSize;
         }
 
         override public function clickHandler(e:MouseEvent):void
@@ -316,6 +375,50 @@ package popups.settings
                 navigateToURL(new URLRequest(Constant.WEBSOCKET_OVERLAY_URL), "_blank");
                 return;
             }
+
+            //- Window Position
+            else if (e.target == windowSavePositionCheck)
+            {
+                e.target.checked = !e.target.checked;
+                _gvars.air_saveWindowPosition = !_gvars.air_saveWindowPosition;
+                LocalOptions.setVariable("saveWindowPosition", _gvars.air_saveWindowPosition);
+            }
+            else if (e.target == windowPositionSet)
+            {
+                parent.addChild(new WindowSettingConfirm(this, _gvars.air_windowProperties));
+
+                _gvars.air_windowProperties["x"] = windowXBox.validate(Math.round((Capabilities.screenResolutionX - _gvars.gameMain.stage.nativeWindow.width) * 0.5));
+                _gvars.air_windowProperties["y"] = windowYBox.validate(Math.round((Capabilities.screenResolutionY - _gvars.gameMain.stage.nativeWindow.height) * 0.5));
+                e_windowSetUpdate();
+            }
+            else if (e.target == windowPositionReset)
+            {
+                _gvars.air_windowProperties["x"] = Math.round((Capabilities.screenResolutionX - _gvars.gameMain.stage.nativeWindow.width) * 0.5);
+                _gvars.air_windowProperties["y"] = Math.round((Capabilities.screenResolutionY - _gvars.gameMain.stage.nativeWindow.height) * 0.5);
+                e_windowSetUpdate();
+            }
+
+            //- Window Size
+            else if (e.target == windowSaveSizeCheck)
+            {
+                e.target.checked = !e.target.checked;
+                _gvars.air_saveWindowSize = !_gvars.air_saveWindowSize;
+                LocalOptions.setVariable("saveWindowSize", _gvars.air_saveWindowSize);
+            }
+            else if (e.target == windowSizeSet)
+            {
+                parent.addChild(new WindowSettingConfirm(this, _gvars.air_windowProperties));
+
+                _gvars.air_windowProperties["width"] = windowWidthBox.validate(Main.GAME_WIDTH);
+                _gvars.air_windowProperties["height"] = windowHeightBox.validate(Main.GAME_HEIGHT);
+                e_windowSetUpdate();
+            }
+            else if (e.target == windowSizeReset)
+            {
+                _gvars.air_windowProperties["width"] = Main.GAME_WIDTH;
+                _gvars.air_windowProperties["height"] = Main.GAME_HEIGHT;
+                e_windowSetUpdate();
+            }
         }
 
         override public function changeHandler(e:Event):void
@@ -332,6 +435,25 @@ package popups.settings
                 Style.fontSize = _avars.configMPSize = optionMPSize.validate(10);
                 _avars.mpSave();
             }
+        }
+
+        private function e_windowPropertyChange(e:Event):void
+        {
+            windowWidthBox.text = _gvars.air_windowProperties["width"];
+            windowHeightBox.text = _gvars.air_windowProperties["height"];
+
+            windowXBox.text = _gvars.air_windowProperties["x"];
+            windowYBox.text = _gvars.air_windowProperties["y"];
+        }
+
+        public function e_windowSetUpdate():void
+        {
+            _gvars.gameMain.ignoreWindowChanges = true;
+            _gvars.gameMain.stage.nativeWindow.x = _gvars.air_windowProperties["x"];
+            _gvars.gameMain.stage.nativeWindow.y = _gvars.air_windowProperties["y"];
+            _gvars.gameMain.stage.nativeWindow.width = _gvars.air_windowProperties["width"] + Main.WINDOW_WIDTH_EXTRA;
+            _gvars.gameMain.stage.nativeWindow.height = _gvars.air_windowProperties["height"] + Main.WINDOW_HEIGHT_EXTRA;
+            _gvars.gameMain.ignoreWindowChanges = false;
         }
 
         private function e_legacyEngineMouseOver(e:Event):void
@@ -487,5 +609,89 @@ package popups.settings
                 engineCombo.addItem({label: "Clear Engines", data: engineCombo});
             engineComboIgnore = false;
         }
+    }
+}
+
+import classes.Language;
+import classes.ui.BoxButton;
+import classes.ui.Text;
+import flash.display.Sprite;
+import flash.events.Event;
+import flash.events.TimerEvent;
+import flash.utils.Timer;
+import popups.settings.SettingsTabMisc;
+
+internal class WindowSettingConfirm extends Sprite
+{
+    private var _lang:Language = Language.instance;
+
+    private var tab:SettingsTabMisc;
+    private var properties:Object;
+    private var previousWidth:int;
+    private var previousHeight:int;
+    private var previousX:int;
+    private var previousY:int;
+
+    private var confirmTimer:Timer;
+
+    private var window_text:Text;
+    private var window_timer_text:Text;
+    private var confirm_btn:BoxButton;
+
+    public function WindowSettingConfirm(tab:SettingsTabMisc, properties:Object):void
+    {
+        this.tab = tab;
+        this.properties = properties;
+
+        this.previousX = properties["x"];
+        this.previousY = properties["y"];
+        this.previousWidth = properties["width"];
+        this.previousHeight = properties["height"];
+
+        this.graphics.lineStyle(0, 0, 0);
+        this.graphics.beginFill(0, 0.95);
+        this.graphics.drawRect(0, 0, Main.GAME_WIDTH, Main.GAME_HEIGHT);
+        this.graphics.endFill();
+
+        confirmTimer = new Timer(1000, 10);
+        confirmTimer.addEventListener(TimerEvent.TIMER, e_timerTick);
+        confirmTimer.start();
+
+        window_text = new Text(this, 0, 200, _lang.string("option_window_settings_confirm_text"), 24);
+        window_text.setAreaParams(Main.GAME_WIDTH, 30, "center");
+
+        window_timer_text = new Text(this, 0, 250, "10", 38);
+        window_timer_text.setAreaParams(Main.GAME_WIDTH, 30, "center");
+
+        confirm_btn = new BoxButton(this, Main.GAME_WIDTH / 2 - 50, 400, 100, 30, _lang.string("menu_confirm"), 12, e_confirm);
+    }
+
+    private function e_timerTick(e:TimerEvent):void
+    {
+        window_timer_text.text = (confirmTimer.repeatCount - confirmTimer.currentCount).toString();
+
+        if (confirmTimer.currentCount >= confirmTimer.repeatCount)
+        {
+            e_cancel();
+        }
+    }
+
+    private function e_confirm(e:Event):void
+    {
+        confirmTimer.stop();
+        this.parent.removeChild(this);
+    }
+
+    private function e_cancel():void
+    {
+        properties["width"] = previousWidth;
+        properties["height"] = previousHeight;
+        properties["x"] = previousX;
+        properties["y"] = previousY;
+
+        confirmTimer.stop();
+        this.parent.removeChild(this);
+
+        this.tab.e_windowSetUpdate();
     }
 }

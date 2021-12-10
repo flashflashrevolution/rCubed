@@ -4,10 +4,6 @@
 
 package
 {
-    CONFIG::release
-    {
-        import flash.system.Security;
-    }
     CONFIG::vsync
     {
         import flash.events.VsyncStateChangeAvailabilityEvent;
@@ -38,6 +34,7 @@ package
     import flash.events.ContextMenuEvent;
     import flash.events.Event;
     import flash.events.KeyboardEvent;
+    import flash.events.NativeWindowBoundsEvent;
     import flash.system.Capabilities;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
@@ -66,6 +63,9 @@ package
         public static const POPUP_REPLAY_HISTORY:String = "PopupReplayHistory";
         public static const EVENT_PANEL_SWITCHED:String = "MainEventSwitched";
 
+        public static var WINDOW_WIDTH_EXTRA:Number = 0;
+        public static var WINDOW_HEIGHT_EXTRA:Number = 0;
+
         public var _lang:Language = Language.instance;
         public var _gvars:GlobalVariables = GlobalVariables.instance;
         public var _site:Site = Site.instance;
@@ -81,6 +81,7 @@ package
         public var loadComplete:Boolean = false;
         public var retryLoadButton:BoxButton;
         public var disablePopups:Boolean = false;
+        public var ignoreWindowChanges:Boolean = false;
 
         private var popupQueue:Array = [];
         private var lastPanel:MenuPanel;
@@ -103,32 +104,9 @@ package
             _gvars.gameMain = this;
 
             if (stage)
-            {
-                //- Set up vSync
-                CONFIG::vsync
-                {
-                    stage.addEventListener(VsyncStateChangeAvailabilityEvent.VSYNC_STATE_CHANGE_AVAILABILITY, onVsyncStateChangeAvailability);
-                }
-
                 gameInit();
-            }
             else
-            {
                 this.addEventListener(Event.ADDED_TO_STAGE, gameInit);
-            }
-        }
-
-        CONFIG::vsync
-        public function onVsyncStateChangeAvailability(event:VsyncStateChangeAvailabilityEvent):void
-        {
-            if (event.available)
-            {
-                stage.vsyncEnabled = _gvars.air_useVSync;
-            }
-            else
-            {
-                stage.vsyncEnabled = true;
-            }
         }
 
         private function gameInit(e:Event = null):void
@@ -152,8 +130,35 @@ package
 
             //- Load Air Items
             _gvars.loadAirOptions();
-            stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE;
+
+            //- Window Options
+            stage.nativeWindow.addEventListener(Event.CLOSING, e_onNativeWindowClosing);
             NativeApplication.nativeApplication.addEventListener(Event.EXITING, e_onNativeShutdown);
+            stage.nativeWindow.addEventListener(NativeWindowBoundsEvent.MOVE, e_onNativeWindowPropertyChange, false, 1);
+            stage.nativeWindow.addEventListener(NativeWindowBoundsEvent.RESIZE, e_onNativeWindowPropertyChange, false, 1);
+
+            CONFIG::vsync
+            {
+                stage.addEventListener(VsyncStateChangeAvailabilityEvent.VSYNC_STATE_CHANGE_AVAILABILITY, e_onVsyncStateChangeAvailability);
+            }
+
+            stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE;
+
+            WINDOW_WIDTH_EXTRA = stage.nativeWindow.width - GAME_WIDTH;
+            WINDOW_HEIGHT_EXTRA = stage.nativeWindow.height - GAME_HEIGHT;
+
+            ignoreWindowChanges = true;
+            if (_gvars.air_saveWindowPosition)
+            {
+                stage.nativeWindow.x = _gvars.air_windowProperties.x;
+                stage.nativeWindow.y = _gvars.air_windowProperties.y;
+            }
+            if (_gvars.air_saveWindowSize)
+            {
+                stage.nativeWindow.width = Math.max(100, _gvars.air_windowProperties.width + WINDOW_WIDTH_EXTRA);
+                stage.nativeWindow.height = Math.max(100, _gvars.air_windowProperties.height + WINDOW_HEIGHT_EXTRA);
+            }
+            ignoreWindowChanges = false;
 
             //- Load Menu Music
             _gvars.loadMenuMusic();
@@ -201,12 +206,6 @@ package
             if (d.getMonth() == 10 && d.getDate() == 6)
                 ver.text = "Happy Birthday Velocity! - " + ver.text;
 
-            CONFIG::debug
-            {
-                stage.nativeWindow.x = (Capabilities.screenResolutionX - stage.nativeWindow.width) * 0.5;
-                stage.nativeWindow.y = (Capabilities.screenResolutionY - stage.nativeWindow.height) * 0.5;
-            }
-
             //- Build global right-click context menu
             buildContextMenu();
 
@@ -250,12 +249,6 @@ package
             }
         }
 
-        private function e_onNativeShutdown(e:Event):void
-        {
-            Logger.destroy();
-            _gvars.onNativeProcessClose(e);
-        }
-
         public function buildContextMenu():void
         {
             //- Backup Menu incase
@@ -277,6 +270,48 @@ package
                 cm.hideBuiltInItems();
             }
         }
+
+        ///- Window Methods
+        private function e_onNativeShutdown(e:Event):void
+        {
+            Logger.destroy();
+            LocalOptions.flush();
+            _gvars.onNativeProcessClose(e);
+        }
+
+        private function e_onNativeWindowClosing(e:Event):void
+        {
+            _gvars.air_windowProperties["width"] = stage.nativeWindow.width - Main.WINDOW_WIDTH_EXTRA;
+            _gvars.air_windowProperties["height"] = stage.nativeWindow.height - Main.WINDOW_HEIGHT_EXTRA;
+            _gvars.air_windowProperties["x"] = stage.nativeWindow.x;
+            _gvars.air_windowProperties["y"] = stage.nativeWindow.y;
+            LocalOptions.setVariable("windowProperties", _gvars.air_windowProperties);
+        }
+
+        private function e_onNativeWindowPropertyChange(e:NativeWindowBoundsEvent):void
+        {
+            if (ignoreWindowChanges)
+                return;
+
+            _gvars.air_windowProperties["width"] = e.afterBounds.width - Main.WINDOW_WIDTH_EXTRA;
+            _gvars.air_windowProperties["height"] = e.afterBounds.height - Main.WINDOW_HEIGHT_EXTRA;
+            _gvars.air_windowProperties["x"] = e.afterBounds.x;
+            _gvars.air_windowProperties["y"] = e.afterBounds.y;
+        }
+
+        CONFIG::vsync
+        public function e_onVsyncStateChangeAvailability(event:VsyncStateChangeAvailabilityEvent):void
+        {
+            if (event.available)
+            {
+                stage.vsyncEnabled = _gvars.air_useVSync;
+            }
+            else
+            {
+                stage.vsyncEnabled = true;
+            }
+        }
+
 
         ///- Preloader
         public function buildPreloader():void
@@ -368,6 +403,7 @@ package
                 return "<font color=\"#FFC4C4\">Error</font>";
             if (isLoaded)
                 return "<font color=\"#C4FFCD\">Complete</font>";
+
             var cycle:int = 35;
             return "Loading." + ((loadTimer % cycle > cycle / 3) ? "." : "") + ((loadTimer % cycle > cycle / 1.5) ? "." : "");
         }

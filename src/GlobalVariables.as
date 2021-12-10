@@ -103,6 +103,10 @@ package
         public var air_autoSaveLocalReplays:Boolean = false;
         public var air_useVSync:Boolean = true;
         public var air_useWebsockets:Boolean = false;
+        public var air_saveWindowPosition:Boolean = false;
+        public var air_saveWindowSize:Boolean = false;
+
+        public var air_windowProperties:Object;
         public var file_replay_cache:FileCache = new FileCache("replays/cache.json", 1);
 
         private var websocket_server:AIRServer;
@@ -123,6 +127,10 @@ package
             air_autoSaveLocalReplays = LocalOptions.getVariable("autoSaveLocalReplays", true);
             air_useVSync = LocalOptions.getVariable("vsync", false);
             air_useWebsockets = LocalOptions.getVariable("useWebsockets", false);
+            air_saveWindowPosition = LocalOptions.getVariable("saveWindowPosition", false);
+            air_saveWindowSize = LocalOptions.getVariable("saveWindowSize", false);
+
+            air_windowProperties = LocalOptions.getVariable("windowProperties", {"x": 0, "y": 0, "width": 0, "height": 0});
 
             if (air_useWebsockets)
             {
