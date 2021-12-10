@@ -133,11 +133,12 @@ package popups.settings
             yOff += 30;
 
             //- Judge Offset
-            new Text(container, xOff, yOff, _lang.string("options_judge_offset"));
+            var judgeOffsetText:Text = new Text(container, xOff, yOff, _lang.string("options_judge_offset"));
+            judgeOffsetText.mouseEnabled = true;
+            judgeOffsetText.contextMenu = arcJudgeMenu(parent);
             yOff += 22;
 
             optionJudgeOffset = new ValidatedText(container, xOff, yOff, 130, 20, ValidatedText.R_FLOAT, changeHandler);
-            optionJudgeOffset.contextMenu = arcJudgeMenu(parent);
             yOff += 30;
 
             //- Auto Judge Offset
