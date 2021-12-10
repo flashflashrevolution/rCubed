@@ -1,10 +1,18 @@
 package popups.replays
 {
     import classes.replay.Replay;
+    import classes.Alert;
+    import classes.Language;
+    import classes.ui.BoxButton;
+    import flash.events.Event;
+    import classes.ui.Prompt;
 
     public class ReplayHistoryTabSession extends ReplayHistoryTabBase
     {
         private var _gvars:GlobalVariables = GlobalVariables.instance;
+        private var _lang:Language = Language.instance;
+
+        private var btn_import:BoxButton;
 
         public function ReplayHistoryTabSession(replayWindow:ReplayHistoryWindow):void
         {
@@ -14,6 +22,21 @@ package popups.replays
         override public function get name():String
         {
             return "session";
+        }
+
+        override public function openTab():void
+        {
+            // Add UI Elements
+            if (!btn_import)
+            {
+                btn_import = new BoxButton(null, 5, Main.GAME_HEIGHT - 35, 162, 29, _lang.string("popup_replay_import"), 12, e_importClick);
+            }
+            parent.addChild(btn_import);
+        }
+
+        override public function closeTab():void
+        {
+            parent.removeChild(btn_import);
         }
 
         override public function setValues():void
@@ -31,6 +54,27 @@ package popups.replays
             }
             parent.pane.setRenderList(render_list);
             parent.updateScrollPane();
+        }
+
+        private function e_importClick(e:Event):void
+        {
+            new Prompt(parent, 320, _lang.string("popup_replay_import_window_title"), 100, _lang.string("popup_replay_import"), e_importReplay);
+        }
+
+        private function e_importReplay(replayString:String):void
+        {
+            var r:Replay = new Replay(new Date().getTime());
+            r.parseEncode(replayString);
+            if (r.isEdited)
+                Alert.add(_lang.string("popup_replay_import_edited"), 180);
+            if (r.isValid())
+            {
+                r.loadSongInfo();
+                _gvars.replayHistory.unshift(r);
+                setValues();
+            }
+            else
+                Alert.add(_lang.string("popup_replay_import_invalid"));
         }
     }
 }
