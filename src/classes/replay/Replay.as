@@ -135,6 +135,7 @@ package classes.replay
                 jsonSettings = _gvars.playerUser.isGuest ? new User().settings : _gvars.playerUser.settings;
                 jsonSettings.speed = Number(tempSettings[0]);
                 jsonSettings.direction = Constant.cleanScrollDirection(tempSettings[2]);
+                jsonSettings.songRate = 1;
                 if (tempSettings.length >= 12)
                 {
                     if (tempSettings[11] == "Mirror")
@@ -160,6 +161,7 @@ package classes.replay
                 jsonSettings = _gvars.playerUser.isGuest ? new User().settings : _gvars.playerUser.settings;
                 jsonSettings.speed = Number(tempSettings[0][1]);
                 jsonSettings.direction = Constant.cleanScrollDirection(tempSettings[0][0]);
+                jsonSettings.songRate = 1;
                 if (tempSettings[0][2] == "true")
                 {
                     jsonSettings.visual.push("mirror");
