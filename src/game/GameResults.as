@@ -23,6 +23,8 @@ package game
     import com.flashfla.utils.ObjectUtil;
     import com.flashfla.utils.TimeUtil;
     import com.flashfla.utils.sprintf;
+    import flash.display.Bitmap;
+    import flash.display.BitmapData;
     import flash.display.DisplayObject;
     import flash.display.Sprite;
     import flash.events.ErrorEvent;
@@ -35,6 +37,7 @@ package game
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
     import flash.ui.Keyboard;
+    import flash.utils.getTimer;
     import game.graph.GraphAccuracy;
     import game.graph.GraphBase;
     import game.graph.GraphCombo;
@@ -144,6 +147,13 @@ package game
             resultsDisplay = new ResultsBackground();
             resultsDisplay.song_description.styleSheet = Constant.STYLESHEET;
             this.addChild(resultsDisplay);
+
+            // Background Noise
+            var noiseSource:BitmapData = new BitmapData(780, 480, false, 0x00000000);
+            noiseSource.perlinNoise(780, 480, 12, getTimer(), true, false, 7, true);
+            var noiseImage:Bitmap = new Bitmap(noiseSource);
+            noiseImage.alpha = 0.3;
+            resultsDisplay.blueBackground.addChild(noiseImage);
 
             // Avatar
             var result:GameScoreResult = songResults[songResults.length - 1];
