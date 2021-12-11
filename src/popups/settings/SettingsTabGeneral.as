@@ -291,9 +291,9 @@ package popups.settings
             if (e.target == optionJudgeOffsetAuto)
             {
                 _gvars.activeUser.AUTO_JUDGE_OFFSET = !_gvars.activeUser.AUTO_JUDGE_OFFSET;
-                optionJudgeOffset.selectable = _gvars.activeUser.AUTO_JUDGE_OFFSET;
+                optionJudgeOffset.selectable = !_gvars.activeUser.AUTO_JUDGE_OFFSET;
                 optionJudgeOffset.alpha = _gvars.activeUser.AUTO_JUDGE_OFFSET ? 0.55 : 1.0;
-                optionJudgeOffsetAuto.checked = !optionJudgeOffsetAuto.checked;
+                optionJudgeOffsetAuto.checked = _gvars.activeUser.AUTO_JUDGE_OFFSET;
             }
 
             else if (e.target.hasOwnProperty("slideDirection"))
