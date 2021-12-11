@@ -329,6 +329,7 @@ package game
                     result.boo += tempResult.boo;
                     result.score += tempResult.score;
                     result.credits += tempResult.credits;
+                    result.restarts += tempResult.restarts;
 
                     // Replay Graph
                     for (var y:int = 0; y < tempResult.replay_hit.length; y++)
@@ -1086,7 +1087,8 @@ package game
                 }
                 else
                 {
-                    resultsDisplay.result_rank.htmlText = "Game mods enabled!";
+                    resultsDisplay.result_rank.htmlText = "Game Mods";
+                    resultsDisplay.result_last_best.htmlText = "Enabled";
                 }
 
                 _gvars.activeUser.grandTotal += gameResult.score_total;
