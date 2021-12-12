@@ -285,7 +285,7 @@ package
             _gvars.air_windowProperties["height"] = stage.nativeWindow.height - Main.WINDOW_HEIGHT_EXTRA;
             _gvars.air_windowProperties["x"] = stage.nativeWindow.x;
             _gvars.air_windowProperties["y"] = stage.nativeWindow.y;
-            LocalOptions.setVariable("windowProperties", _gvars.air_windowProperties);
+            LocalOptions.setVariable("window_properties", _gvars.air_windowProperties);
         }
 
         private function e_onNativeWindowPropertyChange(e:NativeWindowBoundsEvent):void

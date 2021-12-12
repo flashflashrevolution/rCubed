@@ -320,7 +320,7 @@ package popups.settings
             {
                 e.target.checked = !e.target.checked;
                 _gvars.air_autoSaveLocalReplays = !_gvars.air_autoSaveLocalReplays;
-                LocalOptions.setVariable("autoSaveLocalReplays", _gvars.air_autoSaveLocalReplays);
+                LocalOptions.setVariable("auto_save_local_replays", _gvars.air_autoSaveLocalReplays);
             }
 
             //- Auto Save Local Replays
@@ -328,7 +328,7 @@ package popups.settings
             {
                 e.target.checked = !e.target.checked;
                 _gvars.air_useLocalFileCache = !_gvars.air_useLocalFileCache;
-                LocalOptions.setVariable("useLocalFileCache", _gvars.air_useLocalFileCache);
+                LocalOptions.setVariable("use_local_file_cache", _gvars.air_useLocalFileCache);
             }
 
             //- Vsync Toggle
@@ -350,7 +350,7 @@ package popups.settings
                     _gvars.destroyWebsocketServer();
                     _gvars.air_useWebsockets = false;
                     useWebsocketCheckbox.checked = false;
-                    LocalOptions.setVariable("useWebsockets", _gvars.air_useWebsockets);
+                    LocalOptions.setVariable("use_websockets", _gvars.air_useWebsockets);
                 }
                 else
                 {
@@ -358,7 +358,7 @@ package popups.settings
                     {
                         _gvars.air_useWebsockets = true;
                         useWebsocketCheckbox.checked = true;
-                        LocalOptions.setVariable("useWebsockets", _gvars.air_useWebsockets);
+                        LocalOptions.setVariable("use_websockets", _gvars.air_useWebsockets);
                         e_websocketMouseOver();
                     }
                     else
@@ -381,7 +381,7 @@ package popups.settings
             {
                 e.target.checked = !e.target.checked;
                 _gvars.air_saveWindowPosition = !_gvars.air_saveWindowPosition;
-                LocalOptions.setVariable("saveWindowPosition", _gvars.air_saveWindowPosition);
+                LocalOptions.setVariable("save_window_position", _gvars.air_saveWindowPosition);
             }
             else if (e.target == windowPositionSet)
             {
@@ -403,7 +403,7 @@ package popups.settings
             {
                 e.target.checked = !e.target.checked;
                 _gvars.air_saveWindowSize = !_gvars.air_saveWindowSize;
-                LocalOptions.setVariable("saveWindowSize", _gvars.air_saveWindowSize);
+                LocalOptions.setVariable("save_window_size", _gvars.air_saveWindowSize);
             }
             else if (e.target == windowSizeSet)
             {

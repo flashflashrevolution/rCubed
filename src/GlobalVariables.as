@@ -123,14 +123,14 @@ package
 
         public function loadAirOptions():void
         {
-            air_useLocalFileCache = LocalOptions.getVariable("useLocalFileCache", true);
-            air_autoSaveLocalReplays = LocalOptions.getVariable("autoSaveLocalReplays", true);
             air_useVSync = LocalOptions.getVariable("vsync", false);
-            air_useWebsockets = LocalOptions.getVariable("useWebsockets", false);
-            air_saveWindowPosition = LocalOptions.getVariable("saveWindowPosition", false);
-            air_saveWindowSize = LocalOptions.getVariable("saveWindowSize", false);
+            air_useLocalFileCache = LocalOptions.getVariable("use_local_file_cache", true);
+            air_autoSaveLocalReplays = LocalOptions.getVariable("auto_save_local_replays", true);
+            air_useWebsockets = LocalOptions.getVariable("use_websockets", false);
+            air_saveWindowPosition = LocalOptions.getVariable("save_window_position", false);
+            air_saveWindowSize = LocalOptions.getVariable("save_window_size", false);
 
-            air_windowProperties = LocalOptions.getVariable("windowProperties", {"x": 0, "y": 0, "width": 0, "height": 0});
+            air_windowProperties = LocalOptions.getVariable("window_properties", {"x": 0, "y": 0, "width": 0, "height": 0});
 
             if (air_useWebsockets)
             {
