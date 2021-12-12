@@ -48,7 +48,7 @@ package game
     import flash.utils.getTimer;
     import game.controls.AccuracyBar;
     import game.controls.Combo;
-    import game.controls.ComboStatic;
+    import game.controls.TextStatic;
     import game.controls.Judge;
     import game.controls.LifeBar;
     import game.controls.MPHeader;
@@ -67,6 +67,8 @@ package game
         public static const GAME_RESTART:int = 2;
         public static const GAME_PAUSE:int = 3;
 
+        public static const LAYOUT_PROGRESS_BAR:String = "progressbar";
+        public static const LAYOUT_PROGRESS_TEXT:String = "progresstext";
         public static const LAYOUT_RECEPTORS:String = "receptors";
         public static const LAYOUT_JUDGE:String = "judge";
         public static const LAYOUT_HEALTH:String = "health";
@@ -101,13 +103,14 @@ package game
         private var displayBlackBG:Sprite;
         private var gameplayUI:*;
         private var progressDisplay:ProgressBar;
+        private var progressDisplayText:TextStatic;
         private var noteBox:NoteBox;
         private var paWindow:PAWindow;
         private var score:Score;
         private var combo:Combo;
         private var comboTotal:Combo;
-        private var comboStatic:ComboStatic;
-        private var comboTotalStatic:ComboStatic;
+        private var comboStatic:TextStatic;
+        private var comboTotalStatic:TextStatic;
         private var accBar:AccuracyBar;
         private var screenCut:Sprite;
         private var flashLight:Sprite;
@@ -535,10 +538,10 @@ package game
             {
                 combo = new Combo(options);
                 if (!sideScroll)
-                    combo.alignment = Combo.ALIGN_RIGHT;
+                    combo.alignment = "right";
                 this.addChild(combo);
 
-                comboStatic = new ComboStatic(_lang.string("game_combo"));
+                comboStatic = new TextStatic(_lang.string("game_combo"));
                 this.addChild(comboStatic);
             }
 
@@ -546,10 +549,10 @@ package game
             {
                 comboTotal = new Combo(options);
                 if (sideScroll)
-                    comboTotal.alignment = Combo.ALIGN_RIGHT;
+                    comboTotal.alignment = "right";
                 this.addChild(comboTotal);
 
-                comboTotalStatic = new ComboStatic(_lang.string("game_combo_total"));
+                comboTotalStatic = new TextStatic(_lang.string("game_combo_total"));
                 this.addChild(comboTotalStatic);
             }
 
@@ -561,10 +564,15 @@ package game
 
             if (options.displaySongProgress || options.replay)
             {
-                progressDisplay = new ProgressBar(this, 161, 9.35, 458, 20, 4, 0x545454, 0.1);
+                progressDisplay = new ProgressBar(this, 161, 9, 458, 20, 4, 0x545454, 0.1);
 
                 if (options.replay)
                     progressDisplay.addEventListener(MouseEvent.CLICK, progressMouseClick);
+            }
+            if (options.displaySongProgressText)
+            {
+                progressDisplayText = new TextStatic("0:00");
+                this.addChild(progressDisplayText);
             }
 
             if (!mpSpectate)
@@ -706,10 +714,13 @@ package game
 
             songDelayStarted = false;
 
+            updateFieldVars();
+
+            if (progressDisplayText)
+                progressDisplayText.update(TimeUtil.convertToHMSS(Math.ceil(gameLastNoteFrame / 30)));
+
             if (postStart)
             {
-                updateFieldVars();
-
                 // Websocket
                 if (_gvars.air_useWebsockets)
                 {
@@ -809,6 +820,12 @@ package game
             {
                 GAME_STATE = GAME_END;
                 return;
+            }
+
+            // Timer Text
+            if (gameProgress % 30 == 0 && progressDisplayText != null)
+            {
+                progressDisplayText.update(TimeUtil.convertToHMSS(Math.ceil(Math.max(0, (gameLastNoteFrame - gameProgress)) / 30)));
             }
 
             var nextNote:Note = noteBox.nextNote;
@@ -1753,6 +1770,8 @@ package game
         private function interfaceSetup():void
         {
             defaultLayout = new Object();
+            defaultLayout[LAYOUT_PROGRESS_BAR] = {x: 161, y: 9};
+            defaultLayout[LAYOUT_PROGRESS_TEXT] = {x: 768, y: 5, properties: {alignment: "right"}};
             defaultLayout[LAYOUT_JUDGE] = {x: 392, y: 228};
             defaultLayout[LAYOUT_ACCURACY_BAR] = {x: (Main.GAME_WIDTH / 2), y: 328};
             defaultLayout[LAYOUT_HEALTH] = {x: Main.GAME_WIDTH - 37, y: 71.5};
@@ -1762,7 +1781,7 @@ package game
                 defaultLayout[LAYOUT_PA] = {x: 16, y: 418};
                 defaultLayout[LAYOUT_SCORE] = {x: 392, y: 24};
                 defaultLayout[LAYOUT_COMBO] = {x: 508, y: 388};
-                defaultLayout[LAYOUT_COMBO_TOTAL] = {x: 770, y: 420, properties: {alignment: Combo.ALIGN_RIGHT}};
+                defaultLayout[LAYOUT_COMBO_TOTAL] = {x: 770, y: 420, properties: {alignment: "right"}};
                 defaultLayout[LAYOUT_COMBO_STATIC] = {x: 512, y: 438};
                 defaultLayout[LAYOUT_COMBO_TOTAL_STATIC] = {x: 734, y: 414};
             }
@@ -1770,7 +1789,7 @@ package game
             {
                 defaultLayout[LAYOUT_PA] = {x: 6, y: 96};
                 defaultLayout[LAYOUT_SCORE] = {x: 392, y: 440};
-                defaultLayout[LAYOUT_COMBO] = {x: 222, y: 402, properties: {alignment: Combo.ALIGN_RIGHT}};
+                defaultLayout[LAYOUT_COMBO] = {x: 222, y: 402, properties: {alignment: "right"}};
                 defaultLayout[LAYOUT_COMBO_TOTAL] = {x: 544, y: 402};
                 defaultLayout[LAYOUT_COMBO_STATIC] = {x: 228, y: 436};
                 defaultLayout[LAYOUT_COMBO_TOTAL_STATIC] = {x: 502, y: 436};
@@ -1797,6 +1816,8 @@ package game
 
             noteBoxPositionDefault = interfaceLayout(LAYOUT_RECEPTORS);
 
+            interfacePosition(progressDisplay, interfaceLayout(LAYOUT_PROGRESS_BAR));
+            interfacePosition(progressDisplayText, interfaceLayout(LAYOUT_PROGRESS_TEXT));
             interfacePosition(noteBox, interfaceLayout(LAYOUT_RECEPTORS));
             interfacePosition(player1Judge, interfaceLayout(LAYOUT_JUDGE));
             interfacePosition(accBar, interfaceLayout(LAYOUT_ACCURACY_BAR));
@@ -1810,6 +1831,8 @@ package game
 
             if (options.isEditor)
             {
+                interfaceEditor(progressDisplay, interfaceLayout(LAYOUT_PROGRESS_BAR, false));
+                interfaceEditor(progressDisplayText, interfaceLayout(LAYOUT_PROGRESS_TEXT, false));
                 interfaceEditor(noteBox, interfaceLayout(LAYOUT_RECEPTORS, false));
                 interfaceEditor(player1Judge, interfaceLayout(LAYOUT_JUDGE, false));
                 interfaceEditor(accBar, interfaceLayout(LAYOUT_ACCURACY_BAR, false));

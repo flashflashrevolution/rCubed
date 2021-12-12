@@ -11,9 +11,6 @@ package game.controls
 
     public class Combo extends Sprite
     {
-        public static const ALIGN_LEFT:String = TextFieldAutoSize.LEFT;
-        public static const ALIGN_RIGHT:String = TextFieldAutoSize.RIGHT;
-
         private var options:GameOptions;
 
         private var colors:Vector.<Number>;

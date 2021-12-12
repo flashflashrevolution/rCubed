@@ -102,6 +102,7 @@ package classes
         public var DISPLAY_TOTAL:Boolean = true;
         public var DISPLAY_SCREENCUT:Boolean = false;
         public var DISPLAY_SONGPROGRESS:Boolean = true;
+        public var DISPLAY_SONGPROGRESS_TEXT:Boolean = false;
 
         public var DISPLAY_MP_MASK:Boolean = false;
         public var DISPLAY_MP_TIMESTAMP:Boolean = false;
@@ -566,6 +567,9 @@ package classes
             if (_settings.viewSongProgress != null)
                 this.DISPLAY_SONGPROGRESS = _settings.viewSongProgress;
 
+            if (_settings.viewSongProgressText != null)
+                this.DISPLAY_SONGPROGRESS_TEXT = _settings.viewSongProgressText;
+
             if (_settings.viewMPMask != null)
                 this.DISPLAY_MP_MASK = _settings.viewMPMask;
 
@@ -721,6 +725,7 @@ package classes
             gameSave.viewTotal = this.DISPLAY_TOTAL;
             gameSave.viewScreencut = this.DISPLAY_SCREENCUT;
             gameSave.viewSongProgress = this.DISPLAY_SONGPROGRESS;
+            gameSave.viewSongProgressText = this.DISPLAY_SONGPROGRESS_TEXT;
             gameSave.viewMPMask = this.DISPLAY_MP_MASK;
             gameSave.viewMPTimestamp = this.DISPLAY_MP_TIMESTAMP;
             gameSave.viewLegacySongs = this.DISPLAY_LEGACY_SONGS;

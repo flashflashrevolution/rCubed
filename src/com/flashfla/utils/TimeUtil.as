@@ -42,12 +42,29 @@ package com.flashfla.utils
         {
             if (isNaN(_seconds) || _seconds < 0)
                 return "Never";
+
             var s:Number = _seconds % 60;
             var m:Number = Math.floor((_seconds % 3600) / 60);
-            var h:Number = Math.floor(_seconds / (60 * 60));
+            var h:Number = Math.floor(_seconds / 3600);
 
             var hourStr:String = (h == 0) ? "" : doubleDigitFormat(h) + ":";
             var minuteStr:String = doubleDigitFormat(m) + ":";
+            var secondsStr:String = doubleDigitFormat(s);
+
+            return hourStr + minuteStr + secondsStr;
+        }
+
+        public static function convertToHMSS(_seconds:Number):String
+        {
+            if (isNaN(_seconds) || _seconds < 0)
+                return "0:00";
+
+            var s:Number = _seconds % 60;
+            var m:Number = Math.floor((_seconds % 3600) / 60);
+            var h:Number = Math.floor(_seconds / 3600);
+
+            var hourStr:String = (h == 0 ? ("") : (doubleDigitFormat(h) + ":"));
+            var minuteStr:String = (h == 0 ? m.toString() : doubleDigitFormat(m)) + ":";
             var secondsStr:String = doubleDigitFormat(s);
 
             return hourStr + minuteStr + secondsStr;
@@ -59,7 +76,7 @@ package com.flashfla.utils
             {
                 return ("0" + _num);
             }
-            return String(_num);
+            return _num.toString();
         }
     }
 }

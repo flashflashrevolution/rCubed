@@ -44,6 +44,7 @@ package game
         public var displayPerfect:Boolean = true;
         public var displayScreencut:Boolean = false;
         public var displaySongProgress:Boolean = true;
+        public var displaySongProgressText:Boolean = false;
 
         public var displayMP:Boolean = true;
         public var displayMPJudge:Boolean = true;
@@ -122,6 +123,7 @@ package game
             displayPerfect = user.DISPLAY_PERFECT;
             displayScreencut = user.DISPLAY_SCREENCUT;
             displaySongProgress = user.DISPLAY_SONGPROGRESS;
+            displaySongProgressText = user.DISPLAY_SONGPROGRESS_TEXT;
             displayMP = !user.DISPLAY_MP_MASK;
 
             judgeColours = user.judgeColours.concat();
@@ -203,6 +205,7 @@ package game
             displayPerfect = settings["viewPerfect"];
             displayScreencut = settings["viewScreencut"];
             displaySongProgress = settings["viewSongProgress"];
+            displaySongProgressText = settings["viewSongProgressText"];
 
             if (settings["viewScore"] != null)
                 displayScore = settings["viewScore"];
@@ -271,6 +274,9 @@ package game
             settings["viewPerfect"] = displayPerfect;
             settings["viewScreencut"] = displayScreencut;
             settings["viewSongProgress"] = displaySongProgress;
+            settings["viewSongProgressText"] = displaySongProgressText;
+            settings["viewGameTopBar"] = displayGameTopBar;
+            settings["viewGameBottomBar"] = displayGameBottomBar;
             settings["speed"] = scrollSpeed;
             settings["judgeSpeed"] = judgeSpeed;
             settings["receptorAnimationSpeed"] = receptorAnimationSpeed;
@@ -290,8 +296,6 @@ package game
                 settings["isolationLength"] = isolationLength;
             }
 
-            settings["viewGameTopBar"] = displayGameTopBar;
-            settings["viewGameBottomBar"] = displayGameBottomBar;
             settings["noteSwapColours"] = [];
             for (i = 0; i < noteColors.length; i++)
             {

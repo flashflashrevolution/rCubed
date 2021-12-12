@@ -18,6 +18,7 @@ package popups.settings
             "JUDGE",
             "HEALTH",
             "SONGPROGRESS",
+            "SONGPROGRESS_TEXT",
             "SCORE",
             "COMBO",
             "TOTAL",
