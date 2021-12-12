@@ -39,17 +39,6 @@ package game.controls
             this.options = options;
             updateJudge();
 
-            this.graphics.lineStyle(1, 0xFFFFFF, 0.13);
-            this.graphics.beginFill(0xFFFFFF, 0.02);
-            this.graphics.drawRect(-(_width / 2), -(_height / 2), _width, _height);
-            this.graphics.endFill();
-
-            this.graphics.lineStyle(1, 0xFFFFFF, 0.35);
-            this.graphics.moveTo(0, -(_height / 2) - 8);
-            this.graphics.lineTo(0, (_height / 2) + 8);
-
-            drawJudgeRegions();
-
             // Parse Colors
             _colors = [];
             _colors[100] = options.judgeColours[0];
@@ -57,16 +46,11 @@ package game.controls
             _colors[25] = options.judgeColours[2];
             _colors[5] = options.judgeColours[3];
 
-            // Setup Bitmap for Display, and ColorTransform for Fade
+            // Setup ColorTransform for Fade
             _renderTarget = new Shape();
-            _displayBMD = new BitmapData(_width, _height, true, 0)
-            _displayBM = new Bitmap(_displayBMD);
-            _alphaArea = new Rectangle(0, 0, _displayBMD.width, _displayBMD.height);
+            _alphaArea = new Rectangle(0, 0, _width, _height);
 
-            _displayBM.x = -(_width / 2);
-            _displayBM.y = -(_height / 2);
-
-            addChild(_displayBM);
+            draw();
         }
 
         public function onScoreSignal(_score:int, _judgeMS:int):void
@@ -112,6 +96,34 @@ package game.controls
             bound_range = bound_upper - bound_lower;
         }
 
+        public function draw():void
+        {
+            this.graphics.clear();
+
+            this.graphics.lineStyle(1, 0xFFFFFF, 0.13);
+            this.graphics.beginFill(0xFFFFFF, 0.02);
+            this.graphics.drawRect(-(_width / 2), -(_height / 2), _width, _height);
+            this.graphics.endFill();
+
+            this.graphics.lineStyle(1, 0xFFFFFF, 0.35);
+            this.graphics.moveTo(0, -(_height / 2) - 8);
+            this.graphics.lineTo(0, (_height / 2) + 8);
+
+            drawJudgeRegions();
+
+            // Setup Bitmap for Display
+            if (_displayBM != null)
+                removeChild(_displayBM);
+
+            _displayBMD = new BitmapData(_width, _height, true, 0)
+            _displayBM = new Bitmap(_displayBMD);
+
+            _displayBM.x = -(_width / 2);
+            _displayBM.y = -(_height / 2);
+
+            addChild(_displayBM);
+        }
+
         public function drawJudgeRegions():void
         {
             // Get Judge Window
@@ -127,6 +139,20 @@ package game.controls
                 this.graphics.moveTo(-(_width / 2) + dX, -(_height / 2) + 1);
                 this.graphics.lineTo(-(_width / 2) + dX, (_height / 2) - 1);
             }
+        }
+
+        override public function set width(val:Number):void
+        {
+            _width = val;
+            _alphaArea.width = _width;
+            draw();
+        }
+
+        override public function set height(val:Number):void
+        {
+            _height = val;
+            _alphaArea.height = _height;
+            draw();
         }
     }
 
