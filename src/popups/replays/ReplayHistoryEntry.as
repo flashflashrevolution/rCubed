@@ -141,6 +141,11 @@ package popups.replays
             fields[4].text = item.miss.toString();
             fields[5].text = item.boo.toString();
             fields[6].text = item.maxcombo.toString();
+
+            fields[2].alpha = item.good > 0 ? 1 : 0.3;
+            fields[3].alpha = item.average > 0 ? 1 : 0.3;
+            fields[4].alpha = item.miss > 0 ? 1 : 0.3;
+            fields[5].alpha = item.boo > 0 ? 1 : 0.3;
         }
 
         public function clear():void
