@@ -237,9 +237,15 @@ package game
                 if (perSongOptions.set_mirror_invert)
                 {
                     if (options.modEnabled("mirror"))
+                    {
+                        options.mods.removeAt(options.mods.indexOf("mirror"));
                         delete options.modCache["mirror"];
+                    }
                     else
+                    {
+                        options.mods.push("mirror");
                         options.modCache["mirror"] = true;
+                    }
                 }
             }
             // --- End Per Song Settings
