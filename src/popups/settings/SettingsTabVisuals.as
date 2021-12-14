@@ -25,12 +25,13 @@ package popups.settings
             "PACOUNT",
             "ACCURACY_BAR",
             "SCREENCUT",
-            "MP_MASK",
             "----",
             "AMAZING",
             "PERFECT",
             "RECEPTOR_ANIMATIONS",
-            "JUDGE_ANIMATIONS"]; // MP_MASK is Hide not Show. This sucks.
+            "JUDGE_ANIMATIONS"];
+
+        private var gameMPUIArray:Array = ["MP_UI", "MP_PA", "MP_JUDGE", "MP_COMBO"];
 
         private var gameOtherArray:Array = ["SONG_FLAG",
             "SONG_NOTE"];
@@ -64,14 +65,14 @@ package popups.settings
             //- Display
             optionDisplays = [];
 
-            new Text(container, xOff, yOff, _lang.string("options_display"), 14);
+            new Text(container, xOff, yOff, _lang.string("options_gameplay_display"), 14);
             yOff += 25;
 
             for (i = 0; i < gameUIArray.length; i++)
             {
                 if (gameUIArray[i] == "----")
                 {
-                    yOff += drawSeperator(container, xOff, 200, yOff, 2, 3);
+                    yOff += drawSeperator(container, xOff, 250, yOff, 0, 1);
                     continue;
                 }
 
@@ -80,7 +81,7 @@ package popups.settings
                 var gameDisplayCheck:BoxCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
                 gameDisplayCheck.display = gameUIArray[i];
                 optionDisplays.push(gameDisplayCheck);
-                yOff += 20;
+                yOff += 19;
 
                 yOff = drawSpecial(xOff, yOff, container, gameUIArray[i]);
             }
@@ -89,14 +90,37 @@ package popups.settings
             xOff = 310;
             yOff = 15;
 
-            new Text(container, xOff, yOff, _lang.string("options_display"), 14);
+            new Text(container, xOff, yOff, _lang.string("options_gameplay_mp_display"), 14);
+            yOff += 25;
+
+            for (i = 0; i < gameMPUIArray.length; i++)
+            {
+                if (gameMPUIArray[i] == "----")
+                {
+                    yOff += drawSeperator(container, xOff, 250, yOff, 0, 1);
+                    continue;
+                }
+
+                new Text(container, xOff + 23, yOff, _lang.string("options_" + gameMPUIArray[i].toLowerCase()));
+
+                var gameMPDisplayCheck:BoxCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
+                gameMPDisplayCheck.display = gameMPUIArray[i];
+                optionDisplays.push(gameMPDisplayCheck);
+                yOff += 19;
+
+                yOff = drawSpecial(xOff, yOff, container, gameMPUIArray[i]);
+            }
+
+            yOff += drawSeperator(container, xOff, 250, yOff, 6, 5);
+
+            new Text(container, xOff, yOff, _lang.string("options_playlist_display"), 14);
             yOff += 25;
 
             for (i = 0; i < gameOtherArray.length; i++)
             {
                 if (gameOtherArray[i] == "----")
                 {
-                    yOff += drawSeperator(container, xOff, 200, yOff, 2, 3);
+                    yOff += drawSeperator(container, xOff, 250, yOff, 0, 1);
                     continue;
                 }
 
@@ -105,8 +129,9 @@ package popups.settings
                 var optionModCheck:BoxCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
                 optionModCheck.display = gameOtherArray[i];
                 optionDisplays.push(optionModCheck);
-                yOff += 20;
+                yOff += 19;
             }
+            yOff += 30;
         }
 
         private function drawSpecial(xOff:int, yOff:int, container:ScrollPaneContent, key:String):int

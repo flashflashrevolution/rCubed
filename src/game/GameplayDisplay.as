@@ -105,9 +105,7 @@ package game
         private var progressDisplay:ProgressBar;
         private var progressDisplayText:TextStatic;
         private var noteBox:NoteBox;
-        private var paWindow:PAWindow;
         private var score:Score;
-        private var combo:Combo;
         private var comboTotal:Combo;
         private var comboStatic:TextStatic;
         private var comboTotalStatic:TextStatic;
@@ -117,6 +115,8 @@ package game
         private var exitEditor:BoxButton;
         private var resetEditor:BoxButton;
 
+        private var player1PAWindow:PAWindow;
+        private var player1Combo:Combo;
         private var player1Life:LifeBar;
         private var player1Judge:Judge;
         private var player1JudgeOffset:int;
@@ -247,12 +247,6 @@ package game
             return true;
         }
 
-        // protected function initStage3D(e:Event):void
-        // {
-        //     // //var context3D:Context3D = stage.stage3Ds[0].context3D;
-        //     //context3D.createProgram()		
-        // }
-
         override public function stageAdd():void
         {
             if (_gvars.menuMusic)
@@ -261,15 +255,11 @@ package game
             if (MenuSongSelection.previewMusic)
                 MenuSongSelection.previewMusic.stop();
 
-            // var stage3D:Stage3D = stage.stage3Ds[0];
-            // stage.stage3Ds[0].addEventListener(Event.CONTEXT3D_CREATE, initStage3D);
-            // stage.stage3Ds[0].requestContext3D(Context3DRenderMode.AUTO, Context3DProfile.ENHANCED);
-
             // Create Background
             initBackground();
-            initPlayerVars();
 
             // Init Core
+            initPlayerVars();
             initCore();
 
             // Prebuild Websocket Message, this is updated instead of creating a new object every message.
@@ -522,10 +512,10 @@ package game
 
             if (options.displayPA)
             {
-                paWindow = new PAWindow(options);
+                player1PAWindow = new PAWindow(options);
                 if (sideScroll)
-                    paWindow.alternateLayout();
-                this.addChild(paWindow);
+                    player1PAWindow.alternateLayout();
+                this.addChild(player1PAWindow);
             }
 
             if (options.displayScore)
@@ -536,10 +526,10 @@ package game
 
             if (options.displayCombo)
             {
-                combo = new Combo(options);
+                player1Combo = new Combo(options);
                 if (!sideScroll)
-                    combo.alignment = "right";
-                this.addChild(combo);
+                    player1Combo.alignment = "right";
+                this.addChild(player1Combo);
 
                 comboStatic = new TextStatic(_lang.string("game_combo"));
                 this.addChild(comboStatic);
@@ -1507,8 +1497,8 @@ package game
             // Remove Notes
             noteBox.reset();
 
-            if (paWindow)
-                paWindow.reset();
+            if (player1PAWindow)
+                player1PAWindow.reset();
 
             if (accBar)
                 accBar.onResetSignal();
@@ -1580,7 +1570,7 @@ package game
 
         private function buildScreenCut():void
         {
-            if (!options.displayScreencut && !options.isEditor)
+            if (!options.displayScreencut)
                 return;
 
             if (screenCut)
@@ -1681,6 +1671,7 @@ package game
         {
             if (!options.displayJudge)
                 return;
+
             player1Judge = new Judge(options);
             addChild(player1Judge);
             if (options.isEditor)
@@ -1691,6 +1682,7 @@ package game
         {
             if (!options.displayHealth)
                 return;
+
             player1Life = new LifeBar();
             player1Life.x = Main.GAME_WIDTH - 37;
             player1Life.y = 71.5;
@@ -1699,18 +1691,26 @@ package game
 
         private function buildMultiplayer():void
         {
-            mpJudge = new Array();
-            mpPA = new Array();
-            mpCombo = new Array();
-            mpHeader = new Array();
+            mpJudge = [];
+            mpPA = [];
+            mpCombo = [];
+            mpHeader = [];
 
-            if (!options.displayMP && !mpSpectate)
+            if (!options.displayMPUI && !mpSpectate)
                 return;
 
             for each (var user:User in options.mpRoom.players)
             {
                 if (user.id == options.mpRoom.connection.currentUser.id)
+                {
+                    if (player1PAWindow)
+                        mpPA[user.playerIdx] = player1PAWindow;
+                    if (player1Combo)
+                        mpCombo[user.playerIdx] = player1Combo;
+                    if (player1Judge)
+                        mpJudge[user.playerIdx] = player1Judge;
                     continue;
+                }
 
                 if (options.displayMPPA)
                 {
@@ -1736,10 +1736,8 @@ package game
                     mpCombo[user.playerIdx] = combo;
                 }
 
-                // Hide opponent's judge
-                if (mpSpectate)
+                if (options.displayMPJudge)
                 {
-                    //if (options.displayMPJudge) {
                     var judge:Judge = new Judge(options);
                     addChild(judge);
                     mpJudge[user.playerIdx] = judge;
@@ -1795,78 +1793,87 @@ package game
                 defaultLayout[LAYOUT_COMBO_TOTAL_STATIC] = {x: 502, y: 436};
             }
 
-            if (mpSpectate)
-            {
-                defaultLayout[LAYOUT_MP_COMBO + "1"] = defaultLayout[LAYOUT_COMBO];
-                defaultLayout[LAYOUT_MP_JUDGE + "1"] = {x: 208, y: 102};
-                defaultLayout[LAYOUT_MP_PA + "1"] = {x: 6, y: 190};
-                if (options.displayMPPA)
-                    defaultLayout[LAYOUT_MP_HEADER + "1"] = {x: 0, y: -35};
-                else
-                    defaultLayout[LAYOUT_MP_HEADER + "1"] = {x: 6, y: 190};
-            }
+            // Multiplayer
+            defaultLayout[LAYOUT_MP_COMBO + "1"] = defaultLayout[LAYOUT_COMBO];
+            defaultLayout[LAYOUT_MP_JUDGE + "1"] = {x: 208, y: 102};
+            defaultLayout[LAYOUT_MP_PA + "1"] = {x: 6, y: 96};
+            if (options.displayMPPA)
+                defaultLayout[LAYOUT_MP_HEADER + "1"] = {x: 0, y: -35};
+            else
+                defaultLayout[LAYOUT_MP_HEADER + "1"] = {x: 6, y: 190};
 
             defaultLayout[LAYOUT_MP_COMBO + "2"] = defaultLayout[LAYOUT_COMBO_TOTAL];
             defaultLayout[LAYOUT_MP_JUDGE + "2"] = {x: 568, y: 102};
-            defaultLayout[LAYOUT_MP_PA + "2"] = {x: 645, y: (mpSpectate ? 190 : 96)};
+            defaultLayout[LAYOUT_MP_PA + "2"] = {x: 645, y: 96, properties: {alignment: "right"}};
             if (options.displayMPPA)
                 defaultLayout[LAYOUT_MP_HEADER + "2"] = {x: 25, y: -35, properties: {alignment: MPHeader.ALIGN_RIGHT}};
             else
                 defaultLayout[LAYOUT_MP_HEADER + "2"] = {x: 690, y: 190, properties: {alignment: MPHeader.ALIGN_RIGHT}};
 
+            if (mpSpectate)
+            {
+                defaultLayout[LAYOUT_MP_PA + "1"]["y"] += 84;
+                defaultLayout[LAYOUT_MP_PA + "2"]["y"] += 84;
+            }
+
             noteBoxPositionDefault = interfaceLayout(LAYOUT_RECEPTORS);
 
+            // Position
             interfacePosition(progressDisplay, interfaceLayout(LAYOUT_PROGRESS_BAR));
             interfacePosition(progressDisplayText, interfaceLayout(LAYOUT_PROGRESS_TEXT));
             interfacePosition(noteBox, interfaceLayout(LAYOUT_RECEPTORS));
-            interfacePosition(player1Judge, interfaceLayout(LAYOUT_JUDGE));
             interfacePosition(accBar, interfaceLayout(LAYOUT_ACCURACY_BAR));
             interfacePosition(player1Life, interfaceLayout(LAYOUT_HEALTH));
             interfacePosition(score, interfaceLayout(LAYOUT_SCORE));
-            interfacePosition(combo, interfaceLayout(LAYOUT_COMBO));
             interfacePosition(comboTotal, interfaceLayout(LAYOUT_COMBO_TOTAL));
-            interfacePosition(paWindow, interfaceLayout(LAYOUT_PA));
             interfacePosition(comboStatic, interfaceLayout(LAYOUT_COMBO_STATIC));
             interfacePosition(comboTotalStatic, interfaceLayout(LAYOUT_COMBO_TOTAL_STATIC));
 
+            if (!options.mpRoom)
+            {
+                interfacePosition(player1PAWindow, interfaceLayout(LAYOUT_PA));
+                interfacePosition(player1Combo, interfaceLayout(LAYOUT_COMBO));
+                interfacePosition(player1Judge, interfaceLayout(LAYOUT_JUDGE));
+            }
+
+            // Editor Mode
             if (options.isEditor)
             {
                 interfaceEditor(progressDisplay, interfaceLayout(LAYOUT_PROGRESS_BAR, false));
                 interfaceEditor(progressDisplayText, interfaceLayout(LAYOUT_PROGRESS_TEXT, false));
                 interfaceEditor(noteBox, interfaceLayout(LAYOUT_RECEPTORS, false));
-                interfaceEditor(player1Judge, interfaceLayout(LAYOUT_JUDGE, false));
                 interfaceEditor(accBar, interfaceLayout(LAYOUT_ACCURACY_BAR, false));
                 interfaceEditor(player1Life, interfaceLayout(LAYOUT_HEALTH, false));
                 interfaceEditor(score, interfaceLayout(LAYOUT_SCORE, false));
-                interfaceEditor(combo, interfaceLayout(LAYOUT_COMBO, false));
                 interfaceEditor(comboTotal, interfaceLayout(LAYOUT_COMBO_TOTAL, false));
-                interfaceEditor(paWindow, interfaceLayout(LAYOUT_PA, false));
                 interfaceEditor(comboStatic, interfaceLayout(LAYOUT_COMBO_STATIC, false));
                 interfaceEditor(comboTotalStatic, interfaceLayout(LAYOUT_COMBO_TOTAL_STATIC, false));
+
+                if (!options.mpRoom)
+                {
+                    interfaceEditor(player1PAWindow, interfaceLayout(LAYOUT_PA, false));
+                    interfaceEditor(player1Combo, interfaceLayout(LAYOUT_COMBO, false));
+                    interfaceEditor(player1Judge, interfaceLayout(LAYOUT_JUDGE, false));
+                }
             }
 
+            // Multiplayer
             if (options.mpRoom)
             {
-                var index:int = 0;
-                for (var id:int = 1; id < options.mpRoom.playerCount + 1; id++)
+                for each (var user:User in options.mpRoom.players)
                 {
-                    if (id == options.mpRoom.connection.currentUser.id)
-                        continue;
+                    interfacePosition(mpJudge[user.playerIdx], interfaceLayout(LAYOUT_MP_JUDGE + user.playerIdx));
+                    interfacePosition(mpCombo[user.playerIdx], interfaceLayout(LAYOUT_MP_COMBO + user.playerIdx));
+                    interfacePosition(mpPA[user.playerIdx], interfaceLayout(LAYOUT_MP_PA + user.playerIdx));
+                    interfacePosition(mpHeader[user.playerIdx], interfaceLayout(LAYOUT_MP_HEADER + user.playerIdx));
 
-                    index++;
-                    var indexs:String = index.toString();
-
-                    interfacePosition(mpJudge[index], interfaceLayout(LAYOUT_MP_JUDGE + indexs));
-                    interfacePosition(mpCombo[index], interfaceLayout(LAYOUT_MP_COMBO + indexs));
-                    interfacePosition(mpPA[index], interfaceLayout(LAYOUT_MP_PA + indexs));
-                    interfacePosition(mpHeader[index], interfaceLayout(LAYOUT_MP_HEADER + indexs));
-
+                    // Multiplayer - Editor
                     if (options.isEditor)
                     {
-                        interfaceEditor(mpJudge[index], interfaceLayout(LAYOUT_MP_JUDGE + indexs, false));
-                        interfaceEditor(mpCombo[index], interfaceLayout(LAYOUT_MP_COMBO + indexs, false));
-                        interfaceEditor(mpPA[index], interfaceLayout(LAYOUT_MP_PA + indexs, false));
-                        interfaceEditor(mpHeader[index], interfaceLayout(LAYOUT_MP_HEADER + indexs, false));
+                        interfaceEditor(mpJudge[user.playerIdx], interfaceLayout(LAYOUT_MP_JUDGE + user.playerIdx, false));
+                        interfaceEditor(mpCombo[user.playerIdx], interfaceLayout(LAYOUT_MP_COMBO + user.playerIdx, false));
+                        interfaceEditor(mpPA[user.playerIdx], interfaceLayout(LAYOUT_MP_PA + user.playerIdx, false));
+                        interfaceEditor(mpHeader[user.playerIdx], interfaceLayout(LAYOUT_MP_HEADER + user.playerIdx, false));
                     }
                 }
             }
@@ -2254,14 +2261,14 @@ package game
         {
             //gameplayUI.sDisplay_score.text = gameScore.toString();
 
-            if (paWindow)
-                paWindow.update(hitAmazing, hitPerfect, hitGood, hitAverage, hitMiss, hitBoo);
+            if (player1PAWindow)
+                player1PAWindow.update(hitAmazing, hitPerfect, hitGood, hitAverage, hitMiss, hitBoo);
 
             if (score)
                 score.update(gameScore);
 
-            if (combo)
-                combo.update(hitCombo, hitAmazing, hitPerfect, hitGood, hitAverage, hitMiss, hitBoo, gameRawGoods);
+            if (player1Combo)
+                player1Combo.update(hitCombo, hitAmazing, hitPerfect, hitGood, hitAverage, hitMiss, hitBoo, gameRawGoods);
         }
 
         private var previousDiffs:Array = new Array();

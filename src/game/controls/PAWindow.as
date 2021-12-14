@@ -33,6 +33,7 @@ package game.controls
                 {colour: options.judgeColours[3], title: _lang.stringSimple("game_average")},
                 {colour: options.judgeColours[4], title: _lang.stringSimple("game_miss")},
                 {colour: options.judgeColours[5], title: _lang.stringSimple("game_boo")}];
+
             if (!options.displayAmazing)
             {
                 labelDesc.splice(0, 1);
@@ -50,7 +51,7 @@ package game.controls
                 field.y = ypos;
                 field.x = 50;
                 field.width = 10;
-                field.text = label.title + ":";
+                field.text = label.title;
                 addChild(field);
                 labels.push(field);
 
@@ -123,6 +124,33 @@ package game.controls
                     xpos = 50;
                     ypos += 38;
                 }
+            }
+        }
+
+        public function set alignment(val:String):void
+        {
+            if (val == "right")
+            {
+                for (var i:int = 0; i < labels.length; i++)
+                {
+                    var label:TextField = labels[i];
+                    var score:TextField = scores[i];
+
+                    score.text = "0";
+
+                    label.autoSize = TextFieldAutoSize.LEFT;
+                    label.x = 65;
+                    score.autoSize = TextFieldAutoSize.RIGHT;
+                    score.x = 40;
+                }
+            }
+        }
+
+        public function set show_labels(val:Boolean):void
+        {
+            for (var i:int = 0; i < labels.length; i++)
+            {
+                labels[i].visible = val;
             }
         }
     }

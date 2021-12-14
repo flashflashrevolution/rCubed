@@ -46,7 +46,7 @@ package game
         public var displaySongProgress:Boolean = true;
         public var displaySongProgressText:Boolean = false;
 
-        public var displayMP:Boolean = true;
+        public var displayMPUI:Boolean = true;
         public var displayMPJudge:Boolean = true;
         public var displayMPPA:Boolean = true;
         public var displayMPCombo:Boolean = true;
@@ -124,7 +124,11 @@ package game
             displayScreencut = user.DISPLAY_SCREENCUT;
             displaySongProgress = user.DISPLAY_SONGPROGRESS;
             displaySongProgressText = user.DISPLAY_SONGPROGRESS_TEXT;
-            displayMP = !user.DISPLAY_MP_MASK;
+
+            displayMPUI = user.DISPLAY_MP_UI;
+            displayMPPA = user.DISPLAY_MP_PA;
+            displayMPJudge = user.DISPLAY_MP_JUDGE;
+            displayMPCombo = user.DISPLAY_MP_COMBO;
 
             judgeColours = user.judgeColours.concat();
             comboColours = user.comboColours.concat();

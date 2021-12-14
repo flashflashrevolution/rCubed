@@ -104,7 +104,11 @@ package classes
         public var DISPLAY_SONGPROGRESS:Boolean = true;
         public var DISPLAY_SONGPROGRESS_TEXT:Boolean = false;
 
-        public var DISPLAY_MP_MASK:Boolean = false;
+        public var DISPLAY_MP_UI:Boolean = true;
+        public var DISPLAY_MP_PA:Boolean = true;
+        public var DISPLAY_MP_JUDGE:Boolean = true;
+        public var DISPLAY_MP_COMBO:Boolean = true;
+
         public var DISPLAY_MP_TIMESTAMP:Boolean = false;
         public var judgeColours:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
         public var comboColours:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000, 0xDC00C2]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag, RawGood
@@ -570,8 +574,17 @@ package classes
             if (_settings.viewSongProgressText != null)
                 this.DISPLAY_SONGPROGRESS_TEXT = _settings.viewSongProgressText;
 
-            if (_settings.viewMPMask != null)
-                this.DISPLAY_MP_MASK = _settings.viewMPMask;
+            if (_settings.viewMPUI != null)
+                this.DISPLAY_MP_UI = _settings.viewMPUI;
+
+            if (_settings.viewMPUI != null)
+                this.DISPLAY_MP_PA = _settings.viewMPPA;
+
+            if (_settings.viewMPUI != null)
+                this.DISPLAY_MP_COMBO = _settings.viewMPCombo;
+
+            if (_settings.viewMPUI != null)
+                this.DISPLAY_MP_JUDGE = _settings.viewMPJudge;
 
             if (_settings.viewMPTimestamp != null)
                 this.DISPLAY_MP_TIMESTAMP = _settings.viewMPTimestamp;
@@ -726,7 +739,10 @@ package classes
             gameSave.viewScreencut = this.DISPLAY_SCREENCUT;
             gameSave.viewSongProgress = this.DISPLAY_SONGPROGRESS;
             gameSave.viewSongProgressText = this.DISPLAY_SONGPROGRESS_TEXT;
-            gameSave.viewMPMask = this.DISPLAY_MP_MASK;
+            gameSave.viewMPUI = this.DISPLAY_MP_UI;
+            gameSave.viewMPPA = this.DISPLAY_MP_PA;
+            gameSave.viewMPJudge = this.DISPLAY_MP_JUDGE;
+            gameSave.viewMPCombo = this.DISPLAY_MP_COMBO;
             gameSave.viewMPTimestamp = this.DISPLAY_MP_TIMESTAMP;
             gameSave.viewLegacySongs = this.DISPLAY_LEGACY_SONGS;
 
