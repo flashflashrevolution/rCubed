@@ -48,5 +48,27 @@ package classes
         {
 
         }
+
+        public function compareTo(s2:SongInfo):Boolean
+        {
+            return compare(this, s2);
+        }
+
+        public static function compare(s1:SongInfo, s2:SongInfo):Boolean
+        {
+            if (!s1 || !s2)
+                return false;
+
+            if (s1.engine && s2.engine && s1.engine.id != s2.engine.id)
+                return false;
+
+            if (s1.level > 0 && s2.level > 0 && s1.level != s2.level)
+                return false;
+
+            if (s1.levelId && s2.levelId && s1.levelId != s2.levelId)
+                return false;
+
+            return true;
+        }
     }
 }

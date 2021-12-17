@@ -238,7 +238,7 @@ package classes
 
             for each (var player:User in _players)
             {
-                if (player.gameplay.songInfo != songP1)
+                if (!SongInfo.compare(player.gameplay.songInfo, songP1))
                     return false;
             }
 

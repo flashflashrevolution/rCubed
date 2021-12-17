@@ -23,7 +23,7 @@ package arc.mp
     public class MultiplayerRoom extends Window
     {
         public var _lang:Language = Language.instance;
-        
+
         private var controlChat:MultiplayerChat;
         private var controlUsers:MultiplayerUsers;
         private var controlSpectate:PushButton;
@@ -142,12 +142,16 @@ package arc.mp
 
         private function onStateButtonClick(event:MouseEvent):void
         {
-            if(room.isPlayer(currentUser))
+            if (room.isPlayer(currentUser))
             {
-                if(currentUser.gameplay.status == Multiplayer.STATUS_LOADED)
+                if (currentUser.gameplay.status == Multiplayer.STATUS_LOADED)
                 {
                     currentUser.gameplay.status = Multiplayer.STATUS_READY;
                     connection.sendCurrentUserStatus(room);
+                }
+                else if (currentUser.gameplay.status == Multiplayer.STATUS_READY)
+                {
+
                 }
                 else
                 {
@@ -158,7 +162,7 @@ package arc.mp
             {
                 currentUser.wantsToWatch = !currentUser.wantsToWatch;
                 Alert.add(currentUser.wantsToWatch ? "Now spectating games in " + room.name : "No longer spectating games in " + room.name);
-                if(currentUser.wantsToWatch && room.isAllPlayersInStatus(Multiplayer.STATUS_PLAYING) && room.isAllPlayersSameSong())
+                if (currentUser.wantsToWatch && room.isAllPlayersInStatus(Multiplayer.STATUS_PLAYING) && room.isAllPlayersSameSong())
                 {
                     room.songInfo = room.getPlayersSong()
                     connection.lastRoomGamePlayerCount = room.playerCount;
