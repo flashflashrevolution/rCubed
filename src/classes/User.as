@@ -577,13 +577,13 @@ package classes
             if (_settings.viewMPUI != null)
                 this.DISPLAY_MP_UI = _settings.viewMPUI;
 
-            if (_settings.viewMPUI != null)
+            if (_settings.viewMPPA != null)
                 this.DISPLAY_MP_PA = _settings.viewMPPA;
 
-            if (_settings.viewMPUI != null)
+            if (_settings.viewMPCombo != null)
                 this.DISPLAY_MP_COMBO = _settings.viewMPCombo;
 
-            if (_settings.viewMPUI != null)
+            if (_settings.viewMPJudge != null)
                 this.DISPLAY_MP_JUDGE = _settings.viewMPJudge;
 
             if (_settings.viewMPTimestamp != null)
