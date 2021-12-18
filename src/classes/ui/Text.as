@@ -130,8 +130,11 @@ package classes.ui
 
         public function set fontSize(value:int):void
         {
-            _fontSize = value;
-            draw();
+            if (_fontSize != value)
+            {
+                _fontSize = value;
+                draw();
+            }
         }
 
         private function html():String

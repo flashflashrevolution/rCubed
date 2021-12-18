@@ -473,6 +473,8 @@ package
             "<font color=\"#f2a254\">SDG</font>", "<font color=\"#2C2C2C\">BLACKFLAG</font>",
             "<font color=\"#473218\">BOOFLAG</font>", "<font color=\"#FFFF38\">AAA</font>", "<font color=\"#00FF00\">FC*</font>"];
 
+        public static const SONG_ICON_COLOR:Array = ["#9C9C9C", "#FFFFFF", "#00FF00", "#f2a254", "#2C2C2C", "#473218", "#FFFF38", "#00FF00"];
+
         public static const SONG_ICON_TEXT_FLAG:Array = ["Unplayed", "Played", "Full Combo",
             "Single Digit Good", "Blackflag", "Booflag", "AAA", "Full Combo*"];
 

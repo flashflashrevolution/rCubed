@@ -76,6 +76,8 @@ package menu
         private var _mp:MultiplayerSingleton = MultiplayerSingleton.getInstance();
 
         private var genreDisplay:Sprite;
+        private var genreItems:Vector.<Text> = new <Text>[];
+        private var genreListFlags:Array = [];
 
         private var GENRE_MODE_TEXT:Text;
         private var genre_mode_prev:iconLeft;
@@ -88,7 +90,7 @@ package menu
         private var pane_filter_text:Text;
 
         private var genreLength:int;
-        private var songItems:Vector.<SongItem>;
+        private var songItems:Vector.<SongItem> = new <SongItem>[];
 
         private var optionsBox:Sprite;
         private var infoBox:Sprite;
@@ -155,6 +157,7 @@ package menu
         {
             var i:uint = 0;
 
+            genreItems = null;
             songItems = null;
 
             if (genreDisplay)
@@ -358,11 +361,94 @@ package menu
         //******************************************************************************************//
 
         /**
+         * Builds the array for flag colors if applicable.
+         */
+        public function buildGenreListFlags():void
+        {
+            if (!_gvars.activeUser.DISPLAY_GENRE_FLAG)
+                return;
+
+            genreListFlags = [];
+
+            var i:int;
+
+            //- Build Genre List
+            var totalGenres:int = getTotalGenres();
+
+            var genre_index:int;
+            for (genre_index = -1; genre_index < totalGenres; ++genre_index)
+            {
+
+                if (genre_index == PLAYLIST_ALL)
+                {
+                    songList = [];
+
+                    var len:int = _playlist.indexList.length;
+                    for (i = 0; i < len; i++)
+                        songList[i] = _playlist.indexList[i];
+                }
+                else
+                {
+                    // We already know the flag.
+                    if (GENRE_MODE == GENRE_SONGFLAGS)
+                    {
+                        genreListFlags[genre_index] = (genre_index >= 2 ? GlobalVariables.SONG_ICON_COLOR[genre_index] : null);
+                    }
+                    else if (GENRE_MODE == GENRE_DIFFICULTIES)
+                    {
+                        // Difficulty Filter
+                        if (genre_index == _gvars.DIFFICULTY_RANGES.length - 1)
+                        {
+                            songList = getFilteredSongInfoArrayFromVec(_playlist.indexList, function(item:SongInfo, index:int, vec:Vector.<SongInfo>):Boolean
+                            {
+                                return item.difficulty <= 0 || item.difficulty >= _gvars.DIFFICULTY_RANGES[genre_index][0];
+                            });
+                        }
+                        else
+                        {
+                            songList = getFilteredSongInfoArrayFromVec(_playlist.indexList, function(item:SongInfo, index:int, vec:Vector.<SongInfo>):Boolean
+                            {
+                                return item.difficulty >= _gvars.DIFFICULTY_RANGES[genre_index][0] && item.difficulty <= _gvars.DIFFICULTY_RANGES[genre_index][1];
+                            });
+                        }
+                    }
+                    else
+                    {
+                        songList = _playlist.genreList[genre_index + 1];
+                    }
+                }
+
+                if (songList != null)
+                {
+                    var best_flag:int = 6; // 6 = AAA
+                    for (i = 0; i < songList.length; i++)
+                    {
+                        var song_flag:int = GlobalVariables.getSongIconIndex(songList[i], _gvars.activeUser.getLevelRank(songList[i]));
+                        if (song_flag < best_flag)
+                        {
+                            best_flag = song_flag;
+                            if (song_flag <= 1)
+                                break;
+                        }
+                    }
+                    genreListFlags[genre_index] = (best_flag >= 2 ? GlobalVariables.SONG_ICON_COLOR[best_flag] : null);
+                    songList = null;
+                }
+            }
+        }
+
+        /**
          * General builder for the Genre left sidebar display.
          */
         public function buildGenreList():void
         {
+            // Reset
             genreDisplay.removeChildren();
+            genreItems.length = 0;
+            genreDisplay.addChild(SELECTED_GENRE_BACKGROUND);
+
+            // Build Genre Flag Array
+            buildGenreListFlags();
 
             // Set Genre Text
             GENRE_MODE_TEXT.text = _lang.string("genre_mode_" + GENRE_MODE);
@@ -370,16 +456,12 @@ package menu
             //- Build Genre List
             var totalGenres:int = getTotalGenres();
 
-            var genre_text:String;
             var genre_index:int;
             var position_index:int = -1;
-            var gap:Number = (GENRE_MODE == GENRE_SONGFLAGS) ? (337 / (Math.max(12, totalGenres) + 1)) : (337 / (totalGenres + 1));
-            var y:Number;
-            var isActiveGenre:Boolean;
 
             for (genre_index = -1; genre_index < totalGenres; ++genre_index)
             {
-                // If displaying genres, and Legacy Genre isisn't displayed, skip it.
+                // If displaying genres, and Legacy Genre isn't displayed, skip it.
                 if (GENRE_MODE == GENRE_GENRES)
                 {
                     if (!_gvars.activeUser.DISPLAY_LEGACY_SONGS && !_playlist.engine && genre_index == (Constant.LEGACY_GENRE - 1))
@@ -393,19 +475,52 @@ package menu
                     position_index = genre_index + 1;
                 }
 
-                isActiveGenre = (options.activeGenre == genre_index);
-                genre_text = getGenreText(genre_index);
-                y = gap * position_index;
+                // Flag Color
+                var genre_flag:String = genreListFlags[genre_index];
+                var genre_text:String = getGenreText(genre_index);
+
+                if (genre_flag != null && _gvars.activeUser.DISPLAY_GENRE_FLAG)
+                    genre_text = "<font color=\"" + genre_flag + "\">•</font> " + genre_text;
+
+                // Build Label
+                var songGenre:Text = new Text(genreDisplay, 0, 0, genre_text, 14);
+                songGenre.height = 22.6;
+                songGenre.width = 130.75;
+                songGenre.mouseEnabled = true;
+                songGenre.useHandCursor = true;
+                songGenre.buttonMode = true;
+                songGenre.index = genre_index;
+                songGenre.position = position_index;
+                genreItems.push(songGenre);
+            }
+
+            updateGenreList();
+        }
+
+        /**
+         * Updates genre position, font size, and selection background.
+         */
+        private function updateGenreList():void
+        {
+            // Remove Selected Genre Background
+            SELECTED_GENRE_BACKGROUND.visible = false;
+
+            var totalGenres:int = genreItems.length;
+            var gap:Number = Math.min(23, Math.ceil(337 / (totalGenres + 1)));
+
+            for (var g:int = 0; g < totalGenres; g++)
+            {
+                genreItems[g].y = gap * genreItems[g].position;
 
                 // Set Selected Background
-                if (isActiveGenre)
+                if (options.activeGenre == genreItems[g].index)
                 {
-                    genreDisplay.addChild(SELECTED_GENRE_BACKGROUND);
-                    SELECTED_GENRE_BACKGROUND.y = y - 2;
+                    genreItems[g].fontSize = 18;
+                    SELECTED_GENRE_BACKGROUND.y = genreItems[g].y - 2;
+                    SELECTED_GENRE_BACKGROUND.visible = true;
                 }
-
-                // Add Text
-                buildGenreEntry(genre_text, isActiveGenre, y, genre_index);
+                else
+                    genreItems[g].fontSize = 14;
             }
         }
 
@@ -446,24 +561,6 @@ package menu
         }
 
         /**
-         * Creates the Genre Text and also sets the selected background if it is the active genre.
-         * @param genre_text Display Text
-         * @param isActiveGenre
-         * @param y
-         * @param gindex Genre Index
-         */
-        private function buildGenreEntry(text:String, isActiveGenre:Boolean, y:Number, gindex:int):void
-        {
-            var songGenre:Text = new Text(genreDisplay, 0, y, text, (isActiveGenre ? 18 : 14));
-            songGenre.height = 22.6;
-            songGenre.width = 130.75;
-            songGenre.mouseEnabled = true;
-            songGenre.useHandCursor = true;
-            songGenre.buttonMode = true;
-            songGenre.index = gindex;
-        }
-
-        /**
          * Called from the genre display when a genre is clicked.
          * This sets the active genre to the item clicked, resets
          * most of the display parameters and rebuilds the display.
@@ -482,7 +579,7 @@ package menu
 
                 resetFilterOptions();
 
-                buildGenreList();
+                updateGenreList()
                 buildPlayList();
                 buildInfoBox();
             }
@@ -499,7 +596,7 @@ package menu
         public function buildPlayList():void
         {
             //- Clear out/reset pane items and pages.
-            songItems = new Vector.<SongItem>();
+            songItems.length = 0;
 
             scrollbar.reset();
             pane.clear();
@@ -540,8 +637,9 @@ package menu
             else if (options.activeGenre == PLAYLIST_ALL)
             {
                 songList = [];
-                for each (var _songInfo:SongInfo in _playlist.indexList)
-                    songList.push(_songInfo);
+                var len:int = _playlist.indexList.length;
+                for (i = 0; i < len; i++)
+                    songList[i] = _playlist.indexList[i];
 
                 // Song List Filters
                 sourceListLength = songList.length;
@@ -1495,7 +1593,7 @@ package menu
             };
             options.scroll_position = 0;
 
-            buildGenreList();
+            updateGenreList()
             buildPlayList();
         }
 
@@ -1529,7 +1627,7 @@ package menu
                     return _songInfo.name == songName;
                 };
             options.infoTab = TAB_PLAYLIST;
-            buildGenreList();
+            updateGenreList()
             buildPlayList();
             buildInfoBox();
 
@@ -1573,7 +1671,7 @@ package menu
                 options.scroll_position = 0;
             }
             options.activeGenre = (options.infoTab == TAB_QUEUE ? PLAYLIST_QUEUE : 0);
-            buildGenreList();
+            updateGenreList()
             buildPlayList();
             buildInfoBox();
         }
@@ -1909,7 +2007,7 @@ package menu
                         options.activeGenre = maxGenreIndex;
                     if (options.activeGenre > maxGenreIndex)
                         options.activeGenre = -1;
-                    buildGenreList();
+                    updateGenreList()
                     buildPlayList();
                     buildInfoBox();
                     return;

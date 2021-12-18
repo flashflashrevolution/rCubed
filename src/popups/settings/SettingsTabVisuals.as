@@ -33,7 +33,8 @@ package popups.settings
 
         private var gameMPUIArray:Array = ["MP_UI", "MP_PA", "MP_JUDGE", "MP_COMBO"];
 
-        private var gameOtherArray:Array = ["SONG_FLAG",
+        private var gameOtherArray:Array = ["GENRE_FLAG",
+            "SONG_FLAG",
             "SONG_NOTE"];
 
         private var optionDisplays:Array;
@@ -169,7 +170,7 @@ package popups.settings
             {
                 _gvars.activeUser["DISPLAY_" + e.target.display] = !_gvars.activeUser["DISPLAY_" + e.target.display];
                 e.target.checked = !e.target.checked;
-                if (e.target.display == "SONG_FLAG" || e.target.display == "SONG_NOTE")
+                if (e.target.display == "GENRE_FLAG" || e.target.display == "SONG_FLAG" || e.target.display == "SONG_NOTE")
                 {
                     _gvars.gameMain.activePanel.draw();
                 }

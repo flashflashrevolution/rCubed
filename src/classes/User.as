@@ -80,6 +80,7 @@ package classes
         public var songRatings:Object = {};
 
         public var DISPLAY_LEGACY_SONGS:Boolean = false;
+        public var DISPLAY_GENRE_FLAG:Boolean = true;
         public var DISPLAY_SONG_FLAG:Boolean = true;
         public var DISPLAY_SONG_NOTE:Boolean = true;
 
@@ -523,6 +524,9 @@ package classes
             if (_settings.viewSongFlag != null)
                 this.DISPLAY_SONG_FLAG = _settings.viewSongFlag;
 
+            if (_settings.viewGenreFlag != null)
+                this.DISPLAY_GENRE_FLAG = _settings.viewGenreFlag;
+
             if (_settings.viewSongNote != null)
                 this.DISPLAY_SONG_NOTE = _settings.viewSongNote;
 
@@ -721,6 +725,7 @@ package classes
             gameSave.viewOffset = this.GLOBAL_OFFSET;
             gameSave.judgeOffset = this.JUDGE_OFFSET;
             gameSave.autoJudgeOffset = this.AUTO_JUDGE_OFFSET;
+            gameSave.viewGenreFlag = this.DISPLAY_GENRE_FLAG;
             gameSave.viewSongFlag = this.DISPLAY_SONG_FLAG;
             gameSave.viewSongNote = this.DISPLAY_SONG_NOTE;
             gameSave.viewJudge = this.DISPLAY_JUDGE;
