@@ -14,6 +14,7 @@ package menu
     import classes.Language;
     import classes.ui.Box;
     import classes.ui.BoxIcon;
+    import classes.ui.IconUtil;
     import classes.ui.MouseTooltip;
     import classes.ui.SimpleBoxButton;
     import classes.ui.Text;
@@ -29,15 +30,15 @@ package menu
     import flash.ui.ContextMenuItem;
     import popups.PopupFilterManager;
     import popups.PopupSkillRankUpdate;
+    import popups.replays.ReplayHistoryWindow;
 
     public class MainMenu extends MenuPanel
     {
         public static const MENU_SONGSELECTION:String = "MenuSongSelection";
         public static const MENU_MULTIPLAYER:String = "MenuMultiplayer";
-        public static const MENU_FRIENDS:String = "MenuFriends";
-        public static const MENU_STATS:String = "MenuStats";
-        public static const MENU_FILTERS:String = "MenuFilter";
         public static const MENU_TOKENS:String = "MenuTokens";
+        public static const MENU_FILTERS:String = "MenuFilter";
+        public static const MENU_REPLAYS:String = "MenuReplays";
         public static const MENU_OPTIONS:String = "MenuOptions";
 
         private var _gvars:GlobalVariables = GlobalVariables.instance;
@@ -63,7 +64,13 @@ package menu
         private var statUpdaterBtn:SimpleBoxButton;
         private var rankUpdateThrobber:Throbber;
 
-        public var menuItems:Array = [["menu_play", MENU_SONGSELECTION], ["menu_multiplayer", MENU_MULTIPLAYER], ["menu_tokens", MENU_TOKENS], ["menu_filters", MENU_FILTERS], ["menu_options", MENU_OPTIONS]];
+        public var menuItems:Array = [["menu_play", MENU_SONGSELECTION, false, "iconPlay"],
+            ["menu_multiplayer", MENU_MULTIPLAYER, false, "iconUsers"],
+            ["menu_tokens", MENU_TOKENS, false, "iconMedal"],
+            ["menu_filters", MENU_FILTERS, true, "iconFilter"],
+            ["menu_replays", MENU_REPLAYS, true, "iconVideo"],
+            ["menu_options", MENU_OPTIONS, false, "iconGear"]];
+
         public var panel:MenuPanel;
         public var options:Object;
 
@@ -228,13 +235,36 @@ package menu
             menuItemBox.y = 8;
 
             //- Add Menu Buttons
-            for (var i:int = 0; i < menuItems.length; i++)
+            var i:int;
+            var btnLarge:int = menuItems.length;
+
+            for (i = 0; i < menuItems.length; i++)
             {
-                var menuItem:MenuButton = new MenuButton(menuItemBox, i * 122, 0, _lang.string(menuItems[i][0]), i == options.activePanel, menuItemClick);
-                menuItem.panel = menuItems[i][1];
-                menuItem.mouseChildren = false;
-                menuItem.useHandCursor = true;
-                menuItem.buttonMode = true;
+                if (menuItems[i][2])
+                    btnLarge--;
+            }
+
+            var btnWidth:int = ((604 - ((menuItems.length - btnLarge) * 28) - (6 * (menuItems.length - 1))) / btnLarge);
+            var btnPosition:int = 0;
+
+            for (i = 0; i < menuItems.length; i++)
+            {
+                if (menuItems[i][2])
+                {
+                    var menuItemSmall:BoxIcon = new BoxIcon(menuItemBox, btnPosition, 0, 28, 28, IconUtil.getIcon(menuItems[i][3]), menuItemClick);
+                    menuItemSmall.panel = menuItems[i][1];
+                    menuItemSmall.setIconColor("#DDDDDD");
+                    menuItemSmall.setHoverText(_lang.string(menuItems[i][0]), "bottom");
+                    menuItemSmall.active = (i == options.activePanel);
+                    btnPosition += (28 + 6);
+                }
+                else
+                {
+                    var menuItem:MenuButton = new MenuButton(menuItemBox, btnPosition, btnWidth, _lang.string(menuItems[i][0]), i == options.activePanel, menuItemClick);
+                    menuItem.panel = menuItems[i][1];
+                    btnPosition += (btnWidth + 6);
+                }
+
             }
 
             this.addChild(menuItemBox);
@@ -340,6 +370,11 @@ package menu
                 addPopup(new PopupFilterManager(this));
                 return true;
             }
+            else if (_panel == MENU_REPLAYS)
+            {
+                addPopup(new ReplayHistoryWindow(this));
+                return true;
+            }
 
             if (panel != null)
             {
@@ -364,22 +399,6 @@ package menu
                     options.activePanel = 1;
                     isFound = true;
                     break;
-                /*
-                   case MENU_FRIENDS:
-                   if (_MenuFriends == null || useNew)
-                   _MenuFriends = new MenuFriends(this);
-                   panel = _MenuFriends;
-                   options.activePanel = 2;
-                   isFound = true;
-                   break;
-                   case MENU_STATS:
-                   if (_MenuStats == null || useNew)
-                   _MenuStats = new MenuStats(this);
-                   panel = _MenuStats;
-                   options.activePanel = 2;
-                   isFound = true;
-                   break;
-                 */
 
                 case MENU_TOKENS:
                     if (_MenuTokens == null || useNew)
