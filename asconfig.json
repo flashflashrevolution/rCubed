@@ -35,7 +35,7 @@
             },
             {
                 "name": "CONFIG::updater",
-                "value": true
+                "value": false
             },
             {
                 "name": "CONFIG::timeStamp",
