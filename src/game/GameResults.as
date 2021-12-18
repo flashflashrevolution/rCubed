@@ -46,6 +46,7 @@ package game
     import popups.PopupMessage;
     import popups.PopupSongNotes;
     import popups.PopupTokenUnlock;
+    import popups.replays.ReplayHistoryTabLocal;
 
     public class GameResults extends MenuPanel
     {
@@ -1330,11 +1331,17 @@ package game
                     path += (result.song.songInfo.levelId ? result.song.songInfo.levelId : result.song.id.toString())
                     path += "_" + (new Date().getTime())
                     path += "_" + (result.pa_string + "-" + result.max_combo);
+                    path += ".txt";
 
                     // Store Bin Encoded Replay
-                    if (!AirContext.doesFileExist(path + ".txt"))
+                    if (!AirContext.doesFileExist(path))
                     {
-                        AirContext.writeTextFile(AirContext.getAppFile(path + ".txt"), nR.getEncode());
+                        AirContext.writeTextFile(AirContext.getAppFile(path), nR.getEncode());
+
+                        ReplayHistoryTabLocal.REPLAYS.push(nR);
+                        var cachePath:String = path.substr(Constant.REPLAY_PATH.length);
+                        _gvars.file_replay_cache.setValue(cachePath, result.replay_cache_object);
+                        _gvars.file_replay_cache.save();
                     }
                 }
                 catch (err:Error)

@@ -20,7 +20,7 @@ package popups.replays
     public class ReplayHistoryTabLocal extends ReplayHistoryTabBase
     {
         private static var INITIAL_LOAD:Boolean = false;
-        private static var REPLAYS:Vector.<Replay>;
+        public static var REPLAYS:Vector.<Replay>;
         private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _lang:Language = Language.instance;
         private var _avars:ArcGlobals = ArcGlobals.instance;
