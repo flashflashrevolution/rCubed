@@ -320,7 +320,7 @@ package menu
 
                 // Song Flag
                 var FLAG_TEXT:String = GlobalVariables.getSongIcon(_songInfo, rank);
-                if (FLAG_TEXT != "")
+                if (FLAG_TEXT != "" && GlobalVariables.instance.activeUser.DISPLAY_SONG_FLAG)
                 {
                     _lblSongFlag = new Text(this, 296, 0, FLAG_TEXT, 14);
                     _lblSongFlag.setAreaParams(100, 27, Text.RIGHT);
