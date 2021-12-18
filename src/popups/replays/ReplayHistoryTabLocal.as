@@ -298,17 +298,21 @@ package popups.replays
                     if (r.isValid())
                     {
                         r.loadSongInfo();
-                        REPLAYS[REPLAYS.length] = r;
 
-                        cacheObj = {'name': r.song.name,
-                                'rate': r.settings.songRate,
-                                'score': r.score,
-                                'judge': [r.perfect, r.good, r.average, r.miss, r.boo, r.maxcombo]}
+                        if (r.song != null)
+                        {
+                            REPLAYS[REPLAYS.length] = r;
 
-                        if (r.settings.arc_engine != null)
-                            cacheObj["engine"] = r.song.engine.id;
+                            cacheObj = {'name': r.song.name,
+                                    'rate': r.settings.songRate,
+                                    'score': r.score,
+                                    'judge': [r.perfect, r.good, r.average, r.miss, r.boo, r.maxcombo]}
 
-                        _gvars.file_replay_cache.setValue(chartFile.parent.name + "/" + chartFile.name, cacheObj);
+                            if (r.settings.arc_engine != null)
+                                cacheObj["engine"] = r.song.engine.id;
+
+                            _gvars.file_replay_cache.setValue(chartFile.parent.name + "/" + chartFile.name, cacheObj);
+                        }
                     }
 
                     pathIndex++;
