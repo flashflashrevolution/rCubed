@@ -37,7 +37,6 @@ package game
     import flash.events.MouseEvent;
     import flash.events.SecurityErrorEvent;
     import flash.geom.Matrix;
-    import flash.geom.Rectangle;
     import flash.net.URLLoader;
     import flash.net.URLLoaderDataFormat;
     import flash.net.URLRequest;
@@ -48,13 +47,14 @@ package game
     import flash.utils.getTimer;
     import game.controls.AccuracyBar;
     import game.controls.Combo;
-    import game.controls.TextStatic;
     import game.controls.Judge;
     import game.controls.LifeBar;
     import game.controls.MPHeader;
     import game.controls.NoteBox;
     import game.controls.PAWindow;
     import game.controls.Score;
+    import game.controls.ScreenCut;
+    import game.controls.TextStatic;
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import sql.SQLSongUserInfo;
@@ -110,7 +110,7 @@ package game
         private var comboStatic:TextStatic;
         private var comboTotalStatic:TextStatic;
         private var accBar:AccuracyBar;
-        private var screenCut:Sprite;
+        private var screenCut:ScreenCut;
         private var flashLight:Sprite;
         private var exitEditor:BoxButton;
         private var resetEditor:BoxButton;
@@ -1585,91 +1585,7 @@ package game
                     this.removeChild(screenCut);
                 screenCut = null;
             }
-            screenCut = new Sprite();
-            screenCut.graphics.lineStyle(3, 0x39C4E1, 1);
-            screenCut.graphics.beginFill(0x000000);
-
-            switch (options.scrollDirection)
-            {
-                case "down":
-                    screenCut.x = 0;
-                    screenCut.y = options.screencutPosition * Main.GAME_HEIGHT;
-                    screenCut.graphics.drawRect(-Main.GAME_WIDTH, -(Main.GAME_HEIGHT * 3), Main.GAME_WIDTH * 3, Main.GAME_HEIGHT * 3);
-
-                    if (options.isEditor)
-                    {
-                        screenCut.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void
-                        {
-                            screenCut.startDrag(false, new Rectangle(0, 5, 0, Main.GAME_HEIGHT - 7));
-                        });
-                        screenCut.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void
-                        {
-                            screenCut.stopDrag();
-                            options.screencutPosition = (screenCut.y / Main.GAME_HEIGHT);
-                        });
-                    }
-                    break;
-                case "right":
-                    screenCut.x = options.screencutPosition * Main.GAME_WIDTH;
-                    screenCut.y = 0;
-                    screenCut.graphics.drawRect(-Main.GAME_WIDTH * 3, -Main.GAME_HEIGHT, Main.GAME_WIDTH * 3, Main.GAME_HEIGHT * 3);
-
-                    if (options.isEditor)
-                    {
-                        screenCut.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void
-                        {
-                            screenCut.startDrag(false, new Rectangle(0, 0, Main.GAME_WIDTH - 7, 0));
-                        });
-                        screenCut.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void
-                        {
-                            screenCut.stopDrag();
-                            options.screencutPosition = (screenCut.x / Main.GAME_WIDTH);
-                        });
-                    }
-                    break;
-                case "left":
-                    screenCut.x = Main.GAME_WIDTH - (options.screencutPosition * Main.GAME_WIDTH);
-                    screenCut.y = 0;
-                    screenCut.graphics.drawRect(0, -Main.GAME_HEIGHT, Main.GAME_WIDTH * 3, Main.GAME_HEIGHT * 3);
-
-                    if (options.isEditor)
-                    {
-                        screenCut.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void
-                        {
-                            screenCut.startDrag(false, new Rectangle(0, 0, Main.GAME_WIDTH - 7, 0));
-                        });
-                        screenCut.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void
-                        {
-                            screenCut.stopDrag();
-                            options.screencutPosition = 1 - (screenCut.x / Main.GAME_WIDTH);
-                        });
-                    }
-                    break;
-                default:
-                    screenCut.x = 0;
-                    screenCut.y = Main.GAME_HEIGHT - (options.screencutPosition * Main.GAME_HEIGHT);
-                    screenCut.graphics.drawRect(-Main.GAME_WIDTH, 0, Main.GAME_WIDTH * 3, Main.GAME_HEIGHT * 3);
-
-                    if (options.isEditor)
-                    {
-                        screenCut.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void
-                        {
-                            screenCut.startDrag(false, new Rectangle(0, 5, 0, Main.GAME_HEIGHT - 7));
-                        });
-                        screenCut.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void
-                        {
-                            screenCut.stopDrag();
-                            options.screencutPosition = 1 - (screenCut.y / Main.GAME_HEIGHT);
-                        });
-                    }
-                    break;
-            }
-            screenCut.graphics.endFill();
-            if (options.isEditor)
-            {
-                screenCut.buttonMode = true;
-                screenCut.useHandCursor = true;
-            }
+            screenCut = new ScreenCut(options);
             this.addChild(screenCut);
         }
 
