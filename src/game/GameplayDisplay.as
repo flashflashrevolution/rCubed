@@ -27,7 +27,6 @@ package game
     import com.flashfla.utils.TimeUtil;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
-    import flash.display.GradientType;
     import flash.display.MovieClip;
     import flash.display.Sprite;
     import flash.events.ErrorEvent;
@@ -36,7 +35,6 @@ package game
     import flash.events.KeyboardEvent;
     import flash.events.MouseEvent;
     import flash.events.SecurityErrorEvent;
-    import flash.geom.Matrix;
     import flash.net.URLLoader;
     import flash.net.URLLoaderDataFormat;
     import flash.net.URLRequest;
@@ -47,6 +45,7 @@ package game
     import flash.utils.getTimer;
     import game.controls.AccuracyBar;
     import game.controls.Combo;
+    import game.controls.FlashlightOverlay;
     import game.controls.Judge;
     import game.controls.LifeBar;
     import game.controls.MPHeader;
@@ -111,7 +110,7 @@ package game
         private var comboTotalStatic:TextStatic;
         private var accBar:AccuracyBar;
         private var screenCut:ScreenCut;
-        private var flashLight:Sprite;
+        private var flashLight:FlashlightOverlay;
         private var exitEditor:BoxButton;
         private var resetEditor:BoxButton;
 
@@ -1556,15 +1555,8 @@ package game
             if (options.modEnabled("flashlight"))
             {
                 if (flashLight == null)
-                {
-                    var _matrix:Matrix = new Matrix();
-                    _matrix.createGradientBox(Main.GAME_WIDTH, Main.GAME_HEIGHT, 1.5707963267948966);
-                    flashLight = new Sprite();
-                    flashLight.graphics.clear();
-                    flashLight.graphics.beginGradientFill(GradientType.LINEAR, [0, 0, 0, 0, 0, 0], [0.95, 0.55, 0, 0, 0.55, 0.95], [0x00, 0x52, 0x6C, 0x92, 0xAC, 0xFF], _matrix);
-                    flashLight.graphics.drawRect(0, -Main.GAME_HEIGHT, Main.GAME_WIDTH, Main.GAME_HEIGHT * 3);
-                    flashLight.graphics.endFill();
-                }
+                    flashLight = new FlashlightOverlay();
+
                 if (!contains(flashLight))
                     addChild(flashLight);
             }
