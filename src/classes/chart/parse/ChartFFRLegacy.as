@@ -46,7 +46,7 @@ package classes.chart.parse
                 var u:String = sprintf(engine.songURL, songInfo);
                 return sprintf(engine.songURL, songInfo);
             }
-            return engine.songURL + "level_" + songInfo.levelId + ".swf";
+            return engine.songURL + "level_" + songInfo.level_id + ".swf";
         }
 
         public static function validURL(url:String):Boolean
@@ -161,21 +161,21 @@ package classes.chart.parse
                 songInfo.difficulty = int(node.songdifficulty.toString());
                 songInfo.style = node.songstyle.toString();
                 songInfo.time = node.songlength.toString();
-                songInfo.levelId = node.level.toString();
+                songInfo.level_id = node.level.toString();
                 songInfo.level = i + 1;
                 songInfo.order = int(node.order.toString());
-                songInfo.noteCount = int(node.arrows.toString());
+                songInfo.note_count = int(node.arrows.toString());
                 songInfo.author = node.songauthor.toString();
-                songInfo.authorURL = node.songauthorURL.toString();
+                songInfo.author_url = node.songauthorURL.toString();
                 songInfo.stepauthor = node.songstepauthor.toString();
-                songInfo.stepauthorURL = node.songstepauthorurl.toString();
-                songInfo.playhash = node.playhash.toString();
-                songInfo.previewhash = node.previewhash.toString();
-                songInfo.minNps = int(node.min_nps.toString());
-                songInfo.maxNps = int(node.max_nps.toString());
+                songInfo.stepauthor_url = node.songstepauthorurl.toString();
+                songInfo.play_hash = node.playhash.toString();
+                songInfo.preview_hash = node.previewhash.toString();
+                songInfo.min_nps = int(node.min_nps.toString());
+                songInfo.max_nps = int(node.max_nps.toString());
                 songInfo.credits = int(node.secretcredits.toString());
                 songInfo.price = int(node.price.toString());
-                songInfo.chartType = NoteChart.FFR_LEGACY;
+                songInfo.chart_type = NoteChart.FFR_LEGACY;
                 songInfo.engine = engine;
 
                 if (Boolean(node.arc_sync.toString()))

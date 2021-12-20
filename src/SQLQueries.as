@@ -71,7 +71,7 @@ package
         public static function getSongUserInfo(songInfo:SongInfo):SQLSongUserInfo
         {
             if (songInfo.engine != null)
-                return getSongDetails(songInfo.engine.id, songInfo.levelId);
+                return getSongDetails(songInfo.engine.id, songInfo.level_id);
 
             return getSongDetails(Constant.BRAND_NAME_SHORT_LOWER, songInfo.level.toString());
         }

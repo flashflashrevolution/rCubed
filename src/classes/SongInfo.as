@@ -8,41 +8,53 @@ package classes
         public static const SONG_TYPE_PURCHASED:int = 2;
         public static const SONG_TYPE_SECRET:int = 3;
 
+        // Engine Variables
         public var access:int;
-        public var noteCount:int;
-        public var author:String;
-        public var authorURL:String;
-        public var authorwithurl:String;
-        public var chartType:String;
-        public var credits:int;
-        public var difficulty:int;
-        public var engine:Object;
-        public var genre:int;
+        public var chart_type:String;
+        public var song_type:int;
         public var index:int;
-        public var length:int;
-        public var level:int;
-        public var minNps:int;
-        public var maxNps:int;
-        public var name:String;
-        public var order:int;
-        public var playhash:String;
-        public var prerelease:Boolean;
-        public var previewhash:String;
-        public var price:int;
-        public var releasedate:uint;
-        public var scoreRaw:int;
-        public var scoreTotal:int;
-        public var songType:int;
-        public var stepauthor:String;
-        public var stepauthorURL:String;
-        public var stepauthorwithurl:String;
-        public var style:String;
-        public var sync:int;
-        public var time:String;
-        public var timeSecs:int;
 
-        public var levelId:String;
-        public var songRating:Number;
+        public var score_raw:int;
+        public var score_total:int;
+
+        // Song Variables
+        public var genre:int;
+        public var level:int;
+        public var name:String;
+        public var difficulty:int;
+        public var note_count:int;
+        public var order:int;
+        public var style:String;
+
+        public var author:String;
+        public var author_url:String;
+        public var author_html:String;
+
+        public var stepauthor:String;
+        public var stepauthor_url:String;
+        public var stepauthor_html:String;
+
+        public var play_hash:String;
+        public var preview_hash:String;
+
+        public var prerelease:Boolean;
+        public var release_date:uint;
+
+        public var min_nps:int;
+        public var max_nps:int;
+
+        public var time:String;
+        public var time_secs:int;
+
+        // Song - Optional
+        public var price:int;
+        public var credits:int;
+        public var song_rating:Number;
+
+        // Alt Engines Variables
+        public var engine:Object;
+        public var level_id:String;
+        public var sync:int;
 
         public function SongInfo()
         {
@@ -65,7 +77,7 @@ package classes
             if (s1.level > 0 && s2.level > 0 && s1.level != s2.level)
                 return false;
 
-            if (s1.levelId && s2.levelId && s1.levelId != s2.levelId)
+            if (s1.level_id && s2.level_id && s1.level_id != s2.level_id)
                 return false;
 
             return true;

@@ -77,8 +77,8 @@ package classes.chart
             this.songInfo = songInfo;
             this.id = songInfo.level;
             this.preview = isPreview;
-            this.type = songInfo.chartType || NoteChart.FFR;
-            this.chartType = songInfo.chartType || NoteChart.FFR_LEGACY;
+            this.type = songInfo.chart_type || NoteChart.FFR;
+            this.chartType = songInfo.chart_type || NoteChart.FFR_LEGACY;
 
             options = _gvars.options;
             noteMod = new NoteMod(this, options);
@@ -88,7 +88,7 @@ package classes.chart
             if (type == "EDITOR")
             {
                 var editorSongInfo:SongInfo = new SongInfo();
-                editorSongInfo.chartType = NoteChart.FFR_BEATBOX;
+                editorSongInfo.chart_type = NoteChart.FFR_BEATBOX;
                 editorSongInfo.level = this.id;
 
                 chart = NoteChart.parseChart(NoteChart.FFR_BEATBOX, editorSongInfo, '_root.beatBox = [];');
@@ -196,12 +196,12 @@ package classes.chart
 
         private function urlGen(fileType:String, fileHash:String = ""):String
         {
-            switch (songInfo.chartType || type)
+            switch (songInfo.chart_type || type)
             {
                 case NoteChart.FFR:
                 case NoteChart.FFR_RAW:
                 case NoteChart.FFR_MP3:
-                    return Constant.SONG_DATA_URL + "?" + fileHash + "id=" + (preview ? songInfo.previewhash : songInfo.playhash) + (preview ? "&mode=2" : "") + (_gvars.userSession != "0" ? "&session=" + _gvars.userSession : "") + "&type=" + NoteChart.FFR + "_" + fileType;
+                    return Constant.SONG_DATA_URL + "?" + fileHash + "id=" + (preview ? songInfo.preview_hash : songInfo.play_hash) + (preview ? "&mode=2" : "") + (_gvars.userSession != "0" ? "&session=" + _gvars.userSession : "") + "&type=" + NoteChart.FFR + "_" + fileType;
 
                 case NoteChart.FFR_LEGACY:
                     return ChartFFRLegacy.songUrl(songInfo);
@@ -502,8 +502,8 @@ package classes.chart
                     break;
 
                 case NoteChart.FFR_LEGACY:
-                    if (songInfo.noteCount == 0)
-                        songInfo.noteCount = chart.Notes.length;
+                    if (songInfo.note_count == 0)
+                        songInfo.note_count = chart.Notes.length;
                     break;
 
                 case NoteChart.THIRDSTYLE:

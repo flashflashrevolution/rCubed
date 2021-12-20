@@ -383,8 +383,8 @@ package
             var songIcon:int = 0;
             if (_rank)
             {
-                var arrows:int = _songInfo.noteCount;
-                var scoreRaw:int = _songInfo.scoreRaw;
+                var arrows:int = _songInfo.note_count;
+                var scoreRaw:int = _songInfo.score_raw;
                 if (_rank.arrows > 0)
                 {
                     arrows = _rank.arrows;
@@ -431,8 +431,8 @@ package
             var songIcon:int = 0;
             if (_rank)
             {
-                var arrows:int = _songInfo.noteCount;
-                var scoreRaw:int = _songInfo.scoreRaw;
+                var arrows:int = _songInfo.note_count;
+                var scoreRaw:int = _songInfo.score_raw;
                 if (_rank.arrows > 0)
                 {
                     arrows = _rank.arrows;

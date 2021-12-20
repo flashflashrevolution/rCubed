@@ -357,7 +357,7 @@ package game
                 result = songResults[resultIndex];
                 songInfo = result.songInfo;
 
-                var seconds:Number = Math.floor(songInfo.timeSecs * (1 / result.options.songRate));
+                var seconds:Number = Math.floor(songInfo.time_secs * (1 / result.options.songRate));
                 var songLength:String = (Math.floor(seconds / 60)) + ":" + (seconds % 60 >= 10 ? "" : "0") + (seconds % 60);
                 var rateString:String = result.options.songRate != 1 ? " (" + result.options.songRate + "x Rate)" : "";
 
@@ -365,9 +365,9 @@ package game
                 songTitle = songInfo.engine ? songInfo.name + rateString : "<a href=\"" + Constant.LEVEL_STATS_URL + songInfo.level + "\">" + songInfo.name + rateString + "</a>";
                 songSubTitle = sprintf(_lang.string("game_results_subtitle_difficulty"), {"value": songInfo.difficulty}) + " - " + sprintf(_lang.string("game_results_subtitle_length"), {"value": songLength});
                 if (songInfo.author != "")
-                    songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_author"), {"value": songInfo.authorwithurl}));
+                    songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_author"), {"value": songInfo.author_html}));
                 if (songInfo.stepauthor != "")
-                    songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_stepauthor"), {"value": songInfo.stepauthorwithurl}));
+                    songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_stepauthor"), {"value": songInfo.stepauthor_html}));
 
                 displayTime = result.end_time;
                 scoreTotal = result.score_total;
@@ -1172,7 +1172,7 @@ package game
                     "difficulty": gameResult.songInfo.difficulty,
                     "genre": gameResult.songInfo.genre,
                     "level": gameResult.songInfo.level,
-                    "levelid": gameResult.songInfo.levelId,
+                    "levelid": gameResult.songInfo.level_id,
                     "name": gameResult.songInfo.name,
                     "stepauthor": gameResult.songInfo.stepauthor,
                     "time": gameResult.songInfo.time};
@@ -1328,7 +1328,7 @@ package game
                 try
                 {
                     var path:String = AirContext.getReplayPath(result.song);
-                    path += (result.song.songInfo.levelId ? result.song.songInfo.levelId : result.song.id.toString())
+                    path += (result.song.songInfo.level_id ? result.song.songInfo.level_id : result.song.id.toString())
                     path += "_" + (new Date().getTime())
                     path += "_" + (result.pa_string + "-" + result.max_combo);
                     path += ".txt";

@@ -273,7 +273,7 @@ package popups.settings
 
                 var tempSongInfo:SongInfo = new SongInfo();
                 tempSongInfo.level = 1337;
-                tempSongInfo.chartType = "EDITOR";
+                tempSongInfo.chart_type = "EDITOR";
                 _gvars.options.song = new Song(tempSongInfo);
 
                 _gvars.options.fill();

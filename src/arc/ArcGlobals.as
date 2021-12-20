@@ -61,7 +61,7 @@ package arc
                     {
                         var songInfo:SongInfo = new SongInfo();
                         songInfo.engine = engine;
-                        songInfo.levelId = levelid;
+                        songInfo.level_id = levelid;
                         legacyLevelRanksSet(songInfo, engine.level_ranks[levelid]);
                     }
 
@@ -91,12 +91,12 @@ package arc
 
             var engine:Object = {"engineID": song.engine.id,
                     "songLevel": song.level,
-                    "songID": song.levelId,
+                    "songID": song.level_id,
                     "songName": song.name,
                     "songAuthor": song.author,
                     "stepAuthor": song.stepauthor,
                     "ffrlURL": song.engine.songURL,
-                    "type": song.chartType};
+                    "type": song.chart_type};
 
             if (song.sync)
                 engine["sync"] = song.sync;
@@ -119,13 +119,13 @@ package arc
             songInfo.level = data["songLevel"];
             songInfo.name = data["songName"];
             songInfo.author = data["songAuthor"];
-            songInfo.authorwithurl = data["songAuthor"];
+            songInfo.author_html = data["songAuthor"];
             songInfo.stepauthor = data["stepAuthor"];
-            songInfo.stepauthorwithurl = data["stepAuthor"];
-            songInfo.levelId = data["songID"];
-            songInfo.chartType = data["type"];
+            songInfo.stepauthor_html = data["stepAuthor"];
+            songInfo.level_id = data["songID"];
+            songInfo.chart_type = data["type"];
             songInfo.sync = data["sync"];
-            songInfo.noteCount = 0;
+            songInfo.note_count = 0;
 
             return songInfo;
         }
@@ -152,7 +152,7 @@ package arc
             var ranks:Object = legacyLevelRanks[songInfo.engine.id];
             if (!ranks)
                 return null;
-            return ranks[songInfo.levelId || songInfo.level];
+            return ranks[songInfo.level_id || songInfo.level];
         }
 
         public function legacyLevelRanksSet(songInfo:SongInfo, value:Object):void
@@ -162,7 +162,7 @@ package arc
             var ranks:Object = legacyLevelRanks[songInfo.engine.id];
             if (!ranks)
                 legacyLevelRanks[songInfo.engine.id] = ranks = {};
-            ranks[songInfo.levelId || songInfo.level] = value;
+            ranks[songInfo.level_id || songInfo.level] = value;
         }
 
         public function legacyLevelRanksLoad():void

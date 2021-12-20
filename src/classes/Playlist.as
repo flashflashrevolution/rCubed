@@ -179,41 +179,27 @@ package classes
 
                     // Important to note that the dynamic fields aren't all exactly the same name
                     var newSongInfo:SongInfo = new SongInfo();
-                    newSongInfo.access = dynamicSongInfo.access;
                     newSongInfo.author = dynamicSongInfo.author;
-                    newSongInfo.authorURL = dynamicSongInfo.authorURL;
-                    newSongInfo.authorwithurl = dynamicSongInfo.authorwithurl;
-                    newSongInfo.chartType = dynamicSongInfo.chartType;
+                    newSongInfo.author_url = dynamicSongInfo.authorURL;
                     newSongInfo.credits = dynamicSongInfo.credits;
                     newSongInfo.difficulty = dynamicSongInfo.difficulty;
-                    newSongInfo.engine = dynamicSongInfo.engine;
                     newSongInfo.genre = dynamicSongInfo.genre;
-                    newSongInfo.index = dynamicSongInfo.index;
-                    newSongInfo.length = dynamicSongInfo.length;
                     newSongInfo.level = dynamicSongInfo.level;
-                    newSongInfo.levelId = dynamicSongInfo.levelid;
-                    newSongInfo.minNps = dynamicSongInfo.min_nps;
-                    newSongInfo.maxNps = dynamicSongInfo.max_nps;
+                    newSongInfo.min_nps = dynamicSongInfo.min_nps;
+                    newSongInfo.max_nps = dynamicSongInfo.max_nps;
                     newSongInfo.name = dynamicSongInfo.name;
-                    newSongInfo.noteCount = dynamicSongInfo.arrows;
+                    newSongInfo.note_count = dynamicSongInfo.arrows;
                     newSongInfo.order = dynamicSongInfo.order;
-                    newSongInfo.playhash = dynamicSongInfo.playhash;
+                    newSongInfo.play_hash = dynamicSongInfo.playhash;
                     newSongInfo.prerelease = dynamicSongInfo.prerelease;
-                    newSongInfo.previewhash = dynamicSongInfo.previewhash;
+                    newSongInfo.preview_hash = dynamicSongInfo.previewhash;
                     newSongInfo.price = dynamicSongInfo.price;
-                    newSongInfo.releasedate = dynamicSongInfo.releasedate;
-                    newSongInfo.scoreRaw = dynamicSongInfo.scoreRaw;
-                    newSongInfo.scoreTotal = dynamicSongInfo.scoreTotal;
-                    newSongInfo.songRating = dynamicSongInfo.song_rating;
-                    newSongInfo.songType = dynamicSongInfo.songType;
+                    newSongInfo.release_date = dynamicSongInfo.releasedate;
+                    newSongInfo.song_rating = dynamicSongInfo.song_rating;
                     newSongInfo.stepauthor = dynamicSongInfo.stepauthor;
-                    newSongInfo.stepauthorURL = dynamicSongInfo.stepauthorURL;
-                    newSongInfo.stepauthorwithurl = dynamicSongInfo.stepauthorwithurl;
+                    newSongInfo.stepauthor_url = dynamicSongInfo.stepauthorURL;
                     newSongInfo.style = dynamicSongInfo.style;
-                    newSongInfo.sync = dynamicSongInfo.sync;
                     newSongInfo.time = dynamicSongInfo.time;
-                    newSongInfo.timeSecs = dynamicSongInfo.timeSecs;
-
 
                     songInfo = newSongInfo;
                 }
@@ -223,30 +209,30 @@ package classes
                     songInfo.time = "0:00";
 
                 // Note Count
-                if (isNaN(Number(songInfo.noteCount)))
-                    songInfo.noteCount = 0;
+                if (isNaN(Number(songInfo.note_count)))
+                    songInfo.note_count = 0;
 
                 // Extra Info
                 songInfo.index = genreList[songInfo.genre].length;
-                songInfo.timeSecs = (Number(songInfo.time.split(":")[0]) * 60) + Number(songInfo.time.split(":")[1]);
+                songInfo.time_secs = (Number(songInfo.time.split(":")[0]) * 60) + Number(songInfo.time.split(":")[1]);
 
                 // Author with URL
-                if (songInfo.authorURL != null && songInfo.authorURL.length > 7)
-                    songInfo.authorwithurl = "<a href=\"" + songInfo.authorURL + "\">" + songInfo.author + "</a>";
+                if (songInfo.author_url != null && songInfo.author_url.length > 7)
+                    songInfo.author_html = "<a href=\"" + songInfo.author_url + "\">" + songInfo.author + "</a>";
                 else
-                    songInfo.authorwithurl = songInfo.author;
+                    songInfo.author_html = songInfo.author;
 
                 // Multiple Step Authors
                 if (songInfo.stepauthor != null && songInfo.stepauthor.indexOf(" & ") !== false)
                 {
                     var stepAuthors:Array = songInfo.stepauthor.split(" & ");
-                    songInfo.stepauthorwithurl = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(stepAuthors[0]) + "\">" + stepAuthors[0] + "</a>";
+                    songInfo.stepauthor_html = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(stepAuthors[0]) + "\">" + stepAuthors[0] + "</a>";
 
                     for (var i:int = 1; i < stepAuthors.length; i++)
-                        songInfo.stepauthorwithurl += " & <a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(stepAuthors[i]) + "\">" + stepAuthors[i] + "</a>";
+                        songInfo.stepauthor_html += " & <a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(stepAuthors[i]) + "\">" + stepAuthors[i] + "</a>";
                 }
                 else
-                    songInfo.stepauthorwithurl = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(songInfo.stepauthor) + "\">" + songInfo.stepauthor + "</a>";
+                    songInfo.stepauthor_html = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(songInfo.stepauthor) + "\">" + songInfo.stepauthor + "</a>";
 
                 // Song Price
                 if (isNaN(Number(songInfo.price)))
@@ -257,8 +243,8 @@ package classes
                     songInfo.credits = -1;
 
                 // Max Score Totals
-                songInfo.scoreTotal = songInfo.noteCount * 1550;
-                songInfo.scoreRaw = songInfo.noteCount * 50;
+                songInfo.score_total = songInfo.note_count * 1550;
+                songInfo.score_raw = songInfo.note_count * 50;
 
                 // Legacy Sync
                 if (!legacy && isNaN(songInfo.sync))
@@ -341,7 +327,7 @@ package classes
                     songType = 3;
 
                 indexList[i].access = _gvars.checkSongAccess(indexList[i]);
-                indexList[i].songType = songType;
+                indexList[i].song_type = songType;
             }
         }
 

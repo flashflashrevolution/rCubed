@@ -871,7 +871,7 @@ package classes
         {
             if (songInfo.engine != null)
             {
-                var sDetails:SQLSongUserInfo = SQLQueries.getSongDetails(songInfo.engine.id, songInfo.levelId);
+                var sDetails:SQLSongUserInfo = SQLQueries.getSongDetails(songInfo.engine.id, songInfo.level_id);
                 if (sDetails)
                     return sDetails.song_rating;
 

@@ -1372,7 +1372,7 @@ package menu
             var infoDisplay:Array = [["song", songInfo.name],
                 ["author", songInfo.author],
                 ["stepfile", songInfo.stepauthor],
-                ["length", (songInfo.noteCount > 0 ? sprintf(_lang.string("song_selection_song_panel_length_value"), {"time": songInfo.time, "note_count": songInfo.noteCount}) : songInfo.time)],
+                ["length", (songInfo.note_count > 0 ? sprintf(_lang.string("song_selection_song_panel_length_value"), {"time": songInfo.time, "note_count": songInfo.note_count}) : songInfo.time)],
                 ["style", songInfo.style],
                 ["best", (infoRanks.score > 0 ? "\n" + NumberUtil.numberFormat(infoRanks.score) + "\n" + infoRanks.results : _lang.string("song_selection_song_panel_unplayed"))]];
 
