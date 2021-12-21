@@ -1338,10 +1338,11 @@ package game
                     {
                         AirContext.writeTextFile(AirContext.getAppFile(path), nR.getEncode());
 
-                        ReplayHistoryTabLocal.REPLAYS.push(nR);
                         var cachePath:String = path.substr(Constant.REPLAY_PATH.length);
                         _gvars.file_replay_cache.setValue(cachePath, result.replay_cache_object);
                         _gvars.file_replay_cache.save();
+
+                        ReplayHistoryTabLocal.REPLAYS.push(nR);
                     }
                 }
                 catch (err:Error)
