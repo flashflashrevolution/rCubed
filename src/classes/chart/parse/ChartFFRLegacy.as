@@ -43,8 +43,11 @@ package classes.chart.parse
                 engine = songInfo.engine;
             if (engine.songURLMode != null && engine.songURLMode == "replace")
             {
-                var u:String = sprintf(engine.songURL, songInfo);
-                return sprintf(engine.songURL, songInfo);
+                var song_variables:Object = {"level": songInfo.level_id,
+                        "previewhash": songInfo.preview_hash,
+                        "playhash": songInfo.play_hash};
+
+                return sprintf(engine.songURL, song_variables);
             }
             return engine.songURL + "level_" + songInfo.level_id + ".swf";
         }
