@@ -57,7 +57,8 @@ package menu
             background = new SongSelectionBackground();
             background.x = 145;
             background.y = 52;
-            background.pageBackground.alpha = 0;
+            background.pageBackground.visible = false;
+            background.visible = LocalOptions.getVariable("menu_show_song_selection_background", true);
             this.addChild(background);
 
             //- Add ScrollPane
@@ -252,7 +253,6 @@ package menu
 
         private function mouseWheelMoved(e:MouseEvent):void
         {
-
             var dist:Number = scrollbar.scroll + (pane.scrollFactorVertical / 2) * (e.delta > 0 ? -1 : 1);
             pane.scrollTo(dist);
             scrollbar.scrollTo(dist);

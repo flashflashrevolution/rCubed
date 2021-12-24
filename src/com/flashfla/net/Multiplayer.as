@@ -91,7 +91,7 @@ package com.flashfla.net
         public static const CLASS_BANNED:int = 10;
         public static const CLASS_ANONYMOUS:int = 11;
 
-        public static const COLOURS:Array = [0x000000, 0xFF0000, 0x000000, 0x91FF00, 0x91FF00, 0x91FF00, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000];
+        public static const COLORS:Array = [0x000000, 0xFF0000, 0x000000, 0x91FF00, 0x91FF00, 0x91FF00, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000];
 
         public static const STATUS_NONE:int = 0;
         public static const STATUS_CLEANUP:int = 1;
@@ -182,7 +182,7 @@ package com.flashfla.net
         {
             var roomsVec:Vector.<Room> = new <Room>[];
 
-            for (var idx:int in _rooms)
+            for (var idx:String in _rooms)
                 roomsVec.push(_rooms[idx]);
 
             return roomsVec;
@@ -381,7 +381,7 @@ package com.flashfla.net
                     if (previousUserStatus != user.gameplay.status)
                     {
                         anyUserStatusChanged = true;
-                        if(room.isPlayer(user))
+                        if (room.isPlayer(user))
                             anyPlayerStatusChanged = true;
                     }
 
@@ -392,7 +392,7 @@ package com.flashfla.net
                 // Process gameplay status changes for game start/end
                 if (room.isAllPlayersInStatus(STATUS_READY) && room.isAllPlayersSameSong())
                 {
-                    if(currentUserIsPlayer)
+                    if (currentUserIsPlayer)
                     {
                         currentUser.gameplay.status = STATUS_PLAYING;
 
@@ -401,7 +401,7 @@ package com.flashfla.net
 
                         eventGameStart(room);
                     }
-                    else if(currentUser.wantsToWatch)
+                    else if (currentUser.wantsToWatch)
                     {
                         room.songInfo = room.getPlayersSong()
                         lastRoomGamePlayerCount = room.playerCount;
@@ -451,7 +451,7 @@ package com.flashfla.net
         public function login(username:String, password:String):void
         {
             if (connected)
-                server.login(SERVER_ZONE, username, password);
+                server.login(SERVER_ZONE, escape(username), password);
         }
 
         public function logout():void
@@ -662,7 +662,7 @@ package com.flashfla.net
                 leaveRoom(currentRoom);
                 Alert.add(_lang.string("mp_error_multiple_room_restriction"), 120);
             }
-            
+
             if (!connected || name.length <= 0)
             {
                 return;
@@ -771,7 +771,7 @@ package com.flashfla.net
         private function sendCurrentUserRoomVariables(room:Room, joining:Boolean = true, leaving:Boolean = false):void
         {
             if (!room.isGameRoom)
-            { 
+            {
                 return;
             }
 

@@ -37,12 +37,12 @@ package game.controls
 
             speedScale = this.options.judgeSpeed;
 
-            labelDesc[100] = {colour: options.judgeColours[0], title: "AMAZING!!!"};
-            labelDesc[50] = {colour: options.judgeColours[1], title: "PERFECT!"};
-            labelDesc[25] = {colour: options.judgeColours[2], title: "GOOD"};
-            labelDesc[5] = {colour: options.judgeColours[3], title: "AVERAGE"};
-            labelDesc[-5] = {colour: options.judgeColours[5], title: "BOO!!"};
-            labelDesc[-10] = {colour: options.judgeColours[4], title: "MISS!"};
+            labelDesc[100] = {color: options.judgeColors[0], title: "AMAZING!!!"};
+            labelDesc[50] = {color: options.judgeColors[1], title: "PERFECT!"};
+            labelDesc[25] = {color: options.judgeColors[2], title: "GOOD"};
+            labelDesc[5] = {color: options.judgeColors[3], title: "AVERAGE"};
+            labelDesc[-5] = {color: options.judgeColors[5], title: "BOO!!"};
+            labelDesc[-10] = {color: options.judgeColors[4], title: "MISS!"};
 
             var textFormat:TextFormat = new TextFormat(new AachenLight().fontName, 42, 0xffffff, true);
 
@@ -89,7 +89,7 @@ package game.controls
             lastScore = newScore;
 
             field.x = sX;
-            field.textColor = labelDesc[newScore].colour;
+            field.textColor = labelDesc[newScore].color;
             field.text = labelDesc[newScore].title;
             sX = field.x;
             frame = 0;

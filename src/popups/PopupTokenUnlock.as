@@ -4,6 +4,7 @@ package popups
     import classes.Language;
     import classes.ui.Box;
     import classes.ui.BoxButton;
+    import com.flashfla.utils.SpriteUtil;
     import com.greensock.TweenLite;
     import com.greensock.easing.Back;
     import flash.display.Bitmap;
@@ -11,8 +12,6 @@ package popups
     import flash.display.DisplayObject;
     import flash.display.Sprite;
     import flash.events.MouseEvent;
-    import flash.filters.BlurFilter;
-    import flash.geom.Point;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
     import flash.text.TextFieldAutoSize;
@@ -49,11 +48,7 @@ package popups
 
         override public function stageAdd():void
         {
-            var bmd:BitmapData = new BitmapData(Main.GAME_WIDTH, Main.GAME_HEIGHT, false, 0x000000);
-            bmd.draw(stage);
-            bmd.applyFilter(bmd, bmd.rect, new Point(), new BlurFilter(16, 16, 3));
-            bmp = new Bitmap(bmd);
-            bmd = null;
+            bmp = SpriteUtil.getBitmapSprite(stage);
             bmp.alpha = 0;
             this.addChild(bmp);
 

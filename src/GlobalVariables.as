@@ -1,7 +1,3 @@
-/**
- * @author Jonathan (Velocity)
- */
-
 package
 {
     import arc.mp.MultiplayerSingleton;
@@ -76,6 +72,10 @@ package
         public var songCache:Array = [];
         public var songHighscores:Object = {};
 
+        public static var divisionColor:Array = [0xC27BA0, 0x8E7CC3, 0x6D9EEB, 0x93C47D, 0xCEA023, 0xE06666, 0x919C86, 0xD2C7AC, 0xBF0000];
+        public static var divisionTitle:Array = ["Novice", "Intermediate", "Advanced", "Expert", "Master", "Guru", "Legendary", "Godly", "Developer"];
+        public static var divisionLevel:Array = [0, 26, 50, 59, 69, 83, 94, 101, 122];
+
         ///- User Vars
         public var userSession:String = "0";
         public var activeUser:User;
@@ -104,6 +104,11 @@ package
         public var air_autoSaveLocalReplays:Boolean = false;
         public var air_useVSync:Boolean = true;
         public var air_useWebsockets:Boolean = false;
+        public var air_saveWindowPosition:Boolean = false;
+        public var air_saveWindowSize:Boolean = false;
+
+        public var air_windowProperties:Object;
+        public var file_replay_cache:FileCache = new FileCache("replays/cache.json", 1);
 
         private var websocket_server:AIRServer;
         private static var websocket_message:Message = new Message();
@@ -119,10 +124,14 @@ package
 
         public function loadAirOptions():void
         {
-            air_useLocalFileCache = LocalStore.getVariable("air_useLocalFileCache", true);
-            air_autoSaveLocalReplays = LocalStore.getVariable("air_autoSaveLocalReplays", true);
-            air_useVSync = LocalStore.getVariable("air_useVSync", false);
-            air_useWebsockets = LocalStore.getVariable("air_useWebsockets", false);
+            air_useVSync = LocalOptions.getVariable("vsync", false);
+            air_useLocalFileCache = LocalOptions.getVariable("use_local_file_cache", true);
+            air_autoSaveLocalReplays = LocalOptions.getVariable("auto_save_local_replays", true);
+            air_useWebsockets = LocalOptions.getVariable("use_websockets", false);
+            air_saveWindowPosition = LocalOptions.getVariable("save_window_position", false);
+            air_saveWindowSize = LocalOptions.getVariable("save_window_size", false);
+
+            air_windowProperties = LocalOptions.getVariable("window_properties", {"x": 0, "y": 0, "width": 0, "height": 0});
 
             if (air_useWebsockets)
             {
@@ -134,8 +143,8 @@ package
         {
             // Export SQL to JSON
             var db_name:String = "dbinfo/" + (activeUser != null && activeUser.siteId > 0 ? activeUser.siteId : "0") + "_info.";
-            var sql_file:File = new File(AirContext.getAppPath(db_name + "db"));
-            var json_file:File = new File(AirContext.getAppPath(db_name + "json"));
+            var sql_file:File = AirContext.getAppFile(db_name + "db");
+            var json_file:File = AirContext.getAppFile(db_name + "json");
 
             // Use JSON first
             if (json_file.exists)
@@ -162,7 +171,7 @@ package
                     writeUserSongData();
 
                     // Create Backup File
-                    var backupFile:File = new File(AirContext.getAppPath(db_name + "db.bak"));
+                    var backupFile:File = AirContext.getAppFile(db_name + "db.bak");
                     for (var i:int = 0; i < 10; i++)
                     {
                         if (!backupFile.exists)
@@ -171,7 +180,7 @@ package
                             break;
                         }
 
-                        backupFile = new File(AirContext.getAppPath(db_name + "db.bak" + i));
+                        backupFile = AirContext.getAppFile(db_name + "db.bak" + i);
                     }
                 });
             }
@@ -180,7 +189,7 @@ package
         public function writeUserSongData():void
         {
             var db_name:String = "dbinfo/" + (activeUser != null && activeUser.siteId > 0 ? activeUser.siteId : "0") + "_info.";
-            var json_file:File = new File(AirContext.getAppPath(db_name + "json"));
+            var json_file:File = AirContext.getAppFile(db_name + "json");
             SQLQueries.writeFile(json_file);
         }
 
@@ -241,11 +250,12 @@ package
 
         public function loadMenuMusic():void
         {
-            menuMusicSoundVolume = menuMusicSoundTransform.volume = LocalStore.getVariable("menuMusicSoundVolume", 1);
+            menuMusicSoundVolume = menuMusicSoundTransform.volume = LocalOptions.getVariable("menu_music_volume", 1);
+
             // Load Existing Menu Music SWF
             if (AirContext.doesFileExist(Constant.MENU_MUSIC_PATH))
             {
-                var file_bytes:ByteArray = AirContext.readFile(AirContext.getAppPath(Constant.MENU_MUSIC_PATH));
+                var file_bytes:ByteArray = AirContext.readFile(AirContext.getAppFile(Constant.MENU_MUSIC_PATH));
                 if (file_bytes && file_bytes.length > 0)
                 {
                     menuMusic = new SongPlayerBytes(file_bytes);
@@ -254,7 +264,7 @@ package
             // Convert MP3 if exist.
             else if (AirContext.doesFileExist(Constant.MENU_MUSIC_MP3_PATH))
             {
-                var mp3Bytes:ByteArray = AirContext.readFile(AirContext.getAppPath(Constant.MENU_MUSIC_MP3_PATH));
+                var mp3Bytes:ByteArray = AirContext.readFile(AirContext.getAppFile(Constant.MENU_MUSIC_MP3_PATH));
                 if (mp3Bytes && mp3Bytes.length > 0)
                 {
                     menuMusic = new SongPlayerBytes(mp3Bytes, true);
@@ -264,6 +274,30 @@ package
         }
 
         ///- Public
+        //- Player Divisions
+        public static function getDivisionColor(level:int):int
+        {
+            return divisionColor[getDivisionNumber(level)];
+        }
+
+        public static function getDivisionTitle(level:int):String
+        {
+            return divisionTitle[getDivisionNumber(level)];
+        }
+
+        public static function getDivisionNumber(level:int):int
+        {
+            var div:int;
+            for (div = divisionLevel.length - 1; div >= 0; --div)
+            {
+                if (level >= divisionLevel[div])
+                {
+                    break;
+                }
+            }
+            return div;
+        }
+
         //- Song Data
         public function getSongFile(songInfo:SongInfo, preview:Boolean = false):Song
         {
@@ -359,8 +393,8 @@ package
             var songIcon:int = 0;
             if (_rank)
             {
-                var arrows:int = _songInfo.noteCount;
-                var scoreRaw:int = _songInfo.scoreRaw;
+                var arrows:int = _songInfo.note_count;
+                var scoreRaw:int = _songInfo.score_raw;
                 if (_rank.arrows > 0)
                 {
                     arrows = _rank.arrows;
@@ -406,8 +440,8 @@ package
             var songIcon:int = SONG_ICON_NO_SCORE;
             if (_rank)
             {
-                var arrows:int = _songInfo.noteCount;
-                var scoreRaw:int = _songInfo.scoreRaw;
+                var arrows:int = _songInfo.note_count;
+                var scoreRaw:int = _songInfo.score_raw;
                 if (_rank.arrows > 0)
                 {
                     arrows = _rank.arrows;
@@ -447,6 +481,8 @@ package
         public static const SONG_ICON_TEXT:Array = ["<font color=\"#9C9C9C\">UNPLAYED</font>", "", "<font color=\"#00FF00\">FC</font>",
             "<font color=\"#f2a254\">SDG</font>", "<font color=\"#2C2C2C\">BLACKFLAG</font>",
             "<font color=\"#473218\">BOOFLAG</font>", "<font color=\"#FFFF38\">AAA</font>", "<font color=\"#00FF00\">FC*</font>"];
+
+        public static const SONG_ICON_COLOR:Array = ["#9C9C9C", "#FFFFFF", "#00FF00", "#f2a254", "#2C2C2C", "#473218", "#FFFF38", "#00FF00"];
 
         public static const SONG_ICON_TEXT_FLAG:Array = ["Unplayed", "Played", "Full Combo",
             "Single Digit Good", "Blackflag", "Booflag", "AAA", "Full Combo*"];

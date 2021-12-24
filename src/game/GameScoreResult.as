@@ -6,6 +6,7 @@ package game
     import classes.replay.Base64Encoder;
     import classes.replay.ReplayPack;
     import flash.utils.ByteArray;
+    import classes.replay.ReplayBinFrame;
 
     public class GameScoreResult
     {
@@ -72,8 +73,8 @@ package game
         public var replay_hit:Array;
 
         // Binary Replays (aka Replay v4)
-        public var replay_bin_notes:Array;
-        public var replay_bin_boos:Array;
+        public var replay_bin_notes:Vector.<ReplayBinFrame>;
+        public var replay_bin_boos:Vector.<ReplayBinFrame>;
         private var _replay_bin:ByteArray;
 
         public function get replayBin():ByteArray
@@ -190,6 +191,23 @@ package game
             var rateString:String = options.songRate != 1 ? " (" + options.songRate + "x Rate)" : "";
 
             return "R^3 - " + songInfo.name + rateString + " - " + score + " - " + pa_string;
+        }
+
+        /**
+         * Get a simple object used for replay caching with only the needed display info.
+         * @return
+         */
+        public function get replay_cache_object():Object
+        {
+            var out:Object = {'name': song.songInfo.name,
+                    'rate': options.songRate,
+                    'score': score,
+                    'judge': [(amazing + perfect), good, average, miss, boo, max_combo]}
+
+            if (songInfo.engine != null)
+                out["engine"] = song.songInfo.engine.id;
+
+            return out;
         }
     }
 }

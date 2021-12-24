@@ -1,11 +1,11 @@
 package classes
 {
+    import arc.ArcGlobals;
     import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.events.IOErrorEvent;
     import flash.events.SecurityErrorEvent;
-    import flash.filesystem.File;
     import flash.net.URLLoader;
     import flash.net.URLRequest;
     import flash.net.URLRequestMethod;
@@ -91,7 +91,7 @@ package classes
             {
                 Logger.error(this, "Parse Failure: " + Logger.exception_error(err));
                 Logger.error(this, "Wrote invalid response data to log folder. [logs/site.txt]");
-                AirContext.writeText("logs/site.txt", siteDataString);
+                AirContext.writeTextFile(AirContext.getAppFile("logs/site.txt"), siteDataString);
 
                 _loadError = true;
                 this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
@@ -106,6 +106,16 @@ package classes
             _gvars.DIFFICULTY_RANGES = data.game_difficulty_range;
             _gvars.NONPUBLIC_GENRES = data.game_nonpublic_genres;
 
+            // MP Divisions
+            GlobalVariables.divisionLevel = data.division_levels;
+            GlobalVariables.divisionTitle = data.division_titles;
+
+            var divisionColors:Array = [];
+            for each (var value:String in data.division_colors)
+                divisionColors.push(parseInt(value.substring(1), 16));
+            GlobalVariables.divisionColor = divisionColors;
+
+            // Tokens
             _gvars.TOKENS = {};
             var tokens:Object = {};
             for each (var tok:Object in data.game_tokens_all)

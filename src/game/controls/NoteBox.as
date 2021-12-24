@@ -48,9 +48,9 @@ package game.controls
 
                 for each (var direction:String in options.noteDirections)
                 {
-                    for each (var colour:String in options.noteColors)
+                    for each (var color:String in options.noteColors)
                     {
-                        notePool[item.id][direction][colour] = new ObjectPool();
+                        notePool[item.id][direction][color] = new ObjectPool();
                     }
                 }
             }
@@ -106,22 +106,11 @@ package game.controls
             // Other Stuff
             sideScroll = options.scrollDirection == "left" || options.scrollDirection == "right";
             scrollSpeed = options.scrollSpeed * (sideScroll ? 1.5 : 1);
-            readahead = (sideScroll ? Main.GAME_WIDTH : Main.GAME_HEIGHT) / 300 * 1000 / scrollSpeed;
+            readahead = ((sideScroll ? Main.GAME_WIDTH : Main.GAME_HEIGHT) / 300 * 1000 / scrollSpeed);
             receptorAlpha = 1.0;
             notes = [];
             noteCount = 0;
             totalNotes = song.totalNotes;
-        }
-
-        override public function set x(x:Number):void
-        {
-            super.x = x;
-        }
-
-        override public function set y(y:Number):void
-        {
-            readahead = (sideScroll ? _gvars.gameMain.stage.stageWidth + x : _gvars.gameMain.stage.stageHeight + y) / 300 * 1000 / scrollSpeed;
-            super.y = y;
         }
 
         public function noteRealSpawnRotation(dir:String, noteskin:int):Number
@@ -144,17 +133,17 @@ package game.controls
         public function spawnArrow(note:Note, current_position:int = 0):GameNote
         {
             var direction:String = note.direction;
-            var colour:String = options.getNewNoteColor(note.colour);
+            var color:String = options.getNewNoteColor(note.color);
             if (options.DISABLE_NOTE_POOL)
             {
-                var gameNote:GameNote = new GameNote(noteCount++, direction, colour, (note.time + 0.5 / 30) * 1000, note.frame, 0, options.noteskin);
+                var gameNote:GameNote = new GameNote(noteCount++, direction, color, (note.time + 0.5 / 30) * 1000, note.frame, 0, options.noteskin);
             }
             else
             {
-                var spawnPoolRef:ObjectPool = notePool[options.noteskin][direction][colour];
+                var spawnPoolRef:ObjectPool = notePool[options.noteskin][direction][color];
                 if (!spawnPoolRef)
                 {
-                    spawnPoolRef = notePool[options.noteskin][direction][colour] = new ObjectPool();
+                    spawnPoolRef = notePool[options.noteskin][direction][color] = new ObjectPool();
                 }
 
                 gameNote = spawnPoolRef.getObject();
@@ -168,7 +157,7 @@ package game.controls
                 }
                 else
                 {
-                    gameNote = spawnPoolRef.addObject(new GameNote(noteCount++, direction, colour, (note.time + 0.5 / 30) * 1000, note.frame, 0, options.noteskin));
+                    gameNote = spawnPoolRef.addObject(new GameNote(noteCount++, direction, color, (note.time + 0.5 / 30) * 1000, note.frame, 0, options.noteskin));
                     addChild(gameNote);
                 }
             }
@@ -236,16 +225,16 @@ package game.controls
                 case 100:
                 case 50:
                     f = 2;
-                    c = options.judgeColours[0];
+                    c = options.judgeColors[0];
                     break;
                 case 25:
                     f = 7;
-                    c = options.judgeColours[2];
+                    c = options.judgeColors[2];
                     break;
                 case 5:
                 case -5:
                     f = 12;
-                    c = options.judgeColours[3];
+                    c = options.judgeColors[3];
                     break;
                 default:
                     return;

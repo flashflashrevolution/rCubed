@@ -98,7 +98,7 @@ package classes.ui
          * First, the text is checked if it passes a regex test.
          * Then, the parsed number is checked to see if it's not NaN and it's within the bounds supplied by the users of this function.
          * If the text is valid:
-         * --> The BoxText is rendered to display its default colours; otherwise, it turns red.
+         * --> The BoxText is rendered to display its default colors; otherwise, it turns red.
          * --> The parsed number is returned; otherwise, the default value is returned.
          * @param default_value Value returned if validation fails
          * @param lower_bound Lower bound of valid region

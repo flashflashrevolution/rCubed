@@ -12,7 +12,7 @@ package arc
         private var lastChord:Object;
 
         private const DIRECTIONS:Array = ['L', 'D', 'U', 'R'];
-        private const HALF_COLOUR:Object = {"red": "red", "blue": "red", "purple": "purple", "yellow": "blue", "pink": "purple", "orange": "yellow", "cyan": "pink", "green": "orange", "white": "white"}
+        private const HALF_COLOR:Object = {"red": "red", "blue": "red", "purple": "purple", "yellow": "blue", "pink": "purple", "orange": "yellow", "cyan": "pink", "green": "orange", "white": "white"}
 
         public var options:GameOptions;
 
@@ -23,7 +23,7 @@ package arc
         public var modScramble:Boolean;
         public var modShuffle:Boolean;
         public var modReverse:Boolean;
-        public var modColumnColour:Boolean;
+        public var modColumnColor:Boolean;
         public var modHalfTime:Boolean;
         public var modNoBackground:Boolean;
         public var modIsolation:Boolean;
@@ -33,6 +33,7 @@ package arc
         public var modJudgeWindow:Boolean;
 
         private var reverseLastFrame:int;
+        private var reverseLastPos:Number;
 
         public function NoteMod(song:Song, options:GameOptions)
         {
@@ -51,7 +52,7 @@ package arc
             modScramble = options.modEnabled("scramble");
             modShuffle = options.modEnabled("shuffle");
             modReverse = options.modEnabled("reverse");
-            modColumnColour = options.modEnabled("columncolour");
+            modColumnColor = options.modEnabled("columncolour");
             modHalfTime = options.modEnabled("halftime");
             modNoBackground = options.modEnabled("nobackground");
             modIsolation = options.isolation;
@@ -61,6 +62,7 @@ package arc
             modJudgeWindow = Boolean(options.judgeWindow);
 
             reverseLastFrame = -1;
+            reverseLastPos = -1;
         }
 
         public function start(options:GameOptions):void
@@ -105,7 +107,7 @@ package arc
 
         public function required():Boolean
         {
-            return modIsolation || modRandom || modScramble || modShuffle || modColumnColour || modHalfTime || modMirror || modOffset || modRate;
+            return modIsolation || modRandom || modScramble || modShuffle || modColumnColor || modHalfTime || modMirror || modOffset || modRate;
         }
 
         public function transformNote(index:int):Note
@@ -117,7 +119,10 @@ package arc
             {
                 index = notes.length - 1 - index;
                 if (reverseLastFrame < 0)
+                {
                     reverseLastFrame = notes[notes.length - 1].frame - song.musicDelay * 2;
+                    reverseLastPos = notes[notes.length - 1].time - ((song.musicDelay * 2) / 30);
+                }
             }
 
             var note:Note = notes[index];
@@ -125,13 +130,18 @@ package arc
                 return null;
 
             var pos:Number = note.time;
-            var colour:String = note.colour;
-            var frame:Number = note.frame - song.musicDelay;
+            var color:String = note.color;
+            var frame:Number = note.frame;
             var dir:int = valueOfDirection(note.direction);
 
+            frame -= song.musicDelay;
+            pos -= (song.musicDelay / 30);
+
             if (modReverse)
+            {
                 frame = reverseLastFrame - frame + song.mp3Frame + 60;
-            pos = frame / 30;
+                pos = reverseLastPos - pos + (song.mp3Frame + 60) / 30;
+            }
 
             if (modRate)
             {
@@ -178,13 +188,13 @@ package arc
                 }
             }
 
-            if (modColumnColour)
-                colour = (dir % 3) ? "blue" : "red";
+            if (modColumnColor)
+                color = (dir % 3) ? "blue" : "red";
 
             if (modHalfTime)
-                colour = HALF_COLOUR[colour] || colour;
+                color = HALF_COLOR[color] || color;
 
-            return new Note(directionOfValue(dir), pos, colour, int(frame));
+            return new Note(directionOfValue(dir), pos, color, int(frame));
         }
 
         public function transformTotalNotes():int

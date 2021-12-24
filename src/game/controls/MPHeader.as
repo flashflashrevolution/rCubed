@@ -73,7 +73,7 @@ package game.controls
             avatar.y = -avatar.height + 25;
             if (field.textWidth < 100)
                 field.x = 50 - field.textWidth / 2;
-            field.y = -avatar.height;
+            field.y = -avatar.height - 5;
         }
     }
 }

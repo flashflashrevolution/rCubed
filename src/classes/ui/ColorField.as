@@ -84,7 +84,6 @@ package classes.ui
                 var stagePoint:Point = this.localToGlobal(new Point(this.width + 5, 0));
                 stagePoint.x = Math.max(0, Math.min(stagePoint.x, Main.GAME_WIDTH - _picker.width - 5));
                 stagePoint.y = Math.max(0, Math.min(stagePoint.y, Main.GAME_HEIGHT - _picker.height - 5));
-                trace(stagePoint);
                 _picker.x = stagePoint.x;
                 _picker.y = stagePoint.y;
                 stage.addChild(_picker);
@@ -94,10 +93,12 @@ package classes.ui
         private function draw():void
         {
             this.graphics.clear();
-            this.graphics.lineStyle(1, 0xFFFFFF);
+            this.graphics.lineStyle(0, 0, 0);
             this.graphics.beginFill(_color);
-            this.graphics.drawRect(0, 0, _width, _height);
+            this.graphics.drawRect(1, 1, _width - 1, _height - 1);
             this.graphics.endFill();
+            this.graphics.lineStyle(1, 0xFFFFFF, 0.5);
+            this.graphics.drawRect(0, 0, _width, _height);
         }
 
         public function get color():int

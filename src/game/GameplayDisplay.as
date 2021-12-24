@@ -2,40 +2,39 @@ package game
 {
     import arc.ArcGlobals;
     import arc.mp.MultiplayerSingleton;
+    import assets.GameBackgroundColor;
     import assets.gameplay.viewLR;
     import assets.gameplay.viewUD;
     import classes.Alert;
     import classes.GameNote;
+    import classes.Gameplay;
     import classes.Language;
     import classes.Noteskins;
     import classes.User;
-    import classes.Gameplay;
     import classes.chart.LevelScriptRuntime;
     import classes.chart.Note;
     import classes.chart.NoteChart;
     import classes.chart.Song;
+    import classes.replay.ReplayBinFrame;
     import classes.replay.ReplayNote;
     import classes.ui.BoxButton;
     import classes.ui.ProgressBar;
     import com.flashfla.net.Multiplayer;
+    import com.flashfla.net.events.GameResultsEvent;
+    import com.flashfla.net.events.GameUpdateEvent;
     import com.flashfla.utils.Average;
     import com.flashfla.utils.RollingAverage;
     import com.flashfla.utils.TimeUtil;
-    import com.flashfla.net.events.GameUpdateEvent;
-    import com.flashfla.net.events.GameResultsEvent;
-    import flash.display.GradientType;
+    import flash.display.Bitmap;
+    import flash.display.BitmapData;
     import flash.display.MovieClip;
     import flash.display.Sprite;
-    import flash.display.BitmapData;
-    import flash.display.Bitmap;
     import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.IOErrorEvent;
     import flash.events.KeyboardEvent;
     import flash.events.MouseEvent;
     import flash.events.SecurityErrorEvent;
-    import flash.geom.Matrix;
-    import flash.geom.Rectangle;
     import flash.net.URLLoader;
     import flash.net.URLLoaderDataFormat;
     import flash.net.URLRequest;
@@ -44,14 +43,17 @@ package game
     import flash.ui.Keyboard;
     import flash.ui.Mouse;
     import flash.utils.getTimer;
+    import game.controls.AccuracyBar;
     import game.controls.Combo;
-    import game.controls.ComboStatic;
+    import game.controls.FlashlightOverlay;
     import game.controls.Judge;
     import game.controls.LifeBar;
     import game.controls.MPHeader;
     import game.controls.NoteBox;
     import game.controls.PAWindow;
     import game.controls.Score;
+    import game.controls.ScreenCut;
+    import game.controls.TextStatic;
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import sql.SQLSongUserInfo;
@@ -64,6 +66,8 @@ package game
         public static const GAME_RESTART:int = 2;
         public static const GAME_PAUSE:int = 3;
 
+        public static const LAYOUT_PROGRESS_BAR:String = "progressbar";
+        public static const LAYOUT_PROGRESS_TEXT:String = "progresstext";
         public static const LAYOUT_RECEPTORS:String = "receptors";
         public static const LAYOUT_JUDGE:String = "judge";
         public static const LAYOUT_HEALTH:String = "health";
@@ -72,6 +76,7 @@ package game
         public static const LAYOUT_COMBO_TOTAL:String = "combototal";
         public static const LAYOUT_COMBO_STATIC:String = "combostatic";
         public static const LAYOUT_COMBO_TOTAL_STATIC:String = "combototalstatic";
+        public static const LAYOUT_ACCURACY_BAR:String = "accuracybar";
         public static const LAYOUT_PA:String = "pa";
 
         public static const LAYOUT_MP_JUDGE:String = "mpjudge";
@@ -97,18 +102,20 @@ package game
         private var displayBlackBG:Sprite;
         private var gameplayUI:*;
         private var progressDisplay:ProgressBar;
+        private var progressDisplayText:TextStatic;
         private var noteBox:NoteBox;
-        private var paWindow:PAWindow;
         private var score:Score;
-        private var combo:Combo;
         private var comboTotal:Combo;
-        private var comboStatic:ComboStatic;
-        private var comboTotalStatic:ComboStatic;
-        private var screenCut:Sprite;
-        private var flashLight:Sprite;
+        private var comboStatic:TextStatic;
+        private var comboTotalStatic:TextStatic;
+        private var accBar:AccuracyBar;
+        private var screenCut:ScreenCut;
+        private var flashLight:FlashlightOverlay;
         private var exitEditor:BoxButton;
         private var resetEditor:BoxButton;
 
+        private var player1PAWindow:PAWindow;
+        private var player1Combo:Combo;
         private var player1Life:LifeBar;
         private var player1Judge:Judge;
         private var player1JudgeOffset:int;
@@ -133,7 +140,7 @@ package game
         private var accuracy:Average;
         private var judgeOffset:int = 0;
         private var autoJudgeOffset:Boolean = false;
-        private var judgeSettings:Array;
+        private var judgeSettings:Vector.<JudgeNode>;
 
         private var quitDoubleTap:int = -1;
 
@@ -161,8 +168,8 @@ package game
          */
         private var gameReplayHit:Array;
 
-        private var binReplayNotes:Array;
-        private var binReplayBoos:Array;
+        private var binReplayNotes:Vector.<ReplayBinFrame>;
+        private var binReplayBoos:Vector.<ReplayBinFrame>;
 
         private var replayPressCount:Number = 0;
 
@@ -229,21 +236,21 @@ package game
                 if (perSongOptions.set_mirror_invert)
                 {
                     if (options.modEnabled("mirror"))
+                    {
+                        options.mods.removeAt(options.mods.indexOf("mirror"));
                         delete options.modCache["mirror"];
+                    }
                     else
+                    {
+                        options.mods.push("mirror");
                         options.modCache["mirror"] = true;
+                    }
                 }
             }
             // --- End Per Song Settings
 
             return true;
         }
-
-        // protected function initStage3D(e:Event):void
-        // {
-        //     // //var context3D:Context3D = stage.stage3Ds[0].context3D;
-        //     //context3D.createProgram()		
-        // }
 
         override public function stageAdd():void
         {
@@ -253,15 +260,11 @@ package game
             if (MenuSongSelection.previewMusic)
                 MenuSongSelection.previewMusic.stop();
 
-            // var stage3D:Stage3D = stage.stage3Ds[0];
-            // stage.stage3Ds[0].addEventListener(Event.CONTEXT3D_CREATE, initStage3D);
-            // stage.stage3Ds[0].requestContext3D(Context3DRenderMode.AUTO, Context3DProfile.ENHANCED);
-
             // Create Background
             initBackground();
-            initPlayerVars();
 
             // Init Core
+            initPlayerVars();
             initCore();
 
             // Prebuild Websocket Message, this is updated instead of creating a new object every message.
@@ -287,12 +290,12 @@ package game
                         "difficulty": song.songInfo.difficulty,
                         "style": song.songInfo.style,
                         "author": song.songInfo.author,
-                        "author_url": song.songInfo.stepauthorURL,
+                        "author_url": song.songInfo.stepauthor_url,
                         "stepauthor": song.songInfo.stepauthor,
                         "credits": song.songInfo.credits,
                         "genre": song.songInfo.genre,
-                        "nps_min": song.songInfo.minNps,
-                        "nps_max": song.songInfo.maxNps,
+                        "nps_min": song.songInfo.min_nps,
+                        "nps_max": song.songInfo.max_nps,
                         // TODO: Check these fields
                         //"release_date": song.songInfo.releasedate,
                         //"song_rating": song.songInfo.song_rating,
@@ -450,6 +453,8 @@ package game
             GPU_PIXEL_BITMAP = new Bitmap(GPU_PIXEL_BMD);
             this.addChild(GPU_PIXEL_BITMAP);
 
+            stage.color = GameBackgroundColor.BG_STAGE;
+
             // if (!displayBlackBG)
             // {
             //     displayBlackBG = new Sprite();
@@ -507,12 +512,15 @@ package game
             if (!options.displayGameBottomBar)
                 gameplayUI.bottom_bar.visible = false;
 
+            if (!options.displayGameTopBar && !options.displayGameBottomBar)
+                gameplayUI.visible = false;
+
             if (options.displayPA)
             {
-                paWindow = new PAWindow(options);
+                player1PAWindow = new PAWindow(options);
                 if (sideScroll)
-                    paWindow.alternateLayout();
-                this.addChild(paWindow);
+                    player1PAWindow.alternateLayout();
+                this.addChild(player1PAWindow);
             }
 
             if (options.displayScore)
@@ -523,12 +531,12 @@ package game
 
             if (options.displayCombo)
             {
-                combo = new Combo(options);
+                player1Combo = new Combo(options);
                 if (!sideScroll)
-                    combo.alignment = Combo.ALIGN_RIGHT;
-                this.addChild(combo);
+                    player1Combo.alignment = "right";
+                this.addChild(player1Combo);
 
-                comboStatic = new ComboStatic(_lang.string("game_combo"));
+                comboStatic = new TextStatic(_lang.string("game_combo"));
                 this.addChild(comboStatic);
             }
 
@@ -536,19 +544,30 @@ package game
             {
                 comboTotal = new Combo(options);
                 if (sideScroll)
-                    comboTotal.alignment = Combo.ALIGN_RIGHT;
+                    comboTotal.alignment = "right";
                 this.addChild(comboTotal);
 
-                comboTotalStatic = new ComboStatic(_lang.string("game_combo_total"));
+                comboTotalStatic = new TextStatic(_lang.string("game_combo_total"));
                 this.addChild(comboTotalStatic);
+            }
+
+            if (options.displayAccuracyBar)
+            {
+                accBar = new AccuracyBar(options);
+                this.addChild(accBar);
             }
 
             if (options.displaySongProgress || options.replay)
             {
-                progressDisplay = new ProgressBar(gameplayUI, 161, 9.35, 458, 20, 4, 0x545454, 0.1);
+                progressDisplay = new ProgressBar(this, 161, 9, 458, 20, 4, 0x545454, 0.1);
 
                 if (options.replay)
                     progressDisplay.addEventListener(MouseEvent.CLICK, progressMouseClick);
+            }
+            if (options.displaySongProgressText)
+            {
+                progressDisplayText = new TextStatic("0:00");
+                this.addChild(progressDisplayText);
             }
 
             if (!mpSpectate)
@@ -605,9 +624,9 @@ package game
             globalOffset = (options.offsetGlobal - globalOffsetRounded) * 1000 / 30;
 
             if (options.judgeWindow)
-                judgeSettings = options.judgeWindow;
+                judgeSettings = buildJudgeNodes(options.judgeWindow);
             else
-                judgeSettings = Constant.JUDGE_WINDOW;
+                judgeSettings = buildJudgeNodes(Constant.JUDGE_WINDOW);
             judgeOffset = options.offsetJudge * 1000 / 30;
             autoJudgeOffset = options.autoJudgeOffset;
 
@@ -649,8 +668,12 @@ package game
             gameReplay = [];
             gameReplayHit = [];
 
-            binReplayNotes = [];
-            binReplayBoos = [];
+            binReplayNotes = new Vector.<ReplayBinFrame>(song.totalNotes, true);
+            binReplayBoos = new <ReplayBinFrame>[];
+
+            // Prefill Replay
+            for (var i:int = song.totalNotes - 1; i >= 0; i--)
+                binReplayNotes[i] = new ReplayBinFrame(NaN, song.getNote(i).direction, i);
 
             replayPressCount = 0;
 
@@ -686,10 +709,13 @@ package game
 
             songDelayStarted = false;
 
+            updateFieldVars();
+
+            if (progressDisplayText)
+                progressDisplayText.update(TimeUtil.convertToHMSS(Math.ceil(gameLastNoteFrame / 30)));
+
             if (postStart)
             {
-                updateFieldVars();
-
                 // Websocket
                 if (_gvars.air_useWebsockets)
                 {
@@ -791,6 +817,12 @@ package game
                 return;
             }
 
+            // Timer Text
+            if (gameProgress % 30 == 0 && progressDisplayText != null)
+            {
+                progressDisplayText.update(TimeUtil.convertToHMSS(Math.ceil(Math.max(0, (gameLastNoteFrame - gameProgress)) / 30)));
+            }
+
             var nextNote:Note = noteBox.nextNote;
             while (nextNote && nextNote.frame <= gameProgress + player1JudgeOffset + 5)
             {
@@ -813,7 +845,6 @@ package game
                 // Remove Old note
                 if (gameProgress - curNote.PROGRESS + player1JudgeOffset >= 6)
                 {
-                    binReplayNotes[curNote.ID] = {"d": curNote.DIR, "t": null};
                     commitJudge(curNote.DIR, gameProgress, -10);
                     noteBox.removeNote(curNote.ID);
                     n--;
@@ -836,12 +867,12 @@ package game
                         var repCurNote:GameNote = notes[rn];
 
                         // Missed Note
-                        if (repCurNote.ID >= cutOffReplayNote || options.replay.generationReplayNotes[repCurNote.ID] == null)
+                        if (repCurNote.ID >= cutOffReplayNote || (options.replay.generationReplayNotes[repCurNote.ID] == null || isNaN(options.replay.generationReplayNotes[repCurNote.ID].time)))
                         {
                             continue;
                         }
 
-                        var diffValue:int = options.replay.generationReplayNotes[repCurNote.ID] + repCurNote.POSITION;
+                        var diffValue:int = options.replay.generationReplayNotes[repCurNote.ID].time + repCurNote.POSITION;
                         if ((gamePosition + readAheadTime >= diffValue) || gamePosition >= diffValue)
                         {
                             judgeScorePosition(repCurNote.DIR, diffValue);
@@ -853,7 +884,10 @@ package game
                     while (newPress != null && gamePosition >= newPress.time)
                     {
                         if (newPress.frame == -2)
+                        {
                             commitJudge(newPress.direction, gameProgress, -5);
+                            binReplayBoos[binReplayBoos.length] = new ReplayBinFrame(newPress.time, newPress.direction, binReplayBoos.length);
+                        }
                         replayPressCount++;
                         newPress = options.replay.getPress(replayPressCount);
                     }
@@ -944,12 +978,12 @@ package game
 
         private function onEnterFrame(e:Event):void
         {
-            // XXX: HACK HACK HACK
             if (options.displayJudge && player1Judge != null)
             {
                 player1Judge.updateJudge(e);
             }
 
+            // XXX: HACK HACK HACK
             if (legacyMode)
             {
                 var songFrame:int = song_background.currentFrame;
@@ -1029,7 +1063,7 @@ package game
                     noteBox.update(gamePosition);
 
                     if (progressDisplay)
-                        progressDisplay.update((gameProgress / gameLastNoteFrame) * 100, false);
+                        progressDisplay.update(gameProgress / gameLastNoteFrame, false);
                     break;
                 case GAME_END:
                     endGame();
@@ -1406,7 +1440,7 @@ package game
             }
             if (progressDisplay)
             {
-                gameplayUI.removeChild(progressDisplay);
+                this.removeChild(progressDisplay);
                 progressDisplay = null;
             }
             if (player1Life)
@@ -1468,8 +1502,11 @@ package game
             // Remove Notes
             noteBox.reset();
 
-            if (paWindow)
-                paWindow.reset();
+            if (player1PAWindow)
+                player1PAWindow.reset();
+
+            if (accBar)
+                accBar.onResetSignal();
 
             noteBoxOffset = {"x": 0, "y": 0};
 
@@ -1518,15 +1555,8 @@ package game
             if (options.modEnabled("flashlight"))
             {
                 if (flashLight == null)
-                {
-                    var _matrix:Matrix = new Matrix();
-                    _matrix.createGradientBox(Main.GAME_WIDTH, Main.GAME_HEIGHT, 1.5707963267948966);
-                    flashLight = new Sprite();
-                    flashLight.graphics.clear();
-                    flashLight.graphics.beginGradientFill(GradientType.LINEAR, [0, 0, 0, 0, 0, 0], [0.95, 0.55, 0, 0, 0.55, 0.95], [0x00, 0x52, 0x6C, 0x92, 0xAC, 0xFF], _matrix);
-                    flashLight.graphics.drawRect(0, -Main.GAME_HEIGHT, Main.GAME_WIDTH, Main.GAME_HEIGHT * 3);
-                    flashLight.graphics.endFill();
-                }
+                    flashLight = new FlashlightOverlay();
+
                 if (!contains(flashLight))
                     addChild(flashLight);
             }
@@ -1538,7 +1568,7 @@ package game
 
         private function buildScreenCut():void
         {
-            if (!options.displayScreencut && !options.isEditor)
+            if (!options.displayScreencut)
                 return;
 
             if (screenCut)
@@ -1547,91 +1577,7 @@ package game
                     this.removeChild(screenCut);
                 screenCut = null;
             }
-            screenCut = new Sprite();
-            screenCut.graphics.lineStyle(3, 0x39C4E1, 1);
-            screenCut.graphics.beginFill(0x000000);
-
-            switch (options.scrollDirection)
-            {
-                case "down":
-                    screenCut.x = 0;
-                    screenCut.y = options.screencutPosition * Main.GAME_HEIGHT;
-                    screenCut.graphics.drawRect(-Main.GAME_WIDTH, -(Main.GAME_HEIGHT * 3), Main.GAME_WIDTH * 3, Main.GAME_HEIGHT * 3);
-
-                    if (options.isEditor)
-                    {
-                        screenCut.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void
-                        {
-                            screenCut.startDrag(false, new Rectangle(0, 5, 0, Main.GAME_HEIGHT - 7));
-                        });
-                        screenCut.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void
-                        {
-                            screenCut.stopDrag();
-                            options.screencutPosition = (screenCut.y / Main.GAME_HEIGHT);
-                        });
-                    }
-                    break;
-                case "right":
-                    screenCut.x = options.screencutPosition * Main.GAME_WIDTH;
-                    screenCut.y = 0;
-                    screenCut.graphics.drawRect(-Main.GAME_WIDTH * 3, -Main.GAME_HEIGHT, Main.GAME_WIDTH * 3, Main.GAME_HEIGHT * 3);
-
-                    if (options.isEditor)
-                    {
-                        screenCut.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void
-                        {
-                            screenCut.startDrag(false, new Rectangle(0, 0, Main.GAME_WIDTH - 7, 0));
-                        });
-                        screenCut.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void
-                        {
-                            screenCut.stopDrag();
-                            options.screencutPosition = (screenCut.x / Main.GAME_WIDTH);
-                        });
-                    }
-                    break;
-                case "left":
-                    screenCut.x = Main.GAME_WIDTH - (options.screencutPosition * Main.GAME_WIDTH);
-                    screenCut.y = 0;
-                    screenCut.graphics.drawRect(0, -Main.GAME_HEIGHT, Main.GAME_WIDTH * 3, Main.GAME_HEIGHT * 3);
-
-                    if (options.isEditor)
-                    {
-                        screenCut.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void
-                        {
-                            screenCut.startDrag(false, new Rectangle(0, 0, Main.GAME_WIDTH - 7, 0));
-                        });
-                        screenCut.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void
-                        {
-                            screenCut.stopDrag();
-                            options.screencutPosition = 1 - (screenCut.x / Main.GAME_WIDTH);
-                        });
-                    }
-                    break;
-                default:
-                    screenCut.x = 0;
-                    screenCut.y = Main.GAME_HEIGHT - (options.screencutPosition * Main.GAME_HEIGHT);
-                    screenCut.graphics.drawRect(-Main.GAME_WIDTH, 0, Main.GAME_WIDTH * 3, Main.GAME_HEIGHT * 3);
-
-                    if (options.isEditor)
-                    {
-                        screenCut.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void
-                        {
-                            screenCut.startDrag(false, new Rectangle(0, 5, 0, Main.GAME_HEIGHT - 7));
-                        });
-                        screenCut.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void
-                        {
-                            screenCut.stopDrag();
-                            options.screencutPosition = 1 - (screenCut.y / Main.GAME_HEIGHT);
-                        });
-                    }
-                    break;
-            }
-            screenCut.graphics.endFill();
-            if (options.isEditor)
-            {
-                screenCut.buttonMode = true;
-                screenCut.useHandCursor = true;
-            }
+            screenCut = new ScreenCut(options);
             this.addChild(screenCut);
         }
 
@@ -1639,6 +1585,7 @@ package game
         {
             if (!options.displayJudge)
                 return;
+
             player1Judge = new Judge(options);
             addChild(player1Judge);
             if (options.isEditor)
@@ -1649,6 +1596,7 @@ package game
         {
             if (!options.displayHealth)
                 return;
+
             player1Life = new LifeBar();
             player1Life.x = Main.GAME_WIDTH - 37;
             player1Life.y = 71.5;
@@ -1657,18 +1605,26 @@ package game
 
         private function buildMultiplayer():void
         {
-            mpJudge = new Array();
-            mpPA = new Array();
-            mpCombo = new Array();
-            mpHeader = new Array();
+            mpJudge = [];
+            mpPA = [];
+            mpCombo = [];
+            mpHeader = [];
 
-            if (!options.displayMP && !mpSpectate)
+            if (!options.displayMPUI && !mpSpectate)
                 return;
 
             for each (var user:User in options.mpRoom.players)
             {
                 if (user.id == options.mpRoom.connection.currentUser.id)
+                {
+                    if (player1PAWindow)
+                        mpPA[user.playerIdx] = player1PAWindow;
+                    if (player1Combo)
+                        mpCombo[user.playerIdx] = player1Combo;
+                    if (player1Judge)
+                        mpJudge[user.playerIdx] = player1Judge;
                     continue;
+                }
 
                 if (options.displayMPPA)
                 {
@@ -1694,10 +1650,8 @@ package game
                     mpCombo[user.playerIdx] = combo;
                 }
 
-                // Hide opponent's judge
-                if (mpSpectate)
+                if (options.displayMPJudge)
                 {
-                    //if (options.displayMPJudge) {
                     var judge:Judge = new Judge(options);
                     addChild(judge);
                     mpJudge[user.playerIdx] = judge;
@@ -1728,7 +1682,10 @@ package game
         private function interfaceSetup():void
         {
             defaultLayout = new Object();
+            defaultLayout[LAYOUT_PROGRESS_BAR] = {x: 161, y: 9};
+            defaultLayout[LAYOUT_PROGRESS_TEXT] = {x: 768, y: 5, properties: {alignment: "right"}};
             defaultLayout[LAYOUT_JUDGE] = {x: 392, y: 228};
+            defaultLayout[LAYOUT_ACCURACY_BAR] = {x: (Main.GAME_WIDTH / 2), y: 328};
             defaultLayout[LAYOUT_HEALTH] = {x: Main.GAME_WIDTH - 37, y: 71.5};
             defaultLayout[LAYOUT_RECEPTORS] = {x: 230, y: 0};
             if (sideScroll)
@@ -1736,7 +1693,7 @@ package game
                 defaultLayout[LAYOUT_PA] = {x: 16, y: 418};
                 defaultLayout[LAYOUT_SCORE] = {x: 392, y: 24};
                 defaultLayout[LAYOUT_COMBO] = {x: 508, y: 388};
-                defaultLayout[LAYOUT_COMBO_TOTAL] = {x: 770, y: 420, properties: {alignment: Combo.ALIGN_RIGHT}};
+                defaultLayout[LAYOUT_COMBO_TOTAL] = {x: 770, y: 420, properties: {alignment: "right"}};
                 defaultLayout[LAYOUT_COMBO_STATIC] = {x: 512, y: 438};
                 defaultLayout[LAYOUT_COMBO_TOTAL_STATIC] = {x: 734, y: 414};
             }
@@ -1744,79 +1701,93 @@ package game
             {
                 defaultLayout[LAYOUT_PA] = {x: 6, y: 96};
                 defaultLayout[LAYOUT_SCORE] = {x: 392, y: 440};
-                defaultLayout[LAYOUT_COMBO] = {x: 222, y: 402, properties: {alignment: Combo.ALIGN_RIGHT}};
+                defaultLayout[LAYOUT_COMBO] = {x: 222, y: 402, properties: {alignment: "right"}};
                 defaultLayout[LAYOUT_COMBO_TOTAL] = {x: 544, y: 402};
                 defaultLayout[LAYOUT_COMBO_STATIC] = {x: 228, y: 436};
                 defaultLayout[LAYOUT_COMBO_TOTAL_STATIC] = {x: 502, y: 436};
             }
 
-            if (mpSpectate)
-            {
-                defaultLayout[LAYOUT_MP_COMBO + "1"] = defaultLayout[LAYOUT_COMBO];
-                defaultLayout[LAYOUT_MP_JUDGE + "1"] = {x: 208, y: 102};
-                defaultLayout[LAYOUT_MP_PA + "1"] = {x: 6, y: 190};
-                if (options.displayMPPA)
-                    defaultLayout[LAYOUT_MP_HEADER + "1"] = {x: 0, y: -35};
-                else
-                    defaultLayout[LAYOUT_MP_HEADER + "1"] = {x: 6, y: 190};
-            }
+            // Multiplayer
+            defaultLayout[LAYOUT_MP_COMBO + "1"] = defaultLayout[LAYOUT_COMBO];
+            defaultLayout[LAYOUT_MP_JUDGE + "1"] = {x: 208, y: 102};
+            defaultLayout[LAYOUT_MP_PA + "1"] = {x: 6, y: 96};
+            if (options.displayMPPA)
+                defaultLayout[LAYOUT_MP_HEADER + "1"] = {x: 0, y: -35};
+            else
+                defaultLayout[LAYOUT_MP_HEADER + "1"] = {x: 6, y: 190};
 
             defaultLayout[LAYOUT_MP_COMBO + "2"] = defaultLayout[LAYOUT_COMBO_TOTAL];
             defaultLayout[LAYOUT_MP_JUDGE + "2"] = {x: 568, y: 102};
-            defaultLayout[LAYOUT_MP_PA + "2"] = {x: 645, y: (mpSpectate ? 190 : 96)};
+            defaultLayout[LAYOUT_MP_PA + "2"] = {x: 645, y: 96, properties: {alignment: "right"}};
             if (options.displayMPPA)
                 defaultLayout[LAYOUT_MP_HEADER + "2"] = {x: 25, y: -35, properties: {alignment: MPHeader.ALIGN_RIGHT}};
             else
                 defaultLayout[LAYOUT_MP_HEADER + "2"] = {x: 690, y: 190, properties: {alignment: MPHeader.ALIGN_RIGHT}};
 
+            if (mpSpectate)
+            {
+                defaultLayout[LAYOUT_MP_PA + "1"]["y"] += 84;
+                defaultLayout[LAYOUT_MP_PA + "2"]["y"] += 84;
+            }
+
             noteBoxPositionDefault = interfaceLayout(LAYOUT_RECEPTORS);
 
+            // Position
+            interfacePosition(progressDisplay, interfaceLayout(LAYOUT_PROGRESS_BAR));
+            interfacePosition(progressDisplayText, interfaceLayout(LAYOUT_PROGRESS_TEXT));
             interfacePosition(noteBox, interfaceLayout(LAYOUT_RECEPTORS));
-            interfacePosition(player1Judge, interfaceLayout(LAYOUT_JUDGE));
+            interfacePosition(accBar, interfaceLayout(LAYOUT_ACCURACY_BAR));
             interfacePosition(player1Life, interfaceLayout(LAYOUT_HEALTH));
             interfacePosition(score, interfaceLayout(LAYOUT_SCORE));
-            interfacePosition(combo, interfaceLayout(LAYOUT_COMBO));
             interfacePosition(comboTotal, interfaceLayout(LAYOUT_COMBO_TOTAL));
-            interfacePosition(paWindow, interfaceLayout(LAYOUT_PA));
             interfacePosition(comboStatic, interfaceLayout(LAYOUT_COMBO_STATIC));
             interfacePosition(comboTotalStatic, interfaceLayout(LAYOUT_COMBO_TOTAL_STATIC));
 
-            if (options.isEditor)
+            if (!options.mpRoom)
             {
-                interfaceEditor(noteBox, interfaceLayout(LAYOUT_RECEPTORS, false));
-                interfaceEditor(player1Judge, interfaceLayout(LAYOUT_JUDGE, false));
-                interfaceEditor(player1Life, interfaceLayout(LAYOUT_HEALTH, false));
-                interfaceEditor(score, interfaceLayout(LAYOUT_SCORE, false));
-                interfaceEditor(combo, interfaceLayout(LAYOUT_COMBO, false));
-                interfaceEditor(comboTotal, interfaceLayout(LAYOUT_COMBO_TOTAL, false));
-                interfaceEditor(paWindow, interfaceLayout(LAYOUT_PA, false));
-                interfaceEditor(comboStatic, interfaceLayout(LAYOUT_COMBO_STATIC, false));
-                interfaceEditor(comboTotalStatic, interfaceLayout(LAYOUT_COMBO_TOTAL_STATIC, false));
+                interfacePosition(player1PAWindow, interfaceLayout(LAYOUT_PA));
+                interfacePosition(player1Combo, interfaceLayout(LAYOUT_COMBO));
+                interfacePosition(player1Judge, interfaceLayout(LAYOUT_JUDGE));
             }
 
+            // Editor Mode
+            if (options.isEditor)
+            {
+                interfaceEditor(progressDisplay, interfaceLayout(LAYOUT_PROGRESS_BAR, false));
+                interfaceEditor(progressDisplayText, interfaceLayout(LAYOUT_PROGRESS_TEXT, false));
+                interfaceEditor(noteBox, interfaceLayout(LAYOUT_RECEPTORS, false));
+                interfaceEditor(accBar, interfaceLayout(LAYOUT_ACCURACY_BAR, false));
+                interfaceEditor(player1Life, interfaceLayout(LAYOUT_HEALTH, false));
+                interfaceEditor(score, interfaceLayout(LAYOUT_SCORE, false));
+                interfaceEditor(comboTotal, interfaceLayout(LAYOUT_COMBO_TOTAL, false));
+                interfaceEditor(comboStatic, interfaceLayout(LAYOUT_COMBO_STATIC, false));
+                interfaceEditor(comboTotalStatic, interfaceLayout(LAYOUT_COMBO_TOTAL_STATIC, false));
+
+                if (!options.mpRoom)
+                {
+                    interfaceEditor(player1PAWindow, interfaceLayout(LAYOUT_PA, false));
+                    interfaceEditor(player1Combo, interfaceLayout(LAYOUT_COMBO, false));
+                    interfaceEditor(player1Judge, interfaceLayout(LAYOUT_JUDGE, false));
+                }
+            }
+
+            // Multiplayer
             if (options.mpRoom)
             {
-                var index:int = 0;
-                for (var id:int = 1; id < options.mpRoom.playerCount + 1; id++)
+                for each (var user:User in options.mpRoom.players)
                 {
-                    if (id == options.mpRoom.connection.currentUser.id)
-                        continue;
+                    interfacePosition(mpJudge[user.playerIdx], interfaceLayout(LAYOUT_MP_JUDGE + user.playerIdx));
+                    interfacePosition(mpCombo[user.playerIdx], interfaceLayout(LAYOUT_MP_COMBO + user.playerIdx));
+                    interfacePosition(mpPA[user.playerIdx], interfaceLayout(LAYOUT_MP_PA + user.playerIdx));
+                    interfacePosition(mpHeader[user.playerIdx], interfaceLayout(LAYOUT_MP_HEADER + user.playerIdx));
 
-                    index++;
-                    var indexs:String = index.toString();
-                    
-                    interfacePosition(mpJudge[index], interfaceLayout(LAYOUT_MP_JUDGE + indexs));
-                    interfacePosition(mpCombo[index], interfaceLayout(LAYOUT_MP_COMBO + indexs));
-                    interfacePosition(mpPA[index], interfaceLayout(LAYOUT_MP_PA + indexs));
-                    interfacePosition(mpHeader[index], interfaceLayout(LAYOUT_MP_HEADER + indexs));
-                    
-
+                    // Multiplayer - Editor
                     if (options.isEditor)
                     {
-                        interfaceEditor(mpJudge[index], interfaceLayout(LAYOUT_MP_JUDGE + indexs, false));
-                        interfaceEditor(mpCombo[index], interfaceLayout(LAYOUT_MP_COMBO + indexs, false));
-                        interfaceEditor(mpPA[index], interfaceLayout(LAYOUT_MP_PA + indexs, false));
-                        interfaceEditor(mpHeader[index], interfaceLayout(LAYOUT_MP_HEADER + indexs, false));
+                        interfaceEditor(mpJudge[user.playerIdx], interfaceLayout(LAYOUT_MP_JUDGE + user.playerIdx, false));
+                        interfaceEditor(mpCombo[user.playerIdx], interfaceLayout(LAYOUT_MP_COMBO + user.playerIdx, false));
+                        interfaceEditor(mpPA[user.playerIdx], interfaceLayout(LAYOUT_MP_PA + user.playerIdx, false));
+                        interfaceEditor(mpHeader[user.playerIdx], interfaceLayout(LAYOUT_MP_HEADER + user.playerIdx, false));
                     }
                 }
             }
@@ -1870,6 +1841,16 @@ package game
          *							  |_|            |___/
            \*#########################################################################################*/
 
+        private function buildJudgeNodes(src:Array):Vector.<JudgeNode>
+        {
+            var out:Vector.<JudgeNode> = new Vector.<JudgeNode>(src.length, true);
+            for (var i:int = 0; i < src.length; i++)
+            {
+                out[i] = new JudgeNode(src[i].t, src[i].s, src[i].f);
+            }
+            return out;
+        }
+
         /**
          * Judge a note score based on the current song position in ms.
          * @param dir Note Direction
@@ -1890,16 +1871,17 @@ package game
                 if (note.DIR != dir)
                     continue;
 
+                var acc:Number = note.POSITION - position;
                 var diff:Number = positionJudged - note.POSITION;
-                var lastJudge:Object = null;
-                for each (var j:Object in judgeSettings)
+                var lastJudge:JudgeNode = null;
+                for each (var j:JudgeNode in judgeSettings)
                 {
-                    if (diff > j.t)
+                    if (diff > j.time)
                         lastJudge = j;
                 }
-                score = lastJudge ? lastJudge.s : 0;
+                score = lastJudge ? lastJudge.score : 0;
                 if (score)
-                    frame = lastJudge.f;
+                    frame = lastJudge.frame;
                 if (!_avars.configJudge && !score)
                 {
                     var pdiff:int = gameProgress - note.PROGRESS + player1JudgeOffset;
@@ -1908,15 +1890,18 @@ package game
                 }
                 if (score > 0)
                     break;
-                else if (diff <= judgeSettings[0].t)
+                else if (diff <= judgeSettings[0].time)
                     break;
             }
             if (score)
             {
                 commitJudge(dir, frame + note.PROGRESS - player1JudgeOffset, score);
                 noteBox.removeNote(note.ID);
-                accuracy.addValue(note.POSITION - position);
-                binReplayNotes[note.ID] = {"d": dir, "t": (positionJudged - note.POSITION)};
+                accuracy.addValue(acc);
+                binReplayNotes[note.ID].time = diff;
+
+                if (accBar != null)
+                    accBar.onScoreSignal(score, diff);
             }
             else
             {
@@ -1935,8 +1920,10 @@ package game
                         note = noteBox.notes[noteIndex++] || noteBox.spawnNextNote();
                     }
                 }
+
                 if (booFrame >= gameFirstNoteFrame)
-                    binReplayBoos.push({"d": dir, "t": position, "i": binReplayBoos.length});
+                    binReplayBoos[binReplayBoos.length] = new ReplayBinFrame(position, dir, binReplayBoos.length);
+
                 commitJudge(dir, booFrame, -5);
             }
 
@@ -2013,6 +2000,9 @@ package game
                 commitJudge(dir, frame, score);
                 noteBox.removeNote(note.ID);
                 accuracy.addValue((note.PROGRESS - frame) * 1000 / 30);
+
+                if (accBar != null)
+                    accBar.onScoreSignal(score, diff * 33.3333 - 1);
             }
             else
                 commitJudge(dir, frame, -5);
@@ -2185,14 +2175,14 @@ package game
         {
             //gameplayUI.sDisplay_score.text = gameScore.toString();
 
-            if (paWindow)
-                paWindow.update(hitAmazing, hitPerfect, hitGood, hitAverage, hitMiss, hitBoo);
+            if (player1PAWindow)
+                player1PAWindow.update(hitAmazing, hitPerfect, hitGood, hitAverage, hitMiss, hitBoo);
 
             if (score)
                 score.update(gameScore);
 
-            if (combo)
-                combo.update(hitCombo, hitAmazing, hitPerfect, hitGood, hitAverage, hitMiss, hitBoo, gameRawGoods);
+            if (player1Combo)
+                player1Combo.update(hitCombo, hitAmazing, hitPerfect, hitGood, hitAverage, hitMiss, hitBoo, gameRawGoods);
         }
 
         private var previousDiffs:Array = new Array();
@@ -2296,5 +2286,19 @@ package game
         {
             this[key] = val;
         }
+    }
+}
+
+internal class JudgeNode
+{
+    public var time:Number;
+    public var frame:Number;
+    public var score:Number;
+
+    public function JudgeNode(time:Number, score:Number, frame:Number = -1)
+    {
+        this.time = time;
+        this.score = score;
+        this.frame = frame;
     }
 }

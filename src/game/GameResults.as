@@ -12,6 +12,7 @@ package game
     import classes.Alert;
     import classes.Language;
     import classes.Playlist;
+    import classes.SongInfo;
     import classes.replay.Replay;
     import classes.ui.BoxButton;
     import classes.ui.BoxIcon;
@@ -22,6 +23,8 @@ package game
     import com.flashfla.utils.ObjectUtil;
     import com.flashfla.utils.TimeUtil;
     import com.flashfla.utils.sprintf;
+    import flash.display.Bitmap;
+    import flash.display.BitmapData;
     import flash.display.DisplayObject;
     import flash.display.Sprite;
     import flash.events.ErrorEvent;
@@ -30,13 +33,11 @@ package game
     import flash.events.KeyboardEvent;
     import flash.events.MouseEvent;
     import flash.events.SecurityErrorEvent;
-    import flash.filesystem.File;
-    import flash.filesystem.FileMode;
-    import flash.filesystem.FileStream;
     import flash.net.URLRequest;
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
     import flash.ui.Keyboard;
+    import flash.utils.getTimer;
     import game.graph.GraphAccuracy;
     import game.graph.GraphBase;
     import game.graph.GraphCombo;
@@ -45,7 +46,7 @@ package game
     import popups.PopupMessage;
     import popups.PopupSongNotes;
     import popups.PopupTokenUnlock;
-    import classes.SongInfo;
+    import popups.replays.ReplayHistoryTabLocal;
 
     public class GameResults extends MenuPanel
     {
@@ -148,6 +149,13 @@ package game
             resultsDisplay.song_description.styleSheet = Constant.STYLESHEET;
             this.addChild(resultsDisplay);
 
+            // Background Noise
+            var noiseSource:BitmapData = new BitmapData(780, 480, false, 0x00000000);
+            noiseSource.perlinNoise(780, 480, 12, getTimer(), true, false, 7, true);
+            var noiseImage:Bitmap = new Bitmap(noiseSource);
+            noiseImage.alpha = 0.3;
+            resultsDisplay.blueBackground.addChild(noiseImage);
+
             // Avatar
             var result:GameScoreResult = songResults[songResults.length - 1];
             if (result.user)
@@ -225,6 +233,7 @@ package game
             graphDraw = new Sprite();
             graphDraw.x = 30;
             graphDraw.y = 298;
+            graphDraw.cacheAsBitmap = true;
             this.addChild(graphDraw);
 
             graphOverlay = new Sprite();
@@ -321,6 +330,7 @@ package game
                     result.boo += tempResult.boo;
                     result.score += tempResult.score;
                     result.credits += tempResult.credits;
+                    result.restarts += tempResult.restarts;
 
                     // Replay Graph
                     for (var y:int = 0; y < tempResult.replay_hit.length; y++)
@@ -347,7 +357,7 @@ package game
                 result = songResults[resultIndex];
                 songInfo = result.songInfo;
 
-                var seconds:Number = Math.floor(songInfo.timeSecs * (1 / result.options.songRate));
+                var seconds:Number = Math.floor(songInfo.time_secs * (1 / result.options.songRate));
                 var songLength:String = (Math.floor(seconds / 60)) + ":" + (seconds % 60 >= 10 ? "" : "0") + (seconds % 60);
                 var rateString:String = result.options.songRate != 1 ? " (" + result.options.songRate + "x Rate)" : "";
 
@@ -355,9 +365,9 @@ package game
                 songTitle = songInfo.engine ? songInfo.name + rateString : "<a href=\"" + Constant.LEVEL_STATS_URL + songInfo.level + "\">" + songInfo.name + rateString + "</a>";
                 songSubTitle = sprintf(_lang.string("game_results_subtitle_difficulty"), {"value": songInfo.difficulty}) + " - " + sprintf(_lang.string("game_results_subtitle_length"), {"value": songLength});
                 if (songInfo.author != "")
-                    songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_author"), {"value": songInfo.authorwithurl}));
+                    songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_author"), {"value": songInfo.author_html}));
                 if (songInfo.stepauthor != "")
-                    songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_stepauthor"), {"value": songInfo.stepauthorwithurl}));
+                    songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_stepauthor"), {"value": songInfo.stepauthor_html}));
 
                 displayTime = result.end_time;
                 scoreTotal = result.score_total;
@@ -894,6 +904,9 @@ package game
             // Get last score
             var gameResult:GameScoreResult = songResults[songResults.length - 1];
 
+            // Update Judge Offset
+            updateJudgeOffset(gameResult);
+
             // Alt Engine Score
             if (gameResult.songInfo.engine)
             {
@@ -968,7 +981,7 @@ package game
             {
                 Logger.error(this, "Canon Parse Failure: " + Logger.exception_error(err));
                 Logger.error(this, "Wrote invalid response data to log folder. [logs/c_result.txt]");
-                AirContext.writeText("logs/c_result.txt", siteDataString);
+                AirContext.writeTextFile(AirContext.getAppFile("logs/c_result.txt"), siteDataString);
 
                 Alert.add(_lang.string("error_failed_to_save_results") + " (ERR: JSON_ERROR)", 360, Alert.RED);
 
@@ -1022,14 +1035,7 @@ package game
                     // Check Old vs New Rankings.
                     if (data.new_ranking < data.old_ranking && data.old_ranking > 0)
                     {
-                        Alert.add(
-                            sprintf(
-                                _lang.string("new_best_rank"),
-                                {"old": data.old_ranking, "new": data.new_ranking, "diff": ((data.old_ranking - data.new_ranking) * -1)}
-                            ),
-                            240,
-                            Alert.DARK_GREEN
-                        );
+                        Alert.add(sprintf(_lang.string("new_best_rank"), {"old": data.old_ranking, "new": data.new_ranking, "diff": ((data.old_ranking - data.new_ranking) * -1)}), 240, Alert.DARK_GREEN);
                     }
 
                     // Check raw score vs level ranks and update.
@@ -1082,7 +1088,8 @@ package game
                 }
                 else
                 {
-                    resultsDisplay.result_rank.htmlText = "Game mods enabled!";
+                    resultsDisplay.result_rank.htmlText = "Game Mods";
+                    resultsDisplay.result_last_best.htmlText = "Enabled";
                 }
 
                 _gvars.activeUser.grandTotal += gameResult.score_total;
@@ -1090,22 +1097,17 @@ package game
 
                 Playlist.instanceCanon.updateSongAccess();
 
-                // Update Judge Offset
-                updateJudgeOffset(gameResult);
-
                 // Display Popup Queue
                 if (resultsDisplay != null)
                     _gvars.gameMain.displayPopupQueue();
             }
             else
             {
-                if (!data.ignore)
-                {
-                    Alert.add(_lang.string("error_failed_to_save_results") + " (ERR: " + data.result + ")", 360, Alert.RED);
-                }
-
                 if (resultsDisplay != null)
+                {
                     resultsDisplay.result_rank.htmlText = data.ignore ? "" : "Score save failed!";
+                    resultsDisplay.result_last_best.htmlText = data.ignore ? "" : "(ERR: " + data.result + ")";
+                }
             }
         }
 
@@ -1168,7 +1170,7 @@ package game
                     "difficulty": gameResult.songInfo.difficulty,
                     "genre": gameResult.songInfo.genre,
                     "level": gameResult.songInfo.level,
-                    "levelid": gameResult.songInfo.levelId,
+                    "levelid": gameResult.songInfo.level_id,
                     "name": gameResult.songInfo.name,
                     "stepauthor": gameResult.songInfo.stepauthor,
                     "time": gameResult.songInfo.time};
@@ -1227,7 +1229,7 @@ package game
             {
                 Logger.error(this, "Alt Parse Failure: " + Logger.exception_error(err));
                 Logger.error(this, "Wrote invalid response data to log folder. [logs/a_result.txt]");
-                AirContext.writeText("logs/a_result.txt", siteDataString);
+                AirContext.writeTextFile(AirContext.getAppFile("logs/a_result.txt"), siteDataString);
                 return;
             }
 
@@ -1258,9 +1260,6 @@ package game
                 {
                     _gvars.gameMain.addPopupQueue(new PopupTokenUnlock(this, data.tType, data.tID, data.tText, data.tName, data.tMessage));
                 }
-
-                // Update Judge Offset
-                updateJudgeOffset(gameResult);
 
                 // Display Popup Queue
                 if (resultsDisplay != null)
@@ -1311,6 +1310,7 @@ package game
             nR.replayData = result.replayData;
             nR.replayBin = result.replayBin;
             nR.timestamp = int(new Date().getTime() / 1000);
+            nR.song = result.songInfo;
             _gvars.replayHistory.unshift(nR);
 
             // Display F2 Shortcut key only once per session.
@@ -1326,20 +1326,21 @@ package game
                 try
                 {
                     var path:String = AirContext.getReplayPath(result.song);
-                    path += (result.song.songInfo.levelId ? result.song.songInfo.levelId : result.song.id.toString())
+                    path += (result.song.songInfo.level_id ? result.song.songInfo.level_id : result.song.id.toString())
                     path += "_" + (new Date().getTime())
                     path += "_" + (result.pa_string + "-" + result.max_combo);
-
-                    var fileStream:FileStream;
+                    path += ".txt";
 
                     // Store Bin Encoded Replay
-                    if (!AirContext.doesFileExist(path + ".txt"))
+                    if (!AirContext.doesFileExist(path))
                     {
-                        var replayFileText:File = new File(AirContext.getAppPath(path + ".txt"));
-                        fileStream = new FileStream();
-                        fileStream.open(replayFileText, FileMode.WRITE);
-                        fileStream.writeUTFBytes(nR.getEncode());
-                        fileStream.close();
+                        AirContext.writeTextFile(AirContext.getAppFile(path), nR.getEncode());
+
+                        var cachePath:String = path.substr(Constant.REPLAY_PATH.length);
+                        _gvars.file_replay_cache.setValue(cachePath, result.replay_cache_object);
+                        _gvars.file_replay_cache.save();
+
+                        ReplayHistoryTabLocal.REPLAYS.push(nR);
                     }
                 }
                 catch (err:Error)

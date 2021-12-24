@@ -203,7 +203,7 @@ package
 
         private function getUpdateFile():File
         {
-            var air_file:File = new File(AirContext.getAppPath("R3Air." + _site.data["game_r3air_version"] + ".air"));
+            var air_file:File = AirContext.getAppFile("R3Air." + _site.data["game_r3air_version"] + ".air");
             if (air_file.exists && !air_file.isDirectory)
             {
                 return air_file;
@@ -231,7 +231,7 @@ package
         public function downloadUpdate():void
         {
             var URL:String = Constant.ROOT_URL + "~velocity/P/R3Air." + _site.data["game_r3air_version"] + ".air?t=" + new Date().getTime();
-            downloadedFile = new File(AirContext.getAppPath("R3Air." + _site.data["game_r3air_version"] + ".air"));
+            downloadedFile = AirContext.getAppFile("R3Air." + _site.data["game_r3air_version"] + ".air");
 
             fileStream = new FileStream();
             fileStream.addEventListener(IOErrorEvent.IO_ERROR, urlStream_ioErrorHandler);
@@ -377,7 +377,7 @@ package
                 try
                 {
                     // Write File Data
-                    AirContext.writeFile(AirContext.getAppPath(entry.getFilename()), reader.unzip(entry), 0, e_fileError);
+                    AirContext.writeFile(AirContext.getAppFile(entry.getFilename()), reader.unzip(entry), 0, e_fileError);
                     appendText("<FONT COLOR=\"#84ff94\">" + _lang.string("air_file_success") + "</FONT>");
                 }
                 catch (e:Error)

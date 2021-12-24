@@ -223,7 +223,7 @@ package arc.mp
             {
                 return;
             }
-            
+
             chatScrollV = controlChat.textField.scrollV;
             chatScroll ||= (chatScrollV == controlChat.textField.maxScrollV);
             chatFrameDelay = 0;
@@ -273,37 +273,37 @@ package arc.mp
             return (user.userLevel >= 0 ? textFormatLevel(user) : "") + (format ? textFormatUserName(user) : textEscape(user.name));
         }
 
-        public static function textDullColour(colour:int, factor:Number):int
+        public static function textDullColor(color:int, factor:Number):int
         {
-            return (int(((colour & 0xFF0000) >> 16) * factor) << 16) | (int(((colour & 0x00FF00) >> 8) * factor) << 8) | int((colour & 0x0000FF) * factor);
+            return (int(((color & 0xFF0000) >> 16) * factor) << 16) | (int(((color & 0x00FF00) >> 8) * factor) << 8) | int((color & 0x0000FF) * factor);
         }
 
         public static function textFormatUserName(user:User, postfix:String = ""):String
         {
-            var usercolour:int = user.userClass;
+            var usercolor:int = user.userClass;
             if (!user.userColor)
-                usercolour = user.userColor;
-            var colour:String = textDullColour(Multiplayer.COLOURS[usercolour], 0.75).toString(16);
+                usercolor = user.userColor;
+            var color:String = textDullColor(Multiplayer.COLORS[usercolor], 0.75).toString(16);
             if (user.variables.arc_colour != null)
-                colour = user.variables.arc_colour;
+                color = user.variables.arc_colour;
             var userName:String = textEscape(user.name) + postfix;
-            return textFormatColour(userName, "#" + colour);
+            return textFormatColor(userName, "#" + color);
         }
 
         public static function textFormatLevel(user:User):String
         {
             const level:int = user.userLevel;
-            const color:int = ArcGlobals.getDivisionColor(level);
-            const title:String = ArcGlobals.getDivisionTitle(level);
-            const dulledColour:String = textDullColour(color, 1).toString(16);
-            //return textFormatColour(" ", "#" + dulledColour);
-            //return textFormatColour("D" + division + " [" + user.userLevel + "] ", "#" + dulledColour);
-            return textFormatColour("Lv." + level + " (" + title + ") ", "#" + dulledColour);
+            const color:int = GlobalVariables.getDivisionColor(level);
+            const title:String = GlobalVariables.getDivisionTitle(level);
+            const dulledColor:String = textDullColor(color, 1).toString(16);
+            //return textFormatColor(" ", "#" + dulledColor);
+            //return textFormatColor("D" + division + " [" + user.userLevel + "] ", "#" + dulledColor);
+            return textFormatColor("Lv." + level + " (" + title + ") ", "#" + dulledColor);
         }
 
         public static function textFormatServerMessage(user:User, message:String):String
         {
-            return textFormatColour(textFormatBold(textEscape("* Server Notice" + (user != null ? (" [" + user.name + "]") : "") + ": " + message)), "#901000");
+            return textFormatColor(textFormatBold(textEscape("* Server Notice" + (user != null ? (" [" + user.name + "]") : "") + ": " + message)), "#901000");
         }
 
         public static function textFormatMessage(user:User, message:String):String
@@ -313,37 +313,37 @@ package arc.mp
 
         public static function textFormatPrivateMessageIn(user:User, message:String):String
         {
-            return textFormatBold(textFormatColour(textEscape("PM << " + user.name + ":") + " ", "#009090")) + textEscape(message);
+            return textFormatBold(textFormatColor(textEscape("PM << " + user.name + ":") + " ", "#009090")) + textEscape(message);
         }
 
         public static function textFormatPrivateMessageOut(user:User, message:String):String
         {
-            return textFormatBold(textFormatColour(textEscape("PM >> " + user.name + ":") + " ", "#009090")) + textEscape(message);
+            return textFormatBold(textFormatColor(textEscape("PM >> " + user.name + ":") + " ", "#009090")) + textEscape(message);
         }
 
         public static function textFormatUser(user:User, isJoin:Boolean):String
         {
-            return textFormatBold(textFormatColour("* " + nameUser(user, false) + (isJoin ? " has joined" : " has left"), isJoin ? "#009000" : "#900000"));
+            return textFormatBold(textFormatColor("* " + nameUser(user, false) + (isJoin ? " has joined" : " has left"), isJoin ? "#009000" : "#900000"));
         }
 
         public static function textFormatJoin(room:Room):String
         {
-            return textFormatColour("* Joined " + textEscape(room.name), "#009000");
+            return textFormatColor("* Joined " + textEscape(room.name), "#009000");
         }
 
         public static function textFormatDisconnect():String
         {
-            return textFormatColour("* Disconnected", "#900000");
+            return textFormatColor("* Disconnected", "#900000");
         }
 
         public static function textFormatModeratorMute(user:User, minutes:int):String
         {
-            return textFormatBold(textFormatColour("* " + nameUser(user, false) + " has been muted for " + minutes + " minutes.", "#901000"));
+            return textFormatBold(textFormatColor("* " + nameUser(user, false) + " has been muted for " + minutes + " minutes.", "#901000"));
         }
 
         public static function textFormatModeratorBan(user:User, minutes:int):String
         {
-            return textFormatBold(textFormatColour("* " + nameUser(user, false) + " has been banned for " + minutes + " minutes.", "#901000"));
+            return textFormatBold(textFormatColor("* " + nameUser(user, false) + " has been banned for " + minutes + " minutes.", "#901000"));
         }
 
         public static function textFormatGameResults(event:GameResultsEvent):String
@@ -385,18 +385,18 @@ package arc.mp
             var winnertext:String = winner.name + " (" + winner.gameplay.score + " " + pa(winner.gameplay) + ")";
             var losertext:String = loser.name + " (" + loser.gameplay.score + " " + pa(loser.gameplay) + ")";
             var songname:String = MultiplayerPlayer.nameSong(gameplayP1);
-            return textFormatSize(textFormatBold(textFormatColour(textEscape("* " + songname + ": " + winnertext + (isTie ? " tied with " : " won against ") + losertext), "#189018")), "-2");
+            return textFormatSize(textFormatBold(textFormatColor(textEscape("* " + songname + ": " + winnertext + (isTie ? " tied with " : " won against ") + losertext), "#189018")), "-2");
         }
 
         public static function textFormatGameResultsSingle(room:Room, playerIndex:Number):String
         {
             var player:User = room.getPlayer(playerIndex);
-            return textFormatSize(textFormatBold(textFormatColour(textEscape("* Player has left, " + player.name + " has won."), "#189018")), "-2");
+            return textFormatSize(textFormatBold(textFormatColor(textEscape("* Player has left, " + player.name + " has won."), "#189018")), "-2");
         }
 
-        public static function textFormatColour(message:String, colour:String):String
+        public static function textFormatColor(message:String, color:String):String
         {
-            return "<font color=\"" + colour + "\">" + message + "</font>";
+            return "<font color=\"" + color + "\">" + message + "</font>";
         }
 
         public static function textFormatSize(message:String, size:String):String

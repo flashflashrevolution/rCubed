@@ -296,7 +296,7 @@ package
             {
                 Logger.error(this, "Parse Failure: " + Logger.exception_error(err));
                 Logger.error(this, "Wrote invalid response data to log folder. [logs/login.txt]");
-                AirContext.writeText("logs/login.txt", siteDataString);
+                AirContext.writeTextFile(AirContext.getAppFile("logs/login.txt"), siteDataString);
 
                 Alert.add(_lang.string("login_connection_error"));
                 setFields(false);
@@ -354,8 +354,6 @@ package
             if (val)
             {
                 isLoading = true;
-                input_user.type = "dynamic";
-                input_pass.type = "dynamic";
                 input_user.selectable = false;
                 input_pass.selectable = false;
                 input_user.textColor = 0xD6D6D6;
@@ -366,8 +364,6 @@ package
             else
             {
                 isLoading = false;
-                input_user.type = "input";
-                input_pass.type = "input";
                 input_user.selectable = true;
                 input_pass.selectable = true;
                 input_user.textColor = 0xFFFFFF;

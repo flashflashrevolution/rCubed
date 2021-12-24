@@ -11,6 +11,7 @@ package game.graph
     import flash.events.MouseEvent;
     import flash.geom.Rectangle;
     import game.GameScoreResult;
+    import classes.replay.ReplayBinFrame;
 
     public class GraphAccuracy extends GraphBase
     {
@@ -80,7 +81,7 @@ package game.graph
             filterColumnBtn = new BoxButton(buttons, -20, 78, 16, 18, "C", 16, e_filterColumn);
             filterColumnBtn.padding = 6;
             filterColumnBtn.setHoverText(_lang.string("game_results_filter_column_" + COLUMN_FILTERS[0]), "right");
-            
+
             judgeMinTime = new Text(buttons, 0, 0, sprintf(_lang.string("game_results_graph_graph_early"), {"value": ((result.MIN_TIME > 0 ? "+" : "") + (result.MIN_TIME + 1))})); // It's greater then, so it's off by 1.
             judgeMinTime.alpha = 0.2;
 
@@ -137,15 +138,13 @@ package game.graph
                 if (point.index >= player_timings_length)
                     break;
 
-                if(columnFilter != 0 
-                && ((columnFilter < 5 && point.column != COLUMN_FILTERS[columnFilter])
-                || (columnFilter == 5 && (point.column == "U" || point.column == "R"))
-                || (columnFilter == 6 && (point.column == "D" || point.column == "L"))))
+                if (columnFilter != 0 && ((columnFilter < 5 && point.column != COLUMN_FILTERS[columnFilter]) || (columnFilter == 5 && (point.column == "U" || point.column == "R")) || (columnFilter == 6 && (point.column == "D" || point.column == "L"))))
                 {
                     alpha = 0.1;
                 }
-                else alpha = 1.0;
-                
+                else
+                    alpha = 1.0;
+
                 graph.graphics.lineStyle(1, point.color, alpha);
                 graph.graphics.moveTo(point.x - 2, point.y - 2);
                 graph.graphics.lineTo(point.x + 2, point.y + 2);
@@ -156,14 +155,12 @@ package game.graph
             // Draw Crosses
             for each (point in boo_points)
             {
-                if(columnFilter != 0 
-                && ((columnFilter < 5 && point.column != COLUMN_FILTERS[columnFilter])
-                || (columnFilter == 5 && (point.column == "U" || point.column == "R"))
-                || (columnFilter == 6 && (point.column == "D" || point.column == "L"))))
+                if (columnFilter != 0 && ((columnFilter < 5 && point.column != COLUMN_FILTERS[columnFilter]) || (columnFilter == 5 && (point.column == "U" || point.column == "R")) || (columnFilter == 6 && (point.column == "D" || point.column == "L"))))
                 {
                     alpha = 0.1;
                 }
-                else alpha = 1.0;
+                else
+                    alpha = 1.0;
 
                 graph.graphics.lineStyle(1, point.color, alpha);
                 graph.graphics.moveTo(point.x - 2, point.y - 2);
@@ -354,7 +351,7 @@ package game.graph
             }
 
             // Draw Hit Markers
-            var player_timings:Array = result.replay_bin_notes;
+            var player_timings:Vector.<ReplayBinFrame> = result.replay_bin_notes;
             var note_judge:Object;
 
             var timing:int;
@@ -369,15 +366,15 @@ package game.graph
                 timing_score = 0;
 
                 // Judge Timing uses null for misses.
-                if (player_timings[i] != null && player_timings[i]["t"] != null)
+                if (player_timings[i] != null && !isNaN(player_timings[i].time))
                 {
-                    note_judge = result.getJudgeRegion(player_timings[i]["t"]);
+                    note_judge = result.getJudgeRegion(player_timings[i].time);
 
                     if (JUDGE_WINDOW_CROSS_COLORS[note_judge.s] != null && note_judge.s > 0)
                     {
-                        pos_y = (player_timings[i]["t"] - result.MIN_TIME) * ratio_y;
+                        pos_y = (player_timings[i].time - result.MIN_TIME) * ratio_y;
                         draw_color = JUDGE_WINDOW_CROSS_COLORS[note_judge.s];
-                        timing = player_timings[i]["t"];
+                        timing = player_timings[i].time;
                         timing_score = note_judge.s;
                     }
                 }
@@ -393,9 +390,9 @@ package game.graph
                 if (flipGraph)
                     pos_y = graphHeight - pos_y;
 
-                if(player_timings[i] != null)
+                if (player_timings[i] != null)
                 {
-                    cross_points[cross_points.length] = new GraphCrossPoint(i, pos_x, pos_y, timing, draw_color, timing_score, player_timings[i]["d"]);
+                    cross_points[cross_points.length] = new GraphCrossPoint(i, pos_x, pos_y, timing, draw_color, timing_score, player_timings[i].direction);
                 }
                 else
                 {
@@ -409,18 +406,18 @@ package game.graph
                 while (cross_points.length < result.last_note)
                 {
                     pos_x = cross_points.length * ratio_x;
-                    cross_points[cross_points.length] = new GraphCrossPoint(cross_points.length, pos_x, (flipGraph ? graphHeight : 0), 0, JUDGE_WINDOW_CROSS_COLORS["0"], 0, player_timings[i]["d"]);
+                    cross_points[cross_points.length] = new GraphCrossPoint(cross_points.length, pos_x, (flipGraph ? graphHeight : 0), 0, JUDGE_WINDOW_CROSS_COLORS["0"], 0, player_timings[i].direction);
                 }
             }
 
             // Boos
-            var boo:Object; // Variables: d, t, i
+            var boo:ReplayBinFrame;
             ratio_x = graphWidth / result.song.getNote(Math.max(0, song_arrows - 1)).time;
             for (i = 0; i < result.replay_bin_boos.length; i++)
             {
                 boo = result.replay_bin_boos[i];
-                pos_x = (boo.t / 1000) * ratio_x;
-                boo_points[boo_points.length] = new GraphCrossPoint(boo_points.length, pos_x, (flipGraph ? 0 : graphHeight), Number((boo.t / 1000).toFixed(2)), JUDGE_WINDOW_CROSS_COLORS["-5"], -5, boo["d"]);
+                pos_x = (boo.time / 1000) * ratio_x;
+                boo_points[boo_points.length] = new GraphCrossPoint(boo_points.length, pos_x, (flipGraph ? 0 : graphHeight), Number((boo.time / 1000).toFixed(2)), JUDGE_WINDOW_CROSS_COLORS["-5"], -5, boo.direction);
             }
         }
 
@@ -442,9 +439,9 @@ package game.graph
          */
         private function e_filterColumn(event:MouseEvent):void
         {
-            columnFilter = (columnFilter >= COLUMN_FILTERS.length - 1) ? 0 : columnFilter + 1; 
+            columnFilter = (columnFilter >= COLUMN_FILTERS.length - 1) ? 0 : columnFilter + 1;
             filterColumnBtn.setHoverText(_lang.string("game_results_filter_column_" + COLUMN_FILTERS[columnFilter]), "right");
-            if(player_timings_length > 0)
+            if (player_timings_length > 0)
             {
                 generateGraph();
                 draw();

@@ -75,17 +75,17 @@ package classes.ui
         {
             if (percent < 0)
                 percent = 0;
-            if (percent > 100)
-                percent = 100;
+            if (percent > 1)
+                percent = 1;
 
             if (curPercent != percent)
             {
                 if (useTween)
-                    TweenLite.to(progress_mc, 0.25, {width: (percent / 100) * barWidth});
+                    TweenLite.to(progress_mc, 0.25, {width: percent * barWidth});
                 else
-                    progress_mc.width = (percent / 100) * barWidth;
+                    progress_mc.width = percent * barWidth;
 
-                if (percent == 100)
+                if (percent >= 1)
                 {
                     dispatchEvent(new Event(LOADER_COMPLETE));
                     this.isComplete = true;

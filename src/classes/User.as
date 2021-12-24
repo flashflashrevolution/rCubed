@@ -80,6 +80,7 @@ package classes
         public var songRatings:Object = {};
 
         public var DISPLAY_LEGACY_SONGS:Boolean = false;
+        public var DISPLAY_GENRE_FLAG:Boolean = true;
         public var DISPLAY_SONG_FLAG:Boolean = true;
         public var DISPLAY_SONG_NOTE:Boolean = true;
 
@@ -96,19 +97,25 @@ package classes
         public var DISPLAY_SCORE:Boolean = true;
         public var DISPLAY_COMBO:Boolean = true;
         public var DISPLAY_PACOUNT:Boolean = true;
+        public var DISPLAY_ACCURACY_BAR:Boolean = true;
         public var DISPLAY_AMAZING:Boolean = true;
         public var DISPLAY_PERFECT:Boolean = true;
         public var DISPLAY_TOTAL:Boolean = true;
         public var DISPLAY_SCREENCUT:Boolean = false;
         public var DISPLAY_SONGPROGRESS:Boolean = true;
+        public var DISPLAY_SONGPROGRESS_TEXT:Boolean = false;
 
-        public var DISPLAY_MP_MASK:Boolean = false;
+        public var DISPLAY_MP_UI:Boolean = true;
+        public var DISPLAY_MP_PA:Boolean = true;
+        public var DISPLAY_MP_JUDGE:Boolean = true;
+        public var DISPLAY_MP_COMBO:Boolean = true;
+
         public var DISPLAY_MP_TIMESTAMP:Boolean = false;
-        public var judgeColours:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
-        public var comboColours:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000, 0xDC00C2]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag, RawGood
+        public var judgeColors:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
+        public var comboColors:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000, 0xDC00C2]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag, RawGood
         public var enableComboColors:Vector.<Boolean> = new <Boolean>[true, true, true, false, false, false, false, false, false];
-        public var gameColours:Array = [0x1495BD, 0x033242, 0x0C6A88, 0x074B62];
-        public var noteColours:Object = ["red", "blue", "purple", "yellow", "pink", "orange", "cyan", "green", "white"];
+        public var gameColors:Array = [0x1495BD, 0x033242, 0x0C6A88, 0x074B62, 0x000000];
+        public var noteColors:Array = ["red", "blue", "purple", "yellow", "pink", "orange", "cyan", "green", "white"];
         public var rawGoodTracker:Number = 0;
 
         public var autofailAmazing:int = 0;
@@ -283,7 +290,7 @@ package classes
             {
                 Logger.error(this, "Profile Parse Failure: " + Logger.exception_error(err));
                 Logger.error(this, "Wrote invalid response data to log folder. [logs/user_main.txt]");
-                AirContext.writeText("logs/user_main.txt", siteDataString);
+                AirContext.writeTextFile(AirContext.getAppFile("logs/user_main.txt"), siteDataString);
 
                 _loadError = true;
                 this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
@@ -501,120 +508,177 @@ package classes
         {
             if (_settings == null)
                 return;
+
             if (_settings.language != null)
                 this.language = _settings.language;
+
             if (_settings.viewOffset != null)
                 this.GLOBAL_OFFSET = _settings.viewOffset;
+
             if (_settings.judgeOffset != null)
                 this.JUDGE_OFFSET = _settings.judgeOffset;
+
             if (_settings.autoJudgeOffset != null)
                 this.AUTO_JUDGE_OFFSET = _settings.autoJudgeOffset;
+
             if (_settings.viewSongFlag != null)
                 this.DISPLAY_SONG_FLAG = _settings.viewSongFlag;
+
+            if (_settings.viewGenreFlag != null)
+                this.DISPLAY_GENRE_FLAG = _settings.viewGenreFlag;
+
             if (_settings.viewSongNote != null)
                 this.DISPLAY_SONG_NOTE = _settings.viewSongNote;
+
             if (_settings.viewJudge != null)
                 this.DISPLAY_JUDGE = _settings.viewJudge;
+
             if (_settings.viewJudgeAnimations != null)
                 this.DISPLAY_JUDGE_ANIMATIONS = _settings.viewJudgeAnimations;
+
             if (_settings.viewReceptorAnimations != null)
                 this.DISPLAY_RECEPTOR_ANIMATIONS = _settings.viewReceptorAnimations;
+
             if (_settings.viewHealth != null)
                 this.DISPLAY_HEALTH = _settings.viewHealth;
+
             if (_settings.viewGameTopBar != null)
                 this.DISPLAY_GAME_TOP_BAR = _settings.viewGameTopBar;
+
             if (_settings.viewGameBottomBar != null)
                 this.DISPLAY_GAME_BOTTOM_BAR = _settings.viewGameBottomBar;
+
             if (_settings.viewScore != null)
                 this.DISPLAY_SCORE = _settings.viewScore;
+
             if (_settings.viewCombo != null)
                 this.DISPLAY_COMBO = _settings.viewCombo;
+
             if (_settings.viewPACount != null)
                 this.DISPLAY_PACOUNT = _settings.viewPACount;
+
+            if (_settings.viewAccBar != null)
+                this.DISPLAY_ACCURACY_BAR = _settings.viewAccBar;
+
             if (_settings.viewAmazing != null)
                 this.DISPLAY_AMAZING = _settings.viewAmazing;
+
             if (_settings.viewPerfect != null)
                 this.DISPLAY_PERFECT = _settings.viewPerfect;
+
             if (_settings.viewTotal != null)
                 this.DISPLAY_TOTAL = _settings.viewTotal;
+
             if (_settings.viewScreencut != null)
                 this.DISPLAY_SCREENCUT = _settings.viewScreencut;
+
             if (_settings.viewSongProgress != null)
                 this.DISPLAY_SONGPROGRESS = _settings.viewSongProgress;
-            if (_settings.viewMPMask != null)
-                this.DISPLAY_MP_MASK = _settings.viewMPMask;
+
+            if (_settings.viewSongProgressText != null)
+                this.DISPLAY_SONGPROGRESS_TEXT = _settings.viewSongProgressText;
+
+            if (_settings.viewMPUI != null)
+                this.DISPLAY_MP_UI = _settings.viewMPUI;
+
+            if (_settings.viewMPPA != null)
+                this.DISPLAY_MP_PA = _settings.viewMPPA;
+
+            if (_settings.viewMPCombo != null)
+                this.DISPLAY_MP_COMBO = _settings.viewMPCombo;
+
+            if (_settings.viewMPJudge != null)
+                this.DISPLAY_MP_JUDGE = _settings.viewMPJudge;
+
             if (_settings.viewMPTimestamp != null)
                 this.DISPLAY_MP_TIMESTAMP = _settings.viewMPTimestamp;
+
             if (_settings.viewLegacySongs != null)
                 this.DISPLAY_LEGACY_SONGS = _settings.viewLegacySongs;
+
             if (_settings.keys[0] != null)
                 this.keyLeft = _settings.keys[0];
+
             if (_settings.keys[1] != null)
                 this.keyDown = _settings.keys[1];
+
             if (_settings.keys[2] != null)
                 this.keyUp = _settings.keys[2];
+
             if (_settings.keys[3] != null)
                 this.keyRight = _settings.keys[3];
+
             if (_settings.keys[4] != null)
                 this.keyRestart = _settings.keys[4];
+
             if (_settings.keys[5] != null)
                 this.keyQuit = _settings.keys[5];
+
             if (_settings.keys[6] != null)
                 this.keyOptions = _settings.keys[6];
+
             if (_settings.noteskin != null)
                 this.activeNoteskin = _settings.noteskin;
+
             if (_settings.direction != null)
                 this.slideDirection = _settings.direction;
+
             if (_settings.speed != null)
                 this.gameSpeed = _settings.speed;
+
             if (_settings.judgeSpeed != null)
                 this.judgeSpeed = _settings.judgeSpeed;
+
             if (_settings.gap != null)
                 this.receptorGap = _settings.gap;
+
             if (_settings.noteScale != null)
                 this.noteScale = _settings.noteScale;
+
             if (_settings.screencutPosition != null)
                 this.screencutPosition = _settings.screencutPosition;
+
             if (_settings.frameRate != null)
                 this.frameRate = _settings.frameRate;
+
             if (_settings.songRate != null)
                 this.songRate = _settings.songRate;
+
             if (_settings.forceNewJudge != null)
                 this.forceNewJudge = _settings.forceNewJudge;
+
             if (_settings.visual != null)
                 this.activeVisualMods = _settings.visual;
+
             if (_settings.judgeColours != null)
-                this.judgeColours = _settings.judgeColours;
+                mergeIntoArray(this.judgeColors, _settings.judgeColours);
+
             if (_settings.comboColours != null)
-            {
-                var comboColorCount:int = Math.min(this.comboColours.length, _settings.comboColours.length);
-                for (var i:int = 0; i < comboColorCount; i++)
-                {
-                    this.comboColours[i] = _settings.comboColours[i];
-                }
-            }
+                mergeIntoArray(this.comboColors, _settings.comboColours);
+
             if (_settings.enableComboColors != null)
-            {
-                for (i = 0; i < enableComboColors.length; i++)
-                {
-                    this.enableComboColors[i] = _settings.enableComboColors[i];
-                }
-            }
+                mergeIntoArray(this.enableComboColors, _settings.enableComboColors);
+
             if (_settings.gameColours != null)
-                this.gameColours = _settings.gameColours;
+                mergeIntoArray(this.gameColors, _settings.gameColours);
+
             if (_settings.noteColours != null)
-                this.noteColours = _settings.noteColours;
+                mergeIntoArray(this.noteColors, _settings.noteColours);
+
             if (_settings.rawGoodTracker != null)
                 this.rawGoodTracker = _settings.rawGoodTracker;
+
             if (_settings.gameVolume != null)
                 this.gameVolume = _settings.gameVolume;
+
             if (_settings.isolationOffset != null)
                 _avars.configIsolationStart = _settings.isolationOffset;
+
             if (_settings.isolationLength != null)
                 _avars.configIsolationLength = _settings.isolationLength;
+
             if (_settings.startUpScreen != null)
                 this.startUpScreen = Math.max(0, Math.min(2, _settings.startUpScreen));
-
 
             if (_settings.filters != null)
                 this.filters = doImportFilters(_settings.filters);
@@ -632,17 +696,21 @@ package classes
             {
                 SoundMixer.soundTransform = new SoundTransform(this.gameVolume);
 
-                // Setup Background Colours
-                try
-                { // Patch for old Loaders
-                    GameBackgroundColor.BG_LIGHT = gameColours[0];
-                    GameBackgroundColor.BG_DARK = gameColours[1];
-                    GameBackgroundColor.BG_STATIC = gameColours[2];
-                    GameBackgroundColor.BG_POPUP = gameColours[3];
-                    (_gvars.gameMain.getChildAt(0) as GameBackgroundColor).redraw();
-                }
-                catch (err:Error)
+                // Setup Background Colors
+                GameBackgroundColor.BG_LIGHT = gameColors[0];
+                GameBackgroundColor.BG_DARK = gameColors[1];
+                GameBackgroundColor.BG_STATIC = gameColors[2];
+                GameBackgroundColor.BG_POPUP = gameColors[3];
+                GameBackgroundColor.BG_STAGE = gameColors[4];
+                (_gvars.gameMain.getChildAt(0) as GameBackgroundColor).redraw();
+            }
+
+            function mergeIntoArray(arr1:*, arr2:*):void
+            {
+                var minArrLen:int = Math.min(arr1.length, arr2.length);
+                for (var i:int = 0; i < minArrLen; i++)
                 {
+                    arr1[i] = arr2[i];
                 }
             }
         }
@@ -657,6 +725,7 @@ package classes
             gameSave.viewOffset = this.GLOBAL_OFFSET;
             gameSave.judgeOffset = this.JUDGE_OFFSET;
             gameSave.autoJudgeOffset = this.AUTO_JUDGE_OFFSET;
+            gameSave.viewGenreFlag = this.DISPLAY_GENRE_FLAG;
             gameSave.viewSongFlag = this.DISPLAY_SONG_FLAG;
             gameSave.viewSongNote = this.DISPLAY_SONG_NOTE;
             gameSave.viewJudge = this.DISPLAY_JUDGE;
@@ -668,12 +737,17 @@ package classes
             gameSave.viewScore = this.DISPLAY_SCORE;
             gameSave.viewCombo = this.DISPLAY_COMBO;
             gameSave.viewPACount = this.DISPLAY_PACOUNT;
+            gameSave.viewAccBar = this.DISPLAY_ACCURACY_BAR;
             gameSave.viewAmazing = this.DISPLAY_AMAZING;
             gameSave.viewPerfect = this.DISPLAY_PERFECT;
             gameSave.viewTotal = this.DISPLAY_TOTAL;
             gameSave.viewScreencut = this.DISPLAY_SCREENCUT;
             gameSave.viewSongProgress = this.DISPLAY_SONGPROGRESS;
-            gameSave.viewMPMask = this.DISPLAY_MP_MASK;
+            gameSave.viewSongProgressText = this.DISPLAY_SONGPROGRESS_TEXT;
+            gameSave.viewMPUI = this.DISPLAY_MP_UI;
+            gameSave.viewMPPA = this.DISPLAY_MP_PA;
+            gameSave.viewMPJudge = this.DISPLAY_MP_JUDGE;
+            gameSave.viewMPCombo = this.DISPLAY_MP_COMBO;
             gameSave.viewMPTimestamp = this.DISPLAY_MP_TIMESTAMP;
             gameSave.viewLegacySongs = this.DISPLAY_LEGACY_SONGS;
 
@@ -689,11 +763,11 @@ package classes
             gameSave.frameRate = this.frameRate;
             gameSave.forceNewJudge = this.forceNewJudge;
             gameSave.visual = this.activeVisualMods;
-            gameSave.judgeColours = this.judgeColours;
-            gameSave.comboColours = this.comboColours;
+            gameSave.judgeColours = this.judgeColors;
+            gameSave.comboColours = this.comboColors;
             gameSave.enableComboColors = this.enableComboColors;
-            gameSave.gameColours = this.gameColours;
-            gameSave.noteColours = this.noteColours;
+            gameSave.gameColours = this.gameColors;
+            gameSave.noteColours = this.noteColors;
             gameSave.rawGoodTracker = this.rawGoodTracker;
             gameSave.songQueues = this.songQueues;
             gameSave.gameVolume = this.gameVolume;
@@ -765,7 +839,6 @@ package classes
                 }
                 catch (e:Error)
                 {
-
                 }
             }
         }
@@ -798,7 +871,7 @@ package classes
         {
             if (songInfo.engine != null)
             {
-                var sDetails:SQLSongUserInfo = SQLQueries.getSongDetails(songInfo.engine.id, songInfo.levelId);
+                var sDetails:SQLSongUserInfo = SQLQueries.getSongDetails(songInfo.engine.id, songInfo.level_id);
                 if (sDetails)
                     return sDetails.song_rating;
 

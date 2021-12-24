@@ -123,9 +123,9 @@ package classes
 
         public function getPlayerIndex(user:User):int
         {
-            for (var idx:int in _players)
+            for (var idx:String in _players)
                 if (_players[idx] == user)
-                    return idx
+                    return int(idx)
 
             return -1
         }
@@ -159,7 +159,7 @@ package classes
         {
             var playerVec:Vector.<User> = new <User>[]
 
-            for (var idx:int in _players)
+            for (var idx:String in _players)
                 playerVec.push(_players[idx])
 
             return playerVec
@@ -201,7 +201,7 @@ package classes
         {
             var usersVec:Vector.<User> = new <User>[]
 
-            for (var idx:int in _users)
+            for (var idx:String in _users)
                 usersVec.push(_users[idx])
 
             return usersVec
@@ -238,7 +238,7 @@ package classes
 
             for each (var player:User in _players)
             {
-                if (player.gameplay.songInfo != songP1)
+                if (!SongInfo.compare(player.gameplay.songInfo, songP1))
                     return false;
             }
 
@@ -247,11 +247,11 @@ package classes
 
         public function getPlayersSong():SongInfo
         {
-            if(isAllPlayersSameSong())
+            if (isAllPlayersSameSong())
             {
                 for each (var player:User in players)
                 {
-                    if(player.gameplay.songInfo) 
+                    if (player.gameplay.songInfo)
                         return player.gameplay.songInfo;
                 }
             }

@@ -77,8 +77,8 @@ package classes.chart
             this.songInfo = songInfo;
             this.id = songInfo.level;
             this.preview = isPreview;
-            this.type = songInfo.chartType || NoteChart.FFR;
-            this.chartType = songInfo.chartType || NoteChart.FFR_LEGACY;
+            this.type = songInfo.chart_type || NoteChart.FFR;
+            this.chartType = songInfo.chart_type || NoteChart.FFR_LEGACY;
 
             options = _gvars.options;
             noteMod = new NoteMod(this, options);
@@ -88,7 +88,7 @@ package classes.chart
             if (type == "EDITOR")
             {
                 var editorSongInfo:SongInfo = new SongInfo();
-                editorSongInfo.chartType = NoteChart.FFR_BEATBOX;
+                editorSongInfo.chart_type = NoteChart.FFR_BEATBOX;
                 editorSongInfo.level = this.id;
 
                 chart = NoteChart.parseChart(NoteChart.FFR_BEATBOX, editorSongInfo, '_root.beatBox = [];');
@@ -133,7 +133,7 @@ package classes.chart
             var url_file_hash:String = "";
             if ((_gvars.air_useLocalFileCache) && AirContext.doesFileExist(AirContext.getSongCachePath(this) + "data.bin"))
             {
-                localFileData = AirContext.readFile(AirContext.getAppPath(AirContext.getSongCachePath(this) + "data.bin"), (this.songInfo.engine ? 0 : this.id));
+                localFileData = AirContext.readFile(AirContext.getAppFile(AirContext.getSongCachePath(this) + "data.bin"), (this.songInfo.engine ? 0 : this.id));
                 localFileHash = MD5.hashBytes(localFileData);
                 url_file_hash = "hash=" + localFileHash + "&";
 
@@ -196,12 +196,12 @@ package classes.chart
 
         private function urlGen(fileType:String, fileHash:String = ""):String
         {
-            switch (songInfo.chartType || type)
+            switch (songInfo.chart_type || type)
             {
                 case NoteChart.FFR:
                 case NoteChart.FFR_RAW:
                 case NoteChart.FFR_MP3:
-                    return Constant.SONG_DATA_URL + "?" + fileHash + "id=" + (preview ? songInfo.previewhash : songInfo.playhash) + (preview ? "&mode=2" : "") + (_gvars.userSession != "0" ? "&session=" + _gvars.userSession : "") + "&type=" + NoteChart.FFR + "_" + fileType;
+                    return Constant.SONG_DATA_URL + "?" + fileHash + "id=" + (preview ? songInfo.preview_hash : songInfo.play_hash) + (preview ? "&mode=2" : "") + (_gvars.userSession != "0" ? "&session=" + _gvars.userSession : "") + "&type=" + NoteChart.FFR + "_" + fileType;
 
                 case NoteChart.FFR_LEGACY:
                     return ChartFFRLegacy.songUrl(songInfo);
@@ -279,10 +279,17 @@ package classes.chart
                 bytesLoaded = bytesTotal = chartData.length; // Update Progress Bar in case.
                 isMusic2Loaded = false;
 
+                // Check 404 Response
+                if (chartData.length == 3 && chartData.readUTFBytes(3) == "404")
+                {
+                    loadFail = true;
+                    return;
+                }
+
                 // Check for server response for matching hash. Encode Compressed SWF Data
                 var storeChartData:ByteArray;
                 if (_gvars.air_useLocalFileCache)
-                { // && !this.entry.engine) {
+                {
                     // Alt Engine has Data
                     if (this.songInfo.engine && localFileData)
                     {
@@ -292,6 +299,11 @@ package classes.chart
                     {
                         chartData.position = 0;
                         var code:String = chartData.readUTFBytes(3);
+                        if (code == "404")
+                        {
+                            loadFail = true;
+                            return;
+                        }
                         if (code == "403")
                         {
                             chartData = localFileData;
@@ -341,7 +353,7 @@ package classes.chart
                     try
                     {
                         Logger.info(this, "Saving Cache File for " + this.id);
-                        AirContext.writeFile(AirContext.getAppPath(AirContext.getSongCachePath(this) + "data.bin"), storeChartData);
+                        AirContext.writeFile(AirContext.getAppFile(AirContext.getSongCachePath(this) + "data.bin"), storeChartData);
                     }
                     catch (err:Error)
                     {
@@ -490,8 +502,8 @@ package classes.chart
                     break;
 
                 case NoteChart.FFR_LEGACY:
-                    if (songInfo.noteCount == 0)
-                        songInfo.noteCount = chart.Notes.length;
+                    if (songInfo.note_count == 0)
+                        songInfo.note_count = chart.Notes.length;
                     break;
 
                 case NoteChart.THIRDSTYLE:
@@ -508,7 +520,7 @@ package classes.chart
                 generateModNotes();
             }
 
-            Logger.info(this, "Chart parsed with " + chart.Notes.length + " notes, " + (chart.Notes.length > 0 ? TimeUtil.convertToHHMMSS(chart.Notes[chart.Notes.length - 1].time) : "00:00") + " length.");
+            Logger.info(this, "Chart parsed with " + chart.Notes.length + " notes, " + (chart.Notes.length > 0 ? TimeUtil.convertToHHMMSS(chart.Notes[chart.Notes.length - 1].time) : "0:00") + " length.");
 
             loadComplete();
         }

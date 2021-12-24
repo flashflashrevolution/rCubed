@@ -1,14 +1,14 @@
 package
 {
     import com.flashfla.utils.TimeUtil;
-    import flash.utils.getTimer;
-    import flash.filesystem.File;
-    import flash.filesystem.FileStream;
-    import flash.events.SecurityErrorEvent;
+    import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.IOErrorEvent;
+    import flash.events.SecurityErrorEvent;
+    import flash.filesystem.File;
     import flash.filesystem.FileMode;
-    import flash.events.ErrorEvent;
+    import flash.filesystem.FileStream;
+    import flash.utils.getTimer;
 
     public class Logger
     {
@@ -31,7 +31,7 @@ package
         public static function init():void
         {
             // Check for special file to enable file logging.
-            if (new File(AirContext.getAppPath("logging.txt")).exists)
+            if (AirContext.doesFileExist("logging.txt"))
             {
                 trace("Logging Flag Found, enabling.")
                 file_log = true;
@@ -42,7 +42,7 @@ package
             {
                 var now:Date = new Date();
                 var filename:String = AirContext.createFileName(now.toLocaleString(), " ");
-                LOG_FILE = new File(AirContext.getAppPath("logs/" + filename + ".txt"));
+                LOG_FILE = AirContext.getAppFile("logs/" + filename + ".txt");
                 LOG_STREAM = new FileStream();
                 LOG_STREAM.addEventListener(SecurityErrorEvent.SECURITY_ERROR, e_logFileFail);
                 LOG_STREAM.addEventListener(IOErrorEvent.IO_ERROR, e_logFileFail);

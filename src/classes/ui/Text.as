@@ -37,6 +37,7 @@ package classes.ui
             this._fontSize = fontSize;
             this._fontColor = fontColor;
             this.mouseChildren = false;
+            this.mouseEnabled = false;
 
             // Build Text
             _textTF = new TextField();
@@ -44,6 +45,8 @@ package classes.ui
             _textTF.embedFonts = true;
             _textTF.antiAliasType = AntiAliasType.ADVANCED;
             _textTF.autoSize = "left";
+            //_textTF.border = true;
+            //_textTF.borderColor = 0xFF0000;
             this.addChild(_textTF);
 
             draw();
@@ -127,8 +130,11 @@ package classes.ui
 
         public function set fontSize(value:int):void
         {
-            _fontSize = value;
-            draw();
+            if (_fontSize != value)
+            {
+                _fontSize = value;
+                draw();
+            }
         }
 
         private function html():String
@@ -154,6 +160,7 @@ package classes.ui
                 if (_width > 0)
                 {
                     //- Fit Witin Area
+                    _textTF.scaleX = _textTF.scaleY = 1;
                     if (_textTF.width > _width)
                         _textTF.scaleX = _textTF.scaleY = _width / _textTF.width;
 

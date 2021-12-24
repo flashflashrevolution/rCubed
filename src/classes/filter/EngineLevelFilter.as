@@ -137,13 +137,13 @@ package classes.filter
                     return compareNumber(songInfo.difficulty, input_number);
 
                 case FILTER_ARROWCOUNT:
-                    return compareNumber(songInfo.noteCount, input_number);
+                    return compareNumber(songInfo.note_count, input_number);
 
                 case FILTER_MIN_NPS:
-                    return compareNumber(songInfo.minNps, input_number);
+                    return compareNumber(songInfo.min_nps, input_number);
 
                 case FILTER_MAX_NPS:
-                    return compareNumber(songInfo.maxNps, input_number);
+                    return compareNumber(songInfo.max_nps, input_number);
 
                 case FILTER_RANK:
                     return compareNumber(userData.getLevelRank(songInfo).rank, input_number);
@@ -155,10 +155,10 @@ package classes.filter
                     return compareNumber(userData.getLevelRank(songInfo)[input_stat], input_number);
 
                 case FILTER_TIME:
-                    return compareNumber(songInfo.timeSecs, input_number);
+                    return compareNumber(songInfo.time_secs, input_number);
 
                 case FILTER_SONG_RATING:
-                    return compareNumber(songInfo.songRating, input_number);
+                    return compareNumber(songInfo.song_rating, input_number);
 
                 case FILTER_PERSONAL_SONG_RATING:
                     return compareNumber(userData.getSongRating(songInfo), input_number);
@@ -186,7 +186,7 @@ package classes.filter
 
         private function compareSongType(songInfo:SongInfo, value:Number):Boolean
         {
-            var out:Boolean = songInfo.songType == value;
+            var out:Boolean = songInfo.song_type == value;
             return inverse ? !out : out;
         }
 

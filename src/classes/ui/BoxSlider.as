@@ -39,7 +39,7 @@ package classes.ui
 
         protected function init():void
         {
-            this.graphics.lineStyle(1, 0xFFFFFF, 0.3);
+            this.graphics.lineStyle(1, 0xFFFFFF, 0.2);
             this.graphics.moveTo(0, _height / 2);
             this.graphics.lineTo(_width, _height / 2);
 

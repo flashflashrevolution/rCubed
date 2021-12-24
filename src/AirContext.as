@@ -20,11 +20,15 @@ package
     public class AirContext
     {
         // Windows will store files in the current folder, other OS will use the application storage folder.
-        public static var STORAGE_PATH:File = File.applicationDirectory;
+        public static var STORAGE_PATH:File;
         {
             if (SystemUtil.OS.toLowerCase().indexOf("win") == -1)
             {
                 STORAGE_PATH = File.applicationStorageDirectory;
+            }
+            else
+            {
+                STORAGE_PATH = new File(File.applicationDirectory.nativePath);
             }
         }
 
@@ -54,6 +58,24 @@ package
             return 0;
         }
 
+        public static function initFolders():void
+        {
+            // song cache
+            var folder:File = STORAGE_PATH.resolvePath(Constant.SONG_CACHE_PATH);
+            if (!folder.exists)
+                folder.createDirectory();
+
+            // replays
+            folder = STORAGE_PATH.resolvePath(Constant.REPLAY_PATH);
+            if (!folder.exists)
+                folder.createDirectory();
+
+            // noteskins
+            folder = STORAGE_PATH.resolvePath(Constant.NOTESKIN_PATH);
+            if (!folder.exists)
+                folder.createDirectory();
+        }
+
         public static function createFileName(file_name:String, replace:String = ""):String
         {
             // Remove chars not allowed in Windows filename \ / : * ? " < > |
@@ -75,7 +97,7 @@ package
 
         static public function getSongCachePath(song:Song):String
         {
-            return Constant.SONG_CACHE_PATH + (song.songInfo.engine ? MD5.hash(song.songInfo.engine.id) + "/" + MD5.hash(song.songInfo.levelId.toString()) : '57fea2a7e69445179686b7579d5118ef/' + MD5.hash(song.id.toString())) + "/";
+            return Constant.SONG_CACHE_PATH + (song.songInfo.engine ? MD5.hash(song.songInfo.engine.id) + "/" + MD5.hash(song.songInfo.level_id.toString()) : '57fea2a7e69445179686b7579d5118ef/' + MD5.hash(song.id.toString())) + "/";
         }
 
         static public function getReplayPath(song:Song):String
@@ -112,39 +134,32 @@ package
             return STORAGE_PATH.resolvePath(path);
         }
 
-        static public function getAppPath(path:String):String
-        {
-            return STORAGE_PATH.resolvePath(path).nativePath;
-        }
-
         static public function doesFileExist(path:String):Boolean
         {
             return STORAGE_PATH.resolvePath(path).exists;
         }
 
-        static public function writeFile(appPath:String, bytes:ByteArray, key:uint = 0, errorCallback:Function = null):File
+        static public function writeFile(file:File, bytes:ByteArray, key:uint = 0, errorCallback:Function = null):File
         {
-            var cacheFile:File = new File(appPath);
             var fileStream:FileStream = new FileStream();
             fileStream.addEventListener(SecurityErrorEvent.SECURITY_ERROR, (errorCallback != null ? errorCallback : e_fileError));
             fileStream.addEventListener(IOErrorEvent.IO_ERROR, (errorCallback != null ? errorCallback : e_fileError));
-            fileStream.open(cacheFile, FileMode.WRITE);
+            fileStream.open(file, FileMode.WRITE);
             fileStream.writeBytes(encodeData(bytes, key));
             fileStream.close();
 
-            return cacheFile;
+            return file;
         }
 
-        static public function readFile(appPath:String, key:uint = 0, errorCallback:Function = null):ByteArray
+        static public function readFile(file:File, key:uint = 0, errorCallback:Function = null):ByteArray
         {
-            var cacheFile:File = new File(appPath);
-            if (cacheFile.exists)
+            if (file.exists)
             {
                 var fileStream:FileStream = new FileStream();
                 fileStream.addEventListener(SecurityErrorEvent.SECURITY_ERROR, (errorCallback != null ? errorCallback : e_fileError));
                 fileStream.addEventListener(IOErrorEvent.IO_ERROR, (errorCallback != null ? errorCallback : e_fileError));
                 var readData:ByteArray = new ByteArray();
-                fileStream.open(cacheFile, FileMode.READ);
+                fileStream.open(file, FileMode.READ);
                 fileStream.readBytes(readData);
                 fileStream.close();
 
@@ -184,19 +199,11 @@ package
             return file;
         }
 
-        static public function writeText(path:String, data:String, errorCallback:Function = null):File
+        static public function deleteFile(file:File):Boolean
         {
-            var writeFile:File = new File(getAppPath(path));
-            writeTextFile(writeFile, data, errorCallback);
-            return writeFile;
-        }
-
-        static public function deleteFile(appPath:String):Boolean
-        {
-            var cacheFile:File = new File(appPath);
-            if (cacheFile.exists)
+            if (file.exists)
             {
-                cacheFile.moveToTrash();
+                file.moveToTrash();
                 return true;
             }
             return false;

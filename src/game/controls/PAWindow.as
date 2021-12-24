@@ -27,12 +27,13 @@ package game.controls
             var ypos:int = 0;
             var scoreSize:int = 36;
 
-            var labelDesc:Array = [{colour: options.judgeColours[0], title: _lang.stringSimple("game_amazing")},
-                {colour: options.judgeColours[1], title: _lang.stringSimple("game_perfect")},
-                {colour: options.judgeColours[2], title: _lang.stringSimple("game_good")},
-                {colour: options.judgeColours[3], title: _lang.stringSimple("game_average")},
-                {colour: options.judgeColours[4], title: _lang.stringSimple("game_miss")},
-                {colour: options.judgeColours[5], title: _lang.stringSimple("game_boo")}];
+            var labelDesc:Array = [{color: options.judgeColors[0], title: _lang.stringSimple("game_amazing")},
+                {color: options.judgeColors[1], title: _lang.stringSimple("game_perfect")},
+                {color: options.judgeColors[2], title: _lang.stringSimple("game_good")},
+                {color: options.judgeColors[3], title: _lang.stringSimple("game_average")},
+                {color: options.judgeColors[4], title: _lang.stringSimple("game_miss")},
+                {color: options.judgeColors[5], title: _lang.stringSimple("game_boo")}];
+
             if (!options.displayAmazing)
             {
                 labelDesc.splice(0, 1);
@@ -42,7 +43,7 @@ package game.controls
             for each (var label:Object in labelDesc)
             {
                 var field:TextField = new TextField();
-                field.defaultTextFormat = new TextFormat(_lang.font(), 13, label.colour, true);
+                field.defaultTextFormat = new TextFormat(_lang.font(), 13, label.color, true);
                 field.antiAliasType = AntiAliasType.ADVANCED;
                 field.embedFonts = true;
                 field.selectable = false;
@@ -50,12 +51,12 @@ package game.controls
                 field.y = ypos;
                 field.x = 50;
                 field.width = 10;
-                field.text = label.title + ":";
+                field.text = label.title;
                 addChild(field);
                 labels.push(field);
 
                 field = new TextField();
-                field.defaultTextFormat = new TextFormat(_lang.font(), scoreSize--, label.colour, true);
+                field.defaultTextFormat = new TextFormat(_lang.font(), scoreSize--, label.color, true);
                 field.antiAliasType = AntiAliasType.ADVANCED;
                 field.embedFonts = true;
                 field.selectable = false;
@@ -123,6 +124,33 @@ package game.controls
                     xpos = 50;
                     ypos += 38;
                 }
+            }
+        }
+
+        public function set alignment(val:String):void
+        {
+            if (val == "right")
+            {
+                for (var i:int = 0; i < labels.length; i++)
+                {
+                    var label:TextField = labels[i];
+                    var score:TextField = scores[i];
+
+                    score.text = "0";
+
+                    label.autoSize = TextFieldAutoSize.LEFT;
+                    label.x = 65;
+                    score.autoSize = TextFieldAutoSize.RIGHT;
+                    score.x = 40;
+                }
+            }
+        }
+
+        public function set show_labels(val:Boolean):void
+        {
+            for (var i:int = 0; i < labels.length; i++)
+            {
+                labels[i].visible = val;
             }
         }
     }

@@ -13,6 +13,8 @@ package com.flashdynamix.utils
      */
     public class SWFProfiler
     {
+        private static var _lang:Language = Language.instance;
+
         private static var itvTime:int;
         private static var initTime:int;
         private static var currentTime:int;
@@ -62,8 +64,8 @@ package com.flashdynamix.utils
 
         private static function buildContextMenu(context:InteractiveObject):void
         {
-            var str_show_profiler:String = Language.instance.stringSimple("show_profiler", "Show Profiler");
-            var str_hide_profiler:String = Language.instance.stringSimple("hide_profiler", "Hide Profiler");
+            var str_show_profiler:String = _lang.stringSimple("show_profiler");
+            var str_hide_profiler:String = _lang.stringSimple("hide_profiler");
 
             ci = new ContextMenuItem(displayed ? str_hide_profiler : str_show_profiler, true);
             addEvent(ci, ContextMenuEvent.MENU_ITEM_SELECT, onSelect);
@@ -140,7 +142,7 @@ package com.flashdynamix.utils
 
         private static function show():void
         {
-            ci.caption = Language.instance.stringSimple("hide_profiler", "Hide Profiler");
+            ci.caption = _lang.stringSimple("hide_profiler");
             displayed = true;
             addEvent(stage, Event.RESIZE, resize);
             addEvent(frame, Event.ENTER_FRAME, draw);
@@ -150,7 +152,7 @@ package com.flashdynamix.utils
 
         private static function hide():void
         {
-            ci.caption = Language.instance.stringSimple("show_profiler", "Show Profiler");
+            ci.caption = _lang.stringSimple("show_profiler");
             displayed = false;
             removeEvent(stage, Event.RESIZE, resize);
             removeEvent(frame, Event.ENTER_FRAME, draw);
@@ -232,6 +234,7 @@ import flash.text.*;
 
 internal class ProfilerContent extends Sprite
 {
+    private var _lang:Language = Language.instance;
 
     private var minFpsTxtBx:TextField;
     private var maxFpsTxtBx:TextField;
@@ -310,9 +313,9 @@ internal class ProfilerContent extends Sprite
             maxMemTxtBx.text = maxMem.toFixed(3) + " Mb";
         }
 
-        var str_current_fps:String = Language.instance.stringSimple("profiler_current_fps", "Current Fps");
-        var str_average_fps:String = Language.instance.stringSimple("profiler_average_fps", "Average Fps");
-        var str_memory_used:String = Language.instance.stringSimple("profiler_memory_used", "Memory Used");
+        var str_current_fps:String = _lang.stringSimple("profiler_current_fps");
+        var str_average_fps:String = _lang.stringSimple("profiler_average_fps");
+        var str_memory_used:String = _lang.stringSimple("profiler_memory_used");
 
         infoTxtBx.text = str_current_fps + " " + currentFps.toFixed(3) + "   |   " + str_average_fps + " " + averageFps.toFixed(3) + "   |   " + str_memory_used + " " + currentMem.toFixed(3) + " Mb";
         infoTxtBx.x = stage.stageWidth - infoTxtBx.width - 20;

@@ -1,6 +1,12 @@
 package com.flashfla.utils
 {
+    import flash.display.Bitmap;
+    import flash.display.BitmapData;
     import flash.display.DisplayObject;
+    import flash.display.IBitmapDrawable;
+    import flash.filters.BlurFilter;
+    import flash.geom.ColorTransform;
+    import flash.geom.Point;
 
     public class SpriteUtil
     {
@@ -48,6 +54,18 @@ package com.flashfla.utils
         {
             sprite.scaleX = sprite.scaleY = 1;
             sprite.scaleX = sprite.scaleY = Math.min((maxWidth / sprite.width), (maxHeight / sprite.height), 1);
+        }
+
+        public static function getBitmapSprite(drawable:IBitmapDrawable, darkness:Number = 1):Bitmap
+        {
+            var bmd:BitmapData = new BitmapData(Main.GAME_WIDTH, Main.GAME_HEIGHT, false, 0x000000);
+            bmd.draw(drawable);
+            bmd.applyFilter(bmd, bmd.rect, new Point(), new BlurFilter(16, 16, 3));
+
+            if (darkness < 1)
+                bmd.colorTransform(bmd.rect, new ColorTransform(darkness, darkness, darkness));
+
+            return new Bitmap(bmd);
         }
     }
 }

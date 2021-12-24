@@ -25,10 +25,11 @@ package
         public static const ROOT_URL:String = "https://" + R3::ROOT_URL + "/";
 
         // Site URLs
-        public static const SITE_DATA_URL:String = ROOT_URL + "game/r3/r3-siteData.v3.php";
+        public static const SITE_DATA_URL:String = ROOT_URL + "game/r3/r3-siteData.v2.php";
         public static const SITE_PLAYLIST_URL:String = ROOT_URL + "game/r3/r3-playlist.php";
         public static const SITE_LANGUAGE_URL:String = ROOT_URL + "game/r3/r3-language.php";
         public static const SITE_HISCORES_URL:String = ROOT_URL + "game/r3/r3-hiscores.php";
+        public static const SITE_REPLAYS_URL:String = ROOT_URL + "game/r3/r3-replays.php";
         public static const LEVEL_STATS_URL:String = ROOT_URL + "levelstats.php?level=";
         public static const DEBUG_LOG_URL:String = ROOT_URL + "game/r3/r3-debugLog.php";
 
@@ -62,6 +63,7 @@ package
         // File Constants
         public static const MENU_MUSIC_PATH:String = "menu_music.swf";
         public static const MENU_MUSIC_MP3_PATH:String = "menu_music.mp3"
+        public static const NOTESKIN_PATH:String = "noteskins/";
         public static const REPLAY_PATH:String = "replays/";
         public static const SONG_CACHE_PATH:String = "song_cache/";
 

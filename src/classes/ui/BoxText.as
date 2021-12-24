@@ -115,16 +115,6 @@ package classes.ui
             _input.autoSize = newString;
         }
 
-        public function get type():String
-        {
-            return _input.type;
-        }
-
-        public function set type(newString:String):void
-        {
-            _input.type = newString;
-        }
-
         public function get selectable():Boolean
         {
             return _input.selectable;
@@ -132,6 +122,7 @@ package classes.ui
 
         public function set selectable(newBool:Boolean):void
         {
+            _input.type = newBool ? 'input' : 'dynamic';
             _input.selectable = newBool;
         }
 
