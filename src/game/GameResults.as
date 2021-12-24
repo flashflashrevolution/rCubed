@@ -1103,13 +1103,11 @@ package game
             }
             else
             {
-                if (!data.ignore)
-                {
-                    Alert.add(_lang.string("error_failed_to_save_results") + " (ERR: " + data.result + ")", 360, Alert.RED);
-                }
-
                 if (resultsDisplay != null)
+                {
                     resultsDisplay.result_rank.htmlText = data.ignore ? "" : "Score save failed!";
+                    resultsDisplay.result_last_best.htmlText = data.ignore ? "" : "(ERR: " + data.result + ")";
+                }
             }
         }
 
