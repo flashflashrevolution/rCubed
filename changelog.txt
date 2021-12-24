@@ -1,25 +1,45 @@
-R^3 (v1.4.0) [2021-6-TBD]
+R^3 (v1.4.0) [2021-12-25]
 ---------------------------------------------------------------------
 @Psycast
-- Didn't include any of the improvements found in the AF2021 engine.
-- Fix loading of the receptor animation setting. (#312)
-- Implement File Logging. (#275)
+- Add Accuracy/Error Bar.
+- Add Song Progress Time.
+- Add new Settings window.
+- Add new Replay History window.
+- Add support for viewing personal online replays.
+- Add background image support for menu and gameplay.
+- Add option for Stage Color during gameplay.
+- Add support for MS based beatboxes.
+- Add additional key labels for input.
+- Add 'Remove Receptor Judgement Animation' setting. (#287)
+- Add 'Remember Window Position / Size'
+- Add ability to move Song Progress Bar.
+- Add restarts for total queue values.
+- Add ability to store and load custom noteskins from a folder.
+- Add feedback text for multiple song selection states. (No search results, All songs filtered, etc)
+- Update Auto Judge offset regardless of site saving.
+- Load division data from server instead of hardcoding values.
 - Refactor Alerts. (#272)
-- Update Air SDK URL to fixed version. (#259)
+- Refactor all file read / write logic.
+- Implement File Logging. (#275)
+- Implement additional settings saved for replays.
+- Fix binary replays crash bug.
+- Fix multiple UI Components. (Text, Scrollpane, ColorField, List)
+- Fix mirror setting in replays when using per-song invert mirror option.
+- Fix MP access from some users with special characters in their name.
+- Fix Invalid Auto-Music Offsets. (#257)
+- Fix Multiplayer / Spectator Editor
+- Fix ability to set custom judge windows.
 - Add missing png sources for noteskins 8, 9, 10. (#258)
-- Invalid Auto-Music Offsets. (#257)
-- Fixes warning in console about finding a function while expecting a boolean. (#256)
 - Remove config blocks for air and not_air. (#110)
+- Update Air SDK URL to fixed version. (#259)
 
 @Zageron
 - Sync room variables. (#321)
 - Resolve spectating issues when leaving and joining rooms. (#319)
-- Add a bunch of new strings. (#307)
+- Add translation to several strings. (#307)
 - Enable local file cache and local replays by default. (#304)
 - Fix MP Spectating. (#292) - Co-Author
 - Remove all event listeners from the core path of FFR. (#290) - Co-Author
-- Add options and functionality for skipping receptor animations. (#289)
-- Add 'Remove Receptor Judgement Animation' button. (#287)
 - Restore Aachen Light as judge font. (#276)
 - Add signed script that modifies the flex-config.xml to prevent compiler errors. (#273)
 
@@ -66,7 +86,7 @@ R^3 (v1.3.1) [2020-12-24]
 - Edit url prefix. (#245)
 
 @Sploder12
-- Add combo colour for raw goods (#253)
+- Add combo color for raw goods (#253)
 
 @Fission
 - Force `LF` line endings in `.gitattributes` (#249)
@@ -143,7 +163,7 @@ R^3 (v1.2.3) [2020-06-21]
 
 R^3 (v1.2.2) [2020-06-14]
 ---------------------------------------------------------------------
-- Make division colour and title arrays static (#61) - @G-flat
+- Make division color and title arrays static (#61) - @G-flat
 - Rebuild Judge Animations to use Time instead of Frames (#62) - @Psycast
 - Fix Infinite loading when accessing in-game song leaderboards out-of-bounds (#57) - @Psycast
 - Add refresh buttons in the song selection menu and highscores popup (#66) - @G-flat
