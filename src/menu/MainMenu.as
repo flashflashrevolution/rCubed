@@ -257,6 +257,14 @@ package menu
                     menuItemSmall.setHoverText(_lang.string(menuItems[i][0]), "bottom");
                     menuItemSmall.active = (i == options.activePanel);
                     btnPosition += (28 + 6);
+
+                    // Filter - Set to Green if enabled.
+                    if (menuItems[i][1] == MENU_FILTERS && _gvars.activeFilter != null)
+                    {
+                        menuItemSmall.setIconColor("#61ED42");
+                        menuItemSmall.color = 0x61ED42;
+                        menuItemSmall.borderColor = 0x61ED42;
+                    }
                 }
                 else
                 {
