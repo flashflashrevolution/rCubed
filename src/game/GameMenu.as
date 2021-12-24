@@ -1,10 +1,9 @@
 package game
 {
-    import classes.*;
+    import classes.Language;
+    import classes.Playlist;
     import com.flashfla.utils.SystemUtil;
-    import flash.display.*;
-    import flash.events.*;
-    import menu.*;
+    import menu.MenuPanel;
 
     public class GameMenu extends MenuPanel
     {
