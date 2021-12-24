@@ -144,6 +144,7 @@ package menu
             background = new SongSelectionBackground();
             background.x = 145;
             background.y = 52;
+            background.visible = LocalOptions.getVariable("menu_show_song_selection_background", true);
             this.addChild(background);
 
             GENRE_MODE = LocalStore.getVariable("genre_mode", GENRE_DIFFICULTIES);

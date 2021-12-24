@@ -92,11 +92,13 @@ package menu
             logo = new Logo();
             logo.x = 18 + logo.width * 0.5;
             logo.y = 8 + logo.height * 0.5;
+            logo.visible = LocalOptions.getVariable("menu_show_logo", true);
             this.addChild(logo);
 
             //- Add Menu Background
             var menu_bg:MainMenuBackground = new MainMenuBackground();
             menu_bg.x = 145;
+            menu_bg.visible = LocalOptions.getVariable("menu_show_menu_background", true);
             this.addChild(menu_bg);
 
             //- Add Menu to Stage

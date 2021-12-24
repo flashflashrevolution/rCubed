@@ -57,7 +57,8 @@ package menu
             background = new SongSelectionBackground();
             background.x = 145;
             background.y = 52;
-            background.pageBackground.alpha = 0;
+            background.pageBackground.visible = false;
+            background.visible = LocalOptions.getVariable("menu_show_song_selection_background", true);
             this.addChild(background);
 
             //- Add ScrollPane
