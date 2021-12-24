@@ -12,7 +12,7 @@ package arc
         private var lastChord:Object;
 
         private const DIRECTIONS:Array = ['L', 'D', 'U', 'R'];
-        private const HALF_COLOUR:Object = {"red": "red", "blue": "red", "purple": "purple", "yellow": "blue", "pink": "purple", "orange": "yellow", "cyan": "pink", "green": "orange", "white": "white"}
+        private const HALF_COLOR:Object = {"red": "red", "blue": "red", "purple": "purple", "yellow": "blue", "pink": "purple", "orange": "yellow", "cyan": "pink", "green": "orange", "white": "white"}
 
         public var options:GameOptions;
 
@@ -23,7 +23,7 @@ package arc
         public var modScramble:Boolean;
         public var modShuffle:Boolean;
         public var modReverse:Boolean;
-        public var modColumnColour:Boolean;
+        public var modColumnColor:Boolean;
         public var modHalfTime:Boolean;
         public var modNoBackground:Boolean;
         public var modIsolation:Boolean;
@@ -52,7 +52,7 @@ package arc
             modScramble = options.modEnabled("scramble");
             modShuffle = options.modEnabled("shuffle");
             modReverse = options.modEnabled("reverse");
-            modColumnColour = options.modEnabled("columncolour");
+            modColumnColor = options.modEnabled("columncolour");
             modHalfTime = options.modEnabled("halftime");
             modNoBackground = options.modEnabled("nobackground");
             modIsolation = options.isolation;
@@ -107,7 +107,7 @@ package arc
 
         public function required():Boolean
         {
-            return modIsolation || modRandom || modScramble || modShuffle || modColumnColour || modHalfTime || modMirror || modOffset || modRate;
+            return modIsolation || modRandom || modScramble || modShuffle || modColumnColor || modHalfTime || modMirror || modOffset || modRate;
         }
 
         public function transformNote(index:int):Note
@@ -130,7 +130,7 @@ package arc
                 return null;
 
             var pos:Number = note.time;
-            var colour:String = note.colour;
+            var color:String = note.color;
             var frame:Number = note.frame;
             var dir:int = valueOfDirection(note.direction);
 
@@ -188,13 +188,13 @@ package arc
                 }
             }
 
-            if (modColumnColour)
-                colour = (dir % 3) ? "blue" : "red";
+            if (modColumnColor)
+                color = (dir % 3) ? "blue" : "red";
 
             if (modHalfTime)
-                colour = HALF_COLOUR[colour] || colour;
+                color = HALF_COLOR[color] || color;
 
-            return new Note(directionOfValue(dir), pos, colour, int(frame));
+            return new Note(directionOfValue(dir), pos, color, int(frame));
         }
 
         public function transformTotalNotes():int

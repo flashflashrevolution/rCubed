@@ -379,10 +379,10 @@ package arc.mp
             {
                 const color:int = GlobalVariables.getDivisionColor(level);
                 const titleString:String = GlobalVariables.getDivisionTitle(level);
-                const dulledColour:String = MultiplayerChat.textDullColour(color, 1).toString(16);
+                const dulledColor:String = MultiplayerChat.textDullColor(color, 1).toString(16);
                 const titlePrefix:String = "(" + titleString + ")";
 
-                return roomPopulationString + MultiplayerChat.textFormatColour(isPrivateString + titlePrefix, "#" + dulledColour) + " " + MultiplayerChat.textEscape(room.name);
+                return roomPopulationString + MultiplayerChat.textFormatColor(isPrivateString + titlePrefix, "#" + dulledColor) + " " + MultiplayerChat.textEscape(room.name);
             }
             else
             {

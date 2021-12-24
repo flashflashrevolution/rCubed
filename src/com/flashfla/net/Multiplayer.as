@@ -91,7 +91,7 @@ package com.flashfla.net
         public static const CLASS_BANNED:int = 10;
         public static const CLASS_ANONYMOUS:int = 11;
 
-        public static const COLOURS:Array = [0x000000, 0xFF0000, 0x000000, 0x91FF00, 0x91FF00, 0x91FF00, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000];
+        public static const COLORS:Array = [0x000000, 0xFF0000, 0x000000, 0x91FF00, 0x91FF00, 0x91FF00, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000];
 
         public static const STATUS_NONE:int = 0;
         public static const STATUS_CLEANUP:int = 1;

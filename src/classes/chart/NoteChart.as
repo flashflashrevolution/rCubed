@@ -206,11 +206,11 @@ package classes.chart
                 if (type == FFR_BEATBOX)
                 {
                     // [40, "L", "red"],
-                    returnVal += (i > 0 ? ", " : "") + ("[" + (note.frame + frameBuffer) + ", \"" + note.direction + "\", \"" + note.colour + "\"]");
+                    returnVal += (i > 0 ? ", " : "") + ("[" + (note.frame + frameBuffer) + ", \"" + note.direction + "\", \"" + note.color + "\"]");
                 }
                 else
                 {
-                    returnVal += ((i + 1) + "\t\tF: " + (note.frame + frameBuffer) + "\t\tD: " + note.direction + "\t\tC: " + note.colour + "\r");
+                    returnVal += ((i + 1) + "\t\tF: " + (note.frame + frameBuffer) + "\t\tD: " + note.direction + "\t\tC: " + note.color + "\r");
                 }
             }
             if (type == FFR_BEATBOX)

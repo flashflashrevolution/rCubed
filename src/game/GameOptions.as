@@ -51,10 +51,10 @@ package game
         public var displayMPPA:Boolean = true;
         public var displayMPCombo:Boolean = true;
 
-        public var judgeColours:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
-        public var comboColours:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000, 0xDC00C2]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag, RawGood
+        public var judgeColors:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
+        public var comboColors:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000, 0xDC00C2]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag, RawGood
         public var enableComboColors:Vector.<Boolean> = new <Boolean>[true, true, true, false, false, false, false, false, false];
-        public var gameColours:Array = [0x1495BD, 0x033242, 0x0C6A88, 0x074B62, 0x000000];
+        public var gameColors:Array = [0x1495BD, 0x033242, 0x0C6A88, 0x074B62, 0x000000];
         public var noteDirections:Array = ["D", "L", "U", "R"];
         public var noteColors:Array = ["red", "blue", "purple", "yellow", "pink", "orange", "cyan", "green", "white"];
         public var noteSwapColors:Object = {"red": "red", "blue": "blue", "purple": "purple", "yellow": "yellow", "pink": "pink", "orange": "orange", "cyan": "cyan", "green": "green", "white": "white"};
@@ -130,10 +130,10 @@ package game
             displayMPJudge = user.DISPLAY_MP_JUDGE;
             displayMPCombo = user.DISPLAY_MP_COMBO;
 
-            judgeColours = user.judgeColours.concat();
-            comboColours = user.comboColours.concat();
+            judgeColors = user.judgeColors.concat();
+            comboColors = user.comboColors.concat();
             enableComboColors = user.enableComboColors.concat();
-            gameColours = user.gameColors.concat();
+            gameColors = user.gameColors.concat();
             rawGoodTracker = user.rawGoodTracker;
 
             for (var i:int = 0; i < noteColors.length; i++)
@@ -233,9 +233,9 @@ package game
 
             if (settings["judgeColors"] != null)
             {
-                for (i = 0; i < judgeColours.length; i++)
+                for (i = 0; i < judgeColors.length; i++)
                 {
-                    judgeColours[i] = settings["judgeColors"][i];
+                    judgeColors[i] = settings["judgeColors"][i];
                 }
             }
         }
@@ -306,9 +306,9 @@ package game
                 settings["noteSwapColours"][i] = noteSwapColors[noteColors[i]];
             }
             settings["judgeColors"] = [];
-            for (i = 0; i < judgeColours.length; i++)
+            for (i = 0; i < judgeColors.length; i++)
             {
-                settings["judgeColors"][i] = judgeColours[i];
+                settings["judgeColors"][i] = judgeColors[i];
             }
 
             var user:User = GlobalVariables.instance.activeUser;

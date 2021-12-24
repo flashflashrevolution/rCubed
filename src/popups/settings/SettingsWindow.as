@@ -329,7 +329,7 @@ package popups.settings
                     _gvars.activeUser.saveLocal();
                     _gvars.activeUser.save();
 
-                    // Setup Background Colours
+                    // Setup Background Colors
                     GameBackgroundColor.BG_LIGHT = _gvars.activeUser.gameColors[0];
                     GameBackgroundColor.BG_DARK = _gvars.activeUser.gameColors[1];
                     GameBackgroundColor.BG_STATIC = _gvars.activeUser.gameColors[2];

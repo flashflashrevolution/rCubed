@@ -25,12 +25,12 @@ package game.controls
             this.options = options;
 
             // Copy Combo Colors
-            colors = new Vector.<Number>(options.comboColours.length, true);
-            colors_dark = new Vector.<Number>(options.comboColours.length, true);
-            for (var i:int = 0; i < options.comboColours.length; i++)
+            colors = new Vector.<Number>(options.comboColors.length, true);
+            colors_dark = new Vector.<Number>(options.comboColors.length, true);
+            for (var i:int = 0; i < options.comboColors.length; i++)
             {
-                colors[i] = options.comboColours[i];
-                colors_dark[i] = ColorUtil.darkenColor(options.comboColours[i], 0.5);
+                colors[i] = options.comboColors[i];
+                colors_dark[i] = ColorUtil.darkenColor(options.comboColors[i], 0.5);
             }
 
             // Copy Enabled Colors

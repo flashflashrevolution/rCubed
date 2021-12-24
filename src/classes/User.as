@@ -111,8 +111,8 @@ package classes
         public var DISPLAY_MP_COMBO:Boolean = true;
 
         public var DISPLAY_MP_TIMESTAMP:Boolean = false;
-        public var judgeColours:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
-        public var comboColours:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000, 0xDC00C2]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag, RawGood
+        public var judgeColors:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
+        public var comboColors:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000, 0xDC00C2]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag, RawGood
         public var enableComboColors:Vector.<Boolean> = new <Boolean>[true, true, true, false, false, false, false, false, false];
         public var gameColors:Array = [0x1495BD, 0x033242, 0x0C6A88, 0x074B62, 0x000000];
         public var noteColors:Array = ["red", "blue", "purple", "yellow", "pink", "orange", "cyan", "green", "white"];
@@ -651,10 +651,10 @@ package classes
                 this.activeVisualMods = _settings.visual;
 
             if (_settings.judgeColours != null)
-                mergeIntoArray(this.judgeColours, _settings.judgeColours);
+                mergeIntoArray(this.judgeColors, _settings.judgeColours);
 
             if (_settings.comboColours != null)
-                mergeIntoArray(this.comboColours, _settings.comboColours);
+                mergeIntoArray(this.comboColors, _settings.comboColours);
 
             if (_settings.enableComboColors != null)
                 mergeIntoArray(this.enableComboColors, _settings.enableComboColors);
@@ -696,7 +696,7 @@ package classes
             {
                 SoundMixer.soundTransform = new SoundTransform(this.gameVolume);
 
-                // Setup Background Colours
+                // Setup Background Colors
                 GameBackgroundColor.BG_LIGHT = gameColors[0];
                 GameBackgroundColor.BG_DARK = gameColors[1];
                 GameBackgroundColor.BG_STATIC = gameColors[2];
@@ -763,8 +763,8 @@ package classes
             gameSave.frameRate = this.frameRate;
             gameSave.forceNewJudge = this.forceNewJudge;
             gameSave.visual = this.activeVisualMods;
-            gameSave.judgeColours = this.judgeColours;
-            gameSave.comboColours = this.comboColours;
+            gameSave.judgeColours = this.judgeColors;
+            gameSave.comboColours = this.comboColors;
             gameSave.enableComboColors = this.enableComboColors;
             gameSave.gameColours = this.gameColors;
             gameSave.noteColours = this.noteColors;

@@ -41,10 +41,10 @@ package game.controls
 
             // Parse Colors
             _colors = [];
-            _colors[100] = options.judgeColours[0];
-            _colors[50] = options.judgeColours[1];
-            _colors[25] = options.judgeColours[2];
-            _colors[5] = options.judgeColours[3];
+            _colors[100] = options.judgeColors[0];
+            _colors[50] = options.judgeColors[1];
+            _colors[25] = options.judgeColors[2];
+            _colors[5] = options.judgeColors[3];
 
             // Setup ColorTransform for Fade
             _renderTarget = new Shape();
