@@ -978,11 +978,6 @@ package game
 
         private function onEnterFrame(e:Event):void
         {
-            if (options.displayJudge && player1Judge != null)
-            {
-                player1Judge.updateJudge(e);
-            }
-
             // XXX: HACK HACK HACK
             if (legacyMode)
             {
@@ -991,6 +986,21 @@ package game
                     song.stop();
             }
 
+            // UI Updates
+            if (options.displayMPJudge && options.mpRoom)
+            {
+                for each (var mpJudgeComponent:Judge in mpJudge)
+                {
+                    mpJudgeComponent.updateJudge(e);
+                }
+            }
+            else if (options.displayJudge && player1Judge != null)
+            {
+                player1Judge.updateJudge(e);
+            }
+
+
+            // Gameplay Logic
             switch (GAME_STATE)
             {
                 case GAME_PLAY:
@@ -2246,7 +2256,8 @@ package game
                     value = 100;
                 else if (diff.perfect > 0)
                     value = 50;
-                if (value && judge)
+
+                if (value != 0)
                     judge.showJudge(value);
             }
 
