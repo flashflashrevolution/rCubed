@@ -1,3 +1,11 @@
+R^3 (v1.4.1) [2021-12-25]
+---------------------------------------------------------------------
+@Psycast
+- Fix crashes related to Song Queue / Queue Manager.
+- Fix Judge UI updates in multiplayer (#313)
+- Fix Song Flag Filter comparison.
+
+
 R^3 (v1.4.0) [2021-12-25]
 ---------------------------------------------------------------------
 @Psycast
@@ -64,6 +72,7 @@ R^3 (v1.4.0) [2021-12-25]
 - Add Column Filter To Results Screen. (#274)
 - Update behavior of Raw Good Flag. (#270)
 - Change Date Format to yyyy/MM/dd. (#268)
+
 
 R^3 (v1.3.1) [2020-12-24]
 ---------------------------------------------------------------------
