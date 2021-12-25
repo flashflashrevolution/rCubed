@@ -1226,7 +1226,7 @@ package menu
             var songTotalLength:int = 0;
             for (var qS:String in _gvars.songQueue)
             {
-                songTotalLength += _gvars.songQueue[qS].timeSecs;
+                songTotalLength += (_gvars.songQueue[qS] as SongInfo).time_secs;
             }
 
             infoTitle = new Text(infoBox, 5, tY, _lang.string("song_selection_queue_panel_title"), 14, "#DDDDDD");

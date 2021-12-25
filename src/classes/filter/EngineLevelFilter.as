@@ -164,7 +164,7 @@ package classes.filter
                     return compareNumber(userData.getSongRating(songInfo), input_number);
 
                 case FILTER_SONG_FLAGS:
-                    return compareSongFlag(GlobalVariables.getSongIconIndexBitmask(songInfo, userData.getLevelRank(songInfo)), (Math.pow(2, input_number)));
+                    return compareSongFlag(songInfo, userData.getLevelRank(songInfo), input_number);
 
                 case FILTER_SONG_ACCESS:
                     return compareNumberEqual(songInfo.access, input_number);
@@ -195,20 +195,25 @@ package classes.filter
          * @param	flag_bits
          * @param	bitmask
          */
-        private function compareSongFlag(flag_bits:int, bitmask:int):Boolean
+        private function compareSongFlag(songInfo:SongInfo, levelRank:Object, value:Number):Boolean
         {
-            if (isNaN(flag_bits) || isNaN(bitmask))
+            var flag_int:int = GlobalVariables.getSongIconIndex(songInfo, levelRank);
+            var flag_bits:int = GlobalVariables.getSongIconIndexBitmask(songInfo, levelRank);
+            var bitmask:int = 1 << value;
+
+            if (isNaN(flag_int) || isNaN(flag_bits) || isNaN(bitmask))
                 return true;
+
             switch (comparison)
             {
                 case "equal":
-                    return flag_bits == bitmask;
+                    return flag_int == value;
+
+                case "not_equal":
+                    return flag_int != value;
 
                 case "contains":
                     return (flag_bits & bitmask) != 0;
-
-                case "not_equal":
-                    return flag_bits != bitmask;
 
                 case "not_contains":
                     return (flag_bits & bitmask) == 0;
