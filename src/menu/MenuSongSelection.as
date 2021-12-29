@@ -604,6 +604,7 @@ package menu
             pane_filter_text.visible = false;
 
             //- Init Variables
+            var doPageSlice:Boolean = false;
             var i:uint;
             var yOffset:int = 0;
             var songInfo:SongInfo;
@@ -617,8 +618,8 @@ package menu
             {
                 _gvars.songQueue = options.queuePlaylist;
                 sourceListLength = _gvars.songQueue.length;
-                songList = _gvars.songQueue.slice(options.pageNumber * ITEM_PER_PAGE, (options.pageNumber + 1) * ITEM_PER_PAGE);
                 genreLength = _gvars.songQueue.length;
+                doPageSlice = true;
             }
 
             // DM_SEARCH
@@ -630,7 +631,7 @@ package menu
                     songList = getFilteredSongInfoArrayFromVec(_playlist.indexList, filterSongListOptionsFilter);
                     sourceListLength = songList.length;
                     genreLength = songList.length;
-                    songList = songList.slice(options.pageNumber * ITEM_PER_PAGE, (options.pageNumber + 1) * ITEM_PER_PAGE);
+                    doPageSlice = true;
                 }
             }
 
@@ -649,7 +650,7 @@ package menu
 
                 // List Length and Slice into pages.
                 genreLength = songList.length;
-                songList = songList.slice(options.pageNumber * ITEM_PER_PAGE, (options.pageNumber + 1) * ITEM_PER_PAGE);
+                doPageSlice = true;
             }
 
             // STANDARD_DISPLAY
@@ -689,7 +690,7 @@ package menu
                     // Sort, List Length, and Slice into pages.
                     songList.sortOn(["access", "difficulty", "name"], [Array.NUMERIC, Array.NUMERIC, Array.CASEINSENSITIVE]);
                     genreLength = songList.length;
-                    songList = songList.slice(options.pageNumber * ITEM_PER_PAGE, (options.pageNumber + 1) * ITEM_PER_PAGE);
+                    doPageSlice = true;
                 }
                 else
                 {
@@ -710,6 +711,12 @@ package menu
                     songList = filterSongListUser(songList);
                     genreLength = songList.length;
                 }
+            }
+
+            // Page Splicing
+            if (doPageSlice)
+            {
+                songList = songList.slice(options.pageNumber * ITEM_PER_PAGE, (options.pageNumber + 1) * ITEM_PER_PAGE);
             }
 
             //- Pages
