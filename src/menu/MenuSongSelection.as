@@ -425,6 +425,10 @@ package menu
                     for (i = 0; i < songList.length; i++)
                     {
                         var song_flag:int = GlobalVariables.getSongIconIndex(songList[i], _gvars.activeUser.getLevelRank(songList[i]));
+
+                        if (song_flag == GlobalVariables.SONG_ICON_FC_STAR)
+                            song_flag = GlobalVariables.SONG_ICON_FC;
+
                         if (song_flag < best_flag)
                         {
                             best_flag = song_flag;

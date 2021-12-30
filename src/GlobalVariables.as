@@ -379,14 +379,14 @@ package
             return SONG_ACCESS_PLAYABLE;
         }
 
-        private static const SONG_ICON_NO_SCORE:int = 0;
-        private static const SONG_ICON_PLAYED:int = 1;
-        private static const SONG_ICON_FC:int = 2;
-        private static const SONG_ICON_SDG:int = 3;
-        private static const SONG_ICON_BLACKFLAG:int = 4;
-        private static const SONG_ICON_BOOFLAG:int = 5;
-        private static const SONG_ICON_AAA:int = 6;
-        private static const SONG_ICON_FC_STAR:int = 7;
+        public static const SONG_ICON_NO_SCORE:int = 0;
+        public static const SONG_ICON_PLAYED:int = 1;
+        public static const SONG_ICON_FC:int = 2;
+        public static const SONG_ICON_SDG:int = 3;
+        public static const SONG_ICON_BLACKFLAG:int = 4;
+        public static const SONG_ICON_BOOFLAG:int = 5;
+        public static const SONG_ICON_AAA:int = 6;
+        public static const SONG_ICON_FC_STAR:int = 7;
 
         public static function getSongIconIndex(_songInfo:SongInfo, _rank:Object):int
         {
