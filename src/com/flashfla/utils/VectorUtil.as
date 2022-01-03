@@ -38,7 +38,7 @@ package com.flashfla.utils
 
         public static function removeFirst(value:Object, vec:*):Boolean
         {
-            if (!(vec is Vector))
+            if (!(vec is Vector.<*>))
                 return false;
 
             var _vec:Vector.<*> = vec as Vector.<*>;
