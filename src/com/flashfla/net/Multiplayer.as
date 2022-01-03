@@ -1,7 +1,6 @@
 package com.flashfla.net
 {
     import flash.events.EventDispatcher;
-
     import arc.ArcGlobals;
     import arc.mp.MultiplayerSingleton;
     import classes.Alert;
@@ -10,7 +9,6 @@ package com.flashfla.net
     import classes.Room;
     import classes.User;
     import classes.Gameplay;
-
     import it.gotoandplay.smartfoxserver.SFSEvents.AdminMessageSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.ExtensionResponseSFSEvent;
     import it.gotoandplay.smartfoxserver.SFSEvents.DebugMessageSFSEvent;
@@ -373,8 +371,8 @@ package com.flashfla.net
                 var anyUserSongNameChanged:Boolean = false;
                 for each (var user:User in roomPlayers)
                 {
-                    var previousUserStatus:int = user.gameplay ? user.gameplay.status ? user.gameplay.status : -1 : -1;
-                    var previousSongName:String = user.gameplay ? user.gameplay.songInfo ? user.gameplay.songInfo.name : "" : "";
+                    var previousUserStatus:int = user.gameplay ? user.gameplay.status : -1;
+                    var previousSongName:String = user.gameplay ? (user.gameplay.songInfo ? user.gameplay.songInfo.name : "") : "";
 
                     updateUserGameplayFromRoom(room, user);
 
@@ -392,9 +390,11 @@ package com.flashfla.net
                 // Process gameplay status changes for game start/end
                 if (room.isAllPlayersInStatus(STATUS_READY) && room.isAllPlayersSameSong())
                 {
+                    lastRoomGamePlayerCount = room.playerCount;
                     if (currentUserIsPlayer)
                     {
                         currentUser.gameplay.status = STATUS_PLAYING;
+                        room.gameResults = false;
 
                         reportSongStart(room);
                         sendCurrentUserStatus(room);
@@ -403,13 +403,13 @@ package com.flashfla.net
                     }
                     else if (currentUser.wantsToWatch)
                     {
-                        room.songInfo = room.getPlayersSong()
-                        lastRoomGamePlayerCount = room.playerCount;
-                        MultiplayerSingleton.getInstance().spectateGame(room)
+                        room.songInfo = room.getPlayersSong();
+                        MultiplayerSingleton.getInstance().spectateGame(room);
                     }
                 }
-                else if (room.isAllPlayersInStatus(STATUS_RESULTS) && anyPlayerStatusChanged)
+                else if (room.isAllPlayersInStatus(STATUS_RESULTS) && !room.gameResults)
                 {
+                    room.gameResults = true;
                     reportSongEnd(room);
                     eventGameResults(room);
 
@@ -756,8 +756,6 @@ package com.flashfla.net
                 }
             }
 
-
-
             // Send room vars to server
             sendRoomVariables(room, vars);
         }
@@ -822,7 +820,7 @@ package com.flashfla.net
                 gameplay.combo,
                 gameplay.maxCombo];
 
-            vars[prefix + "_GAMESCORES"] = StringUtil.join(":", gamescores);
+            vars[prefix + "_GAMESCORES"] = gamescores.join(":");
             vars[prefix + "_STATE"] = int(gameplay.status);
             vars[prefix + "_GAMELIFE"] = int(gameplay.life * 24 / 100);
             vars[prefix + "_SONGID"] = (gameplay.songInfo == null ? gameplay.songId : int(gameplay.songInfo.level));
@@ -864,7 +862,7 @@ package com.flashfla.net
                 gameplay.combo,
                 gameplay.maxCombo];
 
-            vars[prefix + "_GAMESCORES"] = StringUtil.join(":", gamescores);
+            vars[prefix + "_GAMESCORES"] = gamescores.join(":");
             vars[prefix + "_GAMELIFE"] = int(gameplay.life * 24 / 100);
 
             sendRoomVariables(room, vars);

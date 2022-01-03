@@ -97,18 +97,6 @@ package com.flashfla.utils
             return str.split(delimiters[0]);
         }
 
-        public static function join(sep:String, values:Array):String
-        {
-            var str:String = "";
-            for each (var val:Object in values)
-                str += val + sep;
-
-            if (sep)
-                str = str.slice(0, -(sep.length));
-
-            return str;
-        }
-
         public static function htmlEscape(str:String):String
         {
             return XML(new XMLNode(XMLNodeType.TEXT_NODE, str)).toXMLString();

@@ -25,6 +25,7 @@ package classes
         public var ranked:Object
         public var songInfo:SongInfo
         public var connection:Multiplayer;
+        public var gameResults:Boolean;
 
         /**
          * An associative array containing Room Variables' values, where the key is the variable name.

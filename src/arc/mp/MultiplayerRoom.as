@@ -151,7 +151,7 @@ package arc.mp
                 }
                 else if (currentUser.gameplay.status == Multiplayer.STATUS_READY)
                 {
-
+                    // Left intentionally empty
                 }
                 else
                 {

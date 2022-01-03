@@ -25,7 +25,6 @@ package arc.mp
     import com.flashfla.net.events.RoomUserEvent;
     import com.flashfla.net.events.RoomUserStatusEvent;
     import com.flashfla.utils.sprintf;
-    import com.flashfla.utils.StringUtil;
     import flash.events.Event;
     import flash.events.TimerEvent;
     import flash.net.URLLoader;
@@ -580,9 +579,9 @@ package arc.mp
             for each (var result:Gameplay in results)
             {
                 var hasRes:Boolean = result != null;
-                var resultGamestats:Array = [matchSong.name,
+                var resultGamestats:Array = [matchSong.level,
                     hasRes ? result.score : 1,
-                    hasRes ? result.life : 0,
+                    5000, // Do Not Touch or Remove - Server Required to be 5000
                     hasRes ? result.maxCombo : 0,
                     hasRes ? result.combo : 0,
                     hasRes ? (result.amazing + result.perfect) : 0,
@@ -591,11 +590,11 @@ package arc.mp
                     hasRes ? result.miss : 0,
                     hasRes ? result.boo : 0];
 
-                gamestats.concat(resultGamestats);
+                gamestats.push(resultGamestats.join(":"));
             }
 
             var data:URLVariables = new URLVariables();
-            data.gamestats = StringUtil.join(":", gamestats);
+            data.gamestats = gamestats.join(":");
 
             if (resultsP1.score != resultsP2.score && resultsP1.score > 0 && resultsP2.score > 0)
             {
