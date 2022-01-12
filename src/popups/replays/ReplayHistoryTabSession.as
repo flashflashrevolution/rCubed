@@ -52,7 +52,7 @@ package popups.replays
 
                 render_list[render_list.length] = r;
             }
-            parent.pane.setRenderList(render_list);
+            parent.pane.setRenderList(render_list, false);
             parent.updateScrollPane();
         }
 

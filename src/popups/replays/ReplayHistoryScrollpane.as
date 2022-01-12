@@ -43,7 +43,7 @@ package popups.replays
          * Sets the data for the Song Selector to use as a reference for drawing.
          * @param list Array on EngineLevel Items to use.
          */
-        public function setRenderList(list:Array):void
+        public function setRenderList(list:Array, sortList:Boolean = true):void
         {
             clearButtons(true);
 
@@ -53,7 +53,8 @@ package popups.replays
 
             renderCount = list.length;
 
-            list.sortOn(["songname", "score"], [Array.CASEINSENSITIVE, Array.NUMERIC | Array.DESCENDING]);
+            if (sortList)
+                list.sortOn(["songname", "score"], [Array.CASEINSENSITIVE, Array.NUMERIC | Array.DESCENDING]);
 
             _scrollY = 0;
             _calcHeight = (renderCount * (5 + ReplayHistoryEntry.ENTRY_HEIGHT)) + 5;

@@ -272,7 +272,7 @@ package popups.replays
 
         private function e_searchChange(e:Event):void
         {
-            _search_text = search_field.text;
+            _search_text = search_field.text.toLowerCase();
             search_field_placeholder.visible = (_search_text.length <= 0);
             CURRENT_TAB.setValues();
         }
