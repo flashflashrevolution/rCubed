@@ -1,3 +1,14 @@
+R^3 (v1.4.2) [2022-01-11]
+---------------------------------------------------------------------
+@Psycast
+- Fix song count on genres that slice into pages.
+- Fix several MP bugs.
+- Fix FC* not counting in genre flags.
+- Fix Filter Delete button.
+- Fix session replays not appearing in the intended order.
+- Fix replay search not working consistently due to capitalization mismatch.
+
+
 R^3 (v1.4.1) [2021-12-25]
 ---------------------------------------------------------------------
 @Psycast
