@@ -162,14 +162,6 @@ package com.flashfla.utils
             return "String.fromCharCode(" + output + ")";
         }
 
-        public static function urlencode(s:String):String
-        {
-            s = s.replace(/=/g, "%3D");
-            s = s.replace(/\//g, "%2F");
-            s = s.replace(/\+/g, "%2B");
-            return s;
-        }
-
         /**
          * Reverses the input string.
          */

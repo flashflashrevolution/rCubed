@@ -226,13 +226,13 @@ package classes
                 if (songInfo.stepauthor != null && songInfo.stepauthor.indexOf(" & ") !== false)
                 {
                     var stepAuthors:Array = songInfo.stepauthor.split(" & ");
-                    songInfo.stepauthor_html = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(stepAuthors[0]) + "\">" + stepAuthors[0] + "</a>";
+                    songInfo.stepauthor_html = "<a href=\"" + Constant.ROOT_URL + "profile/" + escape(stepAuthors[0]) + "\">" + stepAuthors[0] + "</a>";
 
                     for (var i:int = 1; i < stepAuthors.length; i++)
-                        songInfo.stepauthor_html += " & <a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(stepAuthors[i]) + "\">" + stepAuthors[i] + "</a>";
+                        songInfo.stepauthor_html += " & <a href=\"" + Constant.ROOT_URL + "profile/" + escape(stepAuthors[i]) + "\">" + stepAuthors[i] + "</a>";
                 }
                 else
-                    songInfo.stepauthor_html = "<a href=\"" + Constant.ROOT_URL + "profile/" + Crypt.urlencode(songInfo.stepauthor) + "\">" + songInfo.stepauthor + "</a>";
+                    songInfo.stepauthor_html = "<a href=\"" + Constant.ROOT_URL + "profile/" + escape(songInfo.stepauthor) + "\">" + songInfo.stepauthor + "</a>";
 
                 // Song Price
                 if (isNaN(Number(songInfo.price)))
