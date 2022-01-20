@@ -836,9 +836,10 @@ package game
                 var curNote:GameNote = notes[n];
 
                 // Game Bot
-                if (options.isAutoplay && (gameProgress - curNote.PROGRESS + player1JudgeOffset) == 0)
+                if (options.isAutoplay && (gameProgress - curNote.PROGRESS + player1JudgeOffset) >= 0)
                 {
-                    judgeScore(curNote.DIR, gameProgress);
+                    commitJudge(curNote.DIR, (curNote.PROGRESS + player1JudgeOffset), 50);
+                    noteBox.removeNote(curNote.ID);
                     n--;
                 }
 
@@ -926,6 +927,8 @@ package game
                 if (!highIndex || (index && index > highIndex))
                     highIndex = index;
             }
+
+            highIndex = lowIndex; // Ignore High Sync - Can cause odd crashes.
 
             if (!song.getNote(lowIndex) || !song.getNote(highIndex))
                 return;
