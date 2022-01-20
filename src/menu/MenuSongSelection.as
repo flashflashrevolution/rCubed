@@ -621,6 +621,7 @@ package menu
             if (options.activeGenre == PLAYLIST_QUEUE)
             {
                 _gvars.songQueue = options.queuePlaylist;
+                songList = _gvars.songQueue;
                 sourceListLength = _gvars.songQueue.length;
                 genreLength = _gvars.songQueue.length;
                 doPageSlice = true;
