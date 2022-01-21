@@ -151,7 +151,8 @@ package arc.mp
                 }
                 else if (currentUser.gameplay.status == Multiplayer.STATUS_READY)
                 {
-                    // Left intentionally empty
+                    currentUser.gameplay.status = Multiplayer.STATUS_LOADED;
+                    connection.sendCurrentUserStatus(room);
                 }
                 else
                 {
@@ -213,7 +214,7 @@ package arc.mp
         private function updateRoomDisplay():void
         {
             controlSpectate.label = room.isPlayer(currentUser) ? "Spectate" : (room.playerCount < 2 ? "Join Game" : "Cannot Join Game");
-            controlState.label = room.isPlayer(currentUser) ? "Ready" : (currentUser.wantsToWatch ? "Stop Spectating" : "Start Spectating");
+            controlState.label = room.isPlayer(currentUser) ? (currentUser.gameplay.status == Multiplayer.STATUS_READY ? "Unready" : "Ready") : (currentUser.wantsToWatch ? "Stop Spectating" : "Start Spectating");
         }
     }
 }
