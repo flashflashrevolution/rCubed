@@ -85,6 +85,7 @@ package arc.mp
             controlRooms = new List();
             controlRooms.listItemClass = ListItemDoubleClick;
             controlRooms.autoHideScrollBar = true;
+            controlRooms.reduceUpdates = true;
             controlRooms.move(0, 0);
             controlRooms.setSize(200, 350);
             controlRooms.addEventListener(MouseEvent.DOUBLE_CLICK, onRoomDoubleClick);

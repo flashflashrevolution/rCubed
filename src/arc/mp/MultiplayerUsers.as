@@ -39,6 +39,7 @@ package arc.mp
             controlUsers = new List();
             controlUsers.listItemClass = ListItemDoubleClick;
             controlUsers.autoHideScrollBar = true;
+            controlUsers.reduceUpdates = true;
             controlUsers.addEventListener(MouseEvent.DOUBLE_CLICK, onUserListDoubleClick);
             addChild(controlUsers);
 

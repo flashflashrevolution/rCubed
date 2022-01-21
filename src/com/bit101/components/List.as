@@ -48,6 +48,7 @@ package com.bit101.components
         protected var _selectedColor:uint = Style.LIST_SELECTED;
         protected var _rolloverColor:uint = Style.LIST_ROLLOVER;
         protected var _alternateRows:Boolean = false;
+        protected var _reduceUpdates:Boolean = false;
 
         /**
          * Constructor
@@ -460,10 +461,30 @@ package com.bit101.components
          */
         public function set items(value:Array):void
         {
-            _items = value;
-            invalidate();
-            makeListItems();
-            fillItems();
+            var needsRedraw:Boolean = true;
+            if (_reduceUpdates)
+            {
+                needsRedraw = _items.length != value.length;
+                if (!needsRedraw)
+                {
+                    for (var idx:int = _items.length - 1; idx >= 0; idx--)
+                    {
+                        if (_items[idx].label != value[idx].label || _items[idx].data != value[idx].data)
+                        {
+                            needsRedraw = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (needsRedraw)
+            {
+                _items = value;
+                invalidate();
+                makeListItems();
+                fillItems();
+            }
         }
 
         public function get items():Array
@@ -525,6 +546,19 @@ package com.bit101.components
         public function get autoHideScrollBar():Boolean
         {
             return _scrollbar.autoHide;
+        }
+
+        /**
+         * Sets / gets whether the setting a new list directly should check for changes.
+         */
+        public function set reduceUpdates(value:Boolean):void
+        {
+            _reduceUpdates = value;
+        }
+
+        public function get reduceUpdates():Boolean
+        {
+            return _reduceUpdates;
         }
 
     }
