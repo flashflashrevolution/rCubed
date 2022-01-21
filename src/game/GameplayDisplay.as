@@ -146,6 +146,7 @@ package game
 
         private var options:GameOptions;
         private var mpSpectate:Boolean;
+        private var mpSpectateDidSync:Boolean = false;
 
         private var gameLastNoteFrame:Number;
         private var gameFirstNoteFrame:Number;
@@ -700,6 +701,7 @@ package game
             gamePosition = 0;
             gameProgress = 0;
             absolutePosition = 0;
+            mpSpectateDidSync = false;
             if (song != null)
             {
                 songOffset = new RollingAverage(song.frameRate * 4, _avars.configMusicOffset);
@@ -916,6 +918,8 @@ package game
 
         private function spectateSync():void
         {
+            mpSpectateDidSync = true;
+
             var lowIndex:int = 0;
             var highIndex:int = 0;
             for each (var user:User in options.mpRoom.players)
@@ -927,8 +931,6 @@ package game
                 if (!highIndex || (index && index > highIndex))
                     highIndex = index;
             }
-
-            highIndex = lowIndex; // Ignore High Sync - Can cause odd crashes.
 
             if (!song.getNote(lowIndex) || !song.getNote(highIndex))
                 return;
@@ -1012,7 +1014,7 @@ package game
                         logicTick();
                         gamePosition = (gameProgress + 0.5) * 1000 / 30;
 
-                        if (mpSpectate)
+                        if (mpSpectate && !mpSpectateDidSync)
                             spectateSync();
                     }
                     else
@@ -1055,7 +1057,7 @@ package game
                         while (gameProgress < targetProgress && threshold-- > 0)
                             logicTick();
 
-                        if (mpSpectate)
+                        if (mpSpectate && !mpSpectateDidSync)
                             spectateSync();
 
                         if (reverseMod)
@@ -1309,6 +1311,9 @@ package game
 
         private function endGame():void
         {
+            if (GAME_STATE == GAME_DISPOSE || song == null)
+                return;
+
             if (levelScript)
                 levelScript.destroy();
 
