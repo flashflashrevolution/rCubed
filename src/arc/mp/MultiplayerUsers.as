@@ -73,7 +73,6 @@ package arc.mp
                 items.push({label: MultiplayerChat.nameUser(user), labelhtml: true, data: user});
             controlUsers.items = items;
             sortUsers();
-            controlUsers.listItemClass = controlUsers.listItemClass;
         }
 
         private function onUserListDoubleClick(event:MouseEvent):void

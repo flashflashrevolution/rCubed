@@ -341,7 +341,6 @@ package arc.mp
                 if (item.data == room)
                 {
                     item.label = nameRoom(room);
-                    controlRooms.items = controlRooms.items;
                     break;
                 }
             }
@@ -360,7 +359,6 @@ package arc.mp
             }
             updateWindowTitle(connection.lobby);
             controlRooms.items = items;
-            controlRooms.listItemClass = controlRooms.listItemClass;
         }
 
         public function updateWindowTitle(room:Room):void
