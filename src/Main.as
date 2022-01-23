@@ -35,6 +35,7 @@ package
     import flash.events.Event;
     import flash.events.KeyboardEvent;
     import flash.events.NativeWindowBoundsEvent;
+    import flash.events.UncaughtErrorEvent;
     import flash.system.Capabilities;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
@@ -136,6 +137,7 @@ package
             NativeApplication.nativeApplication.addEventListener(Event.EXITING, e_onNativeShutdown);
             stage.nativeWindow.addEventListener(NativeWindowBoundsEvent.MOVE, e_onNativeWindowPropertyChange, false, 1);
             stage.nativeWindow.addEventListener(NativeWindowBoundsEvent.RESIZE, e_onNativeWindowPropertyChange, false, 1);
+            loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, e_uncaughtErrorHandler);
 
             CONFIG::vsync
             {
@@ -297,6 +299,11 @@ package
             _gvars.air_windowProperties["height"] = e.afterBounds.height - Main.WINDOW_HEIGHT_EXTRA;
             _gvars.air_windowProperties["x"] = e.afterBounds.x;
             _gvars.air_windowProperties["y"] = e.afterBounds.y;
+        }
+
+        private function e_uncaughtErrorHandler(e:UncaughtErrorEvent):void
+        {
+            Logger.error("UNCAUGHT_ERROR", e.error);
         }
 
         CONFIG::vsync

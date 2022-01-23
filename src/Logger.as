@@ -111,6 +111,11 @@ package
                 var err:Error = (text as Error);
                 msg = "Error: " + exception_error(err);
             }
+            else if (text is ErrorEvent)
+            {
+                var erre:ErrorEvent = (text as ErrorEvent);
+                msg = "Error: " + event_error(erre);
+            }
             else
             {
                 msg = text;
