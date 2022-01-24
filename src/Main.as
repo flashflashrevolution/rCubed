@@ -303,7 +303,10 @@ package
 
         private function e_uncaughtErrorHandler(e:UncaughtErrorEvent):void
         {
+            Logger.enableLogger();
             Logger.error("UNCAUGHT_ERROR", e.error);
+            Logger.info("INFO", "If possible, please submit this crash to the developers.");
+            Alert.add("A fatal error has occured. You should restart the game.", 7200, Alert.RED);
         }
 
         CONFIG::vsync

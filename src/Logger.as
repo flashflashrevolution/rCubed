@@ -8,6 +8,7 @@ package
     import flash.filesystem.File;
     import flash.filesystem.FileMode;
     import flash.filesystem.FileStream;
+    import flash.system.Capabilities;
     import flash.utils.getTimer;
 
     public class Logger
@@ -33,11 +34,16 @@ package
             // Check for special file to enable file logging.
             if (AirContext.doesFileExist("logging.txt"))
             {
-                trace("Logging Flag Found, enabling.")
+                trace("Logging Flag Found, enabling.");
                 file_log = true;
                 enabled = true;
             }
 
+            initLogFile();
+        }
+
+        public static function initLogFile():void
+        {
             if (file_log && LOG_STREAM == null)
             {
                 var now:Date = new Date();
@@ -48,6 +54,7 @@ package
                 LOG_STREAM.addEventListener(IOErrorEvent.IO_ERROR, e_logFileFail);
                 LOG_STREAM.open(LOG_FILE, FileMode.WRITE);
                 LOG_STREAM.writeUTFBytes("======================" + filename + "======================\n");
+                LOG_STREAM.writeUTFBytes("OS: " + Capabilities.os + " | " + Capabilities.version + "\n");
                 LOG_STREAM.writeUTFBytes("R3 Version: " + Constant.AIR_VERSION + " | " + CONFIG::timeStamp + "\n");
                 LOG_STREAM.close();
             }
@@ -60,6 +67,13 @@ package
                 LOG_FILE = null;
                 LOG_STREAM = null;
             }
+        }
+
+        public static function enableLogger():void
+        {
+            file_log = true;
+            enabled = true;
+            initLogFile();
         }
 
         public static function divider(clazz:*):void
