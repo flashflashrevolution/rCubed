@@ -368,7 +368,7 @@ package
         {
             if (songInfo == null || isNaN(songInfo.level))
                 return SONG_ACCESS_BANNED;
-            if (songInfo.credits > 0 && activeUser.credits < songInfo.credits)
+            if (songInfo.credits > 0 && playerUser.credits < songInfo.credits)
                 return SONG_ACCESS_CREDITS;
             if (songInfo.price > 0 && (songInfo.index >= playerUser.purchased.length || !playerUser.purchased[songInfo.index]))
                 return SONG_ACCESS_PURCHASED;
