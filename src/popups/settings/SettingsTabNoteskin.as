@@ -321,7 +321,9 @@ package popups.settings
                 {
                     ns = extList[i];
 
-                    var nsName:String = ns.data.name.indexOf("Custom Export") != -1 ? ns.file.substr(0, ns.file.length - 4) : ns.data.name;
+                    var nsName:String = (ns.data.name.indexOf("Custom Export") != -1 ? ns.file.substr(0, ns.file.length - 4) : ns.data.name).replace(/^\s+|\s+$/gs, '');
+                    if (nsName.length <= 0)
+                        nsName = "<" + ns.file + ">";
 
                     noteskinList.push({"label": nsName, "data": extList[i]});
                 }
