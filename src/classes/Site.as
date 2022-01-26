@@ -141,6 +141,7 @@ package classes
         private function siteLoadError(err:ErrorEvent = null):void
         {
             Logger.error(this, "Load Failure: " + Logger.event_error(err));
+            _loadError = true;
             removeLoaderListeners();
             this.dispatchEvent(new Event(GlobalVariables.LOAD_ERROR));
         }

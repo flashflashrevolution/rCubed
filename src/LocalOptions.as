@@ -22,7 +22,7 @@ package
                     try
                     {
                         SO_OBJECT = JSON.parse(json_str);
-                        Logger.info("LocalOptions", "Loaded \"" + json_file.nativePath + "\"")
+                        Logger.debug("LocalOptions", "Loaded \"" + json_file.nativePath + "\"")
                     }
                     catch (e:Error)
                     {

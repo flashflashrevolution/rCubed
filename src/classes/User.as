@@ -276,7 +276,7 @@ package classes
 
         private function profileLoadComplete(e:Event):void
         {
-            Logger.info(this, "Profile Load Success");
+            Logger.success(this, "Profile Load Success");
             removeLoaderListeners();
 
             // Parse Response
@@ -438,7 +438,7 @@ package classes
 
         private function ranksLoadComplete(e:Event):void
         {
-            Logger.info(this, "Ranks Load Success");
+            Logger.success(this, "Ranks Load Success");
             removeLoaderRanksListeners();
             level_ranks = new Object();
 
@@ -796,7 +796,7 @@ package classes
 
         private function settingSaveComplete(e:Event):void
         {
-            Logger.debug(this, "Settings Save Success");
+            Logger.success(this, "Settings Save Success");
             removeLoaderSaveListeners();
             this.dispatchEvent(new Event(GlobalVariables.LOAD_COMPLETE));
         }

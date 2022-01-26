@@ -996,7 +996,7 @@ package game
             var songInfo:SongInfo = e.target.song;
             var gameResult:GameScoreResult = e.target.results;
             var totalScore:int = e.target.resultsTotal;
-            Logger.debug(this, "Score Save Result: " + data.result);
+            Logger.success(this, "Score Save Result: " + data.result);
 
             if (data.result == 0)
             {
@@ -1239,7 +1239,7 @@ package game
             var totalScore:int = e.target.resultsTotal;
             var gameResult:GameScoreResult = e.target.results;
 
-            Logger.debug(this, "Alt Score Save Result: " + data.result);
+            Logger.success(this, "Alt Score Save Result: " + data.result);
 
             if (data.result == 0)
             {

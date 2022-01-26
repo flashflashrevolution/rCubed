@@ -267,7 +267,7 @@ package classes.chart
 
         private function musicCompleteHandler(e:Event):void
         {
-            Logger.info(this, "Music Load Success");
+            Logger.success(this, "Music Load Success");
             var chartData:ByteArray;
             if (type == NoteChart.FFR_MP3)
             {
@@ -487,7 +487,7 @@ package classes.chart
 
         private function chartLoadComplete(e:Event):void
         {
-            Logger.info(this, "Chart Load Success");
+            Logger.success(this, "Chart Load Success");
             isChartLoaderLoading = false;
             switch (chartType)
             {

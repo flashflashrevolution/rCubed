@@ -313,7 +313,7 @@ package
             }
             else if (_data.result >= 1 && _data.result <= 3)
             {
-                Logger.info(this, "Login Success!");
+                Logger.success(this, "Login Success!");
                 if (_data.result == 1 || _data.result == 2)
                     saveLoginDetails(this.rememberPassword, _data.session);
                 _gvars.userSession = _data.session;

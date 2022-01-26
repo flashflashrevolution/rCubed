@@ -15,12 +15,16 @@ package
     {
         private static var LOG_FILE:File;
         private static var LOG_STREAM:FileStream;
-        public static const DEBUG_LINES:Array = ["Info: ", "Debug: ", "Warning: ", "Error: ", "Fatal: "];
-        public static const INFO:Number = 0; // Gray
-        public static const DEBUG:Number = 1; // Black
-        public static const WARNING:Number = 2; // Orange
+
+        private static const DEBUG_LINES:Array = ["Info: ", "Debug: ", "Warning: ", "Error: ", "Success: "];
+        private static const DEBUG_COLORS:Array = ["", "\u001b[1;35m", "\u001b[1;33m", "\u001b[1;31m", "\u001b[1;32m"];
+        private static const DEBUG_COLOR_RESET:String = "\u001b[0m";
+
+        public static const INFO:Number = 0; // Blue
+        public static const DEBUG:Number = 1; // Purple
+        public static const WARNING:Number = 2; // Yellow
         public static const ERROR:Number = 3; // Red
-        public static const NOTICE:Number = 4; // Purple
+        public static const SUCCESS:Number = 4; // Green
 
         public static var enabled:Boolean = CONFIG::debug;
         public static var file_log:Boolean = false;
@@ -101,9 +105,9 @@ package
             log(clazz, ERROR, text, simple);
         }
 
-        public static function notice(clazz:*, text:*, simple:Boolean = false):void
+        public static function success(clazz:*, text:*, simple:Boolean = false):void
         {
-            log(clazz, NOTICE, text, simple);
+            log(clazz, SUCCESS, text, simple);
         }
 
         public static function log(clazz:*, level:int, text:*, simple:Boolean = false):void
@@ -138,6 +142,7 @@ package
             msg = ((!simple ? "[" + TimeUtil.convertToHHMMSS(getTimer() / 1000) + "][" + class_name(clazz) + "] " : "") + msg);
 
             // Display
+            //trace(DEBUG_COLORS[level] + msg + DEBUG_COLOR_RESET); // For consoles that support color.
             trace(level + ":" + msg);
 
             if (LOG_STREAM != null)
@@ -172,7 +177,7 @@ package
 
         public static function exception_error(err:Error):String
         {
-            return err.name + "\n" + err.message + "\n" + err.errorID + "\n" + err.getStackTrace();
+            return "(" + err.errorID + ") " + err.name + "\n" + err.message + "\n" + err.getStackTrace();
         }
 
         public static function event_error(e:ErrorEvent):String

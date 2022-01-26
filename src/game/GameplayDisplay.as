@@ -742,7 +742,7 @@ package game
         {
             removeLoaderListeners();
             var data:URLVariables = e.target.data;
-            Logger.debug(this, "Post Start Load Success = " + data.result);
+            Logger.success(this, "Post Start Load Success = " + data.result);
             if (data.result == "success")
             {
                 _gvars.songStartTime = data.current_date;
