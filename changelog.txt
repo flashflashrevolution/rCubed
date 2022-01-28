@@ -1,3 +1,12 @@
+R^3 (v1.4.3) [2022-01-28]
+---------------------------------------------------------------------
+@Psycast
+- Fix blank custom noteskin names from hiding away.
+- Fix song queue not being rendered in song selection.
+- Fix MP sync crash due to autoplay being really bad at hitting notes.
+- Greatly reduced the amount of flickering for the room and user list in MP.
+
+
 R^3 (v1.4.2) [2022-01-15]
 ---------------------------------------------------------------------
 @Psycast
