@@ -15,6 +15,11 @@ package com.flashfla.utils
 
     public class Screenshots
     {
+        /**
+         * Capture the bitmap of the stage.
+         * @param gameMain Reference to the main sprite.
+         * @return Bitmap data representation of the entire stage.
+         */
         private static function captureStage(gameMain:Main):BitmapData
         {
             // Create Bitmap of Stage
@@ -23,9 +28,10 @@ package com.flashfla.utils
             return b;
         }
 
-        //- ScreenShot Handling
         /**
          * Takes a screenshot of the stage and saves it to disk.
+         * @param gameMain
+         * @param filename
          */
         public static function takeScreenshot(gameMain:Main, filename:String = null):void
         {
@@ -44,8 +50,9 @@ package com.flashfla.utils
 
         /**
          * Takes a screenshot of the stage and saves it to clipboard.
+         * @param gameMain
          */
-        public static function copyScreenshot(gameMain:Main):void
+        public static function saveToClipboard(gameMain:Main):void
         {
             var b:BitmapData = captureStage(gameMain);
             Clipboard.generalClipboard.clear();

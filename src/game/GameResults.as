@@ -134,6 +134,7 @@ package game
         {
             // Add keyboard navigation
             stage.addEventListener(KeyboardEvent.KEY_DOWN, eventHandler);
+            stage.addEventListener(KeyboardEvent.KEY_UP, eventHandler);
 
             // Add Mouse Move for graphs
             stage.addEventListener(MouseEvent.MOUSE_MOVE, e_graphHover);
@@ -213,7 +214,7 @@ package game
             // Song Results Buttons
             navScreenShot = new BoxIcon(this, 522, 6, 32, 32, new iconPhoto(), eventHandler);
             navScreenShot.setIconColor("#E2FEFF");
-            navScreenShot.setHoverText(_lang.string("game_results_queue_save_screenshot"), "bottom");
+            setContextualTakeScreenshotHovertext(false);
 
             navSaveReplay = new BoxIcon(this, 485, 6, 32, 32, new iconVideo(), eventHandler);
             navSaveReplay.setIconColor("#E2FEFF");
@@ -262,6 +263,7 @@ package game
         {
             // Remove keyboard navigation
             stage.removeEventListener(KeyboardEvent.KEY_DOWN, eventHandler);
+            stage.removeEventListener(KeyboardEvent.KEY_UP, eventHandler);
 
             // Remove Mouse Move for graphs
             stage.removeEventListener(MouseEvent.MOUSE_MOVE, e_graphHover);
@@ -703,11 +705,22 @@ package game
                     target = navMenu;
                     stage.removeEventListener(KeyboardEvent.KEY_DOWN, eventHandler);
                 }
-                else if (keyCode == Keyboard.C && e.controlKey)
+                else if (e.ctrlKey)
                 {
-                    _gvars.copyScreenshot();
+                    setContextualTakeScreenshotHovertext(true);
                 }
             }
+
+            if (e.type == "keyUp" && !_mp.gameplayPlayingStatusResults())
+            {
+                if (!e.ctrlKey)
+                {
+                    setContextualTakeScreenshotHovertext(false);
+                }
+
+                return;
+            }
+
 
             if (!target)
                 return;
@@ -720,12 +733,20 @@ package game
 
             else if (target == navScreenShot)
             {
-                var ext:String = "";
-                if (resultIndex >= 0)
+                if (e.ctrlKey)
                 {
-                    ext = songResults[resultIndex].screenshot_path;
+                    _gvars.saveToClipboard()
                 }
-                _gvars.takeScreenShot(ext);
+                else
+                {
+                    var ext:String = "";
+                    if (resultIndex >= 0)
+                    {
+                        ext = songResults[resultIndex].screenshot_path;
+                    }
+                    _gvars.takeScreenShot(ext);
+                }
+
             }
 
             else if (target == navPrev)
@@ -1418,6 +1439,23 @@ package game
         {
             removeLoaderListeners(replayLoadComplete, replayLoadError);
             Alert.add(_lang.string("error_server_connection_failure"), 120, Alert.RED);
+        }
+
+
+        /**
+         * Set the hover text for the screenshot button based on conext.
+         * @param isClipboardMode Whether to use the clipboard tooltip or not.
+         */
+        private function setContextualTakeScreenshotHovertext(isClipboardMode:Boolean):void
+        {
+            if (isClipboardMode)
+            {
+                navScreenShot.setHoverText(null);
+            }
+            else
+            {
+                navScreenShot.setHoverText(_lang.string("game_results_queue_save_screenshot"), "bottom");
+            }
         }
 
     }
