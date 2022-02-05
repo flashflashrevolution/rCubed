@@ -703,6 +703,10 @@ package game
                     target = navMenu;
                     stage.removeEventListener(KeyboardEvent.KEY_DOWN, eventHandler);
                 }
+                else if (keyCode == Keyboard.C && e.controlKey)
+                {
+                    _gvars.copyScreenshot();
+                }
             }
 
             if (!target)
