@@ -580,7 +580,7 @@ package
         /**
          * Takes a screenshot of the stage and saves it to clipboard.
          */
-        public function saveToClipboard():void
+        public function saveScreenshotToClipboard():void
         {
             Screenshots.saveToClipboard(gameMain);
         }

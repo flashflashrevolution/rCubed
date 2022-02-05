@@ -720,7 +720,7 @@ package game
                 if (e.ctrlKey)
                 {
                     navScreenShot.purge_hover_sprite();
-                    _gvars.saveToClipboard()
+                    _gvars.saveScreenshotToClipboard()
                 }
                 else
                 {
