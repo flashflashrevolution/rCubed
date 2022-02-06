@@ -717,7 +717,7 @@ package game
 
             else if (target == navScreenShot)
             {
-                navScreenShot.purge_hover_sprite();
+                navScreenShot.purgeHoverSprite();
                 if (e.ctrlKey)
                 {
                     _gvars.saveScreenshotToClipboard()

@@ -247,7 +247,7 @@ package classes.ui
         /**
          * Remove the hover sprite from the box icon immediately.
          */
-        public function purge_hover_sprite():void
+        public function purgeHoverSprite():void
         {
             if (_hoverSprite && _hoverSprite.parent)
             {
