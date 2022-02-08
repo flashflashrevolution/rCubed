@@ -577,6 +577,14 @@ package
             Screenshots.takeScreenshot(gameMain, filename);
         }
 
+        /**
+         * Takes a screenshot of the stage and saves it to clipboard.
+         */
+        public function saveScreenshotToClipboard():void
+        {
+            Screenshots.saveToClipboard(gameMain);
+        }
+
         public function logDebugError(id:String, params:Object = null):void
         {
             var output:String = id;
