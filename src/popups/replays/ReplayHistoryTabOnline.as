@@ -12,6 +12,7 @@ package popups.replays
     import com.flashfla.net.WebRequest;
     import flash.events.Event;
     import classes.Alert;
+    import classes.SiteUrl;
 
     public class ReplayHistoryTabOnline extends ReplayHistoryTabBase
     {
@@ -90,7 +91,7 @@ package popups.replays
 
             REPLAYS = new <Replay>[];
 
-            _http = new WebRequest(Constant.SITE_REPLAYS_URL, e_webLoad, e_webError);
+            _http = new WebRequest(SiteUrl.SITE_REPLAYS_URL, e_webLoad, e_webError);
             _http.load({"session": _gvars.userSession});
         }
 

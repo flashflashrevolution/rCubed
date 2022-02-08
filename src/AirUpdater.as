@@ -2,6 +2,7 @@ package
 {
     import classes.Language;
     import classes.Site;
+    import classes.SiteUrl;
     import classes.ui.Box;
     import classes.ui.BoxButton;
     import classes.ui.Text;
@@ -230,7 +231,7 @@ package
          */
         public function downloadUpdate():void
         {
-            var URL:String = Constant.ROOT_URL + "~velocity/P/R3Air." + _site.data["game_r3air_version"] + ".air?t=" + new Date().getTime();
+            var URL:String = SiteUrl.prefix + "~velocity/P/R3Air." + _site.data["game_r3air_version"] + ".air?t=" + new Date().getTime();
             downloadedFile = AirContext.getAppFile("R3Air." + _site.data["game_r3air_version"] + ".air");
 
             fileStream = new FileStream();

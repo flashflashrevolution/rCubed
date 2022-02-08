@@ -14,7 +14,7 @@
 		"workbench.editor.highlightModifiedTabs": true,
 		"files.trimFinalNewlines": true,
 		"files.insertFinalNewline": true,
-		"as3mxml.sdk.framework": "c:\\airsdk\\32.0.0.116",
+		"as3mxml.sdk.framework": "c:\\airsdk\\33.1.1.743",
 		"files.eol": "\n",
 		"markdown.extension.toc.githubCompatibility": true,
 		"files.exclude": {

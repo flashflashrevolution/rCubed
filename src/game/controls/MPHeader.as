@@ -11,6 +11,7 @@ package game.controls
     import flash.text.TextFieldAutoSize;
     import flash.text.AntiAliasType;
     import classes.Language;
+    import classes.SiteUrl;
 
     public class MPHeader extends Sprite
     {
@@ -40,7 +41,7 @@ package game.controls
 
             avatar = new Loader();
             avatar.contentLoaderInfo.addEventListener(Event.COMPLETE, onAvatarComplete);
-            var request:URLRequest = new URLRequest(Constant.USER_AVATAR_URL);
+            var request:URLRequest = new URLRequest(SiteUrl.USER_AVATAR_URL);
             var vars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(vars);
             vars["cHeight"] = 100;

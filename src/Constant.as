@@ -21,45 +21,6 @@ package
         public static const AIR_WINDOW_TITLE:String = R3::BRAND_NAME_SHORT + " R^3 [" + AIR_VERSION + "]";
         public static const LOCAL_SO_NAME:String = "90579262-509d-4370-9c2e-564667e511d7";
         public static const ENGINE_VERSION:int = 3;
-
-        public static const ROOT_URL:String = "https://" + R3::ROOT_URL + "/";
-
-        // Site URLs
-        public static const SITE_DATA_URL:String = ROOT_URL + "game/r3/r3-siteData.v2.php";
-        public static const SITE_PLAYLIST_URL:String = ROOT_URL + "game/r3/r3-playlist.php";
-        public static const SITE_LANGUAGE_URL:String = ROOT_URL + "game/r3/r3-language.php";
-        public static const SITE_HISCORES_URL:String = ROOT_URL + "game/r3/r3-hiscores.php";
-        public static const SITE_REPLAYS_URL:String = ROOT_URL + "game/r3/r3-replays.php";
-        public static const LEVEL_STATS_URL:String = ROOT_URL + "levelstats.php?level=";
-        public static const DEBUG_LOG_URL:String = ROOT_URL + "game/r3/r3-debugLog.php";
-
-        // Song & Gameplay URLs
-        public static const SONG_DATA_URL:String = ROOT_URL + "game/r3/r3-songLoad.php";
-        public static const SONG_START_URL:String = ROOT_URL + "game/r3/r3-songStart.php";
-        public static const SONG_SAVE_URL:String = ROOT_URL + "game/r3/r3-songSave.php";
-        public static const SONG_RATING_URL:String = ROOT_URL + "game/r3/r3-songRating.php";
-        public static const SONG_PURCHASE_URL:String = ROOT_URL + "game/r3/r3-songPurchase.php";
-        public static const ALT_SONG_SAVE_URL:String = ROOT_URL + "game/r3/r3-songSaveOther.php";
-        public static const MULTIPLAYER_SUBMIT_URL:String = ROOT_URL + "game/ffr-legacy_multiplayer.php";
-
-        // User URLs
-        public static const USER_REGISTER_URL:String = ROOT_URL + "vbz/register.php";
-        public static const USER_LOGIN_URL:String = ROOT_URL + "game/r3/r3-siteLogin.php";
-        public static const USER_INFO_URL:String = ROOT_URL + "game/r3/r3-userInfo.php";
-        public static const USER_INFO_LITE_URL:String = ROOT_URL + "game/r3/r3-userSmallInfo.php";
-        public static const USER_AVATAR_URL:String = ROOT_URL + "avatar_imgembedded.php";
-        public static const USER_RANKS_URL:String = ROOT_URL + "game/r3/r3-userRanks.v2.php";
-        public static const USER_RANKS_UPDATE_URL:String = ROOT_URL + "game/r3/r3-userRankUpdate.php";
-        public static const USER_FRIENDS_URL:String = ROOT_URL + "game/r3/r3-userFriends.php";
-        public static const USER_SAVE_REPLAY_URL:String = ROOT_URL + "game/r3/r3-userReplay.php";
-        public static const USER_LOAD_REPLAY_URL:String = ROOT_URL + "game/r3/r3-siteReplay.php";
-        public static const USER_SAVE_SETTINGS_URL:String = ROOT_URL + "game/r3/r3-userSettings.php";
-
-        // Unused URLs
-        public static const SHOP_URL:String = ROOT_URL + "tools/ffrshop.php";
-        public static const NOTESKIN_SWF_URL:String = ROOT_URL + "game/r3/noteskins/";
-        public static const NOTESKIN_URL:String = ROOT_URL + "game/r3/r3-noteSkins.xml";
-
         // File Constants
         public static const MENU_MUSIC_PATH:String = "menu_music.swf";
         public static const MENU_MUSIC_MP3_PATH:String = "menu_music.mp3"
@@ -85,7 +46,6 @@ package
         public static const TEXT_FORMAT_UNICODE:TextFormat = new TextFormat(Language.UNI_FONT_NAME, 14, 0xFFFFFF, true);
 
         // Other
-        public static const NOTESKIN_EDITOR_URL:String = ROOT_URL + "~velocity/ffrjs/noteskin";
         public static const WEBSOCKET_OVERLAY_URL:String = "https://github.com/flashflashrevolution/web-stream-overlay";
         public static const LEGACY_GENRE:int = 13;
         public static const JUDGE_WINDOW:Array = [{t: -118, s: 5, f: -3},

@@ -18,6 +18,7 @@ package popups.settings
     import flash.net.URLRequest;
     import flash.net.navigateToURL;
     import game.noteskins.ExternalNoteskin;
+    import classes.SiteUrl;
 
     public class SettingsTabNoteskin extends SettingsTabBase
     {
@@ -256,7 +257,7 @@ package popups.settings
             //- Custom Noteskin Editor
             else if (e.target == optionOpenCustomNoteskinEditor)
             {
-                navigateToURL(new URLRequest(Constant.NOTESKIN_EDITOR_URL), "_blank");
+                navigateToURL(new URLRequest(SiteUrl.NOTESKIN_EDITOR_URL), "_blank");
                 return;
             }
 

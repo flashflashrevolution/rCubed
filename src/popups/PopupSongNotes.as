@@ -27,6 +27,7 @@ package popups
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import sql.SQLSongUserInfo;
+    import classes.SiteUrl;
 
     public class PopupSongNotes extends MenuPanel
     {
@@ -318,7 +319,7 @@ package popups
             _loader = new URLLoader();
             addLoaderListeners();
 
-            var req:URLRequest = new URLRequest(Constant.SONG_RATING_URL + "?d=" + new Date().getTime());
+            var req:URLRequest = new URLRequest(SiteUrl.SONG_RATING_URL + "?d=" + new Date().getTime());
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.session = _gvars.userSession;

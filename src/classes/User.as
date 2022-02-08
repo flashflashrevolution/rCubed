@@ -247,7 +247,7 @@ package classes
             _loader = new URLLoader();
             addLoaderListeners();
 
-            var req:URLRequest = new URLRequest(Constant.USER_INFO_URL + "?d=" + new Date().getTime());
+            var req:URLRequest = new URLRequest(SiteUrl.USER_INFO_URL + "?d=" + new Date().getTime());
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.session = _gvars.userSession;
@@ -264,7 +264,7 @@ package classes
             _loader = new URLLoader();
             addLoaderListeners();
 
-            var req:URLRequest = new URLRequest(Constant.USER_INFO_LITE_URL + "?d=" + new Date().getTime());
+            var req:URLRequest = new URLRequest(SiteUrl.USER_INFO_LITE_URL + "?d=" + new Date().getTime());
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.userid = userid;
@@ -418,7 +418,7 @@ package classes
                     avatar.removeEventListener(Event.COMPLETE, avatarLoadComplete);
                 }
             }
-            this.avatar.load(new URLRequest(Constant.USER_AVATAR_URL + "?uid=" + this.siteId + "&cHeight=99&cWidth=99"));
+            this.avatar.load(new URLRequest(SiteUrl.USER_AVATAR_URL + "?uid=" + this.siteId + "&cHeight=99&cWidth=99"));
         }
 
         ///- Level Ranks
@@ -427,7 +427,7 @@ package classes
             _loader = new URLLoader();
             addLoaderRanksListeners();
 
-            var req:URLRequest = new URLRequest(Constant.USER_RANKS_URL);
+            var req:URLRequest = new URLRequest(SiteUrl.USER_RANKS_URL);
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.session = _gvars.userSession;
@@ -781,7 +781,7 @@ package classes
             _loader = new URLLoader();
             addLoaderSaveListeners();
 
-            var req:URLRequest = new URLRequest(Constant.USER_SAVE_SETTINGS_URL);
+            var req:URLRequest = new URLRequest(SiteUrl.USER_SAVE_SETTINGS_URL);
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.session = _gvars.userSession;

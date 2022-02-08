@@ -50,6 +50,7 @@ package menu
     import popups.PopupFilterManager;
     import popups.PopupQueueManager;
     import popups.PopupSongNotes;
+    import classes.SiteUrl;
 
     public class MenuSongSelection extends MenuPanel
     {
@@ -1891,7 +1892,7 @@ package menu
                 else if (clickAction == "purchase")
                 {
                     var songDetails:Object = e.target.song_details;
-                    var purchaseRequest:WebRequest = new WebRequest(Constant.SONG_PURCHASE_URL, e_purchaseSongComplete, e_purchaseSongFailure);
+                    var purchaseRequest:WebRequest = new WebRequest(SiteUrl.SONG_PURCHASE_URL, e_purchaseSongComplete, e_purchaseSongFailure);
                     purchaseRequest.level = songDetails.level;
                     purchaseRequest.load({"level": songDetails.level, "session": _gvars.userSession});
                     purchasedWebRequests.push(purchaseRequest);

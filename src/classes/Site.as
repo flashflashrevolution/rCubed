@@ -1,6 +1,5 @@
 package classes
 {
-    import arc.ArcGlobals;
     import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.EventDispatcher;
@@ -66,7 +65,7 @@ package classes
             _loader = new URLLoader();
             addLoaderListeners();
 
-            var req:URLRequest = new URLRequest(Constant.SITE_DATA_URL + "?d=" + new Date().getTime());
+            var req:URLRequest = new URLRequest(SiteUrl.SITE_DATA_URL + "?d=" + new Date().getTime());
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.session = _gvars.userSession;

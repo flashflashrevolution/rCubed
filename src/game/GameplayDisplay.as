@@ -57,6 +57,7 @@ package game
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import sql.SQLSongUserInfo;
+    import classes.SiteUrl;
 
     public class GameplayDisplay extends MenuPanel
     {
@@ -273,7 +274,7 @@ package game
                         "settings": options.settingsEncode(),
                         "name": _gvars.activeUser.name,
                         "userid": _gvars.activeUser.siteId,
-                        "avatar": Constant.USER_AVATAR_URL + "?uid=" + _gvars.activeUser.siteId,
+                        "avatar": SiteUrl.USER_AVATAR_URL + "?uid=" + _gvars.activeUser.siteId,
                         "skill_rating": _gvars.activeUser.skillRating,
                         "skill_level": _gvars.activeUser.skillLevel,
                         "game_rank": _gvars.activeUser.gameRank,
@@ -649,7 +650,7 @@ package game
                 _loader = new URLLoader();
                 addLoaderListeners();
 
-                var req:URLRequest = new URLRequest(Constant.SONG_START_URL);
+                var req:URLRequest = new URLRequest(SiteUrl.SONG_START_URL);
                 var requestVars:URLVariables = new URLVariables();
                 Constant.addDefaultRequestVariables(requestVars);
                 requestVars.session = _gvars.userSession;

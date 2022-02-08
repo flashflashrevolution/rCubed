@@ -47,6 +47,7 @@ package game
     import popups.PopupSongNotes;
     import popups.PopupTokenUnlock;
     import popups.replays.ReplayHistoryTabLocal;
+    import classes.SiteUrl;
 
     public class GameResults extends MenuPanel
     {
@@ -362,7 +363,7 @@ package game
                 var rateString:String = result.options.songRate != 1 ? " (" + result.options.songRate + "x Rate)" : "";
 
                 // Song Title
-                songTitle = songInfo.engine ? songInfo.name + rateString : "<a href=\"" + Constant.LEVEL_STATS_URL + songInfo.level + "\">" + songInfo.name + rateString + "</a>";
+                songTitle = songInfo.engine ? songInfo.name + rateString : "<a href=\"" + SiteUrl.LEVEL_STATS_URL + songInfo.level + "\">" + songInfo.name + rateString + "</a>";
                 songSubTitle = sprintf(_lang.string("game_results_subtitle_difficulty"), {"value": songInfo.difficulty}) + " - " + sprintf(_lang.string("game_results_subtitle_length"), {"value": songLength});
                 if (songInfo.author != "")
                     songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_author"), {"value": songInfo.author_html}));
@@ -924,7 +925,7 @@ package game
             _loader = new DynamicURLLoader();
             addLoaderListeners(siteLoadComplete, siteLoadError);
 
-            var req:URLRequest = new URLRequest(Constant.SONG_SAVE_URL);
+            var req:URLRequest = new URLRequest(SiteUrl.SONG_SAVE_URL);
             var scoreSender:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(scoreSender);
 
@@ -1162,7 +1163,7 @@ package game
             _loader = new DynamicURLLoader();
             addLoaderListeners(altSiteLoadComplete, altSiteLoadError);
 
-            var req:URLRequest = new URLRequest(Constant.ALT_SONG_SAVE_URL);
+            var req:URLRequest = new URLRequest(SiteUrl.ALT_SONG_SAVE_URL);
             var scoreSender:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(scoreSender);
             var sd:Object = {"arrows": gameResult.song.chart.Notes.length, // Playlist XML often lies.
@@ -1361,7 +1362,7 @@ package game
             _loader = new DynamicURLLoader();
             addLoaderListeners(replayLoadComplete, replayLoadError);
 
-            var req:URLRequest = new URLRequest(Constant.USER_SAVE_REPLAY_URL);
+            var req:URLRequest = new URLRequest(SiteUrl.USER_SAVE_REPLAY_URL);
             var scoreSender:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(scoreSender);
 

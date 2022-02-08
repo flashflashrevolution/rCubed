@@ -27,6 +27,7 @@ package
     import flash.net.navigateToURL;
     import flash.ui.Keyboard;
     import menu.MenuPanel;
+    import classes.SiteUrl;
 
     public class LoginMenu extends MenuPanel
     {
@@ -197,7 +198,7 @@ package
 
         public function registerOnline(e:Event = null):void
         {
-            navigateToURL(new URLRequest(Constant.USER_REGISTER_URL), "_blank");
+            navigateToURL(new URLRequest(SiteUrl.USER_REGISTER_URL), "_blank");
         }
 
         private function changeUserEvent(e:Event):void
@@ -224,7 +225,7 @@ package
             _loader = new URLLoader();
             addLoaderListeners();
 
-            var req:URLRequest = new URLRequest(Constant.USER_LOGIN_URL);
+            var req:URLRequest = new URLRequest(SiteUrl.USER_LOGIN_URL);
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.username = savedInfos.username;
@@ -246,7 +247,7 @@ package
             _loader = new URLLoader();
             addLoaderListeners();
 
-            var req:URLRequest = new URLRequest(Constant.USER_LOGIN_URL);
+            var req:URLRequest = new URLRequest(SiteUrl.USER_LOGIN_URL);
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.username = input_user.text;

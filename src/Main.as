@@ -50,6 +50,13 @@ package
     import popups.PopupHelp;
     import popups.replays.ReplayHistoryWindow;
     import popups.settings.SettingsWindow;
+    import flash.net.URLLoader;
+    import flash.net.URLRequest;
+    import flash.net.URLRequestMethod;
+    import flash.errors.IOError;
+    import flash.events.IOErrorEvent;
+    import flash.system.System;
+    import classes.SiteUrl;
 
     public class Main extends MenuPanel
     {
@@ -104,10 +111,57 @@ package
             //- Set GlobalVariables Stage
             _gvars.gameMain = this;
 
-            if (stage)
-                gameInit();
-            else
-                this.addEventListener(Event.ADDED_TO_STAGE, gameInit);
+            checkTlsAndContinue();
+        }
+
+        private function checkTlsAndContinue():void
+        {
+            var continueLoading:Function = function(local:Main):void
+            {
+                //Continue with game load.
+                if (stage)
+                {
+                    gameInit();
+                }
+                else
+                {
+                    local.addEventListener(Event.ADDED_TO_STAGE, gameInit);
+                }
+            }
+
+            function onTLSSuccess(local:Main):Function
+            {
+                return function(e:Event):void
+                {
+                    e.currentTarget.removeEventListener(e.type, arguments.callee);
+                    _loader.removeEventListener(Event.COMPLETE, loOnTLSSuccess);
+                    continueLoading(local);
+                };
+            };
+
+            function onTLSFailure(local:Main):Function
+            {
+                return function(e:Event):void
+                {
+                    e.currentTarget.removeEventListener(e.type, arguments.callee);
+                    _loader.removeEventListener(IOErrorEvent.IO_ERROR, onTLSFailure);
+                    SiteUrl.UseTls(false)
+                    continueLoading(local);
+                };
+            };
+
+            var loOnTLSFailure:Function = onTLSFailure(this);
+            var loOnTLSSuccess:Function = onTLSSuccess(this);
+
+            var _loader:URLLoader = new URLLoader();
+            _loader.addEventListener(Event.COMPLETE, loOnTLSSuccess);
+            _loader.addEventListener(IOErrorEvent.IO_ERROR, loOnTLSFailure);
+
+            var req:URLRequest = new URLRequest("https://www.google.com");
+            req.method = URLRequestMethod.GET;
+            _loader.load(req);
+
+            // Try to load google with HTTPS, and fall-back to HTTP if it fails.
         }
 
         private function gameInit(e:Event = null):void

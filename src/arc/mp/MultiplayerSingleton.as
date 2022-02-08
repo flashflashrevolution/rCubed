@@ -37,6 +37,7 @@ package arc.mp
     import menu.MainMenu;
     import menu.MenuPanel;
     import menu.MenuSongSelection;
+    import classes.SiteUrl;
 
     public class MultiplayerSingleton extends Object
     {
@@ -605,7 +606,7 @@ package arc.mp
             data["player" + room.getPlayerIndex(currentOpponent) + "id"] = currentOpponent.name;
 
             var loader:URLLoader = new URLLoader();
-            var request:URLRequest = new URLRequest(Constant.MULTIPLAYER_SUBMIT_URL);
+            var request:URLRequest = new URLRequest(SiteUrl.MULTIPLAYER_SUBMIT_URL);
             request.method = URLRequestMethod.POST;
             request.data = data;
             loader.load(request);

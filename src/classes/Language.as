@@ -139,7 +139,7 @@ package classes
             _loader = new URLLoader();
             addLoaderListeners();
 
-            var req:URLRequest = new URLRequest(Constant.SITE_LANGUAGE_URL + "?d=" + new Date().getTime());
+            var req:URLRequest = new URLRequest(SiteUrl.SITE_LANGUAGE_URL + "?d=" + new Date().getTime());
             _loader.load(req);
             _isLoading = true;
         }

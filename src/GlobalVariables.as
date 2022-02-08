@@ -6,6 +6,7 @@ package
     import be.aboutme.airserver.endpoints.socket.handlers.websocket.WebSocketClientHandlerFactory;
     import be.aboutme.airserver.messages.Message;
     import classes.Playlist;
+    import classes.SiteUrl;
     import classes.SongInfo;
     import classes.SongPlayerBytes;
     import classes.StatTracker;
@@ -516,7 +517,7 @@ package
             _loader = new DynamicURLLoader();
             addLoaderListeners();
 
-            var req:URLRequest = new URLRequest(Constant.SITE_HISCORES_URL + "?d=" + new Date().getTime());
+            var req:URLRequest = new URLRequest(SiteUrl.SITE_HISCORES_URL + "?d=" + new Date().getTime());
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.session = this.userSession;
@@ -591,7 +592,7 @@ package
             }
 
             var _debugLoader:URLLoader = new URLLoader();
-            var req:URLRequest = new URLRequest(Constant.DEBUG_LOG_URL);
+            var req:URLRequest = new URLRequest(SiteUrl.DEBUG_LOG_URL);
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.session = userSession;

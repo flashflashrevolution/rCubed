@@ -31,6 +31,7 @@ package menu
     import popups.PopupFilterManager;
     import popups.PopupSkillRankUpdate;
     import popups.replays.ReplayHistoryWindow;
+    import classes.SiteUrl;
 
     public class MainMenu extends MenuPanel
     {
@@ -493,7 +494,7 @@ package menu
             if (rankUpdateThrobber.running)
                 return;
 
-            var wr:WebRequest = new WebRequest(Constant.USER_RANKS_UPDATE_URL, c_rankComplete, c_rankFail);
+            var wr:WebRequest = new WebRequest(SiteUrl.USER_RANKS_UPDATE_URL, c_rankComplete, c_rankFail);
             wr.load({"session": _gvars.userSession});
             rankUpdateThrobber.visible = true;
             rankUpdateThrobber.start();

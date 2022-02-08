@@ -16,6 +16,7 @@ package classes.replay
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
     import flash.utils.ByteArray;
+    import classes.SiteUrl;
 
     public class Replay
     {
@@ -64,7 +65,7 @@ package classes.replay
             _loader = new URLLoader();
             addLoaderListeners();
 
-            var req:URLRequest = new URLRequest(Constant.USER_LOAD_REPLAY_URL);
+            var req:URLRequest = new URLRequest(SiteUrl.USER_LOAD_REPLAY_URL);
             var urlVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(urlVars);
 

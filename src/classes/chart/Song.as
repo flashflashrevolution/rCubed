@@ -27,6 +27,7 @@ package classes.chart
     import flash.net.URLRequest;
     import flash.utils.ByteArray;
     import game.GameOptions;
+    import classes.SiteUrl;
 
     public class Song extends EventDispatcher
     {
@@ -201,13 +202,13 @@ package classes.chart
                 case NoteChart.FFR:
                 case NoteChart.FFR_RAW:
                 case NoteChart.FFR_MP3:
-                    return Constant.SONG_DATA_URL + "?" + fileHash + "id=" + (preview ? songInfo.preview_hash : songInfo.play_hash) + (preview ? "&mode=2" : "") + (_gvars.userSession != "0" ? "&session=" + _gvars.userSession : "") + "&type=" + NoteChart.FFR + "_" + fileType;
+                    return SiteUrl.SONG_DATA_URL + "?" + fileHash + "id=" + (preview ? songInfo.preview_hash : songInfo.play_hash) + (preview ? "&mode=2" : "") + (_gvars.userSession != "0" ? "&session=" + _gvars.userSession : "") + "&type=" + NoteChart.FFR + "_" + fileType;
 
                 case NoteChart.FFR_LEGACY:
                     return ChartFFRLegacy.songUrl(songInfo);
 
                 default:
-                    return Constant.SONG_DATA_URL;
+                    return SiteUrl.SONG_DATA_URL;
             }
         }
 
