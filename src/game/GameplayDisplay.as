@@ -273,7 +273,7 @@ package game
                         "settings": options.settingsEncode(),
                         "name": _gvars.activeUser.name,
                         "userid": _gvars.activeUser.siteId,
-                        "avatar": Constant.USER_AVATAR_URL + "?uid=" + _gvars.activeUser.siteId,
+                        "avatar": URLs.resolve(URLs.USER_AVATAR_URL) + "?uid=" + _gvars.activeUser.siteId,
                         "skill_rating": _gvars.activeUser.skillRating,
                         "skill_level": _gvars.activeUser.skillLevel,
                         "game_rank": _gvars.activeUser.gameRank,
@@ -649,7 +649,7 @@ package game
                 _loader = new URLLoader();
                 addLoaderListeners();
 
-                var req:URLRequest = new URLRequest(Constant.SONG_START_URL);
+                var req:URLRequest = new URLRequest(URLs.resolve(URLs.SONG_START_URL));
                 var requestVars:URLVariables = new URLVariables();
                 Constant.addDefaultRequestVariables(requestVars);
                 requestVars.session = _gvars.userSession;

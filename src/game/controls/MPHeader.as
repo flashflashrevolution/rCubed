@@ -40,7 +40,7 @@ package game.controls
 
             avatar = new Loader();
             avatar.contentLoaderInfo.addEventListener(Event.COMPLETE, onAvatarComplete);
-            var request:URLRequest = new URLRequest(Constant.USER_AVATAR_URL);
+            var request:URLRequest = new URLRequest(URLs.resolve(URLs.USER_AVATAR_URL));
             var vars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(vars);
             vars["cHeight"] = 100;

@@ -605,7 +605,7 @@ package arc.mp
             data["player" + room.getPlayerIndex(currentOpponent) + "id"] = currentOpponent.name;
 
             var loader:URLLoader = new URLLoader();
-            var request:URLRequest = new URLRequest(Constant.MULTIPLAYER_SUBMIT_URL);
+            var request:URLRequest = new URLRequest(URLs.resolve(URLs.MULTIPLAYER_SUBMIT_URL));
             request.method = URLRequestMethod.POST;
             request.data = data;
             loader.load(request);

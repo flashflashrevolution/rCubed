@@ -66,7 +66,7 @@ package classes
             _loader = new URLLoader();
             addLoaderListeners();
 
-            var req:URLRequest = new URLRequest(Constant.SITE_DATA_URL + "?d=" + new Date().getTime());
+            var req:URLRequest = new URLRequest(URLs.resolve(URLs.SITE_DATA_URL) + "?d=" + new Date().getTime());
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.session = _gvars.userSession;

@@ -64,7 +64,7 @@ package classes.replay
             _loader = new URLLoader();
             addLoaderListeners();
 
-            var req:URLRequest = new URLRequest(Constant.USER_LOAD_REPLAY_URL);
+            var req:URLRequest = new URLRequest(URLs.resolve(URLs.USER_LOAD_REPLAY_URL));
             var urlVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(urlVars);
 

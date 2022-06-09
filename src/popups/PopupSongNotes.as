@@ -318,7 +318,7 @@ package popups
             _loader = new URLLoader();
             addLoaderListeners();
 
-            var req:URLRequest = new URLRequest(Constant.SONG_RATING_URL + "?d=" + new Date().getTime());
+            var req:URLRequest = new URLRequest(URLs.resolve(URLs.SONG_RATING_URL) + "?d=" + new Date().getTime());
             var requestVars:URLVariables = new URLVariables();
             Constant.addDefaultRequestVariables(requestVars);
             requestVars.session = _gvars.userSession;

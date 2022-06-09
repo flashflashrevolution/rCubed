@@ -493,7 +493,7 @@ package menu
             if (rankUpdateThrobber.running)
                 return;
 
-            var wr:WebRequest = new WebRequest(Constant.USER_RANKS_UPDATE_URL, c_rankComplete, c_rankFail);
+            var wr:WebRequest = new WebRequest(URLs.resolve(URLs.USER_RANKS_UPDATE_URL), c_rankComplete, c_rankFail);
             wr.load({"session": _gvars.userSession});
             rankUpdateThrobber.visible = true;
             rankUpdateThrobber.start();

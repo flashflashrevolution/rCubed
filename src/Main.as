@@ -215,30 +215,7 @@ package
             buildPreloader();
 
             //- Load Game Data
-            loadGameData();
-
-            //- Flashvars
-            //CONFIG::debug { _gvars.flashvars = { replay: "366743"};} //, replaySkip: "1"
-            //CONFIG::debug { _gvars.flashvars = { preview_file: 2283};} //, replaySkip: "1"
-            //CONFIG::debug { _gvars.flashvars = { "__forceLogin": true };} // Login, then on the second go at the login screen, press guest. This should let me test multiple users without dealing with IE. :D
-
-            // Replay
-            if (_gvars.flashvars.replay != null)
-            {
-                _gvars.options = new GameOptions();
-                _gvars.options.replay = new Replay(_gvars.flashvars.replay, true);
-                _gvars.options.loadPreview = true;
-                _gvars.replayHistory.push(_gvars.options.replay);
-            }
-
-            // Song Preview
-            if (_gvars.flashvars.preview_file != null)
-            {
-                _gvars.options = new GameOptions();
-                _gvars.options.replay = new SongPreview(_gvars.flashvars.preview_file);
-                _gvars.options.loadPreview = true;
-                _gvars.replayHistory.push(_gvars.options.replay);
-            }
+            loadSiteData();
 
             //- Key listener
             stage.addEventListener(KeyboardEvent.KEY_DOWN, keyboardKeyDown, false, 0, true);
@@ -336,6 +313,7 @@ package
             loadStatus.antiAliasType = AntiAliasType.ADVANCED;
             loadStatus.autoSize = "left";
             loadStatus.defaultTextFormat = Constant.TEXT_FORMAT;
+            loadStatus.text = "\n\n\n\n\nConnecting...";
             this.addChild(loadStatus);
 
             //- Preloader Display
@@ -346,7 +324,51 @@ package
         }
 
         ///- Game Data
-        public function loadGameData():void
+        private static var LOAD_ATTEMPTS:int = 0;
+
+        public function loadSiteData():void
+        {
+            if (isLoginLoad)
+            {
+                loadGameData(false);
+                return;
+            }
+
+            if (LOAD_ATTEMPTS < 2)
+            {
+                _site.addEventListener(GlobalVariables.LOAD_COMPLETE, gameDataScriptLoad);
+                _site.addEventListener(GlobalVariables.LOAD_ERROR, gameDataScriptLoadError);
+                _site.load();
+                LOAD_ATTEMPTS++;
+            }
+            else
+            {
+                loadStatus.text = "\n\n\n\n\nUnable to connect to the server, please check your internet connection.";
+            }
+        }
+
+        private function gameDataScriptLoad(e:Event = null):void
+        {
+            e.target.removeEventListener(GlobalVariables.LOAD_COMPLETE, gameDataScriptLoad);
+            e.target.removeEventListener(GlobalVariables.LOAD_ERROR, gameDataScriptLoadError);
+            loadScripts++;
+
+            loadGameData();
+        }
+
+        private function gameDataScriptLoadError(e:Event = null):void
+        {
+            e.target.removeEventListener(GlobalVariables.LOAD_COMPLETE, gameDataScriptLoad);
+            e.target.removeEventListener(GlobalVariables.LOAD_ERROR, gameDataScriptLoadError);
+
+            // Fallback to http
+            if (LOAD_ATTEMPTS == 1)
+                URLs.protocol = "http";
+
+            loadSiteData();
+        }
+
+        public function loadGameData(skipSite:Boolean = true):void
         {
             loadTotal = (!isLoginLoad) ? 5 : 3;
 
@@ -355,12 +377,16 @@ package
             _gvars.activeUser.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
             _gvars.activeUser.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
 
-            _site.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
-            _site.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
             _playlist.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
             _playlist.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
-            _site.load();
             _playlist.load();
+
+            if (!skipSite)
+            {
+                _site.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
+                _site.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
+                _site.load();
+            }
 
             if (!isLoginLoad)
             {
@@ -375,9 +401,6 @@ package
             //_friends.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
             //_friends.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
             //_friends.load();
-
-            // Update Text
-            updateLoaderText();
         }
 
         private function gameScriptLoad(e:Event = null):void
@@ -385,23 +408,17 @@ package
             e.target.removeEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
             e.target.removeEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
             loadScripts++;
-
-            // Update Text
-            updateLoaderText();
         }
 
         private function gameScriptLoadError(e:Event = null):void
         {
             e.target.removeEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
             e.target.removeEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
-
-            // Update Text
-            updateLoaderText();
         }
 
         private function updateLoaderText():void
         {
-            if (loadStatus != null)
+            if (loadStatus != null && _gvars.playerUser != null)
             {
                 loadStatus.htmlText = "Total: " + loadScripts + " / " + loadTotal + "\n" + "Playlist: " + getLoadText(_playlist.isLoaded(), _playlist.isError()) + "\n" + "User Data: " + getLoadText(_gvars.playerUser.isLoaded(), _gvars.playerUser.isError()) + "\n" + "Site Data: " + getLoadText(_site.isLoaded(), _site.isError()) + ((!isLoginLoad) ? ("\n" + "Noteskin Data: " + getLoadText(_noteskins.isLoaded(), _noteskins.isError()) + "\n" + "Language Data: " + getLoadText(_lang.isLoaded(), _lang.isError())) : "");
             }
@@ -585,7 +602,7 @@ package
                 buildPreloader();
 
                 //- Load Game Data
-                loadGameData();
+                loadGameData(false);
 
                 return true;
             }

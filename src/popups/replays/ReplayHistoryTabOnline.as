@@ -90,7 +90,7 @@ package popups.replays
 
             REPLAYS = new <Replay>[];
 
-            _http = new WebRequest(Constant.SITE_REPLAYS_URL, e_webLoad, e_webError);
+            _http = new WebRequest(URLs.resolve(URLs.SITE_REPLAYS_URL), e_webLoad, e_webError);
             _http.load({"session": _gvars.userSession});
         }
 
