@@ -943,6 +943,7 @@ package game
             scoreSender.max_combo = gameResult.max_combo;
             scoreSender.score = gameResult.score;
             scoreSender.replay = Replay.getReplayString(gameResult.replayData);
+            scoreSender.replay_bin = gameResult.replay_bin_encoded;
             scoreSender.save_settings = JSON.stringify(gameResult.options.settingsEncode());
             scoreSender.restart_stats = JSON.stringify(gameResult.restart_stats);
             scoreSender.session = _gvars.userSession;
@@ -1191,7 +1192,8 @@ package game
             dataObject.boo = gameResult.boo;
             dataObject.max_combo = gameResult.max_combo;
             dataObject.score = gameResult.score;
-            dataObject.replay = gameResult.replay_bin_encoded;
+            dataObject.replay = Replay.getReplayString(gameResult.replayData);
+            dataObject.replay_bin = gameResult.replay_bin_encoded;
             dataObject.save_settings = gameResult.options.settingsEncode();
             dataObject.session = _gvars.userSession;
             dataObject.hashMap = getSaveHash(dataObject);
