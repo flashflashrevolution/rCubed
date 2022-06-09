@@ -22,12 +22,12 @@ package popups
         private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _lang:Language = Language.instance;
 
-        //- Background
+        // - Background
         private var box:Box;
         private var bmp:Bitmap;
 
         private var page:int = 0;
-        private var maxPage:int = 2147483647; // Max Int Limit
+        private var maxPage:int = 1000;
         private var throbber:Throbber;
         private var pageText:Text;
         private var myUsernameText:Text;
@@ -71,15 +71,15 @@ package popups
             var infoRanks:Object = _gvars.activeUser.getLevelRank(songInfo);
             // Username
             myUsernameText = new Text(box, 25, 345, "#" + infoRanks.rank + ": " + _gvars.activeUser.name, 16, "#D9FF9E");
-            myUsernameText.width = 164;
+            myUsernameText.width = 350;
 
             // Score
-            myScoreText = new Text(box, 360, 345, NumberUtil.numberFormat(infoRanks.rawscore), 15, "#B8D8B3");
-            myScoreText.width = 150;
+            myScoreText = new Text(box, 400, 345, NumberUtil.numberFormat(infoRanks.rawscore), 15, "#B8D8B3");
+            myScoreText.width = 120;
 
             // AV
             myAVText = new Text(box, 545, 345, infoRanks.results, 15, "#99B793");
-            myAVText.width = 200;
+            myAVText.width = 180;
 
             //- Previous
             prevBtn = new BoxButton(box, 10, box.height - 42, 79.5, 27, _lang.string("popup_highscores_previous"), 12, clickHandler);
@@ -128,15 +128,15 @@ package popups
             {
                 // Username
                 textLine = new Text(scorePane, 25, tY, _lang.string("popup_highscores_username"), 16, "#C6F0FF");
-                textLine.width = 200;
+                textLine.width = 350;
 
                 // Score
-                textLine = new Text(scorePane, 360, tY, _lang.string("popup_highscores_score"), 15, "#C6F0FF");
-                textLine.width = 150;
+                textLine = new Text(scorePane, 400, tY, _lang.string("popup_highscores_score"), 15, "#C6F0FF");
+                textLine.width = 120;
 
                 // AV
                 textLine = new Text(scorePane, 545, tY, _lang.string("popup_highscores_pa_spread"), 15, "#C6F0FF");
-                textLine.width = 200;
+                textLine.width = 180;
                 tY += 30;
 
                 var lastRank:int = 0;
@@ -146,24 +146,25 @@ package popups
                     var r:int = (10 * page) + vr;
                     if (highscores[r])
                     {
-                        var username:String = highscores[r]['name'];
+                        var username:String = highscores[r]['username'];
                         var score:Number = highscores[r]['score'];
                         var av:String = highscores[r]['av'];
+                        var level:String = Math.floor(highscores[r]['level']).toString();
                         var isMyPB:Boolean = (!_gvars.activeUser.isGuest) && (_gvars.activeUser.name == username);
 
                         // Username
-                        textLine = new Text(scorePane, 25, tY, "#" + r + ": " + username, 16);
-                        textLine.width = 200;
+                        textLine = new Text(scorePane, 25, tY, "<font color=\"#CCCCCC\">#" + r + ":</font> " + username + " <font size=\"13\" color=\"#CCCCCC\">[Lv " + level + "]</font>", 16);
+                        textLine.width = 350;
                         textLine.fontColor = isMyPB ? "#D9FF9E" : "#FFFFFF";
 
                         // Score
-                        textLine = new Text(scorePane, 360, tY, NumberUtil.numberFormat(score), 15);
-                        textLine.width = 150;
+                        textLine = new Text(scorePane, 400, tY, NumberUtil.numberFormat(score), 15);
+                        textLine.width = 120;
                         textLine.fontColor = isMyPB ? "#B8D8B3" : "#DDDDDD";
 
                         // AV
                         textLine = new Text(scorePane, 545, tY, av, 15);
-                        textLine.width = 200;
+                        textLine.width = 180;
                         textLine.fontColor = isMyPB ? "#99B793" : "#BBBBBB";
                         tY += 25;
                     }
