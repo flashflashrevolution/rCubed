@@ -181,7 +181,7 @@ package popups.settings
             noteHolder.y = yOff;
             container.addChild(noteHolder);
 
-            var noteSprite:Sprite = _noteskins.getNote(data.id, color, "U");
+            var noteSprite:Sprite = _noteskins.getNoteSafe(data.id, color, "U");
             noteSprite.x = -(data.width >> 1);
             noteSprite.y = -(data.height >> 1);
             noteHolder.addChild(noteSprite);
@@ -420,13 +420,18 @@ package popups.settings
             // reload images, custom noteskins are async loaded so we just check for them to load
             if (_gvars.activeUser.activeNoteskin == 0)
             {
-                if (_noteskins.data[0]["notes"]["blue"] != null)
+                if (_noteskins.data[0] != null && _noteskins.data[0]["notes"] != null && _noteskins.data[0]["notes"]["blue"] != null)
                 {
                     parent.removeEventListener(Event.ENTER_FRAME, e_delayCustomUpdate);
                     if (parent != null && parent.stage != null)
                     {
                         updateNoteImages();
                     }
+                }
+
+                if (_noteskins.data[0] == null)
+                {
+                    parent.removeEventListener(Event.ENTER_FRAME, e_delayCustomUpdate);
                 }
             }
         }

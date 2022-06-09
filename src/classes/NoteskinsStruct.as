@@ -44,7 +44,7 @@ package classes
             }
         }
 
-        public static function parseCellInput(text:String):Array
+        public static function parseCellInput(text:String, min_x:int = 0, max_x:int = 20, min_y:int = 0, max_y:int = 20):Array
         {
             var out:Array = [1, 1];
             var cell_values:Array = text.split(",");
@@ -56,10 +56,14 @@ package classes
             else if (cell_values.length == 1)
                 out[0] = out[1] = parseInt(cell_values[0]);
 
-            if (isNaN(out[0]) || !isFinite(out[0]) || out[0] < 0 || out[0] > 20)
+            if (isNaN(out[0]) || !isFinite(out[0]))
                 out[0] = 1;
-            if (isNaN(out[1]) || !isFinite(out[1]) || out[1] < 0 || out[1] > 20)
+            if (isNaN(out[1]) || !isFinite(out[1]))
                 out[1] = 1;
+
+            out[0] = Math.min(Math.max(out[0], min_x), max_x);
+            out[1] = Math.min(Math.max(out[0], min_y), max_y);
+
             return out;
         }
 

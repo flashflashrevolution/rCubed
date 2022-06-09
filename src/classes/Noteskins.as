@@ -181,6 +181,29 @@ package classes
         }
 
         /**
+         * Gets the Note Sprite from the noteskin.
+         * This is slower and shouldn't be used for gameplay, only UI
+         * to prevent crashes on corrupted noteskins. A blank sprite will
+         * be return if a error occurs.
+         * @param noteskin
+         * @param color
+         * @param direction
+         * @return
+         */
+        public function getNoteSafe(noteskin:int, color:String, direction:String):Sprite
+        {
+            try
+            {
+                return getNote(noteskin, color, direction);
+            }
+            catch (e:Error)
+            {
+
+            }
+            return new Sprite();
+        }
+
+        /**
          * Gets the Receptor Movieclip from the noteskin.
          * This assumes verifyNoteskin has filled in any holes in the data to
          * prevent null references and as such isn't checked here for gameplay speed.
@@ -201,6 +224,29 @@ package classes
             }
 
             return new _data[noteskin]["receptor"][direction];
+        }
+
+        /**
+         * Gets the Receptor Movieclip from the noteskin.
+         * This is slower and shouldn't be used for gameplay, only UI
+         * to prevent crashes on corrupted noteskins. A blank movieclip will
+         * be return if a error occurs.
+         * @param noteskin
+         * @param color
+         * @param direction
+         * @return
+         */
+        public function getReceptorSafe(noteskin:int, direction:String):MovieClip
+        {
+            try
+            {
+                return getReceptor(noteskin, direction);
+            }
+            catch (e:Error)
+            {
+
+            }
+            return new MovieClip();
         }
 
         /**
@@ -306,7 +352,7 @@ package classes
 
         /**
          * Attempts to retrieve a class definition from the given object.
-         * Used to retrieve the ntoes and receptors from loaded swfs.
+         * Used to retrieve the notes and receptors from loaded swfs.
          * @param loader
          * @param assetName
          * @return
@@ -469,7 +515,7 @@ package classes
             if (import_struct == null || struct["options"] == null || struct["options"]["grid_dim"] == null || struct["blue"] == null || struct["blue"]["D"] == null || struct["blue"]["D"]["c"] == null)
                 return null;
 
-            var parsedCell:Array = NoteskinsStruct.parseCellInput(struct["options"]["grid_dim"]);
+            var parsedCell:Array = NoteskinsStruct.parseCellInput(struct["options"]["grid_dim"], 1, 1, 20, 20);
             var img_w:int = bmd.width;
             var img_h:int = bmd.height;
             var dim_w:int = parsedCell[0];
@@ -543,13 +589,21 @@ package classes
             for each (var asset_name:String in note_asset_names)
             {
                 if (_data[noteID]["notes"][asset_name] == null)
+                {
                     _data[noteID]["notes"][asset_name] = _data[noteID]["notes"]["blue"];
+                    continue;
+                }
 
                 // Check Missing Directions and fill from Down
                 for each (var direction_name:String in note_direction_names)
                 {
-                    if (_data[noteID]["notes"][asset_name][direction_name] == null)
+                    // Fill from same color.
+                    if (_data[noteID]["notes"][asset_name][direction_name] == null && _data[noteID]["notes"][asset_name]["D"] != null)
                         _data[noteID]["notes"][asset_name][direction_name] = _data[noteID]["notes"][asset_name]["D"];
+
+                    // Fill from blue.
+                    if (_data[noteID]["notes"][asset_name][direction_name] == null && _data[noteID]["notes"]["blue"]["D"] != null)
+                        _data[noteID]["notes"][asset_name][direction_name] = _data[noteID]["notes"]["blue"]["D"];
                 }
             }
 
