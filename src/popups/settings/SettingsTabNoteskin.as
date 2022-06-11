@@ -143,6 +143,11 @@ package popups.settings
             var gameNoteColorTitle:Text = new Text(container, xOff + 5, yOff, _lang.string("options_note_colors_title"), 14);
             gameNoteColorTitle.width = 265;
             gameNoteColorTitle.align = Text.CENTER;
+
+            var optionNoteColorReset:BoxButton = new BoxButton(container, xOff + 245, yOff, 20, 21, "R", 12, clickHandler);
+            optionNoteColorReset.color_reset_id = true;
+            optionNoteColorReset.color = 0xff0000;
+
             yOff += 28;
             yOff += drawSeperator(container, xOff, 266, yOff, -3, -4);
 
@@ -169,6 +174,17 @@ package popups.settings
                 yOff += 20;
                 yOff += drawSeperator(container, xOff, 266, yOff, -3, -4);
             }
+
+            yOff += 20;
+            var gameSwapAllNoteColor:Text = new Text(container, xOff, yOff, _lang.string("note_colors_swap_all"));
+            gameSwapAllNoteColor.width = 120;
+
+            var gameSwapAllNoteColorCombo:ComboBox = new ComboBox(container, xOff + 125, yOff, "---", noteColorComboArray);
+            gameSwapAllNoteColorCombo.setSize(139, 22);
+            gameSwapAllNoteColorCombo.openPosition = ComboBox.BOTTOM;
+            gameSwapAllNoteColorCombo.fontSize = 11;
+            gameSwapAllNoteColorCombo.numVisibleItems = DEFAULT_OPTIONS.noteColors.length;
+            gameSwapAllNoteColorCombo.addEventListener(Event.SELECT, gameSwapAllNoteColorSelect);
         }
 
         private function addNoteImage(xOff:Number, yOff:Number, receptorSize:Number, color:String):Sprite
@@ -289,6 +305,14 @@ package popups.settings
                 return;
             }
 
+            if (e.target.hasOwnProperty("color_reset_id"))
+            {
+                for (var i:int = 0; i < DEFAULT_OPTIONS.noteColors.length; i++)
+                {
+                    _gvars.activeUser.noteColors[i] = DEFAULT_OPTIONS.noteColors[i];
+                }
+            }
+
             setValues();
         }
 
@@ -303,6 +327,20 @@ package popups.settings
                     arrayColorSpritesReplace[i] = replaceNoteImage(arrayColorSpritesReplace[i], 22, _gvars.activeUser.noteColors[i]);
                 }
             }
+        }
+
+        private function gameSwapAllNoteColorSelect(e:Event):void
+        {
+            if (e.target.selectedItem == null)
+                return;
+
+            var data:Object = e.target.selectedItem.data;
+            for (var i:int = 0; i < optionNoteColors.length; i++)
+            {
+                _gvars.activeUser.noteColors[i] = data;
+                arrayColorSpritesReplace[i] = replaceNoteImage(arrayColorSpritesReplace[i], 22, _gvars.activeUser.noteColors[i]);
+            }
+            e.target.selectedItem = null;
         }
 
         private function setCustomNoteskinCombo():void
