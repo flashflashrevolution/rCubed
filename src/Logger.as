@@ -139,7 +139,7 @@ package
                 msg = text;
             }
 
-            msg = ((!simple ? "[" + TimeUtil.convertToHHMMSS(getTimer() / 1000) + "][" + class_name(clazz) + "] " : "") + msg);
+            msg = ((!simple ? "[" + TimeUtil.convertToHHMMSS(currentTime / 1000) + "][" + class_name(clazz) + "] " : "") + msg);
 
             // Display
             //trace(DEBUG_COLORS[level] + msg + DEBUG_COLOR_RESET); // For consoles that support color.
