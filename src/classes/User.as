@@ -125,6 +125,7 @@ package classes
         public var autofailMiss:int = 0;
         public var autofailBoo:int = 0;
         public var autofailRawGoods:Number = 0;
+        public var autofailRestart:Boolean = false;
 
         public var keyLeft:int = Keyboard.LEFT;
         public var keyDown:int = Keyboard.DOWN;
@@ -644,6 +645,9 @@ package classes
             if (_settings.songRate != null)
                 this.songRate = _settings.songRate;
 
+            if (_settings.autofailRestart != null)
+                this.autofailRestart = _settings.autofailRestart;
+
             if (_settings.forceNewJudge != null)
                 this.forceNewJudge = _settings.forceNewJudge;
 
@@ -760,6 +764,7 @@ package classes
             gameSave.gap = this.receptorGap;
             gameSave.noteScale = this.noteScale;
             gameSave.screencutPosition = this.screencutPosition;
+            gameSave.autofailRestart = this.autofailRestart;
             gameSave.frameRate = this.frameRate;
             gameSave.forceNewJudge = this.forceNewJudge;
             gameSave.visual = this.activeVisualMods;

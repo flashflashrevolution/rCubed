@@ -35,6 +35,7 @@ package popups.settings
         private var optionJudgeOffset:ValidatedText;
         private var optionJudgeOffsetAuto:BoxCheck;
         private var optionAutofail:Array;
+        private var optionAutofailRestart:BoxCheck;
 
         private var optionScrollDirections:Vector.<BoxCheck>;
         private var optionMirrorMod:BoxCheck;
@@ -173,7 +174,13 @@ package popups.settings
             optionAutofailInput.autofail = "rawGoods";
             optionAutofailInput.field.maxChars = 6;
             optionAutofail.push(optionAutofailInput);
-            yOff += 22;
+            yOff += 34;
+
+            // Autofail Restart
+            new Text(container, xOff + 22, yOff - 4, _lang.string("options_autofail_restart"));
+
+            optionAutofailRestart = new BoxCheck(container, xOff, yOff, clickHandler);
+            yOff += 25;
 
             /// Col 3
             xOff = 407;
@@ -202,7 +209,6 @@ package popups.settings
             new Text(container, xOff + 22, yOff - 1, _lang.string("options_mod_mirror"));
 
             optionMirrorMod = new BoxCheck(container, xOff + 2, yOff + 3, clickHandler);
-            optionMirrorMod.visual_mod = "mirror";
             yOff += 25;
 
             yOff += drawSeperator(container, xOff, 170, yOff, 1);
@@ -280,6 +286,9 @@ package popups.settings
                 item.text = _gvars.activeUser["autofail" + StringUtil.upperCase(item.autofail)];
             }
 
+            // Autofail Restart
+            optionAutofailRestart.checked = _gvars.activeUser.autofailRestart;
+
             optionIsolation.text = (_avars.configIsolationStart + 1).toString();
             optionIsolationTotal.text = _avars.configIsolationLength.toString();
         }
@@ -294,6 +303,12 @@ package popups.settings
                 optionJudgeOffset.selectable = !_gvars.activeUser.AUTO_JUDGE_OFFSET;
                 optionJudgeOffset.alpha = _gvars.activeUser.AUTO_JUDGE_OFFSET ? 0.55 : 1.0;
                 optionJudgeOffsetAuto.checked = _gvars.activeUser.AUTO_JUDGE_OFFSET;
+            }
+
+            else if (e.target == optionAutofailRestart)
+            {
+                _gvars.activeUser.autofailRestart = !_gvars.activeUser.autofailRestart;
+                optionAutofailRestart.checked = _gvars.activeUser.autofailRestart;
             }
 
             else if (e.target.hasOwnProperty("slideDirection"))

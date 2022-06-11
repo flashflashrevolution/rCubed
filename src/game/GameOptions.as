@@ -72,6 +72,7 @@ package game
         public var mpRoom:Room = null;
         public var singleplayer:Boolean = false;
         public var autofail:Array = [0, 0, 0, 0, 0, 0, 0];
+        public var autofail_restart:Boolean = false;
 
         public var isolationOffset:int = 0;
         public var isolationLength:int = 0;
@@ -148,6 +149,8 @@ package game
                 user.autofailMiss,
                 user.autofailBoo,
                 user.autofailRawGoods];
+
+            autofail_restart = user.autofailRestart;
         }
 
         public function fillFromArcGlobals():void

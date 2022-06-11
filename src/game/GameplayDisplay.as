@@ -2162,7 +2162,12 @@ package game
         private function checkAutofail(autofail:Number, hit:Number):void
         {
             if (autofail > 0 && hit >= autofail)
-                GAME_STATE = GAME_END;
+            {
+                if (options.autofail_restart)
+                    GAME_STATE = GAME_RESTART;
+                else
+                    GAME_STATE = GAME_END;
+            }
         }
 
         /*#########################################################################################*\
