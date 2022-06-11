@@ -50,6 +50,7 @@ package menu
     import popups.PopupFilterManager;
     import popups.PopupQueueManager;
     import popups.PopupSongNotes;
+    import popups.PopupHighscores;
 
     public class MenuSongSelection extends MenuPanel
     {
@@ -1303,6 +1304,8 @@ package menu
 
             // Refresh button
             var refreshBtn:BoxButton = new BoxButton(infoBox, infoBox.width - 19 - 2, 2, 19, 19, "R", 12, refreshHighscoresClick);
+            var openBtn:BoxButton = new BoxButton(infoBox, refreshBtn.x - 19 - 2, 2, 19, 19, "O", 12, openHighscoresClick);
+            openBtn.songInfo = songInfo;
 
             var infoRanks:Object = _gvars.activeUser.getLevelRank(songInfo) || {};
             var highscores:Object = _gvars.getHighscores(songInfo.level);
@@ -1659,6 +1662,14 @@ package menu
             _gvars.clearHighscores();
             _gvars.activeUser.loadLevelRanks();
             buildInfoBox();
+        }
+
+        /**
+         * Called from Info Box: Open highscores popup for the song.
+         */
+        private function openHighscoresClick(e:Event):void
+        {
+            addPopup(new PopupHighscores(this, e.target.songInfo));
         }
 
         /**
