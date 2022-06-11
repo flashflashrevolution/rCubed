@@ -133,17 +133,20 @@ package classes.chart
             var url_file_hash:String = "";
             if ((_gvars.air_useLocalFileCache) && AirContext.doesFileExist(AirContext.getSongCachePath(this) + "data.bin"))
             {
-                localFileData = AirContext.readFile(AirContext.getAppFile(AirContext.getSongCachePath(this) + "data.bin"), (this.songInfo.engine ? 0 : this.id));
+                localFileData = AirContext.readFile(AirContext.getAppFile(AirContext.getSongCachePath(this) + "data.bin"), (songInfo.engine ? 0 : id));
                 localFileHash = MD5.hashBytes(localFileData);
                 url_file_hash = "hash=" + localFileHash + "&";
 
-                if (this.songInfo.engine && localFileData && type == NoteChart.FFR_MP3)
+                if (songInfo.engine)
                 {
-                    removeLoaderListeners();
-                    musicLoader = new Loader();
-                    addLoaderListeners(true);
-                    musicLoader.loadBytes(localFileData, AirContext.getLoaderContext());
-                    return;
+                    if (localFileData && localFileHash == songInfo.swf_hash && type == NoteChart.FFR_MP3)
+                    {
+                        removeLoaderListeners();
+                        musicLoader = new Loader();
+                        addLoaderListeners(true);
+                        musicLoader.loadBytes(localFileData, AirContext.getLoaderContext());
+                        return;
+                    }
                 }
             }
 
@@ -352,7 +355,7 @@ package classes.chart
                 {
                     try
                     {
-                        Logger.info(this, "Saving Cache File for " + this.id);
+                        Logger.info(this, "Saving Cache File for " + this.id + " / " + this.songInfo.level_id);
                         AirContext.writeFile(AirContext.getAppFile(AirContext.getSongCachePath(this) + "data.bin"), storeChartData);
                     }
                     catch (err:Error)

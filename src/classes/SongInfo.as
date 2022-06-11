@@ -36,6 +36,7 @@ package classes
 
         public var play_hash:String;
         public var preview_hash:String;
+        public var swf_hash:String;
 
         public var prerelease:Boolean;
         public var release_date:uint;

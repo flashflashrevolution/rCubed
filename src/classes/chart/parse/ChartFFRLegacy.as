@@ -174,6 +174,7 @@ package classes.chart.parse
                 songInfo.stepauthor_url = node.songstepauthorurl.toString();
                 songInfo.play_hash = node.playhash.toString();
                 songInfo.preview_hash = node.previewhash.toString();
+                songInfo.swf_hash = node.swfhash.toString();
                 songInfo.min_nps = int(node.min_nps.toString());
                 songInfo.max_nps = int(node.max_nps.toString());
                 songInfo.credits = int(node.secretcredits.toString());

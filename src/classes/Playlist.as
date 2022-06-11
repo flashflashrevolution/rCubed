@@ -185,6 +185,7 @@ package classes
                     newSongInfo.difficulty = dynamicSongInfo.difficulty;
                     newSongInfo.genre = dynamicSongInfo.genre;
                     newSongInfo.level = dynamicSongInfo.level;
+                    newSongInfo.level_id = dynamicSongInfo.level;
                     newSongInfo.min_nps = dynamicSongInfo.min_nps;
                     newSongInfo.max_nps = dynamicSongInfo.max_nps;
                     newSongInfo.name = dynamicSongInfo.name;
@@ -199,6 +200,7 @@ package classes
                     newSongInfo.stepauthor = dynamicSongInfo.stepauthor;
                     newSongInfo.stepauthor_url = dynamicSongInfo.stepauthorURL;
                     newSongInfo.style = dynamicSongInfo.style;
+                    newSongInfo.swf_hash = dynamicSongInfo.swfhash;
                     newSongInfo.time = dynamicSongInfo.time;
 
                     songInfo = newSongInfo;
