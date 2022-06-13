@@ -3,7 +3,7 @@ package menu
     import assets.menu.ScrollBackground;
     import assets.menu.ScrollDragger;
     import assets.menu.SongSelectionBackground;
-    import by.blooddy.crypto.MD5;
+    import classes.DynamicLoader;
     import classes.Language;
     import classes.Playlist;
     import classes.ui.BoxButton;
@@ -12,7 +12,6 @@ package menu
     import classes.ui.ScrollPane;
     import classes.ui.Text;
     import flash.display.Bitmap;
-    import flash.display.Loader;
     import flash.display.Sprite;
     import flash.events.Event;
     import flash.events.MouseEvent;
@@ -39,7 +38,8 @@ package menu
 
         private static var loadedTokenImages:Object = {};
         private static var loadQueue:Array = [];
-        private static var ACTIVE_DOWNLOAD:Object = null;
+        private static var activeQueue:Array = [];
+        private static var MAX_ITEMS:int = 20;
 
         public function MenuTokens(myParent:MenuPanel)
         {
@@ -215,7 +215,7 @@ package menu
 
         private function addTokenImageLoader(token_info:Object, token_ui:TokenItem):void
         {
-            var imageHash:String = MD5.hash(token_info['picture']);
+            var imageHash:String = token_info['picture'];
             if (loadedTokenImages[imageHash] != null)
             {
                 token_ui.addTokenImage(loadedTokenImages[imageHash] as Bitmap, false);
@@ -228,25 +228,32 @@ package menu
 
         private function downloadTokenImage():void
         {
-            if (loadQueue.length <= 0 || ACTIVE_DOWNLOAD != null)
+            if (loadQueue.length <= 0 || activeQueue.length >= MAX_ITEMS)
                 return;
 
-            ACTIVE_DOWNLOAD = loadQueue.shift();
+            while (activeQueue.length < MAX_ITEMS && loadQueue.length > 0)
+            {
+                var queueItem:Object = loadQueue.shift();
+                activeQueue.push(queueItem);
 
-            // Load Avatar
-            var loader:Loader = new Loader();
-            loader.contentLoaderInfo.addEventListener(Event.COMPLETE, downloadTokenImageComplete);
-            loader.load(new URLRequest(ACTIVE_DOWNLOAD['url']));
+                // Load Image
+                var loader:DynamicLoader = new DynamicLoader();
+                loader.contentLoaderInfo.addEventListener(Event.COMPLETE, downloadTokenImageComplete);
+                loader.queueItem = queueItem;
+                loader.load(new URLRequest(queueItem['url']));
+            }
         }
 
         private function downloadTokenImageComplete(e:Event):void
         {
-            loadedTokenImages[ACTIVE_DOWNLOAD['hash']] = e.target.content as Bitmap;
+            var queueItem:Object = e.target.loader.queueItem;
 
-            if ((ACTIVE_DOWNLOAD['ui'] as TokenItem).parent != null)
-                (ACTIVE_DOWNLOAD['ui'] as TokenItem).addTokenImage(e.target.content as Bitmap);
+            loadedTokenImages[queueItem['hash']] = e.target.content as Bitmap;
 
-            ACTIVE_DOWNLOAD = null;
+            if ((queueItem['ui'] as TokenItem).parent != null)
+                (queueItem['ui'] as TokenItem).addTokenImage(e.target.content as Bitmap);
+
+            activeQueue.removeAt(activeQueue.indexOf(queueItem));
 
             downloadTokenImage();
         }
