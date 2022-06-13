@@ -1318,7 +1318,7 @@ package menu
                 {
                     if (highscores[r])
                     {
-                        var username:String = highscores[r]['name'];
+                        var username:String = highscores[r]['username'];
                         var score:Number = highscores[r]['score'];
                         var isMyPB:Boolean = (!_gvars.activeUser.isGuest) && (_gvars.activeUser.name == username);
 
@@ -1331,7 +1331,7 @@ package menu
                         infoPAHover = new HoverPABox(5, tY, highscores[r]['av']);
 
                         // Username
-                        infoTitle = new Text(infoBox, 5, tY, "#" + lastRank + ": " + username, 14);
+                        infoTitle = new Text(infoBox, 5, tY, "<font color=\"#CCCCCC\">#" + lastRank + ":</font> " + username, 14);
                         infoTitle.width = 164;
                         infoTitle.fontColor = isMyPB ? "#D9FF9E" : "#FFFFFF";
                         tY += 16;
