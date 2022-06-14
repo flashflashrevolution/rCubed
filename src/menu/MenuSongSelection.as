@@ -103,6 +103,9 @@ package menu
         // Info Page
         private var searchBox:BoxText;
         private var searchTypeBox:ComboBox;
+        private var sortTypeBox:ComboBox;
+        private var sortOrderBox:ComboBox;
+
         private static var purchasedWebRequests:Vector.<WebRequest> = new <WebRequest>[];
 
         public static var options:MenuSongSelectionOptions = new MenuSongSelectionOptions();
@@ -719,6 +722,32 @@ package menu
                 }
             }
 
+            // Sorting
+            if (options.last_sort_type != null)
+            {
+                var sortOrder:uint = options.last_sort_order == "desc" ? Array.DESCENDING : 0;
+                switch (options.last_sort_type)
+                {
+                    case "name":
+                    case "author":
+                    case "stepauthor":
+                    case "style":
+                        songList.sortOn(["access", options.last_sort_type], [Array.NUMERIC, Array.CASEINSENSITIVE | sortOrder])
+                        break;
+
+                    case "time_secs":
+                    case "level":
+                    case "note_count":
+                    case "difficulty":
+                    case "max_nps":
+                        songList.sortOn(["access", options.last_sort_type], [Array.NUMERIC, Array.NUMERIC | sortOrder])
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
             // Page Splicing
             if (doPageSlice)
             {
@@ -1178,22 +1207,68 @@ package menu
 
             // Search Box
             if (searchBox == null)
-            {
                 searchBox = new BoxText(null, 5, 5, 164, 27);
-            }
+
             infoBox.addChild(searchBox);
 
             // Search Type
-            var searchTypeBoxItems:Array = [{label: _lang.stringSimple("song_selection_search_song_name"), data: "name"}, {label: _lang.stringSimple("song_selection_search_author"), data: "author"}, {label: _lang.stringSimple("song_selection_search_stepauthor"), data: "stepauthor"}, {label: _lang.stringSimple("song_selection_search_style"), data: "style"}];
+            var searchTypeBoxItems:Array = [{label: _lang.stringSimple("song_selection_search_song_name"), data: "name"},
+                {label: _lang.stringSimple("song_selection_search_author"), data: "author"},
+                {label: _lang.stringSimple("song_selection_search_stepauthor"), data: "stepauthor"},
+                {label: _lang.stringSimple("song_selection_search_style"), data: "style"}];
+
             if (searchTypeBox != null)
-            {
                 searchTypeBox.removeEventListener(Event.SELECT, searchTypeSelect);
-            }
+
             searchTypeBox = new ComboBox(null, 5, 37, "", searchTypeBoxItems);
             searchTypeBox.setSize(164, 25);
             searchTypeBox.fontSize = 11;
             searchTypeBox.addEventListener(Event.SELECT, searchTypeSelect);
             infoBox.addChild(searchTypeBox);
+
+            var searchBtn:BoxButton = new BoxButton(infoBox, 5, 67, 164, 27, _lang.string("song_selection_search_panel_search"), 12, clickHandler);
+            searchBtn.action = "doSearch";
+
+            // Order Type
+            new Text(infoBox, 5, 137, _lang.string("song_selection_sort"), 14, "#DDDDDD");
+
+            //- data tag should match tag names in SongInfo
+            var sortTypeBoxItems:Array = [{label: _lang.stringSimple("song_selection_search_default"), data: null},
+                {label: _lang.stringSimple("song_selection_search_song_name"), data: "name"},
+                {label: _lang.stringSimple("song_selection_search_author"), data: "author"},
+                {label: _lang.stringSimple("song_selection_search_stepauthor"), data: "stepauthor"},
+                {label: _lang.stringSimple("song_selection_search_style"), data: "style"},
+                {label: _lang.stringSimple("song_selection_search_length"), data: "time_secs"},
+                {label: _lang.stringSimple("song_selection_search_id"), data: "level"},
+                {label: _lang.stringSimple("song_selection_search_note_count"), data: "note_count"},
+                {label: _lang.stringSimple("song_selection_search_difficulty"), data: "difficulty"},
+                {label: _lang.stringSimple("song_selection_search_nps"), data: "max_nps"}];
+
+            if (sortTypeBox != null)
+                sortTypeBox.removeEventListener(Event.SELECT, sortTypeSelect);
+
+            sortTypeBox = new ComboBox(null, 5, 162, "", sortTypeBoxItems);
+            sortTypeBox.setSize(164, 25);
+            sortTypeBox.fontSize = 11;
+            sortTypeBox.numVisibleItems = sortTypeBoxItems.length;
+            sortTypeBox.addEventListener(Event.SELECT, sortTypeSelect);
+            infoBox.addChild(sortTypeBox);
+
+            var sortOrderBoxItems:Array = [{label: _lang.stringSimple("song_selection_sort_asc"), data: "asc"},
+                {label: _lang.stringSimple("song_selection_sort_desc"), data: "desc"}];
+
+            if (sortOrderBox != null)
+                sortOrderBox.removeEventListener(Event.SELECT, sortOrderSelect);
+
+            sortOrderBox = new ComboBox(null, 5, 188, "", sortOrderBoxItems);
+            sortOrderBox.setSize(164, 25);
+            sortOrderBox.fontSize = 11;
+            sortOrderBox.addEventListener(Event.SELECT, sortOrderSelect);
+            infoBox.addChild(sortOrderBox);
+
+            // Random Song
+            var randomButton:BoxButton = new BoxButton(infoBox, 5, 288, 164, 27, _lang.string("song_selection_filter_panel_random"), 12, clickHandler);
+            randomButton.action = "doFilterRandom";
 
             // Save Search Parameters
             if (options.last_search_text != null)
@@ -1205,22 +1280,24 @@ package menu
 
             // Saved Search Type
             if (options.last_search_type != null)
-            {
                 searchTypeBox.selectedItemByData = options.last_search_type;
-            }
+
             else if (searchTypeBox.selectedIndex == -1)
-            {
                 searchTypeBox.selectedIndex = 0;
-            }
 
-            var searchBtn:BoxButton = new BoxButton(infoBox, 5, 67, 164, 27, _lang.string("song_selection_search_panel_search"), 12, clickHandler);
-            searchBtn.action = "doSearch";
+            // Saved Sort Type
+            if (options.last_sort_type != null)
+                sortTypeBox.selectedItemByData = options.last_sort_type;
 
-            var randomButton:BoxButton = new BoxButton(infoBox, 5, 256, 164, 27, _lang.string("song_selection_filter_panel_random"), 12, clickHandler);
-            randomButton.action = "doFilterRandom";
+            else if (sortTypeBox.selectedIndex == -1)
+                sortTypeBox.selectedIndex = 0;
 
-            var filterQueueManager:BoxButton = new BoxButton(infoBox, 5, 288, 164, 27, _lang.string("song_selection_filter_panel_manager"), 12, clickHandler);
-            filterQueueManager.action = "filterManager";
+            // Saved Sort Order
+            if (options.last_sort_order != null)
+                sortOrderBox.selectedItemByData = options.last_sort_order;
+
+            else if (sortOrderBox.selectedIndex == -1)
+                sortOrderBox.selectedIndex = 0;
         }
 
         /**
@@ -1618,6 +1695,18 @@ package menu
             options.last_search_type = e.target.selectedItem["data"];
         }
 
+        private function sortTypeSelect(e:Event):void
+        {
+            options.last_sort_type = e.target.selectedItem["data"];
+            buildPlayList();
+        }
+
+        private function sortOrderSelect(e:Event):void
+        {
+            options.last_sort_order = e.target.selectedItem["data"];
+            buildPlayList();
+        }
+
         /**
          * Does a specific search for a selected song from a multiplayer lobby.
          * It will use a song object first to make level ids first, and if none
@@ -1940,10 +2029,6 @@ package menu
                 else if (clickAction == "queueManager")
                 {
                     addPopup(new PopupQueueManager(this));
-                }
-                else if (clickAction == "filterManager")
-                {
-                    addPopup(new PopupFilterManager(this));
                 }
                 else if (clickAction == "doFilterRandom")
                 {

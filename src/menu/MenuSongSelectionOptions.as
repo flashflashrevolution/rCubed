@@ -14,6 +14,9 @@ package menu
         public var last_search_text:String;
         public var last_search_type:String;
 
+        public var last_sort_type:String;
+        public var last_sort_order:String;
+
         public var isFilter:Boolean = false;
         public var filter:Function = null;
 
