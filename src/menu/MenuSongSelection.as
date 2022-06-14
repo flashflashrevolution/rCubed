@@ -105,6 +105,7 @@ package menu
         private var searchTypeBox:ComboBox;
         private var sortTypeBox:ComboBox;
         private var sortOrderBox:ComboBox;
+        private var sortIgnoreChange:Boolean = false;
 
         private static var purchasedWebRequests:Vector.<WebRequest> = new <WebRequest>[];
 
@@ -1202,6 +1203,8 @@ package menu
          */
         public function buildInfoBoxSearch():void
         {
+            sortIgnoreChange = true;
+
             // Highlight Tab Button
             optionsBox.getChildAt(0).alpha = 1;
 
@@ -1238,11 +1241,11 @@ package menu
                 {label: _lang.stringSimple("song_selection_search_author"), data: "author"},
                 {label: _lang.stringSimple("song_selection_search_stepauthor"), data: "stepauthor"},
                 {label: _lang.stringSimple("song_selection_search_style"), data: "style"},
-                {label: _lang.stringSimple("song_selection_search_length"), data: "time_secs"},
-                {label: _lang.stringSimple("song_selection_search_id"), data: "level"},
-                {label: _lang.stringSimple("song_selection_search_note_count"), data: "note_count"},
                 {label: _lang.stringSimple("song_selection_search_difficulty"), data: "difficulty"},
-                {label: _lang.stringSimple("song_selection_search_nps"), data: "max_nps"}];
+                {label: _lang.stringSimple("song_selection_search_length"), data: "time_secs"},
+                {label: _lang.stringSimple("song_selection_search_note_count"), data: "note_count"},
+                {label: _lang.stringSimple("song_selection_search_nps"), data: "max_nps"},
+                {label: _lang.stringSimple("song_selection_search_id"), data: "level"}];
 
             if (sortTypeBox != null)
                 sortTypeBox.removeEventListener(Event.SELECT, sortTypeSelect);
@@ -1298,6 +1301,8 @@ package menu
 
             else if (sortOrderBox.selectedIndex == -1)
                 sortOrderBox.selectedIndex = 0;
+
+            sortIgnoreChange = false;
         }
 
         /**
@@ -1697,12 +1702,18 @@ package menu
 
         private function sortTypeSelect(e:Event):void
         {
+            if (sortIgnoreChange)
+                return;
+
             options.last_sort_type = e.target.selectedItem["data"];
             buildPlayList();
         }
 
         private function sortOrderSelect(e:Event):void
         {
+            if (sortIgnoreChange)
+                return;
+
             options.last_sort_order = e.target.selectedItem["data"];
             buildPlayList();
         }
