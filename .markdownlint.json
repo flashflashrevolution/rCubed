@@ -2,7 +2,9 @@
     "default": true,
     "MD033": {
         "allowed_elements": [
-            "kbd"
+            "kbd",
+            "details",
+            "summary"
         ]
     },
     "no-hard-tabs": false,

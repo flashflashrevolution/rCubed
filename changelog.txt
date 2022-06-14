@@ -1,3 +1,8 @@
+R^3 (Unreleased) [2022-xx-xx]
+---------------------------------------------------------------------
+- Add ability to take and save a screenshot directly to the clipboard. @Zageron
+- Assure that no tool-tips appear in any screenshots. @Zageron
+
 R^3 (v1.4.3) [2022-01-28]
 ---------------------------------------------------------------------
 @Psycast

@@ -213,7 +213,7 @@ package game
             // Song Results Buttons
             navScreenShot = new BoxIcon(this, 522, 6, 32, 32, new iconPhoto(), eventHandler);
             navScreenShot.setIconColor("#E2FEFF");
-            navScreenShot.setHoverText(_lang.string("game_results_queue_save_screenshot"), "bottom");
+            navScreenShot.setHoverText(_lang.string("game_results_queue_save_screenshot_clipboard_hint"), "bottom");
 
             navSaveReplay = new BoxIcon(this, 485, 6, 32, 32, new iconVideo(), eventHandler);
             navSaveReplay.setIconColor("#E2FEFF");
@@ -705,6 +705,7 @@ package game
                 }
             }
 
+
             if (!target)
                 return;
 
@@ -716,12 +717,21 @@ package game
 
             else if (target == navScreenShot)
             {
-                var ext:String = "";
-                if (resultIndex >= 0)
+                navScreenShot.purgeHoverSprite();
+                if (e.ctrlKey)
                 {
-                    ext = songResults[resultIndex].screenshot_path;
+                    _gvars.saveScreenshotToClipboard()
                 }
-                _gvars.takeScreenShot(ext);
+                else
+                {
+                    var ext:String = "";
+                    if (resultIndex >= 0)
+                    {
+                        ext = songResults[resultIndex].screenshot_path;
+                    }
+                    _gvars.takeScreenShot(ext);
+                }
+
             }
 
             else if (target == navPrev)
