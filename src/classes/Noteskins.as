@@ -589,10 +589,7 @@ package classes
             for each (var asset_name:String in note_asset_names)
             {
                 if (_data[noteID]["notes"][asset_name] == null)
-                {
                     _data[noteID]["notes"][asset_name] = _data[noteID]["notes"]["blue"];
-                    continue;
-                }
 
                 // Check Missing Directions and fill from Down
                 for each (var direction_name:String in note_direction_names)

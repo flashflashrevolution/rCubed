@@ -44,7 +44,7 @@ package classes
             }
         }
 
-        public static function parseCellInput(text:String, min_x:int = 0, max_x:int = 20, min_y:int = 0, max_y:int = 20):Array
+        public static function parseCellInput(text:String, min_x:int = 0, min_y:int = 0, max_x:int = 0, max_y:int = 20):Array
         {
             var out:Array = [1, 1];
             var cell_values:Array = text.split(",");
@@ -62,7 +62,7 @@ package classes
                 out[1] = 1;
 
             out[0] = Math.min(Math.max(out[0], min_x), max_x);
-            out[1] = Math.min(Math.max(out[0], min_y), max_y);
+            out[1] = Math.min(Math.max(out[1], min_y), max_y);
 
             return out;
         }
