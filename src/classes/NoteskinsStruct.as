@@ -44,7 +44,7 @@ package classes
             }
         }
 
-        public static function parseCellInput(text:String, min_x:int = 0, min_y:int = 0, max_x:int = 0, max_y:int = 20):Array
+        public static function parseCellInput(text:String, min_x:int = 0, min_y:int = 0, max_x:int = 20, max_y:int = 20):Array
         {
             var out:Array = [1, 1];
             var cell_values:Array = text.split(",");
