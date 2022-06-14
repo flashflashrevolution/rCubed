@@ -13,6 +13,7 @@ package arc
 
         private const DIRECTIONS:Array = ['L', 'D', 'U', 'R'];
         private const HALF_COLOR:Object = {"red": "red", "blue": "red", "purple": "purple", "yellow": "blue", "pink": "purple", "orange": "yellow", "cyan": "pink", "green": "orange", "white": "white"}
+        private const COLUMN_COLOR:Array = ["red", "blue", "yellow", "green"];
 
         public var options:GameOptions;
 
@@ -189,7 +190,7 @@ package arc
             }
 
             if (modColumnColor)
-                color = (dir % 3) ? "blue" : "red";
+                color = COLUMN_COLOR[dir % 4];
 
             if (modHalfTime)
                 color = HALF_COLOR[color] || color;
