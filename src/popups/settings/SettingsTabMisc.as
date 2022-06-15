@@ -212,7 +212,7 @@ package popups.settings
             yOff += 20;
 
             optionFPS = new ValidatedText(container, xOff + 3, yOff + 3, 120, 20, ValidatedText.R_INT_P, changeHandler);
-            CONFIG::vsync
+            if (Main.VSYNC_SUPPORT)
             {
                 new Text(container, xOff + 163, yOff + 4, _lang.string("air_options_use_vsync"));
                 useVSyncCheckbox = new BoxCheck(container, xOff + 143, yOff + 7, clickHandler);
@@ -278,7 +278,7 @@ package popups.settings
             useCacheCheckbox.checked = _gvars.air_useLocalFileCache;
             useWebsocketCheckbox.checked = _gvars.air_useWebsockets;
 
-            CONFIG::vsync
+            if (Main.VSYNC_SUPPORT)
             {
                 useVSyncCheckbox.checked = _gvars.air_useVSync;
             }
@@ -335,7 +335,7 @@ package popups.settings
             else if (e.target == useVSyncCheckbox)
             {
                 e.target.checked = !e.target.checked;
-                CONFIG::vsync
+                if (Main.VSYNC_SUPPORT)
                 {
                     _gvars.gameMain.stage.vsyncEnabled = _gvars.air_useVSync = !_gvars.air_useVSync;
                     LocalOptions.setVariable("vsync", _gvars.air_useVSync);

@@ -4,11 +4,6 @@
 
 package
 {
-    CONFIG::vsync
-    {
-        import flash.events.VsyncStateChangeAvailabilityEvent;
-    }
-
     import assets.GameBackgroundColor;
     import classes.Alert;
     import classes.Language;
@@ -55,6 +50,8 @@ package
     {
         public static const GAME_WIDTH:int = 780;
         public static const GAME_HEIGHT:int = 480;
+        public static var VSYNC_SUPPORT:Boolean = false;
+
         public static const GAME_UPDATE_PANEL:String = "GameAirUpdatePanel";
         public static const GAME_LOGIN_PANEL:String = "GameLoginPanel";
         public static const GAME_MENU_PANEL:String = "GameMenuPanel";
@@ -133,16 +130,13 @@ package
             _gvars.loadAirOptions();
 
             //- Window Options
+            VSYNC_SUPPORT = stage.hasOwnProperty("vsyncEnabled");
             stage.nativeWindow.addEventListener(Event.CLOSING, e_onNativeWindowClosing);
             NativeApplication.nativeApplication.addEventListener(Event.EXITING, e_onNativeShutdown);
             stage.nativeWindow.addEventListener(NativeWindowBoundsEvent.MOVE, e_onNativeWindowPropertyChange, false, 1);
             stage.nativeWindow.addEventListener(NativeWindowBoundsEvent.RESIZE, e_onNativeWindowPropertyChange, false, 1);
             loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, e_uncaughtErrorHandler);
-
-            CONFIG::vsync
-            {
-                stage.addEventListener(VsyncStateChangeAvailabilityEvent.VSYNC_STATE_CHANGE_AVAILABILITY, e_onVsyncStateChangeAvailability);
-            }
+            stage.addEventListener("vSyncStateChangeAvailability", e_onVsyncStateChangeAvailability); // Lacking proper event class due to SDK limitations in Air 26.
 
             stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE;
 
@@ -286,19 +280,25 @@ package
             Alert.add("A fatal error has occured. You should restart the game.", 7200, Alert.RED);
         }
 
-        CONFIG::vsync
-        public function e_onVsyncStateChangeAvailability(event:VsyncStateChangeAvailabilityEvent):void
+        /**
+         * Called when the vsync state can be set.
+         * This is even called in Air 26, when the actual event doesn't exist yet in the SDK
+         * but is dispatched if you hardcode the event name.
+         */
+        public function e_onVsyncStateChangeAvailability(event:*):void
         {
-            if (event.available)
+            if (VSYNC_SUPPORT)
             {
-                stage.vsyncEnabled = _gvars.air_useVSync;
-            }
-            else
-            {
-                stage.vsyncEnabled = true;
+                if (event.available)
+                {
+                    stage.vsyncEnabled = _gvars.air_useVSync;
+                }
+                else
+                {
+                    stage.vsyncEnabled = true;
+                }
             }
         }
-
 
         ///- Preloader
         public function buildPreloader():void

@@ -30,10 +30,6 @@
                 "value": false
             },
             {
-                "name": "CONFIG::vsync",
-                "value": true
-            },
-            {
                 "name": "CONFIG::updater",
                 "value": false
             },
