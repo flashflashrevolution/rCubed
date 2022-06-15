@@ -209,6 +209,7 @@ package popups.settings
             new Text(container, xOff + 22, yOff - 1, _lang.string("options_mod_mirror"));
 
             optionMirrorMod = new BoxCheck(container, xOff + 2, yOff + 3, clickHandler);
+            optionMirrorMod.visual_mod = "mirror";
             yOff += 25;
 
             yOff += drawSeperator(container, xOff, 170, yOff, 1);
