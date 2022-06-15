@@ -89,6 +89,16 @@ package classes.replay
         static public const MAJOR_VER:uint = 1;
         static public const MINOR_VER:uint = 1;
 
+        // value = MAJOR_VER * 1000 + MINOR_VER
+        static private const SUPPORT_MIN_VER:uint = 1000;
+        static private const SUPPORT_MAX_VER:uint = 1001;
+
+        // because the checksum is assumed to be the last 4 bytes, changes to the format will 
+        // likely need the magic to change so that older engines won't try to parse a different 
+        // format as they didn't do support version range checks until 1.4.4
+        // changing the magic will cause the replay parser on <1.4.4 to use the older json format
+        // which will error out as the string isn't a json string and about the parsing
+
         public static function pack(binNotes:Vector.<ReplayBinFrame>, binBoos:Vector.<ReplayBinFrame>):ByteArray
         {
             // Generate Bin Replay Format
@@ -403,6 +413,13 @@ package classes.replay
                 replay.MAJOR_VER = ba.readByte();
                 replay.MINOR_VER = ba.readByte();
 
+                if (replay.VERSION > SUPPORT_MAX_VER || replay.VERSION < SUPPORT_MIN_VER)
+                {
+                    replay.error = "Unsupported Replay Version";
+                    ba.position = 0;
+                    return replay;
+                }
+
                 var judgeOffset:int = 0;
                 var hasHeader:Boolean = ba.readByte() == 1;
 
@@ -455,6 +472,11 @@ package classes.replay
             if (test == null)
             {
                 trace("test is null, complete fail");
+                return false;
+            }
+            if (test.error != null)
+            {
+                trace("replay error set", test.error);
                 return false;
             }
             if (MAGIC != test.MAGIC)

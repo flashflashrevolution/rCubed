@@ -21,6 +21,13 @@ package classes.replay
         public var rechecksum:uint;
         public var replay_bin:ByteArray;
 
+        public var error:String;
+
+        public function get VERSION():uint
+        {
+            return MAJOR_VER * 1000 + MINOR_VER;
+        }
+
         public function update():void
         {
             var i:int;

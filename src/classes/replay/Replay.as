@@ -213,6 +213,12 @@ package classes.replay
             if (data == null)
                 return;
 
+            if (data.error != null)
+            {
+                Alert.add(data.error, 120, Alert.RED)
+                return;
+            }
+
             //- Level Details
             this.user = new User(loadUser, false);
             this.user.addEventListener(GlobalVariables.LOAD_COMPLETE, userLoad);
