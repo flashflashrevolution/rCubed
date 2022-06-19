@@ -1,7 +1,21 @@
-R^3 (Unreleased) [2022-xx-xx]
+R^3 (v1.4.4) [2022-06-19]
 ---------------------------------------------------------------------
-- Add ability to take and save a screenshot directly to the clipboard. @Zageron
-- Assure that no tool-tips appear in any screenshots. @Zageron
+@Psycast
+- Add playlist sort/ordering under SEARCH.
+- Add Note Color Swap Reset and Change All.
+- Add Autofail Restart option.
+- Make Column Color 4 distinct colors instead of 2.
+- Add button to open full highscores popup from song selection.
+- Add HTTP fallback for TLS connection failures.
+- Improve Highscores Panel
+- Improve custom noteskin crashing prevention.
+- Make Token images load faster.
+- Add supported replay version ranges on bin replays.
+- Add test for vsync instead of compile time constraint.
+
+@Zageron
+- Add ability to take and save a screenshot directly to the clipboard. 
+
 
 R^3 (v1.4.3) [2022-01-28]
 ---------------------------------------------------------------------
