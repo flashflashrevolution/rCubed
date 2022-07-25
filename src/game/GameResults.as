@@ -165,6 +165,7 @@ package game
                 {
                     userAvatar.x = 616 + ((99 - userAvatar.width) / 2);
                     userAvatar.y = 114 + ((99 - userAvatar.height) / 2);
+                    userAvatar.z = 1;
                     this.addChild(userAvatar);
                 }
             }

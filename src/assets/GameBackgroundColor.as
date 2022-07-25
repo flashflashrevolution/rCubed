@@ -155,6 +155,7 @@ package assets
         {
             img.smoothing = true;
             img.pixelSnapping = "always";
+            img.z = 1;
 
             var imageScale:Number = Main.GAME_WIDTH / img.width;
 

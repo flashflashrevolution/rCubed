@@ -83,6 +83,7 @@ package popups.settings
 
                 columnDirectionNote.x = curOffX + 10 + (inputWidth / 2);
                 columnDirectionNote.y = yOff + (receptorSize / 2) + 33;
+                columnDirectionNote.z = 1;
 
                 var gameKeyInput:BoxText = new BoxText(container, curOffX + 10, yOff + 80, inputWidth, 20);
                 gameKeyInput.autoSize = TextFieldAutoSize.CENTER;

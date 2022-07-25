@@ -186,6 +186,7 @@ package game.controls
                 gameNote.alpha = 0.2;
             }
 
+            gameNote.z = 1;
             gameNote.visible = true;
             notes.push(gameNote);
 
@@ -710,6 +711,7 @@ package game.controls
                 receptorAlpha = 0.3;
 
             leftReceptor.alpha = downReceptor.alpha = upReceptor.alpha = rightReceptor.alpha = receptorAlpha;
+            leftReceptor.z = downReceptor.z = upReceptor.z = rightReceptor.z = 1;
         }
     }
 }

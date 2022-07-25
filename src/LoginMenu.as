@@ -111,6 +111,7 @@ package
                             SpriteUtil.scaleTo(userAvatar, 77, 77);
                             userAvatar.x = 11 + ((77 - userAvatar.width) / 2);
                             userAvatar.y = 11 + ((77 - userAvatar.height) / 2);
+                            userAvatar.z = 1;
                             panel_session.addChildAt(userAvatar, 1);
                         }
                     }
