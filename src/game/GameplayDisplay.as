@@ -45,6 +45,7 @@ package game
     import flash.utils.getTimer;
     import game.controls.AccuracyBar;
     import game.controls.Combo;
+    import game.controls.RawGoods;
     import game.controls.FlashlightOverlay;
     import game.controls.Judge;
     import game.controls.LifeBar;
@@ -57,6 +58,7 @@ package game
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import sql.SQLSongUserInfo;
+    import flash.html.__HTMLScriptArray;
 
     public class GameplayDisplay extends MenuPanel
     {
@@ -78,6 +80,8 @@ package game
         public static const LAYOUT_COMBO_TOTAL_STATIC:String = "combototalstatic";
         public static const LAYOUT_ACCURACY_BAR:String = "accuracybar";
         public static const LAYOUT_PA:String = "pa";
+        public static const LAYOUT_RAWGOODS:String = "rawgoods";
+        public static const LAYOUT_RAWGOODS_STATIC:String = "rawgoodsstatic";
 
         public static const LAYOUT_MP_JUDGE:String = "mpjudge";
         public static const LAYOUT_MP_COMBO:String = "mpcombo";
@@ -106,7 +110,9 @@ package game
         private var noteBox:NoteBox;
         private var score:Score;
         private var comboTotal:Combo;
+        private var rawGoodsTotal:RawGoods;
         private var comboStatic:TextStatic;
+        private var rawGoodsStatic:TextStatic;
         private var comboTotalStatic:TextStatic;
         private var accBar:AccuracyBar;
         private var screenCut:ScreenCut;
@@ -119,6 +125,7 @@ package game
         private var player1Life:LifeBar;
         private var player1Judge:Judge;
         private var player1JudgeOffset:int;
+        private var player1RawGoods:RawGoods;
 
         private var mpHeader:Array;
         private var mpCombo:Array;
@@ -182,6 +189,7 @@ package game
         private var hitMiss:int;
         private var hitBoo:int;
         private var hitCombo:int;
+        private var hitRawGoods:int;
         private var hitMaxCombo:int;
 
         private var noteBoxOffset:Object = {"x": 0, "y": 0};
@@ -541,6 +549,18 @@ package game
                 this.addChild(comboStatic);
             }
 
+            if (options.displayRawGoods)
+            {
+                player1RawGoods = new RawGoods(options);
+                if (!sideScroll)
+                    player1RawGoods.alignment = "right";
+                this.addChild(player1RawGoods);
+
+                rawGoodsStatic = new TextStatic(_lang.string("game_raw_goods"));
+                rawGoodsStatic.setFormatting(options.rawGoodsColor, 12)
+                this.addChild(rawGoodsStatic);
+            }
+
             if (options.displayComboTotal)
             {
                 comboTotal = new Combo(options);
@@ -634,7 +654,7 @@ package game
             mpSpectate = (options.mpRoom && !options.mpRoom.connection.currentUser.isPlayer);
             if (mpSpectate)
             {
-                options.displayCombo = options.displayComboTotal = options.displayPA = false;
+                options.displayCombo = options.displayComboTotal = options.displayPA = options.displayRawGoods = false;
             }
             else if (options.mpRoom)
                 options.displayComboTotal = false;
@@ -1723,6 +1743,8 @@ package game
                 defaultLayout[LAYOUT_COMBO_TOTAL] = {x: 544, y: 402};
                 defaultLayout[LAYOUT_COMBO_STATIC] = {x: 228, y: 436};
                 defaultLayout[LAYOUT_COMBO_TOTAL_STATIC] = {x: 502, y: 436};
+                defaultLayout[LAYOUT_RAWGOODS] = {x: 120, y: 365};
+                defaultLayout[LAYOUT_RAWGOODS_STATIC] = {x: 4, y: 380};
             }
 
             // Multiplayer
@@ -1760,11 +1782,13 @@ package game
             interfacePosition(comboTotal, interfaceLayout(LAYOUT_COMBO_TOTAL));
             interfacePosition(comboStatic, interfaceLayout(LAYOUT_COMBO_STATIC));
             interfacePosition(comboTotalStatic, interfaceLayout(LAYOUT_COMBO_TOTAL_STATIC));
+            interfacePosition(rawGoodsStatic, interfaceLayout(LAYOUT_RAWGOODS_STATIC));
 
             if (!options.mpRoom)
             {
                 interfacePosition(player1PAWindow, interfaceLayout(LAYOUT_PA));
                 interfacePosition(player1Combo, interfaceLayout(LAYOUT_COMBO));
+                interfacePosition(player1RawGoods, interfaceLayout(LAYOUT_RAWGOODS))
                 interfacePosition(player1Judge, interfaceLayout(LAYOUT_JUDGE));
             }
 
@@ -1780,11 +1804,13 @@ package game
                 interfaceEditor(comboTotal, interfaceLayout(LAYOUT_COMBO_TOTAL, false));
                 interfaceEditor(comboStatic, interfaceLayout(LAYOUT_COMBO_STATIC, false));
                 interfaceEditor(comboTotalStatic, interfaceLayout(LAYOUT_COMBO_TOTAL_STATIC, false));
+                interfaceEditor(rawGoodsStatic, interfaceLayout(LAYOUT_RAWGOODS_STATIC, false));
 
                 if (!options.mpRoom)
                 {
                     interfaceEditor(player1PAWindow, interfaceLayout(LAYOUT_PA, false));
                     interfaceEditor(player1Combo, interfaceLayout(LAYOUT_COMBO, false));
+                    interfaceEditor(player1RawGoods, interfaceLayout(LAYOUT_RAWGOODS, false))
                     interfaceEditor(player1Judge, interfaceLayout(LAYOUT_JUDGE, false));
                 }
             }
@@ -2206,6 +2232,9 @@ package game
 
             if (player1Combo)
                 player1Combo.update(hitCombo, hitAmazing, hitPerfect, hitGood, hitAverage, hitMiss, hitBoo, gameRawGoods);
+
+            if (player1RawGoods)
+                player1RawGoods.update(gameRawGoods)
         }
 
         private var previousDiffs:Array = new Array();

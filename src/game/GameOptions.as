@@ -37,6 +37,7 @@ package game
         public var displayHealth:Boolean = true;
         public var displayScore:Boolean = true;
         public var displayCombo:Boolean = true;
+        public var displayRawGoods:Boolean = false;
         public var displayComboTotal:Boolean = true;
         public var displayAccuracyBar:Boolean = true;
         public var displayPA:Boolean = true;
@@ -59,6 +60,7 @@ package game
         public var noteColors:Array = ["red", "blue", "purple", "yellow", "pink", "orange", "cyan", "green", "white"];
         public var noteSwapColors:Object = {"red": "red", "blue": "blue", "purple": "purple", "yellow": "yellow", "pink": "pink", "orange": "orange", "cyan": "cyan", "green": "green", "white": "white"};
         public var rawGoodTracker:Number = 0;
+        public var rawGoodsColor:Number = 0xDC00C2
 
         public var layout:Object = {};
 
@@ -117,6 +119,7 @@ package game
             displayGameBottomBar = user.DISPLAY_GAME_BOTTOM_BAR;
             displayScore = user.DISPLAY_SCORE;
             displayCombo = user.DISPLAY_COMBO;
+            displayRawGoods = user.DISPLAY_RAWGOODS;
             displayComboTotal = user.DISPLAY_TOTAL;
             displayPA = user.DISPLAY_PACOUNT;
             displayAccuracyBar = user.DISPLAY_ACCURACY_BAR;
@@ -136,6 +139,7 @@ package game
             enableComboColors = user.enableComboColors.concat();
             gameColors = user.gameColors.concat();
             rawGoodTracker = user.rawGoodTracker;
+            rawGoodsColor = user.rawGoodsColor;
 
             for (var i:int = 0; i < noteColors.length; i++)
             {
@@ -206,6 +210,7 @@ package game
             displayJudge = settings["viewJudge"];
             displayHealth = settings["viewHealth"];
             displayCombo = settings["viewCombo"];
+            displayRawGoods = settings["viewRawGoods"];
             displayComboTotal = settings["viewTotal"];
             displayPA = settings["viewPACount"];
             displayAmazing = settings["viewAmazing"];
@@ -275,6 +280,7 @@ package game
             settings["viewHealth"] = displayHealth;
             settings["viewScore"] = displayScore;
             settings["viewCombo"] = displayCombo;
+            settings["viewRawGoods"] = displayRawGoods;
             settings["viewTotal"] = displayComboTotal;
             settings["viewPACount"] = displayPA;
             settings["viewAmazing"] = displayAmazing;

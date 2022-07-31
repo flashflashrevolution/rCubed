@@ -104,6 +104,7 @@ package classes
         public var DISPLAY_SCREENCUT:Boolean = false;
         public var DISPLAY_SONGPROGRESS:Boolean = true;
         public var DISPLAY_SONGPROGRESS_TEXT:Boolean = false;
+        public var DISPLAY_RAWGOODS:Boolean = true;
 
         public var DISPLAY_MP_UI:Boolean = true;
         public var DISPLAY_MP_PA:Boolean = true;
@@ -117,6 +118,7 @@ package classes
         public var gameColors:Array = [0x1495BD, 0x033242, 0x0C6A88, 0x074B62, 0x000000];
         public var noteColors:Array = ["red", "blue", "purple", "yellow", "pink", "orange", "cyan", "green", "white"];
         public var rawGoodTracker:Number = 0;
+        public var rawGoodsColor:Number = 0xDC00C2
 
         public var autofailAmazing:int = 0;
         public var autofailPerfect:int = 0;
@@ -555,6 +557,9 @@ package classes
             if (_settings.viewCombo != null)
                 this.DISPLAY_COMBO = _settings.viewCombo;
 
+            if (_settings.viewRawGoods != null)
+                this.DISPLAY_RAWGOODS = _settings.viewRawGoods;
+
             if (_settings.viewPACount != null)
                 this.DISPLAY_PACOUNT = _settings.viewPACount;
 
@@ -740,6 +745,7 @@ package classes
             gameSave.viewGameBottomBar = this.DISPLAY_GAME_BOTTOM_BAR;
             gameSave.viewScore = this.DISPLAY_SCORE;
             gameSave.viewCombo = this.DISPLAY_COMBO;
+            gameSave.viewRawGoods = this.DISPLAY_RAWGOODS;
             gameSave.viewPACount = this.DISPLAY_PACOUNT;
             gameSave.viewAccBar = this.DISPLAY_ACCURACY_BAR;
             gameSave.viewAmazing = this.DISPLAY_AMAZING;

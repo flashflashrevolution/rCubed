@@ -34,5 +34,11 @@ package game.controls
         {
             field.autoSize = value;
         }
+
+        public function setFormatting(color:Number = 0x0098CB, size:int = 17):void
+        {
+            field.setTextFormat(new TextFormat(Language.UNI_FONT_NAME, size, color, true));
+            field.autoSize = TextFieldAutoSize.LEFT;
+        }
     }
 }
