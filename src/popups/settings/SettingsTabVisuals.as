@@ -31,7 +31,7 @@ package popups.settings
             "RECEPTOR_ANIMATIONS",
             "JUDGE_ANIMATIONS"];
 
-        private var gameMPUIArray:Array = ["MP_UI", "MP_PA", "MP_JUDGE", "MP_COMBO"];
+        private var gameMPUIArray:Array = ["MP_UI", "MP_PA", "MP_JUDGE", "MP_COMBO", "MP_RAWGOODS"];
 
         private var gameOtherArray:Array = ["GENRE_FLAG",
             "SONG_FLAG",

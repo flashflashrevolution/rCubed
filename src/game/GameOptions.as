@@ -51,6 +51,7 @@ package game
         public var displayMPJudge:Boolean = true;
         public var displayMPPA:Boolean = true;
         public var displayMPCombo:Boolean = true;
+        public var displayMPRawGoods:Boolean = false;
 
         public var judgeColors:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
         public var comboColors:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000, 0xDC00C2]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag, RawGood
@@ -133,6 +134,7 @@ package game
             displayMPPA = user.DISPLAY_MP_PA;
             displayMPJudge = user.DISPLAY_MP_JUDGE;
             displayMPCombo = user.DISPLAY_MP_COMBO;
+            displayMPRawGoods = user.DISPLAY_MP_RAWGOODS;
 
             judgeColors = user.judgeColors.concat();
             comboColors = user.comboColors.concat();

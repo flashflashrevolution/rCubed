@@ -104,12 +104,13 @@ package classes
         public var DISPLAY_SCREENCUT:Boolean = false;
         public var DISPLAY_SONGPROGRESS:Boolean = true;
         public var DISPLAY_SONGPROGRESS_TEXT:Boolean = false;
-        public var DISPLAY_RAWGOODS:Boolean = true;
+        public var DISPLAY_RAWGOODS:Boolean = false;
 
         public var DISPLAY_MP_UI:Boolean = true;
         public var DISPLAY_MP_PA:Boolean = true;
         public var DISPLAY_MP_JUDGE:Boolean = true;
         public var DISPLAY_MP_COMBO:Boolean = true;
+        public var DISPLAY_MP_RAWGOODS:Boolean = false;
 
         public var DISPLAY_MP_TIMESTAMP:Boolean = false;
         public var judgeColors:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
@@ -593,6 +594,9 @@ package classes
             if (_settings.viewMPCombo != null)
                 this.DISPLAY_MP_COMBO = _settings.viewMPCombo;
 
+            if (_settings.viewMPRawGoods != null)
+                this.DISPLAY_MP_RAWGOODS = _settings.viewMPRawGoods;
+
             if (_settings.viewMPJudge != null)
                 this.DISPLAY_MP_JUDGE = _settings.viewMPJudge;
 
@@ -758,6 +762,7 @@ package classes
             gameSave.viewMPPA = this.DISPLAY_MP_PA;
             gameSave.viewMPJudge = this.DISPLAY_MP_JUDGE;
             gameSave.viewMPCombo = this.DISPLAY_MP_COMBO;
+            gameSave.viewMPRawGoods = this.DISPLAY_MP_RAWGOODS;
             gameSave.viewMPTimestamp = this.DISPLAY_MP_TIMESTAMP;
             gameSave.viewLegacySongs = this.DISPLAY_LEGACY_SONGS;
 

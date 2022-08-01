@@ -87,6 +87,7 @@ package game
         public static const LAYOUT_MP_COMBO:String = "mpcombo";
         public static const LAYOUT_MP_PA:String = "mppa";
         public static const LAYOUT_MP_HEADER:String = "mpheader";
+        public static const LAYOUT_MP_RAWGOODS:String = "mprawgoods";
 
         private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _avars:ArcGlobals = ArcGlobals.instance;
@@ -131,6 +132,7 @@ package game
         private var mpCombo:Array;
         private var mpJudge:Array;
         private var mpPA:Array;
+        private var mpRawGoods:Array;
 
         private var msStartTime:Number = 0;
         private var absoluteStart:int = 0;
@@ -552,13 +554,14 @@ package game
             if (options.displayRawGoods)
             {
                 player1RawGoods = new RawGoods(options);
-                if (!sideScroll)
-                    player1RawGoods.alignment = "right";
                 this.addChild(player1RawGoods);
 
-                rawGoodsStatic = new TextStatic(_lang.string("game_raw_goods"));
-                rawGoodsStatic.setFormatting(options.rawGoodsColor, 12)
-                this.addChild(rawGoodsStatic);
+                if (!options.mpRoom && !mpSpectate)
+                {
+                    rawGoodsStatic = new TextStatic(_lang.string("game_raw_goods"));
+                    rawGoodsStatic.setFormatting(options.rawGoodsColor, 12)
+                    this.addChild(rawGoodsStatic);
+                }
             }
 
             if (options.displayComboTotal)
@@ -1647,6 +1650,7 @@ package game
             mpPA = [];
             mpCombo = [];
             mpHeader = [];
+            mpRawGoods = [];
 
             if (!options.displayMPUI && !mpSpectate)
                 return;
@@ -1659,6 +1663,8 @@ package game
                         mpPA[user.playerIdx] = player1PAWindow;
                     if (player1Combo)
                         mpCombo[user.playerIdx] = player1Combo;
+                    if (player1RawGoods)
+                        mpRawGoods[user.playerIdx] = player1RawGoods;
                     if (player1Judge)
                         mpJudge[user.playerIdx] = player1Judge;
                     continue;
@@ -1696,6 +1702,13 @@ package game
                     if (options.isEditor)
                         judge.showJudge(100, true);
                 }
+
+                if (options.displayMPRawGoods)
+                {
+                    var rawGoods:RawGoods = new RawGoods(options);
+                    addChild(rawGoods);
+                    mpRawGoods[user.playerIdx] = rawGoods;
+                }
             }
         }
 
@@ -1732,8 +1745,10 @@ package game
                 defaultLayout[LAYOUT_SCORE] = {x: 392, y: 24};
                 defaultLayout[LAYOUT_COMBO] = {x: 508, y: 388};
                 defaultLayout[LAYOUT_COMBO_TOTAL] = {x: 770, y: 420, properties: {alignment: "right"}};
-                defaultLayout[LAYOUT_COMBO_STATIC] = {x: 512, y: 438};
+                defaultLayout[LAYOUT_COMBO_STATIC] = {x: 512, y: 450};
                 defaultLayout[LAYOUT_COMBO_TOTAL_STATIC] = {x: 734, y: 414};
+                defaultLayout[LAYOUT_RAWGOODS] = {x: 90, y: 35};
+                defaultLayout[LAYOUT_RAWGOODS_STATIC] = {x: 16, y: 53};
             }
             else
             {
@@ -1743,7 +1758,7 @@ package game
                 defaultLayout[LAYOUT_COMBO_TOTAL] = {x: 544, y: 402};
                 defaultLayout[LAYOUT_COMBO_STATIC] = {x: 228, y: 436};
                 defaultLayout[LAYOUT_COMBO_TOTAL_STATIC] = {x: 502, y: 436};
-                defaultLayout[LAYOUT_RAWGOODS] = {x: 120, y: 365};
+                defaultLayout[LAYOUT_RAWGOODS] = {x: 80, y: 365};
                 defaultLayout[LAYOUT_RAWGOODS_STATIC] = {x: 4, y: 380};
             }
 
@@ -1751,6 +1766,7 @@ package game
             defaultLayout[LAYOUT_MP_COMBO + "1"] = defaultLayout[LAYOUT_COMBO];
             defaultLayout[LAYOUT_MP_JUDGE + "1"] = {x: 208, y: 102};
             defaultLayout[LAYOUT_MP_PA + "1"] = {x: 6, y: 96};
+            defaultLayout[LAYOUT_MP_RAWGOODS + "1"] = defaultLayout[LAYOUT_RAWGOODS];
             if (options.displayMPPA)
                 defaultLayout[LAYOUT_MP_HEADER + "1"] = {x: 0, y: -35};
             else
@@ -1759,6 +1775,7 @@ package game
             defaultLayout[LAYOUT_MP_COMBO + "2"] = defaultLayout[LAYOUT_COMBO_TOTAL];
             defaultLayout[LAYOUT_MP_JUDGE + "2"] = {x: 568, y: 102};
             defaultLayout[LAYOUT_MP_PA + "2"] = {x: 645, y: 96, properties: {alignment: "right"}};
+            defaultLayout[LAYOUT_MP_RAWGOODS + "2"] = {x: Main.GAME_WIDTH - 80, y: 365, properties: {alignment: "right"}};
             if (options.displayMPPA)
                 defaultLayout[LAYOUT_MP_HEADER + "2"] = {x: 25, y: -35, properties: {alignment: MPHeader.ALIGN_RIGHT}};
             else
@@ -1824,6 +1841,7 @@ package game
                     interfacePosition(mpCombo[user.playerIdx], interfaceLayout(LAYOUT_MP_COMBO + user.playerIdx));
                     interfacePosition(mpPA[user.playerIdx], interfaceLayout(LAYOUT_MP_PA + user.playerIdx));
                     interfacePosition(mpHeader[user.playerIdx], interfaceLayout(LAYOUT_MP_HEADER + user.playerIdx));
+                    interfacePosition(mpRawGoods[user.playerIdx], interfaceLayout(LAYOUT_MP_RAWGOODS + user.playerIdx));
 
                     // Multiplayer - Editor
                     if (options.isEditor)
@@ -1832,6 +1850,7 @@ package game
                         interfaceEditor(mpCombo[user.playerIdx], interfaceLayout(LAYOUT_MP_COMBO + user.playerIdx, false));
                         interfaceEditor(mpPA[user.playerIdx], interfaceLayout(LAYOUT_MP_PA + user.playerIdx, false));
                         interfaceEditor(mpHeader[user.playerIdx], interfaceLayout(LAYOUT_MP_HEADER + user.playerIdx, false));
+                        interfaceEditor(mpRawGoods[user.playerIdx], interfaceLayout(LAYOUT_MP_RAWGOODS + user.playerIdx, false));
                     }
                 }
             }
@@ -2281,6 +2300,10 @@ package game
             var pa:PAWindow = mpPA[user.playerIdx];
             if (pa)
                 pa.update(gameplay.amazing, gameplay.perfect, gameplay.good, gameplay.average, gameplay.miss, gameplay.boo);
+
+            var rawgoods:RawGoods = mpRawGoods[user.playerIdx];
+            if (rawgoods)
+                rawgoods.updateFromPA(gameplay.good, gameplay.average, gameplay.miss, gameplay.boo);
 
             var judge:Judge = mpJudge[user.playerIdx];
             if (judge)
