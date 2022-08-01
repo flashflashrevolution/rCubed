@@ -216,6 +216,10 @@ package menu
         private function addTokenImageLoader(token_info:Object, token_ui:TokenItem):void
         {
             var imageHash:String = token_info['picture'];
+
+            if (token_info['picture'] == null || token_info['picture'] == '')
+                return;
+
             if (loadedTokenImages[imageHash] != null)
             {
                 token_ui.addTokenImage(loadedTokenImages[imageHash] as Bitmap, false);
