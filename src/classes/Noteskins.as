@@ -159,8 +159,6 @@ package classes
 
         /**
          * Gets the Note Sprite from the noteskin.
-         * This assumes verifyNoteskin has filled in any holes in the data to
-         * prevent null references and as such isn't checked here for gameplay speed.
          * @param noteskin
          * @param color
          * @param direction
@@ -168,62 +166,24 @@ package classes
          */
         public function getNote(noteskin:int, color:String, direction:String):Sprite
         {
-            // Is requested noteskin is missing, fallback to Default
-            if (_data[noteskin] == null)
-                noteskin = 1;
-
-            if (_data[noteskin]["type"] == TYPE_BITMAP)
-            {
-                return drawBitmapNote(_data[noteskin]["notes"][color][direction]);
-            }
-
-            return new _data[noteskin]["notes"][color][direction];
-        }
-
-        /**
-         * Gets the Note Sprite from the noteskin.
-         * This is slower and shouldn't be used for gameplay, only UI
-         * to prevent crashes on corrupted noteskins. A blank sprite will
-         * be return if a error occurs.
-         * @param noteskin
-         * @param color
-         * @param direction
-         * @return
-         */
-        public function getNoteSafe(noteskin:int, color:String, direction:String):Sprite
-        {
             try
             {
-                return getNote(noteskin, color, direction);
+                // Is requested noteskin is missing, fallback to Default
+                if (_data[noteskin] == null)
+                    noteskin = 1;
+
+                if (_data[noteskin]["type"] == TYPE_BITMAP)
+                {
+                    return drawBitmapNote(_data[noteskin]["notes"][color][direction]);
+                }
+
+                return new _data[noteskin]["notes"][color][direction];
             }
             catch (e:Error)
             {
 
             }
             return new Sprite();
-        }
-
-        /**
-         * Gets the Receptor Movieclip from the noteskin.
-         * This assumes verifyNoteskin has filled in any holes in the data to
-         * prevent null references and as such isn't checked here for gameplay speed.
-         * @param noteskin
-         * @param color
-         * @param direction
-         * @return
-         */
-        public function getReceptor(noteskin:int, direction:String):MovieClip
-        {
-            // Is requested noteskin is missing, fallback to Default
-            if (_data[noteskin] == null)
-                noteskin = 1;
-
-            if (_data[noteskin]["type"] == TYPE_BITMAP)
-            {
-                return new GameReceptor(direction, _data[noteskin]["receptor"][direction]);
-            }
-
-            return new _data[noteskin]["receptor"][direction];
         }
 
         /**
@@ -236,11 +196,20 @@ package classes
          * @param direction
          * @return
          */
-        public function getReceptorSafe(noteskin:int, direction:String):MovieClip
+        public function getReceptor(noteskin:int, direction:String):MovieClip
         {
             try
             {
-                return getReceptor(noteskin, direction);
+                // Is requested noteskin is missing, fallback to Default
+                if (_data[noteskin] == null)
+                    noteskin = 1;
+
+                if (_data[noteskin]["type"] == TYPE_BITMAP)
+                {
+                    return new GameReceptor(direction, _data[noteskin]["receptor"][direction]);
+                }
+
+                return new _data[noteskin]["receptor"][direction];
             }
             catch (e:Error)
             {
