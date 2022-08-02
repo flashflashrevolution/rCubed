@@ -13,19 +13,15 @@ package game.controls
     public class RawGoods extends Sprite
     {
         private var options:GameOptions;
-
         private var colors:Number;
-        private var colors_dark:Number;
-
         private var field:TextField;
-        private var fieldShadow:TextField;
 
         public function RawGoods(options:GameOptions)
         {
             this.options = options;
 
             // Copy Raw Goods Colors
-            colors = new Number(options.rawGoodsColor);
+            colors = options.rawGoodsColor;
 
             field = new TextField();
             field.defaultTextFormat = new TextFormat(Language.UNI_FONT_NAME, 30, colors, true);
