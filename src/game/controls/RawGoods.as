@@ -26,7 +26,6 @@ package game.controls
 
             // Copy Raw Goods Colors
             colors = new Number(options.rawGoodsColor);
-            colors = options.rawGoodsColor;
 
             field = new TextField();
             field.defaultTextFormat = new TextFormat(Language.UNI_FONT_NAME, 30, colors, true);

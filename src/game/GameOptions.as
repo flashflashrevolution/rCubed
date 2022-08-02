@@ -61,7 +61,7 @@ package game
         public var noteColors:Array = ["red", "blue", "purple", "yellow", "pink", "orange", "cyan", "green", "white"];
         public var noteSwapColors:Object = {"red": "red", "blue": "blue", "purple": "purple", "yellow": "yellow", "pink": "pink", "orange": "orange", "cyan": "cyan", "green": "green", "white": "white"};
         public var rawGoodTracker:Number = 0;
-        public var rawGoodsColor:Number = 0xDC00C2
+        public var rawGoodsColor:Number = 0xDC00C2;
 
         public var layout:Object = {};
 

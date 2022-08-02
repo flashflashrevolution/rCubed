@@ -119,7 +119,7 @@ package classes
         public var gameColors:Array = [0x1495BD, 0x033242, 0x0C6A88, 0x074B62, 0x000000];
         public var noteColors:Array = ["red", "blue", "purple", "yellow", "pink", "orange", "cyan", "green", "white"];
         public var rawGoodTracker:Number = 0;
-        public var rawGoodsColor:Number = 0xDC00C2
+        public var rawGoodsColor:Number = 0xDC00C2;
 
         public var autofailAmazing:int = 0;
         public var autofailPerfect:int = 0;

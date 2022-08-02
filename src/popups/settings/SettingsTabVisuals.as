@@ -26,6 +26,7 @@ package popups.settings
             "ACCURACY_BAR",
             "SCREENCUT",
             "RAWGOODS",
+            "----",
             "AMAZING",
             "PERFECT",
             "RECEPTOR_ANIMATIONS",

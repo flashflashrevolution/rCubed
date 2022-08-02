@@ -58,7 +58,6 @@ package game
     import menu.MenuPanel;
     import menu.MenuSongSelection;
     import sql.SQLSongUserInfo;
-    import flash.html.__HTMLScriptArray;
 
     public class GameplayDisplay extends MenuPanel
     {
@@ -2253,7 +2252,7 @@ package game
                 player1Combo.update(hitCombo, hitAmazing, hitPerfect, hitGood, hitAverage, hitMiss, hitBoo, gameRawGoods);
 
             if (player1RawGoods)
-                player1RawGoods.update(gameRawGoods)
+                player1RawGoods.update(gameRawGoods);
         }
 
         private var previousDiffs:Array = new Array();
