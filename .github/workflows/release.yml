@@ -100,13 +100,13 @@ jobs:
           key: ${{ runner.os }}-air-sdk
 
       - name: Download Air Windows
-        if: matrix.os == 'windows-latest' && steps.cache-air-sdk.outputs.cache-hit != 'true'
+        if: matrix.os == 'windows-2019' && steps.cache-air-sdk.outputs.cache-hit != 'true'
         run: |
           $ProgressPreference = 'SilentlyContinue';
           (irm -Uri "http://airdownload.adobe.com/air/win/download/32.0/AIRSDK_Compiler.zip" -ContentType "application/octet-stream" -OutFile "air-sdk.zip")
 
       - name: extract-7z-action
-        if: matrix.os == 'windows-latest' && steps.cache-air-sdk.outputs.cache-hit != 'true'
+        if: matrix.os == 'windows-2019' && steps.cache-air-sdk.outputs.cache-hit != 'true'
         uses: DuckSoft/extract-7z-action@v1.0
         with:
           # archive path to extract
@@ -148,12 +148,12 @@ jobs:
         run: echo ::set-output name=name::rCubed${{ steps.tagFileName.outputs.name }}${{ steps.branchFileName.outputs.name }}
 
       - name: Build Embedded Fonts Library (Windows) (64-bit)
-        if: matrix.os == 'windows-latest'
+        if: matrix.os == 'windows-2019'
         shell: cmd
         run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project ${{ github.workspace }}/fonts/asconfig.embed-fonts.json --verbose
 
       - name: Build the Game (Windows) (64-bit)
-        if: matrix.os == 'windows-latest'
+        if: matrix.os == 'windows-2019'
         shell: cmd
         run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.release.json --air windows --storepass ${{ secrets.CODESIGN_CERT_PASS }} --verbose
 
@@ -178,12 +178,12 @@ jobs:
         run: xml ed --inplace -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:architecture" -v 32 application.xml
 
       - name: Build Embedded Fonts Library (Windows) (32-bit)
-        if: matrix.os == 'windows-latest'
+        if: matrix.os == 'windows-2019'
         shell: cmd
         run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project ${{ github.workspace }}/fonts/asconfig.embed-fonts.json --verbose
 
       - name: Build the Game (Windows) (32-bit)
-        if: matrix.os == 'windows-latest'
+        if: matrix.os == 'windows-2019'
         shell: cmd
         run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.release.json --air windows --storepass ${{ secrets.CODESIGN_CERT_PASS }} --verbose
 
