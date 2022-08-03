@@ -44,7 +44,7 @@ jobs:
 
       - name: Cache Choco
         id: cache-choco
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             C:\ProgramData\chocolatey\lib\xmlstarlet.portable
@@ -94,7 +94,7 @@ jobs:
 
       - name: Cache Air SDK
         id: cache-air-sdk
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ github.workspace }}\airsdk
           key: ${{ runner.os }}-air-sdk
