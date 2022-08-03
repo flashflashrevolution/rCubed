@@ -11,6 +11,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2.3.1
         
-      - uses: Ilshidur/action-discord@759f6ea4dc493b8bd1bb35ae7fbd7ae10fcea129
+      - uses: Ilshidur/action-discord@0c4b27844ba47cb1c7bee539c8eead5284ce9fa9
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
