@@ -20,8 +20,6 @@
 		"files.exclude": {
 			"node_modules/": true,
 			"package-lock.json": true,
-			"bin": true,
-			"dist": true,
 			"assets/DataStore": true,
 			"assets/RECOVER*": true
 		},
