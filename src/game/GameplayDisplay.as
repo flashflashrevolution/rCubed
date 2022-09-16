@@ -1628,9 +1628,6 @@ package game
             mpCombo = [];
             mpHeader = [];
 
-            if (!options.displayMPUI && !mpSpectate)
-                return;
-
             for each (var user:User in options.mpRoom.players)
             {
                 if (user.id == options.mpRoom.connection.currentUser.id)
@@ -1643,6 +1640,9 @@ package game
                         mpJudge[user.playerIdx] = player1Judge;
                     continue;
                 }
+
+                if (!options.displayMPUI)
+                    continue;
 
                 if (options.displayMPPA)
                 {
