@@ -37,6 +37,7 @@ package game
         public var displayHealth:Boolean = true;
         public var displayScore:Boolean = true;
         public var displayCombo:Boolean = true;
+        public var displayRawGoods:Boolean = false;
         public var displayComboTotal:Boolean = true;
         public var displayAccuracyBar:Boolean = true;
         public var displayPA:Boolean = true;
@@ -50,6 +51,7 @@ package game
         public var displayMPJudge:Boolean = true;
         public var displayMPPA:Boolean = true;
         public var displayMPCombo:Boolean = true;
+        public var displayMPRawGoods:Boolean = false;
 
         public var judgeColors:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
         public var comboColors:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000, 0xDC00C2]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag, RawGood
@@ -59,6 +61,7 @@ package game
         public var noteColors:Array = ["red", "blue", "purple", "yellow", "pink", "orange", "cyan", "green", "white"];
         public var noteSwapColors:Object = {"red": "red", "blue": "blue", "purple": "purple", "yellow": "yellow", "pink": "pink", "orange": "orange", "cyan": "cyan", "green": "green", "white": "white"};
         public var rawGoodTracker:Number = 0;
+        public var rawGoodsColor:Number = 0xDC00C2;
 
         public var layout:Object = {};
 
@@ -117,6 +120,7 @@ package game
             displayGameBottomBar = user.DISPLAY_GAME_BOTTOM_BAR;
             displayScore = user.DISPLAY_SCORE;
             displayCombo = user.DISPLAY_COMBO;
+            displayRawGoods = user.DISPLAY_RAWGOODS;
             displayComboTotal = user.DISPLAY_TOTAL;
             displayPA = user.DISPLAY_PACOUNT;
             displayAccuracyBar = user.DISPLAY_ACCURACY_BAR;
@@ -130,12 +134,14 @@ package game
             displayMPPA = user.DISPLAY_MP_PA;
             displayMPJudge = user.DISPLAY_MP_JUDGE;
             displayMPCombo = user.DISPLAY_MP_COMBO;
+            displayMPRawGoods = user.DISPLAY_MP_RAWGOODS;
 
             judgeColors = user.judgeColors.concat();
             comboColors = user.comboColors.concat();
             enableComboColors = user.enableComboColors.concat();
             gameColors = user.gameColors.concat();
             rawGoodTracker = user.rawGoodTracker;
+            rawGoodsColor = user.rawGoodsColor;
 
             for (var i:int = 0; i < noteColors.length; i++)
             {
@@ -206,6 +212,7 @@ package game
             displayJudge = settings["viewJudge"];
             displayHealth = settings["viewHealth"];
             displayCombo = settings["viewCombo"];
+            displayRawGoods = settings["viewRawGoods"];
             displayComboTotal = settings["viewTotal"];
             displayPA = settings["viewPACount"];
             displayAmazing = settings["viewAmazing"];
@@ -275,6 +282,7 @@ package game
             settings["viewHealth"] = displayHealth;
             settings["viewScore"] = displayScore;
             settings["viewCombo"] = displayCombo;
+            settings["viewRawGoods"] = displayRawGoods;
             settings["viewTotal"] = displayComboTotal;
             settings["viewPACount"] = displayPA;
             settings["viewAmazing"] = displayAmazing;

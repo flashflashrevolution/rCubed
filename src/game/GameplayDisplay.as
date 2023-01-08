@@ -45,6 +45,7 @@ package game
     import flash.utils.getTimer;
     import game.controls.AccuracyBar;
     import game.controls.Combo;
+    import game.controls.RawGoods;
     import game.controls.FlashlightOverlay;
     import game.controls.Judge;
     import game.controls.LifeBar;
@@ -78,11 +79,14 @@ package game
         public static const LAYOUT_COMBO_TOTAL_STATIC:String = "combototalstatic";
         public static const LAYOUT_ACCURACY_BAR:String = "accuracybar";
         public static const LAYOUT_PA:String = "pa";
+        public static const LAYOUT_RAWGOODS:String = "rawgoods";
+        public static const LAYOUT_RAWGOODS_STATIC:String = "rawgoodsstatic";
 
         public static const LAYOUT_MP_JUDGE:String = "mpjudge";
         public static const LAYOUT_MP_COMBO:String = "mpcombo";
         public static const LAYOUT_MP_PA:String = "mppa";
         public static const LAYOUT_MP_HEADER:String = "mpheader";
+        public static const LAYOUT_MP_RAWGOODS:String = "mprawgoods";
 
         private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _avars:ArcGlobals = ArcGlobals.instance;
@@ -106,7 +110,9 @@ package game
         private var noteBox:NoteBox;
         private var score:Score;
         private var comboTotal:Combo;
+        private var rawGoodsTotal:RawGoods;
         private var comboStatic:TextStatic;
+        private var rawGoodsStatic:TextStatic;
         private var comboTotalStatic:TextStatic;
         private var accBar:AccuracyBar;
         private var screenCut:ScreenCut;
@@ -119,11 +125,13 @@ package game
         private var player1Life:LifeBar;
         private var player1Judge:Judge;
         private var player1JudgeOffset:int;
+        private var player1RawGoods:RawGoods;
 
         private var mpHeader:Array;
         private var mpCombo:Array;
         private var mpJudge:Array;
         private var mpPA:Array;
+        private var mpRawGoods:Array;
 
         private var msStartTime:Number = 0;
         private var absoluteStart:int = 0;
@@ -182,6 +190,7 @@ package game
         private var hitMiss:int;
         private var hitBoo:int;
         private var hitCombo:int;
+        private var hitRawGoods:int;
         private var hitMaxCombo:int;
 
         private var noteBoxOffset:Object = {"x": 0, "y": 0};
@@ -541,6 +550,19 @@ package game
                 this.addChild(comboStatic);
             }
 
+            if (options.displayRawGoods)
+            {
+                player1RawGoods = new RawGoods(options);
+                this.addChild(player1RawGoods);
+
+                if (!options.mpRoom && !mpSpectate)
+                {
+                    rawGoodsStatic = new TextStatic(_lang.string("game_raw_goods"));
+                    rawGoodsStatic.setFormatting(options.rawGoodsColor, 12)
+                    this.addChild(rawGoodsStatic);
+                }
+            }
+
             if (options.displayComboTotal)
             {
                 comboTotal = new Combo(options);
@@ -634,7 +656,7 @@ package game
             mpSpectate = (options.mpRoom && !options.mpRoom.connection.currentUser.isPlayer);
             if (mpSpectate)
             {
-                options.displayCombo = options.displayComboTotal = options.displayPA = false;
+                options.displayCombo = options.displayComboTotal = options.displayPA = options.displayRawGoods = false;
             }
             else if (options.mpRoom)
                 options.displayComboTotal = false;
@@ -1627,6 +1649,7 @@ package game
             mpPA = [];
             mpCombo = [];
             mpHeader = [];
+            mpRawGoods = [];
 
             if (!options.displayMPUI && !mpSpectate)
                 return;
@@ -1639,6 +1662,8 @@ package game
                         mpPA[user.playerIdx] = player1PAWindow;
                     if (player1Combo)
                         mpCombo[user.playerIdx] = player1Combo;
+                    if (player1RawGoods)
+                        mpRawGoods[user.playerIdx] = player1RawGoods;
                     if (player1Judge)
                         mpJudge[user.playerIdx] = player1Judge;
                     continue;
@@ -1676,6 +1701,13 @@ package game
                     if (options.isEditor)
                         judge.showJudge(100, true);
                 }
+
+                if (options.displayMPRawGoods)
+                {
+                    var rawGoods:RawGoods = new RawGoods(options);
+                    addChild(rawGoods);
+                    mpRawGoods[user.playerIdx] = rawGoods;
+                }
             }
         }
 
@@ -1712,8 +1744,10 @@ package game
                 defaultLayout[LAYOUT_SCORE] = {x: 392, y: 24};
                 defaultLayout[LAYOUT_COMBO] = {x: 508, y: 388};
                 defaultLayout[LAYOUT_COMBO_TOTAL] = {x: 770, y: 420, properties: {alignment: "right"}};
-                defaultLayout[LAYOUT_COMBO_STATIC] = {x: 512, y: 438};
+                defaultLayout[LAYOUT_COMBO_STATIC] = {x: 512, y: 450};
                 defaultLayout[LAYOUT_COMBO_TOTAL_STATIC] = {x: 734, y: 414};
+                defaultLayout[LAYOUT_RAWGOODS] = {x: 90, y: 35};
+                defaultLayout[LAYOUT_RAWGOODS_STATIC] = {x: 16, y: 53};
             }
             else
             {
@@ -1723,12 +1757,15 @@ package game
                 defaultLayout[LAYOUT_COMBO_TOTAL] = {x: 544, y: 402};
                 defaultLayout[LAYOUT_COMBO_STATIC] = {x: 228, y: 436};
                 defaultLayout[LAYOUT_COMBO_TOTAL_STATIC] = {x: 502, y: 436};
+                defaultLayout[LAYOUT_RAWGOODS] = {x: 80, y: 365};
+                defaultLayout[LAYOUT_RAWGOODS_STATIC] = {x: 4, y: 380};
             }
 
             // Multiplayer
             defaultLayout[LAYOUT_MP_COMBO + "1"] = defaultLayout[LAYOUT_COMBO];
             defaultLayout[LAYOUT_MP_JUDGE + "1"] = {x: 208, y: 102};
             defaultLayout[LAYOUT_MP_PA + "1"] = {x: 6, y: 96};
+            defaultLayout[LAYOUT_MP_RAWGOODS + "1"] = defaultLayout[LAYOUT_RAWGOODS];
             if (options.displayMPPA)
                 defaultLayout[LAYOUT_MP_HEADER + "1"] = {x: 0, y: -35};
             else
@@ -1737,6 +1774,7 @@ package game
             defaultLayout[LAYOUT_MP_COMBO + "2"] = defaultLayout[LAYOUT_COMBO_TOTAL];
             defaultLayout[LAYOUT_MP_JUDGE + "2"] = {x: 568, y: 102};
             defaultLayout[LAYOUT_MP_PA + "2"] = {x: 645, y: 96, properties: {alignment: "right"}};
+            defaultLayout[LAYOUT_MP_RAWGOODS + "2"] = {x: Main.GAME_WIDTH - 80, y: 365, properties: {alignment: "right"}};
             if (options.displayMPPA)
                 defaultLayout[LAYOUT_MP_HEADER + "2"] = {x: 25, y: -35, properties: {alignment: MPHeader.ALIGN_RIGHT}};
             else
@@ -1760,11 +1798,13 @@ package game
             interfacePosition(comboTotal, interfaceLayout(LAYOUT_COMBO_TOTAL));
             interfacePosition(comboStatic, interfaceLayout(LAYOUT_COMBO_STATIC));
             interfacePosition(comboTotalStatic, interfaceLayout(LAYOUT_COMBO_TOTAL_STATIC));
+            interfacePosition(rawGoodsStatic, interfaceLayout(LAYOUT_RAWGOODS_STATIC));
 
             if (!options.mpRoom)
             {
                 interfacePosition(player1PAWindow, interfaceLayout(LAYOUT_PA));
                 interfacePosition(player1Combo, interfaceLayout(LAYOUT_COMBO));
+                interfacePosition(player1RawGoods, interfaceLayout(LAYOUT_RAWGOODS))
                 interfacePosition(player1Judge, interfaceLayout(LAYOUT_JUDGE));
             }
 
@@ -1780,11 +1820,13 @@ package game
                 interfaceEditor(comboTotal, interfaceLayout(LAYOUT_COMBO_TOTAL, false));
                 interfaceEditor(comboStatic, interfaceLayout(LAYOUT_COMBO_STATIC, false));
                 interfaceEditor(comboTotalStatic, interfaceLayout(LAYOUT_COMBO_TOTAL_STATIC, false));
+                interfaceEditor(rawGoodsStatic, interfaceLayout(LAYOUT_RAWGOODS_STATIC, false));
 
                 if (!options.mpRoom)
                 {
                     interfaceEditor(player1PAWindow, interfaceLayout(LAYOUT_PA, false));
                     interfaceEditor(player1Combo, interfaceLayout(LAYOUT_COMBO, false));
+                    interfaceEditor(player1RawGoods, interfaceLayout(LAYOUT_RAWGOODS, false))
                     interfaceEditor(player1Judge, interfaceLayout(LAYOUT_JUDGE, false));
                 }
             }
@@ -1798,6 +1840,7 @@ package game
                     interfacePosition(mpCombo[user.playerIdx], interfaceLayout(LAYOUT_MP_COMBO + user.playerIdx));
                     interfacePosition(mpPA[user.playerIdx], interfaceLayout(LAYOUT_MP_PA + user.playerIdx));
                     interfacePosition(mpHeader[user.playerIdx], interfaceLayout(LAYOUT_MP_HEADER + user.playerIdx));
+                    interfacePosition(mpRawGoods[user.playerIdx], interfaceLayout(LAYOUT_MP_RAWGOODS + user.playerIdx));
 
                     // Multiplayer - Editor
                     if (options.isEditor)
@@ -1806,6 +1849,7 @@ package game
                         interfaceEditor(mpCombo[user.playerIdx], interfaceLayout(LAYOUT_MP_COMBO + user.playerIdx, false));
                         interfaceEditor(mpPA[user.playerIdx], interfaceLayout(LAYOUT_MP_PA + user.playerIdx, false));
                         interfaceEditor(mpHeader[user.playerIdx], interfaceLayout(LAYOUT_MP_HEADER + user.playerIdx, false));
+                        interfaceEditor(mpRawGoods[user.playerIdx], interfaceLayout(LAYOUT_MP_RAWGOODS + user.playerIdx, false));
                     }
                 }
             }
@@ -2206,6 +2250,9 @@ package game
 
             if (player1Combo)
                 player1Combo.update(hitCombo, hitAmazing, hitPerfect, hitGood, hitAverage, hitMiss, hitBoo, gameRawGoods);
+
+            if (player1RawGoods)
+                player1RawGoods.update(gameRawGoods);
         }
 
         private var previousDiffs:Array = new Array();
@@ -2252,6 +2299,10 @@ package game
             var pa:PAWindow = mpPA[user.playerIdx];
             if (pa)
                 pa.update(gameplay.amazing, gameplay.perfect, gameplay.good, gameplay.average, gameplay.miss, gameplay.boo);
+
+            var rawgoods:RawGoods = mpRawGoods[user.playerIdx];
+            if (rawgoods)
+                rawgoods.updateFromPA(gameplay.good, gameplay.average, gameplay.miss, gameplay.boo);
 
             var judge:Judge = mpJudge[user.playerIdx];
             if (judge)

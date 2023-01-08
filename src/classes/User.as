@@ -104,11 +104,13 @@ package classes
         public var DISPLAY_SCREENCUT:Boolean = false;
         public var DISPLAY_SONGPROGRESS:Boolean = true;
         public var DISPLAY_SONGPROGRESS_TEXT:Boolean = false;
+        public var DISPLAY_RAWGOODS:Boolean = false;
 
         public var DISPLAY_MP_UI:Boolean = true;
         public var DISPLAY_MP_PA:Boolean = true;
         public var DISPLAY_MP_JUDGE:Boolean = true;
         public var DISPLAY_MP_COMBO:Boolean = true;
+        public var DISPLAY_MP_RAWGOODS:Boolean = false;
 
         public var DISPLAY_MP_TIMESTAMP:Boolean = false;
         public var judgeColors:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
@@ -117,6 +119,7 @@ package classes
         public var gameColors:Array = [0x1495BD, 0x033242, 0x0C6A88, 0x074B62, 0x000000];
         public var noteColors:Array = ["red", "blue", "purple", "yellow", "pink", "orange", "cyan", "green", "white"];
         public var rawGoodTracker:Number = 0;
+        public var rawGoodsColor:Number = 0xDC00C2;
 
         public var autofailAmazing:int = 0;
         public var autofailPerfect:int = 0;
@@ -555,6 +558,9 @@ package classes
             if (_settings.viewCombo != null)
                 this.DISPLAY_COMBO = _settings.viewCombo;
 
+            if (_settings.viewRawGoods != null)
+                this.DISPLAY_RAWGOODS = _settings.viewRawGoods;
+
             if (_settings.viewPACount != null)
                 this.DISPLAY_PACOUNT = _settings.viewPACount;
 
@@ -587,6 +593,9 @@ package classes
 
             if (_settings.viewMPCombo != null)
                 this.DISPLAY_MP_COMBO = _settings.viewMPCombo;
+
+            if (_settings.viewMPRawGoods != null)
+                this.DISPLAY_MP_RAWGOODS = _settings.viewMPRawGoods;
 
             if (_settings.viewMPJudge != null)
                 this.DISPLAY_MP_JUDGE = _settings.viewMPJudge;
@@ -740,6 +749,7 @@ package classes
             gameSave.viewGameBottomBar = this.DISPLAY_GAME_BOTTOM_BAR;
             gameSave.viewScore = this.DISPLAY_SCORE;
             gameSave.viewCombo = this.DISPLAY_COMBO;
+            gameSave.viewRawGoods = this.DISPLAY_RAWGOODS;
             gameSave.viewPACount = this.DISPLAY_PACOUNT;
             gameSave.viewAccBar = this.DISPLAY_ACCURACY_BAR;
             gameSave.viewAmazing = this.DISPLAY_AMAZING;
@@ -752,6 +762,7 @@ package classes
             gameSave.viewMPPA = this.DISPLAY_MP_PA;
             gameSave.viewMPJudge = this.DISPLAY_MP_JUDGE;
             gameSave.viewMPCombo = this.DISPLAY_MP_COMBO;
+            gameSave.viewMPRawGoods = this.DISPLAY_MP_RAWGOODS;
             gameSave.viewMPTimestamp = this.DISPLAY_MP_TIMESTAMP;
             gameSave.viewLegacySongs = this.DISPLAY_LEGACY_SONGS;
 

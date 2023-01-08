@@ -22,6 +22,7 @@ package popups.settings
         private var optionComboColorCheck:BoxCheck;
         private var optionGameColors:Array;
         private var optionRawGoodTracker:ValidatedText;
+        private var optionRawGoodsColor:String;
 
         public function SettingsTabColors(settingsWindow:SettingsWindow):void
         {
@@ -36,18 +37,18 @@ package popups.settings
         override public function openTab():void
         {
             container.graphics.lineStyle(1, 0xFFFFFF, 0.35);
-            container.graphics.moveTo(295, 15);
+            container.graphics.moveTo(295, 10);
             container.graphics.lineTo(295, 405);
 
             var i:int;
             var xOff:int = 15;
-            var yOff:int = 15;
+            var yOff:int = 10;
 
             /// Col 1
             var gameJudgeColorTitle:Text = new Text(container, xOff, yOff, _lang.string("options_judge_colors_title"), 14);
             gameJudgeColorTitle.width = 265;
             gameJudgeColorTitle.align = Text.CENTER;
-            yOff += 28;
+            yOff += 20;
             yOff += drawSeperator(container, xOff, 266, yOff, -3, -4);
 
             optionJudgeColors = [];
@@ -72,12 +73,30 @@ package popups.settings
                 yOff += drawSeperator(container, xOff, 266, yOff, -3, -4);
             }
 
-            yOff += 8;
+            var gameRawGoodsColor:Text = new Text(container, xOff, yOff, _lang.string("game_raw_goods"));
+            gameRawGoodsColor.width = 115;
+
+            var optionRawGoodsColor:ValidatedText = new ValidatedText(container, xOff + 120, yOff, 70, 20, ValidatedText.R_COLOR, changeHandler);
+            optionRawGoodsColor.rawgoods_color_id = 1;
+            optionRawGoodsColor.field.maxChars = 7;
+
+            var gameRawGoodsColorDisplay:ColorField = new ColorField(container, xOff + 195, yOff, 0, 45, 21, changeHandler);
+            gameRawGoodsColorDisplay.key_name = "optionRawGoodsColor";
+
+            var optionRawGoodsColorReset:BoxButton = new BoxButton(container, xOff + 245, yOff, 20, 21, "R", 12, clickHandler);
+            optionRawGoodsColorReset.rawgoods_color_reset_id = 1;
+            optionRawGoodsColorReset.color = 0xDC00C2;
+            optionJudgeColors.push({"text": optionRawGoodsColor, "display": gameRawGoodsColorDisplay, "reset": optionRawGoodsColorReset});
+
+            yOff += 20;
+            yOff += drawSeperator(container, xOff, 266, yOff, -3, -4);
+
+            yOff += 5;
 
             var gameGameColorTitle:Text = new Text(container, xOff, yOff, _lang.string("options_game_colors_title"), 14);
             gameGameColorTitle.width = 265;
             gameGameColorTitle.align = Text.CENTER;
-            yOff += 28;
+            yOff += 20;
             yOff += drawSeperator(container, xOff, 266, yOff, -3, -4);
 
             optionGameColors = [];
@@ -110,12 +129,12 @@ package popups.settings
 
             /// Col 2
             xOff = 310;
-            yOff = 15;
+            yOff = 10;
 
             var gameComboColorTitle:Text = new Text(container, xOff, yOff, _lang.string("options_combo_colors_title"), 14);
             gameComboColorTitle.width = 265;
             gameComboColorTitle.align = Text.CENTER;
-            yOff += 28;
+            yOff += 20;
             yOff += drawSeperator(container, xOff, 266, yOff, -3, -4);
 
             optionComboColors = [];
@@ -162,6 +181,11 @@ package popups.settings
                 optionJudgeColors[i]["text"].text = "#" + StringUtil.pad(_gvars.activeUser.judgeColors[i].toString(16).substr(0, 6), 6, "0", StringUtil.STR_PAD_LEFT);
                 optionJudgeColors[i]["display"].color = _gvars.activeUser.judgeColors[i];
             }
+
+            // Set Raw Goods Display Color
+            optionJudgeColors[judgeTitles.length]["text"].text = "#" + StringUtil.pad(_gvars.activeUser.rawGoodsColor.toString(16).substr(0, 6), 6, "0", StringUtil.STR_PAD_LEFT);
+            optionJudgeColors[judgeTitles.length]["display"].color = _gvars.activeUser.rawGoodsColor;
+
             // Set Combo Colors
             for (i = 0; i < DEFAULT_OPTIONS.comboColors.length; i++)
             {
@@ -193,6 +217,13 @@ package popups.settings
             if (e.target.hasOwnProperty("judge_color_reset_id"))
             {
                 _gvars.activeUser.judgeColors[e.target.judge_color_reset_id] = DEFAULT_OPTIONS.judgeColors[e.target.judge_color_reset_id];
+                setValues();
+            }
+
+            // Raw Goods Color Reset
+            if (e.target.hasOwnProperty("rawgoods_color_reset_id"))
+            {
+                _gvars.activeUser.rawGoodsColor = DEFAULT_OPTIONS.rawGoodsColor;
                 setValues();
             }
 
@@ -237,6 +268,11 @@ package popups.settings
                 _gvars.activeUser.judgeColors[jid] = e.target.validate(0, 0);
                 optionJudgeColors[jid]["display"].color = _gvars.activeUser.judgeColors[jid];
             }
+            else if (e.target.hasOwnProperty("rawgoods_color_id"))
+            {
+                _gvars.activeUser.rawGoodsColor = e.target.validate(0, 0);
+                optionJudgeColors[judgeTitles.length]["display"].color = _gvars.activeUser.rawGoodsColor;
+            }
             else if (e.target.hasOwnProperty("combo_color_id"))
             {
                 var cid:int = e.target.combo_color_id;
@@ -262,6 +298,9 @@ package popups.settings
                 switch (e.target.key_name)
                 {
                     case "optionJudgeColor":
+                        sourceArray = optionJudgeColors;
+                        break;
+                    case "optionRawGoodsColor":
                         sourceArray = optionJudgeColors;
                         break;
                     case "gameComboColorDisplay":
