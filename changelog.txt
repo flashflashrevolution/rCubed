@@ -1,3 +1,21 @@
+R^3 (v1.4.5) [2023-01-08]
+---------------------------------------------------------------------
+@Psycast
+- Fix image scaling smoothing.
+- Use safe getNote/getReceptor and fallback to default noteskin if missing.
+- Fix crash on invalid/blank token image URL.
+
+@JustinAFaulkner
+- Add Raw Good display tracking and UI.
+
+@Sploder12
+- Fix player 1 multiplayer display bug
+
+@Zageron
+- Add dependabot for actions longevity.
+- Fix build pipeline not downloading xmlstarlet.
+- Workflow improvements
+
 R^3 (v1.4.4) [2022-06-19]
 ---------------------------------------------------------------------
 @Psycast
