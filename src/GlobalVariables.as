@@ -397,6 +397,13 @@ package
                 var noteCount:int = _songInfo.note_count;
                 var maxRawScore:int = _songInfo.score_raw;
 
+                // Alt engine hack
+                if (_rank.arrows > 0)
+                {
+                    noteCount = _rank.arrows;
+                    maxRawScore = noteCount * 50;
+                }
+
                 // No Score
                 if (_rank.score == 0)
                     songIcon = SONG_ICON_NO_SCORE;
@@ -444,6 +451,13 @@ package
             {
                 var noteCount:int = _songInfo.note_count;
                 var maxRawScore:int = _songInfo.score_raw;
+
+                // Alt engine hack
+                if (_rank.arrows > 0)
+                {
+                    noteCount = _rank.arrows;
+                    maxRawScore = noteCount * 50;
+                }
                 
                 // Unfinished or Passed
                 if (_rank.score > 0) {
