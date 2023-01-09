@@ -380,56 +380,65 @@ package
         }
 
         public static const SONG_ICON_NO_SCORE:int = 0;
-        public static const SONG_ICON_PLAYED:int = 1;
+        public static const SONG_ICON_PASSED:int = 1;
         public static const SONG_ICON_FC:int = 2;
         public static const SONG_ICON_SDG:int = 3;
         public static const SONG_ICON_BLACKFLAG:int = 4;
         public static const SONG_ICON_BOOFLAG:int = 5;
         public static const SONG_ICON_AAA:int = 6;
         public static const SONG_ICON_FC_STAR:int = 7;
+        public static const SONG_ICON_UNFINISHED:int = 8;
 
         public static function getSongIconIndex(_songInfo:SongInfo, _rank:Object):int
         {
             var songIcon:int = 0;
             if (_rank)
             {
-                var arrows:int = _songInfo.note_count;
-                var scoreRaw:int = _songInfo.score_raw;
+                var noteCount:int = _songInfo.note_count;
+                var maxRawScore:int = _songInfo.score_raw;
+
+                // Alt engine hack
                 if (_rank.arrows > 0)
                 {
-                    arrows = _rank.arrows;
-                    scoreRaw = arrows * 50;
+                    noteCount = _rank.arrows;
+                    maxRawScore = noteCount * 50;
                 }
+
                 // No Score
                 if (_rank.score == 0)
                     songIcon = SONG_ICON_NO_SCORE;
 
-                // Played
-                if (_rank.score > 0)
-                    songIcon = SONG_ICON_PLAYED;
+                // Unfinished or Passed
+                if (_rank.score > 0) {
+                    if (_rank.perfect + _rank.good + _rank.average + _rank.miss < noteCount) {
+                        songIcon = SONG_ICON_UNFINISHED;
+                    } else {
+                        songIcon = SONG_ICON_PASSED;
+                    }
+                }
 
                 // FC* - When current score isn't FC but a FC has been achieved before.
                 if (_rank.fcs > 0)
                     songIcon = SONG_ICON_FC_STAR;
 
                 // FC
-                if (_rank.perfect + _rank.good + _rank.average == arrows && _rank.miss == 0 && _rank.maxcombo == arrows)
+                if (_rank.perfect + _rank.good + _rank.average == noteCount && _rank.miss == 0 && _rank.maxcombo == noteCount)
                     songIcon = SONG_ICON_FC;
 
                 // SDG
-                if (scoreRaw - _rank.rawscore < 250)
+                if (maxRawScore - _rank.rawscore < 250)
                     songIcon = SONG_ICON_SDG;
 
                 // BlackFlag
-                if (_rank.perfect == arrows - 1 && _rank.good == 1 && _rank.average == 0 && _rank.miss == 0 && _rank.boo == 0 && _rank.maxcombo == arrows)
+                if (_rank.perfect == noteCount - 1 && _rank.good == 1 && _rank.average == 0 && _rank.miss == 0 && _rank.boo == 0 && _rank.maxcombo == noteCount)
                     songIcon = SONG_ICON_BLACKFLAG;
 
                 // BooFlag
-                if (_rank.perfect == arrows && _rank.good == 0 && _rank.average == 0 && _rank.miss == 0 && _rank.boo == 1 && _rank.maxcombo == arrows)
+                if (_rank.perfect == noteCount && _rank.good == 0 && _rank.average == 0 && _rank.miss == 0 && _rank.boo == 1 && _rank.maxcombo == noteCount)
                     songIcon = SONG_ICON_BOOFLAG;
 
                 // AAA
-                if (_rank.rawscore == scoreRaw)
+                if (_rank.rawscore == maxRawScore)
                     songIcon = SONG_ICON_AAA;
             }
             return songIcon;
@@ -440,52 +449,60 @@ package
             var songIcon:int = SONG_ICON_NO_SCORE;
             if (_rank)
             {
-                var arrows:int = _songInfo.note_count;
-                var scoreRaw:int = _songInfo.score_raw;
+                var noteCount:int = _songInfo.note_count;
+                var maxRawScore:int = _songInfo.score_raw;
+
+                // Alt engine hack
                 if (_rank.arrows > 0)
                 {
-                    arrows = _rank.arrows;
-                    scoreRaw = arrows * 50;
+                    noteCount = _rank.arrows;
+                    maxRawScore = noteCount * 50;
                 }
-                // Played
-                if (_rank.score > 0)
-                    songIcon |= (1 << SONG_ICON_PLAYED);
+                
+                // Unfinished or Passed
+                if (_rank.score > 0) {
+                    if (_rank.perfect + _rank.good + _rank.average + _rank.miss < noteCount) {
+                        songIcon |= (1 << SONG_ICON_UNFINISHED);
+                    } else {
+                        songIcon |= (1 << SONG_ICON_PASSED);
+                    }
+                }
 
                 // FC* - When current score isn't FC but a FC has been achieved before.
                 if (_rank.fcs > 0)
                     songIcon |= (1 << SONG_ICON_FC_STAR);
 
                 // FC
-                if (_rank.perfect + _rank.good + _rank.average == arrows && _rank.miss == 0 && _rank.maxcombo == arrows)
+                if (_rank.perfect + _rank.good + _rank.average == noteCount && _rank.miss == 0 && _rank.maxcombo == noteCount)
                     songIcon |= (1 << SONG_ICON_FC);
 
                 // SDG
-                if (scoreRaw - _rank.rawscore < 250)
+                if (maxRawScore - _rank.rawscore < 250)
                     songIcon |= (1 << SONG_ICON_SDG);
 
                 // BlackFlag
-                if (_rank.perfect == arrows - 1 && _rank.good == 1 && _rank.average == 0 && _rank.miss == 0 && _rank.boo == 0 && _rank.maxcombo == arrows)
+                if (_rank.perfect == noteCount - 1 && _rank.good == 1 && _rank.average == 0 && _rank.miss == 0 && _rank.boo == 0 && _rank.maxcombo == noteCount)
                     songIcon |= (1 << SONG_ICON_BLACKFLAG);
 
                 // BooFlag
-                if (_rank.perfect == arrows && _rank.good == 0 && _rank.average == 0 && _rank.miss == 0 && _rank.boo == 1 && _rank.maxcombo == arrows)
+                if (_rank.perfect == noteCount && _rank.good == 0 && _rank.average == 0 && _rank.miss == 0 && _rank.boo == 1 && _rank.maxcombo == noteCount)
                     songIcon |= (1 << SONG_ICON_BOOFLAG);
 
                 // AAA
-                if (_rank.rawscore == scoreRaw)
+                if (_rank.rawscore == maxRawScore)
                     songIcon |= (1 << SONG_ICON_AAA);
             }
             return songIcon;
         }
 
-        public static const SONG_ICON_TEXT:Array = ["<font color=\"#9C9C9C\">UNPLAYED</font>", "", "<font color=\"#00FF00\">FC</font>",
+        public static const SONG_ICON_TEXT:Array = ["<font color=\"#9C9C9C\">UNPLAYED</font>", "<font color=\"#9FC4B4\">PASS</font>", "<font color=\"#00FF00\">FC</font>",
             "<font color=\"#f2a254\">SDG</font>", "<font color=\"#2C2C2C\">BLACKFLAG</font>",
-            "<font color=\"#473218\">BOOFLAG</font>", "<font color=\"#FFFF38\">AAA</font>", "<font color=\"#00FF00\">FC*</font>"];
+            "<font color=\"#473218\">BOOFLAG</font>", "<font color=\"#FFFF38\">AAA</font>", "<font color=\"#00FF00\">FC*</font>", ""];
 
         public static const SONG_ICON_COLOR:Array = ["#9C9C9C", "#FFFFFF", "#00FF00", "#f2a254", "#2C2C2C", "#473218", "#FFFF38", "#00FF00"];
 
-        public static const SONG_ICON_TEXT_FLAG:Array = ["Unplayed", "Played", "Full Combo",
-            "Single Digit Good", "Blackflag", "Booflag", "AAA", "Full Combo*"];
+        public static const SONG_ICON_TEXT_FLAG:Array = ["Unplayed", "Passed", "Full Combo",
+            "Single Digit Good", "Blackflag", "Booflag", "AAA", "Full Combo*", "Unfinished"];
 
         public static function getSongIcon(_songInfo:SongInfo, _rank:Object):String
         {
