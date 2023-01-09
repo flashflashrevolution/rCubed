@@ -429,10 +429,6 @@ package menu
                     var best_flag:int = 8; // 8 = AAA
                     for (i = 0; i < songList.length; i++)
                     {
-                        if (songList[i].name == "SYNTHETICS (EXTENDED MIX)") {
-                            var a = 1;
-                        }
-
                         var song_flag:int = GlobalVariables.getSongIconIndex(songList[i], _gvars.activeUser.getLevelRank(songList[i]));
 
                         if (song_flag == GlobalVariables.SONG_ICON_FC_STAR)
