@@ -426,7 +426,7 @@ package menu
 
                 if (songList != null)
                 {
-                    var best_flag:int = 6; // 6 = AAA
+                    var best_flag:int = 8; // 8 = AAA
                     for (i = 0; i < songList.length; i++)
                     {
                         var song_flag:int = GlobalVariables.getSongIconIndex(songList[i], _gvars.activeUser.getLevelRank(songList[i]));
