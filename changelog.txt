@@ -1,7 +1,6 @@
-R^3 (v1.4.5) [2023-01-08]
+R^3 (v1.4.5 & v1.4.6) [2023-01-15]
 ---------------------------------------------------------------------
 @Psycast
-- Fix image scaling smoothing.
 - Use safe getNote/getReceptor and fallback to default noteskin if missing.
 - Fix crash on invalid/blank token image URL.
 
