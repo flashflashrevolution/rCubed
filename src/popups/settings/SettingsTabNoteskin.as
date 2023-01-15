@@ -195,7 +195,6 @@ package popups.settings
             var noteHolder:Sprite = new Sprite();
             noteHolder.x = xOff;
             noteHolder.y = yOff;
-            noteHolder.z = 1;
             container.addChild(noteHolder);
 
             var noteSprite:Sprite = _noteskins.getNote(data.id, color, "U");
