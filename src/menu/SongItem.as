@@ -346,7 +346,7 @@ package menu
 
         public function getDifficultyText():String
         {
-            return isFavorite ? '<font color="#f7b9e4">' + _songInfo["difficulty"] + '</font>' : _songInfo["difficulty"];
+            return isFavorite ? '<font color="#f7b9e4">' + _songInfo.difficulty + '</font>' : _songInfo.difficulty.toString();
         }
 
         public function getSongLockText():String
