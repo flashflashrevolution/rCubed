@@ -18,7 +18,7 @@ package
         public static var BRAND_NAME_SHORT_LOWER:String = BRAND_NAME_SHORT.toLocaleLowerCase();
 
         public static const AIR_VERSION:String = R3::VERSION;
-        public static const AIR_WINDOW_TITLE:String = R3::BRAND_NAME_SHORT + " R^3 [" + AIR_VERSION + "]";
+        public static const AIR_WINDOW_TITLE:String = R3::BRAND_NAME_SHORT + " R^3 [" + R3::VERSION_PREFIX + AIR_VERSION + R3::VERSION_SUFFIX + "]";
         public static const LOCAL_SO_NAME:String = "90579262-509d-4370-9c2e-564667e511d7";
         public static const ENGINE_VERSION:int = 3;
 

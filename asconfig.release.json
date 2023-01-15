@@ -16,7 +16,7 @@
             },
             {
                 "name": "CONFIG::timeStamp",
-                "value": "\"2023-01-08\""
+                "value": "\"2023-01-15\""
             },
             {
                 "name": "R3::HASH_STRING",
@@ -25,6 +25,10 @@
             {
                 "name": "R3::VERSION",
                 "value": "\"#{VERSION}#\""
+            },
+            {
+                "name": "R3::VERSION_SUFFIX",
+                "value": "\"\""
             }
         ],
         "debug": false,

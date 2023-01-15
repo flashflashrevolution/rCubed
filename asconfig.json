@@ -14,7 +14,9 @@
         "output": "bin/develop/R3Air.swf",
         "library-path": [
             "libs/",
-            "libs/assets/",
+            "libs/assets/"
+        ],
+        "include-libraries": [
             "fonts/bin/"
         ],
         // Branding is left here for development contributions.
@@ -56,6 +58,14 @@
             {
                 "name": "R3::VERSION",
                 "value": "\"9.9.9\""
+            },
+            {
+                "name": "R3::VERSION_PREFIX",
+                "value": "\"\""
+            },
+            {
+                "name": "R3::VERSION_SUFFIX",
+                "value": "\"D\""
             }
         ],
         "default-size": {

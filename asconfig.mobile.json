@@ -1,0 +1,20 @@
+{
+    "extends": "asconfig.release.json",
+    "application": "application-mobile.xml",
+    "config": "airmobile",
+    "compilerOptions": {
+        "define": [],
+        // Overrides left here for alternate builds.
+        "swf-version": 43,
+        "target-player": "32.0"
+    },
+    "airOptions": {
+        "android": {
+            "output": "bin/Main.apk",
+            "signingOptions": {
+                "storetype": "jks",
+                "keystore": "certs/mobile.keystore"
+            }
+        }
+    }
+}
