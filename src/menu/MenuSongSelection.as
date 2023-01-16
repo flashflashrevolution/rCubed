@@ -51,6 +51,7 @@ package menu
     import popups.PopupQueueManager;
     import popups.PopupSongNotes;
     import popups.PopupHighscores;
+    import classes.User;
 
     public class MenuSongSelection extends MenuPanel
     {
@@ -726,6 +727,72 @@ package menu
             // Sorting
             if (options.last_sort_type != null)
             {
+                var cache: Object = {};
+
+                function getSongRank(song: SongInfo, activeUser: User): uint {
+                    var songRank: uint = cache[song.level];
+                    if (!songRank) {
+                        songRank = activeUser.getLevelRank(song).rank;
+                        cache[song.level] = songRank;
+                    }
+                    return songRank;
+                }
+
+                function sortByRank(songA: SongInfo, songB: SongInfo): int {
+                    var songARank: uint = getSongRank(songA, _gvars.activeUser);
+                    var songBRank: uint = getSongRank(songB, _gvars.activeUser);
+                    
+                    if (songA.access !== songB.access) {
+                        return songA.access < songB.access ? -1 : 1;
+                    }
+
+                    if (songARank === songBRank) {
+                        return songA.level < songB.level ? -1 : 1;
+                    }
+                    
+                    return songARank < songBRank ? -1 : 1;
+                }
+                
+                function getSongRawGoods(song: SongInfo, activeUser: User): Number {
+                    var songRawGoods: Number = cache[song.level];
+                    if (!songRawGoods) {
+                        var songLevelRank: Object = activeUser.getLevelRank(song);
+
+                        if (songLevelRank == null) {
+                            songRawGoods = 2000000;
+                        } else {
+                            var rawGoods: Number = songLevelRank.good + (songLevelRank.average * 1.8) + (songLevelRank.miss * 2.4) + (songLevelRank.boo * 0.2);
+                            var notesPlayed: uint = songLevelRank.perfect + songLevelRank.good + songLevelRank.average + songLevelRank.miss;
+                            var noteCount: uint = song.note_count || songLevelRank.arrows;
+
+                            if (notesPlayed < noteCount) {
+                                var implicitMisses: uint = noteCount - notesPlayed;
+                                songRawGoods = 1000000 + rawGoods + implicitMisses * 2.4;
+                            } else {
+                                songRawGoods = rawGoods;
+                            }
+                        }
+
+                        cache[song.level] = songRawGoods;
+                    }
+                    return songRawGoods;
+                }
+
+                function sortByRawGoods(songA: SongInfo, songB: SongInfo): int {
+                    var songARawGoods: Number = getSongRawGoods(songA, _gvars.activeUser);
+                    var songBRawGoods: Number = getSongRawGoods(songB, _gvars.activeUser);
+                    
+                    if (songA.access !== songB.access) {
+                        return songA.access < songB.access ? -1 : 1;
+                    }
+
+                    if (songARawGoods === songBRawGoods) {
+                        return songA.level < songB.level ? -1 : 1;
+                    }
+                    
+                    return songARawGoods < songBRawGoods ? -1 : 1;
+                }
+
                 var sortOrder:uint = options.last_sort_order == "desc" ? Array.DESCENDING : 0;
                 switch (options.last_sort_type)
                 {
@@ -733,7 +800,7 @@ package menu
                     case "author":
                     case "stepauthor":
                     case "style":
-                        songList.sortOn(["access", options.last_sort_type], [Array.NUMERIC, Array.CASEINSENSITIVE | sortOrder])
+                        songList.sortOn(["access", options.last_sort_type], [Array.NUMERIC, Array.CASEINSENSITIVE | sortOrder]);
                         break;
 
                     case "time_secs":
@@ -741,7 +808,15 @@ package menu
                     case "note_count":
                     case "difficulty":
                     case "max_nps":
-                        songList.sortOn(["access", options.last_sort_type], [Array.NUMERIC, Array.NUMERIC | sortOrder])
+                        songList.sortOn(["access", options.last_sort_type], [Array.NUMERIC, Array.NUMERIC | sortOrder]);
+                        break;
+
+                    case "rank":
+                        songList.sort(sortByRank, Array.NUMERIC | sortOrder);
+                        break;
+
+                    case "raw_goods":
+                        songList.sort(sortByRawGoods, Array.NUMERIC | sortOrder);
                         break;
 
                     default:
@@ -1245,7 +1320,9 @@ package menu
                 {label: _lang.stringSimple("song_selection_search_length"), data: "time_secs"},
                 {label: _lang.stringSimple("song_selection_search_note_count"), data: "note_count"},
                 {label: _lang.stringSimple("song_selection_search_nps"), data: "max_nps"},
-                {label: _lang.stringSimple("song_selection_search_id"), data: "level"}];
+                {label: _lang.stringSimple("song_selection_search_id"), data: "level"},
+                {label: _lang.stringSimple("song_selection_search_rank"), data: "rank"},
+                {label: _lang.stringSimple("song_selection_search_raw_goods"), data: "raw_goods"}];
 
             if (sortTypeBox != null)
                 sortTypeBox.removeEventListener(Event.SELECT, sortTypeSelect);
