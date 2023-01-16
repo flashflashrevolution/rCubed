@@ -19,6 +19,7 @@ package menu
     import classes.SongPlayerBytes;
     import classes.SongPreview;
     import classes.SongQueueItem;
+    import classes.User;
     import classes.chart.Song;
     import classes.ui.BoxButton;
     import classes.ui.BoxIcon;
@@ -51,7 +52,6 @@ package menu
     import popups.PopupQueueManager;
     import popups.PopupSongNotes;
     import popups.PopupHighscores;
-    import classes.User;
 
     public class MenuSongSelection extends MenuPanel
     {
