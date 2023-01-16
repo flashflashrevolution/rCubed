@@ -731,10 +731,19 @@ package menu
 
                 function getSongRank(song: SongInfo, activeUser: User): uint {
                     var songRank: uint = cache[song.level];
-                    if (!songRank) {
-                        songRank = activeUser.getLevelRank(song).rank;
-                        cache[song.level] = songRank;
+                    if (songRank) {
+                        return songRank;
                     }
+
+                    var songLevelRank: Object = activeUser.getLevelRank(song);
+                    if (songLevelRank == null) {
+                        songRank = 1000000000;
+                    } else {
+                        songRank = songLevelRank.rank;
+                    }
+
+                    cache[song.level] = songRank;
+
                     return songRank;
                 }
 
@@ -755,26 +764,29 @@ package menu
                 
                 function getSongRawGoods(song: SongInfo, activeUser: User): Number {
                     var songRawGoods: Number = cache[song.level];
-                    if (!songRawGoods) {
-                        var songLevelRank: Object = activeUser.getLevelRank(song);
-
-                        if (songLevelRank == null) {
-                            songRawGoods = 2000000;
-                        } else {
-                            var rawGoods: Number = songLevelRank.good + (songLevelRank.average * 1.8) + (songLevelRank.miss * 2.4) + (songLevelRank.boo * 0.2);
-                            var notesPlayed: uint = songLevelRank.perfect + songLevelRank.good + songLevelRank.average + songLevelRank.miss;
-                            var noteCount: uint = song.note_count || songLevelRank.arrows;
-
-                            if (notesPlayed < noteCount) {
-                                var implicitMisses: uint = noteCount - notesPlayed;
-                                songRawGoods = 1000000 + rawGoods + implicitMisses * 2.4;
-                            } else {
-                                songRawGoods = rawGoods;
-                            }
-                        }
-
-                        cache[song.level] = songRawGoods;
+                    if (songRawGoods) {
+                        return songRawGoods;
                     }
+
+                    var songLevelRank: Object = activeUser.getLevelRank(song);
+
+                    if (songLevelRank == null) {
+                        songRawGoods = 2000000;
+                    } else {
+                        var rawGoods: Number = songLevelRank.good + (songLevelRank.average * 1.8) + (songLevelRank.miss * 2.4) + (songLevelRank.boo * 0.2);
+                        var notesPlayed: uint = songLevelRank.perfect + songLevelRank.good + songLevelRank.average + songLevelRank.miss;
+                        var noteCount: uint = song.note_count || songLevelRank.arrows;
+
+                        if (notesPlayed < noteCount) {
+                            var implicitMisses: uint = noteCount - notesPlayed;
+                            songRawGoods = 1000000 + rawGoods + implicitMisses * 2.4;
+                        } else {
+                            songRawGoods = rawGoods;
+                        }
+                    }
+
+                    cache[song.level] = songRawGoods;
+                    
                     return songRawGoods;
                 }
 
