@@ -47,6 +47,7 @@ package game
     import popups.PopupSongNotes;
     import popups.PopupTokenUnlock;
     import popups.replays.ReplayHistoryTabLocal;
+    import game.graph.GraphAccuracyPrecise;
 
     public class GameResults extends MenuPanel
     {
@@ -54,8 +55,9 @@ package game
         public static const GRAPH_HEIGHT:int = 117;
         public static const GRAPH_COMBO:int = 0;
         public static const GRAPH_ACCURACY:int = 1;
+        public static const GRAPH_ACCURACY_PRECISE:int = 2;
 
-        private var graphCache:Object = {"0": {}, "1": {}};
+        private var graphCache:Object = {"0": {}, "1": {}, "2": {}};
 
         private var _mp:MultiplayerSingleton = MultiplayerSingleton.getInstance();
         private var _gvars:GlobalVariables = GlobalVariables.instance;
@@ -564,6 +566,10 @@ package game
                 {
                     newGraph = new GraphAccuracy(graphDraw, graphOverlay, result);
                 }
+                else if (graphType == GRAPH_ACCURACY_PRECISE)
+                {
+                    newGraph = new GraphAccuracyPrecise(graphDraw, graphOverlay, result);
+                }
                 else
                 {
                     newGraph = new GraphCombo(graphDraw, graphOverlay, result);
@@ -829,7 +835,7 @@ package game
             {
                 if (resultIndex >= 0)
                 {
-                    graphType = (graphType + 1) % 2;
+                    graphType = (graphType + 1) % 3;
                     LocalStore.setVariable("result_graph_type", graphType);
                     drawResultGraph(songResults[resultIndex]);
                 }
