@@ -564,11 +564,11 @@ package game
 
                 if (graphType == GRAPH_ACCURACY)
                 {
-                    newGraph = new GraphAccuracyPrecise(graphDraw, graphOverlay, result);
+                    newGraph = new GraphAccuracy(graphDraw, graphOverlay, result);
                 }
                 else if (graphType == GRAPH_ACCURACY_PRECISE)
                 {
-                    newGraph = new GraphAccuracy(graphDraw, graphOverlay, result);
+                    newGraph = new GraphAccuracyPrecise(graphDraw, graphOverlay, result);
                 }
                 else
                 {
@@ -835,7 +835,7 @@ package game
             {
                 if (resultIndex >= 0)
                 {
-                    graphType = (graphType + 1) % 2;
+                    graphType = (graphType + 1) % 3;
                     LocalStore.setVariable("result_graph_type", graphType);
                     drawResultGraph(songResults[resultIndex]);
                 }

@@ -358,6 +358,8 @@ package game.graph
             var draw_color:uint;
             var timing_score:int;
 
+            var boos: Vector.<ReplayBinFrame> = result.replay_bin_boos;
+
             player_timings_length = player_timings.length;
 
             for (i = 0; i < player_timings_length; i++)
@@ -382,7 +384,7 @@ package game.graph
                 // Note Miss
                 if (timing_score == 0)
                 {
-                    pos_y = 0;
+                    pos_y = graphHeight;
                     timing = 0;
                     draw_color = JUDGE_WINDOW_CROSS_COLORS["0"];
                 }
@@ -403,21 +405,23 @@ package game.graph
             // Fill in Misses, Overlay uses cross point length.
             if (result.note_count > 0)
             {
+                var miss_y: Number = flipGraph ? 0 : graphHeight;
                 while (cross_points.length < result.last_note)
                 {
                     pos_x = cross_points.length * ratio_x;
-                    cross_points[cross_points.length] = new GraphCrossPoint(cross_points.length, pos_x, (flipGraph ? graphHeight : 0), 0, JUDGE_WINDOW_CROSS_COLORS["0"], 0, player_timings[i].direction);
+                    cross_points[cross_points.length] = new GraphCrossPoint(cross_points.length, pos_x, miss_y, 0, JUDGE_WINDOW_CROSS_COLORS["0"], 0, player_timings[i].direction);
                 }
             }
 
             // Boos
             var boo:ReplayBinFrame;
+            var boo_y: Number = flipGraph ? graphHeight : 0;
             ratio_x = graphWidth / result.song.getNote(Math.max(0, song_arrows - 1)).time;
-            for (i = 0; i < result.replay_bin_boos.length; i++)
+            for (i = 0; i < boos.length; i++)
             {
-                boo = result.replay_bin_boos[i];
+                boo = boos[i];
                 pos_x = (boo.time / 1000) * ratio_x;
-                boo_points[boo_points.length] = new GraphCrossPoint(boo_points.length, pos_x, (flipGraph ? 0 : graphHeight), Number((boo.time / 1000).toFixed(2)), JUDGE_WINDOW_CROSS_COLORS["-5"], -5, boo.direction);
+                boo_points[boo_points.length] = new GraphCrossPoint(boo_points.length, pos_x, boo_y, Number((boo.time / 1000).toFixed(2)), JUDGE_WINDOW_CROSS_COLORS["-5"], -5, boo.direction);
             }
         }
 
