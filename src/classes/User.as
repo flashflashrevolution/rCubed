@@ -146,6 +146,7 @@ package classes
         public var gameSpeed:Number = 1.5;
         public var receptorGap:Number = 80;
         public var receptorAnimationSpeed:Number = 1;
+        public var judgeScale:Number = 1;
         public var noteScale:Number = 1;
         public var gameVolume:Number = 1;
         public var screencutPosition:Number = 0.5;
@@ -639,6 +640,9 @@ package classes
             if (_settings.judgeSpeed != null)
                 this.judgeSpeed = _settings.judgeSpeed;
 
+            if (_settings.judgeScale != null)
+                this.judgeScale = _settings.judgeScale;
+
             if (_settings.gap != null)
                 this.receptorGap = _settings.gap;
 
@@ -769,6 +773,7 @@ package classes
             gameSave.keys = [this.keyLeft, this.keyDown, this.keyUp, this.keyRight, this.keyRestart, this.keyQuit, this.keyOptions];
 
             gameSave.judgeSpeed = this.judgeSpeed;
+            gameSave.judgeScale = this.judgeScale;
             gameSave.speed = this.gameSpeed;
             gameSave.direction = this.slideDirection;
             gameSave.noteskin = this.activeNoteskin;

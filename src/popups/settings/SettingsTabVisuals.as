@@ -43,6 +43,9 @@ package popups.settings
         private var optionJudgeSpeed:BoxSlider;
         private var textJudgeSpeed:Text;
 
+        private var optionJudgeScale:BoxSlider;
+        private var textJudgeScale:Text;
+
         public function SettingsTabVisuals(settingsWindow:SettingsWindow):void
         {
             super(settingsWindow);
@@ -85,7 +88,11 @@ package popups.settings
                 optionDisplays.push(gameDisplayCheck);
                 yOff += 19;
 
-                yOff = drawSpecial(xOff, yOff, container, gameUIArray[i]);
+                if (gameUIArray[i] == "JUDGE_ANIMATIONS")
+                {
+                    yOff = drawJudgeSpeed(xOff, yOff, container);
+                    yOff = drawJudgeScale(xOff, yOff, container);
+                }
             }
 
             /// Col 2
@@ -109,8 +116,6 @@ package popups.settings
                 gameMPDisplayCheck.display = gameMPUIArray[i];
                 optionDisplays.push(gameMPDisplayCheck);
                 yOff += 19;
-
-                yOff = drawSpecial(xOff, yOff, container, gameMPUIArray[i]);
             }
 
             yOff += drawSeperator(container, xOff, 250, yOff, 6, 5);
@@ -136,20 +141,32 @@ package popups.settings
             yOff += 30;
         }
 
-        private function drawSpecial(xOff:int, yOff:int, container:ScrollPaneContent, key:String):int
+        private function drawJudgeSpeed(xOff:int, yOff:int, container:ScrollPaneContent):int
         {
-            if (key == "JUDGE_ANIMATIONS")
-            {
-                new Text(container, xOff + 23, yOff, _lang.string("options_judge_speed"));
-                yOff += 22;
+            new Text(container, xOff + 23, yOff, _lang.string("options_judge_speed"));
+            yOff += 22;
 
-                optionJudgeSpeed = new BoxSlider(container, xOff + 23, yOff + 3, 100, 10, changeHandler);
-                optionJudgeSpeed.minValue = 0.25;
-                optionJudgeSpeed.maxValue = 3;
+            optionJudgeSpeed = new BoxSlider(container, xOff + 23, yOff + 3, 100, 10, changeHandler);
+            optionJudgeSpeed.minValue = 0.25;
+            optionJudgeSpeed.maxValue = 3;
 
-                textJudgeSpeed = new Text(container, xOff + 128, yOff - 2);
-                yOff += 20;
-            }
+            textJudgeSpeed = new Text(container, xOff + 128, yOff - 2);
+            yOff += 20;
+
+            return yOff;
+        }
+
+        private function drawJudgeScale(xOff:int, yOff:int, container:ScrollPaneContent):int
+        {
+            new Text(container, xOff + 23, yOff, _lang.string("options_judge_scale"));
+            yOff += 22;
+
+            optionJudgeScale = new BoxSlider(container, xOff + 23, yOff + 3, 100, 10, changeHandler);
+            optionJudgeScale.minValue = 0.25;
+            optionJudgeScale.maxValue = 3;
+
+            textJudgeScale = new Text(container, xOff + 128, yOff - 2);
+            yOff += 20;
 
             return yOff;
         }
@@ -163,6 +180,9 @@ package popups.settings
 
             optionJudgeSpeed.slideValue = _gvars.activeUser.judgeSpeed;
             textJudgeSpeed.text = _gvars.activeUser.judgeSpeed.toFixed(2) + "x";
+
+            optionJudgeScale.slideValue = _gvars.activeUser.judgeScale;
+            textJudgeScale.text = _gvars.activeUser.judgeScale.toFixed(2) + "x";
         }
 
         override public function clickHandler(e:MouseEvent):void
@@ -186,6 +206,12 @@ package popups.settings
             {
                 _gvars.activeUser.judgeSpeed = (Math.round((optionJudgeSpeed.slideValue * 100) / 5) * 5) / 100; // Snap to 0.05 intervals.
                 textJudgeSpeed.text = _gvars.activeUser.judgeSpeed.toFixed(2) + "x";
+            }
+
+            if (e.target == optionJudgeScale)
+            {
+                _gvars.activeUser.judgeScale = (Math.round((optionJudgeScale.slideValue * 100) / 5) * 5) / 100; // Snap to 0.05 intervals.
+                textJudgeScale.text = _gvars.activeUser.judgeScale.toFixed(2) + "x";
             }
 
             parent.checkValidMods();

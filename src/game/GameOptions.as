@@ -19,6 +19,7 @@ package game
         public var receptorSpacing:int = 80;
         public var receptorAnimationSpeed:Number = 1;
         public var noteScale:Number = 1;
+        public var judgeScale:Number = 1;
         public var screencutPosition:Number = 0.5;
         public var mods:Array = [];
         public var noteskin:int = 1;
@@ -103,6 +104,7 @@ package game
             receptorSpacing = user.receptorGap;
             receptorAnimationSpeed = user.receptorAnimationSpeed;
             noteScale = user.noteScale;
+            judgeScale = user.judgeScale;
             screencutPosition = user.screencutPosition;
             mods = user.activeMods.concat(user.activeVisualMods);
             modCache = null;
@@ -197,6 +199,7 @@ package game
             scrollSpeed = settings["speed"] || 1.5;
             receptorSpacing = settings["gap"] || 80;
             noteScale = settings["noteScale"] || 1;
+            judgeScale = settings["judgeScale"] || 1;
             screencutPosition = settings["screencutPosition"] || 0;
             mods = settings["visual"] || [];
             modCache = null;
@@ -299,6 +302,7 @@ package game
             settings["noteskin"] = noteskin;
             settings["gap"] = receptorSpacing;
             settings["noteScale"] = noteScale;
+            settings["judgeScale"] = judgeScale;
             settings["screencutPosition"] = screencutPosition;
             settings["forceNewJudge"] = forceNewJudge;
             settings["frameRate"] = frameRate;
