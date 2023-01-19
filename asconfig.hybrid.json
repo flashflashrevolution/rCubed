@@ -5,7 +5,7 @@
         "define": [
             {
                 "name": "R3::VERSION",
-                "value": "\"1.4.6\""
+                "value": "\"1.4.7\""
             },
             {
                 "name": "R3::VERSION_PREFIX",

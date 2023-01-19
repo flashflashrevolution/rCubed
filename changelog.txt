@@ -1,3 +1,9 @@
+R^3 (v1.4.7) [2023-01-18]
+@mat100payette
+- Added judge scale option.
+- Add new accuracy graph type.
+- Add raw goods and rank sorting.
+
 R^3 (v1.4.5 & v1.4.6) [2023-01-15]
 ---------------------------------------------------------------------
 @Psycast
