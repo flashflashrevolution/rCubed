@@ -350,6 +350,9 @@ package game
 
                 // Index
                 songRankIndex = -1;
+
+                // Discord
+                _gvars.updatePresence("In Song Results");
             }
 
             // Single Song
@@ -388,6 +391,9 @@ package game
                 navSaveReplay.enabled = true;
                 if (!canSendScore(result, true, false, true, true) || result.is_preview)
                     navSaveReplay.enabled = false;
+
+                // Discord
+                _gvars.updatePresence("Results: " + songInfo.name + (result.options.songRate != 1 ? " [" + result.options.songRate + "x]" : ""), result.pa_string);
             }
 
             // Save Screenshot

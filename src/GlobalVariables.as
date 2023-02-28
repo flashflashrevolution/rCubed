@@ -15,6 +15,7 @@ package
     import com.flashfla.loader.DataEvent;
     import com.flashfla.net.DynamicURLLoader;
     import com.flashfla.utils.Screenshots;
+    import fi.joniaromaa.adobeair.discordrpc.DiscordRpc;
     import flash.display.StageDisplayState;
     import flash.events.Event;
     import flash.events.EventDispatcher;
@@ -112,6 +113,8 @@ package
 
         private var websocket_server:AIRServer;
         private static var websocket_message:Message = new Message();
+
+        private var _discord:DiscordRpc;
 
         ///- Constructor
         public function GlobalVariables(en:SingletonEnforcer)
@@ -237,6 +240,26 @@ package
                 websocket_message.command = cmd;
                 websocket_message.data = data;
                 websocket_server.sendMessageToAllClients(websocket_message);
+            }
+        }
+
+        public function initDiscord():void
+        {
+            _discord = new DiscordRpc();
+            _discord.init(R3::DISCORD_APP_ID);
+        }
+
+        public function updatePresence(top:String = "", bottom:String = "", startTime:Number = 0, endTime:Number = 0):void
+        {
+            var sr:Number = Math.round(playerUser.skillRating * 100) / 100;
+            var division:Number = getDivisionNumber(playerUser.skillRating);
+            if (division > 0)
+            {
+                _discord.updatePresence(bottom, top, startTime, endTime, "logo", playerUser.name, "d" + division, "D" + division + " - Lv. " + playerUser.skillRating, "", 0, 0, "", "");
+            }
+            else
+            {
+                _discord.updatePresence(bottom, top, startTime, endTime, "logo", playerUser.name, "", "", "", 0, 0, "", "");
             }
         }
 

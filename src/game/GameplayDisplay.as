@@ -757,6 +757,10 @@ package game
                     _gvars.websocketSend("NOTE_JUDGE", SOCKET_SCORE_MESSAGE);
                     _gvars.websocketSend("SONG_START", SOCKET_SONG_MESSAGE);
                 }
+
+                // Discord - start / end time don't work because reasons?
+                //var currentTime:uint = new Date().getTime(); // song.chartTime
+                _gvars.updatePresence("Playing:", song.songInfo.name + " - " + song.songInfo.author);
             }
         }
 

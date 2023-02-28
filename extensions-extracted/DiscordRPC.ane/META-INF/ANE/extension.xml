@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension xmlns="http://ns.adobe.com/air/extension/2.5">
+	<id>fi.joniaromaa.adobeair.discordrpc</id>
+	<name>Discord RPC</name>
+	<versionNumber>1.0.0</versionNumber>
+	<platforms>
+		<platform name="Windows-x86">
+			<applicationDeployment>
+				<nativeLibrary>AdobeAIR-DiscordRPC.dll</nativeLibrary>
+				<initializer>ExtensionInitializer</initializer>
+				<finalizer>ExtensionFinalizer</finalizer>
+			</applicationDeployment>
+		</platform>
+	</platforms>
+</extension>

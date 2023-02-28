@@ -157,6 +157,9 @@ package menu
 
             draw();
 
+            // Discord
+            _gvars.updatePresence("Song Selection");
+
             return true;
         }
 

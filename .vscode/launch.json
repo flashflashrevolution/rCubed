@@ -5,7 +5,8 @@
 			"type": "swf",
 			"request": "launch",
 			"name": "Launch R3",
-			"preLaunchTask": "ActionScript: compile debug - asconfig.json"
+			"preLaunchTask": "ActionScript: compile debug - asconfig.json",
+			"extdir": "extensions-extracted"
 		},
 		{
 			"type": "swf",

@@ -6,7 +6,7 @@
   <name>
     <text xml:lang="en">R^3</text>
   </name>
-  <architecture>64</architecture>
+  <architecture>32</architecture>
   <description>
     <text xml:lang="en">R^3 Engine</text>
   </description>
@@ -37,4 +37,7 @@
     <image192x192>data/icons/icon-192.png</image192x192>
     <image512x512>data/icons/icon-512.png</image512x512>
   </icon>
+  <extensions>
+    <extensionID>fi.joniaromaa.adobeair.discordrpc</extensionID>
+  </extensions>
 </application>

@@ -25,6 +25,7 @@ package
     import com.greensock.plugins.AutoAlphaPlugin;
     import com.greensock.plugins.TintPlugin;
     import com.greensock.plugins.TweenPlugin;
+    import fi.joniaromaa.adobeair.discordrpc.DiscordRpc;
     import flash.desktop.NativeApplication;
     import flash.events.ContextMenuEvent;
     import flash.events.Event;
@@ -128,6 +129,7 @@ package
 
             //- Load Air Items
             _gvars.loadAirOptions();
+            _gvars.initDiscord();
 
             //- Window Options
             VSYNC_SUPPORT = stage.hasOwnProperty("vsyncEnabled");

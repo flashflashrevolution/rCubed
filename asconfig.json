@@ -17,7 +17,8 @@
             "libs/assets/"
         ],
         "include-libraries": [
-            "fonts/bin/"
+            "fonts/bin/",
+            "extensions"
         ],
         // Branding is left here for development contributions.
         // The engine doesn't run unless they are filled out.
@@ -66,6 +67,10 @@
             {
                 "name": "R3::VERSION_SUFFIX",
                 "value": "\"D\""
+            },
+            {
+                "name": "R3::DISCORD_APP_ID",
+                "value": "\"443571872391495681\""
             }
         ],
         "default-size": {
@@ -86,6 +91,7 @@
         "src/Main.as"
     ],
     "airOptions": {
+        "extdir": ["extensions"],
         "windows": {
             "target": "bundle",
             "output": "dist/R^3GameDevelop"
