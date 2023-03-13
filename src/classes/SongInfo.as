@@ -21,21 +21,24 @@ package classes
         public var genre:int;
         public var level:int;
         public var name:String;
+        public var name_original:String;
+        public var name_explicit:String;
+        public var subtitle:String;
         public var difficulty:int;
         public var note_count:int;
         public var order:int;
         public var style:String;
+        public var tags:String;
 
         public var author:String;
+        public var author_original:String;
         public var author_url:String;
         public var author_html:String;
 
         public var stepauthor:String;
-        public var stepauthor_url:String;
         public var stepauthor_html:String;
 
         public var play_hash:String;
-        public var preview_hash:String;
         public var swf_hash:String;
 
         public var prerelease:Boolean;
@@ -46,6 +49,12 @@ package classes
 
         public var time:String;
         public var time_secs:int;
+        public var time_end:Number;
+
+        public var is_ranked:Boolean = true;
+        public var is_explicit:Boolean = false;
+        public var is_legacy:Boolean = false;
+        public var is_disabled:Boolean = false;
 
         // Song - Optional
         public var price:int;

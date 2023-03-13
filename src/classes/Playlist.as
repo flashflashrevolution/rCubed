@@ -154,7 +154,7 @@ package classes
                 _instanceCanon.generatedQueues = generatedQueues;
             }
 
-            for each (var dynamicSongInfo:Object in data)
+            for each (var dynamicSongInfo:Object in data.songs)
             {
                 var songInfo:SongInfo;
 
@@ -179,29 +179,44 @@ package classes
 
                     // Important to note that the dynamic fields aren't all exactly the same name
                     var newSongInfo:SongInfo = new SongInfo();
-                    newSongInfo.author = dynamicSongInfo.author;
-                    newSongInfo.author_url = dynamicSongInfo.authorURL;
-                    newSongInfo.credits = dynamicSongInfo.credits;
-                    newSongInfo.difficulty = dynamicSongInfo.difficulty;
-                    newSongInfo.genre = dynamicSongInfo.genre;
                     newSongInfo.level = dynamicSongInfo.level;
                     newSongInfo.level_id = dynamicSongInfo.level;
-                    newSongInfo.min_nps = dynamicSongInfo.min_nps;
-                    newSongInfo.max_nps = dynamicSongInfo.max_nps;
+
                     newSongInfo.name = dynamicSongInfo.name;
-                    newSongInfo.note_count = dynamicSongInfo.arrows;
-                    newSongInfo.order = dynamicSongInfo.order;
-                    newSongInfo.play_hash = dynamicSongInfo.playhash;
-                    newSongInfo.prerelease = dynamicSongInfo.prerelease;
-                    newSongInfo.preview_hash = dynamicSongInfo.previewhash;
-                    newSongInfo.price = dynamicSongInfo.price;
-                    newSongInfo.release_date = dynamicSongInfo.releasedate;
-                    newSongInfo.song_rating = dynamicSongInfo.song_rating;
+                    newSongInfo.name_original = dynamicSongInfo.name_original; // Optional
+                    newSongInfo.name_explicit = dynamicSongInfo.name_explicit; // Optional
+                    newSongInfo.subtitle = dynamicSongInfo.subtitle; // Optional
+
+                    newSongInfo.author = dynamicSongInfo.author;
+                    newSongInfo.author_original = dynamicSongInfo.author_original; // Optional
+                    newSongInfo.author_url = dynamicSongInfo.author_url;
+
                     newSongInfo.stepauthor = dynamicSongInfo.stepauthor;
-                    newSongInfo.stepauthor_url = dynamicSongInfo.stepauthorURL;
+
+                    newSongInfo.genre = dynamicSongInfo.genre;
+                    newSongInfo.difficulty = dynamicSongInfo.difficulty;
                     newSongInfo.style = dynamicSongInfo.style;
-                    newSongInfo.swf_hash = dynamicSongInfo.swfhash;
+                    newSongInfo.tags = dynamicSongInfo.tags; // Optional
                     newSongInfo.time = dynamicSongInfo.time;
+                    newSongInfo.note_count = dynamicSongInfo.note_count;
+                    newSongInfo.order = dynamicSongInfo.order;
+                    newSongInfo.release_date = dynamicSongInfo.date;
+                    newSongInfo.prerelease = dynamicSongInfo.prerelease;
+                    newSongInfo.play_hash = dynamicSongInfo.hash_load;
+                    newSongInfo.time_end = dynamicSongInfo.swf_end_delay;
+
+                    newSongInfo.price = dynamicSongInfo.credits_price;
+                    newSongInfo.credits = dynamicSongInfo.credits_secret;
+
+                    newSongInfo.min_nps = dynamicSongInfo.nps_min;
+                    newSongInfo.max_nps = dynamicSongInfo.nps_max;
+
+                    newSongInfo.is_legacy = dynamicSongInfo.o_legacy == 1;
+                    newSongInfo.is_ranked = dynamicSongInfo.o_ranked != 0;
+                    newSongInfo.is_explicit = dynamicSongInfo.o_explicit == 1;
+                    newSongInfo.is_disabled = dynamicSongInfo.o_disabled == 1;
+
+                    newSongInfo.swf_hash = dynamicSongInfo.swfhash;
 
                     songInfo = newSongInfo;
                 }
@@ -217,6 +232,7 @@ package classes
                 // Extra Info
                 songInfo.index = genreList[songInfo.genre].length;
                 songInfo.time_secs = (Number(songInfo.time.split(":")[0]) * 60) + Number(songInfo.time.split(":")[1]);
+                songInfo.prerelease = data.time < songInfo.release_date;
 
                 // Author with URL
                 if (songInfo.author_url != null && songInfo.author_url.length > 7)
