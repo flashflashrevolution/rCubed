@@ -38,7 +38,6 @@ package popups.settings
         private var optionMPSize:ValidatedText;
         private var timestampCheck:BoxCheck;
 
-        private var forceJudgeCheck:BoxCheck;
         private var useCacheCheckbox:BoxCheck;
         private var autoSaveLocalCheckbox:BoxCheck;
         private var useVSyncCheckbox:BoxCheck;
@@ -143,11 +142,6 @@ package popups.settings
             yOff += 30;
 
             yOff += drawSeperator(container, xOff, 250, yOff, 0, 0);
-
-            // Force engine Judge Mode
-            new Text(container, xOff + 23, yOff, _lang.string("options_force_judge_mode"));
-            forceJudgeCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
-            yOff += 30;
 
             new Text(container, xOff + 23, yOff, _lang.string("air_options_save_local_replays"));
             autoSaveLocalCheckbox = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
@@ -265,8 +259,6 @@ package popups.settings
             // Set Framerate
             optionFPS.text = _gvars.activeUser.frameRate.toString();
 
-            forceJudgeCheck.checked = _gvars.activeUser.forceNewJudge;
-
             timestampCheck.checked = _gvars.activeUser.DISPLAY_MP_TIMESTAMP;
             legacySongsCheck.checked = _gvars.activeUser.DISPLAY_LEGACY_SONGS;
             optionMPSize.text = _avars.configMPSize.toString();
@@ -294,15 +286,8 @@ package popups.settings
 
         override public function clickHandler(e:MouseEvent):void
         {
-            // Force Judge Mode
-            if (e.target == forceJudgeCheck)
-            {
-                e.target.checked = !e.target.checked;
-                _gvars.activeUser.forceNewJudge = !_gvars.activeUser.forceNewJudge;
-            }
-
             // MP Timestamp
-            else if (e.target == timestampCheck)
+            if (e.target == timestampCheck)
             {
                 e.target.checked = !e.target.checked;
                 _gvars.activeUser.DISPLAY_MP_TIMESTAMP = !_gvars.activeUser.DISPLAY_MP_TIMESTAMP;

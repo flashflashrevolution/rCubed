@@ -96,7 +96,6 @@ package game
         private var _keys:Array;
         private var song:Song;
         private var song_background:MovieClip;
-        private var legacyMode:Boolean;
         private var levelScript:LevelScriptRuntime;
 
         private var reverseMod:Boolean;
@@ -300,7 +299,7 @@ package game
                         "difficulty": song.songInfo.difficulty,
                         "style": song.songInfo.style,
                         "author": song.songInfo.author,
-                        "author_url": song.songInfo.stepauthor_url,
+                        "author_url": song.songInfo.author_url,
                         "stepauthor": song.songInfo.stepauthor,
                         "credits": song.songInfo.credits,
                         "genre": song.songInfo.genre,
@@ -441,10 +440,9 @@ package game
 
             // Song
             song.updateMusicDelay();
-            legacyMode = (song.type == NoteChart.FFR || song.type == NoteChart.FFR_RAW || song.type == NoteChart.FFR_LEGACY);
-            if (song.music && (legacyMode || !options.modEnabled("nobackground")))
+            if (song.background && !options.modEnabled("nobackground"))
             {
-                song_background = song.music as MovieClip;
+                song_background = song.background as MovieClip;
                 gameSongFrames = song_background.totalFrames;
                 song_background.x = 115;
                 song_background.y = 42.5;
@@ -1005,14 +1003,6 @@ package game
 
         private function onEnterFrame(e:Event):void
         {
-            // XXX: HACK HACK HACK
-            if (legacyMode)
-            {
-                var songFrame:int = song_background.currentFrame;
-                if (songFrame == gameSongFrames - 1)
-                    song.stop();
-            }
-
             // UI Updates
             if (options.displayMPJudge && options.mpRoom)
             {
@@ -1031,62 +1021,52 @@ package game
             switch (GAME_STATE)
             {
                 case GAME_PLAY:
-                    if (legacyMode)
-                    {
-                        logicTick();
-                        gamePosition = (gameProgress + 0.5) * 1000 / 30;
 
-                        if (mpSpectate && !mpSpectateDidSync)
-                            spectateSync();
-                    }
-                    else
-                    {
-                        var lastAbsolutePosition:int = absolutePosition;
-                        absolutePosition = getTimer() - absoluteStart;
+                    var lastAbsolutePosition:int = absolutePosition;
+                    absolutePosition = getTimer() - absoluteStart;
 
-                        if (!songDelayStarted)
+                    if (!songDelayStarted)
+                    {
+                        if (absolutePosition < songDelay)
                         {
-                            if (absolutePosition < songDelay)
-                            {
-                                song.stop();
-                            }
-                            else
-                            {
-                                songDelayStarted = true;
-                                song.start();
-                            }
+                            song.stop();
                         }
-
-                        var songPosition:int = song.getPosition() + songDelay;
-                        if (song.musicIsPlaying && songPosition > 100)
-                            songOffset.addValue(songPosition - absolutePosition);
-
-                        frameRate.addValue(1000 / (absolutePosition - lastAbsolutePosition));
-
-                        gamePosition = Math.round(absolutePosition + songOffset.value);
-                        if (gamePosition < 0)
-                            gamePosition = 0;
-
-                        var targetProgress:int = Math.round(gamePosition * 30 / 1000 - 0.5);
-                        var threshold:int = Math.round(1 / (frameRate.value / 60));
-                        if (threshold < 1)
-                            threshold = 1;
-                        if (options.replay)
-                            threshold = 0x7fffffff;
-
-                        //Logger.debug("GP", "lAP: " + lastAbsolutePosition + " | aP: " + absolutePosition + " | sDS: " + songDelayStarted + " | sD: " + songDelay + " | sOv: " + songOffset.value + " | sGP: " + song.getPosition() + " | sP: " + songPosition + " | gP: " + gamePosition + " | tP: " + targetProgress + " | t: " + threshold);
-
-                        while (gameProgress < targetProgress && threshold-- > 0)
-                            logicTick();
-
-                        if (mpSpectate && !mpSpectateDidSync)
-                            spectateSync();
-
-                        if (reverseMod)
-                            stopClips(song_background, 2 + song.musicDelay - globalOffsetRounded + gameProgress * options.songRate);
                         else
-                            stopClips(song_background, 2 + song.musicDelay - globalOffsetRounded + gameProgress * options.songRate);
+                        {
+                            songDelayStarted = true;
+                            song.start();
+                        }
                     }
+
+                    var songPosition:int = song.getPosition() + songDelay;
+                    if (song.musicIsPlaying && songPosition > 100)
+                        songOffset.addValue(songPosition - absolutePosition);
+
+                    frameRate.addValue(1000 / (absolutePosition - lastAbsolutePosition));
+
+                    gamePosition = Math.round(absolutePosition + songOffset.value);
+                    if (gamePosition < 0)
+                        gamePosition = 0;
+
+                    var targetProgress:int = Math.round(gamePosition * 30 / 1000 - 0.5);
+                    var threshold:int = Math.round(1 / (frameRate.value / 60));
+                    if (threshold < 1)
+                        threshold = 1;
+                    if (options.replay)
+                        threshold = 0x7fffffff;
+
+                    //Logger.debug("GP", "lAP: " + lastAbsolutePosition + " | aP: " + absolutePosition + " | sDS: " + songDelayStarted + " | sD: " + songDelay + " | sOv: " + songOffset.value + " | sGP: " + song.getPosition() + " | sP: " + songPosition + " | gP: " + gamePosition + " | tP: " + targetProgress + " | t: " + threshold);
+
+                    while (gameProgress < targetProgress && threshold-- > 0)
+                        logicTick();
+
+                    if (mpSpectate && !mpSpectateDidSync)
+                        spectateSync();
+
+                    if (reverseMod)
+                        stopClips(song_background, 2 + song.musicDelay - globalOffsetRounded + gameProgress * options.songRate);
+                    else
+                        stopClips(song_background, 2 + song.musicDelay - globalOffsetRounded + gameProgress * options.songRate);
 
                     if (options.modEnabled("tap_pulse"))
                     {
@@ -1166,10 +1146,7 @@ package game
                     }
                     if (dir)
                     {
-                        if (legacyMode)
-                            judgeScore(dir, gameProgress);
-                        else
-                            judgeScorePosition(dir, Math.round(getTimer() - absoluteStart + songOffset.value));
+                        judgeScorePosition(dir, Math.round(getTimer() - absoluteStart + songOffset.value));
                     }
                 }
             }
@@ -1416,7 +1393,7 @@ package game
             _gvars.sessionStats.addFromStats(_gvars.songStats);
             _gvars.songStats.reset();
 
-            if (!legacyMode && !options.replay && !options.isEditor && !mpSpectate)
+            if (!options.replay && !options.isEditor && !mpSpectate)
             {
                 _avars.configMusicOffset = (_avars.configMusicOffset * 0.85) + songOffset.value * 0.15;
 

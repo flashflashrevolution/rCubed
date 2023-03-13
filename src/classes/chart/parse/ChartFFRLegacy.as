@@ -32,11 +32,6 @@ package classes.chart.parse
             parseChart(ByteArray(inData));
         }
 
-        override public function noteToTime(note:Note):int
-        {
-            return Math.floor(note.time * framerate);
-        }
-
         public static function songUrl(songInfo:SongInfo, engine:Object = null):String
         {
             if (engine == null)
@@ -143,7 +138,7 @@ package classes.chart.parse
             Alert.add("Error loading legacy engine");
         }
 
-        public static function parsePlaylist(data:Object, engine:Object = null):Array
+        public static function parsePlaylist(data:Object, engine:Object = null):Object
         {
             if (engine == null)
                 engine = ArcGlobals.instance.configLegacy;
@@ -170,15 +165,12 @@ package classes.chart.parse
                 songInfo.author = node.songauthor.toString();
                 songInfo.author_url = node.songauthorURL.toString();
                 songInfo.stepauthor = node.songstepauthor.toString();
-                songInfo.stepauthor_url = node.songstepauthorurl.toString();
                 songInfo.play_hash = node.playhash.toString();
-                songInfo.preview_hash = node.previewhash.toString();
                 songInfo.swf_hash = node.swfhash.toString();
                 songInfo.min_nps = int(node.min_nps.toString());
                 songInfo.max_nps = int(node.max_nps.toString());
                 songInfo.credits = int(node.secretcredits.toString());
                 songInfo.price = int(node.price.toString());
-                songInfo.chart_type = NoteChart.FFR_LEGACY;
                 songInfo.engine = engine;
 
                 if (Boolean(node.arc_sync.toString()))
@@ -188,17 +180,19 @@ package classes.chart.parse
 
                 songs.push(songInfo);
             }
-            return songs;
+            return {"time": Number.POSITIVE_INFINITY, "songs": songs};
         }
 
         public function parseChart(data:ByteArray):void
         {
+            var validDirections:Array = ['L', 'D', 'U', 'R'];
+
             var beatbox:Array = Beatbox.parseBeatbox(data);
             if (beatbox && beatbox.length > 0)
             {
                 for each (var beat:Array in beatbox)
                 {
-                    if (ChartFFRBeatbox.isValidDirection(beat[1]))
+                    if (validDirections.indexOf(beat[1]) >= 0)
                     {
                         var beatPos:int = beat[0] + (songInfo.sync || 0);
                         var beatPosMS:Number = beatPos / framerate;

@@ -151,7 +151,6 @@ package classes
         public var gameVolume:Number = 1;
         public var screencutPosition:Number = 0.5;
         public var frameRate:int = 60;
-        public var forceNewJudge:Boolean = false;
         public var songRate:Number = 1;
 
         public var gameplay:Gameplay;
@@ -661,9 +660,6 @@ package classes
             if (_settings.autofailRestart != null)
                 this.autofailRestart = _settings.autofailRestart;
 
-            if (_settings.forceNewJudge != null)
-                this.forceNewJudge = _settings.forceNewJudge;
-
             if (_settings.visual != null)
                 this.activeVisualMods = _settings.visual;
 
@@ -782,7 +778,6 @@ package classes
             gameSave.screencutPosition = this.screencutPosition;
             gameSave.autofailRestart = this.autofailRestart;
             gameSave.frameRate = this.frameRate;
-            gameSave.forceNewJudge = this.forceNewJudge;
             gameSave.visual = this.activeVisualMods;
             gameSave.judgeColours = this.judgeColors;
             gameSave.comboColours = this.comboColors;

@@ -28,8 +28,6 @@ package game
         public var offsetJudge:Number = 0;
         public var autoJudgeOffset:Boolean = false;
 
-        public var forceNewJudge:Boolean = false;
-
         public var displayGameTopBar:Boolean = true;
         public var displayGameBottomBar:Boolean = true;
         public var displayJudge:Boolean = true;
@@ -95,7 +93,6 @@ package game
         {
             frameRate = user.frameRate;
             songRate = user.songRate;
-            forceNewJudge = user.forceNewJudge;
 
             scrollDirection = user.slideDirection;
             judgeSpeed = user.judgeSpeed;
@@ -191,7 +188,6 @@ package game
 
             frameRate = settings["frameRate"] || 30;
             songRate = settings["songRate"] || 1;
-            forceNewJudge = settings["forceNewJudge"] || false;
 
             scrollDirection = settings["direction"] || "up";
             judgeSpeed = settings["judgeSpeed"] || 1;
@@ -303,7 +299,6 @@ package game
             settings["noteScale"] = noteScale;
             settings["judgeScale"] = judgeScale;
             settings["screencutPosition"] = screencutPosition;
-            settings["forceNewJudge"] = forceNewJudge;
             settings["frameRate"] = frameRate;
             settings["songRate"] = songRate;
             settings["visual"] = mods;

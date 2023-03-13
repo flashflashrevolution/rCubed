@@ -70,9 +70,6 @@ package classes.chart.parse
                 }
                 lineNum++;
             }
-
-            //- Set Note Frames
-            notesToFrame();
         }
 
         private function extractNotesFromLine(s:String, divisor:int, measure:int):void
