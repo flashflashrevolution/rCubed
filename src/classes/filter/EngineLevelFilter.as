@@ -25,7 +25,6 @@ package classes.filter
         public static const FILTER_COMBO_SCORE:String = "combo_score";
         public static const FILTER_STATS:String = "stats";
         public static const FILTER_TIME:String = "time";
-        public static const FILTER_SONG_RATING:String = "song_rating";
         public static const FILTER_PERSONAL_SONG_RATING:String = "personal_rating";
         public static const FILTER_SONG_FLAGS:String = "song_flags";
         public static const FILTER_SONG_ACCESS:String = "song_access";
@@ -37,7 +36,7 @@ package classes.filter
         public static const FILTERS:Array = [FILTER_AND, FILTER_OR, FILTER_ARTIST, FILTER_STEPARTIST,
             FILTER_STYLE, FILTER_TIME, FILTER_DIFFICULTY, FILTER_ARROWCOUNT, FILTER_MIN_NPS, FILTER_MAX_NPS,
             FILTER_RANK, FILTER_SCORE, FILTER_STATS, FILTER_SONG_FLAGS, FILTER_SONG_ACCESS, FILTER_SONG_TYPE,
-            FILTER_SONG_RATING, FILTER_PERSONAL_SONG_RATING, FILTER_SONG_GENRE, FILTER_FAVORITE];
+            FILTER_PERSONAL_SONG_RATING, FILTER_SONG_GENRE, FILTER_FAVORITE];
         public static const FILTERS_STAT:Array = ["perfect", "good", "average", "miss", "boo", "combo"];
         public static const FILTERS_NUMBER:Array = ["=", "!=", "<=", ">=", "<", ">"];
         public static const FILTERS_STRING:Array = ["equal", "start_with", "end_with", "contains"];
@@ -156,9 +155,6 @@ package classes.filter
 
                 case FILTER_TIME:
                     return compareNumber(songInfo.time_secs, input_number);
-
-                case FILTER_SONG_RATING:
-                    return compareNumber(songInfo.song_rating, input_number);
 
                 case FILTER_PERSONAL_SONG_RATING:
                     return compareNumber(userData.getSongRating(songInfo), input_number);
@@ -405,7 +401,6 @@ package classes.filter
                 case FILTER_RANK:
                 case FILTER_SCORE:
                 case FILTER_TIME:
-                case FILTER_SONG_RATING:
                 case FILTER_PERSONAL_SONG_RATING:
                     comparison = FILTERS_NUMBER[0];
                     break;

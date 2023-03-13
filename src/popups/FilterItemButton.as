@@ -112,7 +112,6 @@ package popups
                 case EngineLevelFilter.FILTER_SCORE:
                 case EngineLevelFilter.FILTER_COMBO_SCORE:
                 case EngineLevelFilter.FILTER_TIME:
-                case EngineLevelFilter.FILTER_SONG_RATING:
                 case EngineLevelFilter.FILTER_PERSONAL_SONG_RATING:
                     typeText = new Text(this, 5, 6, _lang.string("filter_type_" + filter.type));
 
