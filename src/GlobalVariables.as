@@ -409,10 +409,14 @@ package
                     songIcon = SONG_ICON_NO_SCORE;
 
                 // Unfinished or Passed
-                if (_rank.score > 0) {
-                    if (_rank.perfect + _rank.good + _rank.average + _rank.miss < noteCount) {
+                if (_rank.score > 0)
+                {
+                    if (_rank.perfect + _rank.good + _rank.average + _rank.miss < noteCount)
+                    {
                         songIcon = SONG_ICON_UNFINISHED;
-                    } else {
+                    }
+                    else
+                    {
                         songIcon = SONG_ICON_PASSED;
                     }
                 }
@@ -460,10 +464,14 @@ package
                 }
                 
                 // Unfinished or Passed
-                if (_rank.score > 0) {
-                    if (_rank.perfect + _rank.good + _rank.average + _rank.miss < noteCount) {
+                if (_rank.score > 0)
+                {
+                    if (_rank.perfect + _rank.good + _rank.average + _rank.miss < noteCount)
+                    {
                         songIcon |= (1 << SONG_ICON_UNFINISHED);
-                    } else {
+                    }
+                    else
+                    {
                         songIcon |= (1 << SONG_ICON_PASSED);
                     }
                 }

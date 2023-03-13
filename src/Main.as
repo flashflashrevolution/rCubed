@@ -12,7 +12,6 @@ package
     import classes.Site;
     import classes.SongPreview;
     import classes.User;
-    import classes.replay.Replay;
     import classes.ui.BoxButton;
     import classes.ui.ProgressBar;
     import classes.ui.Text;
@@ -38,7 +37,6 @@ package
     import flash.ui.ContextMenuItem;
     import flash.ui.Keyboard;
     import game.GameMenu;
-    import game.GameOptions;
     import menu.MainMenu;
     import menu.MenuPanel;
     import popups.PopupContextMenu;
