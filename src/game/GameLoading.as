@@ -46,7 +46,7 @@ package game
                 var songInfo:SongInfo = _gvars.songQueue[0];
                 _gvars.songQueue.shift();
 
-                song = _gvars.getSongFile(songInfo, _gvars.options.loadPreview);
+                song = _gvars.getSongFile(songInfo);
                 _gvars.options.song = song;
             }
             else if (_gvars.options.song)

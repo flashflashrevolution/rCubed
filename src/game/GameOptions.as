@@ -70,7 +70,6 @@ package game
 
         public var song:Song = null;
         public var replay:Replay = null;
-        public var loadPreview:Boolean = false;
         public var isEditor:Boolean = false;
         public var isAutoplay:Boolean = false;
         public var mpRoom:Room = null;

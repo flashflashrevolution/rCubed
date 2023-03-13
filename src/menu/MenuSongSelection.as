@@ -1150,7 +1150,7 @@ package menu
             var songInfo:SongInfo = _playlist.getSongInfo(songItem.level);
             if (songInfo != null)
             {
-                var song:Song = _gvars.getSongFile(songInfo, true);
+                var song:Song = _gvars.getSongFile(songInfo);
                 if (song.isLoaded)
                 {
                     writeMenuMusicBytes(song);
@@ -1204,7 +1204,7 @@ package menu
             var songInfo:SongInfo = _playlist.getSongInfo(songItem.level);
             if (songInfo != null)
             {
-                var song:Song = _gvars.getSongFile(songInfo, true);
+                var song:Song = _gvars.getSongFile(songInfo);
                 if (song.isLoaded)
                 {
                     playSongPreview(song);

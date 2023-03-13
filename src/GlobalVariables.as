@@ -299,9 +299,9 @@ package
         }
 
         //- Song Data
-        public function getSongFile(songInfo:SongInfo, preview:Boolean = false):Song
+        public function getSongFile(songInfo:SongInfo):Song
         {
-            if (!preview && songInfo.engine == Playlist.instance.engine && (!songInfo.engine || !songInfo.engine.ignoreCache))
+            if (songInfo.engine == Playlist.instance.engine && (!songInfo.engine || !songInfo.engine.ignoreCache))
             {
                 for (var s:int = 0; s < songCache.length; s++)
                 {
@@ -311,21 +311,21 @@ package
                 }
             }
 
-            return loadSongFile(songInfo, preview);
+            return loadSongFile(songInfo);
         }
 
-        private function loadSongFile(songInfo:SongInfo, preview:Boolean = false):Song
+        private function loadSongFile(songInfo:SongInfo):Song
         {
             //- Only Cache 10 Songs
             var engineCache:Boolean = (songInfo.engine == Playlist.instance.engine) && (!songInfo.engine || !songInfo.engine.ignoreCache);
-            if (!preview && songCache.length > 10 && engineCache)
+            if (songCache.length > 10 && engineCache)
                 songCache.pop();
 
             //- Make new Song
-            var song:Song = new Song(songInfo, preview);
+            var song:Song = new Song(songInfo);
 
             //- Push to cache
-            if (!preview && engineCache)
+            if (engineCache)
                 songCache.push(song);
 
             return song;
@@ -462,7 +462,7 @@ package
                     noteCount = _rank.arrows;
                     maxRawScore = noteCount * 50;
                 }
-                
+
                 // Unfinished or Passed
                 if (_rank.score > 0)
                 {

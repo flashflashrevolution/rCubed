@@ -44,7 +44,6 @@ package classes.chart.parse
             if (engine.songURLMode != null && engine.songURLMode == "replace")
             {
                 var song_variables:Object = {"level": songInfo.level_id,
-                        "previewhash": songInfo.preview_hash,
                         "playhash": songInfo.play_hash};
 
                 return sprintf(engine.songURL, song_variables);

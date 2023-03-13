@@ -242,7 +242,6 @@ package popups.replays
                     _gvars.options = new GameOptions();
                     _gvars.options.isolation = false;
                     _gvars.options.replay = replay;
-                    _gvars.options.loadPreview = true;
                     _gvars.options.fillFromReplay();
                     _gvars.options.fillFromArcGlobals();
 

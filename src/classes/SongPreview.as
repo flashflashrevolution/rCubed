@@ -34,7 +34,6 @@ package classes
             this.isPreview = true;
             this.isLoaded = true;
 
-            _gvars.options.loadPreview = true;
             _gvars.options.fill();
         }
     }
