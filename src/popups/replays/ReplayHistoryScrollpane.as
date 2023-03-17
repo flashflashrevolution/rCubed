@@ -6,8 +6,9 @@ package popups.replays
     import flash.display.DisplayObject;
     import classes.Language;
     import classes.ui.Text;
+    import classes.ui.IScrollPane;
 
-    public class ReplayHistoryScrollpane extends Sprite
+    public class ReplayHistoryScrollpane extends Sprite implements IScrollPane
     {
         private var _width:Number = 100;
         private var _height:Number = 100;

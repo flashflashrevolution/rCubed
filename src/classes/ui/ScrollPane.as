@@ -6,7 +6,7 @@ package classes.ui
     import flash.events.MouseEvent;
     import flash.geom.Rectangle;
 
-    public class ScrollPane extends Sprite
+    public class ScrollPane extends Sprite implements IScrollPane
     {
         private var _width:Number;
         private var _height:Number;
