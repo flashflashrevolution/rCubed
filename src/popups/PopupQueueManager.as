@@ -184,7 +184,7 @@ package popups
                 }
             }
             scrollpane.update();
-            scrollpane.scrollTo(scrollbar.scroll, false);
+            scrollpane.scrollTo(scrollbar.scroll);
             scrollbar.draggerVisibility = (yOffset > scrollpane.height);
         }
 

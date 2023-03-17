@@ -812,8 +812,8 @@ package menu
             }
 
             // Scroll Position
-            pane.scrollTo(options.scroll_position, false);
-            scrollbar.scrollTo(options.scroll_position, false);
+            pane.scrollTo(options.scroll_position);
+            scrollbar.scrollTo(options.scroll_position);
 
             scrollbar.draggerVisibility = (yOffset > pane.height);
 

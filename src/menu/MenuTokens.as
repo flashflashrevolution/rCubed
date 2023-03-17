@@ -182,7 +182,7 @@ package menu
             downloadTokenImage();
 
             options.totalItems = sX;
-            pane.scrollTo(scrollbar.scroll, false);
+            pane.scrollTo(scrollbar.scroll);
             scrollbar.draggerVisibility = (yOffset > pane.height);
         }
 
@@ -271,7 +271,7 @@ package menu
 
         private function scrollBarMoved(e:Event):void
         {
-            pane.scrollTo(e.target.scroll, false);
+            pane.scrollTo(e.target.scroll);
         }
     }
 }

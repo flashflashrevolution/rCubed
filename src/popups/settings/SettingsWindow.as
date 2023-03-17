@@ -240,8 +240,8 @@ package popups.settings
 
             pane.update();
 
-            pane.scrollTo(0, false);
-            scrollbar.scrollTo(0, false);
+            pane.scrollTo(0);
+            scrollbar.scrollTo(0);
 
             scrollbar.visible = (pane.content.height > 425);
 
@@ -357,13 +357,13 @@ package popups.settings
                 return;
 
             var dist:Number = scrollbar.scroll + (pane.scrollFactorVertical / 2) * (e.delta > 0 ? -1 : 1);
-            pane.scrollTo(dist, false);
-            scrollbar.scrollTo(dist, false);
+            pane.scrollTo(dist);
+            scrollbar.scrollTo(dist);
         }
 
         private function scrollBarMoved(e:Event):void
         {
-            pane.scrollTo(e.target.scroll, false);
+            pane.scrollTo(e.target.scroll);
         }
     }
 }

@@ -200,7 +200,7 @@ package popups.replays
 
             var dist:Number = scrollbar.scroll + (pane.scrollFactorVertical / 2) * (e.delta > 0 ? -1 : 1);
             pane.scrollTo(dist);
-            scrollbar.scrollTo(dist, false);
+            scrollbar.scrollTo(dist);
         }
 
         private function e_scrollBarMoved(e:Event):void
@@ -211,7 +211,7 @@ package popups.replays
         public function updateScrollPane():void
         {
             pane.scrollTo(0);
-            scrollbar.scrollTo(0, false);
+            scrollbar.scrollTo(0);
 
             scrollbar.visible = pane.doScroll;
         }

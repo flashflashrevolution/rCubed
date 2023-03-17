@@ -84,17 +84,14 @@ package classes.ui
             scroll = 0;
         }
 
-        public function scrollTo(val:Number, useTween:Boolean = true):void
+        public function scrollTo(val:Number):void
         {
             if (val < 0)
                 val = 0;
             if (val > 1)
                 val = 1;
             scroll = val;
-            if (!useTween)
-                _dragger.y = (_bottom * val);
-            else
-                TweenLite.to(_dragger, 0.25, {y: (_bottom * val)});
+            _dragger.y = (_bottom * val);
         }
 
         public function set draggerVisibility(visible:Boolean):void
