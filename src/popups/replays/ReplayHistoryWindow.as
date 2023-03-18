@@ -41,7 +41,6 @@ package popups.replays
         private var TAB_BUTTONS:Vector.<TabButton>;
 
         private var txt_title:Text;
-        private var txt_mod_warning:Text;
 
         private var search_field:BoxText;
         private var search_field_placeholder:Text;
@@ -285,13 +284,10 @@ package popups.replays
 
 
 import assets.menu.icons.fa.iconRight;
-
 import classes.Room;
 import classes.ui.SimpleBoxButton;
 import classes.ui.Text;
-
 import com.greensock.TweenLite;
-
 import flash.display.Sprite;
 
 internal class TabButton extends Sprite
