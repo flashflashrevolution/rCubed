@@ -134,7 +134,7 @@ package popups.settings
                     _gvars.activeUser.activeMods.push(mod);
                 }
                 if (mod == "reverse")
-                    _gvars.removeSongFiles();
+                    _gvars.markSongFiles();
             }
 
             parent.checkValidMods();

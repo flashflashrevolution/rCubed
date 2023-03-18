@@ -38,6 +38,9 @@ package classes.chart
         public var songInfo:SongInfo;
         public var type:String;
 
+        public var isDirty:Boolean = true;
+
+        private var baseSound:Sound;
         public var sound:Sound;
         public var background:MovieClip;
         public var chart:NoteChart;
@@ -49,6 +52,12 @@ package classes.chart
         public var musicIsPlaying:Boolean = false;
         public var mp3Frame:int = 0;
         public var mp3Rate:Number = 1;
+
+        private var rateReverse:Boolean = false;
+        private var rateRate:Number = 1;
+        private var rateSample:int = 0;
+        private var rateSampleCount:int = 0;
+        private var rateSamples:ByteArray = new ByteArray();
 
         public var isLoaded:Boolean = false;
         public var isChartLoaded:Boolean = false;
@@ -74,9 +83,6 @@ package classes.chart
             this.type = songInfo.chart_type || NoteChart.FFR_MP3;
 
             options = _gvars.options;
-            noteMod = new NoteMod(this, options);
-            rateReverse = options.modEnabled("reverse");
-            rateRate = options.songRate;
 
             if (type == "EDITOR")
             {
@@ -272,18 +278,9 @@ package classes.chart
                 bytes.position = 0;
                 mp3Frame = metadata.frame - 2;
                 mp3Rate = MP3Extraction.formatRate(metadata.format) / 44100;
-                sound = new Sound();
-                sound.loadCompressedDataFromByteArray(bytes, bytes.length);
-                if (rateRate != 1 || rateReverse)
-                {
-                    rateSound = sound;
-                    sound = new Sound();
 
-                    if (rateReverse)
-                        sound.addEventListener("sampleData", onReverseSound);
-                    else
-                        sound.addEventListener("sampleData", onRateSound);
-                }
+                baseSound = new Sound();
+                baseSound.loadCompressedDataFromByteArray(bytes, bytes.length);
 
                 // Generate a SWF containing no audio, used as a background.
                 var mloader:Loader = new Loader();
@@ -342,21 +339,54 @@ package classes.chart
             loadFail = true;
         }
 
+        public function handleDirty(options:GameOptions):void
+        {
+            if (!isDirty)
+                return;
+
+            // Remove Old Sound
+            if (sound != null)
+            {
+                sound.removeEventListener("sampleData", onReverseSound);
+                sound.removeEventListener("sampleData", onRateSound);
+                sound = null;
+            }
+
+            if (soundChannel)
+            {
+                soundChannel.removeEventListener(Event.SOUND_COMPLETE, stopSound);
+                soundChannel.stop();
+            }
+
+            noteMod = new NoteMod(this, options);
+            rateReverse = options.modEnabled("reverse");
+            rateRate = options.songRate;
+
+            // Add Sound
+            if (rateRate != 1 || rateReverse)
+            {
+                sound = new Sound();
+
+                if (rateReverse)
+                    sound.addEventListener("sampleData", onReverseSound);
+                else
+                    sound.addEventListener("sampleData", onRateSound);
+            }
+            else
+            {
+                sound = baseSound;
+            }
+
+            isDirty = false;
+        }
 
         public function getSoundObject():Sound
         {
             if (rateRate != 1 || rateReverse)
-                return rateSound;
+                return baseSound;
 
             return sound;
         }
-
-        private var rateReverse:Boolean = false;
-        private var rateRate:Number = 1;
-        private var rateSound:Sound;
-        private var rateSample:int = 0;
-        private var rateSampleCount:int = 0;
-        private var rateSamples:ByteArray = new ByteArray();
 
         private function onRateSound(e:SampleDataEvent):void
         {
@@ -373,7 +403,7 @@ package classes.chart
                     rateSamples.position = 0;
                     sampleDiff = sample - rateSample;
                     var seekExtract:Boolean = (sampleDiff < 0 || sampleDiff > 8192);
-                    rateSampleCount = (rateSound as Object).extract(rateSamples, 4096, seekExtract ? sample * mp3Rate : -1);
+                    rateSampleCount = (baseSound as Object).extract(rateSamples, 4096, seekExtract ? sample * mp3Rate : -1);
 
                     if (seekExtract)
                     {
@@ -407,7 +437,7 @@ package classes.chart
                     rateSamples.position = 0;
                     sampleDiff = sample - rateSample;
                     var seekPosition:int = sample - 4095;
-                    rateSampleCount = (rateSound as Object).extract(rateSamples, 4096, seekPosition * mp3Rate);
+                    rateSampleCount = (baseSound as Object).extract(rateSamples, 4096, seekPosition * mp3Rate);
                     rateSample = seekPosition;
                     sampleDiff = sample - rateSample;
 
@@ -443,6 +473,7 @@ package classes.chart
             {
                 soundChannel.removeEventListener(Event.SOUND_COMPLETE, stopSound);
                 soundChannel.stop();
+                soundChannel = null;
             }
 
             if (sound)

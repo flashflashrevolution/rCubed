@@ -412,7 +412,6 @@ package popups.settings
             {
                 _gvars.activeUser.frameRate = optionFPS.validate(60);
                 _gvars.activeUser.frameRate = Math.max(Math.min(_gvars.activeUser.frameRate, 1000), 10);
-                _gvars.removeSongFiles();
             }
 
             else if (e.target == optionMPSize)

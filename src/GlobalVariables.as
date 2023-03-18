@@ -357,6 +357,12 @@ package
             }
         }
 
+        public function markSongFiles():void
+        {
+            for (var s:int = 0; s < songCache.length; s++)
+                songCache[s].isDirty = true;
+        }
+
         public static const SONG_ACCESS_PLAYABLE:int = 0;
         public static const SONG_ACCESS_CREDITS:int = 1;
         public static const SONG_ACCESS_PURCHASED:int = 2;

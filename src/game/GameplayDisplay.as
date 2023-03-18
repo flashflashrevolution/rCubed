@@ -215,6 +215,8 @@ package game
         {
             options = _gvars.options;
             song = options.song;
+            song.handleDirty(options);
+
             if (!options.isEditor && song.chart.Notes.length == 0)
             {
                 Alert.add(_lang.string("error_chart_has_no_notes"), 120, Alert.RED);
