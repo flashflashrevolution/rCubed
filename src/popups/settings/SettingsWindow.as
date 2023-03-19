@@ -540,7 +540,7 @@ internal class ManageWindow extends Sprite
         _tf.width = boxMid - 30;
         _tf.height = 215;
         _tf.multiline = true;
-        _tf.defaultTextFormat = new TextFormat(Language.FONT_NAME, 10, 0xFFFFFF, true);
+        _tf.defaultTextFormat = new TextFormat(Fonts.BASE_FONT, 10, 0xFFFFFF, true);
         _tf.type = TextFieldType.DYNAMIC;
         _tf.embedFonts = true;
         _tf.antiAliasType = AntiAliasType.ADVANCED;

@@ -25,7 +25,7 @@ package popups
         private var deleteCopyBox:BoxButton;
         private var closeBox:Box;
         private var results:Object;
-        private var textFormat:TextFormat = new TextFormat(Language.UNI_FONT_NAME, 14, 0xFFFFFF, true);
+        private var textFormat:TextFormat = new TextFormat(Language.BASE_FONT_CJK, 14, 0xFFFFFF, true);
 
         public function PopupScreenShot(myParent:MenuPanel, results:Object)
         {

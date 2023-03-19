@@ -139,7 +139,7 @@ package classes.ui
 
         private function html():String
         {
-            var fnt:String = isUnicode(_message) ? Language.UNI_FONT_NAME : Language.FONT_NAME;
+            var fnt:String = isUnicode(_message) ? Fonts.BASE_FONT_CJK : Fonts.BASE_FONT;
             return "<font face=\"" + fnt + "\" color=\"" + _fontColor + "\" size=\"" + _fontSize + "\"><b>" + _message + "</b></font>";
         }
 

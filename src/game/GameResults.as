@@ -405,9 +405,9 @@ package game
 
             // Display Results
             if (Text.isUnicode(songTitle))
-                resultsDisplay.song_title.defaultTextFormat.font = Language.UNI_FONT_NAME;
+                resultsDisplay.song_title.defaultTextFormat.font = Fonts.BASE_FONT_CJK;
             if (Text.isUnicode(songSubTitle))
-                resultsDisplay.song_description.defaultTextFormat.font = Language.UNI_FONT_NAME;
+                resultsDisplay.song_description.defaultTextFormat.font = Fonts.BASE_FONT_CJK;
 
             resultsDisplay.results_username.htmlText = "<B>" + (result.options.replay ? "Replay r" : "R") + "esults for " + skillLevel + result.user.name + ":</B>";
             resultsDisplay.results_time.htmlText = "<B>" + displayTime + "</B>";

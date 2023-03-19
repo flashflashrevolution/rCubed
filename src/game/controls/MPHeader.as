@@ -27,7 +27,7 @@ package game.controls
             this.user = user;
 
             field = new TextField();
-            field.defaultTextFormat = new TextFormat(Language.UNI_FONT_NAME, 18, 0xFFFFFF, true);
+            field.defaultTextFormat = new TextFormat(Fonts.BASE_FONT_CJK, 18, 0xFFFFFF, true);
             field.antiAliasType = AntiAliasType.ADVANCED;
             field.embedFonts = true;
             field.selectable = false;

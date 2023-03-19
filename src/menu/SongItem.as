@@ -256,7 +256,7 @@ package menu
         {
             if (_hoverSprite != null)
             {
-                _hoverSprite.message = "<font face=\"" + Language.UNI_FONT_NAME + "\" >" + _songUserInfo.notes + "</font>";
+                _hoverSprite.message = "<font face=\"" + Fonts.BASE_FONT_CJK + "\" >" + _songUserInfo.notes + "</font>";
             }
         }
 
@@ -298,7 +298,7 @@ package menu
                 _lblMessageText.width = 395;
                 _lblMessageText.wordWrap = true;
                 _lblMessageText.autoSize = TextFieldAutoSize.LEFT;
-                _lblMessageText.htmlText = "<font face=\"" + Language.UNI_FONT_NAME + "\" color=\"#FFFFFF\" size=\"10\"><b>" + _message + "</b></font>";
+                _lblMessageText.htmlText = "<font face=\"" + Fonts.BASE_FONT_CJK + "\" color=\"#FFFFFF\" size=\"10\"><b>" + _message + "</b></font>";
                 this.addChild(_lblMessageText);
 
                 _lblSongName.x = 5;

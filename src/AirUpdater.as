@@ -86,7 +86,7 @@ package
             outputText.antiAliasType = AntiAliasType.ADVANCED;
             outputText.multiline = true;
             outputText.wordWrap = true;
-            outputText.htmlText = "<BODY><FONT face=\"" + Language.FONT_NAME + "\"></FONT></BODY>";
+            outputText.htmlText = "<BODY><FONT face=\"" + Fonts.BASE_FONT + "\"></FONT></BODY>";
             box.addChild(outputText);
 
             update_checks = LocalStore.getVariable("air_update_checks", 0);
@@ -325,7 +325,7 @@ package
                                 try
                                 {
                                     var changeBytes:ByteArray = reader.unzip(entry);
-                                    outputText.htmlText = "<BODY><FONT face=\"" + Language.FONT_NAME + "\">";
+                                    outputText.htmlText = "<BODY><FONT face=\"" + Fonts.BASE_FONT + "\">";
                                     outputText.htmlText += getUpdateCheckText();
                                     outputText.htmlText += changeBytes.toString().replace(/\r\n/gi, "\n") + "\n</FONT></BODY>";
                                     haveChangeLog = true;
