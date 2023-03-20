@@ -159,6 +159,13 @@ package menu
 
             draw();
 
+            // Re-Open File Browser
+            if (Flags.VALUES[Flags.FILE_LOADER_OPEN])
+            {
+                Flags.VALUES[Flags.FILE_LOADER_OPEN] = false;
+                switchTo(MainMenu.MENU_LOCAL);
+            }
+
             return true;
         }
 

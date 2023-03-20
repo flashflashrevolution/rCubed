@@ -739,6 +739,7 @@ package popups
             song.isChartLoaded = song.isMusicLoaded = song.isLoaded = true;
 
             // Setup Loading
+            Flags.VALUES[Flags.FILE_LOADER_OPEN] = true;
             _gvars.externalSongInfo = songInfo;
             _gvars.externalSong = song;
             _gvars.songQueue = [songInfo];
