@@ -723,6 +723,7 @@ package popups
             songInfo.time = chartinfo.time;
             songInfo.time_secs = chartinfo.time_secs;
             songInfo.engine = ENGINE_INFO;
+            songInfo.background = chartinfo.background != "" ? chartinfo.folder + chartinfo.background : null;
 
             // Build Chart
             var noteChart:NoteChart = new NoteChart();

@@ -64,6 +64,7 @@ package classes
         public var engine:Object;
         public var level_id:String;
         public var sync:int;
+        public var background:String;
 
         public function SongInfo()
         {

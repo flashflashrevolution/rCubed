@@ -26,6 +26,8 @@ package game
     import flash.display.Bitmap;
     import flash.display.BitmapData;
     import flash.display.DisplayObject;
+    import flash.display.Loader;
+    import flash.display.LoaderInfo;
     import flash.display.Sprite;
     import flash.events.ErrorEvent;
     import flash.events.Event;
@@ -39,6 +41,7 @@ package game
     import flash.ui.Keyboard;
     import flash.utils.getTimer;
     import game.graph.GraphAccuracy;
+    import game.graph.GraphAccuracyPrecise;
     import game.graph.GraphBase;
     import game.graph.GraphCombo;
     import menu.MenuPanel;
@@ -47,7 +50,6 @@ package game
     import popups.PopupSongNotes;
     import popups.PopupTokenUnlock;
     import popups.replays.ReplayHistoryTabLocal;
-    import game.graph.GraphAccuracyPrecise;
 
     public class GameResults extends MenuPanel
     {
@@ -79,6 +81,7 @@ package game
 
         // Game Result
         private var resultsDisplay:ResultsBackground;
+        private var bgImage:Bitmap;
         private var navRating:Sprite;
         private var navPrev:BoxButton;
         private var navNext:BoxButton;
@@ -309,6 +312,13 @@ package game
             // Song Results
             var result:GameScoreResult;
 
+            // Local Backgrounds
+            if (bgImage)
+            {
+                bgImage.parent.removeChild(bgImage);
+                bgImage = null;
+            }
+
             // Song Queue (Multiple Songs)
             if (gameIndex == -1)
             {
@@ -362,6 +372,50 @@ package game
                 var seconds:Number = Math.floor(songInfo.time_secs * (1 / result.options.songRate));
                 var songLength:String = (Math.floor(seconds / 60)) + ":" + (seconds % 60 >= 10 ? "" : "0") + (seconds % 60);
                 var rateString:String = result.options.songRate != 1 ? " (" + result.options.songRate + "x Rate)" : "";
+
+                // Background
+                if (songInfo.background != null)
+                {
+                    // Check Extension
+                    var backgroundExt:String = songInfo.background.substr(songInfo.background.lastIndexOf(".") + 1).toLowerCase();
+                    if (backgroundExt == "jpg" || backgroundExt == "png" || backgroundExt == "gif" || backgroundExt == "jpeg")
+                    {
+                        var path:String = "file:///" + songInfo.background;
+                        var imageLoader:Loader = new Loader();
+                        imageLoader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, e_backgroundLoaded);
+                        imageLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, e_backgroundLoaded);
+                        imageLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, e_backgroundLoaded);
+                        imageLoader.load(new URLRequest(path), AirContext.getLoaderContext());
+
+                        function e_backgroundLoaded(e:Event):void
+                        {
+                            // Position Loaded Banner Image
+                            if (e.type == Event.COMPLETE && e.target != null && ((e.target as LoaderInfo).content) != null)
+                            {
+                                bgImage = ((e.target as LoaderInfo).content) as Bitmap;
+                                bgImage.smoothing = true;
+                                bgImage.pixelSnapping = "always";
+                                resultsDisplay.blueBackground.addChildAt(bgImage, 1);
+                                bgImage.alpha = 0.5;
+
+                                var imageScale:Number = 780 / bgImage.width;
+
+                                bgImage.scaleX = bgImage.scaleY = imageScale;
+
+                                if (bgImage.height < 480)
+                                {
+                                    bgImage.scaleX = bgImage.scaleY = 1;
+                                    imageScale = 480 / bgImage.height;
+                                    bgImage.scaleX = bgImage.scaleY = imageScale;
+                                    bgImage.x = -((bgImage.width - 780) / 2);
+                                }
+                                else
+                                    bgImage.y = -((bgImage.height - 480) / 2);
+                            }
+                        }
+                    }
+                }
+
 
                 // Song Title
                 songTitle = songInfo.engine ? songInfo.name + rateString : "<a href=\"" + URLs.resolve(URLs.LEVEL_STATS_URL) + songInfo.level + "\">" + songInfo.name + rateString + "</a>";
