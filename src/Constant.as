@@ -60,32 +60,6 @@ package
 
         // Functions
         /**
-         * Cleans the scroll direction from older engine names to the current names.
-         * Only used on loaded replays to understand older scroll direction values.
-         * @param dir
-         * @return
-         */
-        public static function cleanScrollDirection(dir:String):String
-        {
-            dir = dir.toLowerCase();
-
-            switch (dir)
-            {
-                case "slideright":
-                    return "right"; // Legacy/Velocity
-                case "slideleft":
-                    return "left"; // Legacy/Velocity
-                case "rising":
-                    return "up"; // Legacy/Velocity
-                case "falling":
-                    return "down"; // Legacy/Velocity
-                case "diagonalley":
-                    return "diagonalley"; // Legacy/Velocity
-            }
-            return dir;
-        }
-
-        /**
          * Adds default URLVariables to the passed requestVars.
          * @param requestVars
          */
