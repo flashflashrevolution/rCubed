@@ -138,7 +138,7 @@ package classes.chart.parse
             Alert.add("Error loading legacy engine");
         }
 
-        public static function parsePlaylist(data:Object, engine:Object = null):Object
+        public static function parsePlaylist(data:Object, engine:Object = null):Array
         {
             if (engine == null)
                 engine = ArcGlobals.instance.configLegacy;
@@ -180,7 +180,7 @@ package classes.chart.parse
 
                 songs.push(songInfo);
             }
-            return {"time": Number.POSITIVE_INFINITY, "songs": songs};
+            return songs;
         }
 
         public function parseChart(data:ByteArray):void

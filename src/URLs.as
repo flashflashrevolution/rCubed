@@ -40,7 +40,7 @@ package
 
         // Site URLs
         public static var SITE_DATA_URL:String = "game/r3/r3-siteData.v2.php";
-        public static var SITE_PLAYLIST_URL:String = "game/r3/r3-playlist.v2.php";
+        public static var SITE_PLAYLIST_URL:String = "game/r3/r3-playlist.php";
         public static var SITE_LANGUAGE_URL:String = "game/r3/r3-language.php";
         public static var SITE_HISCORES_URL:String = "game/r3/r3-hiscores.php";
         public static var SITE_REPLAYS_URL:String = "game/r3/r3-replays.php";

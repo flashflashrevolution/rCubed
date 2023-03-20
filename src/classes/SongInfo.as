@@ -51,7 +51,7 @@ package classes
         public var time_secs:int;
         public var time_end:Number;
 
-        public var is_ranked:Boolean = true;
+        public var is_unranked:Boolean = false;
         public var is_explicit:Boolean = false;
         public var is_legacy:Boolean = false;
         public var is_disabled:Boolean = false;
