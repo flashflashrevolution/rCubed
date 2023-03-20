@@ -4,7 +4,7 @@ package classes.chart.parse
     import flash.utils.ByteArray;
     import flash.utils.getTimer;
 
-    public class ChartStepmania extends ChartBase
+    public class ChartSSC extends ChartBase
     {
         private static const NOTE_TYPE_4TH:int = 0;
         private static const NOTE_TYPE_8TH:int = 1;
@@ -19,31 +19,11 @@ package classes.chart.parse
 
         private static const ROWS_PER_MEASURE:int = 192;
 
-        private var fields_array:Array = ['title',
-            'subtitle',
-            'artist',
-            'titletranslit',
-            'subtitletranslit',
-            'artisttranslit',
-            'credit',
-            'banner',
-            'background',
-            'cdtitle',
-            'music',
-            'offset',
-            'samplestart',
-            'samplelength',
-            'bpms',
-            'stops',
-            'freezes',
-            'notes'];
-
         private var fields_number:Array = ['offset',
             'samplestart',
-            'samplelength'];
-
-        private var bpms:Array = [];
-        private var stops:Array = [];
+            'samplelength',
+            'version',
+            'meter'];
 
         override public function load(fileData:ByteArray, fileName:String = null):Boolean
         {
@@ -76,129 +56,167 @@ package classes.chart.parse
                         break;
                 }
 
+                var tmp_array:Array;
+                var chart:int = -1;
+
                 // Build Data Structure
-                var notes:Object;
                 for each (var match:Array in matches)
                 {
-                    if (fields_array.indexOf(match[0]) <= -1)
-                        continue;
-
-                    switch (match[0])
+                    if (match[0] == "notedata")
                     {
-                        case 'bpms':
-                        case 'stops':
-                        case 'freezes':
-                            data[match[0]] = getListValues(match[1], true);
-                            break;
+                        chart++;
+                        data["notes"][chart] = {};
+                        continue;
+                    }
 
-                        case 'notes':
-                            notes = {};
+                    if (chart > -1)
+                    {
+                        switch (match[0])
+                        {
+                            // time=string
+                            case 'labels':
+                            case 'speeds':
+                            case 'timesignatures':
+                                data["notes"][chart][match[0]] = getListValues(match[1], false);
+                                break;
 
-                            var notesValues:Array = match[1].split(":");
-                            for (var i:int = 0; i < notesValues.length; i++)
-                                notesValues[i] = StringUtil.trim(notesValues[i]);
+                            // time=value
+                            case 'bpms':
+                            case 'stops':
+                            case 'delays':
+                            case 'warps':
+                            case 'tickcounts':
+                            case 'combos':
+                            case 'scrolls':
+                                data["notes"][chart][match[0]] = getListValues(match[1], true);
 
-                            notes['type'] = standardType(notesValues[0]); // dance-single, dance-double, dance-couple, dance-solo
-                            notes['desc'] = notesValues[1]; // ???
-                            notes['class'] = notesValues[2]; // Beginner, Easy, Medium, Hard, Challenge, ...Edit?
-                            notes['class_color'] = notesValues[2]; // Beginner, Easy, Medium, Hard, Challenge, ...Edit?
-                            notes['difficulty'] = notesValues[3]; // [0-9]+
-                            notes['radar_values'] = notesValues[4]; // 0.000,0.000,0.000,0.000,0.000
+                                break;
 
-                            // check type for valid
-                            if (!ignoreValidation && (validColumnCounts.indexOf(notes['type']) == -1))
-                            {
-                                trace("SM: Invalid: [", notesValues[0], notes['type'], "]");
-                                continue;
-                            }
+                            case 'notes':
+                                // filter out anything except notes and commas
+                                var notesData:Array = StringUtil.trim(match[1]).split("\n");
+                                for (var i:int = 0; i < notesData.length; i++)
+                                {
+                                    var pos:int = notesData[i].indexOf('//');
 
-                            // filter out anything except notes and commas
-                            var notesData:Array = notesValues[5].split("\n");
-                            for (i = 0; i < notesData.length; i++)
-                            {
-                                var pos:int = notesData[i].indexOf('//');
+                                    if (pos !== -1)
+                                        notesData[i] = notesData[i].substr(0, pos);
 
-                                if (pos !== -1)
-                                    notesData[i] = notesData[i].substr(0, pos);
+                                    notesData[i] = StringUtil.trim(notesData[i]);
+                                }
+                                data["notes"][chart]['data'] = notesData.join('');
 
-                                notesData[i] = StringUtil.trim(notesData[i]);
-                            }
-                            notes['data'] = notesData.join('');
+                                // count arrows, holds, mines
+                                data["notes"][chart]['arrows'] = getCharacterCount(data["notes"][chart]['data'], "1");
+                                data["notes"][chart]['holds'] = getCharacterCount(data["notes"][chart]['data'], "2");
+                                data["notes"][chart]['mines'] = getCharacterCount(data["notes"][chart]['data'], "M");
+                                break;
 
-                            // count arrows, holds, mines
-                            notes['arrows'] = getCharacterCount(notes['data'], "1");
-                            notes['holds'] = getCharacterCount(notes['data'], "2");
-                            notes['mines'] = getCharacterCount(notes['data'], "M");
+                            default:
+                                if (fields_number.indexOf(match[0]) != -1)
+                                    data["notes"][chart][match[0]] = parseFloat(StringUtil.trim(match[1]));
+                                else
+                                    data["notes"][chart][match[0]] = StringUtil.trim(match[1]);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (match[0])
+                        {
+                            // time=string
+                            case 'labels':
+                            case 'speeds':
+                            case 'timesignatures':
+                                tmp_array = getListValues(match[1], false);
 
-                            data['notes'].push(notes);
-                            break;
+                                if (tmp_array.length > 0)
+                                    data[match[0]] = tmp_array;
+                                break;
 
-                        default:
-                            if (fields_number.indexOf(match[0]) != -1)
-                                data[match[0]] = parseFloat(match[1]);
-                            else
-                                data[match[0]] = match[1];
-                            break;
+                            // time=value
+                            case 'bpms':
+                            case 'stops':
+                            case 'delays':
+                            case 'warps':
+                            case 'tickcounts':
+                            case 'combos':
+                            case 'scrolls':
+                                tmp_array = getListValues(match[1], true);
+
+                                if (tmp_array.length > 0)
+                                    data[match[0]] = tmp_array;
+
+                                break;
+
+                            default:
+                                if (fields_number.indexOf(match[0]) != -1)
+                                    data[match[0]] = parseFloat(StringUtil.trim(match[1]));
+                                else
+                                    data[match[0]] = StringUtil.trim(match[1]);
+                                break;
+                        }
                     }
                 }
 
-                // Setup BPMS
-                this.bpms = this.data['bpms'] || [];
-                this.bpms.sort(keyPairSort);
-                if (this.bpms.length <= 0)
-                    this.bpms[0] = [0, 60]; // No BPM, default to 60.
-                this.bpms[0][0] = 0; // First BPM starts at beat 0.
-
-                // Setup Stops
-                this.stops = this.data['stops'] || this.data['freezes'] || [];
-                this.stops.sort(keyPairSort);
-
                 // Finalize Charts
-                for (var chart:int = 0; chart < data["notes"].length; chart++)
+                for (chart = 0; chart < data["notes"].length; chart++)
                 {
-                    notes = data["notes"][chart];
+                    var notes:Object = data["notes"][chart];
+
+                    notes['type'] = standardType(notes['stepstype']); // dance-single, dance-double, dance-couple, dance-solo, etc.
+                    notes['desc'] = ""; // ???
+                    notes['class'] = notes['difficulty'] || "Easy"; // Beginner, Easy, Medium, Hard, Challenge, ...Edit?
+                    notes['class_color'] = notes['difficulty'] || "Easy"; // Beginner, Easy, Medium, Hard, Challenge, ...Edit?
+                    notes['difficulty'] = notes['meter'] || 1; // [0-9]+
+                    notes['radar_values'] = notes['radarvalues'] || ""; // 0.000,0.000,0.000,0.000,0.000
                     notes['time_sec'] = getChartTimeFast(chart);
                     notes['nps'] = ((notes['arrows'] + notes['holds']) / (notes['time_sec']));
+
+                    if (notes['credit'] != null)
+                    {
+                        notes['stepauthor'] = notes['credit'];
+                        delete notes['credit'];
+                    }
+
+                    delete notes['stepstype'];
+                    delete notes['meter'];
+
+                    if (!ignoreValidation && (validColumnCounts.indexOf(notes['type']) == -1))
+                    {
+                        trace("SSC: Invalid: [", notes['stepstype'], notes['type'], "]");
+                        data["notes"].removeAt(chart);
+                    }
                 }
 
+                // Match Stepmania Variables
                 data['stepauthor'] = data['credit'];
-
-                // Validation
-                if (data['music'] == null)
-                    data['music'] = fileName.substr(0, fileName.lastIndexOf(".")) + ".mp3";
-
-                var audioExt:String = (data['music'] || "").substr(-3).toLowerCase();
-                if (!ignoreValidation && (audioExt != "mp3"))
-                {
-                    trace("SM: Invalid: [", audioExt, "]");
-                    return false;
-                }
-
-                // No valid charts found.
-                if (data['notes'].length <= 0)
-                {
-                    trace("SM: No Charts");
-                    return false;
-                }
             }
             catch (e:Error)
             {
-                trace("SM: Error Catch: " + e);
+                trace("SSC: Error Catch: " + e);
+                return false;
+            }
+
+            var audioExt:String = (data['music'] || "").substr(-3).toLowerCase();
+            if (!ignoreValidation && (audioExt != "mp3"))
+            {
+                trace("SSC: Invalid: [", audioExt, "]");
+                return false;
+            }
+
+            // No valid charts found.
+            if (data['notes'].length <= 0)
+            {
+                trace("SSC: No Charts");
                 return false;
             }
 
             this.loaded = true;
 
-            var t:Number = getTimer();
-            parse();
-            trace("parsed in", (getTimer() - t));
-
             return true;
         }
 
-        /**
-         * Fully parse the chart data if applicable.
-         */
         override public function parse():void
         {
             if (!loaded || this.parsed)
@@ -230,18 +248,23 @@ package classes.chart.parse
                     'columns': columnCount};
 
             var notes:Array = [];
+            var holds:Array = [];
             var mines:Array = [];
 
             var pre_notes:Vector.<ChartObject> = new <ChartObject>[];
             var pre_mines:Vector.<ChartObject> = new <ChartObject>[];
             var pre_holds:Object = {};
 
-            var currentRow:int = 0;
+            var currentBeat:Number = 0;
             var currentTime:Number = 0;
 
             var measureArray:Array = chartData['data'].split(",");
             var measureCount:int = measureArray.length;
             var notebarOffset:int = 0;
+            var rowValue:int = 0;
+
+            var row:int;
+            var rowUpdates:int;
 
             var msBeatIncrement:Number;
             var lastBPMIndex:int = 0;
@@ -251,9 +274,22 @@ package classes.chart.parse
             var warpStart:Number = -1;
             var isWarping:Boolean = false;
 
+            // Setup BPMs
+            var bpms:Array = chartData['bpms'] || this.data['bpms'] || [[0, 60]];
+            bpms.sort(keyPairSort);
+            bpms[0][0] = 0; // First BPM starts at beat 0.
+
+            // Setup Stops
+            var stops:Array = chartData['stops'] || this.data['stops'] || [];
+            stops.sort(keyPairSort);
+
+            // Setup Warps
+            var warps:Array = chartData['warps'] || this.data['warps'] || [];
+            warps.sort(keyPairSort);
+
             for (var currentMeasure:int = 0; currentMeasure < measureCount; currentMeasure++)
             {
-                currentRow = currentMeasure * ROWS_PER_MEASURE;
+                rowValue = currentMeasure * ROWS_PER_MEASURE;
 
                 var measure:String = measureArray[currentMeasure];
                 notebarOffset = 0;
@@ -263,7 +299,10 @@ package classes.chart.parse
 
                 for (var currentNoteBar:int = 0; currentNoteBar < barsPerMeasure; currentNoteBar++)
                 {
-                    lastBPMIndex = bpm_at_row_index(currentRow, lastBPMIndex);
+                    // calculate the current beat, this can have decimals
+                    currentBeat = measureBeat + ((currentNoteBar / barsPerMeasure) * 4);
+
+                    lastBPMIndex = bpm_at_beat_index(bpms, currentBeat, lastBPMIndex);
                     var currentBPM:Number = bpms[lastBPMIndex][1];
 
                     // Stops
@@ -272,7 +311,7 @@ package classes.chart.parse
                         if (lastStop == null)
                             lastStop = stops[0];
 
-                        while (lastStop[0] < currentRow)
+                        while (lastStop[0] <= currentBeat)
                         {
                             currentTime += lastStop[1] * 1000;
                             lastStopIndex++;
@@ -331,10 +370,12 @@ package classes.chart.parse
 
                     // BPMs need to be handled on every 192nd, skipping any row will result in
                     // off-sync if a BPM change lands on a row not handled by the measure.
-                    var rowUpdates:int = ROWS_PER_MEASURE / barsPerMeasure;
-                    for (var row:int = 0; row < rowUpdates; row++)
+                    rowUpdates = ROWS_PER_MEASURE / barsPerMeasure;
+                    for (row = 0; row < rowUpdates; row++)
                     {
-                        lastBPMIndex = bpm_at_row_index(currentRow, lastBPMIndex);
+                        rowValue++;
+                        currentBeat = measureBeat + (((currentNoteBar / barsPerMeasure) + (row / ROWS_PER_MEASURE)) * 4);
+                        lastBPMIndex = bpm_at_beat_index(bpms, currentBeat, lastBPMIndex);
                         currentBPM = bpms[lastBPMIndex][1];
 
                         // Start Warp
@@ -347,8 +388,6 @@ package classes.chart.parse
                         // Increase Time
                         msBeatIncrement = 1000 / (currentBPM / 60);
                         currentTime += ((4 / ROWS_PER_MEASURE) * msBeatIncrement);
-
-                        currentRow++;
                     }
 
                     // End Warp
@@ -372,7 +411,10 @@ package classes.chart.parse
 
                 elm.time = (offset + elm.time) / 1000;
 
-                notes[notes.length] = [elm.time, elm.dir, elm.color, (!isNaN(elm.tail) ? (int(elm.tail) / 1000) : 0)];
+                notes[notes.length] = [elm.time, elm.dir, elm.color];
+
+                if (!isNaN(elm.tail))
+                    holds[holds.length] = [elm.time, elm.dir, elm.color, (int(elm.tail) / 1000)];
             }
 
             // finalize mines
@@ -390,6 +432,7 @@ package classes.chart.parse
             mines.sortOn("0", Array.NUMERIC);
 
             out['notes'] = notes;
+            out['holds'] = holds;
             out['mines'] = mines;
 
             delete chartData['data'];
@@ -419,30 +462,44 @@ package classes.chart.parse
             // Calculate
             //var t:Number = getTimer();
 
+            var chartData:Object = data['notes'][chart_index];
+
+            var currentBeat:Number = 0;
             var currentTime:Number = 0;
             var currentBPM:Number;
 
-            var measureCount:int = getCharacterCount(data['notes'][chart_index]['data'], ",") + 1;
+            var measureCount:int = getCharacterCount(chartData['data'], ",") + 1;
             var maxRows:int = ROWS_PER_MEASURE * measureCount;
 
             var msBeatIncrement:Number;
             var lastBPMIndex:int = 0;
-            var currentRow:int = 0;
 
             const timeSeq:Number = (4 / ROWS_PER_MEASURE);
 
+            // Setup BPMs
+            var bpms:Array = chartData['bpms'] || this.data['bpms'] || [[0, 60]];
+            bpms.sort(keyPairSort);
+            bpms[0][0] = 0; // First BPM starts at beat 0.
+
+            // Setup Stops
+            var stops:Array = chartData['stops'] || this.data['stops'] || [];
+            stops.sort(keyPairSort);
+
+            // Setup Warps
+            var warps:Array = chartData['warps'] || this.data['warps'] || [];
+            warps.sort(keyPairSort);
+
             // BPMs need to be handled on every 192nd, skipping any row will result in
             // off-sync if a BPM change lands on a row not handled by the measure.
-            while (currentRow < maxRows)
+            for (var row:int = 0; row < maxRows; row++)
             {
-                lastBPMIndex = bpm_at_row_index(currentRow, lastBPMIndex);
+                currentBeat = (row / 48);
+                lastBPMIndex = bpm_at_beat_index(bpms, currentBeat, lastBPMIndex);
                 currentBPM = bpms[lastBPMIndex][1];
 
                 // Increase Time
                 msBeatIncrement = 1000 / (currentBPM / 60);
                 currentTime += (timeSeq * msBeatIncrement);
-
-                currentRow++;
             }
 
             // Stops
@@ -451,7 +508,7 @@ package classes.chart.parse
                     currentTime += stops[i][1] * 1000;
 
             // Offset
-            currentTime += (data['offset'] * -1000);
+            currentTime += ((chartData['offset'] || data['offset'] || 0) * -1000);
 
             // MS -> Seconds
             currentTime /= 1000;
@@ -574,14 +631,16 @@ package classes.chart.parse
          * @param startIndex
          * @return
          */
-        private function bpm_at_row_index(currentRow:Number, startIndex:int = 0):int
+        private function bpm_at_beat_index(bpms:Array, currentBeat:Number, startIndex:int = 0):int
         {
+            currentBeat = Math.round(currentBeat * 48); // round to nearest row
+
             var bpm:int = startIndex;
             var len:int = bpms.length;
 
             for (var i:int = startIndex; i < len; i++)
             {
-                if (bpms[i][0] > currentRow)
+                if (Math.round(bpms[i][0]) * 48 > currentBeat)
                     break;
 
                 bpm = i;
@@ -616,9 +675,9 @@ package classes.chart.parse
 
                 if (splitIndex >= 1)
                     if (isNumber)
-                        tmp_array[tmp_array.length] = [Math.round(48 * parseFloat(arrayList.substr(0, splitIndex))), parseFloat(arrayList.substr(splitIndex + 1))];
+                        tmp_array[tmp_array.length] = [parseFloat(arrayList.substr(0, splitIndex)), parseFloat(arrayList.substr(splitIndex + 1))];
                     else
-                        tmp_array[tmp_array.length] = [Math.round(48 * parseFloat(arrayList.substr(0, splitIndex))), arrayList.substr(splitIndex + 1)];
+                        tmp_array[tmp_array.length] = [parseFloat(arrayList.substr(0, splitIndex)), arrayList.substr(splitIndex + 1)];
             }
             return tmp_array;
         }

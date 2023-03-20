@@ -272,15 +272,11 @@ package classes.chart
                 chart = NoteChart.parseChart(NoteChart.FFR_LEGACY, songInfo, chartData);
                 chartLoadComplete(e);
 
-                // Generate SWF Containing a MP3 as class "SoundClass".
+                // Extract MP3 Data and load into Sound.
                 var metadata:Object = {};
-                var bytes:ByteArray = MP3Extraction.extractSound(chartData, metadata);
-                bytes.position = 0;
+                loadSoundBytes(MP3Extraction.extractSound(chartData, metadata));
                 mp3Frame = metadata.frame - 2;
                 mp3Rate = MP3Extraction.formatRate(metadata.format) / 44100;
-
-                baseSound = new Sound();
-                baseSound.loadCompressedDataFromByteArray(bytes, bytes.length);
 
                 // Generate a SWF containing no audio, used as a background.
                 var mloader:Loader = new Loader();
@@ -378,6 +374,13 @@ package classes.chart
             }
 
             isDirty = false;
+        }
+
+        public function loadSoundBytes(bytes:ByteArray):void
+        {
+            bytes.position = 0;
+            baseSound = new Sound();
+            baseSound.loadCompressedDataFromByteArray(bytes, bytes.length);
         }
 
         public function getSoundObject():Sound

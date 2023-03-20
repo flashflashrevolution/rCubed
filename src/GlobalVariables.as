@@ -110,6 +110,10 @@ package
         public var air_windowProperties:Object;
         public var file_replay_cache:FileCache = new FileCache("replays/cache.json", 1);
 
+        ///- Song Loader
+        public var externalSongInfo:SongInfo;
+        public var externalSong:Song;
+
         private var websocket_server:AIRServer;
         private static var websocket_message:Message = new Message();
 
@@ -301,6 +305,9 @@ package
         //- Song Data
         public function getSongFile(songInfo:SongInfo):Song
         {
+            if (songInfo == externalSongInfo)
+                return externalSong;
+
             if (songInfo.engine == Playlist.instance.engine && (!songInfo.engine || !songInfo.engine.ignoreCache))
             {
                 for (var s:int = 0; s < songCache.length; s++)
@@ -359,6 +366,9 @@ package
 
         public function dirtySongFiles():void
         {
+            if (externalSong)
+                externalSong.isDirty = true;
+
             for (var s:int = 0; s < songCache.length; s++)
                 songCache[s].isDirty = true;
         }

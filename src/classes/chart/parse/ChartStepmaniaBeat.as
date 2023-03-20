@@ -4,7 +4,7 @@ package classes.chart.parse
     import flash.utils.ByteArray;
     import flash.utils.getTimer;
 
-    public class ChartStepmania extends ChartBase
+    public class ChartStepmaniaBeat extends ChartBase
     {
         private static const NOTE_TYPE_4TH:int = 0;
         private static const NOTE_TYPE_8TH:int = 1;
@@ -44,6 +44,8 @@ package classes.chart.parse
 
         private var bpms:Array = [];
         private var stops:Array = [];
+
+        private var _hasWarp:Boolean = false;
 
         override public function load(fileData:ByteArray, fileName:String = null):Boolean
         {
@@ -89,6 +91,7 @@ package classes.chart.parse
                         case 'stops':
                         case 'freezes':
                             data[match[0]] = getListValues(match[1], true);
+                            checkWarps(data[match[0]]);
                             break;
 
                         case 'notes':
@@ -189,10 +192,6 @@ package classes.chart.parse
 
             this.loaded = true;
 
-            var t:Number = getTimer();
-            parse();
-            trace("parsed in", (getTimer() - t));
-
             return true;
         }
 
@@ -219,170 +218,72 @@ package classes.chart.parse
          */
         private function parseNoteData(chartData:Object):Object
         {
-            //var t:Number = getTimer();
+            var t:Number = getTimer();
 
             var columnCount:int = chartData['type'];
             var columnMap:Array = COLUMNS[chartData['type']] || [];
 
-            var offset:Number = data['offset'] * -1000;
-
             var out:Object = {'data': chartData,
                     'columns': columnCount};
 
+            var pre_holds:Object = {};
             var notes:Array = [];
             var mines:Array = [];
-
-            var pre_notes:Vector.<ChartObject> = new <ChartObject>[];
-            var pre_mines:Vector.<ChartObject> = new <ChartObject>[];
-            var pre_holds:Object = {};
 
             var currentRow:int = 0;
             var currentTime:Number = 0;
 
             var measureArray:Array = chartData['data'].split(",");
             var measureCount:int = measureArray.length;
-            var notebarOffset:int = 0;
-
-            var msBeatIncrement:Number;
-            var lastBPMIndex:int = 0;
-            var lastStopIndex:int = 0;
-            var lastStop:Array;
-
-            var warpStart:Number = -1;
-            var isWarping:Boolean = false;
 
             for (var currentMeasure:int = 0; currentMeasure < measureCount; currentMeasure++)
             {
                 currentRow = currentMeasure * ROWS_PER_MEASURE;
 
                 var measure:String = measureArray[currentMeasure];
-                notebarOffset = 0;
+                var notebarOffset:int = 0;
 
                 var barsPerMeasure:int = measure.length / columnCount;
-                var measureBeat:int = currentMeasure * 4;
 
                 for (var currentNoteBar:int = 0; currentNoteBar < barsPerMeasure; currentNoteBar++)
                 {
-                    lastBPMIndex = bpm_at_row_index(currentRow, lastBPMIndex);
-                    var currentBPM:Number = bpms[lastBPMIndex][1];
+                    var measureBeat:Number = (currentMeasure * 4) + (((192 / barsPerMeasure) / 48) * currentNoteBar);
 
-                    // Stops
-                    if (stops.length > 0 && lastStopIndex < stops.length)
+                    for (var column:int = 0; column < columnCount; column++)
                     {
-                        if (lastStop == null)
-                            lastStop = stops[0];
+                        var noteStr:String = measure.charAt(notebarOffset + column);
 
-                        while (lastStop[0] < currentRow)
+                        if (noteStr == "0")
+                            continue;
+
+                        if (noteStr == "1" || noteStr == "2" || noteStr == "4")
                         {
-                            currentTime += lastStop[1] * 1000;
-                            lastStopIndex++;
-                            if (lastStopIndex >= stops.length)
-                                break;
+                            if (noteStr == "2" || noteStr == "4")
+                                pre_holds[column] = notes.length;
 
-                            lastStop = stops[lastStopIndex];
+                            var noteColor:String = noteTypeToColor(getNoteType(currentNoteBar * (ROWS_PER_MEASURE / barsPerMeasure)));
+
+                            notes[notes.length] = [measureBeat, column, noteColor, 0];
                         }
-                    }
-
-                    // Start Warp
-                    if (currentBPM < 0 && !isWarping)
-                    {
-                        warpStart = currentTime;
-                        isWarping = true;
-                    }
-
-                    // No Notes during Warps
-                    if (!isWarping)
-                    {
-                        for (var column:int = 0; column < columnCount; column++)
+                        else if (noteStr == "3")
                         {
-                            var noteStr:String = measure.charAt(notebarOffset + column);
-
-                            if (noteStr == "0")
-                                continue;
-
-                            if (noteStr == "1" || noteStr == "2" || noteStr == "4")
+                            if (pre_holds[column] != null)
                             {
-                                if (noteStr == "2" || noteStr == "4")
-                                    pre_holds[column] = pre_notes.length;
-
-                                var noteColor:String = noteTypeToColor(getNoteType(currentNoteBar * (ROWS_PER_MEASURE / barsPerMeasure)));
-
-                                pre_notes[pre_notes.length] = new ChartObject(int(currentTime), columnMap[column], noteColor);
+                                var holdStart:int = pre_holds[column];
+                                var holdStartData:Array = notes[holdStart];
+                                notes[holdStart][3] = measureBeat;
+                                delete pre_holds[column];
                             }
-                            else if (noteStr == "3")
-                            {
-                                if (pre_holds[column] != null)
-                                {
-                                    var holdStart:int = pre_holds[column];
-                                    var holdStartData:ChartObject = pre_notes[holdStart];
-                                    pre_notes[holdStart].tail = (currentTime - holdStartData.time);
-                                    delete pre_holds[column];
-                                }
-                            }
-                            else if (noteStr == 'M')
-                            {
-                                pre_mines[pre_mines.length] = new ChartObject(int(currentTime), columnMap[column]);
-                            }
+                        }
+                        else if (noteStr == 'M')
+                        {
+                            mines[mines.length] = [measureBeat, column];
                         }
                     }
 
                     // Update String Offset
                     notebarOffset += columnCount;
-
-                    // BPMs need to be handled on every 192nd, skipping any row will result in
-                    // off-sync if a BPM change lands on a row not handled by the measure.
-                    var rowUpdates:int = ROWS_PER_MEASURE / barsPerMeasure;
-                    for (var row:int = 0; row < rowUpdates; row++)
-                    {
-                        lastBPMIndex = bpm_at_row_index(currentRow, lastBPMIndex);
-                        currentBPM = bpms[lastBPMIndex][1];
-
-                        // Start Warp
-                        if (currentBPM < 0 && !isWarping)
-                        {
-                            warpStart = currentTime;
-                            isWarping = true;
-                        }
-
-                        // Increase Time
-                        msBeatIncrement = 1000 / (currentBPM / 60);
-                        currentTime += ((4 / ROWS_PER_MEASURE) * msBeatIncrement);
-
-                        currentRow++;
-                    }
-
-                    // End Warp
-                    if (isWarping)
-                    {
-                        if (int(currentTime) >= int(warpStart)) // Truncate values because number precision loss can make them not line up.
-                        {
-                            warpStart = -1;
-                            isWarping = false;
-                        }
-                    }
                 }
-            }
-
-            // finalize notes
-            var i:int;
-            var elm:ChartObject;
-            for (i = 0; i < pre_notes.length; i++)
-            {
-                elm = pre_notes[i];
-
-                elm.time = (offset + elm.time) / 1000;
-
-                notes[notes.length] = [elm.time, elm.dir, elm.color, (!isNaN(elm.tail) ? (int(elm.tail) / 1000) : 0)];
-            }
-
-            // finalize mines
-            for (i = 0; i < pre_mines.length; i++)
-            {
-                elm = pre_mines[i];
-
-                elm.time = (offset + elm.time) / 1000;
-
-                mines[mines.length] = [elm.time, elm.dir];
             }
 
             // sort data array so time is in order
@@ -396,11 +297,9 @@ package classes.chart.parse
 
             // Clear Vectors for GC
             measureArray = null;
-            pre_notes = null;
             pre_holds = null;
-            pre_mines = null;
 
-            //trace("parsed in", (getTimer() - t), notes[notes.length - 1][0]);
+            trace("parsed in", (getTimer() - t), notes[notes.length - 1][0]);
 
             return out;
         }
@@ -459,6 +358,26 @@ package classes.chart.parse
             //trace("time parsed in", (getTimer() - t), currentTime);
 
             return currentTime;
+        }
+
+        /**
+         * Mark a file for have some element that would cause a beat warp.
+         * @param array
+         */
+        private function checkWarps(array:Array):void
+        {
+            if (_hasWarp)
+                return;
+
+            var len:int = array.length;
+            for (var index:int = 0; index < len; index++)
+            {
+                if (array[index][1] < 0)
+                {
+                    _hasWarp = true;
+                    break;
+                }
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -616,9 +535,9 @@ package classes.chart.parse
 
                 if (splitIndex >= 1)
                     if (isNumber)
-                        tmp_array[tmp_array.length] = [Math.round(48 * parseFloat(arrayList.substr(0, splitIndex))), parseFloat(arrayList.substr(splitIndex + 1))];
+                        tmp_array[tmp_array.length] = [parseFloat(arrayList.substr(0, splitIndex)), parseFloat(arrayList.substr(splitIndex + 1))];
                     else
-                        tmp_array[tmp_array.length] = [Math.round(48 * parseFloat(arrayList.substr(0, splitIndex))), arrayList.substr(splitIndex + 1)];
+                        tmp_array[tmp_array.length] = [parseFloat(arrayList.substr(0, splitIndex)), arrayList.substr(splitIndex + 1)];
             }
             return tmp_array;
         }
@@ -640,20 +559,20 @@ package classes.chart.parse
 
             return count;
         }
-    }
-}
 
-internal class ChartObject
-{
-    public var time:Number;
-    public var color:String;
-    public var dir:String;
-    public var tail:Number;
+        public function get chart_bpms():Array
+        {
+            return bpms;
+        }
 
-    public function ChartObject(time:Number, dir:String, color:String = null)
-    {
-        this.time = time;
-        this.dir = dir;
-        this.color = color;
+        public function get chart_stops():Array
+        {
+            return stops;
+        }
+
+        public function get hasWarp():Boolean
+        {
+            return _hasWarp;
+        }
     }
 }
