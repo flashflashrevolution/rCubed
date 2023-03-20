@@ -357,7 +357,7 @@ package
             }
         }
 
-        public function markSongFiles():void
+        public function dirtySongFiles():void
         {
             for (var s:int = 0; s < songCache.length; s++)
                 songCache[s].isDirty = true;
