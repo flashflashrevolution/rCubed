@@ -12,5 +12,17 @@ package
         public static const ULTRA:String = "Ultra"; //new Ultra().fontName;
         public static const XOLONIUM:String = "Xolonium Regular"; //new Xolonium.Regular().fontName;
         public static const HUSSAR:String = "Hussar Regular"; //new HussarBold.Regular().fontName;
+
+        // Embed Fonts
+        AachenLight;
+        BreeSerif;
+        Ultra;
+        BebasNeue;
+        Xolonium.Bold;
+        Xolonium.Regular;
+        HussarBold.Italic;
+        HussarBold.Regular;
+        NotoSans.CJKBold;
+        NotoSans.Bold;
     }
 }
