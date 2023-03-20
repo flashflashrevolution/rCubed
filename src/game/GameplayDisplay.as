@@ -738,6 +738,14 @@ package game
             if (progressDisplayText)
                 progressDisplayText.update(TimeUtil.convertToHMSS(Math.ceil(gameLastNoteFrame / 30)));
 
+            // Handle Early Charts - Pad Charts till atleast 1 second before first note.
+            if (song != null && song.totalNotes > 0)
+            {
+                var firstNote:Note = song.getNote(0);
+                if (firstNote.time < 1)
+                    absoluteStart += (1 - firstNote.time) * 1000;
+            }
+
             if (postStart)
             {
                 // Websocket
@@ -1047,8 +1055,6 @@ package game
                     frameRate.addValue(1000 / (absolutePosition - lastAbsolutePosition));
 
                     gamePosition = Math.round(absolutePosition + songOffset.value);
-                    if (gamePosition < 0)
-                        gamePosition = 0;
 
                     var targetProgress:int = Math.round(gamePosition * 30 / 1000 - 0.5);
                     var threshold:int = Math.round(1 / (frameRate.value / 60));
