@@ -13,7 +13,6 @@ package game
     import classes.User;
     import classes.chart.LevelScriptRuntime;
     import classes.chart.Note;
-    import classes.chart.NoteChart;
     import classes.chart.Song;
     import classes.replay.ReplayBinFrame;
     import classes.replay.ReplayNote;
@@ -464,14 +463,6 @@ package game
             this.addChild(GPU_PIXEL_BITMAP);
 
             stage.color = GameBackgroundColor.BG_STAGE;
-
-            // if (!displayBlackBG)
-            // {
-            //     displayBlackBG = new Sprite();
-            //     displayBlackBG.graphics.beginFill(0x000000);
-            //     displayBlackBG.graphics.drawRect(-Main.GAME_WIDTH, -Main.GAME_WIDTH, Main.GAME_WIDTH * 3, Main.GAME_HEIGHT * 3);
-            //     this.addChild(displayBlackBG);
-            // }
         }
 
         private function initUI():void
@@ -738,12 +729,12 @@ package game
             if (progressDisplayText)
                 progressDisplayText.update(TimeUtil.convertToHMSS(Math.ceil(gameLastNoteFrame / 30)));
 
-            // Handle Early Charts - Pad Charts till atleast 1 second before first note.
+            // Handle Early Charts - Pad Charts till atleast 2 seconds before first note.
             if (song != null && song.totalNotes > 0)
             {
                 var firstNote:Note = song.getNote(0);
-                if (firstNote.time < 1)
-                    absoluteStart += (1 - firstNote.time) * 1000;
+                if (firstNote.time < 2)
+                    absoluteStart += (2 - firstNote.time) * 1000;
             }
 
             if (postStart)
@@ -2153,7 +2144,7 @@ package game
                 gameReplayHit.push(score);
 
             if (score >= 0)
-                gameReplay.push(new ReplayNote(dir, frame, (getTimer() - msStartTime), score));
+                gameReplay.push(new ReplayNote(dir, frame, Math.round(getTimer() - absoluteStart + songOffset.value), score));
 
             updateFieldVars();
 
