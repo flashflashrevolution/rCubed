@@ -86,7 +86,7 @@ package classes.chart
 
             if (type == "EDITOR")
             {
-                chart = new NoteChart(this.id, "");
+                chart = new NoteChart(null);
                 return;
             }
 
@@ -232,7 +232,7 @@ package classes.chart
                 bytesLoaded = bytesTotal = chartData.length; // Update Progress Bar in case.
 
                 // Check 404 Response
-                if (chartData.length == 3 && chartData.readUTFBytes(3) == "404")
+                if (chartData.length == 0 || (chartData.length == 3 && chartData.readUTFBytes(3) == "404"))
                 {
                     loadFail = true;
                     return;

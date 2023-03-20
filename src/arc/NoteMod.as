@@ -7,7 +7,7 @@ package arc
     public class NoteMod extends Object
     {
         private var song:Song;
-        private var notes:Array;
+        private var notes:Vector.<Note>;
         private var shuffle:Array;
         private var lastChord:Object;
 

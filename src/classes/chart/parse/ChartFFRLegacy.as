@@ -25,7 +25,7 @@ package classes.chart.parse
         {
             type = NoteChart.FFR_LEGACY;
 
-            super(songInfo.level, null, framerate);
+            super(null, framerate);
 
             this.songInfo = songInfo;
 

@@ -11,19 +11,12 @@ package classes.chart
         /** SWF MP3 + Beatbox Extraction */
         public static const FFR_MP3:String = "ChartFFRMP3";
 
-        public static const SM:String = "ChartSM";
-
         public var type:String;
-        public var id:Number = 0;
-        public var gap:Number = 0;
-        public var BPMs:Array = [];
-        public var Stops:Array = [];
-        public var Notes:Array = [];
+        public var Notes:Vector.<Note> = new <Note>[];
         public var chartData:Object;
         public var framerate:int = 60;
-        protected var frameOffset:int = 0;
 
-        public function NoteChart(id:Number, inData:Object, framerate:int = 60):void
+        public function NoteChart(inData:Object = null, framerate:int = 60):void
         {
             this.chartData = inData;
             this.framerate = framerate;
@@ -43,9 +36,6 @@ package classes.chart
         {
             switch (type)
             {
-                case SM:
-                    return new ChartStepmania(songInfo.level, String(inData), framerate);
-
                 case FFR_LEGACY:
                     return new ChartFFRLegacy(songInfo, inData, 30);
             }
