@@ -70,12 +70,11 @@ package com.flashfla.utils
             return hourStr + minuteStr + secondsStr;
         }
 
-        private static function doubleDigitFormat(_num:uint):String
+        public static function doubleDigitFormat(_num:uint):String
         {
             if (_num < 10)
-            {
-                return ("0" + _num);
-            }
+                return "0" + _num;
+
             return _num.toString();
         }
     }
