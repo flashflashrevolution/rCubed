@@ -198,6 +198,13 @@ package classes.chart.parse
                 return false;
             }
 
+            // Validation
+            if (data['music'] == null || data['music'] == "")
+                data['music'] = fileName.substr(0, fileName.lastIndexOf(".")) + ".mp3";
+
+            if (data['title'] == null || data['title'] == "")
+                data['title'] = fileName;
+
             var audioExt:String = (data['music'] || "").substr(-3).toLowerCase();
             if (!ignoreValidation && (audioExt != "mp3"))
             {

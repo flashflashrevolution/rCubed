@@ -99,7 +99,7 @@ package classes.chart.parse
                 }
 
                 data['music'] = collections["General"]["AudioFilename"];
-                data['title'] = collections["Metadata"]["Title"];
+                data['title'] = collections["Metadata"]["Title"] || fileName;
                 data['artist'] = collections["Metadata"]["Artist"];
                 data['stepauthor'] = collections["Metadata"]["Creator"];
                 data['difficulty'] = parseInt(collections["Difficulty"]["OverallDifficulty"]) * 16;

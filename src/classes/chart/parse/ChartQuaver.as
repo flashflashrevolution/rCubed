@@ -36,7 +36,7 @@ package classes.chart.parse
                 }
 
                 data['music'] = collections["AudioFile"];
-                data['title'] = collections["Title"];
+                data['title'] = collections["Title"] || fileName;
                 data['artist'] = collections["Artist"];
                 data['stepauthor'] = collections["Creator"];
 
