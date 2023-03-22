@@ -11,7 +11,6 @@ package game
     import classes.Language;
     import classes.Noteskins;
     import classes.User;
-    import classes.chart.LevelScriptRuntime;
     import classes.chart.Note;
     import classes.chart.Song;
     import classes.replay.ReplayBinFrame;
@@ -95,7 +94,6 @@ package game
         private var _keys:Array;
         private var song:Song;
         private var song_background:MovieClip;
-        private var levelScript:LevelScriptRuntime;
 
         private var reverseMod:Boolean;
         private var sideScroll:Boolean;
@@ -826,9 +824,6 @@ package game
                     GPU_PIXEL_BMD.setPixel(0, 0, 0x020202);
             }
 
-            if (levelScript != null)
-                levelScript.doProgressTick(gameProgress);
-
             if (quitDoubleTap > 0)
             {
                 quitDoubleTap--;
@@ -1311,9 +1306,6 @@ package game
         {
             if (GAME_STATE == GAME_DISPOSE || song == null)
                 return;
-
-            if (levelScript)
-                levelScript.destroy();
 
             // Stop Music Play
             if (song)

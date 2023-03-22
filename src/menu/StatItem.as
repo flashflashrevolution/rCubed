@@ -1,15 +1,9 @@
-/**
- * @author Jonathan (Velocity)
- */
-
 package menu
 {
     import classes.ui.Box;
     import classes.ui.Text;
     import com.flashfla.utils.NumberUtil;
     import flash.display.Sprite;
-    import flash.events.Event;
-    import flash.events.MouseEvent;
 
     public class StatItem extends Sprite
     {

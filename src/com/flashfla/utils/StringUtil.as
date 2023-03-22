@@ -1,7 +1,3 @@
-/**
- * @author Jonathan (Velocity)
- */
-
 package com.flashfla.utils
 {
     import flash.xml.XMLDocument;

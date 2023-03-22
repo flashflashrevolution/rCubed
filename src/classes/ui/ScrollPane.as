@@ -1,6 +1,5 @@
 package classes.ui
 {
-    import com.greensock.TweenLite;
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.events.MouseEvent;

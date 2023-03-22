@@ -1,7 +1,3 @@
-/**
- * @author Jonathan (Velocity)
- */
-
 package menu
 {
     import classes.Language;

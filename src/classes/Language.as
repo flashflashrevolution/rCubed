@@ -1,7 +1,3 @@
-/**
- * @author Jonathan (Velocity)
- */
-
 package classes
 {
     import classes.ui.Text;

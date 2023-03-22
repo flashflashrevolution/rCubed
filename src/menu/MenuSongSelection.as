@@ -48,10 +48,9 @@ package menu
     import flash.ui.Keyboard;
     import game.GameOptions;
     import menu.MenuSongSelectionOptions;
-    import popups.PopupFilterManager;
+    import popups.PopupHighscores;
     import popups.PopupQueueManager;
     import popups.PopupSongNotes;
-    import popups.PopupHighscores;
 
     public class MenuSongSelection extends MenuPanel
     {
