@@ -204,6 +204,7 @@ package classes
                     newSongInfo.prerelease = dynamicSongInfo.prerelease;
                     newSongInfo.play_hash = dynamicSongInfo.playhash;
                     newSongInfo.time_end = dynamicSongInfo.end_delay;
+                    newSongInfo.song_rating = dynamicSongInfo.song_rating;
 
                     newSongInfo.price = dynamicSongInfo.credits;
                     newSongInfo.credits = dynamicSongInfo.price;
