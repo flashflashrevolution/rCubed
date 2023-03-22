@@ -440,7 +440,7 @@ package classes.chart
                     rateSamples.position = 0;
                     sampleDiff = sample - rateSample;
                     var seekPosition:int = sample - 4095;
-                    rateSampleCount = (baseSound as Object).extract(rateSamples, 4096, seekPosition * mp3Rate);
+                    rateSampleCount = baseSound.extract(rateSamples, 4096, seekPosition * mp3Rate);
                     rateSample = seekPosition;
                     sampleDiff = sample - rateSample;
 
