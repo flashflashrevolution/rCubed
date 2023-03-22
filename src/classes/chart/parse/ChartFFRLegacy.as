@@ -171,6 +171,7 @@ package classes.chart.parse
                 songInfo.max_nps = int(node.max_nps.toString());
                 songInfo.credits = int(node.secretcredits.toString());
                 songInfo.price = int(node.price.toString());
+                songInfo.background = node.background.toString();
                 songInfo.engine = engine;
 
                 if (Boolean(node.arc_sync.toString()))

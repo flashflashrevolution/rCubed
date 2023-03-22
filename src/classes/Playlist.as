@@ -218,6 +218,7 @@ package classes
                     newSongInfo.is_disabled = dynamicSongInfo.o_disabled == 1;
 
                     newSongInfo.swf_hash = dynamicSongInfo.swfhash;
+                    newSongInfo.background = dynamicSongInfo.background;
 
                     songInfo = newSongInfo;
                 }

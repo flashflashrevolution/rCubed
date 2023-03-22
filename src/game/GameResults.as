@@ -376,16 +376,29 @@ package game
                 // Background
                 if (songInfo.background != null)
                 {
-                    // Check Extension
-                    var backgroundExt:String = songInfo.background.substr(songInfo.background.lastIndexOf(".") + 1).toLowerCase();
-                    if (backgroundExt == "jpg" || backgroundExt == "png" || backgroundExt == "gif" || backgroundExt == "jpeg")
+                    var bgValid:Boolean = false;
+                    var bgPath:String = songInfo.background;
+                    if (bgPath.substring(0, 4) == "http")
                     {
-                        var path:String = "file:///" + songInfo.background;
+                        bgValid = true;
+                    }
+                    else
+                    {
+                        var bgExt:String = songInfo.background.substr(songInfo.background.lastIndexOf(".") + 1).toLowerCase();
+                        if (bgExt == "jpg" || bgExt == "png" || bgExt == "gif" || bgExt == "jpeg")
+                        {
+                            bgPath = "file:///" + bgPath;
+                            bgValid = true;
+                        }
+                    }
+
+                    if (bgValid)
+                    {
                         var imageLoader:Loader = new Loader();
                         imageLoader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, e_backgroundLoaded);
                         imageLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, e_backgroundLoaded);
                         imageLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, e_backgroundLoaded);
-                        imageLoader.load(new URLRequest(path), AirContext.getLoaderContext());
+                        imageLoader.load(new URLRequest(bgPath), AirContext.getLoaderContext());
 
                         function e_backgroundLoaded(e:Event):void
                         {
