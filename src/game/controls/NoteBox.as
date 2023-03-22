@@ -26,11 +26,13 @@ package game.controls
         private var notePool:Array;
         public var notes:Array;
 
-        public var leftReceptor:MovieClip;
-        public var downReceptor:MovieClip;
-        public var upReceptor:MovieClip;
-        public var rightReceptor:MovieClip;
+        public var leftReceptor:GameReceptor;
+        public var downReceptor:GameReceptor;
+        public var upReceptor:GameReceptor;
+        public var rightReceptor:GameReceptor;
         public var receptorArray:Array;
+        public var receptorTable:Object = {};
+
         public var positionOffsetMax:Object;
         private var sideScroll:Boolean;
         private var receptorAlpha:Number;
@@ -83,20 +85,16 @@ package game.controls
             // Setup Receptors
             leftReceptor = _noteskins.getReceptor(options.noteskin, "L");
             leftReceptor.KEY = "Left";
+            leftReceptor.animationSpeed = options.receptorSpeed;
             downReceptor = _noteskins.getReceptor(options.noteskin, "D");
             downReceptor.KEY = "Down";
+            downReceptor.animationSpeed = options.receptorSpeed;
             upReceptor = _noteskins.getReceptor(options.noteskin, "U");
             upReceptor.KEY = "Up";
+            upReceptor.animationSpeed = options.receptorSpeed;
             rightReceptor = _noteskins.getReceptor(options.noteskin, "R");
             rightReceptor.KEY = "Right";
-
-            if (leftReceptor is GameReceptor)
-            {
-                (leftReceptor as GameReceptor).animationSpeed = options.receptorSpeed;
-                (downReceptor as GameReceptor).animationSpeed = options.receptorSpeed;
-                (upReceptor as GameReceptor).animationSpeed = options.receptorSpeed;
-                (rightReceptor as GameReceptor).animationSpeed = options.receptorSpeed;
-            }
+            rightReceptor.animationSpeed = options.receptorSpeed;
 
             addChildAt(leftReceptor, 0);
             addChildAt(downReceptor, 0);
@@ -194,7 +192,7 @@ package game.controls
             return gameNote;
         }
 
-        public function getReceptor(dir:String):MovieClip
+        public function getReceptor(dir:String):GameReceptor
         {
             switch (dir)
             {
@@ -217,38 +215,26 @@ package game.controls
                 return;
             }
 
-            var f:int = 2;
             var c:uint = 0;
 
             switch (score)
             {
                 case 100:
                 case 50:
-                    f = 2;
                     c = options.judgeColors[0];
                     break;
                 case 25:
-                    f = 7;
                     c = options.judgeColors[2];
                     break;
                 case 5:
                 case -5:
-                    f = 12;
                     c = options.judgeColors[3];
                     break;
                 default:
                     return;
             }
 
-            var recepterFeedbackRef:MovieClip = getReceptor(dir);
-            if (recepterFeedbackRef is GameReceptor)
-            {
-                (recepterFeedbackRef as GameReceptor).playAnimation(c);
-            }
-            else
-            {
-                recepterFeedbackRef.gotoAndPlay(f);
-            }
+            getReceptor(dir).playAnimation(c);
         }
 
         public function get nextNote():Note
