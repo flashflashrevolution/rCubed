@@ -160,7 +160,7 @@ package classes.chart.parse
                 }
 
                 // Finalize Charts
-                for (chart = 0; chart < data["notes"].length; chart++)
+                for (chart = data["notes"].length - 1; chart >= 0; chart--)
                 {
                     var notes:Object = data["notes"][chart];
 
@@ -179,14 +179,15 @@ package classes.chart.parse
                         delete notes['credit'];
                     }
 
-                    delete notes['stepstype'];
-                    delete notes['meter'];
-
                     if (!ignoreValidation && (validColumnCounts.indexOf(notes['type']) == -1))
                     {
                         trace("SSC: Invalid: [", notes['stepstype'], notes['type'], "]");
                         data["notes"].removeAt(chart);
+                        continue;
                     }
+
+                    delete notes['stepstype'];
+                    delete notes['meter'];
                 }
 
                 // Match Stepmania Variables
