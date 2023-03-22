@@ -17,7 +17,7 @@ package game
         public var judgeSpeed:Number = 1;
         public var scrollSpeed:Number = 1.5;
         public var receptorSpacing:int = 80;
-        public var receptorAnimationSpeed:Number = 1;
+        public var receptorSpeed:Number = 1;
         public var noteScale:Number = 1;
         public var judgeScale:Number = 1;
         public var screencutPosition:Number = 0.5;
@@ -98,7 +98,7 @@ package game
             judgeSpeed = user.judgeSpeed;
             scrollSpeed = user.gameSpeed;
             receptorSpacing = user.receptorGap;
-            receptorAnimationSpeed = user.receptorAnimationSpeed;
+            receptorSpeed = user.receptorSpeed;
             noteScale = user.noteScale;
             judgeScale = user.judgeScale;
             screencutPosition = user.screencutPosition;
@@ -292,7 +292,7 @@ package game
             settings["viewGameBottomBar"] = displayGameBottomBar;
             settings["speed"] = scrollSpeed;
             settings["judgeSpeed"] = judgeSpeed;
-            settings["receptorAnimationSpeed"] = receptorAnimationSpeed;
+            settings["receptorSpeed"] = receptorSpeed;
             settings["direction"] = scrollDirection;
             settings["noteskin"] = noteskin;
             settings["gap"] = receptorSpacing;

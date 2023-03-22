@@ -40,6 +40,9 @@ package popups.settings
 
         private var optionDisplays:Array;
 
+        private var optionReceptorSpeed:BoxSlider;
+        private var textReceptorSpeed:Text;
+
         private var optionJudgeSpeed:BoxSlider;
         private var textJudgeSpeed:Text;
 
@@ -60,7 +63,7 @@ package popups.settings
         {
             container.graphics.lineStyle(1, 0xFFFFFF, 0.35);
             container.graphics.moveTo(295, 15);
-            container.graphics.lineTo(295, 405);
+            container.graphics.lineTo(295, 505);
 
             var i:int;
             var xOff:int = 15;
@@ -87,6 +90,11 @@ package popups.settings
                 gameDisplayCheck.display = gameUIArray[i];
                 optionDisplays.push(gameDisplayCheck);
                 yOff += 19;
+
+                if (gameUIArray[i] == "RECEPTOR_ANIMATIONS")
+                {
+                    yOff = drawReceptorSpeed(xOff, yOff, container);
+                }
 
                 if (gameUIArray[i] == "JUDGE_ANIMATIONS")
                 {
@@ -141,6 +149,21 @@ package popups.settings
             yOff += 30;
         }
 
+
+        private function drawReceptorSpeed(xOff:int, yOff:int, container:ScrollPaneContent):int
+        {
+            new Text(container, xOff + 23, yOff, _lang.string("options_receptor_speed"));
+            yOff += 22;
+
+            optionReceptorSpeed = new BoxSlider(container, xOff + 23, yOff + 3, 100, 10, changeHandler);
+            optionReceptorSpeed.minValue = 0.25;
+            optionReceptorSpeed.maxValue = 5;
+
+            textReceptorSpeed = new Text(container, xOff + 128, yOff - 2);
+            yOff += 20;
+            return yOff + 4;
+        }
+
         private function drawJudgeSpeed(xOff:int, yOff:int, container:ScrollPaneContent):int
         {
             new Text(container, xOff + 23, yOff, _lang.string("options_judge_speed"));
@@ -148,12 +171,12 @@ package popups.settings
 
             optionJudgeSpeed = new BoxSlider(container, xOff + 23, yOff + 3, 100, 10, changeHandler);
             optionJudgeSpeed.minValue = 0.25;
-            optionJudgeSpeed.maxValue = 3;
+            optionJudgeSpeed.maxValue = 5;
 
             textJudgeSpeed = new Text(container, xOff + 128, yOff - 2);
             yOff += 20;
 
-            return yOff;
+            return yOff + 4;
         }
 
         private function drawJudgeScale(xOff:int, yOff:int, container:ScrollPaneContent):int
@@ -168,7 +191,7 @@ package popups.settings
             textJudgeScale = new Text(container, xOff + 128, yOff - 2);
             yOff += 20;
 
-            return yOff;
+            return yOff + 4;
         }
 
         override public function setValues():void
@@ -177,6 +200,9 @@ package popups.settings
             {
                 item.checked = (_gvars.activeUser["DISPLAY_" + item.display]);
             }
+
+            optionReceptorSpeed.slideValue = _gvars.activeUser.receptorSpeed;
+            textReceptorSpeed.text = _gvars.activeUser.receptorSpeed.toFixed(2) + "x";
 
             optionJudgeSpeed.slideValue = _gvars.activeUser.judgeSpeed;
             textJudgeSpeed.text = _gvars.activeUser.judgeSpeed.toFixed(2) + "x";
@@ -212,6 +238,12 @@ package popups.settings
             {
                 _gvars.activeUser.judgeScale = (Math.round((optionJudgeScale.slideValue * 100) / 5) * 5) / 100; // Snap to 0.05 intervals.
                 textJudgeScale.text = _gvars.activeUser.judgeScale.toFixed(2) + "x";
+            }
+
+            if (e.target == optionReceptorSpeed)
+            {
+                _gvars.activeUser.receptorSpeed = (Math.round((optionReceptorSpeed.slideValue * 100) / 5) * 5) / 100; // Snap to 0.05 intervals.
+                textReceptorSpeed.text = _gvars.activeUser.receptorSpeed.toFixed(2) + "x";
             }
 
             parent.checkValidMods();

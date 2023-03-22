@@ -92,10 +92,10 @@ package game.controls
 
             if (leftReceptor is GameReceptor)
             {
-                (leftReceptor as GameReceptor).animationSpeed = options.receptorAnimationSpeed;
-                (downReceptor as GameReceptor).animationSpeed = options.receptorAnimationSpeed;
-                (upReceptor as GameReceptor).animationSpeed = options.receptorAnimationSpeed;
-                (rightReceptor as GameReceptor).animationSpeed = options.receptorAnimationSpeed;
+                (leftReceptor as GameReceptor).animationSpeed = options.receptorSpeed;
+                (downReceptor as GameReceptor).animationSpeed = options.receptorSpeed;
+                (upReceptor as GameReceptor).animationSpeed = options.receptorSpeed;
+                (rightReceptor as GameReceptor).animationSpeed = options.receptorSpeed;
             }
 
             addChildAt(leftReceptor, 0);
