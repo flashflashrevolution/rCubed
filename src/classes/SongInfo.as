@@ -59,6 +59,7 @@ package classes
         // Song - Optional
         public var price:int;
         public var credits:int;
+        public var song_rating:Number;
 
         // Alt Engines Variables
         public var engine:Object;
