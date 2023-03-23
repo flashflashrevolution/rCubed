@@ -93,11 +93,12 @@ package popups.filebrowser
 
             if (filter.type != null && filter.term != null && filter.term.length >= 2)
             {
+                var quickTerm:String = filter.term.toLocaleLowerCase();
                 if (filter.type == "author" || filter.type == "name")
                 {
                     filterList = sourceElements.filter(function(item:FileFolder, index:int, arr:Array):Boolean
                     {
-                        return item.name.toLocaleLowerCase().indexOf(filter.term) >= 0 || item.author.toLocaleLowerCase().indexOf(filter.term) >= 0;
+                        return item.name.toLocaleLowerCase().indexOf(quickTerm) >= 0 || item.author.toLocaleLowerCase().indexOf(quickTerm) >= 0;
                     });
                 }
             }
