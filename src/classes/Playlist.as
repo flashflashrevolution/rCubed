@@ -231,6 +231,10 @@ package classes
                 if (isNaN(Number(songInfo.note_count)))
                     songInfo.note_count = 0;
 
+                // Time End
+                if (isNaN(Number(songInfo.time_end)))
+                    songInfo.time_end = 0;
+
                 // Extra Info
                 songInfo.index = genreList[songInfo.genre].length;
                 songInfo.time_secs = (Number(songInfo.time.split(":")[0]) * 60) + Number(songInfo.time.split(":")[1]);
