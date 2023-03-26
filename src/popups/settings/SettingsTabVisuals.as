@@ -49,6 +49,10 @@ package popups.settings
         private var optionJudgeScale:BoxSlider;
         private var textJudgeScale:Text;
 
+        private var legacySongsCheck:BoxCheck;
+        private var explicitSongsCheck:BoxCheck;
+        private var unrankedSongsCheck:BoxCheck;
+
         public function SettingsTabVisuals(settingsWindow:SettingsWindow):void
         {
             super(settingsWindow);
@@ -146,7 +150,23 @@ package popups.settings
                 optionDisplays.push(optionModCheck);
                 yOff += 19;
             }
-            yOff += 30;
+            yOff += 11;
+
+            // Legacy Song Display
+            new Text(container, xOff + 23, yOff, _lang.string("options_include_legacy_songs"));
+            legacySongsCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
+            legacySongsCheck.addEventListener(MouseEvent.MOUSE_OVER, e_legacyEngineMouseOver, false, 0, true);
+            yOff += 19;
+
+            // Explicit Song Display
+            new Text(container, xOff + 23, yOff, _lang.string("options_include_explicit_songs"));
+            explicitSongsCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
+            yOff += 19;
+
+            // Unranked Song Display
+            new Text(container, xOff + 23, yOff, _lang.string("options_include_unranked_songs"));
+            unrankedSongsCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
+            yOff += 19;
         }
 
 
@@ -209,6 +229,10 @@ package popups.settings
 
             optionJudgeScale.slideValue = _gvars.activeUser.judgeScale;
             textJudgeScale.text = _gvars.activeUser.judgeScale.toFixed(2) + "x";
+
+            legacySongsCheck.checked = _gvars.activeUser.DISPLAY_LEGACY_SONGS;
+            explicitSongsCheck.checked = _gvars.activeUser.DISPLAY_EXPLICIT_SONGS;
+            unrankedSongsCheck.checked = _gvars.activeUser.DISPLAY_UNRANKED_SONGS;
         }
 
         override public function clickHandler(e:MouseEvent):void
@@ -221,6 +245,25 @@ package popups.settings
                 {
                     _gvars.gameMain.activePanel.draw();
                 }
+            }
+
+            // Songs Flags
+            else if (e.target == legacySongsCheck)
+            {
+                e.target.checked = !e.target.checked;
+                _gvars.activeUser.DISPLAY_LEGACY_SONGS = !_gvars.activeUser.DISPLAY_LEGACY_SONGS;
+            }
+
+            else if (e.target == explicitSongsCheck)
+            {
+                e.target.checked = !e.target.checked;
+                _gvars.activeUser.DISPLAY_EXPLICIT_SONGS = !_gvars.activeUser.DISPLAY_EXPLICIT_SONGS;
+            }
+
+            else if (e.target == unrankedSongsCheck)
+            {
+                e.target.checked = !e.target.checked;
+                _gvars.activeUser.DISPLAY_UNRANKED_SONGS = !_gvars.activeUser.DISPLAY_UNRANKED_SONGS;
             }
 
             parent.checkValidMods();
@@ -248,5 +291,18 @@ package popups.settings
 
             parent.checkValidMods();
         }
+
+        private function e_legacyEngineMouseOver(e:Event):void
+        {
+            legacySongsCheck.addEventListener(MouseEvent.MOUSE_OUT, e_legacyEngineMouseOut);
+            displayToolTip(legacySongsCheck.x, legacySongsCheck.y + 22, _lang.string("popup_legacy_songs"), "left");
+        }
+
+        private function e_legacyEngineMouseOut(e:Event):void
+        {
+            legacySongsCheck.removeEventListener(MouseEvent.MOUSE_OUT, e_legacyEngineMouseOut);
+            hideTooltip();
+        }
+
     }
 }

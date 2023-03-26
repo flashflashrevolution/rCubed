@@ -80,6 +80,8 @@ package classes
         public var songRatings:Object = {};
 
         public var DISPLAY_LEGACY_SONGS:Boolean = false;
+        public var DISPLAY_UNRANKED_SONGS:Boolean = true;
+        public var DISPLAY_EXPLICIT_SONGS:Boolean = true;
         public var DISPLAY_GENRE_FLAG:Boolean = true;
         public var DISPLAY_SONG_FLAG:Boolean = true;
         public var DISPLAY_SONG_NOTE:Boolean = true;
@@ -606,6 +608,12 @@ package classes
             if (_settings.viewLegacySongs != null)
                 this.DISPLAY_LEGACY_SONGS = _settings.viewLegacySongs;
 
+            if (_settings.viewExplicitSongs != null)
+                this.DISPLAY_EXPLICIT_SONGS = _settings.viewExplicitSongs;
+
+            if (_settings.viewUnrankedSongs != null)
+                this.DISPLAY_UNRANKED_SONGS = _settings.viewUnrankedSongs;
+
             if (_settings.keys[0] != null)
                 this.keyLeft = _settings.keys[0];
 
@@ -768,6 +776,8 @@ package classes
             gameSave.viewMPRawGoods = this.DISPLAY_MP_RAWGOODS;
             gameSave.viewMPTimestamp = this.DISPLAY_MP_TIMESTAMP;
             gameSave.viewLegacySongs = this.DISPLAY_LEGACY_SONGS;
+            gameSave.viewExplicitSongs = this.DISPLAY_EXPLICIT_SONGS;
+            gameSave.viewUnrankedSongs = this.DISPLAY_UNRANKED_SONGS;
 
             gameSave.keys = [this.keyLeft, this.keyDown, this.keyUp, this.keyRight, this.keyRestart, this.keyQuit, this.keyOptions];
 

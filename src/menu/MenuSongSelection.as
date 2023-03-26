@@ -664,7 +664,7 @@ package menu
 
                 // Song List Filters
                 sourceListLength = songList.length;
-                songList = filterSongListLegacy(songList);
+                songList = filterSongListFlags(songList);
                 songList = filterSongListUser(songList);
 
                 // List Length and Slice into pages.
@@ -689,7 +689,7 @@ package menu
 
                     // Song List Filters
                     sourceListLength = songList.length;
-                    songList = filterSongListLegacy(songList);
+                    songList = filterSongListFlags(songList);
                     songList = filterSongListUser(songList);
 
                     // Sort and get List Length
@@ -703,7 +703,7 @@ package menu
 
                     // Song List Filters
                     sourceListLength = songList.length;
-                    songList = filterSongListLegacy(songList);
+                    songList = filterSongListFlags(songList);
                     songList = filterSongListUser(songList);
 
                     // Sort, List Length, and Slice into pages.
@@ -999,20 +999,42 @@ package menu
          * Process the legacy filter on the given song list if enabled.
          * @param songList Song List Array for Song objects to filter.
          */
-        private function filterSongListLegacy(songList:Array):Array
+        private function filterSongListFlags(songList:Array):Array
         {
-            if (!_playlist.engine && !_gvars.activeUser.DISPLAY_LEGACY_SONGS)
+            if (!_gvars.activeUser.DISPLAY_LEGACY_SONGS)
                 songList = songList.filter(filterSongListLegacyFilter);
+
+            if (!_gvars.activeUser.DISPLAY_EXPLICIT_SONGS)
+                songList = songList.filter(filterSongListExplicitFilter);
+
+            if (!_gvars.activeUser.DISPLAY_UNRANKED_SONGS)
+                songList = songList.filter(filterSongListUnrankedFilter);
 
             return songList;
         }
 
         /**
-         * Array filter for filterSongListLegacy.
+         * Legacy Array filter for filterSongListFlags.
          */
         private function filterSongListLegacyFilter(item:SongInfo, index:int, array:Array):Boolean
         {
-            return item.genre != Constant.LEGACY_GENRE;
+            return !item.is_legacy;
+        }
+
+        /**
+         * Explicit Array filter for filterSongListFlags.
+         */
+        private function filterSongListExplicitFilter(item:SongInfo, index:int, array:Array):Boolean
+        {
+            return !item.is_explicit;
+        }
+
+        /**
+         * Unranked Array filter for filterSongListFlags.
+         */
+        private function filterSongListUnrankedFilter(item:SongInfo, index:int, array:Array):Boolean
+        {
+            return !item.is_unranked;
         }
 
         /**
