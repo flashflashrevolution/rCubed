@@ -18,6 +18,7 @@ package popups.replays
     import flash.events.Event;
     import flash.events.MouseEvent;
     import game.GameOptions;
+    import menu.FileLoader;
     import menu.MenuPanel;
 
     public class ReplayHistoryWindow extends MenuPanel
@@ -231,8 +232,23 @@ package popups.replays
                 {
                     if (replay.song == null)
                     {
-                        Alert.add(_lang.string("popup_replay_missing_song_data"));
+                        Alert.add(_lang.string("popup_replay_missing_song_data"), 120, Alert.RED);
                         return;
+                    }
+
+                    if (replay.isFileLoader)
+                    {
+                        var chartLoaded:Boolean = true;
+                        if (_gvars.externalSongInfo.engine.cache_id != replay.cacheID)
+                            chartLoaded = FileLoader.setupLocalFile(replay.chartPath, replay.settings.arc_engine.chartID);
+
+                        replay.song = _gvars.externalSongInfo;
+
+                        if (!chartLoaded)
+                        {
+                            Alert.add(_lang.string("popup_replay_file_browser_replays"), 120, Alert.RED);
+                            return;
+                        }
                     }
 
                     if (!replay.user.isLoaded())

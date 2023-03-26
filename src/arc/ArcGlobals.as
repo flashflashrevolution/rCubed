@@ -89,6 +89,11 @@ package arc
             if (!song || !song.engine)
                 return null;
 
+            if (song.engine.id == "fileloader")
+                return {"engineID": "fileloader",
+                        "cacheID": song.engine.cache_id,
+                        "chartID": song.engine.chart_id};
+
             var engine:Object = {"engineID": song.engine.id,
                     "songLevel": song.level,
                     "songID": song.level_id,

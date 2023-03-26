@@ -384,22 +384,31 @@ package popups.replays
         override public function prepareReplay(r:Replay):Replay
         {
             // Incomplete 
-            if (r.filePath != null)
+            try
             {
-                Logger.debug(this, "Loading Local replay: " + "replays/" + r.filePath);
-                var txt:String = AirContext.readFile(AirContext.getAppFile("replays/" + r.filePath)).toString();
-
-                if (txt != null && txt.length > 0)
+                if (r.filePath != null)
                 {
-                    r.parseEncode(txt, false);
-                    r.fileReplay = true;
-                    if (r.isValid())
-                    {
-                        r.loadSongInfo();
-                        return r;
-                    }
-                }
+                    Logger.debug(this, "Loading Local replay: " + "replays/" + r.filePath);
+                    var txt:String = AirContext.readFile(AirContext.getAppFile("replays/" + r.filePath)).toString();
 
+                    if (txt != null && txt.length > 0)
+                    {
+                        r.parseEncode(txt, false);
+                        r.fileReplay = true;
+                        if (r.isValid())
+                        {
+                            r.loadSongInfo();
+                            return r;
+                        }
+                    }
+
+                    return null;
+                }
+            }
+            catch (e:Error)
+            {
+                Logger.error(this, "Loading replay txt file error:");
+                Logger.exception_error(e);
                 return null;
             }
 

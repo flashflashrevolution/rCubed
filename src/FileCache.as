@@ -69,6 +69,37 @@ package
             }
         }
 
+        public function findKey(condition:Function):String
+        {
+            for (var key:String in CACHE["keys"])
+            {
+                if (condition(CACHE["keys"][key]))
+                {
+                    return key;
+                }
+            }
+
+            return null;
+        }
+
+        public function findValue(condition:Function):Object
+        {
+            for each (var entry:Object in CACHE["keys"])
+            {
+                if (condition(entry))
+                {
+                    return entry;
+                }
+            }
+
+            return null;
+        }
+
+        public function findValues(condition:Function):Object
+        {
+            return CACHE["keys"].filter(condition);
+        }
+
         public function getValue(path:String):Object
         {
             return CACHE["keys"][path] || null;

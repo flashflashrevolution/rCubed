@@ -41,6 +41,7 @@ package popups
     import popups.filebrowser.FileBrowserList;
     import popups.filebrowser.FileFolder;
     import popups.filebrowser.FileFolderItem;
+    import menu.FileLoader;
 
     public class PopupFileBrowser extends MenuPanel
     {
@@ -49,15 +50,6 @@ package popups
 
         public var lc:LoaderContext = new LoaderContext();
 
-        public static var ENGINE_INFO:Object = {name: "File Loader",
-                id: "fileloader",
-                config_url: "",
-                ignoreCache: true,
-                legacySync: false,
-                playlistURL: "",
-                songURL: ""}
-
-        public static var pathCache:FileCache = new FileCache("chart_cache.json", 1);
         public static var rootFolder:File;
         public static var lastSelectedIndex:int = 0;
         public static var listFilter:FileBrowserFilter = new FileBrowserFilter();
@@ -218,7 +210,7 @@ package popups
             var arLen:Number = pathList.length;
             for (var i:int = 0; i < arLen; i++)
             {
-                cacheValue = pathCache.getValue(pathList[i]);
+                cacheValue = FileLoader.cache.getValue(pathList[i]);
                 path = pathList[i];
                 endOfFolder = path.lastIndexOf(File.separator) + 1;
                 renderList[i] = new FileFolder(path.substr(0, endOfFolder), path.substr(endOfFolder), cacheValue["ext"], new FileFolderItem(pathList[i], cacheValue));
@@ -450,7 +442,7 @@ package popups
                 {
                     chartFile = fileQueue[pathIndex];
                     stringPath = chartFile.nativePath;
-                    if ((cacheObj = pathCache.getValue(stringPath)) != null)
+                    if ((cacheObj = FileLoader.cache.getValue(stringPath)) != null)
                     {
                         if (cacheObj.valid == 1)
                             pathList.push(stringPath);
@@ -486,7 +478,8 @@ package popups
                                     "banner": chartData['banner'],
                                     "background": chartData['background'],
                                     "ext": chartData['ext'],
-                                    "chart": []}
+                                    "chart": [],
+                                    "id": emb.ID}
 
                             for (var i:int = 0; i < chartCharts.length; i++)
                             {
@@ -496,7 +489,6 @@ package popups
                                         "desc": difficultyData['desc'],
                                         "difficulty": difficultyData['difficulty'],
                                         "type": difficultyData['type'],
-                                        "radar_values": difficultyData['radar_values'],
                                         "time_sec": Number(difficultyData['time_sec'].toFixed(2)),
                                         "nps": Number(difficultyData['nps'].toFixed(2)),
                                         "arrows": difficultyData['arrows'],
@@ -505,7 +497,7 @@ package popups
                             }
                         }
 
-                        pathCache.setValue(stringPath, cacheObj);
+                        FileLoader.cache.setValue(stringPath, cacheObj);
 
                         if (cacheObj.valid == 1)
                             pathList.push(stringPath);
@@ -533,7 +525,7 @@ package popups
                 if (pathIndex >= pathTotal)
                 {
                     loadTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_parseTimer);
-                    pathCache.save();
+                    FileLoader.cache.save();
                     lockUI = false;
 
                     buildFileList();
@@ -702,52 +694,11 @@ package popups
             var info:FileFolderItem = tar.cache_info;
             var id:int = tar.chart_id;
 
+            Flags.VALUES[Flags.FILE_LOADER_OPEN] = true;
+
             removePopup();
 
-            // Parse Chart
-            var emb:ExternalChartBase = new ExternalChartBase();
-            emb.load(new File(info.loc));
-            var chartinfo:Object = emb.getInfo();
-            var chartData:Object = emb.getValidChartData(id);
-
-            // Build Song Info
-            var songInfo:SongInfo = new SongInfo();
-            songInfo.access = SongInfo.SONG_TYPE_PUBLIC;
-            songInfo.genre = 14;
-            songInfo.author = songInfo.author_html = chartinfo.author;
-            songInfo.stepauthor = songInfo.stepauthor_html = chartinfo.stepauthor;
-            songInfo.name = chartinfo.display;
-            songInfo.level = 1;
-            songInfo.level_id = MD5.hash(id + MD5.hashBytes(emb.getChartData()));
-            songInfo.note_count = chartinfo.arrows;
-            songInfo.time = chartinfo.time;
-            songInfo.time_secs = chartinfo.time_secs;
-            songInfo.engine = ENGINE_INFO;
-            songInfo.background = chartinfo.background != "" ? chartinfo.folder + chartinfo.background : null;
-
-            // Build Chart
-            var noteChart:NoteChart = new NoteChart();
-            noteChart.type = "EXTERNAL";
-            for each (var note:Array in chartData.notes)
-            {
-                noteChart.Notes.push(new Note(note[1], note[0], note[2], Math.floor(note[0] * 30)));
-            }
-
-            // Build Song
-            var song:Song = new Song(songInfo, false);
-            song.chart = noteChart;
-            song.loadSoundBytes(emb.getAudioData());
-            song.isChartLoaded = song.isMusicLoaded = song.isLoaded = true;
-
-            // Setup Loading
-            Flags.VALUES[Flags.FILE_LOADER_OPEN] = true;
-            _gvars.externalSongInfo = songInfo;
-            _gvars.externalSong = song;
-            _gvars.songQueue = [songInfo];
-
-            _gvars.options = new GameOptions();
-            _gvars.options.fill();
-            switchTo(Main.GAME_PLAY_PANEL);
+            FileLoader.loadLocalFile(info.loc, id);
         }
 
         public function set lockUI(val:Boolean):void

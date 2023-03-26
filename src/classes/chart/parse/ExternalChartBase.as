@@ -1,10 +1,12 @@
 package classes.chart.parse
 {
+    import by.blooddy.crypto.MD5;
     import classes.chart.parse.ChartBase;
     import classes.chart.parse.ChartOSU;
     import classes.chart.parse.ChartQuaver;
     import classes.chart.parse.ChartSSC;
     import classes.chart.parse.ChartStepmania;
+    import com.flashfla.utils.TimeUtil;
     import flash.events.ErrorEvent;
     import flash.events.IOErrorEvent;
     import flash.events.SecurityErrorEvent;
@@ -12,13 +14,12 @@ package classes.chart.parse
     import flash.filesystem.FileMode;
     import flash.filesystem.FileStream;
     import flash.utils.ByteArray;
-    import com.flashfla.utils.TimeUtil;
 
     public class ExternalChartBase
     {
         public static const VALID_CHART_EXTENSIONS:Array = ["sm", "ssc", "osu", "qua"];
 
-        public var ID:int;
+        public var ID:String;
 
         public var DEFAULT_CHART_ID:int = 0;
 
@@ -174,6 +175,8 @@ package classes.chart.parse
                     info['music'] = parser.data.music || "";
                     info['banner'] = parser.data.banner || "";
                     info['background'] = parser.data.background || "";
+
+                    ID = MD5.hashBytes(CHART_BYTES);
 
                     // Folder Path
                     var path:String = firstFile.nativePath;
