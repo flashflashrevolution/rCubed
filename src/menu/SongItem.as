@@ -21,6 +21,9 @@ package menu
 
     public class SongItem extends Sprite
     {
+        private static var _gvars:GlobalVariables = GlobalVariables.instance;
+        private static var _lang:Language = Language.instance;
+
         private static const HOVER_POINT_GLOBAL:Point = new Point();
         private static const DISABLED_COLORS:Array = [0xFF0000, 0xFF0000];
         private static const GRADIENT_COLORS:Array = [0xFFFFFF, 0xFFFFFF];
@@ -351,17 +354,13 @@ package menu
                 return '<font color="#f7b9e4">' + _songInfo.difficulty + '</font>';
 
             if (songInfo.is_unranked)
-                return '<font color="#cfc3c3">' + _songInfo.difficulty + '</font>';
+                return '<font color="#9C9C9C">' + _songInfo.difficulty + '</font>';
 
             return songInfo.difficulty.toString();
         }
 
         public function getSongLockText():String
         {
-            // Get them here to reduce instance loading, as only locked songs call this.
-            var _gvars:GlobalVariables = GlobalVariables.instance;
-            var _lang:Language = Language.instance;
-
             switch (songInfo.access)
             {
                 case GlobalVariables.SONG_ACCESS_CREDITS:
