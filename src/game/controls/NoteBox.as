@@ -10,7 +10,7 @@ package game.controls
     import game.GameOptions;
     import flash.display.Sprite;
     import flash.display.MovieClip;
-    import com.flashfla.utils.ObjectPool;
+    import com.flashfla.utils.GameNotePool;
 
     public class NoteBox extends Sprite
     {
@@ -52,7 +52,7 @@ package game.controls
                 {
                     for each (var color:String in options.noteColors)
                     {
-                        notePool[item.id][direction][color] = new ObjectPool();
+                        notePool[item.id][direction][color] = new GameNotePool();
                     }
                 }
             }
@@ -70,7 +70,7 @@ package game.controls
             {
                 for each (var pre_color:String in options.noteColors)
                 {
-                    var pool:ObjectPool = notePool[options.noteskin][pre_dir][pre_color];
+                    var pool:GameNotePool = notePool[options.noteskin][pre_dir][pre_color];
 
                     for (i = 0; i < preLoadCount; i++)
                     {
@@ -138,10 +138,10 @@ package game.controls
             }
             else
             {
-                var spawnPoolRef:ObjectPool = notePool[options.noteskin][direction][color];
+                var spawnPoolRef:GameNotePool = notePool[options.noteskin][direction][color];
                 if (!spawnPoolRef)
                 {
-                    spawnPoolRef = notePool[options.noteskin][direction][color] = new ObjectPool();
+                    spawnPoolRef = notePool[options.noteskin][direction][color] = new GameNotePool();
                 }
 
                 gameNote = spawnPoolRef.getObject();
