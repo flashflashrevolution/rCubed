@@ -446,8 +446,6 @@ package game
                 song_background.x = 115;
                 song_background.y = 42.5;
                 this.addChild(song_background);
-                if (options.modEnabled("nobackground"))
-                    setChildIndex(song_background, 0);
             }
 
             songDelay = song.mp3Frame / options.songRate * 1000 / 30 - globalOffset;
