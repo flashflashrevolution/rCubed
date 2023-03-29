@@ -43,13 +43,13 @@ package game
     import flash.utils.getTimer;
     import game.controls.AccuracyBar;
     import game.controls.Combo;
-    import game.controls.RawGoods;
     import game.controls.FlashlightOverlay;
     import game.controls.Judge;
     import game.controls.LifeBar;
     import game.controls.MPHeader;
     import game.controls.NoteBox;
     import game.controls.PAWindow;
+    import game.controls.RawGoods;
     import game.controls.Score;
     import game.controls.ScreenCut;
     import game.controls.TextStatic;
@@ -449,7 +449,7 @@ package game
                 if (options.modEnabled("nobackground"))
                     setChildIndex(song_background, 0);
             }
-            song.start();
+
             songDelay = song.mp3Frame / options.songRate * 1000 / 30 - globalOffset;
         }
 
@@ -728,7 +728,7 @@ package game
                 progressDisplayText.update(TimeUtil.convertToHMSS(Math.ceil(gameLastNoteFrame / 30)));
 
             // Handle Early Charts - Pad Charts till atleast 2 seconds before first note.
-            if (song != null && song.totalNotes > 0)
+            if (song != null && song.totalNotes > 0 && options.isolationOffset == 0)
             {
                 var firstNote:Note = song.getNote(0);
                 if (firstNote.time < 2)
@@ -1023,11 +1023,7 @@ package game
 
                     if (!songDelayStarted)
                     {
-                        if (absolutePosition < songDelay)
-                        {
-                            song.stop();
-                        }
-                        else
+                        if (absolutePosition >= songDelay)
                         {
                             songDelayStarted = true;
                             song.start();
@@ -1533,7 +1529,7 @@ package game
             _gvars.songStats.restarts++;
 
             // Restart
-            song.reset();
+            song.stop();
             GAME_STATE = GAME_PLAY;
             initPlayerVars();
             initVars();

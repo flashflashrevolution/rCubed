@@ -5,7 +5,6 @@ package game.controls
     import classes.Noteskins;
     import classes.chart.Song;
     import classes.chart.Note;
-    import flash.display.DisplayObject;
     import flash.utils.getTimer;
     import game.GameOptions;
     import flash.display.Sprite;
