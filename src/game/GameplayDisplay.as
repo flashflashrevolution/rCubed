@@ -701,7 +701,7 @@ package game
             updateHealth(0);
             if (song != null && song.totalNotes > 0)
             {
-                gameLastNoteFrame = song.getNote(song.totalNotes - 1).frame;
+                gameLastNoteFrame = song.getNote(song.totalNotes - 1).frame + Math.ceil(song.songInfo.time_end * 30);
                 gameFirstNoteFrame = song.getNote(0).frame;
             }
             if (comboTotal)
