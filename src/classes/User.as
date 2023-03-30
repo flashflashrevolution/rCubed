@@ -118,6 +118,8 @@ package classes
         public var judgeColors:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
         public var comboColors:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000, 0xDC00C2]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag, RawGood
         public var enableComboColors:Vector.<Boolean> = new <Boolean>[true, true, true, false, false, false, false, false, false];
+        public var receptorColors:Array = [0xFFFFFF, 0xFFFFFF, 0x64FF64, 0xFFFF00, 0xBB8500, 0xA80000];
+        public var enableReceptorColors:Vector.<Boolean> = new <Boolean>[true, true, true, true, true, false];
         public var gameColors:Array = [0x1495BD, 0x033242, 0x0C6A88, 0x074B62, 0x000000];
         public var noteColors:Array = ["red", "blue", "purple", "yellow", "pink", "orange", "cyan", "green", "white"];
         public var rawGoodTracker:Number = 0;
@@ -683,6 +685,12 @@ package classes
             if (_settings.enableComboColors != null)
                 mergeIntoArray(this.enableComboColors, _settings.enableComboColors);
 
+            if (_settings.receptorColours != null)
+                mergeIntoArray(this.receptorColors, _settings.receptorColours);
+
+            if (_settings.enableReceptorColors != null)
+                mergeIntoArray(this.enableReceptorColors, _settings.enableReceptorColors);
+
             if (_settings.gameColours != null)
                 mergeIntoArray(this.gameColors, _settings.gameColours);
 
@@ -796,6 +804,8 @@ package classes
             gameSave.judgeColours = this.judgeColors;
             gameSave.comboColours = this.comboColors;
             gameSave.enableComboColors = this.enableComboColors;
+            gameSave.receptorColours = this.receptorColors;
+            gameSave.enableReceptorColors = this.enableReceptorColors;
             gameSave.gameColours = this.gameColors;
             gameSave.noteColours = this.noteColors;
             gameSave.rawGoodTracker = this.rawGoodTracker;

@@ -44,7 +44,7 @@ package classes
         public function playAnimation(color:uint):void
         {
             _note.scaleX = _note.scaleY = 1;
-            TweenLite.to(_note, (0.1 / animationSpeed), {scaleX: 1.25, scaleY: 1.25, tint: color, useFrames: false, onComplete: function():void
+            TweenLite.to(_note, (0.1 / animationSpeed), {scaleX: 1.15, scaleY: 1.15, tint: color, useFrames: false, onComplete: function():void
             {
                 TweenLite.to(_note, (0.066 / animationSpeed), {scaleX: 1, scaleY: 1, tint: null, useFrames: false});
             }});

@@ -36,6 +36,10 @@ package game.controls
         private var sideScroll:Boolean;
         private var receptorAlpha:Number;
 
+        private var recp_colors:Vector.<Number>;
+        private var recp_colors_enabled:Vector.<Boolean>;
+        private var recp_color_indexs:Object = {"100": 0, "50": 1, "25": 2, "5": 3, "-5": 4, "-10": 5};
+
         public function NoteBox(song:Song, options:GameOptions)
         {
             this.song = song;
@@ -108,6 +112,20 @@ package game.controls
             notes = [];
             noteCount = 0;
             totalNotes = song.totalNotes;
+
+            // Copy Receptor Colors
+            recp_colors = new Vector.<Number>(options.receptorColors.length, true);
+            for (i = 0; i < options.receptorColors.length; i++)
+            {
+                recp_colors[i] = options.receptorColors[i];
+            }
+
+            // Copy Enabled Colors
+            recp_colors_enabled = new Vector.<Boolean>(options.enableReceptorColors.length, true);
+            for (i = 0; i < options.enableReceptorColors.length; i++)
+            {
+                recp_colors_enabled[i] = options.enableReceptorColors[i];
+            }
         }
 
         public function noteRealSpawnRotation(dir:String, noteskin:int):Number
@@ -209,31 +227,12 @@ package game.controls
 
         public function receptorFeedback(dir:String, score:int):void
         {
-            if (!options.displayReceptorAnimations)
-            {
+            var idx:int = recp_color_indexs[score] != null ? recp_color_indexs[score] : -1;
+
+            if (idx == -1 || !recp_colors_enabled[idx] || !options.displayReceptorAnimations)
                 return;
-            }
 
-            var c:uint = 0;
-
-            switch (score)
-            {
-                case 100:
-                case 50:
-                    c = options.judgeColors[0];
-                    break;
-                case 25:
-                    c = options.judgeColors[2];
-                    break;
-                case 5:
-                case -5:
-                    c = options.judgeColors[3];
-                    break;
-                default:
-                    return;
-            }
-
-            getReceptor(dir).playAnimation(c);
+            getReceptor(dir).playAnimation(recp_colors[idx]);
         }
 
         public function get nextNote():Note
