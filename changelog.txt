@@ -1,8 +1,34 @@
+R^3 (v1.5.0) [2023-04-01]
+---------------------------------------------------------------------
+@Psycast
+File Browser
+- Local file browser for playing .sm / .osu / .qua files.
+
+Song Tags and display toggles:
+- Legacy
+- Explicit
+- Unranked
+- Disabled
+
+Song End Delay
+- Delay after last note to results screen. In Seconds.
+
+Reworked Receptor Code:
+- Speed Scaler (0.25x - 5x)
+- Unify Animations
+- Per Judge Score Color and Toggles
+
+Song Rates
+- No longer requires reloading the song when changed.
+
+
 R^3 (v1.4.7) [2023-01-18]
+---------------------------------------------------------------------
 @mat100payette
 - Added judge scale option.
 - Add new accuracy graph type.
 - Add raw goods and rank sorting.
+
 
 R^3 (v1.4.5 & v1.4.6) [2023-01-15]
 ---------------------------------------------------------------------
@@ -20,6 +46,7 @@ R^3 (v1.4.5 & v1.4.6) [2023-01-15]
 - Add dependabot for actions longevity.
 - Fix build pipeline not downloading xmlstarlet.
 - Workflow improvements
+
 
 R^3 (v1.4.4) [2022-06-19]
 ---------------------------------------------------------------------

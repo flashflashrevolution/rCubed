@@ -1,60 +1,60 @@
 {
-    "extends": "asconfig.json",
-    "compilerOptions": {
-        "verbose-stacktraces": false,
-        "advanced-telemetry": false,
-        "optimize": true,
-        "output": "bin/release/R3Air.swf",
-        "define": [
-            {
-                "name": "CONFIG::debug",
-                "value": false
-            },
-            {
-                "name": "CONFIG::release",
-                "value": true
-            },
-            {
-                "name": "CONFIG::timeStamp",
-                "value": "\"2023-01-18\""
-            },
-            {
-                "name": "R3::HASH_STRING",
-                "value": "\"hash:#{SCORE_SAVE_SALT}#\""
-            },
-            {
-                "name": "R3::VERSION",
-                "value": "\"#{VERSION}#\""
-            },
-            {
-                "name": "R3::VERSION_SUFFIX",
-                "value": "\"\""
-            }
-        ],
-        "debug": false,
-        "omit-trace-statements": true,
-        // Overrides left here for alternate builds.
-        "swf-version": 43,
-        "target-player": "32.0"
+  "extends": "asconfig.json",
+  "compilerOptions": {
+    "verbose-stacktraces": false,
+    "advanced-telemetry": false,
+    "optimize": true,
+    "output": "bin/release/R3Air.swf",
+    "define": [
+      {
+        "name": "CONFIG::debug",
+        "value": false
+      },
+      {
+        "name": "CONFIG::release",
+        "value": true
+      },
+      {
+        "name": "CONFIG::timeStamp",
+        "value": "\"2023-04-01\""
+      },
+      {
+        "name": "R3::HASH_STRING",
+        "value": "\"hash:#{SCORE_SAVE_SALT}#\""
+      },
+      {
+        "name": "R3::VERSION",
+        "value": "\"#{VERSION}#\""
+      },
+      {
+        "name": "R3::VERSION_SUFFIX",
+        "value": "\"\""
+      }
+    ],
+    "debug": false,
+    "omit-trace-statements": true,
+    // Overrides left here for alternate builds.
+    "swf-version": 43,
+    "target-player": "32.0"
+  },
+  "airOptions": {
+    "windows": {
+      "target": "bundle",
+      "output": "dist/R3Release",
+      "signingOptions": {
+        "storetype": "pkcs12",
+        "keystore": "certs/air-cert.p12",
+        "tsa": "http://timestamp.digicert.com"
+      }
     },
-    "airOptions": {
-        "windows": {
-            "target": "bundle",
-            "output": "dist/R3Release",
-            "signingOptions": {
-                "storetype": "pkcs12",
-                "keystore": "certs/air-cert.p12",
-                "tsa": "http://timestamp.digicert.com"
-            }
-        },
-        "mac": {
-            "target": "bundle",
-            "output": "dist/r3Release.app",
-            "signingOptions": {
-                "storetype": "pkcs12",
-                "keystore": "certs/air-cert.p12",
-                "tsa": "http://timestamp.digicert.com"
-            }
-        }
+    "mac": {
+      "target": "bundle",
+      "output": "dist/r3Release.app",
+      "signingOptions": {
+        "storetype": "pkcs12",
+        "keystore": "certs/air-cert.p12",
+        "tsa": "http://timestamp.digicert.com"
+      }
     }
+  }
 }
