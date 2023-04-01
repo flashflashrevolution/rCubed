@@ -17,7 +17,7 @@ package game
         public var judgeSpeed:Number = 1;
         public var scrollSpeed:Number = 1.5;
         public var receptorSpacing:int = 80;
-        public var receptorAnimationSpeed:Number = 1;
+        public var receptorSpeed:Number = 1;
         public var noteScale:Number = 1;
         public var judgeScale:Number = 1;
         public var screencutPosition:Number = 0.5;
@@ -27,8 +27,6 @@ package game
         public var offsetGlobal:Number = 0;
         public var offsetJudge:Number = 0;
         public var autoJudgeOffset:Boolean = false;
-
-        public var forceNewJudge:Boolean = false;
 
         public var displayGameTopBar:Boolean = true;
         public var displayGameBottomBar:Boolean = true;
@@ -57,6 +55,8 @@ package game
         public var judgeColors:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
         public var comboColors:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000, 0xDC00C2]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag, RawGood
         public var enableComboColors:Vector.<Boolean> = new <Boolean>[true, true, true, false, false, false, false, false, false];
+        public var receptorColors:Array = [0xFFFFFF, 0xFFFFFF, 0x64FF64, 0xFFFF00, 0xBB8500, 0xA80000];
+        public var enableReceptorColors:Vector.<Boolean> = new <Boolean>[true, true, true, true, true, false];
         public var gameColors:Array = [0x1495BD, 0x033242, 0x0C6A88, 0x074B62, 0x000000];
         public var noteDirections:Array = ["D", "L", "U", "R"];
         public var noteColors:Array = ["red", "blue", "purple", "yellow", "pink", "orange", "cyan", "green", "white"];
@@ -70,7 +70,6 @@ package game
 
         public var song:Song = null;
         public var replay:Replay = null;
-        public var loadPreview:Boolean = false;
         public var isEditor:Boolean = false;
         public var isAutoplay:Boolean = false;
         public var mpRoom:Room = null;
@@ -96,13 +95,12 @@ package game
         {
             frameRate = user.frameRate;
             songRate = user.songRate;
-            forceNewJudge = user.forceNewJudge;
 
             scrollDirection = user.slideDirection;
             judgeSpeed = user.judgeSpeed;
             scrollSpeed = user.gameSpeed;
             receptorSpacing = user.receptorGap;
-            receptorAnimationSpeed = user.receptorAnimationSpeed;
+            receptorSpeed = user.receptorSpeed;
             noteScale = user.noteScale;
             judgeScale = user.judgeScale;
             screencutPosition = user.screencutPosition;
@@ -141,6 +139,8 @@ package game
             judgeColors = user.judgeColors.concat();
             comboColors = user.comboColors.concat();
             enableComboColors = user.enableComboColors.concat();
+            receptorColors = user.receptorColors.concat();
+            enableReceptorColors = user.enableReceptorColors.concat();
             gameColors = user.gameColors.concat();
             rawGoodTracker = user.rawGoodTracker;
             rawGoodsColor = user.rawGoodsColor;
@@ -192,7 +192,6 @@ package game
 
             frameRate = settings["frameRate"] || 30;
             songRate = settings["songRate"] || 1;
-            forceNewJudge = settings["forceNewJudge"] || false;
 
             scrollDirection = settings["direction"] || "up";
             judgeSpeed = settings["judgeSpeed"] || 1;
@@ -297,14 +296,13 @@ package game
             settings["viewGameBottomBar"] = displayGameBottomBar;
             settings["speed"] = scrollSpeed;
             settings["judgeSpeed"] = judgeSpeed;
-            settings["receptorAnimationSpeed"] = receptorAnimationSpeed;
+            settings["receptorSpeed"] = receptorSpeed;
             settings["direction"] = scrollDirection;
             settings["noteskin"] = noteskin;
             settings["gap"] = receptorSpacing;
             settings["noteScale"] = noteScale;
             settings["judgeScale"] = judgeScale;
             settings["screencutPosition"] = screencutPosition;
-            settings["forceNewJudge"] = forceNewJudge;
             settings["frameRate"] = frameRate;
             settings["songRate"] = songRate;
             settings["visual"] = mods;

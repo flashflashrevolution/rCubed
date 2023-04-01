@@ -1,10 +1,5 @@
-/**
- * @author Jonathan (Velocity)
- */
-
 package classes.ui
 {
-    import com.greensock.TweenLite;
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.events.Event;
@@ -84,17 +79,14 @@ package classes.ui
             scroll = 0;
         }
 
-        public function scrollTo(val:Number, useTween:Boolean = true):void
+        public function scrollTo(val:Number):void
         {
             if (val < 0)
                 val = 0;
             if (val > 1)
                 val = 1;
             scroll = val;
-            if (!useTween)
-                _dragger.y = (_bottom * val);
-            else
-                TweenLite.to(_dragger, 0.25, {y: (_bottom * val)});
+            _dragger.y = (_bottom * val);
         }
 
         public function set draggerVisibility(visible:Boolean):void
@@ -137,5 +129,4 @@ package classes.ui
             this.dispatchEvent(new Event(Event.CHANGE));
         }
     }
-
 }

@@ -435,7 +435,6 @@ package arc.mp
             _gvars.options.isAutoplay = true;
             _gvars.options.songRate = 1;
             _gvars.options.isolationOffset = _gvars.options.isolationLength = 0;
-            _gvars.options.loadPreview = true;
             _gvars.gameMain.switchTo(Main.GAME_PLAY_PANEL);
         }
 

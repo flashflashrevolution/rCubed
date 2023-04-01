@@ -7,15 +7,16 @@ package classes.filter
     import classes.ui.Box;
     import classes.ui.BoxButton;
     import classes.ui.BoxCheck;
+    import classes.ui.BoxIcon;
+    import classes.ui.IconUtil;
     import classes.ui.Text;
-    import com.flashfla.utils.ArrayUtil;
     import com.flashfla.utils.SystemUtil;
+    import com.flashfla.utils.VectorUtil;
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.events.Event;
     import flash.events.MouseEvent;
     import popups.PopupFilterManager;
-    import com.flashfla.utils.VectorUtil;
 
     public class SavedFilterButton extends Box
     {
@@ -26,9 +27,9 @@ package classes.filter
         private var updater:PopupFilterManager;
         public var filter:EngineLevelFilter;
         public var filterName:Text;
-        public var exportButton:BoxButton;
         public var editButton:BoxButton;
-        public var deleteButton:BoxButton;
+        public var exportButton:BoxIcon;
+        public var deleteButton:BoxIcon;
         public var defaultCheckbox:BoxCheck;
 
         public function SavedFilterButton(parent:DisplayObjectContainer, xpos:Number, ypos:Number, filter:EngineLevelFilter, updater:PopupFilterManager)
@@ -50,9 +51,11 @@ package classes.filter
             filterName = new Text(this, 25, 0, filter.name);
             filterName.height = 35;
 
-            deleteButton = new BoxButton(this, width - 105, 5, 100, 23, _lang.string("filter_editor_delete"), 12, e_deleteClick);
-            editButton = new BoxButton(this, deleteButton.x - 105, 5, 100, 23, _lang.string("filter_editor_select_edit"), 12, e_editClick);
-            exportButton = new BoxButton(this, editButton.x - 105, 5, 100, 23, _lang.string("popup_filter_filter_single_export"), 12, e_exportClick);
+            deleteButton = new BoxIcon(this, width - 28, 5, 23, 23, IconUtil.getIcon("iconDelete"), e_deleteClick);
+            deleteButton.setHoverText(_lang.string("filter_editor_delete"));
+            exportButton = new BoxIcon(this, deleteButton.x - 28, 5, 23, 23, IconUtil.getIcon("iconCopy"), e_exportClick);
+            exportButton.setHoverText(_lang.string("popup_filter_filter_single_export"));
+            editButton = new BoxButton(this, exportButton.x - 105, 5, 100, 23, _lang.string("filter_editor_select_edit"), 12, e_editClick);
         }
 
         override public function dispose():void

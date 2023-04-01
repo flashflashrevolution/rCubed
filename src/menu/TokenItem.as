@@ -1,7 +1,3 @@
-/**
- * @author Jonathan (Velocity)
- */
-
 package menu
 {
     import classes.Language;
@@ -74,7 +70,7 @@ package menu
             messageText.autoSize = TextFieldAutoSize.LEFT;
             //messageText.border = true;
             //messageText.borderColor = 0xffffff;
-            messageText.htmlText = "<font face=\"" + Language.UNI_FONT_NAME + "\" color=\"#FFFFFF\" size=\"12\"><b>" + messageString + "</b></font>";
+            messageText.htmlText = "<font face=\"" + Fonts.BASE_FONT_CJK + "\" color=\"#FFFFFF\" size=\"12\"><b>" + messageString + "</b></font>";
 
             //- Make Display
             var box:Box = new Box(this, 5, 0, false);

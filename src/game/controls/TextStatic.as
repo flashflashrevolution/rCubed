@@ -14,7 +14,7 @@ package game.controls
         public function TextStatic(text:String)
         {
             field = new TextField();
-            field.defaultTextFormat = new TextFormat(Language.UNI_FONT_NAME, 17, 0x0098CB, true);
+            field.defaultTextFormat = new TextFormat(Fonts.BASE_FONT_CJK, 17, 0x0098CB, true);
             field.antiAliasType = AntiAliasType.ADVANCED;
             field.embedFonts = true;
             field.selectable = false;
@@ -37,7 +37,7 @@ package game.controls
 
         public function setFormatting(color:Number = 0x0098CB, size:int = 17):void
         {
-            field.setTextFormat(new TextFormat(Language.UNI_FONT_NAME, size, color, true));
+            field.setTextFormat(new TextFormat(Fonts.BASE_FONT_CJK, size, color, true));
             field.autoSize = TextFieldAutoSize.LEFT;
         }
     }

@@ -21,7 +21,11 @@ package menu
 
     public class SongItem extends Sprite
     {
+        private static var _gvars:GlobalVariables = GlobalVariables.instance;
+        private static var _lang:Language = Language.instance;
+
         private static const HOVER_POINT_GLOBAL:Point = new Point();
+        private static const DISABLED_COLORS:Array = [0xFF0000, 0xFF0000];
         private static const GRADIENT_COLORS:Array = [0xFFFFFF, 0xFFFFFF];
         private static const GRADIENT_ALPHA_HIGHLIGHT:Array = [0.35, 0.1225];
         private static const GRADIENT_ALPHA:Array = [0.2, 0.04];
@@ -76,10 +80,11 @@ package menu
         public function draw():void
         {
             const ALPHAS:Array = (highlight ? GRADIENT_ALPHA_HIGHLIGHT : GRADIENT_ALPHA);
+            const COLORS:Array = (songInfo.is_disabled ? DISABLED_COLORS : GRADIENT_COLORS);
 
             this.graphics.clear();
             this.graphics.lineStyle(1, 0xFFFFFF, (highlight ? 0.8 : 0.55));
-            this.graphics.beginGradientFill(GradientType.LINEAR, GRADIENT_COLORS, ALPHAS, GRADIENT_RATIO, Constant.GRADIENT_MATRIX);
+            this.graphics.beginGradientFill(GradientType.LINEAR, COLORS, ALPHAS, GRADIENT_RATIO, Constant.GRADIENT_MATRIX);
             this.graphics.drawRect(0, 0, width - 1, height - 1);
             this.graphics.endFill();
 
@@ -129,19 +134,16 @@ package menu
             // `enabled` accounts for both `active` and `highlight`.
             if (enabled)
             {
-                if (highlight && _hoverEnabled)
+                // Have a song note, show note.
+                if (highlight && (_hoverEnabled && (_songUserInfo != null && _songUserInfo.notes.length > 0)))
                 {
-                    // Have a song note, show note.
-                    if (_songUserInfo != null && _songUserInfo.notes.length > 0)
-                    {
-                        if (!_hoverTimer)
-                            _hoverTimer = new Timer(500, 1);
+                    if (!_hoverTimer)
+                        _hoverTimer = new Timer(500, 1);
 
-                        if (!_hoverTimer.running && (_hoverSprite == null || _hoverSprite.parent == null))
-                        {
-                            _hoverTimer.addEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
-                            _hoverTimer.start();
-                        }
+                    if (!_hoverTimer.running && (_hoverSprite == null || _hoverSprite.parent == null))
+                    {
+                        _hoverTimer.addEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
+                        _hoverTimer.start();
                     }
                 }
             }
@@ -256,7 +258,7 @@ package menu
         {
             if (_hoverSprite != null)
             {
-                _hoverSprite.message = "<font face=\"" + Language.UNI_FONT_NAME + "\" >" + _songUserInfo.notes + "</font>";
+                _hoverSprite.message = "<font face=\"" + Fonts.BASE_FONT_CJK + "\" >" + _songUserInfo.notes + "</font>";
             }
         }
 
@@ -275,7 +277,9 @@ package menu
             // Song Name
             var songname:String = songInfo.name;
 
-            if (!songInfo.engine && songInfo.genre == Constant.LEGACY_GENRE)
+            if (songInfo.is_explicit)
+                songname = '<font color="#e89200">[E]</font> ' + songname;
+            if (songInfo.is_legacy)
                 songname = '<font color="#004587">[L]</font> ' + songname;
 
             _lblSongName = new Text(this, 0, 0, songname || "", 14);
@@ -298,7 +302,7 @@ package menu
                 _lblMessageText.width = 395;
                 _lblMessageText.wordWrap = true;
                 _lblMessageText.autoSize = TextFieldAutoSize.LEFT;
-                _lblMessageText.htmlText = "<font face=\"" + Language.UNI_FONT_NAME + "\" color=\"#FFFFFF\" size=\"10\"><b>" + _message + "</b></font>";
+                _lblMessageText.htmlText = "<font face=\"" + Fonts.BASE_FONT_CJK + "\" color=\"#FFFFFF\" size=\"10\"><b>" + _message + "</b></font>";
                 this.addChild(_lblMessageText);
 
                 _lblSongName.x = 5;
@@ -346,15 +350,17 @@ package menu
 
         public function getDifficultyText():String
         {
-            return isFavorite ? '<font color="#f7b9e4">' + _songInfo.difficulty + '</font>' : _songInfo.difficulty.toString();
+            if (isFavorite)
+                return '<font color="#f7b9e4">' + _songInfo.difficulty + '</font>';
+
+            if (songInfo.is_unranked)
+                return '<font color="#9C9C9C">' + _songInfo.difficulty + '</font>';
+
+            return songInfo.difficulty.toString();
         }
 
         public function getSongLockText():String
         {
-            // Get them here to reduce instance loading, as only locked songs call this.
-            var _gvars:GlobalVariables = GlobalVariables.instance;
-            var _lang:Language = Language.instance;
-
             switch (songInfo.access)
             {
                 case GlobalVariables.SONG_ACCESS_CREDITS:

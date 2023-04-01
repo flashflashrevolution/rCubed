@@ -48,10 +48,9 @@ package menu
     import flash.ui.Keyboard;
     import game.GameOptions;
     import menu.MenuSongSelectionOptions;
-    import popups.PopupFilterManager;
+    import popups.PopupHighscores;
     import popups.PopupQueueManager;
     import popups.PopupSongNotes;
-    import popups.PopupHighscores;
 
     public class MenuSongSelection extends MenuPanel
     {
@@ -76,6 +75,8 @@ package menu
         private var _lang:Language = Language.instance;
         private var _playlist:Playlist = Playlist.instance;
         private var _mp:MultiplayerSingleton = MultiplayerSingleton.getInstance();
+
+        private var SORT_VALUE_CACHE:Object = {};
 
         private var genreDisplay:Sprite;
         private var genreItems:Vector.<Text> = new <Text>[];
@@ -156,6 +157,13 @@ package menu
             GENRE_MODE = LocalStore.getVariable("genre_mode", GENRE_DIFFICULTIES);
 
             draw();
+
+            // Re-Open File Browser
+            if (Flags.VALUES[Flags.FILE_LOADER_OPEN])
+            {
+                Flags.VALUES[Flags.FILE_LOADER_OPEN] = false;
+                switchTo(MainMenu.MENU_LOCAL);
+            }
 
             return true;
         }
@@ -656,7 +664,7 @@ package menu
 
                 // Song List Filters
                 sourceListLength = songList.length;
-                songList = filterSongListLegacy(songList);
+                songList = filterSongListFlags(songList);
                 songList = filterSongListUser(songList);
 
                 // List Length and Slice into pages.
@@ -681,7 +689,7 @@ package menu
 
                     // Song List Filters
                     sourceListLength = songList.length;
-                    songList = filterSongListLegacy(songList);
+                    songList = filterSongListFlags(songList);
                     songList = filterSongListUser(songList);
 
                     // Sort and get List Length
@@ -695,7 +703,7 @@ package menu
 
                     // Song List Filters
                     sourceListLength = songList.length;
-                    songList = filterSongListLegacy(songList);
+                    songList = filterSongListFlags(songList);
                     songList = filterSongListUser(songList);
 
                     // Sort, List Length, and Slice into pages.
@@ -727,83 +735,7 @@ package menu
             // Sorting
             if (options.last_sort_type != null)
             {
-                var cache: Object = {};
-
-                function getSongRank(song: SongInfo, activeUser: User): uint {
-                    var songRank: uint = cache[song.level];
-                    if (songRank) {
-                        return songRank;
-                    }
-
-                    var songLevelRank: Object = activeUser.getLevelRank(song);
-                    if (songLevelRank == null) {
-                        songRank = 1000000000;
-                    } else {
-                        songRank = songLevelRank.rank;
-                    }
-
-                    cache[song.level] = songRank;
-
-                    return songRank;
-                }
-
-                function sortByRank(songA: SongInfo, songB: SongInfo): int {
-                    var songARank: uint = getSongRank(songA, _gvars.activeUser);
-                    var songBRank: uint = getSongRank(songB, _gvars.activeUser);
-                    
-                    if (songA.access !== songB.access) {
-                        return songA.access < songB.access ? -1 : 1;
-                    }
-
-                    if (songARank === songBRank) {
-                        return songA.level < songB.level ? -1 : 1;
-                    }
-                    
-                    return songARank < songBRank ? -1 : 1;
-                }
-                
-                function getSongRawGoods(song: SongInfo, activeUser: User): Number {
-                    var songRawGoods: Number = cache[song.level];
-                    if (songRawGoods) {
-                        return songRawGoods;
-                    }
-
-                    var songLevelRank: Object = activeUser.getLevelRank(song);
-
-                    if (songLevelRank == null) {
-                        songRawGoods = 2000000;
-                    } else {
-                        var rawGoods: Number = songLevelRank.good + (songLevelRank.average * 1.8) + (songLevelRank.miss * 2.4) + (songLevelRank.boo * 0.2);
-                        var notesPlayed: uint = songLevelRank.perfect + songLevelRank.good + songLevelRank.average + songLevelRank.miss;
-                        var noteCount: uint = song.note_count || songLevelRank.arrows;
-
-                        if (notesPlayed < noteCount) {
-                            var implicitMisses: uint = noteCount - notesPlayed;
-                            songRawGoods = 1000000 + rawGoods + implicitMisses * 2.4;
-                        } else {
-                            songRawGoods = rawGoods;
-                        }
-                    }
-
-                    cache[song.level] = songRawGoods;
-                    
-                    return songRawGoods;
-                }
-
-                function sortByRawGoods(songA: SongInfo, songB: SongInfo): int {
-                    var songARawGoods: Number = getSongRawGoods(songA, _gvars.activeUser);
-                    var songBRawGoods: Number = getSongRawGoods(songB, _gvars.activeUser);
-                    
-                    if (songA.access !== songB.access) {
-                        return songA.access < songB.access ? -1 : 1;
-                    }
-
-                    if (songARawGoods === songBRawGoods) {
-                        return songA.level < songB.level ? -1 : 1;
-                    }
-                    
-                    return songARawGoods < songBRawGoods ? -1 : 1;
-                }
+                SORT_VALUE_CACHE = {};
 
                 var sortOrder:uint = options.last_sort_order == "desc" ? Array.DESCENDING : 0;
                 switch (options.last_sort_type)
@@ -886,8 +818,8 @@ package menu
             }
 
             // Scroll Position
-            pane.scrollTo(options.scroll_position, false);
-            scrollbar.scrollTo(options.scroll_position, false);
+            pane.scrollTo(options.scroll_position);
+            scrollbar.scrollTo(options.scroll_position);
 
             scrollbar.draggerVisibility = (yOffset > pane.height);
 
@@ -918,6 +850,102 @@ package menu
                 setActiveIndex(0, -1, false, false);
             }
         }
+
+        private function getSongRank(song:SongInfo, activeUser:User):uint
+        {
+            var songRank:uint = SORT_VALUE_CACHE[song.level];
+            if (songRank)
+            {
+                return songRank;
+            }
+
+            var songLevelRank:Object = activeUser.getLevelRank(song);
+            if (songLevelRank == null)
+            {
+                songRank = 1000000000;
+            }
+            else
+            {
+                songRank = songLevelRank.rank;
+            }
+
+            SORT_VALUE_CACHE[song.level] = songRank;
+
+            return songRank;
+        }
+
+        private function sortByRank(songA:SongInfo, songB:SongInfo):int
+        {
+            var songARank:uint = getSongRank(songA, _gvars.activeUser);
+            var songBRank:uint = getSongRank(songB, _gvars.activeUser);
+
+            if (songA.access !== songB.access)
+            {
+                return songA.access < songB.access ? -1 : 1;
+            }
+
+            if (songARank === songBRank)
+            {
+                return songA.level < songB.level ? -1 : 1;
+            }
+
+            return songARank < songBRank ? -1 : 1;
+        }
+
+        private function getSongRawGoods(song:SongInfo, activeUser:User):Number
+        {
+            var songRawGoods:Number = SORT_VALUE_CACHE[song.level];
+            if (songRawGoods)
+            {
+                return songRawGoods;
+            }
+
+            var songLevelRank:Object = activeUser.getLevelRank(song);
+
+            if (songLevelRank == null)
+            {
+                songRawGoods = 2000000;
+            }
+            else
+            {
+                var rawGoods:Number = songLevelRank.good + (songLevelRank.average * 1.8) + (songLevelRank.miss * 2.4) + (songLevelRank.boo * 0.2);
+                var notesPlayed:uint = songLevelRank.perfect + songLevelRank.good + songLevelRank.average + songLevelRank.miss;
+                var noteCount:uint = song.note_count || songLevelRank.arrows;
+
+                if (notesPlayed < noteCount)
+                {
+                    var implicitMisses:uint = noteCount - notesPlayed;
+                    songRawGoods = 1000000 + rawGoods + implicitMisses * 2.4;
+                }
+                else
+                {
+                    songRawGoods = rawGoods;
+                }
+            }
+
+            SORT_VALUE_CACHE[song.level] = songRawGoods;
+
+            return songRawGoods;
+        }
+
+        private function sortByRawGoods(songA:SongInfo, songB:SongInfo):int
+        {
+            var songARawGoods:Number = getSongRawGoods(songA, _gvars.activeUser);
+            var songBRawGoods:Number = getSongRawGoods(songB, _gvars.activeUser);
+
+            if (songA.access !== songB.access)
+            {
+                return songA.access < songB.access ? -1 : 1;
+            }
+
+            if (songARawGoods === songBRawGoods)
+            {
+                return songA.level < songB.level ? -1 : 1;
+            }
+
+            return songARawGoods < songBRawGoods ? -1 : 1;
+        }
+
 
         /**
          * Filters the `_playlist.indexList` vector of SongInfo into an Array given a specific filter function.
@@ -971,20 +999,42 @@ package menu
          * Process the legacy filter on the given song list if enabled.
          * @param songList Song List Array for Song objects to filter.
          */
-        private function filterSongListLegacy(songList:Array):Array
+        private function filterSongListFlags(songList:Array):Array
         {
-            if (!_playlist.engine && !_gvars.activeUser.DISPLAY_LEGACY_SONGS)
+            if (!_gvars.activeUser.DISPLAY_LEGACY_SONGS)
                 songList = songList.filter(filterSongListLegacyFilter);
+
+            if (!_gvars.activeUser.DISPLAY_EXPLICIT_SONGS)
+                songList = songList.filter(filterSongListExplicitFilter);
+
+            if (!_gvars.activeUser.DISPLAY_UNRANKED_SONGS)
+                songList = songList.filter(filterSongListUnrankedFilter);
 
             return songList;
         }
 
         /**
-         * Array filter for filterSongListLegacy.
+         * Legacy Array filter for filterSongListFlags.
          */
         private function filterSongListLegacyFilter(item:SongInfo, index:int, array:Array):Boolean
         {
-            return item.genre != Constant.LEGACY_GENRE;
+            return !item.is_legacy;
+        }
+
+        /**
+         * Explicit Array filter for filterSongListFlags.
+         */
+        private function filterSongListExplicitFilter(item:SongInfo, index:int, array:Array):Boolean
+        {
+            return !item.is_explicit;
+        }
+
+        /**
+         * Unranked Array filter for filterSongListFlags.
+         */
+        private function filterSongListUnrankedFilter(item:SongInfo, index:int, array:Array):Boolean
+        {
+            return !item.is_unranked;
         }
 
         /**
@@ -1128,7 +1178,7 @@ package menu
             var songInfo:SongInfo = _playlist.getSongInfo(songItem.level);
             if (songInfo != null)
             {
-                var song:Song = _gvars.getSongFile(songInfo, true);
+                var song:Song = _gvars.getSongFile(songInfo);
                 if (song.isLoaded)
                 {
                     writeMenuMusicBytes(song);
@@ -1182,7 +1232,7 @@ package menu
             var songInfo:SongInfo = _playlist.getSongInfo(songItem.level);
             if (songInfo != null)
             {
-                var song:Song = _gvars.getSongFile(songInfo, true);
+                var song:Song = _gvars.getSongFile(songInfo);
                 if (song.isLoaded)
                 {
                     playSongPreview(song);

@@ -1,7 +1,3 @@
-/**
- * @author Jonathan (Velocity)
- */
-
 package classes.ui
 {
     import com.greensock.TweenLite;

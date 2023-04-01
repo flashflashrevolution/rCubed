@@ -1,12 +1,11 @@
 package classes.ui
 {
-    import com.greensock.TweenLite;
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.events.MouseEvent;
     import flash.geom.Rectangle;
 
-    public class ScrollPane extends Sprite
+    public class ScrollPane extends Sprite implements IScrollPane
     {
         private var _width:Number;
         private var _height:Number;
@@ -69,22 +68,15 @@ package classes.ui
             content.update(content.y * -1, _height);
         }
 
-        public function scrollTo(val:Number, useTween:Boolean = true):void
+        public function scrollTo(val:Number):void
         {
             if (val < 0)
                 val = 0;
             if (val > 1)
                 val = 1;
 
-            if (!useTween)
-            {
-                content.y = -((content.height - _height) * val);
-                update();
-            }
-            else
-            {
-                TweenLite.to(content, 0.25, {y: -((content.height - _height) * val), onUpdate: update, onComplete: update});
-            }
+            content.y = -((content.height - _height) * val);
+            update();
         }
 
         override public function get height():Number

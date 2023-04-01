@@ -18,6 +18,7 @@ package popups.replays
     import flash.events.Event;
     import flash.events.MouseEvent;
     import game.GameOptions;
+    import menu.FileLoader;
     import menu.MenuPanel;
 
     public class ReplayHistoryWindow extends MenuPanel
@@ -41,7 +42,6 @@ package popups.replays
         private var TAB_BUTTONS:Vector.<TabButton>;
 
         private var txt_title:Text;
-        private var txt_mod_warning:Text;
 
         private var search_field:BoxText;
         private var search_field_placeholder:Text;
@@ -200,7 +200,7 @@ package popups.replays
 
             var dist:Number = scrollbar.scroll + (pane.scrollFactorVertical / 2) * (e.delta > 0 ? -1 : 1);
             pane.scrollTo(dist);
-            scrollbar.scrollTo(dist, false);
+            scrollbar.scrollTo(dist);
         }
 
         private function e_scrollBarMoved(e:Event):void
@@ -211,7 +211,7 @@ package popups.replays
         public function updateScrollPane():void
         {
             pane.scrollTo(0);
-            scrollbar.scrollTo(0, false);
+            scrollbar.scrollTo(0);
 
             scrollbar.visible = pane.doScroll;
         }
@@ -232,8 +232,23 @@ package popups.replays
                 {
                     if (replay.song == null)
                     {
-                        Alert.add(_lang.string("popup_replay_missing_song_data"));
+                        Alert.add(_lang.string("popup_replay_missing_song_data"), 120, Alert.RED);
                         return;
+                    }
+
+                    if (replay.isFileLoader)
+                    {
+                        var chartLoaded:Boolean = true;
+                        if (_gvars.externalSongInfo.engine.cache_id != replay.cacheID)
+                            chartLoaded = FileLoader.setupLocalFile(replay.chartPath, replay.settings.arc_engine.chartID);
+
+                        replay.song = _gvars.externalSongInfo;
+
+                        if (!chartLoaded)
+                        {
+                            Alert.add(_lang.string("popup_replay_file_browser_replays"), 120, Alert.RED);
+                            return;
+                        }
                     }
 
                     if (!replay.user.isLoaded())
@@ -242,7 +257,6 @@ package popups.replays
                     _gvars.options = new GameOptions();
                     _gvars.options.isolation = false;
                     _gvars.options.replay = replay;
-                    _gvars.options.loadPreview = true;
                     _gvars.options.fillFromReplay();
                     _gvars.options.fillFromArcGlobals();
 
@@ -286,13 +300,10 @@ package popups.replays
 
 
 import assets.menu.icons.fa.iconRight;
-
 import classes.Room;
 import classes.ui.SimpleBoxButton;
 import classes.ui.Text;
-
 import com.greensock.TweenLite;
-
 import flash.display.Sprite;
 
 internal class TabButton extends Sprite

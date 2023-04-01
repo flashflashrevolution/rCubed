@@ -41,7 +41,7 @@ package game.controls
             }
 
             fieldShadow = new TextField();
-            fieldShadow.defaultTextFormat = new TextFormat(Language.UNI_FONT_NAME, 50, colors_dark[2], true);
+            fieldShadow.defaultTextFormat = new TextFormat(Fonts.BASE_FONT_CJK, 50, colors_dark[2], true);
             fieldShadow.antiAliasType = AntiAliasType.ADVANCED;
             fieldShadow.embedFonts = true;
             fieldShadow.selectable = false;
@@ -52,7 +52,7 @@ package game.controls
             addChild(fieldShadow);
 
             field = new TextField();
-            field.defaultTextFormat = new TextFormat(Language.UNI_FONT_NAME, 50, colors[2], true);
+            field.defaultTextFormat = new TextFormat(Fonts.BASE_FONT_CJK, 50, colors[2], true);
             field.antiAliasType = AntiAliasType.ADVANCED;
             field.embedFonts = true;
             field.selectable = false;

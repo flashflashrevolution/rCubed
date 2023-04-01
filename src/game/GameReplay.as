@@ -8,7 +8,7 @@ package game
 
     public class GameReplay extends MenuPanel
     {
-        private var _textFormat:TextFormat = new TextFormat(Language.UNI_FONT_NAME, 16, 0xFFFFFF, true);
+        private var _textFormat:TextFormat = new TextFormat(Fonts.BASE_FONT_CJK, 16, 0xFFFFFF, true);
 
         private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _lang:Language = Language.instance;

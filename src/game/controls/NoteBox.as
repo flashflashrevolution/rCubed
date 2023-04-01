@@ -5,12 +5,11 @@ package game.controls
     import classes.Noteskins;
     import classes.chart.Song;
     import classes.chart.Note;
-    import flash.display.DisplayObject;
     import flash.utils.getTimer;
     import game.GameOptions;
     import flash.display.Sprite;
     import flash.display.MovieClip;
-    import com.flashfla.utils.ObjectPool;
+    import com.flashfla.utils.GameNotePool;
 
     public class NoteBox extends Sprite
     {
@@ -26,14 +25,20 @@ package game.controls
         private var notePool:Array;
         public var notes:Array;
 
-        public var leftReceptor:MovieClip;
-        public var downReceptor:MovieClip;
-        public var upReceptor:MovieClip;
-        public var rightReceptor:MovieClip;
+        public var leftReceptor:GameReceptor;
+        public var downReceptor:GameReceptor;
+        public var upReceptor:GameReceptor;
+        public var rightReceptor:GameReceptor;
         public var receptorArray:Array;
+        public var receptorTable:Object = {};
+
         public var positionOffsetMax:Object;
         private var sideScroll:Boolean;
         private var receptorAlpha:Number;
+
+        private var recp_colors:Vector.<Number>;
+        private var recp_colors_enabled:Vector.<Boolean>;
+        private var recp_color_indexs:Object = {"100": 0, "50": 1, "25": 2, "5": 3, "-5": 4, "-10": 5};
 
         public function NoteBox(song:Song, options:GameOptions)
         {
@@ -50,7 +55,7 @@ package game.controls
                 {
                     for each (var color:String in options.noteColors)
                     {
-                        notePool[item.id][direction][color] = new ObjectPool();
+                        notePool[item.id][direction][color] = new GameNotePool();
                     }
                 }
             }
@@ -68,7 +73,7 @@ package game.controls
             {
                 for each (var pre_color:String in options.noteColors)
                 {
-                    var pool:ObjectPool = notePool[options.noteskin][pre_dir][pre_color];
+                    var pool:GameNotePool = notePool[options.noteskin][pre_dir][pre_color];
 
                     for (i = 0; i < preLoadCount; i++)
                     {
@@ -83,20 +88,16 @@ package game.controls
             // Setup Receptors
             leftReceptor = _noteskins.getReceptor(options.noteskin, "L");
             leftReceptor.KEY = "Left";
+            leftReceptor.animationSpeed = options.receptorSpeed;
             downReceptor = _noteskins.getReceptor(options.noteskin, "D");
             downReceptor.KEY = "Down";
+            downReceptor.animationSpeed = options.receptorSpeed;
             upReceptor = _noteskins.getReceptor(options.noteskin, "U");
             upReceptor.KEY = "Up";
+            upReceptor.animationSpeed = options.receptorSpeed;
             rightReceptor = _noteskins.getReceptor(options.noteskin, "R");
             rightReceptor.KEY = "Right";
-
-            if (leftReceptor is GameReceptor)
-            {
-                (leftReceptor as GameReceptor).animationSpeed = options.receptorAnimationSpeed;
-                (downReceptor as GameReceptor).animationSpeed = options.receptorAnimationSpeed;
-                (upReceptor as GameReceptor).animationSpeed = options.receptorAnimationSpeed;
-                (rightReceptor as GameReceptor).animationSpeed = options.receptorAnimationSpeed;
-            }
+            rightReceptor.animationSpeed = options.receptorSpeed;
 
             addChildAt(leftReceptor, 0);
             addChildAt(downReceptor, 0);
@@ -111,6 +112,20 @@ package game.controls
             notes = [];
             noteCount = 0;
             totalNotes = song.totalNotes;
+
+            // Copy Receptor Colors
+            recp_colors = new Vector.<Number>(options.receptorColors.length, true);
+            for (i = 0; i < options.receptorColors.length; i++)
+            {
+                recp_colors[i] = options.receptorColors[i];
+            }
+
+            // Copy Enabled Colors
+            recp_colors_enabled = new Vector.<Boolean>(options.enableReceptorColors.length, true);
+            for (i = 0; i < options.enableReceptorColors.length; i++)
+            {
+                recp_colors_enabled[i] = options.enableReceptorColors[i];
+            }
         }
 
         public function noteRealSpawnRotation(dir:String, noteskin:int):Number
@@ -140,10 +155,10 @@ package game.controls
             }
             else
             {
-                var spawnPoolRef:ObjectPool = notePool[options.noteskin][direction][color];
+                var spawnPoolRef:GameNotePool = notePool[options.noteskin][direction][color];
                 if (!spawnPoolRef)
                 {
-                    spawnPoolRef = notePool[options.noteskin][direction][color] = new ObjectPool();
+                    spawnPoolRef = notePool[options.noteskin][direction][color] = new GameNotePool();
                 }
 
                 gameNote = spawnPoolRef.getObject();
@@ -194,7 +209,7 @@ package game.controls
             return gameNote;
         }
 
-        public function getReceptor(dir:String):MovieClip
+        public function getReceptor(dir:String):GameReceptor
         {
             switch (dir)
             {
@@ -212,43 +227,12 @@ package game.controls
 
         public function receptorFeedback(dir:String, score:int):void
         {
-            if (!options.displayReceptorAnimations)
-            {
+            var idx:int = recp_color_indexs[score] != null ? recp_color_indexs[score] : -1;
+
+            if (idx == -1 || !recp_colors_enabled[idx] || !options.displayReceptorAnimations)
                 return;
-            }
 
-            var f:int = 2;
-            var c:uint = 0;
-
-            switch (score)
-            {
-                case 100:
-                case 50:
-                    f = 2;
-                    c = options.judgeColors[0];
-                    break;
-                case 25:
-                    f = 7;
-                    c = options.judgeColors[2];
-                    break;
-                case 5:
-                case -5:
-                    f = 12;
-                    c = options.judgeColors[3];
-                    break;
-                default:
-                    return;
-            }
-
-            var recepterFeedbackRef:MovieClip = getReceptor(dir);
-            if (recepterFeedbackRef is GameReceptor)
-            {
-                (recepterFeedbackRef as GameReceptor).playAnimation(c);
-            }
-            else
-            {
-                recepterFeedbackRef.gotoAndPlay(f);
-            }
+            getReceptor(dir).playAnimation(recp_colors[idx]);
         }
 
         public function get nextNote():Note

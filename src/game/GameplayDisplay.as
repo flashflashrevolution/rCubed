@@ -11,9 +11,7 @@ package game
     import classes.Language;
     import classes.Noteskins;
     import classes.User;
-    import classes.chart.LevelScriptRuntime;
     import classes.chart.Note;
-    import classes.chart.NoteChart;
     import classes.chart.Song;
     import classes.replay.ReplayBinFrame;
     import classes.replay.ReplayNote;
@@ -45,13 +43,13 @@ package game
     import flash.utils.getTimer;
     import game.controls.AccuracyBar;
     import game.controls.Combo;
-    import game.controls.RawGoods;
     import game.controls.FlashlightOverlay;
     import game.controls.Judge;
     import game.controls.LifeBar;
     import game.controls.MPHeader;
     import game.controls.NoteBox;
     import game.controls.PAWindow;
+    import game.controls.RawGoods;
     import game.controls.Score;
     import game.controls.ScreenCut;
     import game.controls.TextStatic;
@@ -96,8 +94,6 @@ package game
         private var _keys:Array;
         private var song:Song;
         private var song_background:MovieClip;
-        private var legacyMode:Boolean;
-        private var levelScript:LevelScriptRuntime;
 
         private var reverseMod:Boolean;
         private var sideScroll:Boolean;
@@ -216,6 +212,8 @@ package game
         {
             options = _gvars.options;
             song = options.song;
+            song.handleDirty(options);
+
             if (!options.isEditor && song.chart.Notes.length == 0)
             {
                 Alert.add(_lang.string("error_chart_has_no_notes"), 120, Alert.RED);
@@ -300,7 +298,7 @@ package game
                         "difficulty": song.songInfo.difficulty,
                         "style": song.songInfo.style,
                         "author": song.songInfo.author,
-                        "author_url": song.songInfo.stepauthor_url,
+                        "author_url": song.songInfo.author_url,
                         "stepauthor": song.songInfo.stepauthor,
                         "credits": song.songInfo.credits,
                         "genre": song.songInfo.genre,
@@ -441,18 +439,15 @@ package game
 
             // Song
             song.updateMusicDelay();
-            legacyMode = (song.type == NoteChart.FFR || song.type == NoteChart.FFR_RAW || song.type == NoteChart.FFR_LEGACY);
-            if (song.music && (legacyMode || !options.modEnabled("nobackground")))
+            if (song.background && !options.modEnabled("nobackground"))
             {
-                song_background = song.music as MovieClip;
+                song_background = song.background as MovieClip;
                 gameSongFrames = song_background.totalFrames;
                 song_background.x = 115;
                 song_background.y = 42.5;
                 this.addChild(song_background);
-                if (options.modEnabled("nobackground"))
-                    setChildIndex(song_background, 0);
             }
-            song.start();
+
             songDelay = song.mp3Frame / options.songRate * 1000 / 30 - globalOffset;
         }
 
@@ -464,14 +459,6 @@ package game
             this.addChild(GPU_PIXEL_BITMAP);
 
             stage.color = GameBackgroundColor.BG_STAGE;
-
-            // if (!displayBlackBG)
-            // {
-            //     displayBlackBG = new Sprite();
-            //     displayBlackBG.graphics.beginFill(0x000000);
-            //     displayBlackBG.graphics.drawRect(-Main.GAME_WIDTH, -Main.GAME_WIDTH, Main.GAME_WIDTH * 3, Main.GAME_HEIGHT * 3);
-            //     this.addChild(displayBlackBG);
-            // }
         }
 
         private function initUI():void
@@ -712,7 +699,7 @@ package game
             updateHealth(0);
             if (song != null && song.totalNotes > 0)
             {
-                gameLastNoteFrame = song.getNote(song.totalNotes - 1).frame;
+                gameLastNoteFrame = song.getNote(song.totalNotes - 1).frame + Math.ceil(song.songInfo.time_end * 30);
                 gameFirstNoteFrame = song.getNote(0).frame;
             }
             if (comboTotal)
@@ -737,6 +724,14 @@ package game
 
             if (progressDisplayText)
                 progressDisplayText.update(TimeUtil.convertToHMSS(Math.ceil(gameLastNoteFrame / 30)));
+
+            // Handle Early Charts - Pad Charts till atleast 2 seconds before first note.
+            if (song != null && song.totalNotes > 0 && options.isolationOffset == 0)
+            {
+                var firstNote:Note = song.getNote(0);
+                if (firstNote.time < 2)
+                    absoluteStart += (2 - firstNote.time) * 1000;
+            }
 
             if (postStart)
             {
@@ -826,9 +821,6 @@ package game
                 else
                     GPU_PIXEL_BMD.setPixel(0, 0, 0x020202);
             }
-
-            if (levelScript != null)
-                levelScript.doProgressTick(gameProgress);
 
             if (quitDoubleTap > 0)
             {
@@ -1005,14 +997,6 @@ package game
 
         private function onEnterFrame(e:Event):void
         {
-            // XXX: HACK HACK HACK
-            if (legacyMode)
-            {
-                var songFrame:int = song_background.currentFrame;
-                if (songFrame == gameSongFrames - 1)
-                    song.stop();
-            }
-
             // UI Updates
             if (options.displayMPJudge && options.mpRoom)
             {
@@ -1031,62 +1015,46 @@ package game
             switch (GAME_STATE)
             {
                 case GAME_PLAY:
-                    if (legacyMode)
-                    {
-                        logicTick();
-                        gamePosition = (gameProgress + 0.5) * 1000 / 30;
 
-                        if (mpSpectate && !mpSpectateDidSync)
-                            spectateSync();
-                    }
-                    else
-                    {
-                        var lastAbsolutePosition:int = absolutePosition;
-                        absolutePosition = getTimer() - absoluteStart;
+                    var lastAbsolutePosition:int = absolutePosition;
+                    absolutePosition = getTimer() - absoluteStart;
 
-                        if (!songDelayStarted)
+                    if (!songDelayStarted)
+                    {
+                        if (absolutePosition >= songDelay)
                         {
-                            if (absolutePosition < songDelay)
-                            {
-                                song.stop();
-                            }
-                            else
-                            {
-                                songDelayStarted = true;
-                                song.start();
-                            }
+                            songDelayStarted = true;
+                            song.start();
                         }
-
-                        var songPosition:int = song.getPosition() + songDelay;
-                        if (song.musicIsPlaying && songPosition > 100)
-                            songOffset.addValue(songPosition - absolutePosition);
-
-                        frameRate.addValue(1000 / (absolutePosition - lastAbsolutePosition));
-
-                        gamePosition = Math.round(absolutePosition + songOffset.value);
-                        if (gamePosition < 0)
-                            gamePosition = 0;
-
-                        var targetProgress:int = Math.round(gamePosition * 30 / 1000 - 0.5);
-                        var threshold:int = Math.round(1 / (frameRate.value / 60));
-                        if (threshold < 1)
-                            threshold = 1;
-                        if (options.replay)
-                            threshold = 0x7fffffff;
-
-                        //Logger.debug("GP", "lAP: " + lastAbsolutePosition + " | aP: " + absolutePosition + " | sDS: " + songDelayStarted + " | sD: " + songDelay + " | sOv: " + songOffset.value + " | sGP: " + song.getPosition() + " | sP: " + songPosition + " | gP: " + gamePosition + " | tP: " + targetProgress + " | t: " + threshold);
-
-                        while (gameProgress < targetProgress && threshold-- > 0)
-                            logicTick();
-
-                        if (mpSpectate && !mpSpectateDidSync)
-                            spectateSync();
-
-                        if (reverseMod)
-                            stopClips(song_background, 2 + song.musicDelay - globalOffsetRounded + gameProgress * options.songRate);
-                        else
-                            stopClips(song_background, 2 + song.musicDelay - globalOffsetRounded + gameProgress * options.songRate);
                     }
+
+                    var songPosition:int = song.getPosition() + songDelay;
+                    if (song.musicIsPlaying && songPosition > 100)
+                        songOffset.addValue(songPosition - absolutePosition);
+
+                    frameRate.addValue(1000 / (absolutePosition - lastAbsolutePosition));
+
+                    gamePosition = Math.round(absolutePosition + songOffset.value);
+
+                    var targetProgress:int = Math.round(gamePosition * 30 / 1000 - 0.5);
+                    var threshold:int = Math.round(1 / (frameRate.value / 60));
+                    if (threshold < 1)
+                        threshold = 1;
+                    if (options.replay)
+                        threshold = 0x7fffffff;
+
+                    //Logger.debug("GP", "lAP: " + lastAbsolutePosition + " | aP: " + absolutePosition + " | sDS: " + songDelayStarted + " | sD: " + songDelay + " | sOv: " + songOffset.value + " | sGP: " + song.getPosition() + " | sP: " + songPosition + " | gP: " + gamePosition + " | tP: " + targetProgress + " | t: " + threshold);
+
+                    while (gameProgress < targetProgress && threshold-- > 0)
+                        logicTick();
+
+                    if (mpSpectate && !mpSpectateDidSync)
+                        spectateSync();
+
+                    if (reverseMod)
+                        stopClips(song_background, 2 + song.musicDelay - globalOffsetRounded + gameProgress * options.songRate);
+                    else
+                        stopClips(song_background, 2 + song.musicDelay - globalOffsetRounded + gameProgress * options.songRate);
 
                     if (options.modEnabled("tap_pulse"))
                     {
@@ -1166,10 +1134,7 @@ package game
                     }
                     if (dir)
                     {
-                        if (legacyMode)
-                            judgeScore(dir, gameProgress);
-                        else
-                            judgeScorePosition(dir, Math.round(getTimer() - absoluteStart + songOffset.value));
+                        judgeScorePosition(dir, Math.round(getTimer() - absoluteStart + songOffset.value));
                     }
                 }
             }
@@ -1336,9 +1301,6 @@ package game
             if (GAME_STATE == GAME_DISPOSE || song == null)
                 return;
 
-            if (levelScript)
-                levelScript.destroy();
-
             // Stop Music Play
             if (song)
                 song.stop();
@@ -1416,7 +1378,7 @@ package game
             _gvars.sessionStats.addFromStats(_gvars.songStats);
             _gvars.songStats.reset();
 
-            if (!legacyMode && !options.replay && !options.isEditor && !mpSpectate)
+            if (!options.replay && !options.isEditor && !mpSpectate)
             {
                 _avars.configMusicOffset = (_avars.configMusicOffset * 0.85) + songOffset.value * 0.15;
 
@@ -1565,7 +1527,7 @@ package game
             _gvars.songStats.restarts++;
 
             // Restart
-            song.reset();
+            song.stop();
             GAME_STATE = GAME_PLAY;
             initPlayerVars();
             initVars();
@@ -2168,7 +2130,7 @@ package game
                 gameReplayHit.push(score);
 
             if (score >= 0)
-                gameReplay.push(new ReplayNote(dir, frame, (getTimer() - msStartTime), score));
+                gameReplay.push(new ReplayNote(dir, frame, Math.round(getTimer() - absoluteStart + songOffset.value), score));
 
             updateFieldVars();
 

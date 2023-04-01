@@ -49,7 +49,7 @@ package com.bit101.components
         public static var LIST_ROLLOVER:uint = 0XDDDDDD;
 
         public static var embedFonts:Boolean = true;
-        public static var fontName:String = Language.UNI_FONT_NAME; //"Arial Unicode MS Bold";
+        public static var fontName:String = Fonts.BASE_FONT_CJK;
         public static var fontSize:Number = 8;
 
         public static const DARK:String = "dark";

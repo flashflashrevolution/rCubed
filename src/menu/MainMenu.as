@@ -28,6 +28,7 @@ package menu
     import flash.events.MouseEvent;
     import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
+    import popups.PopupFileBrowser;
     import popups.PopupFilterManager;
     import popups.PopupSkillRankUpdate;
     import popups.replays.ReplayHistoryWindow;
@@ -39,6 +40,7 @@ package menu
         public static const MENU_TOKENS:String = "MenuTokens";
         public static const MENU_FILTERS:String = "MenuFilter";
         public static const MENU_REPLAYS:String = "MenuReplays";
+        public static const MENU_LOCAL:String = "MenuLocal";
         public static const MENU_OPTIONS:String = "MenuOptions";
 
         private var _gvars:GlobalVariables = GlobalVariables.instance;
@@ -69,6 +71,7 @@ package menu
             ["menu_tokens", MENU_TOKENS, false, "iconMedal"],
             ["menu_filters", MENU_FILTERS, true, "iconFilter"],
             ["menu_replays", MENU_REPLAYS, true, "iconVideo"],
+            ["menu_local", MENU_LOCAL, true, "iconFolder"],
             ["menu_options", MENU_OPTIONS, false, "iconGear"]];
 
         public var panel:MenuPanel;
@@ -383,6 +386,11 @@ package menu
             else if (_panel == MENU_REPLAYS)
             {
                 addPopup(new ReplayHistoryWindow(this));
+                return true;
+            }
+            else if (_panel == MENU_LOCAL)
+            {
+                addPopup(new PopupFileBrowser(this));
                 return true;
             }
 

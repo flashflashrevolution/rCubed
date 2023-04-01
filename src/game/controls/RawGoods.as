@@ -24,7 +24,7 @@ package game.controls
             colors = options.rawGoodsColor;
 
             field = new TextField();
-            field.defaultTextFormat = new TextFormat(Language.UNI_FONT_NAME, 30, colors, true);
+            field.defaultTextFormat = new TextFormat(Fonts.BASE_FONT_CJK, 30, colors, true);
             field.antiAliasType = AntiAliasType.ADVANCED;
             field.embedFonts = true;
             field.selectable = false;

@@ -38,7 +38,6 @@ package popups.settings
         private var optionMPSize:ValidatedText;
         private var timestampCheck:BoxCheck;
 
-        private var forceJudgeCheck:BoxCheck;
         private var useCacheCheckbox:BoxCheck;
         private var autoSaveLocalCheckbox:BoxCheck;
         private var useVSyncCheckbox:BoxCheck;
@@ -48,7 +47,6 @@ package popups.settings
         private var engineCombo:ComboBox;
         private var engineDefaultCombo:ComboBox;
         private var engineComboIgnore:Boolean;
-        private var legacySongsCheck:BoxCheck;
         private var optionFPS:ValidatedText;
 
         private var windowWidthBox:ValidatedText;
@@ -144,11 +142,6 @@ package popups.settings
 
             yOff += drawSeperator(container, xOff, 250, yOff, 0, 0);
 
-            // Force engine Judge Mode
-            new Text(container, xOff + 23, yOff, _lang.string("options_force_judge_mode"));
-            forceJudgeCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
-            yOff += 30;
-
             new Text(container, xOff + 23, yOff, _lang.string("air_options_save_local_replays"));
             autoSaveLocalCheckbox = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
             yOff += 30;
@@ -197,12 +190,6 @@ package popups.settings
             engineDefaultCombo.addEventListener(Event.SELECT, engineDefaultSelect);
             container.addChild(engineDefaultCombo);
             engineRefresh();
-            yOff += 30;
-
-            // Legacy Song Display
-            new Text(container, xOff + 23, yOff, _lang.string("options_include_legacy_songs"));
-            legacySongsCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
-            legacySongsCheck.addEventListener(MouseEvent.MOUSE_OVER, e_legacyEngineMouseOver, false, 0, true);
             yOff += 30;
 
             yOff += drawSeperator(container, xOff, 250, yOff, 0, 0);
@@ -265,10 +252,7 @@ package popups.settings
             // Set Framerate
             optionFPS.text = _gvars.activeUser.frameRate.toString();
 
-            forceJudgeCheck.checked = _gvars.activeUser.forceNewJudge;
-
             timestampCheck.checked = _gvars.activeUser.DISPLAY_MP_TIMESTAMP;
-            legacySongsCheck.checked = _gvars.activeUser.DISPLAY_LEGACY_SONGS;
             optionMPSize.text = _avars.configMPSize.toString();
             startUpScreenCombo.selectedIndex = _gvars.activeUser.startUpScreen;
 
@@ -294,25 +278,11 @@ package popups.settings
 
         override public function clickHandler(e:MouseEvent):void
         {
-            // Force Judge Mode
-            if (e.target == forceJudgeCheck)
-            {
-                e.target.checked = !e.target.checked;
-                _gvars.activeUser.forceNewJudge = !_gvars.activeUser.forceNewJudge;
-            }
-
             // MP Timestamp
-            else if (e.target == timestampCheck)
+            if (e.target == timestampCheck)
             {
                 e.target.checked = !e.target.checked;
                 _gvars.activeUser.DISPLAY_MP_TIMESTAMP = !_gvars.activeUser.DISPLAY_MP_TIMESTAMP;
-            }
-
-            // Legacy Songs
-            else if (e.target == legacySongsCheck)
-            {
-                e.target.checked = !e.target.checked;
-                _gvars.activeUser.DISPLAY_LEGACY_SONGS = !_gvars.activeUser.DISPLAY_LEGACY_SONGS;
             }
 
             //- Auto Save Local Replays
@@ -427,7 +397,6 @@ package popups.settings
             {
                 _gvars.activeUser.frameRate = optionFPS.validate(60);
                 _gvars.activeUser.frameRate = Math.max(Math.min(_gvars.activeUser.frameRate, 1000), 10);
-                _gvars.removeSongFiles();
             }
 
             else if (e.target == optionMPSize)
@@ -454,18 +423,6 @@ package popups.settings
             _gvars.gameMain.stage.nativeWindow.width = _gvars.air_windowProperties["width"] + Main.WINDOW_WIDTH_EXTRA;
             _gvars.gameMain.stage.nativeWindow.height = _gvars.air_windowProperties["height"] + Main.WINDOW_HEIGHT_EXTRA;
             _gvars.gameMain.ignoreWindowChanges = false;
-        }
-
-        private function e_legacyEngineMouseOver(e:Event):void
-        {
-            legacySongsCheck.addEventListener(MouseEvent.MOUSE_OUT, e_legacyEngineMouseOut);
-            displayToolTip(legacySongsCheck.x, legacySongsCheck.y + 22, _lang.string("popup_legacy_songs"), "left");
-        }
-
-        private function e_legacyEngineMouseOut(e:Event):void
-        {
-            legacySongsCheck.removeEventListener(MouseEvent.MOUSE_OUT, e_legacyEngineMouseOut);
-            hideTooltip();
         }
 
         private function e_websocketMouseOver(e:Event = null):void

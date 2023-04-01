@@ -3,24 +3,24 @@ package com.flashfla.utils
 
     import classes.GameNote;
 
-    public class ObjectPool
+    public class GameNotePool
     {
-        public var pool:Vector.<Object>;
+        public var pool:Vector.<PoolObject>;
 
-        public function ObjectPool()
+        public function GameNotePool()
         {
-            pool = new Vector.<Object>();
+            pool = new Vector.<PoolObject>();
         }
 
         public function addObject(object:GameNote, mark:Boolean = true):GameNote
         {
-            pool.push({mark: mark, value: object});
+            pool.push(new PoolObject(mark, object));
             return object;
         }
 
         public function unmarkObject(object:GameNote, mark:Boolean = false):void
         {
-            for each (var item:Object in pool)
+            for each (var item:PoolObject in pool)
             {
                 if (item.value == object)
                 {
@@ -31,13 +31,13 @@ package com.flashfla.utils
 
         public function unmarkAll(mark:Boolean = false):void
         {
-            for each (var item:Object in pool)
+            for each (var item:PoolObject in pool)
                 item.mark = mark;
         }
 
-        public function getObject():*
+        public function getObject():GameNote
         {
-            for each (var item:Object in pool)
+            for each (var item:PoolObject in pool)
             {
                 if (!item.mark)
                 {
@@ -47,5 +47,19 @@ package com.flashfla.utils
             }
             return null;
         }
+    }
+}
+
+import classes.GameNote;
+
+internal class PoolObject
+{
+    public var mark:Boolean;
+    public var value:GameNote;
+
+    public function PoolObject(mark:Boolean, value:GameNote)
+    {
+        this.mark = mark;
+        this.value = value;
     }
 }

@@ -20,6 +20,8 @@ package popups.settings
         private var optionJudgeColors:Array;
         private var optionComboColors:Array;
         private var optionComboColorCheck:BoxCheck;
+        private var optionReceptorColors:Array;
+        private var optionReceptorColorCheck:BoxCheck;
         private var optionGameColors:Array;
         private var optionRawGoodTracker:ValidatedText;
         private var optionRawGoodsColor:String;
@@ -169,6 +171,42 @@ package popups.settings
             var gameRawGoodTracker:Text = new Text(container, xOff, yOff, _lang.string("options_raw_goods_tracker"));
             gameRawGoodTracker.width = 144;
             optionRawGoodTracker = new ValidatedText(container, xOff + 149, yOff, 70, 20, ValidatedText.R_FLOAT_P, changeHandler);
+
+            // Receptor Colors
+            yOff += 40;
+            yOff += drawSeperator(container, xOff, 265, yOff, -3, -4);
+
+            var gameReceptorColorTitle:Text = new Text(container, xOff, yOff, _lang.string("options_receptor_colors_title"), 14);
+            gameReceptorColorTitle.width = 265;
+            gameReceptorColorTitle.align = Text.CENTER;
+            yOff += 20;
+            yOff += drawSeperator(container, xOff, 266, yOff, -3, -4);
+
+            optionReceptorColors = [];
+            for (i = 0; i < DEFAULT_OPTIONS.receptorColors.length; i++)
+            {
+                var gameReceptorColor:Text = new Text(container, xOff, yOff, _lang.string("options_receptor_colors_" + i));
+                gameReceptorColor.width = 95;
+
+                var optionReceptorColor:ValidatedText = new ValidatedText(container, xOff + 100, yOff, 70, 20, ValidatedText.R_COLOR, changeHandler);
+                optionReceptorColor.receptor_color_id = i;
+                optionReceptorColor.field.maxChars = 7;
+
+                var gameReceptorColorDisplay:ColorField = new ColorField(container, xOff + 175, yOff, 0, 45, 21, changeHandler);
+                gameReceptorColorDisplay.key_name = "gameReceptorColorDisplay";
+
+                var optionReceptorColorReset:BoxButton = new BoxButton(container, xOff + 225, yOff, 20, 21, "R", 12, clickHandler);
+                optionReceptorColorReset.receptor_color_reset_id = i;
+                optionReceptorColorReset.color = 0xff0000;
+
+                optionReceptorColorCheck = new BoxCheck(container, xOff + 250, yOff + 3, clickHandler);
+                optionReceptorColorCheck.receptor_color_enable_id = i;
+                optionReceptorColors.push({"text": optionReceptorColor, "display": gameReceptorColorDisplay, "reset": optionReceptorColorReset, "enable": optionReceptorColorCheck});
+
+                yOff += 20;
+                yOff += drawSeperator(container, xOff, 265, yOff, -3, -4);
+            }
+
         }
 
         override public function setValues():void
@@ -195,6 +233,14 @@ package popups.settings
                 {
                     optionComboColors[i]["enable"].checked = (_gvars.activeUser.enableComboColors[i]);
                 }
+            }
+
+            // Set Receptor Colors
+            for (i = 0; i < DEFAULT_OPTIONS.receptorColors.length; i++)
+            {
+                optionReceptorColors[i]["text"].text = "#" + StringUtil.pad(_gvars.activeUser.receptorColors[i].toString(16).substr(0, 6), 6, "0", StringUtil.STR_PAD_LEFT);
+                optionReceptorColors[i]["display"].color = _gvars.activeUser.receptorColors[i];
+                optionReceptorColors[i]["enable"].checked = (_gvars.activeUser.enableReceptorColors[i]);
             }
 
             // Set Raw Good Tracker
@@ -241,6 +287,21 @@ package popups.settings
                 e.target.checked = !e.target.checked;
             }
 
+            // Receptor Color Reset
+            else if (e.target.hasOwnProperty("receptor_color_reset_id"))
+            {
+                _gvars.activeUser.receptorColors[e.target.receptor_color_reset_id] = DEFAULT_OPTIONS.receptorColors[e.target.receptor_color_reset_id];
+                setValues();
+            }
+
+            // Receptor Color Enable/Disable
+            else if (e.target.hasOwnProperty("receptor_color_enable_id"))
+            {
+                _gvars.activeUser.enableReceptorColors[e.target.receptor_color_enable_id] = !_gvars.activeUser.enableReceptorColors[e.target.receptor_color_enable_id];
+                e.target.checked = !e.target.checked;
+            }
+
+
             // Game Background Color Reset
             else if (e.target.hasOwnProperty("game_color_reset_id"))
             {
@@ -279,6 +340,12 @@ package popups.settings
                 _gvars.activeUser.comboColors[cid] = e.target.validate(0, 0);
                 optionComboColors[cid]["display"].color = _gvars.activeUser.comboColors[cid];
             }
+            else if (e.target.hasOwnProperty("receptor_color_id"))
+            {
+                var rid:int = e.target.receptor_color_id;
+                _gvars.activeUser.receptorColors[rid] = e.target.validate(0, 0);
+                optionReceptorColors[rid]["display"].color = _gvars.activeUser.receptorColors[rid];
+            }
             else if (e.target.hasOwnProperty("game_color_id"))
             {
                 var gid:int = e.target.game_color_id;
@@ -305,6 +372,9 @@ package popups.settings
                         break;
                     case "gameComboColorDisplay":
                         sourceArray = optionComboColors;
+                        break;
+                    case "gameReceptorColorDisplay":
+                        sourceArray = optionReceptorColors;
                         break;
                     case "gameGameColorDisplay":
                         sourceArray = optionGameColors;

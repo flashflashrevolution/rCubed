@@ -16,6 +16,7 @@ package classes.replay
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
     import flash.utils.ByteArray;
+    import menu.FileLoader;
 
     public class Replay
     {
@@ -25,11 +26,15 @@ package classes.replay
         public var fileReplay:Boolean = false;
         public var filePath:String;
 
+        public var chartPath:String;
+        public var cacheID:String;
+
         public var replayBin:ByteArray;
 
         public var isLoaded:Boolean = false;
         public var isEdited:Boolean = false;
         public var isPreview:Boolean = false;
+        public var isFileLoader:Boolean = false;
 
         public var needsBeatboxGeneration:Boolean = false;
         public var generationReplayBoos:Vector.<ReplayBinFrame>;
@@ -134,7 +139,7 @@ package classes.replay
                 tempSettings = tempSettings.split("|");
                 jsonSettings = _gvars.playerUser.isGuest ? new User().settings : _gvars.playerUser.settings;
                 jsonSettings.speed = Number(tempSettings[0]);
-                jsonSettings.direction = Constant.cleanScrollDirection(tempSettings[2]);
+                jsonSettings.direction = cleanScrollDirection(tempSettings[2]);
                 jsonSettings.songRate = 1;
                 if (tempSettings.length >= 12)
                 {
@@ -160,7 +165,7 @@ package classes.replay
                 }
                 jsonSettings = _gvars.playerUser.isGuest ? new User().settings : _gvars.playerUser.settings;
                 jsonSettings.speed = Number(tempSettings[0][1]);
-                jsonSettings.direction = Constant.cleanScrollDirection(tempSettings[0][0]);
+                jsonSettings.direction = cleanScrollDirection(tempSettings[0][0]);
                 jsonSettings.songRate = 1;
                 if (tempSettings[0][2] == "true")
                 {
@@ -305,7 +310,29 @@ package classes.replay
 
         public function loadSongInfo():void
         {
-            song = settings.arc_engine ? ArcGlobals.instance.legacyDecode(settings.arc_engine) : Playlist.instanceCanon.getSongInfo(level);
+            if (settings.arc_engine)
+            {
+                // File Loader - Find Song Data from Cache
+                if (settings.arc_engine.engineID == "fileloader")
+                {
+                    cacheID = settings.arc_engine.cacheID;
+                    chartPath = FileLoader.cache.findKey(function(entry:Object):Object
+                    {
+                        return entry["id"] == settings.arc_engine.cacheID;
+                    });
+
+                    if (chartPath == null)
+                        return;
+
+                    isFileLoader = true;
+                    return;
+                }
+
+                // Alt Engines
+                song = ArcGlobals.instance.legacyDecode(settings.arc_engine);
+                return;
+            }
+            song = Playlist.instanceCanon.getSongInfo(level);
         }
 
         private function getDirCol(noteDir:String):String
@@ -446,6 +473,32 @@ package classes.replay
                 return 'Y';
             if (dir == 'R')
                 return 'Z';
+            return dir;
+        }
+
+        /**
+         * Cleans the scroll direction from older engine names to the current names.
+         * Only used on loaded replays to understand older scroll direction values.
+         * @param dir
+         * @return
+         */
+        public static function cleanScrollDirection(dir:String):String
+        {
+            dir = dir.toLowerCase();
+
+            switch (dir)
+            {
+                case "slideright":
+                    return "right"; // Legacy/Velocity
+                case "slideleft":
+                    return "left"; // Legacy/Velocity
+                case "rising":
+                    return "up"; // Legacy/Velocity
+                case "falling":
+                    return "down"; // Legacy/Velocity
+                case "diagonalley":
+                    return "diagonalley"; // Legacy/Velocity
+            }
             return dir;
         }
     }

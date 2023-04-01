@@ -29,22 +29,10 @@ package
         public static var REPLAY_PATH:String = "replays/";
         public static var SONG_CACHE_PATH:String = "song_cache/";
 
-        // Embed Fonts
-        AachenLight;
-        BreeSerif;
-        Ultra;
-        BebasNeue;
-        Xolonium.Bold;
-        Xolonium.Regular;
-        HussarBold.Italic;
-        HussarBold.Regular;
-        NotoSans.CJKBold;
-        NotoSans.Bold;
-
-        public static const TEXT_FORMAT:TextFormat = new TextFormat(Language.FONT_NAME, 14, 0xFFFFFF, true);
-        public static const TEXT_FORMAT_12:TextFormat = new TextFormat(Language.FONT_NAME, 12, 0xFFFFFF, true);
-        public static const TEXT_FORMAT_CENTER:TextFormat = new TextFormat(Language.FONT_NAME, 14, 0xFFFFFF, true, null, null, null, null, TextFormatAlign.CENTER);
-        public static const TEXT_FORMAT_UNICODE:TextFormat = new TextFormat(Language.UNI_FONT_NAME, 14, 0xFFFFFF, true);
+        public static const TEXT_FORMAT:TextFormat = new TextFormat(Fonts.BASE_FONT, 14, 0xFFFFFF, true);
+        public static const TEXT_FORMAT_12:TextFormat = new TextFormat(Fonts.BASE_FONT, 12, 0xFFFFFF, true);
+        public static const TEXT_FORMAT_CENTER:TextFormat = new TextFormat(Fonts.BASE_FONT, 14, 0xFFFFFF, true, null, null, null, null, TextFormatAlign.CENTER);
+        public static const TEXT_FORMAT_UNICODE:TextFormat = new TextFormat(Fonts.BASE_FONT_CJK, 14, 0xFFFFFF, true);
 
         // Other
         public static const NOTESKIN_EDITOR_URL:String = "https://www.flashflashrevolution.com/~velocity/ffrjs/noteskin/";
@@ -71,32 +59,6 @@ package
         }
 
         // Functions
-        /**
-         * Cleans the scroll direction from older engine names to the current names.
-         * Only used on loaded replays to understand older scroll direction values.
-         * @param dir
-         * @return
-         */
-        public static function cleanScrollDirection(dir:String):String
-        {
-            dir = dir.toLowerCase();
-
-            switch (dir)
-            {
-                case "slideright":
-                    return "right"; // Legacy/Velocity
-                case "slideleft":
-                    return "left"; // Legacy/Velocity
-                case "rising":
-                    return "up"; // Legacy/Velocity
-                case "falling":
-                    return "down"; // Legacy/Velocity
-                case "diagonalley":
-                    return "diagonalley"; // Legacy/Velocity
-            }
-            return dir;
-        }
-
         /**
          * Adds default URLVariables to the passed requestVars.
          * @param requestVars

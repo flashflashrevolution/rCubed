@@ -1,7 +1,3 @@
-/**
- * @author Jonathan (Velocity)
- */
-
 package classes
 {
     import classes.ui.Text;
@@ -15,9 +11,6 @@ package classes
 
     public class Language extends EventDispatcher
     {
-        public static const FONT_NAME:String = new NotoSans.Bold().fontName;
-        public static const UNI_FONT_NAME:String = new NotoSans.CJKBold().fontName;
-
         ///- Singleton Instance
         private static var _instance:Language = null;
 
@@ -63,7 +56,7 @@ package classes
         ///- Public Functions
         public function font(testStr:String = ""):String
         {
-            return Text.isUnicode(testStr) ? UNI_FONT_NAME : FONT_NAME;
+            return Text.isUnicode(testStr) ? Fonts.BASE_FONT_CJK : Fonts.BASE_FONT;
         }
 
         public function wrapFont(text:String):String

@@ -1,108 +1,97 @@
 {
-    "application": "application.xml",
-    "config": "air",
-    "type": "app",
-    "compilerOptions": {
-        "verbose-stacktraces": true,
-        "advanced-telemetry": true,
-        "warnings": true,
-        "strict": true,
-        "use-direct-blit": true,
-        "source-path": [
-            "src"
-        ],
-        "output": "bin/develop/R3Air.swf",
-        "library-path": [
-            "libs/",
-            "libs/assets/"
-        ],
-        "include-libraries": [
-            "fonts/bin/"
-        ],
-        // Branding is left here for development contributions.
-        // The engine doesn't run unless they are filled out.
-        // The FFR branding is Copyright to Synthlight, you MUST modify before redistributing.
-        "define": [
-            {
-                "name": "CONFIG::debug",
-                "value": true
-            },
-            {
-                "name": "CONFIG::release",
-                "value": false
-            },
-            {
-                "name": "CONFIG::updater",
-                "value": false
-            },
-            {
-                "name": "CONFIG::timeStamp",
-                "value": "\"9999-12-31\""
-            },
-            {
-                "name": "R3::HASH_STRING",
-                "value": "\"hashstring\""
-            },
-            {
-                "name": "R3::BRAND_NAME_LONG",
-                "value": "\"FlashFlashRevolution\""
-            },
-            {
-                "name": "R3::BRAND_NAME_SHORT",
-                "value": "\"FFR\""
-            },
-            {
-                "name": "R3::ROOT_URL",
-                "value": "\"www.flashflashrevolution.com\""
-            },
-            {
-                "name": "R3::VERSION",
-                "value": "\"9.9.9\""
-            },
-            {
-                "name": "R3::VERSION_PREFIX",
-                "value": "\"\""
-            },
-            {
-                "name": "R3::VERSION_SUFFIX",
-                "value": "\"D\""
-            }
-        ],
-        "default-size": {
-            "width": 780,
-            "height": 480
-        },
-        "default-frame-rate": 60,
-        "default-background-color": "#000000",
-        "debug": true,
-        "omit-trace-statements": false,
-        "swf-version": 43,
-        "target-player": "32.0",
-        "locale": [
-            "en_US"
-        ]
+  "application": "application.xml",
+  "config": "air",
+  "type": "app",
+  "compilerOptions": {
+    "verbose-stacktraces": true,
+    "advanced-telemetry": true,
+    "warnings": true,
+    "strict": true,
+    "use-direct-blit": true,
+    "source-path": ["src"],
+    "output": "bin/develop/R3Air.swf",
+    "library-path": ["libs/", "libs/assets/"],
+    "include-libraries": ["fonts/bin/"],
+    // Branding is left here for development contributions.
+    // The engine doesn't run unless they are filled out.
+    // The FFR branding is Copyright to Synthlight, you MUST modify before redistributing.
+    "define": [
+      {
+        "name": "CONFIG::debug",
+        "value": true
+      },
+      {
+        "name": "CONFIG::release",
+        "value": false
+      },
+      {
+        "name": "CONFIG::updater",
+        "value": false
+      },
+      {
+        "name": "CONFIG::timeStamp",
+        "value": "\"9999-12-31\""
+      },
+      {
+        "name": "R3::HASH_STRING",
+        "value": "\"hashstring\""
+      },
+      {
+        "name": "R3::BRAND_NAME_LONG",
+        "value": "\"FlashFlashRevolution\""
+      },
+      {
+        "name": "R3::BRAND_NAME_SHORT",
+        "value": "\"FFR\""
+      },
+      {
+        "name": "R3::ROOT_URL",
+        "value": "\"www.flashflashrevolution.com\""
+      },
+      {
+        "name": "R3::VERSION",
+        "value": "\"9.9.9\""
+      },
+      {
+        "name": "R3::VERSION_PREFIX",
+        "value": "\"\""
+      },
+      {
+        "name": "R3::VERSION_SUFFIX",
+        "value": "\"D\""
+      }
+    ],
+    "default-size": {
+      "width": 780,
+      "height": 480
+    },
+    "default-frame-rate": 60,
+    "default-background-color": "#000000",
+    "debug": true,
+    "omit-trace-statements": false,
+    "swf-version": 26,
+    "target-player": "26.0",
+    "locale": ["en_US"]
+  },
+  "files": ["src/Main.as"],
+  "airOptions": {
+    "windows": {
+      "target": "bundle",
+      "output": "dist/R^3GameDevelop"
+    },
+    "mac": {
+      "target": "bundle",
+      "output": "dist/r3Develop.app"
     },
     "files": [
-        "src/Main.as"
-    ],
-    "airOptions": {
-        "windows": {
-            "target": "bundle",
-            "output": "dist/R^3GameDevelop"
-        },
-        "mac": {
-            "target": "bundle",
-            "output": "dist/r3Develop.app"
-        },
-        "files": [
-            {
-                "file": "data",
-                "path": "data"
-            },
-            {
-                "file": "changelog.txt",
-                "path": "changelog.txt"
-            }
-        ]
-    }
+      {
+        "file": "data",
+        "path": "data"
+      },
+      {
+        "file": "changelog.txt",
+        "path": "changelog.txt"
+      }
+    ]
+  }
 }

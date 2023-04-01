@@ -40,11 +40,18 @@ package popups.settings
 
         private var optionDisplays:Array;
 
+        private var optionReceptorSpeed:BoxSlider;
+        private var textReceptorSpeed:Text;
+
         private var optionJudgeSpeed:BoxSlider;
         private var textJudgeSpeed:Text;
 
         private var optionJudgeScale:BoxSlider;
         private var textJudgeScale:Text;
+
+        private var legacySongsCheck:BoxCheck;
+        private var explicitSongsCheck:BoxCheck;
+        private var unrankedSongsCheck:BoxCheck;
 
         public function SettingsTabVisuals(settingsWindow:SettingsWindow):void
         {
@@ -60,7 +67,7 @@ package popups.settings
         {
             container.graphics.lineStyle(1, 0xFFFFFF, 0.35);
             container.graphics.moveTo(295, 15);
-            container.graphics.lineTo(295, 405);
+            container.graphics.lineTo(295, 505);
 
             var i:int;
             var xOff:int = 15;
@@ -87,6 +94,11 @@ package popups.settings
                 gameDisplayCheck.display = gameUIArray[i];
                 optionDisplays.push(gameDisplayCheck);
                 yOff += 19;
+
+                if (gameUIArray[i] == "RECEPTOR_ANIMATIONS")
+                {
+                    yOff = drawReceptorSpeed(xOff, yOff, container);
+                }
 
                 if (gameUIArray[i] == "JUDGE_ANIMATIONS")
                 {
@@ -138,7 +150,38 @@ package popups.settings
                 optionDisplays.push(optionModCheck);
                 yOff += 19;
             }
-            yOff += 30;
+            yOff += 11;
+
+            // Legacy Song Display
+            new Text(container, xOff + 23, yOff, _lang.string("options_include_legacy_songs"));
+            legacySongsCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
+            legacySongsCheck.addEventListener(MouseEvent.MOUSE_OVER, e_legacyEngineMouseOver, false, 0, true);
+            yOff += 19;
+
+            // Explicit Song Display
+            new Text(container, xOff + 23, yOff, _lang.string("options_include_explicit_songs"));
+            explicitSongsCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
+            yOff += 19;
+
+            // Unranked Song Display
+            new Text(container, xOff + 23, yOff, _lang.string("options_include_unranked_songs"));
+            unrankedSongsCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
+            yOff += 19;
+        }
+
+
+        private function drawReceptorSpeed(xOff:int, yOff:int, container:ScrollPaneContent):int
+        {
+            new Text(container, xOff + 23, yOff, _lang.string("options_receptor_speed"));
+            yOff += 22;
+
+            optionReceptorSpeed = new BoxSlider(container, xOff + 23, yOff + 3, 100, 10, changeHandler);
+            optionReceptorSpeed.minValue = 0.25;
+            optionReceptorSpeed.maxValue = 5;
+
+            textReceptorSpeed = new Text(container, xOff + 128, yOff - 2);
+            yOff += 20;
+            return yOff + 4;
         }
 
         private function drawJudgeSpeed(xOff:int, yOff:int, container:ScrollPaneContent):int
@@ -148,12 +191,12 @@ package popups.settings
 
             optionJudgeSpeed = new BoxSlider(container, xOff + 23, yOff + 3, 100, 10, changeHandler);
             optionJudgeSpeed.minValue = 0.25;
-            optionJudgeSpeed.maxValue = 3;
+            optionJudgeSpeed.maxValue = 5;
 
             textJudgeSpeed = new Text(container, xOff + 128, yOff - 2);
             yOff += 20;
 
-            return yOff;
+            return yOff + 4;
         }
 
         private function drawJudgeScale(xOff:int, yOff:int, container:ScrollPaneContent):int
@@ -168,7 +211,7 @@ package popups.settings
             textJudgeScale = new Text(container, xOff + 128, yOff - 2);
             yOff += 20;
 
-            return yOff;
+            return yOff + 4;
         }
 
         override public function setValues():void
@@ -178,11 +221,18 @@ package popups.settings
                 item.checked = (_gvars.activeUser["DISPLAY_" + item.display]);
             }
 
+            optionReceptorSpeed.slideValue = _gvars.activeUser.receptorSpeed;
+            textReceptorSpeed.text = _gvars.activeUser.receptorSpeed.toFixed(2) + "x";
+
             optionJudgeSpeed.slideValue = _gvars.activeUser.judgeSpeed;
             textJudgeSpeed.text = _gvars.activeUser.judgeSpeed.toFixed(2) + "x";
 
             optionJudgeScale.slideValue = _gvars.activeUser.judgeScale;
             textJudgeScale.text = _gvars.activeUser.judgeScale.toFixed(2) + "x";
+
+            legacySongsCheck.checked = _gvars.activeUser.DISPLAY_LEGACY_SONGS;
+            explicitSongsCheck.checked = _gvars.activeUser.DISPLAY_EXPLICIT_SONGS;
+            unrankedSongsCheck.checked = _gvars.activeUser.DISPLAY_UNRANKED_SONGS;
         }
 
         override public function clickHandler(e:MouseEvent):void
@@ -195,6 +245,25 @@ package popups.settings
                 {
                     _gvars.gameMain.activePanel.draw();
                 }
+            }
+
+            // Songs Flags
+            else if (e.target == legacySongsCheck)
+            {
+                e.target.checked = !e.target.checked;
+                _gvars.activeUser.DISPLAY_LEGACY_SONGS = !_gvars.activeUser.DISPLAY_LEGACY_SONGS;
+            }
+
+            else if (e.target == explicitSongsCheck)
+            {
+                e.target.checked = !e.target.checked;
+                _gvars.activeUser.DISPLAY_EXPLICIT_SONGS = !_gvars.activeUser.DISPLAY_EXPLICIT_SONGS;
+            }
+
+            else if (e.target == unrankedSongsCheck)
+            {
+                e.target.checked = !e.target.checked;
+                _gvars.activeUser.DISPLAY_UNRANKED_SONGS = !_gvars.activeUser.DISPLAY_UNRANKED_SONGS;
             }
 
             parent.checkValidMods();
@@ -214,7 +283,26 @@ package popups.settings
                 textJudgeScale.text = _gvars.activeUser.judgeScale.toFixed(2) + "x";
             }
 
+            if (e.target == optionReceptorSpeed)
+            {
+                _gvars.activeUser.receptorSpeed = (Math.round((optionReceptorSpeed.slideValue * 100) / 5) * 5) / 100; // Snap to 0.05 intervals.
+                textReceptorSpeed.text = _gvars.activeUser.receptorSpeed.toFixed(2) + "x";
+            }
+
             parent.checkValidMods();
         }
+
+        private function e_legacyEngineMouseOver(e:Event):void
+        {
+            legacySongsCheck.addEventListener(MouseEvent.MOUSE_OUT, e_legacyEngineMouseOut);
+            displayToolTip(legacySongsCheck.x, legacySongsCheck.y + 22, _lang.string("popup_legacy_songs"), "left");
+        }
+
+        private function e_legacyEngineMouseOut(e:Event):void
+        {
+            legacySongsCheck.removeEventListener(MouseEvent.MOUSE_OUT, e_legacyEngineMouseOut);
+            hideTooltip();
+        }
+
     }
 }

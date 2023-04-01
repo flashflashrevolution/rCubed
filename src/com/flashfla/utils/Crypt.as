@@ -1,8 +1,3 @@
-/**
- * R^2 Encryption Library
- * @author Jonathan (Velocity)
- */
-
 package com.flashfla.utils
 {
 

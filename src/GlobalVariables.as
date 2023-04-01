@@ -110,6 +110,10 @@ package
         public var air_windowProperties:Object;
         public var file_replay_cache:FileCache = new FileCache("replays/cache.json", 1);
 
+        ///- Song Loader
+        public var externalSongInfo:SongInfo;
+        public var externalSong:Song;
+
         private var websocket_server:AIRServer;
         private static var websocket_message:Message = new Message();
 
@@ -299,9 +303,12 @@ package
         }
 
         //- Song Data
-        public function getSongFile(songInfo:SongInfo, preview:Boolean = false):Song
+        public function getSongFile(songInfo:SongInfo):Song
         {
-            if (!preview && songInfo.engine == Playlist.instance.engine && (!songInfo.engine || !songInfo.engine.ignoreCache))
+            if (songInfo == externalSongInfo)
+                return externalSong;
+
+            if (songInfo.engine == Playlist.instance.engine && (!songInfo.engine || !songInfo.engine.ignoreCache))
             {
                 for (var s:int = 0; s < songCache.length; s++)
                 {
@@ -311,21 +318,21 @@ package
                 }
             }
 
-            return loadSongFile(songInfo, preview);
+            return loadSongFile(songInfo);
         }
 
-        private function loadSongFile(songInfo:SongInfo, preview:Boolean = false):Song
+        private function loadSongFile(songInfo:SongInfo):Song
         {
             //- Only Cache 10 Songs
             var engineCache:Boolean = (songInfo.engine == Playlist.instance.engine) && (!songInfo.engine || !songInfo.engine.ignoreCache);
-            if (!preview && songCache.length > 10 && engineCache)
+            if (songCache.length > 10 && engineCache)
                 songCache.pop();
 
             //- Make new Song
-            var song:Song = new Song(songInfo, preview);
+            var song:Song = new Song(songInfo);
 
             //- Push to cache
-            if (!preview && engineCache)
+            if (engineCache)
                 songCache.push(song);
 
             return song;
@@ -355,6 +362,15 @@ package
             {
                 mpInstance.clearStatus();
             }
+        }
+
+        public function dirtySongFiles():void
+        {
+            if (externalSong)
+                externalSong.isDirty = true;
+
+            for (var s:int = 0; s < songCache.length; s++)
+                songCache[s].isDirty = true;
         }
 
         public static const SONG_ACCESS_PLAYABLE:int = 0;
@@ -409,10 +425,14 @@ package
                     songIcon = SONG_ICON_NO_SCORE;
 
                 // Unfinished or Passed
-                if (_rank.score > 0) {
-                    if (_rank.perfect + _rank.good + _rank.average + _rank.miss < noteCount) {
+                if (_rank.score > 0)
+                {
+                    if (_rank.perfect + _rank.good + _rank.average + _rank.miss < noteCount)
+                    {
                         songIcon = SONG_ICON_UNFINISHED;
-                    } else {
+                    }
+                    else
+                    {
                         songIcon = SONG_ICON_PASSED;
                     }
                 }
@@ -458,12 +478,16 @@ package
                     noteCount = _rank.arrows;
                     maxRawScore = noteCount * 50;
                 }
-                
+
                 // Unfinished or Passed
-                if (_rank.score > 0) {
-                    if (_rank.perfect + _rank.good + _rank.average + _rank.miss < noteCount) {
+                if (_rank.score > 0)
+                {
+                    if (_rank.perfect + _rank.good + _rank.average + _rank.miss < noteCount)
+                    {
                         songIcon |= (1 << SONG_ICON_UNFINISHED);
-                    } else {
+                    }
+                    else
+                    {
                         songIcon |= (1 << SONG_ICON_PASSED);
                     }
                 }

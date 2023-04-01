@@ -385,7 +385,7 @@ package popups.settings
             else if (e.target == optionRate)
             {
                 _gvars.activeUser.songRate = optionRate.validate(1, 0.1);
-                _gvars.removeSongFiles();
+                _gvars.dirtySongFiles();
             }
 
             else if (e.target == optionIsolation)

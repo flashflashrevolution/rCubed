@@ -193,12 +193,14 @@ package game.graph
             var dy:Number;
             var distance:Number;
 
-            function binarySearch(values:Vector.<GraphCrossPoint>, target:Number):int {
-                var high: int = values.length;
-                var low: int = -1;
-                var is_closest_low: Boolean;
+            function binarySearch(values:Vector.<GraphCrossPoint>, target:Number):int
+            {
+                var high:int = values.length;
+                var low:int = -1;
+                var is_closest_low:Boolean;
 
-                while (high - low > 1) {
+                while (high - low > 1)
+                {
                     var probe:int = (low + high) / 2;
 
                     if (values[probe].x > target)
@@ -206,27 +208,30 @@ package game.graph
                     else
                         low = probe;
                 }
-                
+
                 return low;
             }
 
-            var nearest_cross_x: int = VectorUtil.binarySearch(cross_points, mx, 'x');
-            var nearest_boo_x: int = VectorUtil.binarySearch(boo_points, mx, 'x');
+            var nearest_cross_x:int = VectorUtil.binarySearch(cross_points, mx, 'x');
+            var nearest_boo_x:int = VectorUtil.binarySearch(boo_points, mx, 'x');
 
-            var nearest_is_boo: Boolean = false;
-            var nearest_hit_index: int = -1;
-            var min_distance: Number = 1000000;
-            var dx_px_threshold: int = 3;
+            var nearest_is_boo:Boolean = false;
+            var nearest_hit_index:int = -1;
+            var min_distance:Number = 1000000;
+            var dx_px_threshold:int = 3;
 
-            function checkIfNearer(point: GraphCrossPoint, isBoo: Boolean): Boolean {
+            function checkIfNearer(point:GraphCrossPoint, isBoo:Boolean):Boolean
+            {
                 dx = Math.abs(mx - point.x);
-                if (dx > dx_px_threshold) {
+                if (dx > dx_px_threshold)
+                {
                     return false;
                 }
                 dy = Math.abs(my - point.y);
                 distance = Math.sqrt(dx * dx + dy * dy);
 
-                if (distance < min_distance) {
+                if (distance < min_distance)
+                {
                     min_distance = distance;
                     nearest_hit_index = point.index;
                     nearest_is_boo = isBoo;
@@ -235,48 +240,65 @@ package game.graph
                 return true;
             }
 
-            if (nearest_cross_x >= 0) {
-                for (i = nearest_cross_x; i >= 0; i--) {
-                    if (!checkIfNearer(cross_points[i], false)) {
+            if (nearest_cross_x >= 0)
+            {
+                for (i = nearest_cross_x; i >= 0; i--)
+                {
+                    if (!checkIfNearer(cross_points[i], false))
+                    {
                         break;
                     }
                 }
 
-                for (i = nearest_cross_x; i < cross_points.length; i++) {
-                    if (!checkIfNearer(cross_points[i], false)) {
-                        break;
-                    }
-                }
-            }
-
-            if (nearest_boo_x >= 0) {
-                for (i = nearest_boo_x; i >= 0; i--) {
-                    if (!checkIfNearer(boo_points[i], true)) {
-                        break;
-                    }
-                }
-
-                for (i = nearest_boo_x; i < boo_points.length; i++) {
-                    if (!checkIfNearer(boo_points[i], true)) {
+                for (i = nearest_cross_x; i < cross_points.length; i++)
+                {
+                    if (!checkIfNearer(cross_points[i], false))
+                    {
                         break;
                     }
                 }
             }
 
-            if (nearest_hit_index == -1) {
-                if (nearest_boo_x == -1) {
+            if (nearest_boo_x >= 0)
+            {
+                for (i = nearest_boo_x; i >= 0; i--)
+                {
+                    if (!checkIfNearer(boo_points[i], true))
+                    {
+                        break;
+                    }
+                }
+
+                for (i = nearest_boo_x; i < boo_points.length; i++)
+                {
+                    if (!checkIfNearer(boo_points[i], true))
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if (nearest_hit_index == -1)
+            {
+                if (nearest_boo_x == -1)
+                {
                     nearest_hit_index = nearest_cross_x;
-                } else {
-                    var boo_point: GraphCrossPoint = boo_points[nearest_boo_x];
-                    var boo_dx: Number = Math.abs(mx - boo_point.x);
+                }
+                else
+                {
+                    var boo_point:GraphCrossPoint = boo_points[nearest_boo_x];
+                    var boo_dx:Number = Math.abs(mx - boo_point.x);
 
-                    var cross_point: GraphCrossPoint = cross_points[nearest_cross_x];
-                    var cross_dx: Number = Math.abs(mx - cross_point.x);
+                    var cross_point:GraphCrossPoint = cross_points[nearest_cross_x];
+                    var cross_dx:Number = Math.abs(mx - cross_point.x);
 
-                    if (boo_dx < cross_dx) {
+                    if (boo_dx < cross_dx)
+                    {
                         nearest_hit_index = nearest_boo_x;
                         nearest_is_boo = true;
-                    } else {
+                    }
+                    else
+                    {
                         nearest_hit_index = nearest_cross_x;
                         nearest_is_boo = false;
                     }
@@ -285,8 +307,9 @@ package game.graph
 
             // Store Current Index to prevent redraws.
             // Also give boo a shift to prevent potential index overlaps.
-            var nearest_cross_index:int = nearest_hit_index + (nearest_is_boo ? 1000000 : 0); 
-            if (nearest_cross_index < 0) {
+            var nearest_cross_index:int = nearest_hit_index + (nearest_is_boo ? 1000000 : 0);
+            if (nearest_cross_index < 0)
+            {
                 nearest_cross_index = 0;
             }
             if (last_nearest_index == nearest_cross_index || player_timings_length <= 0)
@@ -420,27 +443,29 @@ package game.graph
 
             player_timings_length = player_timings.length;
 
-            var times: Array = [];
-            var notes_times: Array = [];
+            var times:Array = [];
+            var notes_times:Array = [];
 
-            function getTimeFromHit(timing:ReplayBinFrame, index:int, vector:Vector.<ReplayBinFrame>):void {
+            function getTimeFromHit(timing:ReplayBinFrame, index:int, vector:Vector.<ReplayBinFrame>):void
+            {
                 times.push(timing.time);
             }
-            function getTimeFromSongNote(note:Note, index:int, array:Array):void {
+            function getTimeFromSongNote(note:Note, index:int, array:Vector.<Note>):void
+            {
                 notes_times.push(note.time || note.frame / 30.0);
             }
-            
+
             player_timings.forEach(getTimeFromHit);
             result.song.chart.Notes.forEach(getTimeFromSongNote);
 
-            var boos: Vector.<ReplayBinFrame> = result.replay_bin_boos;
+            var boos:Vector.<ReplayBinFrame> = result.replay_bin_boos;
 
-            var first_hit_time: Number = notes_times[0] + (player_timings[0].time || 0) * 0.001;
-            var last_hit_time: Number = notes_times[notes_times.length - 1] + (player_timings[player_timings.length - 1].time || 0) * 0.001;
-            var last_boo_time: Number = boos.length > 0 ? boos[boos.length - 1].time * 0.001 : 0;
+            var first_hit_time:Number = notes_times[0] + (player_timings[0].time || 0) * 0.001;
+            var last_hit_time:Number = notes_times[notes_times.length - 1] + (player_timings[player_timings.length - 1].time || 0) * 0.001;
+            var last_boo_time:Number = boos.length > 0 ? boos[boos.length - 1].time * 0.001 : 0;
 
-            var min_time: Number = Math.max(Math.min(0, first_hit_time), 0);
-            var max_time: Number = Math.max(Math.max(notes_times[notes_times.length - 1], last_hit_time), last_boo_time);
+            var min_time:Number = Math.max(Math.min(0, first_hit_time), 0);
+            var max_time:Number = Math.max(Math.max(notes_times[notes_times.length - 1], last_hit_time), last_boo_time);
 
             var ratio_x:Number = graphWidth / Math.max(1, max_time - min_time);
 
@@ -489,7 +514,7 @@ package game.graph
             // Fill in Misses, Overlay uses cross point length.
             if (result.note_count > 0)
             {
-                var miss_y: Number = flipGraph ? 0 : graphHeight;
+                var miss_y:Number = flipGraph ? 0 : graphHeight;
                 while (cross_points.length < result.last_note)
                 {
                     pos_x = (notes_times[cross_points.length] - min_time) * ratio_x;
@@ -499,7 +524,7 @@ package game.graph
 
             // Boos
             var boo:ReplayBinFrame;
-            var boo_y: Number = flipGraph ? graphHeight : 0;
+            var boo_y:Number = flipGraph ? graphHeight : 0;
             for (i = 0; i < boos.length; i++)
             {
                 boo = boos[i];

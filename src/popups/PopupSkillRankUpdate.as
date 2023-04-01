@@ -1,7 +1,3 @@
-/**
- * @author Jonathan (Velocity)
- */
-
 package popups
 {
     import classes.Language;

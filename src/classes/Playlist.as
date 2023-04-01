@@ -179,29 +179,46 @@ package classes
 
                     // Important to note that the dynamic fields aren't all exactly the same name
                     var newSongInfo:SongInfo = new SongInfo();
-                    newSongInfo.author = dynamicSongInfo.author;
-                    newSongInfo.author_url = dynamicSongInfo.authorURL;
-                    newSongInfo.credits = dynamicSongInfo.credits;
-                    newSongInfo.difficulty = dynamicSongInfo.difficulty;
-                    newSongInfo.genre = dynamicSongInfo.genre;
                     newSongInfo.level = dynamicSongInfo.level;
                     newSongInfo.level_id = dynamicSongInfo.level;
-                    newSongInfo.min_nps = dynamicSongInfo.min_nps;
-                    newSongInfo.max_nps = dynamicSongInfo.max_nps;
+
                     newSongInfo.name = dynamicSongInfo.name;
+                    newSongInfo.name_original = dynamicSongInfo.name_original; // Optional
+                    newSongInfo.name_explicit = dynamicSongInfo.name_explicit; // Optional
+                    newSongInfo.subtitle = dynamicSongInfo.subtitle; // Optional
+
+                    newSongInfo.author = dynamicSongInfo.author;
+                    newSongInfo.author_original = dynamicSongInfo.author_original; // Optional
+                    newSongInfo.author_url = dynamicSongInfo.authorURL;
+
+                    newSongInfo.stepauthor = dynamicSongInfo.stepauthor;
+
+                    newSongInfo.genre = dynamicSongInfo.genre;
+                    newSongInfo.difficulty = dynamicSongInfo.difficulty;
+                    newSongInfo.style = dynamicSongInfo.style;
+                    newSongInfo.tags = dynamicSongInfo.tags; // Optional
+                    newSongInfo.time = dynamicSongInfo.time;
                     newSongInfo.note_count = dynamicSongInfo.arrows;
                     newSongInfo.order = dynamicSongInfo.order;
-                    newSongInfo.play_hash = dynamicSongInfo.playhash;
+                    newSongInfo.release_date = dynamicSongInfo.date;
                     newSongInfo.prerelease = dynamicSongInfo.prerelease;
-                    newSongInfo.preview_hash = dynamicSongInfo.previewhash;
-                    newSongInfo.price = dynamicSongInfo.price;
-                    newSongInfo.release_date = dynamicSongInfo.releasedate;
+                    newSongInfo.play_hash = dynamicSongInfo.playhash;
+                    newSongInfo.time_end = dynamicSongInfo.end_delay;
                     newSongInfo.song_rating = dynamicSongInfo.song_rating;
-                    newSongInfo.stepauthor = dynamicSongInfo.stepauthor;
-                    newSongInfo.stepauthor_url = dynamicSongInfo.stepauthorURL;
-                    newSongInfo.style = dynamicSongInfo.style;
+
+                    newSongInfo.price = dynamicSongInfo.credits;
+                    newSongInfo.credits = dynamicSongInfo.price;
+
+                    newSongInfo.min_nps = dynamicSongInfo.min_nps;
+                    newSongInfo.max_nps = dynamicSongInfo.max_nps;
+
+                    newSongInfo.is_legacy = dynamicSongInfo.o_legacy == 1;
+                    newSongInfo.is_unranked = dynamicSongInfo.o_unranked == 1;
+                    newSongInfo.is_explicit = dynamicSongInfo.o_explicit == 1;
+                    newSongInfo.is_disabled = dynamicSongInfo.o_disabled == 1;
+
                     newSongInfo.swf_hash = dynamicSongInfo.swfhash;
-                    newSongInfo.time = dynamicSongInfo.time;
+                    newSongInfo.background = dynamicSongInfo.background;
 
                     songInfo = newSongInfo;
                 }
@@ -213,6 +230,10 @@ package classes
                 // Note Count
                 if (isNaN(Number(songInfo.note_count)))
                     songInfo.note_count = 0;
+
+                // Time End
+                if (isNaN(Number(songInfo.time_end)))
+                    songInfo.time_end = 0;
 
                 // Extra Info
                 songInfo.index = genreList[songInfo.genre].length;

@@ -80,6 +80,8 @@ package classes
         public var songRatings:Object = {};
 
         public var DISPLAY_LEGACY_SONGS:Boolean = false;
+        public var DISPLAY_UNRANKED_SONGS:Boolean = true;
+        public var DISPLAY_EXPLICIT_SONGS:Boolean = true;
         public var DISPLAY_GENRE_FLAG:Boolean = true;
         public var DISPLAY_SONG_FLAG:Boolean = true;
         public var DISPLAY_SONG_NOTE:Boolean = true;
@@ -116,6 +118,8 @@ package classes
         public var judgeColors:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
         public var comboColors:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000, 0xDC00C2]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag, RawGood
         public var enableComboColors:Vector.<Boolean> = new <Boolean>[true, true, true, false, false, false, false, false, false];
+        public var receptorColors:Array = [0xFFFFFF, 0xFFFFFF, 0x64FF64, 0xFFFF00, 0xBB8500, 0xA80000];
+        public var enableReceptorColors:Vector.<Boolean> = new <Boolean>[true, true, true, true, true, false];
         public var gameColors:Array = [0x1495BD, 0x033242, 0x0C6A88, 0x074B62, 0x000000];
         public var noteColors:Array = ["red", "blue", "purple", "yellow", "pink", "orange", "cyan", "green", "white"];
         public var rawGoodTracker:Number = 0;
@@ -145,13 +149,12 @@ package classes
         public var judgeSpeed:Number = 1;
         public var gameSpeed:Number = 1.5;
         public var receptorGap:Number = 80;
-        public var receptorAnimationSpeed:Number = 1;
+        public var receptorSpeed:Number = 1;
         public var judgeScale:Number = 1;
         public var noteScale:Number = 1;
         public var gameVolume:Number = 1;
         public var screencutPosition:Number = 0.5;
         public var frameRate:int = 60;
-        public var forceNewJudge:Boolean = false;
         public var songRate:Number = 1;
 
         public var gameplay:Gameplay;
@@ -607,6 +610,12 @@ package classes
             if (_settings.viewLegacySongs != null)
                 this.DISPLAY_LEGACY_SONGS = _settings.viewLegacySongs;
 
+            if (_settings.viewExplicitSongs != null)
+                this.DISPLAY_EXPLICIT_SONGS = _settings.viewExplicitSongs;
+
+            if (_settings.viewUnrankedSongs != null)
+                this.DISPLAY_UNRANKED_SONGS = _settings.viewUnrankedSongs;
+
             if (_settings.keys[0] != null)
                 this.keyLeft = _settings.keys[0];
 
@@ -640,6 +649,9 @@ package classes
             if (_settings.judgeSpeed != null)
                 this.judgeSpeed = _settings.judgeSpeed;
 
+            if (_settings.receptorSpeed != null)
+                this.receptorSpeed = _settings.receptorSpeed;
+
             if (_settings.judgeScale != null)
                 this.judgeScale = _settings.judgeScale;
 
@@ -661,9 +673,6 @@ package classes
             if (_settings.autofailRestart != null)
                 this.autofailRestart = _settings.autofailRestart;
 
-            if (_settings.forceNewJudge != null)
-                this.forceNewJudge = _settings.forceNewJudge;
-
             if (_settings.visual != null)
                 this.activeVisualMods = _settings.visual;
 
@@ -675,6 +684,12 @@ package classes
 
             if (_settings.enableComboColors != null)
                 mergeIntoArray(this.enableComboColors, _settings.enableComboColors);
+
+            if (_settings.receptorColours != null)
+                mergeIntoArray(this.receptorColors, _settings.receptorColours);
+
+            if (_settings.enableReceptorColors != null)
+                mergeIntoArray(this.enableReceptorColors, _settings.enableReceptorColors);
 
             if (_settings.gameColours != null)
                 mergeIntoArray(this.gameColors, _settings.gameColours);
@@ -769,9 +784,12 @@ package classes
             gameSave.viewMPRawGoods = this.DISPLAY_MP_RAWGOODS;
             gameSave.viewMPTimestamp = this.DISPLAY_MP_TIMESTAMP;
             gameSave.viewLegacySongs = this.DISPLAY_LEGACY_SONGS;
+            gameSave.viewExplicitSongs = this.DISPLAY_EXPLICIT_SONGS;
+            gameSave.viewUnrankedSongs = this.DISPLAY_UNRANKED_SONGS;
 
             gameSave.keys = [this.keyLeft, this.keyDown, this.keyUp, this.keyRight, this.keyRestart, this.keyQuit, this.keyOptions];
 
+            gameSave.receptorSpeed = this.receptorSpeed;
             gameSave.judgeSpeed = this.judgeSpeed;
             gameSave.judgeScale = this.judgeScale;
             gameSave.speed = this.gameSpeed;
@@ -782,11 +800,12 @@ package classes
             gameSave.screencutPosition = this.screencutPosition;
             gameSave.autofailRestart = this.autofailRestart;
             gameSave.frameRate = this.frameRate;
-            gameSave.forceNewJudge = this.forceNewJudge;
             gameSave.visual = this.activeVisualMods;
             gameSave.judgeColours = this.judgeColors;
             gameSave.comboColours = this.comboColors;
             gameSave.enableComboColors = this.enableComboColors;
+            gameSave.receptorColours = this.receptorColors;
+            gameSave.enableReceptorColors = this.enableReceptorColors;
             gameSave.gameColours = this.gameColors;
             gameSave.noteColours = this.noteColors;
             gameSave.rawGoodTracker = this.rawGoodTracker;
