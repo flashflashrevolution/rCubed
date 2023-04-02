@@ -196,7 +196,7 @@ package classes
          * @param direction
          * @return
          */
-        public function getReceptor(noteskin:int, direction:String):GameReceptor
+        public function getReceptor(noteskin:int, direction:String):MovieClip
         {
             try
             {
@@ -205,15 +205,15 @@ package classes
                     noteskin = 1;
 
                 if (_data[noteskin]["type"] == TYPE_BITMAP)
-                    return new GameReceptor(direction).attachBitmap(_data[noteskin]["receptor"][direction]);
+                    return new GameReceptor(direction, _data[noteskin]["receptor"][direction]);
 
-                return new GameReceptor(direction).attachMovieclip(new _data[noteskin]["receptor"][direction]);
+                return new _data[noteskin]["receptor"][direction];
             }
             catch (e:Error)
             {
 
             }
-            return new GameReceptor(direction);
+            return new MovieClip();
         }
 
         /**
