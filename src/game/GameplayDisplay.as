@@ -364,6 +364,7 @@ package game
                 options.singleplayer = true; // Back to song selection
             }
             stage.focus = this.stage;
+            stage.frameRate = options.frameRate;
 
             interfaceSetup();
 
@@ -379,13 +380,11 @@ package game
             if (options.isEditor)
             {
                 options.isAutoplay = true;
-                stage.frameRate = options.frameRate;
                 stage.addEventListener(Event.ENTER_FRAME, editorOnEnterFrame, false, int.MAX_VALUE - 10, true);
                 stage.addEventListener(KeyboardEvent.KEY_DOWN, editorKeyboardKeyDown, false, int.MAX_VALUE - 10, true);
             }
             else
             {
-                stage.frameRate = song.frameRate;
                 stage.addEventListener(Event.ENTER_FRAME, onEnterFrame, false, int.MAX_VALUE - 10, true);
                 stage.addEventListener(KeyboardEvent.KEY_DOWN, keyboardKeyDown, true, int.MAX_VALUE - 10, true);
                 stage.addEventListener(KeyboardEvent.KEY_UP, keyboardKeyUp, true, int.MAX_VALUE - 10, true);
@@ -438,7 +437,7 @@ package game
                 options.isolationOffset = song.chart.Notes.length - 1;
 
             // Song
-            song.updateMusicDelay();
+            song.updateMusicOffset();
             if (song.background && !options.modEnabled("nobackground"))
             {
                 song_background = song.background as MovieClip;
@@ -711,11 +710,9 @@ package game
             gameProgress = 0;
             absolutePosition = 0;
             mpSpectateDidSync = false;
-            if (song != null)
-            {
-                songOffset = new RollingAverage(song.frameRate * 4, _avars.configMusicOffset);
-                frameRate = new RollingAverage(song.frameRate * 4, song.frameRate);
-            }
+
+            songOffset = new RollingAverage(options.frameRate * 4, _avars.configMusicOffset);
+            frameRate = new RollingAverage(options.frameRate * 4, options.frameRate);
             accuracy = new Average();
 
             songDelayStarted = false;
@@ -1052,9 +1049,9 @@ package game
                         spectateSync();
 
                     if (reverseMod)
-                        stopClips(song_background, 2 + song.musicDelay - globalOffsetRounded + gameProgress * options.songRate);
+                        stopClips(song_background, 2 + song.musicStartFrames - globalOffsetRounded + gameProgress * options.songRate);
                     else
-                        stopClips(song_background, 2 + song.musicDelay - globalOffsetRounded + gameProgress * options.songRate);
+                        stopClips(song_background, 2 + song.musicStartFrames - globalOffsetRounded + gameProgress * options.songRate);
 
                     if (options.modEnabled("tap_pulse"))
                     {

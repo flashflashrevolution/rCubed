@@ -48,7 +48,7 @@ package game.graph
                 if (song_file == null)
                     pos_y = n * ratio_x;
                 else
-                    pos_y = (song_file.getNote(n).frame * result.options.songRate + song_file.musicDelay) * ratio_x;
+                    pos_y = (song_file.getNote(n).frame * result.options.songRate + song_file.musicStartFrames) * ratio_x;
                 if (result.replay_hit.length <= n || (status == -5 && song_file != null))
                 {
                     graph.graphics.lineStyle(2, 0xFF0000, 1, true);
@@ -95,7 +95,7 @@ package game.graph
             {
                 for each (var replayHit:ReplayNote in result.replayData)
                 {
-                    pos_y = (replayHit.frame * result.options.songRate + song_file.musicDelay) * ratio_x;
+                    pos_y = (replayHit.frame * result.options.songRate + song_file.musicStartFrames) * ratio_x;
                     status = replayHit.score;
                     switch (status)
                     {
