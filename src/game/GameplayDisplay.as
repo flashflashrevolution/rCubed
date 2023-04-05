@@ -17,6 +17,8 @@ package game
     import classes.replay.ReplayNote;
     import classes.ui.BoxButton;
     import classes.ui.ProgressBar;
+    import classes.user.UserSongData;
+    import classes.user.UserSongNotes;
     import com.flashfla.net.Multiplayer;
     import com.flashfla.net.events.GameResultsEvent;
     import com.flashfla.net.events.GameUpdateEvent;
@@ -55,7 +57,6 @@ package game
     import game.controls.TextStatic;
     import menu.MenuPanel;
     import menu.MenuSongSelection;
-    import sql.SQLSongUserInfo;
 
     public class GameplayDisplay extends MenuPanel
     {
@@ -228,7 +229,7 @@ package game
             }
 
             // --- Per Song Options
-            var perSongOptions:SQLSongUserInfo = SQLQueries.getSongUserInfo(song.songInfo);
+            var perSongOptions:UserSongData = UserSongNotes.getSongUserInfo(song.songInfo);
             if (perSongOptions != null && !options.isEditor && !options.replay)
             {
                 options.fill(); // Reset

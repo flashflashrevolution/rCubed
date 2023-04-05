@@ -3,6 +3,8 @@ package classes
     import arc.ArcGlobals;
     import assets.GameBackgroundColor;
     import classes.filter.EngineLevelFilter;
+    import classes.user.UserSongData;
+    import classes.user.UserSongNotes;
     import com.flashfla.utils.VectorUtil;
     import flash.display.Loader;
     import flash.display.LoaderInfo;
@@ -18,7 +20,6 @@ package classes
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
     import flash.ui.Keyboard;
-    import sql.SQLSongUserInfo;
 
     public class User extends EventDispatcher
     {
@@ -911,7 +912,7 @@ package classes
         {
             if (songInfo.engine != null)
             {
-                var sDetails:SQLSongUserInfo = SQLQueries.getSongDetails(songInfo.engine.id, songInfo.level_id);
+                var sDetails:UserSongData = UserSongNotes.getSongDetails(songInfo.engine.id, songInfo.level_id);
                 if (sDetails)
                     return sDetails.song_rating;
 
