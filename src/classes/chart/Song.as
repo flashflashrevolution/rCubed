@@ -7,7 +7,6 @@ package classes.chart
     import com.flashfla.media.MP3Extraction;
     import com.flashfla.media.SwfSilencer;
     import com.flashfla.net.ForcibleLoader;
-    import com.flashfla.utils.Crypt;
     import com.flashfla.utils.TimeUtil;
     import flash.display.Loader;
     import flash.display.LoaderInfo;
