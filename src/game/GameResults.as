@@ -1124,7 +1124,9 @@ package game
 
                     // Check raw score vs level ranks and update.
                     var previousLevelRanks:Object = _gvars.activeUser.level_ranks[songInfo.level];
-                    var newLevelRanks:Object = {"genre": songInfo.genre,
+                    var newLevelRanks:Object = {
+                            "id": songInfo.level,
+                            "genre": songInfo.genre,
                             "rank": data.new_ranking,
                             "score": gameResult.score,
                             "results": gameResult.pa_string + "-" + gameResult.max_combo,
@@ -1137,7 +1139,8 @@ package game
                             "miss": gameResult.miss,
                             "boo": gameResult.boo,
                             "maxcombo": gameResult.max_combo,
-                            "rawscore": gameResult.score};
+                            "rawscore": gameResult.score,
+                            "equiv": SkillRating.calcSongWeightFromScore(gameResult.score, songInfo)};
 
                     // Update Level Ranks is missing or better.
                     if (previousLevelRanks == null || gameResult.score > previousLevelRanks.score)
@@ -1150,6 +1153,33 @@ package game
                             newLevelRanks["fcs"] += previousLevelRanks["fcs"];
                         }
                         _gvars.activeUser.level_ranks[songInfo.level] = newLevelRanks;
+
+                        // Update/replace Skill Rating top X song if better than our lowest SR equiv
+                        if (newLevelRanks.equiv > _gvars.activeUser.skill_rating_songs[_gvars.activeUser.skill_rating_top_count - 1].equiv)
+                        {
+                            // Check if the song is already included in the top X equiv
+                            for (var i:int = 0; i < _gvars.activeUser.skill_rating_songs.length; i++)
+                            {
+                                if (_gvars.activeUser.skill_rating_songs[i].id == newLevelRanks.id)
+                                {
+                                    // Level ID match, so we've improved on a top score. Drop the old equiv entry
+                                    _gvars.activeUser.skill_rating_songs.splice(i, 1);
+                                }
+                            }
+                            
+                            // Add this improved rating
+                            _gvars.activeUser.skill_rating_songs.push(newLevelRanks)
+                            
+                            // Sort it to the right spot
+                             _gvars.activeUser.skill_rating_songs.sort(_gvars.activeUser.equivSort);
+
+                            // Drop the bottom equiv if we have more than the top X count
+                            //[won't be necessary for newer players with less than X scores for equiv rating, or if we've improved a score that we already had equiv from]
+                            if (_gvars.activeUser.skill_rating_songs.length > _gvars.activeUser.skill_rating_top_count)
+                            {
+                                _gvars.activeUser.skill_rating_songs.pop();
+                            }
+                        }
                     }
 
                     // Update Counters

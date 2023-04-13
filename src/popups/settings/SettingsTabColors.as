@@ -25,6 +25,7 @@ package popups.settings
         private var optionGameColors:Array;
         private var optionRawGoodTracker:ValidatedText;
         private var optionRawGoodsColor:String;
+        private var optionPersonalBestTracker:BoxCheck;
 
         public function SettingsTabColors(settingsWindow:SettingsWindow):void
         {
@@ -171,9 +172,16 @@ package popups.settings
             var gameRawGoodTracker:Text = new Text(container, xOff, yOff, _lang.string("options_raw_goods_tracker"));
             gameRawGoodTracker.width = 144;
             optionRawGoodTracker = new ValidatedText(container, xOff + 149, yOff, 70, 20, ValidatedText.R_FLOAT_P, changeHandler);
+            yOff += 30;
+
+            // Personal Best tracking via Combo color
+            new Text(container, xOff + 30, yOff - 4, _lang.string("options_personalbest_tracker"));
+
+            optionPersonalBestTracker = new BoxCheck(container, xOff + 10, yOff, clickHandler);
+            optionPersonalBestTracker.addEventListener(MouseEvent.MOUSE_OVER, e_personalBestTrackerMouseOver, false, 0, true);
 
             // Receptor Colors
-            yOff += 40;
+            yOff += 18;
             yOff += drawSeperator(container, xOff, 265, yOff, -3, -4);
 
             var gameReceptorColorTitle:Text = new Text(container, xOff, yOff, _lang.string("options_receptor_colors_title"), 14);
@@ -246,6 +254,9 @@ package popups.settings
             // Set Raw Good Tracker
             optionRawGoodTracker.text = _gvars.activeUser.rawGoodTracker.toString();
 
+            // Personal Best Mode
+            optionPersonalBestTracker.checked = _gvars.activeUser.personalBestTracker;
+
             // Set Game Colors
             for (i = 0; i < DEFAULT_OPTIONS.gameColors.length; i++)
             {
@@ -301,6 +312,11 @@ package popups.settings
                 e.target.checked = !e.target.checked;
             }
 
+            else if (e.target == optionPersonalBestTracker)
+            {
+                _gvars.activeUser.personalBestTracker = !_gvars.activeUser.personalBestTracker;
+                optionPersonalBestTracker.checked = _gvars.activeUser.personalBestTracker;
+            }
 
             // Game Background Color Reset
             else if (e.target.hasOwnProperty("game_color_reset_id"))
@@ -315,6 +331,18 @@ package popups.settings
 
                 setValues();
             }
+        }
+
+        private function e_personalBestTrackerMouseOver(e:Event):void
+        {
+            optionPersonalBestTracker.addEventListener(MouseEvent.MOUSE_OUT, e_personalBestTrackerMouseOut);
+            displayToolTip(optionPersonalBestTracker.x, optionPersonalBestTracker.y - 45, _lang.string("popup_personalbest_tracker"));
+        }
+
+        private function e_personalBestTrackerMouseOut(e:Event):void
+        {
+            optionPersonalBestTracker.removeEventListener(MouseEvent.MOUSE_OUT, e_personalBestTrackerMouseOut);
+            hideTooltip();
         }
 
         override public function changeHandler(e:Event):void

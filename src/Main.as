@@ -523,6 +523,7 @@ package
                     _playlist.updateSongAccess();
                     _playlist.updatePublicSongsCount();
                     _gvars.loadUserSongData();
+                    _gvars.activeUser.getUserSkillRatingData();
                     switchTo(_gvars.activeUser.isGuest || _gvars.flashvars["__forceLogin"] ? GAME_LOGIN_PANEL : GAME_MENU_PANEL);
                 }
             }

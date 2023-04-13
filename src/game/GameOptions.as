@@ -74,8 +74,10 @@ package game
         public var isAutoplay:Boolean = false;
         public var mpRoom:Room = null;
         public var singleplayer:Boolean = false;
-        public var autofail:Array = [0, 0, 0, 0, 0, 0, 0];
+        public var autofail:Array = [0, 0, 0, 0, 0, 0, 0, 0];
         public var autofail_restart:Boolean = false;
+        public var personalBestMode:Boolean = false;
+        public var personalBestTracker:Boolean = false;
 
         public var isolationOffset:int = 0;
         public var isolationLength:int = 0;
@@ -156,9 +158,13 @@ package game
                 user.autofailAverage,
                 user.autofailMiss,
                 user.autofailBoo,
-                user.autofailRawGoods];
+                user.autofailRawGoods,
+                user.autofailAaaEquiv];
 
             autofail_restart = user.autofailRestart;
+
+            personalBestMode = user.personalBestMode;
+            personalBestTracker = user.personalBestTracker;
         }
 
         public function fillFromArcGlobals():void

@@ -257,6 +257,37 @@ package game
             }
             // --- End Per Song Settings
 
+            // --- Update RG values for Personal Best or AAA Equiv autofail/tracking if active
+            if (options.personalBestMode || options.personalBestTracker || options.autofail[7] != 0)
+            {
+                var infoRanks:Object = GlobalVariables.instance.activeUser.getLevelRank(song.songInfo);
+                var rawDifference:Number = song.songInfo.score_raw - infoRanks.rawscore;
+
+                if (options.personalBestMode)
+                    options.autofail[6] = rawDifference / 25;
+                
+                if (options.personalBestTracker)
+                    options.rawGoodTracker = rawDifference / 25;
+
+                if (options.autofail[7] != 0)
+                {
+                    // first check if the song can even meet that equiv, if not then set the autofail at non-AAA
+                    if(song.songInfo.difficulty <= options.autofail[7])
+                    {
+                        options.autofail[6] = 0.2 //one boo's worth of RG, any non-AAA judgement will cause autofail
+                    }
+                    else
+                    {
+                        // need to convert the AAA equiv to a raw good max on this particular song to use for autofail
+                        var calculatedRawGoods:Number = SkillRating.getRawGoodsFromEquiv(song.songInfo, options.autofail[7]);
+                        
+                        // now set the autofail to that value
+                        options.autofail[6] = calculatedRawGoods;
+                    }
+                }
+            }
+            // --- End Personal Best tracking
+
             return true;
         }
 
