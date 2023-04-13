@@ -278,6 +278,35 @@ package classes
             }
         }
 
+        public function UpdateSRList(newLevelRanks:Object):void
+        {
+            if (newLevelRanks.equiv > skill_rating_songs[skill_rating_top_count - 1].equiv)
+            {
+                // Check if the song is already included in the top X equiv
+                for (var i:int = 0; i < skill_rating_songs.length; i++)
+                {
+                    if (skill_rating_songs[i].id == newLevelRanks.id)
+                    {
+                        // Level ID match, so we've improved on a top score. Drop the old equiv entry
+                        skill_rating_songs.splice(i, 1);
+                    }
+                }
+                
+                // Add this improved rating
+                skill_rating_songs.push(newLevelRanks)
+                
+                // Sort it to the right spot
+                    skill_rating_songs.sort(equivSort);
+
+                // Drop the bottom equiv if we have more than the top X count
+                //[won't be necessary for newer players with less than X scores for equiv rating, or if we've improved a score that we already had equiv from]
+                if (skill_rating_songs.length > skill_rating_top_count)
+                {
+                    skill_rating_songs.pop();
+                }
+            }
+        }
+
         ///- Profile Loading
         public function isLoaded():Boolean
         {
