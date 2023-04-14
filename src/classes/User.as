@@ -74,7 +74,7 @@ package classes
         public var averageRank:Number;
         public var level_ranks:Object = {};
         public var skill_rating_top_count:int = 50;
-        public var skill_rating_songs:Array = new Array();
+        public var skill_rating_levelranks:Array = [];
         public var avatar:Loader;
         public var startUpScreen:int = 0; // 0 = MP Connect + MP Screen   |   1 = MP Connect + Song List   |   2 = Song List
         public var loggedIn:Boolean;
@@ -244,7 +244,7 @@ package classes
                 var levelRank:Object = this.level_ranks[key];
                 
                 //Calculate the AAA Equiv for the scores on the song if greater than 0
-                if (levelRank.score != 0)
+                if (levelRank.score > 0)
                 {
                     //Get the song's difficulty
                     var songInfo:SongInfo = _playlist.getSongInfo(key);
@@ -254,56 +254,51 @@ package classes
 
                     //Add it to the Skill Rating list if it's not 0
                     if (levelRank.equiv > 0)
-                        skill_rating_songs.push(levelRank);
+                        skill_rating_levelranks.push(levelRank);
                 }
             }
 
             //Sort based on equiv
-            skill_rating_songs.sort(equivSort);
+            skill_rating_levelranks.sort(equivSort);
 
             //Dump all but the top X
-            while (skill_rating_songs.length > skill_rating_top_count)
-            {
-                skill_rating_songs.pop();
-            }
+            if (skill_rating_levelranks.length > skill_rating_top_count)
+                skill_rating_levelranks.length = skill_rating_top_count;
         }
 
         public function equivSort(a:Object, b:Object):int {
             if (a.equiv < b.equiv) {
                 return 1;
-            } else if (a.equiv > b.equiv) {
+            }
+            else if (a.equiv > b.equiv) {
                 return -1;
-            } else {
+            }
+            else {
                 return 0;
             }
         }
 
         public function UpdateSRList(newLevelRanks:Object):void
         {
-            if (newLevelRanks.equiv > skill_rating_songs[skill_rating_top_count - 1].equiv)
+            if (newLevelRanks.equiv > skill_rating_levelranks[skill_rating_top_count - 1].equiv)
             {
                 // Check if the song is already included in the top X equiv
-                for (var i:int = 0; i < skill_rating_songs.length; i++)
+                for (var i:int = 0; i < skill_rating_levelranks.length; i++)
                 {
-                    if (skill_rating_songs[i].id == newLevelRanks.id)
-                    {
-                        // Level ID match, so we've improved on a top score. Drop the old equiv entry
-                        skill_rating_songs.splice(i, 1);
-                    }
+                    if (skill_rating_levelranks[i].id == newLevelRanks.id) // Level ID match, so we've improved on a top score. Drop the old equiv entry
+                        skill_rating_levelranks.splice(i, 1);
                 }
-                
+
                 // Add this improved rating
-                skill_rating_songs.push(newLevelRanks)
-                
+                skill_rating_levelranks.push(newLevelRanks);
+
                 // Sort it to the right spot
-                    skill_rating_songs.sort(equivSort);
+                skill_rating_levelranks.sort(equivSort);
 
                 // Drop the bottom equiv if we have more than the top X count
                 //[won't be necessary for newer players with less than X scores for equiv rating, or if we've improved a score that we already had equiv from]
-                if (skill_rating_songs.length > skill_rating_top_count)
-                {
-                    skill_rating_songs.pop();
-                }
+                if (skill_rating_levelranks.length > skill_rating_top_count)
+                    skill_rating_levelranks.length = skill_rating_top_count;
             }
         }
 
@@ -559,7 +554,7 @@ package classes
                             "boo": scoreResults[4],
                             "maxcombo": scoreResults[5],
                             "rawscore": ((scoreResults[0] * 50) + (scoreResults[1] * 25) + (scoreResults[2] * 5) - (scoreResults[3] * 10) - (scoreResults[4] * 5)),
-                            "equiv": Number(0.00)};
+                            "equiv": 0};
                 }
             }
             _isLoaded = true;

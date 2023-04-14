@@ -316,6 +316,16 @@ package popups.settings
             {
                 _gvars.activeUser.personalBestTracker = !_gvars.activeUser.personalBestTracker;
                 optionPersonalBestTracker.checked = _gvars.activeUser.personalBestTracker;
+                optionRawGoodTracker.selectable = !_gvars.activeUser.personalBestTracker;
+
+                if (_gvars.activeUser.personalBestTracker)
+                {
+                    optionRawGoodTracker.alpha = 0.4;
+                }
+                else
+                {
+                    optionRawGoodTracker.alpha = 1;
+                }
             }
 
             // Game Background Color Reset

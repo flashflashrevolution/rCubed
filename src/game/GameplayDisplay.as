@@ -261,20 +261,28 @@ package game
             if (options.personalBestMode || options.personalBestTracker || options.autofail[7] != 0)
             {
                 var infoRanks:Object = GlobalVariables.instance.activeUser.getLevelRank(song.songInfo);
-                var rawDifference:Number = song.songInfo.score_raw - infoRanks.rawscore;
+                var rawScoreMax:Number = song.songInfo.score_raw;
 
-                if (options.personalBestMode)
-                    options.autofail[6] = rawDifference / 25;
-                
-                if (options.personalBestTracker)
-                    options.rawGoodTracker = rawDifference / 25;
+                if (rawScoreMax == 0)
+                    rawScoreMax = song.chart.Notes.length * 50; // Alt engine hack as they often don't have a note count or raw max saved...
 
-                if (options.autofail[7] != 0)
+                if(infoRanks != null) // Alt engine will return null here if the song is unplayed, and if unplayed then we don't need to autofail them
+                {
+                    var rawDifference:Number = rawScoreMax - infoRanks.rawscore;
+
+                    if (options.personalBestMode)
+                        options.autofail[6] = rawDifference / 25;
+
+                    if (options.personalBestTracker)
+                        options.rawGoodTracker = rawDifference / 25;
+                }
+
+                if (options.autofail[7] != 0 && song.songInfo.engine == null) // Don't bother processing this if it's an Alt Engine
                 {
                     // first check if the song can even meet that equiv, if not then set the autofail at non-AAA
                     if(song.songInfo.difficulty <= options.autofail[7])
                     {
-                        options.autofail[6] = 0.2 //one boo's worth of RG, any non-AAA judgement will cause autofail
+                        options.autofail[6] = 0.2; //one boo's worth of RG, any non-AAA judgement will cause autofail
                     }
                     else
                     {

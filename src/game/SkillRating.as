@@ -66,7 +66,7 @@ package game
             var difficulty:Number = song.difficulty;
             var delta:Number = D1 + D2 * difficulty + D3 * Math.pow(difficulty, 2) + D4 * Math.pow(difficulty, 3) + D5 * Math.pow(difficulty, 4);
             
-            rawgoods = (delta - delta * Math.pow(songweight + ALPHA, BETA) / Math.pow(difficulty + ALPHA, BETA)) / LAMBDA
+            rawgoods = (delta - delta * Math.pow(songweight + ALPHA, BETA) / Math.pow(difficulty + ALPHA, BETA)) / LAMBDA;
             
             return Math.round(rawgoods * 5) / 5;
         }

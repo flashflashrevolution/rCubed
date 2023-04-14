@@ -11,10 +11,12 @@ package popups
     import com.flashfla.utils.ArrayUtil;
     import flash.display.DisplayObjectContainer;
     import flash.events.Event;
+    import arc.ArcGlobals;
 
     public class FilterItemButton extends Box
     {
         private var _gvars:GlobalVariables = GlobalVariables.instance;
+        private var _avars:ArcGlobals = ArcGlobals.instance;
         private var _lang:Language = Language.instance;
 
         private var updater:PopupFilterManager;
@@ -119,6 +121,18 @@ package popups
                     xOff += combo_compare.width + 10;
 
                     var improvementText:Text = new Text(this, xOff, 6, _lang.string("filter_setting_possible"));
+
+                    if (_avars.configLegacy != null)
+                    {
+                        this.alpha = 0.5;
+                        this.color = 0xBBBBBB;
+
+                        var altEngineText:Text = new Text(this, 0, 6, "altengine_setting_ignored");
+                        altEngineText.x = this.width - altEngineText.width - 5;
+                        altEngineText.fontColor = "#FF0000";
+                        altEngineText.alpha = 2;
+                    }
+                    
                     break;
 
                 case EngineLevelFilter.FILTER_SONG_TYPE:

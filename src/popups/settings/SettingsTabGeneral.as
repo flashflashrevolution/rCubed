@@ -186,6 +186,13 @@ package popups.settings
             optionAutofailEquivInput.field.maxChars = 6;
             optionAutofail.push(optionAutofailEquivInput);
             optionAutofailEquivInput.addEventListener(MouseEvent.MOUSE_OVER, e_autofailEquivMouseOver, false, 0, true);
+
+            if (_avars.configLegacy != null)
+            {
+                optionAutofailEquivInput.alpha = 0.5;
+                optionAutofailEquivInput.selectable = false;
+            }
+
             yOff += 34;
 
             // Autofail Restart
@@ -481,7 +488,15 @@ package popups.settings
         private function e_autofailEquivMouseOver(e:Event):void
         {
             optionAutofailEquivInput.addEventListener(MouseEvent.MOUSE_OUT, e_autofailEquivMouseOut);
-            displayToolTip(optionAutofailEquivInput.x + 65, optionAutofailEquivInput.y - 45, _lang.string("popup_autofail_equiv"));
+            
+            if (_avars.configLegacy != null)
+            {
+                displayToolTip(optionAutofailEquivInput.x + 65, optionAutofailEquivInput.y - 45, _lang.string("popup_autofail_equiv") + " " + _lang.string("altengine_setting_ignored"));
+            }
+            else
+            {
+                displayToolTip(optionAutofailEquivInput.x + 65, optionAutofailEquivInput.y - 45, _lang.string("popup_autofail_equiv"));
+            }
         }
 
         private function e_autofailEquivMouseOut(e:Event):void

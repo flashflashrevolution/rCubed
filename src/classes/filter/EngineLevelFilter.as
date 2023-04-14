@@ -168,7 +168,8 @@ package classes.filter
                     return compareSongFlag(songInfo, userData.getLevelRank(songInfo), input_number);
 
                 case FILTER_AAA_EQUIV:
-                    return greaterThan(songInfo.difficulty, userData.skill_rating_songs[userData.skill_rating_top_count - 1].equiv) && userData.getLevelRank(songInfo).rawscore < songInfo.score_raw;
+                    if (!songInfo.engine)
+                        return greaterThan(songInfo.difficulty, userData.skill_rating_levelranks[userData.skill_rating_levelranks.length - 1].equiv) && userData.getLevelRank(songInfo).rawscore < songInfo.score_raw;
 
                 case FILTER_SONG_ACCESS:
                     return compareNumberEqual(songInfo.access, input_number);
