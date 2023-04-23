@@ -51,6 +51,7 @@ package menu
     import popups.PopupHighscores;
     import popups.PopupQueueManager;
     import popups.PopupSongNotes;
+    import game.SkillRating;
 
     public class MenuSongSelection extends MenuPanel
     {
@@ -1603,6 +1604,7 @@ package menu
         {
             var infoTitle:Text;
             var infoDetails:Text;
+            var infoPAHover:HoverPABox;
             var tY:int = 0;
 
             var infoRanks:Object = _gvars.activeUser.getLevelRank(songInfo) || {};
@@ -1637,6 +1639,39 @@ package menu
                 infoDetails = new Text(infoBox, 5, tY, infoDisplay[item][1] || "");
                 infoDetails.width = 164;
                 tY += 23;
+                
+                if (infoDisplay[item][0] == "best")
+                {
+                    // Split the infoRanks results into an array
+                    var songPASpread:Array = infoRanks.results.split("-");
+
+                    // 0-1-2-3-4-5
+                    // P-G-A-M-B-C
+                    var songPA:Object = {
+                        perfect: Number(songPASpread[0]),
+                        good: Number(songPASpread[1]),
+                        average: Number(songPASpread[2]),
+                        miss: Number(songPASpread[3]),
+                        boo: Number(songPASpread[4])
+                    };
+
+                    // Get raw goods value to display in the hover
+                    var rawGoods:Number = SkillRating.getRawGoods(songPA);
+
+                    // Get song % played
+                    var songPercentageString:String = ((songPA.perfect + songPA.good + songPA.average + songPA.miss) / songInfo.note_count * 100).toFixed(2);
+
+                    if (songPercentageString != "0.00")
+                    {
+                        //Construct the display string (could do this in one go but man it's a long line lol)
+                        var hoverString:String = _lang.string("song_selection_song_panel_rghover") + rawGoods;
+                        hoverString += (songPercentageString == "100.00" ? "" : " (" + songPercentageString + "% " + _lang.string("song_selection_song_panel_rghover_unfinished") + ")");
+
+                        // Add raw goods Hover Box
+                        infoPAHover = new HoverPABox(5, tY, hoverString);
+                        infoBox.addChild(infoPAHover);
+                    }
+                }
             }
         }
 
