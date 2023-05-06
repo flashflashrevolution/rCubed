@@ -206,12 +206,15 @@ package popups
                         pG.moveTo(xPos - 4, yPos + 14);
                         pG.lineTo(xPos - INDENT_GAP + 10, yPos + 14);
 
-                        // AND / OR Label
-                        var type_text:Text = new Text(scrollpane.content, xPos, yPos + 2, _lang.string("filter_type_" + filter.type));
-
                         // Remove Filter Button
-                        var removeFilter:BoxButton = new BoxButton(scrollpane.content, xPos + INDENT_GAP + 327, yPos, 23, 23, "X", 12, e_removeFilter);
+                        var removeFilter:BoxButton = new BoxButton(scrollpane.content, xPos, yPos, 23, 23, "×", 10, e_removeFilter);
                         removeFilter.tag = filter;
+                        removeFilter.color = 0xFF0000;
+                        removeFilter.normalAlpha = 0.35;
+                        removeFilter.activeAlpha = 0.45;
+                        
+                        // AND / OR Label
+                        var type_text:Text = new Text(scrollpane.content, xPos + 29, yPos + 2, _lang.string("filter_type_" + filter.type));
 
                         yPos -= 8;
                     }
@@ -232,9 +235,11 @@ package popups
                     pG.moveTo(xPos + INDENT_GAP - 4, yPos + 57);
                     pG.lineTo(xPos + 10, yPos + 57);
 
-                    var addFilter:BoxButton = new BoxButton(scrollpane.content, xPos + INDENT_GAP, yPos += 44, 23, 23, "+", 12, e_addFilter);
+                    var addFilter:BoxButton = new BoxButton(scrollpane.content, xPos + INDENT_GAP, yPos += 44, 23, 23, "+", 14, e_addFilter);
                     addFilter.tag = filter;
-                    pG.drawRect(addFilter.x, addFilter.y, 23, 23);
+                    addFilter.color = 0x27D200;
+                    addFilter.normalAlpha = 0.35;
+                    addFilter.activeAlpha = 0.45;
 
                     pG.moveTo(xPos + 10, topYPos);
                     pG.lineTo(xPos + 10, yPos + 14);

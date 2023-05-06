@@ -1124,7 +1124,9 @@ package game
 
                     // Check raw score vs level ranks and update.
                     var previousLevelRanks:Object = _gvars.activeUser.level_ranks[songInfo.level];
-                    var newLevelRanks:Object = {"genre": songInfo.genre,
+                    var newLevelRanks:Object = {
+                            "id": songInfo.level,
+                            "genre": songInfo.genre,
                             "rank": data.new_ranking,
                             "score": gameResult.score,
                             "results": gameResult.pa_string + "-" + gameResult.max_combo,
@@ -1137,7 +1139,8 @@ package game
                             "miss": gameResult.miss,
                             "boo": gameResult.boo,
                             "maxcombo": gameResult.max_combo,
-                            "rawscore": gameResult.score};
+                            "rawscore": gameResult.score,
+                            "equiv": SkillRating.calcSongWeightFromScore(gameResult.score, songInfo)};
 
                     // Update Level Ranks is missing or better.
                     if (previousLevelRanks == null || gameResult.score > previousLevelRanks.score)
@@ -1150,6 +1153,9 @@ package game
                             newLevelRanks["fcs"] += previousLevelRanks["fcs"];
                         }
                         _gvars.activeUser.level_ranks[songInfo.level] = newLevelRanks;
+
+                        // Update/replace Skill Rating top X song if better than our lowest SR equiv
+                        _gvars.activeUser.UpdateSRList(newLevelRanks);
                     }
 
                     // Update Counters
