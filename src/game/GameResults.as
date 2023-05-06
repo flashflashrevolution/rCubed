@@ -42,6 +42,7 @@ package game
     import flash.utils.getTimer;
     import game.graph.GraphAccuracy;
     import game.graph.GraphAccuracyPrecise;
+    import game.graph.GraphAccuracyPrecise2;
     import game.graph.GraphBase;
     import game.graph.GraphCombo;
     import menu.MenuPanel;
@@ -58,8 +59,9 @@ package game
         public static const GRAPH_COMBO:int = 0;
         public static const GRAPH_ACCURACY:int = 1;
         public static const GRAPH_ACCURACY_PRECISE:int = 2;
+        public static const GRAPH_ACCURACY_PRECISE2:int = 3;
 
-        private var graphCache:Object = {"0": {}, "1": {}, "2": {}};
+        private var graphCache:Object = {"0": {}, "1": {}, "2": {}, "3": {}};
 
         private var _mp:MultiplayerSingleton = MultiplayerSingleton.getInstance();
         private var _gvars:GlobalVariables = GlobalVariables.instance;
@@ -637,6 +639,10 @@ package game
                 {
                     newGraph = new GraphAccuracyPrecise(graphDraw, graphOverlay, result);
                 }
+                else if (graphType == GRAPH_ACCURACY_PRECISE2)
+                {
+                    newGraph = new GraphAccuracyPrecise2(graphDraw, graphOverlay, result);
+                }
                 else
                 {
                     newGraph = new GraphCombo(graphDraw, graphOverlay, result);
@@ -902,7 +908,7 @@ package game
             {
                 if (resultIndex >= 0)
                 {
-                    graphType = (graphType + 1) % 3;
+                    graphType = (graphType + 1) % 4;
                     LocalStore.setVariable("result_graph_type", graphType);
                     drawResultGraph(songResults[resultIndex]);
                 }
