@@ -35,7 +35,9 @@ package popups.settings
         private var optionJudgeOffset:ValidatedText;
         private var optionJudgeOffsetAuto:BoxCheck;
         private var optionAutofail:Array;
+        private var optionAutofailEquivInput:ValidatedText;
         private var optionAutofailRestart:BoxCheck;
+        private var optionPersonalBestMode:BoxCheck;
 
         private var optionScrollDirections:Vector.<BoxCheck>;
         private var optionMirrorMod:BoxCheck;
@@ -86,17 +88,28 @@ package popups.settings
 
             yOff += drawSeperator(container, xOff, 170, yOff, 2, 4);
 
-            //- Note Scale
-            new Text(container, xOff, yOff, _lang.string("options_note_scale"));
+            //- Global Offset
+            new Text(container, xOff, yOff, _lang.string("options_global_offset"));
             yOff += 22;
 
-            optionNoteScale = new BoxSlider(container, xOff, yOff, 130, 10, changeHandler);
-            optionNoteScale.minValue = 0.1;
-            optionNoteScale.maxValue = 1.5;
-            yOff += 10;
-
-            textNoteScale = new Text(container, xOff, yOff, Math.round(_gvars.activeUser.noteScale * 100) + "%");
+            optionOffset = new ValidatedText(container, xOff, yOff, 130, 20, ValidatedText.R_FLOAT, changeHandler);
             yOff += 30;
+
+            //- Judge Offset
+            var judgeOffsetText:Text = new Text(container, xOff, yOff, _lang.string("options_judge_offset"));
+            judgeOffsetText.mouseEnabled = true;
+            judgeOffsetText.contextMenu = arcJudgeMenu(parent);
+            yOff += 22;
+
+            optionJudgeOffset = new ValidatedText(container, xOff, yOff, 130, 20, ValidatedText.R_FLOAT, changeHandler);
+            yOff += 30;
+
+            //- Auto Judge Offset
+            new Text(container, xOff + 22, yOff, _lang.string("options_auto_judge_offset"));
+
+            optionJudgeOffsetAuto = new BoxCheck(container, xOff + 2, yOff + 3, clickHandler);
+            optionJudgeOffsetAuto.addEventListener(MouseEvent.MOUSE_OVER, e_autoJudgeMouseOver, false, 0, true);
+            yOff += 25;
 
             yOff += drawSeperator(container, xOff, 170, yOff, -4, 5);
 
@@ -126,29 +139,18 @@ package popups.settings
             xOff = 211;
             yOff = 15;
 
-            //- Global Offset
-            new Text(container, xOff, yOff, _lang.string("options_global_offset"));
+            //- Note Scale
+            new Text(container, xOff, yOff, _lang.string("options_note_scale"));
             yOff += 22;
 
-            optionOffset = new ValidatedText(container, xOff, yOff, 130, 20, ValidatedText.R_FLOAT, changeHandler);
-            yOff += 30;
+            optionNoteScale = new BoxSlider(container, xOff, yOff, 130, 10, changeHandler);
+            optionNoteScale.minValue = 0.1;
+            optionNoteScale.maxValue = 1.5;
+            yOff += 10;
 
-            //- Judge Offset
-            var judgeOffsetText:Text = new Text(container, xOff, yOff, _lang.string("options_judge_offset"));
-            judgeOffsetText.mouseEnabled = true;
-            judgeOffsetText.contextMenu = arcJudgeMenu(parent);
+            textNoteScale = new Text(container, xOff, yOff, Math.round(_gvars.activeUser.noteScale * 100) + "%");
             yOff += 22;
-
-            optionJudgeOffset = new ValidatedText(container, xOff, yOff, 130, 20, ValidatedText.R_FLOAT, changeHandler);
-            yOff += 30;
-
-            //- Auto Judge Offset
-            new Text(container, xOff + 22, yOff, _lang.string("options_auto_judge_offset"));
-
-            optionJudgeOffsetAuto = new BoxCheck(container, xOff + 2, yOff + 3, clickHandler);
-            optionJudgeOffsetAuto.addEventListener(MouseEvent.MOUSE_OVER, e_autoJudgeMouseOver, false, 0, true);
-            yOff += 25;
-
+            
             yOff += drawSeperator(container, xOff, 170, yOff, 3, 5);
 
             // Autofail
@@ -174,12 +176,36 @@ package popups.settings
             optionAutofailInput.autofail = "rawGoods";
             optionAutofailInput.field.maxChars = 6;
             optionAutofail.push(optionAutofailInput);
+            yOff += 25;
+
+            // AAA Equiv autofail
+            new Text(container, xOff + 72, yOff + 1, _lang.string("options_autofail_equiv"));
+
+            optionAutofailEquivInput = new ValidatedText(container, xOff, yOff, 65, 20, ValidatedText.R_FLOAT_P, changeHandler);
+            optionAutofailEquivInput.autofail = "aaaEquiv";
+            optionAutofailEquivInput.field.maxChars = 6;
+            optionAutofail.push(optionAutofailEquivInput);
+            optionAutofailEquivInput.addEventListener(MouseEvent.MOUSE_OVER, e_autofailEquivMouseOver, false, 0, true);
+
+            if (_avars.configLegacy != null)
+            {
+                optionAutofailEquivInput.alpha = 0.5;
+                optionAutofailEquivInput.selectable = false;
+            }
+
             yOff += 34;
 
             // Autofail Restart
             new Text(container, xOff + 22, yOff - 4, _lang.string("options_autofail_restart"));
 
             optionAutofailRestart = new BoxCheck(container, xOff, yOff, clickHandler);
+            yOff += 25;
+
+            // Personal Best Mode
+            new Text(container, xOff + 22, yOff - 4, _lang.string("options_personalbest_mode"));
+
+            optionPersonalBestMode = new BoxCheck(container, xOff, yOff, clickHandler);
+            optionPersonalBestMode.addEventListener(MouseEvent.MOUSE_OVER, e_personalBestModeMouseOver, false, 0, true);
             yOff += 25;
 
             /// Col 3
@@ -290,6 +316,9 @@ package popups.settings
             // Autofail Restart
             optionAutofailRestart.checked = _gvars.activeUser.autofailRestart;
 
+            // Personal Best Mode
+            optionPersonalBestMode.checked = _gvars.activeUser.personalBestMode;
+
             optionIsolation.text = (_avars.configIsolationStart + 1).toString();
             optionIsolationTotal.text = _avars.configIsolationLength.toString();
         }
@@ -310,6 +339,12 @@ package popups.settings
             {
                 _gvars.activeUser.autofailRestart = !_gvars.activeUser.autofailRestart;
                 optionAutofailRestart.checked = _gvars.activeUser.autofailRestart;
+            }
+
+            else if (e.target == optionPersonalBestMode)
+            {
+                _gvars.activeUser.personalBestMode = !_gvars.activeUser.personalBestMode;
+                optionPersonalBestMode.checked = _gvars.activeUser.personalBestMode;
             }
 
             else if (e.target.hasOwnProperty("slideDirection"))
@@ -435,6 +470,38 @@ package popups.settings
         private function e_autoJudgeMouseOut(e:Event):void
         {
             optionJudgeOffsetAuto.removeEventListener(MouseEvent.MOUSE_OUT, e_autoJudgeMouseOut);
+            hideTooltip();
+        }
+
+        private function e_personalBestModeMouseOver(e:Event):void
+        {
+            optionPersonalBestMode.addEventListener(MouseEvent.MOUSE_OUT, e_personalBestModeMouseOut);
+            displayToolTip(optionPersonalBestMode.x, optionPersonalBestMode.y - 45, _lang.string("popup_personalbest_mode"));
+        }
+
+        private function e_personalBestModeMouseOut(e:Event):void
+        {
+            optionPersonalBestMode.removeEventListener(MouseEvent.MOUSE_OUT, e_personalBestModeMouseOut);
+            hideTooltip();
+        }
+
+        private function e_autofailEquivMouseOver(e:Event):void
+        {
+            optionAutofailEquivInput.addEventListener(MouseEvent.MOUSE_OUT, e_autofailEquivMouseOut);
+            
+            if (_avars.configLegacy != null)
+            {
+                displayToolTip(optionAutofailEquivInput.x + 65, optionAutofailEquivInput.y - 45, _lang.string("popup_autofail_equiv") + " " + _lang.string("altengine_setting_ignored"));
+            }
+            else
+            {
+                displayToolTip(optionAutofailEquivInput.x + 65, optionAutofailEquivInput.y - 45, _lang.string("popup_autofail_equiv"));
+            }
+        }
+
+        private function e_autofailEquivMouseOut(e:Event):void
+        {
+            optionAutofailEquivInput.removeEventListener(MouseEvent.MOUSE_OUT, e_autofailEquivMouseOut);
             hideTooltip();
         }
 

@@ -20,6 +20,7 @@ package classes
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
     import flash.ui.Keyboard;
+    import game.SkillRating;
 
     public class User extends EventDispatcher
     {
@@ -38,6 +39,7 @@ package classes
         ///- Private Locals
         private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _avars:ArcGlobals = ArcGlobals.instance;
+        private var _playlist:Playlist = Playlist.instance;
         private var _loader:URLLoader;
         private var _isLoaded:Boolean = false;
         private var _isLoading:Boolean = false;
@@ -72,6 +74,8 @@ package classes
         public var purchased:Vector.<Boolean>;
         public var averageRank:Number;
         public var level_ranks:Object = {};
+        public var skill_rating_top_count:int = 50;
+        public var skill_rating_levelranks:Array = [];
         public var avatar:Loader;
         public var startUpScreen:int = 0; // 0 = MP Connect + MP Screen   |   1 = MP Connect + Song List   |   2 = Song List
         public var loggedIn:Boolean;
@@ -133,7 +137,10 @@ package classes
         public var autofailMiss:int = 0;
         public var autofailBoo:int = 0;
         public var autofailRawGoods:Number = 0;
+        public var autofailAaaEquiv:Number = 0;
         public var autofailRestart:Boolean = false;
+        public var personalBestMode:Boolean = false;
+        public var personalBestTracker:Boolean = false;
 
         public var keyLeft:int = Keyboard.LEFT;
         public var keyDown:int = Keyboard.DOWN;
@@ -228,6 +235,76 @@ package classes
                 }
             }
             this.averageRank = (rankTotal / _gvars.TOTAL_PUBLIC_SONGS);
+        }
+
+        ///- Determine what songs make up the user's Skill Rating
+        public function getUserSkillRatingData():void
+        {
+            for (var key:int in this.level_ranks)
+            {
+                var levelRank:Object = this.level_ranks[key];
+
+                //Calculate the AAA Equiv for the scores on the song if greater than 0
+                if (levelRank.score > 0)
+                {
+                    //Get the song's difficulty
+                    var songInfo:SongInfo = _playlist.getSongInfo(key);
+
+                    //Calculate the song's equiv
+                    levelRank.equiv = SkillRating.calcSongWeightFromScore(levelRank.rawscore, songInfo);
+
+                    //Add it to the Skill Rating list if it's not 0
+                    if (levelRank.equiv > 0)
+                        skill_rating_levelranks.push(levelRank);
+                }
+            }
+
+            //Sort based on equiv
+            skill_rating_levelranks.sort(equivSort);
+
+            //Dump all but the top X
+            if (skill_rating_levelranks.length > skill_rating_top_count)
+                skill_rating_levelranks.length = skill_rating_top_count;
+        }
+
+        public function equivSort(a:Object, b:Object):int
+        {
+            if (a.equiv < b.equiv)
+            {
+                return 1;
+            }
+            else if (a.equiv > b.equiv)
+            {
+                return -1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        public function UpdateSRList(newLevelRanks:Object):void
+        {
+            if (newLevelRanks.equiv > skill_rating_levelranks[skill_rating_top_count - 1].equiv)
+            {
+                // Check if the song is already included in the top X equiv
+                for (var i:int = 0; i < skill_rating_levelranks.length; i++)
+                {
+                    if (skill_rating_levelranks[i].id == newLevelRanks.id) // Level ID match, so we've improved on a top score. Drop the old equiv entry
+                        skill_rating_levelranks.splice(i, 1);
+                }
+
+                // Add this improved rating
+                skill_rating_levelranks.push(newLevelRanks);
+
+                // Sort it to the right spot
+                skill_rating_levelranks.sort(equivSort);
+
+                // Drop the bottom equiv if we have more than the top X count
+                //[won't be necessary for newer players with less than X scores for equiv rating, or if we've improved a score that we already had equiv from]
+                if (skill_rating_levelranks.length > skill_rating_top_count)
+                    skill_rating_levelranks.length = skill_rating_top_count;
+            }
         }
 
         ///- Profile Loading
@@ -466,7 +543,8 @@ package classes
                     for (var s:String in scoreResults)
                         scoreResults[s] = Number(scoreResults[s]);
 
-                    level_ranks[Number(rankSplit[0])] = {"genre": Number(rankSplit[3]),
+                    level_ranks[Number(rankSplit[0])] = {"id": Number(rankSplit[0]),
+                            "genre": Number(rankSplit[3]),
                             "rank": Number(rankSplit[1]),
                             "score": Number(rankSplit[2]),
                             "results": rankSplit[4],
@@ -479,7 +557,8 @@ package classes
                             "miss": scoreResults[3],
                             "boo": scoreResults[4],
                             "maxcombo": scoreResults[5],
-                            "rawscore": ((scoreResults[0] * 50) + (scoreResults[1] * 25) + (scoreResults[2] * 5) - (scoreResults[3] * 10) - (scoreResults[4] * 5))};
+                            "rawscore": ((scoreResults[0] * 50) + (scoreResults[1] * 25) + (scoreResults[2] * 5) - (scoreResults[3] * 10) - (scoreResults[4] * 5)),
+                            "equiv": 0};
                 }
             }
             _isLoaded = true;
@@ -674,6 +753,12 @@ package classes
             if (_settings.autofailRestart != null)
                 this.autofailRestart = _settings.autofailRestart;
 
+            if (_settings.personalBestMode != null)
+                this.personalBestMode = _settings.personalBestMode;
+
+            if (_settings.personalBestTracker != null)
+                this.personalBestTracker = _settings.personalBestTracker;
+
             if (_settings.visual != null)
                 this.activeVisualMods = _settings.visual;
 
@@ -800,6 +885,8 @@ package classes
             gameSave.noteScale = this.noteScale;
             gameSave.screencutPosition = this.screencutPosition;
             gameSave.autofailRestart = this.autofailRestart;
+            gameSave.personalBestMode = this.personalBestMode;
+            gameSave.personalBestTracker = this.personalBestTracker;
             gameSave.frameRate = this.frameRate;
             gameSave.visual = this.activeVisualMods;
             gameSave.judgeColours = this.judgeColors;

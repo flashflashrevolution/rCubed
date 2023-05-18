@@ -17,6 +17,7 @@ package classes.filter
         public static const FILTER_STEPARTIST:String = "stepartist";
         public static const FILTER_BPM:String = "bpm";
         public static const FILTER_DIFFICULTY:String = "difficulty";
+        public static const FILTER_AAA_EQUIV:String = "aaa_eq";
         public static const FILTER_ARROWCOUNT:String = "arrows";
         public static const FILTER_ID:String = "id";
         public static const FILTER_MIN_NPS:String = "min_nps";
@@ -36,7 +37,7 @@ package classes.filter
 
 
         public static const FILTERS:Array = [FILTER_AND, FILTER_OR, FILTER_ARTIST, FILTER_STEPARTIST,
-            FILTER_STYLE, FILTER_TIME, FILTER_DIFFICULTY, FILTER_ARROWCOUNT, FILTER_MIN_NPS, FILTER_MAX_NPS,
+            FILTER_STYLE, FILTER_TIME, FILTER_DIFFICULTY, FILTER_AAA_EQUIV, FILTER_ARROWCOUNT, FILTER_MIN_NPS, FILTER_MAX_NPS,
             FILTER_RANK, FILTER_SCORE, FILTER_STATS, FILTER_SONG_FLAGS, FILTER_SONG_ACCESS, FILTER_SONG_TYPE,
             FILTER_SONG_RATING, FILTER_PERSONAL_SONG_RATING, FILTER_SONG_GENRE, FILTER_FAVORITE];
         public static const FILTERS_STAT:Array = ["perfect", "good", "average", "miss", "boo", "combo"];
@@ -167,6 +168,10 @@ package classes.filter
                 case FILTER_SONG_FLAGS:
                     return compareSongFlag(songInfo, userData.getLevelRank(songInfo), input_number);
 
+                case FILTER_AAA_EQUIV:
+                    if (!songInfo.engine)
+                        return greaterThan(songInfo.difficulty, userData.skill_rating_levelranks[userData.skill_rating_levelranks.length - 1].equiv) && userData.getLevelRank(songInfo).rawscore < songInfo.score_raw;
+
                 case FILTER_SONG_ACCESS:
                     return compareNumberEqual(songInfo.access, input_number);
 
@@ -254,6 +259,22 @@ package classes.filter
                     return value1 > value2;
             }
             return false;
+        }
+
+        /**
+         * Compares 2 Number values with a greater than comparison, unless inverted.
+         * @param	value1	Input Value
+         * @param	value2	Value to compare to.
+         * @param	inverse	Use inverse comparisons.
+         * @return	If comparision was successful.
+         */
+        private function greaterThan(value1:Number, value2:Number):Boolean
+        {
+            if (isNaN(value1) || isNaN(value2))
+                return true;
+            
+            var out:Boolean = value1 > value2;
+            return inverse ? !out : out;
         }
 
         private function compareNumberEqual(value1:Number, value2:Number):Boolean
