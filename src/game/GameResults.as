@@ -591,7 +591,7 @@ package game
             var graph_type:int = graphType;
 
             // Check for Totals Index
-            if (graph_type == GRAPH_ACCURACY && (result.song == null || result.replay_bin_notes == null))
+            if (result.song == null || result.replay_bin_notes == null)
                 graph_type = GRAPH_COMBO;
 
             // Graph Toggle
@@ -1130,8 +1130,7 @@ package game
 
                     // Check raw score vs level ranks and update.
                     var previousLevelRanks:Object = _gvars.activeUser.level_ranks[songInfo.level];
-                    var newLevelRanks:Object = {
-                            "id": songInfo.level,
+                    var newLevelRanks:Object = {"id": songInfo.level,
                             "genre": songInfo.genre,
                             "rank": data.new_ranking,
                             "score": gameResult.score,

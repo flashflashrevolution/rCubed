@@ -11,6 +11,8 @@ package popups
     import classes.ui.StarSelector;
     import classes.ui.Text;
     import classes.ui.ValidatedText;
+    import classes.user.UserSongData;
+    import classes.user.UserSongNotes;
     import com.flashfla.utils.SpriteUtil;
     import flash.display.Bitmap;
     import flash.events.Event;
@@ -26,7 +28,6 @@ package popups
     import menu.MainMenu;
     import menu.MenuPanel;
     import menu.MenuSongSelection;
-    import sql.SQLSongUserInfo;
 
     public class PopupSongNotes extends MenuPanel
     {
@@ -40,7 +41,7 @@ package popups
         private var bmp:Bitmap;
 
         private var songInfo:Object;
-        private var sDetails:SQLSongUserInfo;
+        private var sDetails:UserSongData;
 
         private var sRating:StarSelector;
         private var sFavorite:HeartSelector;
@@ -66,7 +67,7 @@ package popups
             this.songInfo = songInfo;
 
             var engineId:String = songInfo.engine != null ? songInfo.engine.id : Constant.BRAND_NAME_SHORT_LOWER;
-            sDetails = SQLQueries.getSongDetailsSafe(engineId, String(songInfo.level));
+            sDetails = UserSongNotes.getSongDetailsSafe(engineId, String(songInfo.level));
 
             songRatingValue = _gvars.playerUser.getSongRating(songInfo);
         }

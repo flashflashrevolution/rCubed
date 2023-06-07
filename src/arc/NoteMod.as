@@ -30,7 +30,6 @@ package arc
         public var modIsolation:Boolean;
         public var modOffset:Boolean;
         public var modRate:Boolean;
-        public var modFPS:Boolean;
         public var modJudgeWindow:Boolean;
 
         private var reverseLastFrame:int;
@@ -59,7 +58,6 @@ package arc
             modIsolation = options.isolation;
             modOffset = options.offsetGlobal != 0;
             modRate = options.songRate != 1;
-            modFPS = options.frameRate > 30;
             modJudgeWindow = Boolean(options.judgeWindow);
 
             reverseLastFrame = -1;
@@ -121,8 +119,8 @@ package arc
                 index = notes.length - 1 - index;
                 if (reverseLastFrame < 0)
                 {
-                    reverseLastFrame = notes[notes.length - 1].frame - song.musicDelay * 2;
-                    reverseLastPos = notes[notes.length - 1].time - ((song.musicDelay * 2) / 30);
+                    reverseLastFrame = notes[notes.length - 1].frame - song.musicStartFrames * 2;
+                    reverseLastPos = notes[notes.length - 1].time - ((song.musicStartFrames * 2) / 30);
                 }
             }
 
@@ -135,8 +133,8 @@ package arc
             var frame:Number = note.frame;
             var dir:int = valueOfDirection(note.direction);
 
-            frame -= song.musicDelay;
-            pos -= (song.musicDelay / 30);
+            frame -= song.musicStartFrames;
+            pos -= (song.musicStartFrames / 30);
 
             if (modReverse)
             {

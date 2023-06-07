@@ -3,6 +3,8 @@ package classes
     import arc.ArcGlobals;
     import assets.GameBackgroundColor;
     import classes.filter.EngineLevelFilter;
+    import classes.user.UserSongData;
+    import classes.user.UserSongNotes;
     import com.flashfla.utils.VectorUtil;
     import flash.display.Loader;
     import flash.display.LoaderInfo;
@@ -18,7 +20,6 @@ package classes
     import flash.net.URLRequestMethod;
     import flash.net.URLVariables;
     import flash.ui.Keyboard;
-    import sql.SQLSongUserInfo;
     import game.SkillRating;
 
     public class User extends EventDispatcher
@@ -242,13 +243,13 @@ package classes
             for (var key:int in this.level_ranks)
             {
                 var levelRank:Object = this.level_ranks[key];
-                
+
                 //Calculate the AAA Equiv for the scores on the song if greater than 0
                 if (levelRank.score > 0)
                 {
                     //Get the song's difficulty
                     var songInfo:SongInfo = _playlist.getSongInfo(key);
-                    
+
                     //Calculate the song's equiv
                     levelRank.equiv = SkillRating.calcSongWeightFromScore(levelRank.rawscore, songInfo);
 
@@ -266,14 +267,18 @@ package classes
                 skill_rating_levelranks.length = skill_rating_top_count;
         }
 
-        public function equivSort(a:Object, b:Object):int {
-            if (a.equiv < b.equiv) {
+        public function equivSort(a:Object, b:Object):int
+        {
+            if (a.equiv < b.equiv)
+            {
                 return 1;
             }
-            else if (a.equiv > b.equiv) {
+            else if (a.equiv > b.equiv)
+            {
                 return -1;
             }
-            else {
+            else
+            {
                 return 0;
             }
         }
@@ -538,8 +543,7 @@ package classes
                     for (var s:String in scoreResults)
                         scoreResults[s] = Number(scoreResults[s]);
 
-                    level_ranks[Number(rankSplit[0])] = {
-                            "id": Number(rankSplit[0]),
+                    level_ranks[Number(rankSplit[0])] = {"id": Number(rankSplit[0]),
                             "genre": Number(rankSplit[3]),
                             "rank": Number(rankSplit[1]),
                             "score": Number(rankSplit[2]),
@@ -750,10 +754,10 @@ package classes
                 this.autofailRestart = _settings.autofailRestart;
 
             if (_settings.personalBestMode != null)
-            this.personalBestMode = _settings.personalBestMode;
+                this.personalBestMode = _settings.personalBestMode;
 
             if (_settings.personalBestTracker != null)
-            this.personalBestTracker = _settings.personalBestTracker;
+                this.personalBestTracker = _settings.personalBestTracker;
 
             if (_settings.visual != null)
                 this.activeVisualMods = _settings.visual;
@@ -995,7 +999,7 @@ package classes
         {
             if (songInfo.engine != null)
             {
-                var sDetails:SQLSongUserInfo = SQLQueries.getSongDetails(songInfo.engine.id, songInfo.level_id);
+                var sDetails:UserSongData = UserSongNotes.getSongDetails(songInfo.engine.id, songInfo.level_id);
                 if (sDetails)
                     return sDetails.song_rating;
 

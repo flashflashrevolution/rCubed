@@ -66,17 +66,23 @@ package classes.chart.parse
                     // Held Note
                     if (collectionEntry["EndTime"] != null)
                     {
-                        noteHeldTime = (parseFloat(collectionEntry["EndTime"])) - noteTime;
+                        noteHeldTime = ((parseFloat(collectionEntry["EndTime"])) - noteTime) / 1000;
                     }
 
-                    //noteArray[noteArray.length] = [noteTime, COLUMNS[columnCount][noteColumn], COLORS[columnCount][noteColumn], noteHeldTime];
-                    noteArray[noteArray.length] = [noteTime, noteColumn, COLORS[columnCount][noteColumn], noteHeldTime];
+                    noteArray[noteArray.length] = [noteTime / 1000, COLUMNS[columnCount][noteColumn], COLORS[columnCount][noteColumn], noteHeldTime];
+                }
+
+                // Invalid Column Count
+                if (validColumnCounts.indexOf(columnCount) == -1)
+                {
+                    trace("QUA: Invalid: [ Keys", columnCount, "]");
+                    return false;
                 }
 
                 // No Notes in the file.
                 if (noteArray.length <= 0)
                 {
-                    trace("QUA: Invalid: [No Notes]");
+                    trace("QUA: Invalid: [ No Notes ]");
                     return false;
                 }
 

@@ -8,8 +8,6 @@ package game
 
     public class GameOptions extends Object
     {
-        public var DISABLE_NOTE_POOL:Boolean = false;
-
         public var frameRate:int = 60;
         public var songRate:Number = 1;
 
@@ -196,7 +194,6 @@ package game
             var i:int;
             var settings:Object = r.settings;
 
-            frameRate = settings["frameRate"] || 30;
             songRate = settings["songRate"] || 1;
 
             scrollDirection = settings["direction"] || "up";
