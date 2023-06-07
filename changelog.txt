@@ -1,3 +1,22 @@
+R^3 (v1.5.1) [2023-04-02]
+---------------------------------------------------------------------
+@Psycast
+- Fix Hide Receptors
+- Fix Secret / Purchased.
+- Fix Quaver Files for FileLoader.
+- Bug Fixes for Results Graphs for song queues.
+
+
+@JustinAFaulkner
+- New Result Graph (#367)
+- Personal Best mode checkbox for autofail, which dynamically determines your pb (based on raw goods) and autofails you based on that.
+- Personal Best combo color tracking which functions similarly to the above but doesn't fail you, just changes the combo color
+- AAA Equiv autofail value, which will set autofail at the appropriate number of raw goods necessary to maintain the specified AAA Equiv on any given song. 
+    - If that AAA Equiv is not possible, autofail is set to non-AAA instead.
+- "Skill Rating gain is/isn't possible" filter (shows only songs that you can play to increase your skill rating [or the opposite])
+- Visual improvements to the filter screen
+
+
 R^3 (v1.5.0) [2023-04-01]
 ---------------------------------------------------------------------
 @Psycast
