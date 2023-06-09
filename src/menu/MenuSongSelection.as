@@ -1640,7 +1640,7 @@ package menu
                 infoDetails.width = 164;
                 tY += 23;
 
-                if (infoDisplay[item][0] == "best")
+                if (infoDisplay[item][0] == "best" && infoRanks.results != null)
                 {
                     // Split the infoRanks results into an array
                     var songPASpread:Array = infoRanks.results.split("-");
