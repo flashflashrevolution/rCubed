@@ -433,6 +433,12 @@ package game.graph
                 regions[regions.length] = judge_rect;
             }
 
+            // Verify Exist
+            if (!result.replay_bin_notes || !result.replay_bin_boos)
+            {
+                return;
+            }
+
             // Draw Hit Markers
             var player_timings:Vector.<ReplayBinFrame> = result.replay_bin_notes;
             var note_judge:Object;

@@ -1639,21 +1639,19 @@ package menu
                 infoDetails = new Text(infoBox, 5, tY, infoDisplay[item][1] || "");
                 infoDetails.width = 164;
                 tY += 23;
-                
-                if (infoDisplay[item][0] == "best")
+
+                if (infoDisplay[item][0] == "best" && infoRanks.results != null)
                 {
                     // Split the infoRanks results into an array
                     var songPASpread:Array = infoRanks.results.split("-");
 
                     // 0-1-2-3-4-5
                     // P-G-A-M-B-C
-                    var songPA:Object = {
-                        perfect: Number(songPASpread[0]),
-                        good: Number(songPASpread[1]),
-                        average: Number(songPASpread[2]),
-                        miss: Number(songPASpread[3]),
-                        boo: Number(songPASpread[4])
-                    };
+                    var songPA:Object = {perfect: Number(songPASpread[0]),
+                            good: Number(songPASpread[1]),
+                            average: Number(songPASpread[2]),
+                            miss: Number(songPASpread[3]),
+                            boo: Number(songPASpread[4])};
 
                     // Get raw goods value to display in the hover
                     var rawGoods:Number = SkillRating.getRawGoods(songPA);
@@ -1664,11 +1662,10 @@ package menu
                     if (songPercentageString != "0.00")
                     {
                         //Construct the display string (could do this in one go but man it's a long line lol)
-                        var hoverString:String = _lang.string("song_selection_song_panel_rghover") + rawGoods;
-                        hoverString += (songPercentageString == "100.00" ? "" : " (" + songPercentageString + "% " + _lang.string("song_selection_song_panel_rghover_unfinished") + ")");
+                        var hoverString:String = _lang.string("song_selection_song_panel_rghover" + (songPercentageString != "100.00" ? "_unfinished" : ""));
 
                         // Add raw goods Hover Box
-                        infoPAHover = new HoverPABox(5, tY, hoverString);
+                        infoPAHover = new HoverPABox(5, tY, sprintf(hoverString, {"raw": rawGoods, "percent": songPercentageString}));
                         infoBox.addChild(infoPAHover);
                     }
                 }

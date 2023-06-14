@@ -36,7 +36,7 @@ package game
         static public function calcSongWeightFromScore(rawScore:Number, song:SongInfo):Number
         {
             var rawGoods:Number = calcRawGoods(rawScore, song);
-            
+
             return calcSongWeightFromRawGoods(rawGoods, song);
         }
 
@@ -60,14 +60,14 @@ package game
         {
             if (song == null || targetEquiv == 0)
                 return 0;
-            
+
             var rawgoods:Number = 0;
             var songweight:Number = targetEquiv;
             var difficulty:Number = song.difficulty;
             var delta:Number = D1 + D2 * difficulty + D3 * Math.pow(difficulty, 2) + D4 * Math.pow(difficulty, 3) + D5 * Math.pow(difficulty, 4);
-            
+
             rawgoods = (delta - delta * Math.pow(songweight + ALPHA, BETA) / Math.pow(difficulty + ALPHA, BETA)) / LAMBDA;
-            
+
             return Math.round(rawgoods * 5) / 5;
         }
 

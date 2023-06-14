@@ -358,7 +358,7 @@ package game.graph
             var draw_color:uint;
             var timing_score:int;
 
-            var boos: Vector.<ReplayBinFrame> = result.replay_bin_boos;
+            var boos:Vector.<ReplayBinFrame> = result.replay_bin_boos;
 
             player_timings_length = player_timings.length;
 
@@ -405,7 +405,7 @@ package game.graph
             // Fill in Misses, Overlay uses cross point length.
             if (result.note_count > 0)
             {
-                var miss_y: Number = flipGraph ? 0 : graphHeight;
+                var miss_y:Number = flipGraph ? 0 : graphHeight;
                 while (cross_points.length < result.last_note)
                 {
                     pos_x = cross_points.length * ratio_x;
@@ -415,7 +415,7 @@ package game.graph
 
             // Boos
             var boo:ReplayBinFrame;
-            var boo_y: Number = flipGraph ? graphHeight : 0;
+            var boo_y:Number = flipGraph ? graphHeight : 0;
             ratio_x = graphWidth / result.song.getNote(Math.max(0, song_arrows - 1)).time;
             for (i = 0; i < boos.length; i++)
             {

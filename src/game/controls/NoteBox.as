@@ -22,13 +22,13 @@ package game.controls
         private var readahead:Number;
         private var totalNotes:int;
         private var noteCount:int;
-        private var notePool:Array;
+        private var notePool:Object;
         public var notes:Array;
 
-        public var leftReceptor:GameReceptor;
-        public var downReceptor:GameReceptor;
-        public var upReceptor:GameReceptor;
-        public var rightReceptor:GameReceptor;
+        public var leftReceptor:MovieClip;
+        public var downReceptor:MovieClip;
+        public var upReceptor:MovieClip;
+        public var rightReceptor:MovieClip;
         public var receptorArray:Array;
         public var receptorTable:Object = {};
 
@@ -38,7 +38,6 @@ package game.controls
 
         private var recp_colors:Vector.<Number>;
         private var recp_colors_enabled:Vector.<Boolean>;
-        private var recp_color_indexs:Object = {"100": 0, "50": 1, "25": 2, "5": 3, "-5": 4, "-10": 5};
 
         public function NoteBox(song:Song, options:GameOptions)
         {
@@ -46,58 +45,50 @@ package game.controls
             this.options = options;
 
             // Create Object Pools
-            notePool = [];
-            for each (var item:Object in _noteskins.data)
-            {
-                notePool[item.id] = {"L": [], "D": [], "U": [], "R": []};
-
-                for each (var direction:String in options.noteDirections)
-                {
-                    for each (var color:String in options.noteColors)
-                    {
-                        notePool[item.id][direction][color] = new GameNotePool();
-                    }
-                }
-            }
-
-            // Check for invalid Noteskin / Pool
-            if (notePool[options.noteskin] == null)
+            if (_noteskins.data[options.noteskin] == null)
             {
                 options.noteskin = 1;
             }
 
-            // Prefill Object Pools for active noteskin.
+            notePool = {"L": {}, "D": {}, "U": {}, "R": {}};
+
             var i:int = 0;
-            var preLoadCount:int = 4;
-            for each (var pre_dir:String in options.noteDirections)
+            var preLoadCount:int = 6;
+            for each (var direction:String in options.noteDirections)
             {
-                for each (var pre_color:String in options.noteColors)
+                for each (var color:String in options.noteColors)
                 {
-                    var pool:GameNotePool = notePool[options.noteskin][pre_dir][pre_color];
+                    var pool:GameNotePool = new GameNotePool();
 
                     for (i = 0; i < preLoadCount; i++)
                     {
-                        var gameNote:GameNote = pool.addObject(new GameNote(0, pre_dir, pre_color, 1 * 1000, 0, 0, options.noteskin));
+                        var gameNote:GameNote = pool.addObject(new GameNote(0, direction, color, 1 * 1000, 0, 0, options.noteskin));
                         gameNote.visible = false;
                         pool.unmarkObject(gameNote);
                         addChild(gameNote);
                     }
+
+                    notePool[direction][color] = pool;
                 }
             }
 
             // Setup Receptors
             leftReceptor = _noteskins.getReceptor(options.noteskin, "L");
             leftReceptor.KEY = "Left";
-            leftReceptor.animationSpeed = options.receptorSpeed;
             downReceptor = _noteskins.getReceptor(options.noteskin, "D");
             downReceptor.KEY = "Down";
-            downReceptor.animationSpeed = options.receptorSpeed;
             upReceptor = _noteskins.getReceptor(options.noteskin, "U");
             upReceptor.KEY = "Up";
-            upReceptor.animationSpeed = options.receptorSpeed;
             rightReceptor = _noteskins.getReceptor(options.noteskin, "R");
             rightReceptor.KEY = "Right";
-            rightReceptor.animationSpeed = options.receptorSpeed;
+
+            if (leftReceptor is GameReceptor)
+            {
+                (leftReceptor as GameReceptor).animationSpeed = options.receptorSpeed;
+                (downReceptor as GameReceptor).animationSpeed = options.receptorSpeed;
+                (upReceptor as GameReceptor).animationSpeed = options.receptorSpeed;
+                (rightReceptor as GameReceptor).animationSpeed = options.receptorSpeed;
+            }
 
             addChildAt(leftReceptor, 0);
             addChildAt(downReceptor, 0);
@@ -128,60 +119,31 @@ package game.controls
             }
         }
 
-        public function noteRealSpawnRotation(dir:String, noteskin:int):Number
-        {
-            var rot:Number = _noteskins.data[noteskin]["rotation"];
-            switch (dir)
-            {
-                case "D":
-                    return 0;
-                case "L":
-                    return rot;
-                case "U":
-                    return rot * 2;
-                case "R":
-                    return rot * -1;
-            }
-            return rot;
-        }
-
         public function spawnArrow(note:Note, current_position:int = 0):GameNote
         {
             var direction:String = note.direction;
             var color:String = options.getNewNoteColor(note.color);
-            if (options.DISABLE_NOTE_POOL)
+
+            var spawnPoolRef:GameNotePool = notePool[direction][color];
+            var gameNote:GameNote;
+
+            gameNote = spawnPoolRef.getObject();
+            if (gameNote != null)
             {
-                var gameNote:GameNote = new GameNote(noteCount++, direction, color, (note.time + 0.5 / 30) * 1000, note.frame, 0, options.noteskin);
+                gameNote.ID = noteCount++;
+                gameNote.DIR = direction;
+                gameNote.POSITION = (note.time + 0.5 / 30) * 1000;
+                gameNote.PROGRESS = note.frame;
+                gameNote.alpha = 1;
             }
             else
             {
-                var spawnPoolRef:GameNotePool = notePool[options.noteskin][direction][color];
-                if (!spawnPoolRef)
-                {
-                    spawnPoolRef = notePool[options.noteskin][direction][color] = new GameNotePool();
-                }
-
-                gameNote = spawnPoolRef.getObject();
-                if (gameNote)
-                {
-                    gameNote.ID = noteCount++;
-                    gameNote.DIR = direction;
-                    gameNote.POSITION = (note.time + 0.5 / 30) * 1000;
-                    gameNote.PROGRESS = note.frame;
-                    gameNote.alpha = 1;
-                }
-                else
-                {
-                    gameNote = spawnPoolRef.addObject(new GameNote(noteCount++, direction, color, (note.time + 0.5 / 30) * 1000, note.frame, 0, options.noteskin));
-                    addChild(gameNote);
-                }
+                gameNote = spawnPoolRef.addObject(new GameNote(noteCount++, direction, color, (note.time + 0.5 / 30) * 1000, note.frame, 0, options.noteskin));
+                addChild(gameNote);
             }
 
             gameNote.SPAWN_PROGRESS = gameNote.POSITION - 1000; // readahead;
             gameNote.rotation = getReceptor(direction).rotation;
-
-            if (options.modEnabled("_spawn_noteskin_data_rotation"))
-                gameNote.rotation = noteRealSpawnRotation(direction, options.noteskin);
 
             if (options.noteScale != 1.0)
             {
@@ -209,7 +171,7 @@ package game.controls
             return gameNote;
         }
 
-        public function getReceptor(dir:String):GameReceptor
+        public function getReceptor(dir:String):MovieClip
         {
             switch (dir)
             {
@@ -227,12 +189,64 @@ package game.controls
 
         public function receptorFeedback(dir:String, score:int):void
         {
-            var idx:int = recp_color_indexs[score] != null ? recp_color_indexs[score] : -1;
-
-            if (idx == -1 || !recp_colors_enabled[idx] || !options.displayReceptorAnimations)
+            if (!options.displayReceptorAnimations)
                 return;
 
-            getReceptor(dir).playAnimation(recp_colors[idx]);
+            var receptor:MovieClip = getReceptor(dir);
+            var isCustom:Boolean = receptor is GameReceptor;
+            var f:int = 2;
+            var c:uint = 0;
+            var e:Boolean = false;
+
+            switch (score)
+            {
+                case 100:
+                    f = 2;
+                    c = recp_colors[0];
+                    e = recp_colors_enabled[0];
+                    break;
+                case 50:
+                    f = 2;
+                    c = recp_colors[1];
+                    e = recp_colors_enabled[1];
+                    break;
+                case 25:
+                    f = 7;
+                    c = recp_colors[2];
+                    e = recp_colors_enabled[2];
+                    break;
+                case 5:
+                    f = 12;
+                    c = recp_colors[3];
+                    e = recp_colors_enabled[3];
+                    break;
+                case -5:
+                    f = 12;
+                    c = recp_colors[4];
+                    e = recp_colors_enabled[4];
+                    break;
+                case -10:
+                    f = 12;
+                    c = recp_colors[5];
+                    e = recp_colors_enabled[5];
+
+                    if (!isCustom)
+                    {
+                        e = false;
+                    }
+                    break;
+                default:
+                    return;
+            }
+
+            if (!e)
+                return;
+
+            if (isCustom)
+                (receptor as GameReceptor).playAnimation(c);
+
+            else
+                receptor.gotoAndPlay(f);
         }
 
         public function get nextNote():Note
@@ -391,16 +405,8 @@ package game.controls
                 removeNoteRef = notes[removeNoteIndex];
                 if (removeNoteRef.ID == id)
                 {
-                    if (!options.DISABLE_NOTE_POOL)
-                    {
-                        notePool[removeNoteRef.NOTESKIN][removeNoteRef.DIR][removeNoteRef.COLOR].unmarkObject(removeNoteRef);
-                        removeNoteRef.visible = false;
-                    }
-                    else
-                    {
-                        removeChild(removeNoteRef);
-                    }
-
+                    notePool[removeNoteRef.DIR][removeNoteRef.COLOR].unmarkObject(removeNoteRef);
+                    removeNoteRef.visible = false;
                     notes.splice(removeNoteIndex, 1);
                     break;
                 }
@@ -411,15 +417,8 @@ package game.controls
         {
             for each (var note:GameNote in notes)
             {
-                if (!options.DISABLE_NOTE_POOL)
-                {
-                    notePool[note.NOTESKIN][note.DIR][note.COLOR].unmarkObject(note);
-                    note.visible = false;
-                }
-                else
-                {
-                    removeChild(note);
-                }
+                notePool[note.DIR][note.COLOR].unmarkObject(note);
+                note.visible = false;
             }
 
             notes = new Array();

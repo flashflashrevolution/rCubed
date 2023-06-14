@@ -12,6 +12,7 @@ package
     import classes.User;
     import classes.chart.Song;
     import classes.filter.EngineLevelFilter;
+    import classes.user.UserSongNotes;
     import com.flashfla.loader.DataEvent;
     import com.flashfla.net.DynamicURLLoader;
     import com.flashfla.utils.Screenshots;
@@ -147,10 +148,8 @@ package
         {
             // Export SQL to JSON
             var db_name:String = "dbinfo/" + (activeUser != null && activeUser.siteId > 0 ? activeUser.siteId : "0") + "_info.";
-            var sql_file:File = AirContext.getAppFile(db_name + "db");
             var json_file:File = AirContext.getAppFile(db_name + "json");
 
-            // Use JSON first
             if (json_file.exists)
             {
                 var json_str:String = AirContext.readTextFile(json_file);
@@ -158,7 +157,7 @@ package
                 {
                     try
                     {
-                        SQLQueries.loadFromObject(JSON.parse(json_str));
+                        UserSongNotes.loadFromObject(JSON.parse(json_str));
                     }
                     catch (e:Error)
                     {
@@ -166,35 +165,13 @@ package
                     }
                 }
             }
-            // Fallback to SQL
-            else if (sql_file.exists)
-            {
-                SQLQueries.exportToJSON(sql_file, function(data:Object):void
-                {
-                    SQLQueries.loadFromObject(data);
-                    writeUserSongData();
-
-                    // Create Backup File
-                    var backupFile:File = AirContext.getAppFile(db_name + "db.bak");
-                    for (var i:int = 0; i < 10; i++)
-                    {
-                        if (!backupFile.exists)
-                        {
-                            sql_file.moveToAsync(backupFile);
-                            break;
-                        }
-
-                        backupFile = AirContext.getAppFile(db_name + "db.bak" + i);
-                    }
-                });
-            }
         }
 
         public function writeUserSongData():void
         {
             var db_name:String = "dbinfo/" + (activeUser != null && activeUser.siteId > 0 ? activeUser.siteId : "0") + "_info.";
             var json_file:File = AirContext.getAppFile(db_name + "json");
-            SQLQueries.writeFile(json_file);
+            UserSongNotes.writeFile(json_file);
         }
 
         public function websocketPortNumber(type:String):uint

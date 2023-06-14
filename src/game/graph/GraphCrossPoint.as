@@ -19,7 +19,7 @@ package game.graph
             this.timing = timing;
             this.color = color;
             this.score = score;
-            this.column = column
+            this.column = column;
         }
     }
 }

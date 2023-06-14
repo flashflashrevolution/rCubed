@@ -206,8 +206,8 @@ package classes
                     newSongInfo.time_end = dynamicSongInfo.end_delay;
                     newSongInfo.song_rating = dynamicSongInfo.song_rating;
 
-                    newSongInfo.price = dynamicSongInfo.credits;
-                    newSongInfo.credits = dynamicSongInfo.price;
+                    newSongInfo.price = dynamicSongInfo.price;
+                    newSongInfo.credits = dynamicSongInfo.credits;
 
                     newSongInfo.min_nps = dynamicSongInfo.min_nps;
                     newSongInfo.max_nps = dynamicSongInfo.max_nps;

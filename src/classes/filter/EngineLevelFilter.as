@@ -1,9 +1,10 @@
 package classes.filter
 {
     import classes.Language;
-    import classes.User;
-    import sql.SQLSongUserInfo;
     import classes.SongInfo;
+    import classes.User;
+    import classes.user.UserSongData;
+    import classes.user.UserSongNotes;
 
     public class EngineLevelFilter
     {
@@ -181,7 +182,7 @@ package classes.filter
                     return compareNumberEqual(songInfo.genre, input_number + 1);
 
                 case FILTER_FAVORITE:
-                    var details:SQLSongUserInfo = SQLQueries.getSongUserInfo(songInfo);
+                    var details:UserSongData = UserSongNotes.getSongUserInfo(songInfo);
                     if (details)
                         return compareNumberEqual(details.song_favorite ? 0 : 1, input_number);
                     return compareNumberEqual(1, input_number);
@@ -271,7 +272,7 @@ package classes.filter
         {
             if (isNaN(value1) || isNaN(value2))
                 return true;
-            
+
             var out:Boolean = value1 > value2;
             return inverse ? !out : out;
         }

@@ -235,9 +235,11 @@ package game.graph
             var alpha:Number = 1.0;
             var color:uint = 0xFFFFFF;
 
+            var testNoteCount:int = Math.min(cross_points.length - 1, 15);
+
             if (result.last_note == 0)
             {
-                for (var i:int = 0; i < 15; i++)
+                for (var i:int = 0; i < testNoteCount; i++)
                 {
                     // Check the first 15 notes, 10 misses (10 NaN) would have failed them
                     if (cross_points[i] != null && cross_points[i].score != 0)
@@ -289,8 +291,8 @@ package game.graph
                             if (point.timing < 0)
                                 alpha = 0.1;
                             break;
-                    };
-                };
+                    }
+                }
 
                 switch (point.score) // Set the alpha if that judge is specifically hidden from the graph
                 {
@@ -310,7 +312,7 @@ package game.graph
                         if (!showJudge[3])
                             alpha = 0.1;
                         break;
-                };
+                }
 
                 graph.graphics.lineStyle(1, point.color, alpha);
                 graph.graphics.moveTo(point.x - 2, point.y - 2);
@@ -346,7 +348,7 @@ package game.graph
             for each (point in boo_points)
             {
                 alpha = 1.0;
-                
+
                 if (columnFilter != 0 && ((columnFilter < 5 && point.column != COLUMN_FILTERS[columnFilter]) || (columnFilter == 5 && (point.column == "U" || point.column == "R")) || (columnFilter == 6 && (point.column == "D" || point.column == "L"))))
                     alpha = 0.1;
 
@@ -658,6 +660,12 @@ package game.graph
                 regions[regions.length] = judge_rect;
             }
 
+            // Verify Exist
+            if (result.replay_bin_notes == null || result.replay_bin_boos == null)
+            {
+                return;
+            }
+
             // Draw Hit Markers
             var player_timings:Vector.<ReplayBinFrame> = result.replay_bin_notes;
             var note_judge:Object;
@@ -765,7 +773,7 @@ package game.graph
         {
             columnFilter = (columnFilter >= COLUMN_FILTERS.length - 1) ? 0 : columnFilter + 1;
             filterColumnBtn.setHoverText(_lang.string("game_results_filter_column_" + COLUMN_FILTERS[columnFilter]), "right");
-            
+
             redrawGraph();
         }
 
@@ -784,7 +792,7 @@ package game.graph
 
         /**
          * Changes toggles display of a specific judgement.
-        */
+         */
         private function e_filterAccuracy(event:MouseEvent):void
         {
             switch (event.target)
@@ -812,7 +820,7 @@ package game.graph
                 case filterBooBtn:
                     showJudge[5] = !showJudge[5];
                     break;
-            };
+            }
 
             formatButtons();
             redrawGraph();
@@ -826,7 +834,7 @@ package game.graph
             for (i = 0; i < 6; i++)
             {
                 showJudge[i] = true;
-            };
+            }
 
             switch (accuracyFilter)
             {
@@ -843,7 +851,7 @@ package game.graph
                         showJudge[i] = false;
                     }
                     break;
-            };
+            }
         }
 
         private function redrawGraph():void

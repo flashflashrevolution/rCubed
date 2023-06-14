@@ -1,8 +1,11 @@
 package menu
 {
     import classes.Language;
+    import classes.SongInfo;
     import classes.ui.MouseTooltip;
     import classes.ui.Text;
+    import classes.user.UserSongData;
+    import classes.user.UserSongNotes;
     import com.flashfla.utils.NumberUtil;
     import com.flashfla.utils.sprintf;
     import flash.display.GradientType;
@@ -16,8 +19,6 @@ package menu
     import flash.text.TextFieldAutoSize;
     import flash.ui.ContextMenu;
     import flash.utils.Timer;
-    import sql.SQLSongUserInfo;
-    import classes.SongInfo;
 
     public class SongItem extends Sprite
     {
@@ -54,7 +55,7 @@ package menu
 
         // Song Data
         private var _songInfo:SongInfo;
-        private var _songUserInfo:SQLSongUserInfo;
+        private var _songUserInfo:UserSongData;
         private var _level:int = 0;
         public var isLocked:Boolean = false;
         public var isFavorite:Boolean = false;
@@ -237,7 +238,7 @@ package menu
         {
             // Check for Changes
             if (_songUserInfo == null)
-                _songUserInfo = SQLQueries.getSongUserInfo(songInfo);
+                _songUserInfo = UserSongNotes.getSongUserInfo(songInfo);
 
             // Update Favorite
             isFavorite = (_songUserInfo != null && _songUserInfo.song_favorite);
@@ -271,7 +272,7 @@ package menu
             isLocked = !(!songInfo.access || songInfo.access == GlobalVariables.SONG_ACCESS_PLAYABLE);
 
             // Song Details
-            _songUserInfo = SQLQueries.getSongUserInfo(songInfo);
+            _songUserInfo = UserSongNotes.getSongUserInfo(songInfo);
             isFavorite = (_songUserInfo != null && _songUserInfo.song_favorite);
 
             // Song Name

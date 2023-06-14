@@ -7,7 +7,6 @@ package classes.chart
     import com.flashfla.media.MP3Extraction;
     import com.flashfla.media.SwfSilencer;
     import com.flashfla.net.ForcibleLoader;
-    import com.flashfla.utils.Crypt;
     import com.flashfla.utils.TimeUtil;
     import flash.display.Loader;
     import flash.display.LoaderInfo;
@@ -71,7 +70,9 @@ package classes.chart
         public var bytesTotal:uint = 0;
 
         private var musicForcibleLoader:ForcibleLoader;
-        public var musicDelay:int = 0;
+
+        public var musicStartFrames:int = 0;
+        public var musicStartTime:int = 0;
 
         private var localFileData:ByteArray = null;
         private var localFileHash:String = "";
@@ -470,7 +471,7 @@ package classes.chart
         ///- Song Function
         public function start(seek:int = 0):void
         {
-            updateMusicDelay();
+            updateMusicOffset();
 
             if (soundChannel)
             {
@@ -481,13 +482,13 @@ package classes.chart
 
             if (sound)
             {
-                soundChannel = sound.play(musicDelay * 1000 / options.songRate / 30 + seek);
+                soundChannel = sound.play(musicStartTime + seek);
                 soundChannel.soundTransform = SoundMixer.soundTransform;
                 soundChannel.addEventListener(Event.SOUND_COMPLETE, stopSound);
             }
 
             if (background)
-                background.gotoAndPlay(2 + musicDelay + int(seek * 30 / 1000));
+                background.gotoAndPlay(2 + musicStartFrames + int(seek * 30 / 1000));
 
             musicIsPlaying = true;
         }
@@ -530,7 +531,7 @@ package classes.chart
 
         private function playClips(clip:MovieClip):void
         {
-            clip.gotoAndPlay(2 + musicDelay);
+            clip.gotoAndPlay(2 + musicStartFrames);
             for (var i:int = 0; i < clip.numChildren; i++)
             {
                 var subclip:MovieClip = clip.getChildAt(i) as MovieClip;
@@ -590,49 +591,32 @@ package classes.chart
             return minutes + ":" + seconds;
         }
 
-        public function get noteSteps():int
-        {
-            if (!chart)
-                return NaN;
-
-            return chart.framerate + 1;
-        }
-
-        public function get frameRate():int
-        {
-            return type == NoteChart.FFR_MP3 ? _gvars.activeUser.frameRate : chart.framerate;
-        }
-
-        public function updateMusicDelay():void
+        public function updateMusicOffset():void
         {
             options = _gvars.options;
             rateReverse = options.modEnabled("reverse");
             rateRate = options.songRate;
             noteMod.start(options);
+
             if (options.isolation && totalNotes > 0)
             {
                 if (rateReverse)
-                    musicDelay = Math.max(0, chart.Notes[chart.Notes.length - 1].frame - chart.Notes[Math.max(0, chart.Notes.length - 1 - options.isolationOffset)].frame - 60);
+                    musicStartFrames = Math.max(0, chart.Notes[chart.Notes.length - 1].frame - chart.Notes[Math.max(0, chart.Notes.length - 1 - options.isolationOffset)].frame - 60);
                 else
-                    musicDelay = Math.max(0, chart.Notes[options.isolationOffset].frame - 60);
+                    musicStartFrames = Math.max(0, chart.Notes[options.isolationOffset].frame - 60);
             }
             else
-                musicDelay = 0;
+                musicStartFrames = 0;
+
+            musicStartTime = (musicStartFrames / options.songRate * 1000 / 30);
         }
 
         public function getPosition():int
         {
-            switch (type)
-            {
-                case NoteChart.FFR_LEGACY:
-                    return (background.currentFrame - 2 - musicDelay) * 1000 / 30;
+            if (soundChannel != null)
+                return soundChannel.position - musicStartTime;
 
-                case NoteChart.FFR_MP3:
-                    return soundChannel ? soundChannel.position - musicDelay / options.songRate * 1000 / 30 : 0;
-
-                default:
-                    return 0;
-            }
+            return 0;
         }
     }
 }
