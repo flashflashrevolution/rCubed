@@ -272,7 +272,7 @@ package classes.filter
         {
             if (isNaN(value1) || isNaN(value2))
                 return true;
-            
+
             var out:Boolean = value1 > value2;
             return inverse ? !out : out;
         }

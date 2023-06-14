@@ -267,7 +267,7 @@ package game
                 if (rawScoreMax == 0)
                     rawScoreMax = song.chart.Notes.length * 50; // Alt engine hack as they often don't have a note count or raw max saved...
 
-                if(infoRanks != null) // Alt engine will return null here if the song is unplayed, and if unplayed then we don't need to autofail them
+                if (infoRanks != null) // Alt engine will return null here if the song is unplayed, and if unplayed then we don't need to autofail them
                 {
                     var rawDifference:Number = rawScoreMax - infoRanks.rawscore;
 
@@ -281,7 +281,7 @@ package game
                 if (options.autofail[7] != 0 && song.songInfo.engine == null) // Don't bother processing this if it's an Alt Engine
                 {
                     // first check if the song can even meet that equiv, if not then set the autofail at non-AAA
-                    if(song.songInfo.difficulty <= options.autofail[7])
+                    if (song.songInfo.difficulty <= options.autofail[7])
                     {
                         options.autofail[6] = 0.2; //one boo's worth of RG, any non-AAA judgement will cause autofail
                     }
@@ -289,7 +289,7 @@ package game
                     {
                         // need to convert the AAA equiv to a raw good max on this particular song to use for autofail
                         var calculatedRawGoods:Number = SkillRating.getRawGoodsFromEquiv(song.songInfo, options.autofail[7]);
-                        
+
                         // now set the autofail to that value
                         options.autofail[6] = calculatedRawGoods;
                     }

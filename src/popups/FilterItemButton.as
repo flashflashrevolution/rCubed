@@ -51,7 +51,7 @@ package popups
             {
                 case EngineLevelFilter.FILTER_STATS:
                     combo_stat = new ComboBox(this, 8, 4, "", EngineLevelFilter.createOptions(EngineLevelFilter.FILTERS_STAT, "compare_stat"));
-                    
+
                     combo_stat.addEventListener(Event.SELECT, e_valueStatChange);
                     combo_stat.setSize(130, 26);
                     combo_stat.selectedItemByData = filter.input_stat;
@@ -132,7 +132,7 @@ package popups
                         altEngineText.fontColor = "#FF0000";
                         altEngineText.alpha = 2;
                     }
-                    
+
                     break;
 
                 case EngineLevelFilter.FILTER_SONG_TYPE:

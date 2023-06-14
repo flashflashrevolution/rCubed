@@ -150,7 +150,7 @@ package popups.settings
 
             textNoteScale = new Text(container, xOff, yOff, Math.round(_gvars.activeUser.noteScale * 100) + "%");
             yOff += 22;
-            
+
             yOff += drawSeperator(container, xOff, 170, yOff, 3, 5);
 
             // Autofail
@@ -488,7 +488,7 @@ package popups.settings
         private function e_autofailEquivMouseOver(e:Event):void
         {
             optionAutofailEquivInput.addEventListener(MouseEvent.MOUSE_OUT, e_autofailEquivMouseOut);
-            
+
             if (_avars.configLegacy != null)
             {
                 displayToolTip(optionAutofailEquivInput.x + 65, optionAutofailEquivInput.y - 45, _lang.string("popup_autofail_equiv") + " " + _lang.string("altengine_setting_ignored"));

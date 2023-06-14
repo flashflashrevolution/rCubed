@@ -212,7 +212,7 @@ package popups
                         removeFilter.color = 0xFF0000;
                         removeFilter.normalAlpha = 0.35;
                         removeFilter.activeAlpha = 0.45;
-                        
+
                         // AND / OR Label
                         var type_text:Text = new Text(scrollpane.content, xPos + 29, yPos + 2, _lang.string("filter_type_" + filter.type));
 
