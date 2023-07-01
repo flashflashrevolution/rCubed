@@ -1,3 +1,10 @@
+R^3 (v1.5.3) [2023-06-30]
+---------------------------------------------------------------------
+@Psycast
+- Fix Crash due to having less then 50 unique songs played.
+- Fix raw goods formatting on song selection screen.
+
+
 R^3 (v1.5.2) [2023-06-09]
 ---------------------------------------------------------------------
 @Psycast
