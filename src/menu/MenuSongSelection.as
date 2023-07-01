@@ -1642,22 +1642,11 @@ package menu
 
                 if (infoDisplay[item][0] == "best" && infoRanks.results != null)
                 {
-                    // Split the infoRanks results into an array
-                    var songPASpread:Array = infoRanks.results.split("-");
-
-                    // 0-1-2-3-4-5
-                    // P-G-A-M-B-C
-                    var songPA:Object = {perfect: Number(songPASpread[0]),
-                            good: Number(songPASpread[1]),
-                            average: Number(songPASpread[2]),
-                            miss: Number(songPASpread[3]),
-                            boo: Number(songPASpread[4])};
-
                     // Get raw goods value to display in the hover
-                    var rawGoods:Number = SkillRating.getRawGoods(songPA);
+                    var rawGoods:String = NumberUtil.numberFormat(SkillRating.getRawGoods(infoRanks), 1, true);
 
                     // Get song % played
-                    var songPercentageString:String = ((songPA.perfect + songPA.good + songPA.average + songPA.miss) / songInfo.note_count * 100).toFixed(2);
+                    var songPercentageString:String = Math.min(100, Math.max(0, ((infoRanks.perfect + infoRanks.good + infoRanks.average + infoRanks.miss) / songInfo.note_count * 100))).toFixed(2);
 
                     if (songPercentageString != "0.00")
                     {
