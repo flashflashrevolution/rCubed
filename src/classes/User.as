@@ -775,6 +775,9 @@ package classes
             if (_settings.comboColours != null)
                 mergeIntoArray(this.comboColors, _settings.comboColours);
 
+            if (_settings.rawGoodsColor != null)
+                this.rawGoodsColor = _settings.rawGoodsColor;
+
             if (_settings.enableComboColors != null)
                 mergeIntoArray(this.enableComboColors, _settings.enableComboColors);
 
@@ -898,6 +901,7 @@ package classes
             gameSave.visual = this.activeVisualMods;
             gameSave.judgeColours = this.judgeColors;
             gameSave.comboColours = this.comboColors;
+            gameSave.rawGoodsColor = this.rawGoodsColor;
             gameSave.enableComboColors = this.enableComboColors;
             gameSave.receptorColours = this.receptorColors;
             gameSave.enableReceptorColors = this.enableReceptorColors;
