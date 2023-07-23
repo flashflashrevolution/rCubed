@@ -1,7 +1,6 @@
 package menu
 {
     import arc.ArcGlobals;
-    import arc.mp.MultiplayerSingleton;
     import assets.GameBackgroundColor;
     import assets.menu.GenreSelection;
     import assets.menu.ScrollBackground;
@@ -75,7 +74,6 @@ package menu
         private var _avars:ArcGlobals = ArcGlobals.instance;
         private var _lang:Language = Language.instance;
         private var _playlist:Playlist = Playlist.instance;
-        private var _mp:MultiplayerSingleton = MultiplayerSingleton.getInstance();
 
         private var SORT_VALUE_CACHE:Object = {};
 
@@ -1108,13 +1106,6 @@ package menu
                 pane.scrollTo(scrollVal);
                 scrollbar.scrollTo(scrollVal);
             }
-
-            // Update Multiplayer Selection
-            if (mpUpdate && options.activeSongId != -1)
-            {
-                var songInfo:SongInfo = _playlist.getSongInfo(options.activeSongId);
-                _mp.gameplayPicking(songInfo);
-            }
         }
 
         /**
@@ -1138,7 +1129,7 @@ package menu
                 {
                     if (!tarSongItem.isLocked && options.infoTab == TAB_PLAYLIST)
                     {
-                        if (_mp.gameplayHasOpponent())
+                        if (false) // TODO
                             multiplayerLoad(tarSongItem.level);
                         else
                             playSong(tarSongItem.level);
@@ -1702,7 +1693,7 @@ package menu
                 songOptionsButton.setHoverText(_lang.string("song_selection_song_panel_hover_song_options"));
 
                 buttonWidth = 164;
-                if (_mp.gameplayCanPick())
+                if (false) // TODO
                 {
                     buttonWidth = 79.5;
                     var songLoadButton:BoxButton = new BoxButton(infoBox, 89.5, 288, 79.5, 27, _lang.string("song_selection_song_panel_mp_load"), 14, songLoadClick);
@@ -1794,8 +1785,8 @@ package menu
             if (level < 0)
                 return;
 
-            _mp.gameplayPicking(_playlist.getSongInfo(level));
-            _mp.gameplayLoading();
+            //_mp.gameplayPicking(_playlist.getSongInfo(level)); // TODO
+            //_mp.gameplayLoading(); // TODO
             switchTo(MainMenu.MENU_MULTIPLAYER);
         }
 
@@ -2221,7 +2212,7 @@ package menu
                     if (randomList.length > 0)
                     {
                         var random:Object = randomList[int(Math.floor(Math.random() * randomList.length))];
-                        if (_mp.gameplayHasOpponent())
+                        if (false) // TODO
                             multiplayerLoad(random.level);
                         else
                             playSong(random.level);
@@ -2306,7 +2297,7 @@ package menu
                 case Keyboard.ENTER:
                     if (!((stage.focus is PushButton) || (stage.focus is TextField)) && options.activeSongId >= 0)
                     {
-                        if (_mp.gameplayHasOpponent())
+                        if (false) // TODO _mp.gameplayHasOpponent()
                             multiplayerLoad(options.activeSongId);
                         else
                             playSong(options.activeSongId);

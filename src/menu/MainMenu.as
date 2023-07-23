@@ -1,8 +1,6 @@
 package menu
 {
     import arc.ArcGlobals;
-    import arc.mp.MultiplayerPanel;
-    import arc.mp.MultiplayerSingleton;
     import assets.GameBackgroundColor;
     import assets.menu.Logo;
     import assets.menu.MainMenuBackground;
@@ -123,38 +121,8 @@ package menu
                 }
             }
 
-            MultiplayerSingleton.getInstance().gameplayCleanup();
-
             //- Add Main Panel to Stage
-            var targetMenu:String = "";
-            // Guests
-            if (GlobalVariables.instance.activeUser.isGuest || (_gvars.options && _gvars.options.singleplayer))
-            {
-                targetMenu = MENU_SONGSELECTION;
-            }
-            else
-            {
-                if (!Flags.VALUES[Flags.STARTUP_SCREEN])
-                {
-                    var playerStartup:int = _gvars.activeUser.startUpScreen;
-
-                    // Auto - Connect MP
-                    if (playerStartup == 0 || playerStartup == 1)
-                        var pan:MultiplayerPanel = MultiplayerSingleton.getInstance().getPanel(this);
-
-                    if (playerStartup == 0)
-                        targetMenu = MENU_MULTIPLAYER;
-                    else
-                        targetMenu = MENU_SONGSELECTION;
-
-                    Flags.VALUES[Flags.STARTUP_SCREEN] = true;
-                }
-                else
-                {
-                    targetMenu = MENU_MULTIPLAYER;
-                }
-            }
-            switchTo(targetMenu);
+            switchTo(MENU_SONGSELECTION);
             return false;
         }
 
@@ -409,15 +377,15 @@ package menu
                     options.activePanel = 0;
                     isFound = true;
                     break;
-
-                case MENU_MULTIPLAYER:
-                    if (_MenuMultiplayer == null || useNew)
-                        _MenuMultiplayer = MultiplayerSingleton.getInstance().getPanel(this); //_MenuMultiplayer = new MenuMultiplayer(this);
-                    panel = _MenuMultiplayer;
-                    options.activePanel = 1;
-                    isFound = true;
-                    break;
-
+                /*
+                   case MENU_MULTIPLAYER:
+                   if (_MenuMultiplayer == null || useNew)
+                   _MenuMultiplayer =
+                   panel = _MenuMultiplayer;
+                   options.activePanel = 1;
+                   isFound = true;
+                   break;
+                 */
                 case MENU_TOKENS:
                     if (_MenuTokens == null || useNew)
                         _MenuTokens = new MenuTokens(this);

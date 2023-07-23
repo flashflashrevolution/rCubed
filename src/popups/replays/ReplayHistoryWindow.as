@@ -300,7 +300,6 @@ package popups.replays
 
 
 import assets.menu.icons.fa.iconRight;
-import classes.Room;
 import classes.ui.SimpleBoxButton;
 import classes.ui.Text;
 import com.greensock.TweenLite;
@@ -309,8 +308,6 @@ import flash.display.Sprite;
 internal class TabButton extends Sprite
 {
     public var index:int;
-
-    public var editor:Room;
 
     private var text:Text;
     private var button:SimpleBoxButton;

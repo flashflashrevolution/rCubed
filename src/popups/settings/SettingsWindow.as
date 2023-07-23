@@ -3,7 +3,6 @@ package popups.settings
     import arc.ArcGlobals;
     import assets.GameBackgroundColor;
     import classes.Language;
-    import classes.Room;
     import classes.SongInfo;
     import classes.User;
     import classes.chart.Song;
@@ -13,7 +12,6 @@ package popups.settings
     import classes.ui.SimpleBoxButton;
     import classes.ui.Text;
     import com.bit101.components.Window;
-    import com.flashfla.net.Multiplayer;
     import com.flashfla.utils.SpriteUtil;
     import com.greensock.TweenLite;
     import flash.display.Bitmap;
@@ -171,53 +169,6 @@ package popups.settings
             btn_editor_multiplayer.addEventListener(MouseEvent.CLICK, clickHandler);
             btn_editor_spectator = new TabButton(box, -1, 430, -1, _lang.string("settings_tab_editor_spectator"));
             btn_editor_spectator.addEventListener(MouseEvent.CLICK, clickHandler);
-
-            // editor options, fake entities for filling gameplay elements
-            var fakePlayer1:User = new User();
-            fakePlayer1.id = 1;
-            fakePlayer1.playerIdx = 1;
-            fakePlayer1.isPlayer = true;
-            fakePlayer1.name = "Player 1";
-            fakePlayer1.siteId = 1830376;
-
-            var fakePlayer2:User = new User();
-            fakePlayer2.id = 2
-            fakePlayer2.playerIdx = 2;
-            fakePlayer2.isPlayer = true;
-            fakePlayer2.name = "Player 2";
-            fakePlayer2.siteId = 249481;
-
-            var fakeSpectator:User = new User();
-            fakeSpectator.id = 3;
-            fakeSpectator.playerIdx = 3;
-            fakeSpectator.isPlayer = false;
-            fakeSpectator.name = "Spectator";
-            fakeSpectator.siteId = 0;
-
-            // Editor - MP
-            var fakeMP1:Multiplayer = new Multiplayer();
-            fakeMP1.currentUser = fakePlayer1;
-
-            var mpEditorRoom:Room = new Room(0);
-            mpEditorRoom.connection = fakeMP1;
-            mpEditorRoom.addUser(fakePlayer1);
-            mpEditorRoom.addUser(fakePlayer2);
-            mpEditorRoom.addPlayer(fakePlayer1);
-            mpEditorRoom.addPlayer(fakePlayer2);
-            btn_editor_multiplayer.editor = mpEditorRoom;
-
-            // Editor - MP Spectate
-            var fakeMP2:Multiplayer = new Multiplayer();
-            fakeMP2.currentUser = fakeSpectator;
-
-            var mpSpectateEditorRoom:Room = new Room(0);
-            mpSpectateEditorRoom.connection = fakeMP2;
-            mpSpectateEditorRoom.addUser(fakePlayer1);
-            mpSpectateEditorRoom.addUser(fakePlayer2);
-            mpSpectateEditorRoom.addUser(fakeSpectator);
-            mpSpectateEditorRoom.addPlayer(fakePlayer1);
-            mpSpectateEditorRoom.addPlayer(fakePlayer2);
-            btn_editor_spectator.editor = mpSpectateEditorRoom;
         }
 
         public function changeTab(idx:int):void
@@ -269,7 +220,6 @@ package popups.settings
             {
                 _gvars.options = new GameOptions();
                 _gvars.options.isEditor = true;
-                _gvars.options.mpRoom = e.currentTarget.editor;
 
                 var tempSongInfo:SongInfo = new SongInfo();
                 tempSongInfo.level = 1337;
@@ -372,7 +322,6 @@ import assets.GameBackgroundColor;
 import assets.menu.icons.fa.iconRight;
 import classes.Alert;
 import classes.Language;
-import classes.Room;
 import classes.ui.BoxButton;
 import classes.ui.SimpleBoxButton;
 import classes.ui.Text;
@@ -392,8 +341,6 @@ import popups.settings.SettingsWindow;
 internal class TabButton extends Sprite
 {
     public var index:int;
-
-    public var editor:Room;
 
     private var text:Text;
     private var button:SimpleBoxButton;

@@ -45,12 +45,6 @@ package classes
         private var _isLoading:Boolean = false;
         private var _loadError:Boolean = false;
 
-        //- SFS vars
-        public var id:int;
-        public var variables:Array;
-        public var isSpec:Boolean;
-        public var wantsToWatch:Boolean;
-
         //- User Vars
         public var name:String;
         public var siteId:int;
@@ -165,9 +159,6 @@ package classes
         public var frameRate:int = 60;
         public var songRate:Number = 1;
 
-        public var gameplay:Gameplay;
-
-
         //- Permissions
         public var isActiveUser:Boolean;
         public var isGuest:Boolean;
@@ -194,19 +185,16 @@ package classes
          * @param	isActiveUser Sets the active user flag.
          * @tiptext
          */
-        public function User(loadData:Boolean = false, isActiveUser:Boolean = false, sfsId:int = -1):void
+        public function User(loadData:Boolean = false, isActiveUser:Boolean = false, siteId:int = -1):void
         {
-            this.id = sfsId;
-            this.variables = [];
-            this.isSpec = false;
-            this.wantsToWatch = false;
+            this.siteId = siteId;
             this.isActiveUser = isActiveUser;
 
             if (loadData)
             {
-                if (sfsId > -1)
+                if (siteId > -1)
                 {
-                    loadUser(sfsId);
+                    loadUser(siteId);
                 }
                 else
                 {
@@ -1052,29 +1040,6 @@ package classes
                     filters.push(exportFilter);
             }
             return filters;
-        }
-
-        /**
-         * Set the User Variables.
-         *
-         * @param	o:	an object containing variables' key-value pairs.
-         *
-         * @exclude
-         */
-        public function setVariables(o:Object):void
-        {
-            /*
-             * TODO: only string, number (int, uint) and boolean should be allowed
-             */
-            for (var key:String in o)
-            {
-                var v:* = o[key];
-                if (v != null)
-                    this.variables[key] = v;
-
-                else
-                    delete this.variables[key];
-            }
         }
     }
 }

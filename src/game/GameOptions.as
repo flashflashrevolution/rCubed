@@ -1,7 +1,6 @@
 package game
 {
     import arc.ArcGlobals;
-    import classes.Room;
     import classes.User;
     import classes.chart.Song;
     import classes.replay.Replay;
@@ -70,8 +69,6 @@ package game
         public var replay:Replay = null;
         public var isEditor:Boolean = false;
         public var isAutoplay:Boolean = false;
-        public var mpRoom:Room = null;
-        public var singleplayer:Boolean = false;
         public var autofail:Array = [0, 0, 0, 0, 0, 0, 0, 0];
         public var autofail_restart:Boolean = false;
         public var personalBestMode:Boolean = false;
@@ -172,7 +169,7 @@ package game
             isolationOffset = avars.configIsolationStart;
             isolationLength = avars.configIsolationLength;
 
-            var layoutKey:String = mpRoom ? (mpRoom.connection.currentUser.isPlayer ? "mp" : "mpspec") : "sp";
+            var layoutKey:String = "sp"; // TODO: mpRoom ? (mpRoom.connection.currentUser.isPlayer ? "mp" : "mpspec") : "sp";
             if (!avars.configInterface[layoutKey])
                 avars.configInterface[layoutKey] = {};
             layout = avars.configInterface[layoutKey];

@@ -1,7 +1,6 @@
 package game
 {
     import arc.ArcGlobals;
-    import arc.mp.MultiplayerSingleton;
     import assets.menu.icons.fa.iconPhoto;
     import assets.menu.icons.fa.iconRandom;
     import assets.menu.icons.fa.iconRight;
@@ -63,7 +62,6 @@ package game
 
         private var graphCache:Object = {"0": {}, "1": {}, "2": {}, "3": {}};
 
-        private var _mp:MultiplayerSingleton = MultiplayerSingleton.getInstance();
         private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _avars:ArcGlobals = ArcGlobals.instance;
         private var _lang:Language = Language.instance;
@@ -189,11 +187,9 @@ package game
             navHighscores = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_highscores"), 17, eventHandler);
             buttonMenuItems.push(navHighscores);
 
-            if (!_mp.gameplayPlayingStatus())
-            {
-                navReplay = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_replay_song"), 17, eventHandler);
-                buttonMenuItems.push(navReplay);
-            }
+            navReplay = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_replay_song"), 17, eventHandler);
+            buttonMenuItems.push(navReplay);
+
 
             if (!_gvars.flashvars.replay && !_gvars.flashvars.preview_file)
             {
@@ -261,7 +257,6 @@ package game
             // Display Game Result
             displayGameResult(songResults.length > 1 ? -1 : 0);
 
-            _mp.gameplayResults(this, songResults);
             _gvars.gameMain.displayPopupQueue();
         }
 
@@ -464,7 +459,7 @@ package game
                 navScreenShot.enabled = true;
 
             // Random Song Button
-            if (result.options.replay || result.is_preview || _mp.gameplayPlayingStatus())
+            if (result.options.replay || result.is_preview)
                 navRandomSong.enabled = false;
 
             // Skill rating
@@ -761,7 +756,7 @@ package game
                 return;
 
             // Handle Key events and click in the same function
-            if (e.type == "keyDown" && !_mp.gameplayPlayingStatusResults())
+            if (e.type == "keyDown")
             {
                 target = null;
                 var keyCode:int = e.keyCode;
