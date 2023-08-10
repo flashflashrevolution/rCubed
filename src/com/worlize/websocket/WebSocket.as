@@ -46,6 +46,7 @@ package com.worlize.websocket
         private static const MODE_BINARY:int = 0;
 
         private static const MAX_HANDSHAKE_BYTES:int = 10 * 1024; // 10KiB
+        private static const SEND_FRAME_BUFFER:ByteArray = new ByteArray();
 
         private var _bufferedAmount:int = 0;
 
@@ -404,11 +405,11 @@ package com.worlize.websocket
 
         private function sendFrame(frame:WebSocketFrame, force:Boolean = false):void
         {
+            SEND_FRAME_BUFFER.length = 0;
             frame.mask = true;
             frame.useNullMask = _useNullMask;
-            var buffer:ByteArray = new ByteArray();
-            frame.send(buffer);
-            sendData(buffer);
+            frame.send(SEND_FRAME_BUFFER);
+            sendData(SEND_FRAME_BUFFER);
         }
 
         private function sendData(data:ByteArray, fullFlush:Boolean = false):void
