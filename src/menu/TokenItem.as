@@ -2,6 +2,7 @@ package menu
 {
     import classes.Language;
     import classes.Playlist;
+    import classes.SongInfo;
     import classes.ui.Box;
     import classes.ui.Text;
     import com.greensock.TweenLite;
@@ -50,7 +51,8 @@ package menu
                     messageString += "\r\r" + _lang.string("menu_tokens_unlock_by_playing");
                     for each (var item:int in token_levels)
                     {
-                        messageString += "\r&gt; " + Playlist.instanceCanon.playList[item]['name'];
+                        var tempLevel:SongInfo = Playlist.instanceCanon.playList[item];
+                        messageString += "\r&gt; " + (tempLevel != null ? tempLevel.name : "??");
                     }
                 }
             }
