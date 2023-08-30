@@ -131,7 +131,10 @@ package classes.ui
             _pickerColorExample.graphics.clear();
             _pickerColorExample.graphics.lineStyle(0, 0, 0);
             _pickerColorExample.graphics.beginFill(_pickerColor);
-            _pickerColorExample.graphics.drawRect(0, 0, _bmp.width, 30);
+            _pickerColorExample.graphics.drawRect(0, 0, _bmp.width / 2, 30);
+            _pickerColorExample.graphics.endFill();
+            _pickerColorExample.graphics.beginFill(_color);
+            _pickerColorExample.graphics.drawRect(_bmp.width / 2, 0, _bmp.width / 2, 30);
             _pickerColorExample.graphics.endFill();
         }
 
