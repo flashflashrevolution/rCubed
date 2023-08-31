@@ -1,14 +1,13 @@
 package popups.replays
 {
-    import flash.display.Sprite;
-    import classes.ui.ScrollPane;
-    import flash.display.GradientType;
-    import flash.geom.Matrix;
-    import classes.ui.Text;
-    import classes.ui.SimpleBoxButton;
     import assets.menu.icons.fa.iconCopy;
-    import classes.replay.Replay;
     import classes.SongInfo;
+    import classes.replay.Replay;
+    import classes.ui.SimpleBoxButton;
+    import classes.ui.Text;
+    import flash.display.GradientType;
+    import flash.display.Sprite;
+    import flash.geom.Matrix;
 
     public class ReplayHistoryEntry extends Sprite
     {

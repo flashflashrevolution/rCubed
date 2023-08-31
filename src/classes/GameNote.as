@@ -1,6 +1,5 @@
 package classes
 {
-    import flash.display.MovieClip;
     import flash.display.Sprite;
 
     public class GameNote extends Sprite

@@ -1,6 +1,6 @@
 package com.flashfla.utils
 {
-    import flash.utils.Dictionary
+    import flash.utils.Dictionary;
 
     public class ExtraMath
     {

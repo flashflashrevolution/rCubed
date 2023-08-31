@@ -3,13 +3,13 @@ package game.controls
     import classes.GameNote;
     import classes.GameReceptor;
     import classes.Noteskins;
-    import classes.chart.Song;
     import classes.chart.Note;
+    import classes.chart.Song;
+    import com.flashfla.utils.GameNotePool;
+    import flash.display.MovieClip;
+    import flash.display.Sprite;
     import flash.utils.getTimer;
     import game.GameOptions;
-    import flash.display.Sprite;
-    import flash.display.MovieClip;
-    import com.flashfla.utils.GameNotePool;
 
     public class NoteBox extends Sprite
     {

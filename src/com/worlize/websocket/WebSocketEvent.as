@@ -17,7 +17,6 @@
 package com.worlize.websocket
 {
     import flash.events.Event;
-    import flash.utils.ByteArray;
 
     public class WebSocketEvent extends Event
     {

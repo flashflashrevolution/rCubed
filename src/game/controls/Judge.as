@@ -3,13 +3,13 @@ package game.controls
     import com.greensock.TweenLite;
     import flash.display.Sprite;
     import flash.events.Event;
+    import flash.geom.Matrix;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
     import flash.text.TextFieldAutoSize;
     import flash.text.TextFormat;
-    import game.GameOptions;
-    import flash.geom.Matrix;
     import flash.utils.getTimer;
+    import game.GameOptions;
     import AachenLight;
 
     public class Judge extends Sprite

@@ -4,13 +4,13 @@
 
 package com.flashfla.utils
 {
+    import by.blooddy.crypto.image.PNGEncoder;
+    import classes.Alert;
     import classes.Language;
     import flash.desktop.Clipboard;
     import flash.desktop.ClipboardFormats;
     import flash.display.BitmapData;
     import flash.net.FileReference;
-    import by.blooddy.crypto.image.PNGEncoder;
-    import classes.Alert;
     import Main;
 
     public class Screenshots

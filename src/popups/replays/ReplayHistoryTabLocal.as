@@ -1,21 +1,20 @@
 package popups.replays
 {
-
+    import arc.ArcGlobals;
+    import classes.Language;
+    import classes.SongInfo;
+    import classes.replay.Replay;
     import classes.ui.BoxButton;
     import classes.ui.ProgressBar;
     import classes.ui.Text;
-    import flash.display.Sprite;
-    import flash.events.MouseEvent;
-    import classes.replay.Replay;
-    import flash.utils.Timer;
-    import flash.events.TimerEvent;
-    import flash.utils.getTimer;
-    import flash.filesystem.File;
-    import classes.SongInfo;
-    import arc.ArcGlobals;
     import com.flashfla.utils.SpriteUtil;
     import flash.display.Bitmap;
-    import classes.Language;
+    import flash.display.Sprite;
+    import flash.events.MouseEvent;
+    import flash.events.TimerEvent;
+    import flash.filesystem.File;
+    import flash.utils.Timer;
+    import flash.utils.getTimer;
 
     public class ReplayHistoryTabLocal extends ReplayHistoryTabBase
     {

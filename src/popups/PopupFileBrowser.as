@@ -3,12 +3,7 @@ package popups
     import assets.menu.icons.fa.iconClose;
     import assets.menu.icons.fa.iconFolder;
     import assets.menu.icons.fa.iconUpLevel;
-    import by.blooddy.crypto.MD5;
     import classes.Language;
-    import classes.SongInfo;
-    import classes.chart.Note;
-    import classes.chart.NoteChart;
-    import classes.chart.Song;
     import classes.chart.parse.ExternalChartBase;
     import classes.ui.Box;
     import classes.ui.BoxButton;
@@ -33,7 +28,7 @@ package popups
     import flash.text.TextFormat;
     import flash.utils.Timer;
     import flash.utils.getTimer;
-    import game.GameOptions;
+    import menu.FileLoader;
     import menu.MenuPanel;
     import popups.filebrowser.FileBrowserDifficultyItem;
     import popups.filebrowser.FileBrowserFilter;
@@ -41,7 +36,6 @@ package popups
     import popups.filebrowser.FileBrowserList;
     import popups.filebrowser.FileFolder;
     import popups.filebrowser.FileFolderItem;
-    import menu.FileLoader;
 
     public class PopupFileBrowser extends MenuPanel
     {

@@ -1,9 +1,9 @@
 package game.controls
 {
-    import flash.display.Sprite;
-    import flash.display.Shape;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
+    import flash.display.Shape;
+    import flash.display.Sprite;
     import flash.geom.ColorTransform;
     import flash.geom.Rectangle;
     import game.GameOptions;

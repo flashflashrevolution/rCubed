@@ -1,11 +1,11 @@
 package popups.replays
 {
-    import classes.replay.Replay;
     import classes.Alert;
     import classes.Language;
+    import classes.replay.Replay;
     import classes.ui.BoxButton;
-    import flash.events.Event;
     import classes.ui.Prompt;
+    import flash.events.Event;
 
     public class ReplayHistoryTabSession extends ReplayHistoryTabBase
     {

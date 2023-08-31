@@ -1,12 +1,12 @@
 package popups.replays
 {
+    import classes.Language;
+    import classes.replay.Replay;
+    import classes.ui.IScrollPane;
+    import classes.ui.Text;
+    import flash.display.DisplayObject;
     import flash.display.Sprite;
     import flash.geom.Rectangle;
-    import classes.replay.Replay;
-    import flash.display.DisplayObject;
-    import classes.Language;
-    import classes.ui.Text;
-    import classes.ui.IScrollPane;
 
     public class ReplayHistoryScrollpane extends Sprite implements IScrollPane
     {

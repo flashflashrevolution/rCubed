@@ -1,7 +1,6 @@
 package com.flashfla.media
 {
     import flash.utils.ByteArray;
-    import flash.utils.Endian;
 
     public class MP3Extraction
     {

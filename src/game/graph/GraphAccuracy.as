@@ -2,8 +2,9 @@ package game.graph
 {
     import assets.menu.icons.fa.iconSmallF;
     import classes.Language;
-    import classes.ui.BoxIcon;
+    import classes.replay.ReplayBinFrame;
     import classes.ui.BoxButton;
+    import classes.ui.BoxIcon;
     import classes.ui.Text;
     import com.flashfla.utils.sprintf;
     import flash.display.DisplayObjectContainer;
@@ -11,7 +12,6 @@ package game.graph
     import flash.events.MouseEvent;
     import flash.geom.Rectangle;
     import game.GameScoreResult;
-    import classes.replay.ReplayBinFrame;
 
     public class GraphAccuracy extends GraphBase
     {

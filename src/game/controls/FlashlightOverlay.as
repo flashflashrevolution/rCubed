@@ -1,8 +1,8 @@
 package game.controls
 {
+    import flash.display.GradientType;
     import flash.display.Sprite;
     import flash.geom.Matrix;
-    import flash.display.GradientType;
 
     public class FlashlightOverlay extends Sprite
     {

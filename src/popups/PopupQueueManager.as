@@ -3,6 +3,7 @@ package popups
     import assets.GameBackgroundColor;
     import classes.Language;
     import classes.Playlist;
+    import classes.SongInfo;
     import classes.SongQueueItem;
     import classes.ui.Box;
     import classes.ui.BoxButton;
@@ -17,7 +18,6 @@ package popups
     import flash.filters.BlurFilter;
     import flash.geom.Point;
     import menu.MenuPanel;
-    import classes.SongInfo;
 
     public class PopupQueueManager extends MenuPanel
     {
@@ -257,6 +257,7 @@ package popups
 import classes.Alert;
 import classes.Language;
 import classes.Playlist;
+import classes.SongInfo;
 import classes.SongQueueItem;
 import classes.ui.Box;
 import classes.ui.BoxButton;
@@ -269,7 +270,6 @@ import flash.events.MouseEvent;
 import menu.MainMenu;
 import menu.MenuSongSelection;
 import popups.PopupQueueManager;
-import classes.SongInfo;
 
 internal class QueueBox extends Sprite
 {

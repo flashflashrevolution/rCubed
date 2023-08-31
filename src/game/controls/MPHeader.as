@@ -1,16 +1,15 @@
 package game.controls
 {
     import classes.User;
-    import flash.events.Event;
     import flash.display.Loader;
+    import flash.display.Sprite;
+    import flash.events.Event;
     import flash.net.URLRequest;
     import flash.net.URLVariables;
-    import flash.display.Sprite;
-    import flash.text.TextField;
-    import flash.text.TextFormat;
-    import flash.text.TextFieldAutoSize;
     import flash.text.AntiAliasType;
-    import classes.Language;
+    import flash.text.TextField;
+    import flash.text.TextFieldAutoSize;
+    import flash.text.TextFormat;
 
     public class MPHeader extends Sprite
     {

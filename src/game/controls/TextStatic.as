@@ -1,11 +1,10 @@
 package game.controls
 {
     import flash.display.Sprite;
-    import flash.text.TextField;
-    import flash.text.TextFormat;
-    import flash.text.TextFieldAutoSize;
     import flash.text.AntiAliasType;
-    import classes.Language;
+    import flash.text.TextField;
+    import flash.text.TextFieldAutoSize;
+    import flash.text.TextFormat;
 
     public class TextStatic extends Sprite
     {

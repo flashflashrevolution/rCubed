@@ -1,7 +1,7 @@
 package classes.ui
 {
-    import flash.display.Sprite;
     import assets.menu.icons.fa.*;
+    import flash.display.Sprite;
 
     public class IconUtil
     {

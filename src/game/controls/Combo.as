@@ -2,12 +2,11 @@ package game.controls
 {
     import com.flashfla.utils.ColorUtil;
     import flash.display.Sprite;
-    import flash.text.TextField;
-    import flash.text.TextFormat;
-    import flash.text.TextFieldAutoSize;
     import flash.text.AntiAliasType;
+    import flash.text.TextField;
+    import flash.text.TextFieldAutoSize;
+    import flash.text.TextFormat;
     import game.GameOptions;
-    import classes.Language;
 
     public class Combo extends Sprite
     {

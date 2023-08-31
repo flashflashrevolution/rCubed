@@ -1,8 +1,8 @@
 package game
 {
-    import com.flashfla.utils.TimeUtil;
     import classes.Language;
     import classes.Playlist;
+    import com.flashfla.utils.TimeUtil;
     import flash.text.TextFormat;
     import menu.MenuPanel;
 

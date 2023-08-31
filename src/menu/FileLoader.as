@@ -1,13 +1,13 @@
 package menu
 {
-    import classes.chart.parse.ExternalChartBase;
-    import flash.filesystem.File;
     import by.blooddy.crypto.MD5;
     import classes.SongInfo;
+    import classes.chart.Note;
     import classes.chart.NoteChart;
     import classes.chart.Song;
+    import classes.chart.parse.ExternalChartBase;
+    import flash.filesystem.File;
     import game.GameOptions;
-    import classes.chart.Note;
 
     public class FileLoader
     {

@@ -1,12 +1,12 @@
 package game
 {
-    import classes.User;
     import classes.SongInfo;
+    import classes.User;
     import classes.chart.Song;
     import classes.replay.Base64Encoder;
+    import classes.replay.ReplayBinFrame;
     import classes.replay.ReplayPack;
     import flash.utils.ByteArray;
-    import classes.replay.ReplayBinFrame;
 
     public class GameScoreResult
     {

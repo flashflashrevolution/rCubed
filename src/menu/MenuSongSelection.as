@@ -46,11 +46,11 @@ package menu
     import flash.ui.ContextMenuItem;
     import flash.ui.Keyboard;
     import game.GameOptions;
+    import game.SkillRating;
     import menu.MenuSongSelectionOptions;
     import popups.PopupHighscores;
     import popups.PopupQueueManager;
     import popups.PopupSongNotes;
-    import game.SkillRating;
 
     public class MenuSongSelection extends MenuPanel
     {
@@ -2523,9 +2523,7 @@ package menu
 
 
 import assets.GameBackgroundColor;
-
 import classes.ui.Text;
-
 import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.events.Event;
