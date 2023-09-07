@@ -11,7 +11,6 @@ package popups.settings
     import classes.ui.ScrollPane;
     import classes.ui.SimpleBoxButton;
     import classes.ui.Text;
-    import com.bit101.components.Window;
     import com.flashfla.utils.SpriteUtil;
     import com.greensock.TweenLite;
     import flash.display.Bitmap;
@@ -60,6 +59,7 @@ package popups.settings
         private var game_options_test:GameOptions = new GameOptions();
 
         private var win_manage:ManageWindow;
+        private var win_reset:ConfirmResetWindow;
 
         public function SettingsWindow(myParent:MenuPanel)
         {
@@ -116,8 +116,7 @@ package popups.settings
             this.addChild(box);
 
             // scroll pane
-            pane = new ScrollPane(this, 175, 61, 589, Main.GAME_HEIGHT - 61);
-            pane.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelMoved, false, 0, false);
+            pane = new ScrollPane(this, 175, 61, 589, Main.GAME_HEIGHT - 61, mouseWheelMoved);
             scrollbar = new ScrollBar(this, Main.GAME_WIDTH - 16, 61, 16, Main.GAME_HEIGHT - 61, null, new Sprite());
             scrollbar.addEventListener(Event.CHANGE, scrollBarMoved, false, 0, false);
 
@@ -171,9 +170,9 @@ package popups.settings
             btn_editor_spectator.addEventListener(MouseEvent.CLICK, clickHandler);
         }
 
-        public function changeTab(idx:int):void
+        public function changeTab(idx:int, force:Boolean = false):void
         {
-            if (CURRENT_INDEX == idx)
+            if (CURRENT_INDEX == idx && !force)
                 return;
 
             if (CURRENT_TAB != null)
@@ -201,6 +200,11 @@ package popups.settings
                 tabButton.setActive(tabButton.index == idx);
 
             checkValidMods();
+        }
+
+        public function refreshTab():void
+        {
+            changeTab(CURRENT_INDEX, true);
         }
 
         private function tabHandler(e:MouseEvent):void
@@ -240,36 +244,8 @@ package popups.settings
 
             else if (e.target == btn_reset)
             {
-                var confirmP:Window = new Window(this, 0, 0, "Confirm Settings Reset");
-                confirmP.hasMinimizeButton = false;
-                confirmP.hasCloseButton = false;
-                confirmP.setSize(110, 105);
-                confirmP.x = (Main.GAME_WIDTH / 2 - confirmP.width / 2);
-                confirmP.y = (Main.GAME_HEIGHT / 2 - confirmP.height / 2);
-
-                function doReset(e:Event):void
-                {
-                    confirmP.parent.removeChild(confirmP);
-                    if (_gvars.activeUser == _gvars.playerUser)
-                    {
-                        _gvars.activeUser.settings = new User().settings;
-                        _avars.resetSettings();
-                    }
-                    changeTab(CURRENT_INDEX);
-                }
-
-                function closeReset(e:Event):void
-                {
-                    confirmP.parent.removeChild(confirmP);
-                }
-
-                var resB:BoxButton = new BoxButton(confirmP, 5, 5, 100, 35, _lang.string("menu_reset"), 12, doReset);
-                resB.color = 0x330000;
-                resB.textColor = "#990000";
-
-                var conB:BoxButton = new BoxButton(confirmP, 5, 45, 100, 35, _lang.string("menu_close"), 12, closeReset);
-                conB.color = 0;
-                conB.textColor = "#000000";
+                win_reset = new ConfirmResetWindow(this);
+                addChild(win_reset);
             }
 
             else if (e.target == btn_close)
@@ -318,10 +294,12 @@ package popups.settings
     }
 }
 
+import arc.ArcGlobals;
 import assets.GameBackgroundColor;
 import assets.menu.icons.fa.iconRight;
 import classes.Alert;
 import classes.Language;
+import classes.User;
 import classes.ui.BoxButton;
 import classes.ui.SimpleBoxButton;
 import classes.ui.Text;
@@ -435,12 +413,12 @@ internal class ManageWindow extends Sprite
         this.addChild(bmp);
 
         box = new Sprite();
-        box.graphics.beginFill(0, 0.25);
+        box.graphics.beginFill(0x000000, 0.25);
         box.graphics.drawRect(0, 0, Main.GAME_WIDTH, Main.GAME_HEIGHT);
         box.graphics.endFill();
 
         box.graphics.lineStyle(1, 0xffffff, 0.35);
-        box.graphics.beginFill(GameBackgroundColor.BG_POPUP, 0.7);
+        box.graphics.beginFill(GameBackgroundColor.BG_POPUP, 0.6);
         box.graphics.drawRect(100, 100, Main.GAME_WIDTH - 200, Main.GAME_HEIGHT - 200);
         box.graphics.endFill();
 
@@ -531,6 +509,67 @@ internal class ManageWindow extends Sprite
             }
         }
 
+        else if (e.target == btn_close)
+        {
+            win.removeChild(this);
+        }
+    }
+}
+
+internal class ConfirmResetWindow extends Sprite
+{
+    private var _gvars:GlobalVariables = GlobalVariables.instance;
+    private var _lang:Language = Language.instance;
+    private var _avars:ArcGlobals = ArcGlobals.instance;
+    private var bmp:Bitmap;
+    private var box:Sprite;
+    private var win:SettingsWindow;
+
+    private var boxMid:Number = Main.GAME_WIDTH / 2;
+
+    private var btn_close:BoxButton;
+    private var btn_confirm:BoxButton;
+
+    public function ConfirmResetWindow(win:SettingsWindow):void
+    {
+        this.win = win;
+
+        bmp = SpriteUtil.getBitmapSprite(win.stage);
+        this.addChild(bmp);
+
+        box = new Sprite();
+        box.graphics.beginFill(0x000000, 0.25);
+        box.graphics.drawRect(0, 0, Main.GAME_WIDTH, Main.GAME_HEIGHT);
+        box.graphics.endFill();
+
+        box.graphics.lineStyle(1, 0xffffff, 0.35);
+        box.graphics.beginFill(GameBackgroundColor.BG_POPUP, 0.6);
+        box.graphics.drawRect(150, 150, Main.GAME_WIDTH - 300, Main.GAME_HEIGHT - 300);
+        box.graphics.endFill();
+
+        this.addChild(box);
+
+        new Text(box, 150, Main.GAME_HEIGHT / 2 - 55, _lang.string("option_reset_settings_confirm_text"), 26).setAreaParams(Main.GAME_WIDTH - 300, 35, "center");
+
+        btn_confirm = new BoxButton(box, boxMid - 140, Main.GAME_HEIGHT / 2 + 35, 120, 35, _lang.string("menu_reset"), 12, clickHandler);
+        btn_confirm.color = 0xAA0000;
+        btn_confirm.textColor = "#AA0000";
+
+        btn_close = new BoxButton(box, boxMid + 40, Main.GAME_HEIGHT / 2 + 35, 120, 35, _lang.string("menu_close"), 12, clickHandler);
+    }
+
+    private function clickHandler(e:Event):void
+    {
+        if (e.target == btn_confirm)
+        {
+            win.removeChild(this);
+            if (_gvars.activeUser == _gvars.playerUser)
+            {
+                _gvars.activeUser.settings = new User().settings;
+                _avars.resetSettings();
+            }
+            win.refreshTab();
+        }
         else if (e.target == btn_close)
         {
             win.removeChild(this);
