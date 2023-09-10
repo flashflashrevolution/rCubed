@@ -52,7 +52,7 @@ jobs:
           key: ${{ runner.os }}-cache-choco
 
       - name: Choco Install xmlstarlet
-        uses: crazy-max/ghaction-chocolatey@v2
+        uses: crazy-max/ghaction-chocolatey@v3
         if: steps.cache-choco.outputs.cache-hit != 'true'
         with:
           args: install xmlstarlet -y
