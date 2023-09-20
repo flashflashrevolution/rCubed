@@ -496,7 +496,7 @@ package popups.settings
             // Add Engine
             if (data == this)
             {
-                new Prompt(parent, 320, "Engine URL", 120, "Add Engine", e_addEngine);
+                new Prompt(parent, 320, _lang.string("custom_engine_url"), 120, _lang.string("custom_engine_add_engine"), e_addEngine);
             }
             // Clears Engines
             else if (data == engineCombo)
@@ -517,7 +517,7 @@ package popups.settings
 
         private function engineAdd(engine:Object):void
         {
-            Alert.add("Engine Loaded: " + engine.name, 80);
+            Alert.add(sprintf(_lang.string("custom_engine_loaded"), {"name": engine.name}), 80);
             for (var i:int = 0; i < _avars.legacyEngines.length; i++)
             {
                 if (_avars.legacyEngines[i].id == engine.id)
@@ -561,9 +561,9 @@ package popups.settings
                 if (engine == _avars.legacyDefaultEngine || (_avars.legacyDefaultEngine && engine["id"] == _avars.legacyDefaultEngine["id"]))
                     engineDefaultCombo.selectedItem = item;
             }
-            engineCombo.addItem({label: "Add Engine...", data: this});
+            engineCombo.addItem({label: _lang.stringSimple("custom_engine_add_engine"), data: this});
             if (_avars.legacyEngines.length > 0 && engineCombo.items.length > 2)
-                engineCombo.addItem({label: "Clear Engines", data: engineCombo});
+                engineCombo.addItem({label: _lang.stringSimple("custom_engine_clear_engines"), data: engineCombo});
             engineComboIgnore = false;
         }
     }

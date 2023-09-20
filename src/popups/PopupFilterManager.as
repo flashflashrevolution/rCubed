@@ -327,7 +327,7 @@ package popups
 
         private function e_importFilterButton(e:Event):void
         {
-            new Prompt(box.parent, 320, _lang.string("popup_filter_filter_single_import"), 100, "IMPORT", e_importFilter);
+            new Prompt(box.parent, 320, _lang.string("popup_filter_filter_single_import"), 100, _lang.string("popup_filter_import"), e_importFilter);
         }
 
         private function e_importFilter(filterJSON:String):void

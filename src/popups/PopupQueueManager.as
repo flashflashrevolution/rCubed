@@ -202,7 +202,7 @@ package popups
         {
             if (e.target == importBtn)
             {
-                new Prompt(box.parent, 320, _lang.string("popup_queue_import_song_queue"), 100, "SUBMIT", e_importSongQueue);
+                new Prompt(box.parent, 320, _lang.string("popup_queue_import_song_queue"), 100, _lang.string("popup_queue_submit"), e_importSongQueue);
             }
             else if (e.target == menuPregen)
             {

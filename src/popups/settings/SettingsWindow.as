@@ -496,16 +496,16 @@ internal class ManageWindow extends Sprite
                 {
                     var item:Object = JSON.parse(optionsJSON);
                     _gvars.activeUser.settings = item;
-                    Alert.add("Settings Imported!", 120, Alert.GREEN);
+                    Alert.add(_lang.string("settings_manage_import_success"), 120, Alert.GREEN);
                 }
                 else
                 {
-                    Alert.add("Nothing to Import", 120, Alert.RED);
+                    Alert.add(_lang.string("settings_manage_import_blank"), 120, Alert.RED);
                 }
             }
             catch (e:Error)
             {
-                Alert.add("Import Fail...", 120, Alert.RED);
+                Alert.add(_lang.string("settings_manage_import_fail"), 120, Alert.RED);
             }
         }
 

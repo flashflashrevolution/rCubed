@@ -2197,7 +2197,7 @@ package menu
                 }
                 else if (clickAction == "queueSave")
                 {
-                    new Prompt(this, 320, _lang.string("song_selection_song_queue_name_prompt"), 100, "SUBMIT", e_saveSongQueue);
+                    new Prompt(this, 320, _lang.string("song_selection_song_queue_name_prompt"), 100, _lang.string("song_selection_song_queue_name_submit"), e_saveSongQueue);
                 }
                 else if (clickAction == "queueManager")
                 {
