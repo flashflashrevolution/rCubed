@@ -8,7 +8,7 @@ package popups.settings
     import classes.ui.BoxButton;
     import classes.ui.BoxCheck;
     import classes.ui.BoxIcon;
-    import classes.ui.Prompt;
+    import classes.ui.PromptInput;
     import classes.ui.Text;
     import com.bit101.components.ComboBox;
     import com.flashfla.utils.SystemUtil;
@@ -286,7 +286,7 @@ package popups.settings
             //- Import Custom Noteskin
             else if (e.target == optionImportCustomNoteskin)
             {
-                new Prompt(parent, 320, _lang.string("popup_noteskin_import_json"), 100, _lang.string("popup_noteskin_import"), e_importNoteskin);
+                new PromptInput(parent, _lang.string("popup_noteskin_import_json"), _lang.string("popup_noteskin_import"), e_importNoteskin);
                 return;
             }
 

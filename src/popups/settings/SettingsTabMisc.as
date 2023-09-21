@@ -7,7 +7,7 @@ package popups.settings
     import classes.chart.parse.ChartFFRLegacy;
     import classes.ui.BoxButton;
     import classes.ui.BoxCheck;
-    import classes.ui.Prompt;
+    import classes.ui.PromptInput;
     import classes.ui.Text;
     import classes.ui.ValidatedText;
     import com.bit101.components.ComboBox;
@@ -496,7 +496,7 @@ package popups.settings
             // Add Engine
             if (data == this)
             {
-                new Prompt(parent, 320, _lang.string("custom_engine_url"), 120, _lang.string("custom_engine_add_engine"), e_addEngine);
+                new PromptInput(parent, _lang.string("custom_engine_url"), _lang.string("custom_engine_add_engine"), e_addEngine);
             }
             // Clears Engines
             else if (data == engineCombo)

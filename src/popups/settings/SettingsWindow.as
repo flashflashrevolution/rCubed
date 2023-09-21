@@ -239,13 +239,11 @@ package popups.settings
             else if (e.target == btn_manage)
             {
                 win_manage = new ManageWindow(this);
-                addChild(win_manage);
             }
 
             else if (e.target == btn_reset)
             {
                 win_reset = new ConfirmResetWindow(this);
-                addChild(win_reset);
             }
 
             else if (e.target == btn_close)
@@ -315,6 +313,7 @@ import flash.text.TextField;
 import flash.text.TextFieldType;
 import flash.text.TextFormat;
 import popups.settings.SettingsWindow;
+import classes.ui.Prompt;
 
 internal class TabButton extends Sprite
 {
@@ -385,15 +384,13 @@ internal class TabButton extends Sprite
     }
 }
 
-internal class ManageWindow extends Sprite
+internal class ManageWindow extends Prompt
 {
     private var _gvars:GlobalVariables = GlobalVariables.instance;
     private var _lang:Language = Language.instance;
-    private var bmp:Bitmap;
-    private var box:Sprite;
     private var win:SettingsWindow;
 
-    private var boxMid:Number = (Main.GAME_WIDTH - 200) / 2;
+    private var boxMid:Number = 290;
 
     private var saveJSON:String;
 
@@ -406,33 +403,19 @@ internal class ManageWindow extends Sprite
     public function ManageWindow(win:SettingsWindow):void
     {
         this.win = win;
+        super(win, 580, 280);
 
         saveJSON = JSON.stringify(_gvars.activeUser.save(true));
 
-        bmp = SpriteUtil.getBitmapSprite(win.stage);
-        this.addChild(bmp);
+        var xOff:Number = 0;
+        var yOff:Number = 0;
 
-        box = new Sprite();
-        box.graphics.beginFill(0x000000, 0.25);
-        box.graphics.drawRect(0, 0, Main.GAME_WIDTH, Main.GAME_HEIGHT);
-        box.graphics.endFill();
+        // Close
+        btn_close = new BoxButton(this, xOff + Main.GAME_WIDTH - 300, yOff + Main.GAME_HEIGHT - 190, 100, 29, _lang.string("menu_close"), 12, clickHandler);
 
-        box.graphics.lineStyle(1, 0xffffff, 0.35);
-        box.graphics.beginFill(GameBackgroundColor.BG_POPUP, 0.6);
-        box.graphics.drawRect(100, 100, Main.GAME_WIDTH - 200, Main.GAME_HEIGHT - 200);
-        box.graphics.endFill();
-
-        box.graphics.moveTo(100 + boxMid, 110);
-        box.graphics.lineTo(100 + boxMid, 100 + Main.GAME_HEIGHT - 210);
-        this.addChild(box);
-
-        var xOff:Number = 100;
-        var yOff:Number = 100;
-
-        btn_close = new BoxButton(box, xOff + Main.GAME_WIDTH - 300, yOff + Main.GAME_HEIGHT - 190, 100, 29, _lang.string("menu_close"), 12, clickHandler);
-
-        new Text(box, xOff + 10, yOff + 12, "Export", 16).setAreaParams(160, 30);
-        btn_export = new BoxButton(box, xOff + 179, yOff + 10, 100, 26, "Copy", 12, clickHandler);
+        // Export
+        new Text(this, xOff + 10, yOff + 12, _lang.string("settings_manage_export"), 16).setAreaParams(160, 30);
+        btn_export = new BoxButton(this, xOff + 179, yOff + 10, 100, 26, _lang.string("menu_copy"), 12, clickHandler);
 
         txt_export = makeTextfield();
         txt_export.x = xOff + 15;
@@ -440,23 +423,24 @@ internal class ManageWindow extends Sprite
         txt_export.type = TextFieldType.DYNAMIC;
         txt_export.text = saveJSON;
 
-        box.graphics.beginFill(0, 0.4);
-        box.graphics.drawRect(txt_export.x - 4, txt_export.y - 4, txt_export.width + 8, txt_export.height + 8);
-        box.graphics.endFill();
+        _content.graphics.beginFill(0, 0.4);
+        _content.graphics.drawRect(txt_export.x - 4, txt_export.y - 4, txt_export.width + 8, txt_export.height + 8);
+        _content.graphics.endFill();
 
         xOff += boxMid;
 
-        new Text(box, xOff + 10, yOff + 12, "Import", 16).setAreaParams(160, 30);
-        btn_import = new BoxButton(box, xOff + 179, yOff + 10, 100, 26, "Save", 12, clickHandler);
+        // Import
+        new Text(this, xOff + 10, yOff + 12, _lang.string("settings_manage_import"), 16).setAreaParams(160, 30);
+        btn_import = new BoxButton(this, xOff + 179, yOff + 10, 100, 26, _lang.string("menu_save"), 12, clickHandler);
 
         txt_import = makeTextfield();
         txt_import.x = xOff + 15;
         txt_import.y = yOff + 50;
         txt_import.type = TextFieldType.INPUT;
 
-        box.graphics.beginFill(0, 0.4);
-        box.graphics.drawRect(txt_import.x - 4, txt_import.y - 4, txt_import.width + 8, txt_import.height + 8);
-        box.graphics.endFill();
+        _content.graphics.beginFill(0, 0.4);
+        _content.graphics.drawRect(txt_import.x - 4, txt_import.y - 4, txt_import.width + 8, txt_import.height + 8);
+        _content.graphics.endFill();
     }
 
     private function makeTextfield():TextField
@@ -471,7 +455,7 @@ internal class ManageWindow extends Sprite
         _tf.antiAliasType = AntiAliasType.ADVANCED;
         _tf.gridFitType = GridFitType.SUBPIXEL;
         _tf.wordWrap = true;
-        box.addChild(_tf);
+        addChild(_tf);
         return _tf;
     }
 
@@ -516,13 +500,11 @@ internal class ManageWindow extends Sprite
     }
 }
 
-internal class ConfirmResetWindow extends Sprite
+internal class ConfirmResetWindow extends Prompt
 {
     private var _gvars:GlobalVariables = GlobalVariables.instance;
     private var _lang:Language = Language.instance;
     private var _avars:ArcGlobals = ArcGlobals.instance;
-    private var bmp:Bitmap;
-    private var box:Sprite;
     private var win:SettingsWindow;
 
     private var boxMid:Number = Main.GAME_WIDTH / 2;
@@ -533,29 +515,18 @@ internal class ConfirmResetWindow extends Sprite
     public function ConfirmResetWindow(win:SettingsWindow):void
     {
         this.win = win;
+        super(win, 450, 200)
 
-        bmp = SpriteUtil.getBitmapSprite(win.stage);
-        this.addChild(bmp);
+        // Title
+        new Text(this, 0, 22, _lang.string("option_reset_settings_confirm_text"), 26).setAreaParams(width, 35, "center");
 
-        box = new Sprite();
-        box.graphics.beginFill(0x000000, 0.25);
-        box.graphics.drawRect(0, 0, Main.GAME_WIDTH, Main.GAME_HEIGHT);
-        box.graphics.endFill();
-
-        box.graphics.lineStyle(1, 0xffffff, 0.35);
-        box.graphics.beginFill(GameBackgroundColor.BG_POPUP, 0.6);
-        box.graphics.drawRect(150, 150, Main.GAME_WIDTH - 300, Main.GAME_HEIGHT - 300);
-        box.graphics.endFill();
-
-        this.addChild(box);
-
-        new Text(box, 150, Main.GAME_HEIGHT / 2 - 55, _lang.string("option_reset_settings_confirm_text"), 26).setAreaParams(Main.GAME_WIDTH - 300, 35, "center");
-
-        btn_confirm = new BoxButton(box, boxMid - 140, Main.GAME_HEIGHT / 2 + 35, 120, 35, _lang.string("menu_reset"), 12, clickHandler);
+        // Confirm
+        btn_confirm = new BoxButton(this, 15, height - 50, 120, 35, _lang.string("menu_reset"), 12, clickHandler);
         btn_confirm.color = 0xAA0000;
         btn_confirm.textColor = "#AA0000";
 
-        btn_close = new BoxButton(box, boxMid + 40, Main.GAME_HEIGHT / 2 + 35, 120, 35, _lang.string("menu_close"), 12, clickHandler);
+        // Close
+        btn_close = new BoxButton(this, width - 135, height - 50, 120, 35, _lang.string("menu_close"), 12, clickHandler);
     }
 
     private function clickHandler(e:Event):void

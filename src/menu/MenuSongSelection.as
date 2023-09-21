@@ -23,7 +23,7 @@ package menu
     import classes.ui.BoxButton;
     import classes.ui.BoxIcon;
     import classes.ui.BoxText;
-    import classes.ui.Prompt;
+    import classes.ui.PromptInput;
     import classes.ui.ScrollBar;
     import classes.ui.ScrollPane;
     import classes.ui.StarSelector;
@@ -2197,7 +2197,7 @@ package menu
                 }
                 else if (clickAction == "queueSave")
                 {
-                    new Prompt(this, 320, _lang.string("song_selection_song_queue_name_prompt"), 100, _lang.string("song_selection_song_queue_name_submit"), e_saveSongQueue);
+                    new PromptInput(this, _lang.string("song_selection_song_queue_name_prompt"), _lang.string("song_selection_queue_panel_save"), e_saveSongQueue);
                 }
                 else if (clickAction == "queueManager")
                 {

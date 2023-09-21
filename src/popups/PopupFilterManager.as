@@ -7,7 +7,7 @@ package popups
     import classes.ui.Box;
     import classes.ui.BoxButton;
     import classes.ui.BoxText;
-    import classes.ui.Prompt;
+    import classes.ui.PromptInput;
     import classes.ui.ScrollBar;
     import classes.ui.ScrollPane;
     import classes.ui.Text;
@@ -327,7 +327,7 @@ package popups
 
         private function e_importFilterButton(e:Event):void
         {
-            new Prompt(box.parent, 320, _lang.string("popup_filter_filter_single_import"), 100, _lang.string("popup_filter_import"), e_importFilter);
+            new PromptInput(box.parent, _lang.string("popup_filter_filter_single_import"), _lang.string("popup_filter_import"), e_importFilter);
         }
 
         private function e_importFilter(filterJSON:String):void

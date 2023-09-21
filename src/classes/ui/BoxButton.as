@@ -27,9 +27,7 @@ package classes.ui
 
             //- Add Text
             _text = new Text(this, 0, 0, text, size, "#FFFFFF");
-            _text.height = height + 1;
-            _text.width = width;
-            _text.align = Text.CENTER;
+            _text.setAreaParams(width, height + 1, Text.CENTER);
 
             //- Set Defaults
             this.mouseEnabled = true;

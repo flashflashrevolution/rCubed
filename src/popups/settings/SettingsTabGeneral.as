@@ -5,7 +5,7 @@ package popups.settings
     import classes.Language;
     import classes.ui.BoxCheck;
     import classes.ui.BoxSlider;
-    import classes.ui.Prompt;
+    import classes.ui.PromptInput;
     import classes.ui.Text;
     import classes.ui.ValidatedText;
     import com.flashfla.utils.ArrayUtil;
@@ -511,7 +511,7 @@ package popups.settings
             var judgeItem:ContextMenuItem = new ContextMenuItem("Custom Judge Windows");
             judgeItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, function(event:ContextMenuEvent):void
             {
-                new Prompt(parent, 320, "Judge Window", 100, "SUBMIT", e_changeJudgeWindow);
+                new PromptInput(parent, "Judge Window", "SUBMIT", e_changeJudgeWindow);
             });
             judgeMenu.customItems.push(judgeItem);
             return judgeMenu;

@@ -4,7 +4,7 @@ package popups.replays
     import classes.Language;
     import classes.replay.Replay;
     import classes.ui.BoxButton;
-    import classes.ui.Prompt;
+    import classes.ui.PromptInput;
     import flash.events.Event;
 
     public class ReplayHistoryTabSession extends ReplayHistoryTabBase
@@ -58,7 +58,7 @@ package popups.replays
 
         private function e_importClick(e:Event):void
         {
-            new Prompt(parent, 320, _lang.string("popup_replay_import_window_title"), 100, _lang.string("popup_replay_import"), e_importReplay);
+            new PromptInput(parent, _lang.string("popup_replay_import_window_title"), _lang.string("popup_replay_import"), e_importReplay);
         }
 
         private function e_importReplay(replayString:String):void

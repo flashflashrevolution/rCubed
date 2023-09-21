@@ -8,8 +8,8 @@ package classes.ui
     dynamic public class Box extends Sprite
     {
         // Display
-        private var _width:Number = -1;
-        private var _height:Number = -1;
+        protected var _width:Number = -1;
+        protected var _height:Number = -1;
         private var _highlight:Boolean = false;
         private var _active:Boolean = false;
 
