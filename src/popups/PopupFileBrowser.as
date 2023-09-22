@@ -243,7 +243,7 @@ package popups
                 elm1.name = elm1.data[0].info.name;
                 elm1.banner = elm1.data[0].info.banner;
             }
-            renderList.sortOn(["author", "name"], [Array.CASEINSENSITIVE, Array.CASEINSENSITIVE]);
+            renderList.sortOn(["name", "author"], [Array.CASEINSENSITIVE, Array.CASEINSENSITIVE]);
 
             // Display
             songBrowser.setRenderList(renderList);
