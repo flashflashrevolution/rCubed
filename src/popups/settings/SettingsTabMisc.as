@@ -11,7 +11,6 @@ package popups.settings
     import classes.ui.Text;
     import classes.ui.ValidatedText;
     import com.bit101.components.ComboBox;
-    import com.bit101.components.Style;
     import com.flashfla.utils.sprintf;
     import flash.events.Event;
     import flash.events.MouseEvent;
@@ -100,7 +99,7 @@ package popups.settings
             languageCombo = new ComboBox(container, xOff, yOff, selectedLanguage, optionGameLanguages);
             languageCombo.x = xOff;
             languageCombo.y = yOff;
-            languageCombo.width = 200;
+            languageCombo.setSize(200, 22);
             languageCombo.openPosition = ComboBox.BOTTOM;
             languageCombo.fontSize = 11;
             languageCombo.addEventListener(Event.SELECT, languageSelect);
@@ -120,7 +119,7 @@ package popups.settings
             startUpScreenCombo = new ComboBox(container, xOff, yOff, "Selection...", startUpScreenSelections);
             startUpScreenCombo.x = xOff;
             startUpScreenCombo.y = yOff;
-            startUpScreenCombo.width = 200;
+            startUpScreenCombo.setSize(200, 22);
             startUpScreenCombo.openPosition = ComboBox.BOTTOM;
             startUpScreenCombo.fontSize = 11;
             startUpScreenCombo.addEventListener(Event.SELECT, startUpScreenSelect);
@@ -167,24 +166,19 @@ package popups.settings
             new Text(container, xOff, yOff, _lang.string("options_game_engine"));
             yOff += 20;
 
-            engineCombo = new ComboBox();
-            engineCombo.x = xOff;
-            engineCombo.y = yOff;
-            engineCombo.width = 200;
+            engineCombo = new ComboBox(container, xOff, yOff);
+            engineCombo.setSize(200, 22);
             engineCombo.openPosition = ComboBox.BOTTOM;
             engineCombo.fontSize = 11;
             engineCombo.addEventListener(Event.SELECT, engineSelect);
-            container.addChild(engineCombo);
             yOff += 30;
 
             // Default Game Engine
             new Text(container, xOff, yOff, _lang.string("options_default_game_engine"));
             yOff += 20;
 
-            engineDefaultCombo = new ComboBox();
-            engineDefaultCombo.x = xOff;
-            engineDefaultCombo.y = yOff;
-            engineDefaultCombo.width = 200;
+            engineDefaultCombo = new ComboBox(container, xOff, yOff);
+            engineDefaultCombo.setSize(200, 22);
             engineDefaultCombo.openPosition = ComboBox.BOTTOM;
             engineDefaultCombo.fontSize = 11;
             engineDefaultCombo.addEventListener(Event.SELECT, engineDefaultSelect);
@@ -401,7 +395,7 @@ package popups.settings
 
             else if (e.target == optionMPSize)
             {
-                Style.fontSize = _avars.configMPSize = optionMPSize.validate(10);
+                // TODO MP Font Size
                 _avars.mpSave();
             }
         }

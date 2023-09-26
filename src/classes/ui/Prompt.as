@@ -48,6 +48,8 @@ package classes.ui
             _content.y = (Main.GAME_HEIGHT - _height) / 2;
             super.addChild(_content);
 
+            _content.graphics.lineStyle(1, 0xFFFFFF, 0.35);
+
             // Shadow
             _dropshadow = new Sprite();
             _dropshadow.graphics.beginFill(0x000000, 1);
@@ -55,7 +57,7 @@ package classes.ui
             _dropshadow.graphics.endFill();
             _dropshadow.x = _content.x;
             _dropshadow.y = _content.y;
-            _dropshadow.filters = [new DropShadowFilter(0, 45, GameBackgroundColor.BG_DARK, 0.7, 128, 128, 1, 1, false, true, true)];
+            _dropshadow.filters = [new DropShadowFilter(0, 45, GameBackgroundColor.BG_DARK, 1, 128, 128, 1, 1, false, true, true)];
             super.addChildAt(_dropshadow, 0);
         }
 

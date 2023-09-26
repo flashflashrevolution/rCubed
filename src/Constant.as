@@ -33,6 +33,7 @@ package
         public static const TEXT_FORMAT_12:TextFormat = new TextFormat(Fonts.BASE_FONT, 12, 0xFFFFFF, true);
         public static const TEXT_FORMAT_CENTER:TextFormat = new TextFormat(Fonts.BASE_FONT, 14, 0xFFFFFF, true, null, null, null, null, TextFormatAlign.CENTER);
         public static const TEXT_FORMAT_UNICODE:TextFormat = new TextFormat(Fonts.BASE_FONT_CJK, 14, 0xFFFFFF, true);
+        public static const TEXT_FORMAT_UNICODE_12:TextFormat = new TextFormat(Fonts.BASE_FONT_CJK, 12, 0xFFFFFF, true);
 
         // Other
         public static const NOTESKIN_EDITOR_URL:String = "https://www.flashflashrevolution.com/~velocity/ffrjs/noteskin/";

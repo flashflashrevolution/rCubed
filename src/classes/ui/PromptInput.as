@@ -29,7 +29,7 @@ package classes.ui
 
             //- Add Text
             _text = new Text(this, 9, 10, promptTitle, 16);
-            _text.setAreaParams(width - 20, 22);
+            _text.setAreaParams(width - 45, 22);
 
             //- Add Close Button
             _close_button = new BoxIcon(this, _width - 32, 10, 22, 22, new iconClose(), closePrompt);

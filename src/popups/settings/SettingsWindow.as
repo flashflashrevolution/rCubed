@@ -403,7 +403,7 @@ internal class ManageWindow extends Prompt
     public function ManageWindow(win:SettingsWindow):void
     {
         this.win = win;
-        super(win, 580, 280);
+        super(win, 580, 320);
 
         saveJSON = JSON.stringify(_gvars.activeUser.save(true));
 
@@ -411,7 +411,7 @@ internal class ManageWindow extends Prompt
         var yOff:Number = 0;
 
         // Close
-        btn_close = new BoxButton(this, xOff + Main.GAME_WIDTH - 300, yOff + Main.GAME_HEIGHT - 190, 100, 29, _lang.string("menu_close"), 12, clickHandler);
+        btn_close = new BoxButton(this, width - 110, height - 39, 100, 29, _lang.string("menu_close"), 12, clickHandler);
 
         // Export
         new Text(this, xOff + 10, yOff + 12, _lang.string("settings_manage_export"), 16).setAreaParams(160, 30);

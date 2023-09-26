@@ -32,6 +32,7 @@ package com.bit101.components
     import flash.display.Sprite;
     import flash.events.Event;
     import flash.events.MouseEvent;
+    import assets.GameBackgroundColor;
 
     [Event(name = "select", type = "flash.events.Event")]
     public class List extends Component
@@ -43,10 +44,6 @@ package com.bit101.components
         protected var _listItemClass:Class = ListItem;
         protected var _scrollbar:VScrollBar;
         protected var _selectedIndex:int = -1;
-        protected var _defaultColor:uint = Style.LIST_DEFAULT;
-        protected var _alternateColor:uint = Style.LIST_ALTERNATE;
-        protected var _selectedColor:uint = Style.LIST_SELECTED;
-        protected var _rolloverColor:uint = Style.LIST_ROLLOVER;
         protected var _alternateRows:Boolean = false;
         protected var _reduceUpdates:Boolean = false;
 
@@ -90,7 +87,7 @@ package com.bit101.components
         {
             super.addChildren();
             _panel = new Panel(this, 0, 0);
-            _panel.color = _defaultColor;
+            _panel.color = GameBackgroundColor.BG_POPUP;
             _itemHolder = new Sprite();
             _panel.content.addChild(_itemHolder);
             _scrollbar = new VScrollBar(this, 0, 0, onScroll);
@@ -118,10 +115,6 @@ package com.bit101.components
 
                 item = new _listItemClass(_itemHolder, 0, i * _listItemHeight);
                 item.setSize(width, _listItemHeight);
-                item.defaultColor = _defaultColor;
-
-                item.selectedColor = _selectedColor;
-                item.rolloverColor = _rolloverColor;
                 item.addEventListener(MouseEvent.CLICK, onSelect);
             }
         }
@@ -141,14 +134,6 @@ package com.bit101.components
                 else
                 {
                     item.data = "";
-                }
-                if (_alternateRows)
-                {
-                    item.defaultColor = ((offset + i) % 2 == 0) ? _defaultColor : _alternateColor;
-                }
-                else
-                {
-                    item.defaultColor = _defaultColor;
                 }
                 if (offset + i == _selectedIndex)
                 {
@@ -203,7 +188,6 @@ package com.bit101.components
 
             // panel
             _panel.setSize(_width, _height);
-            _panel.color = _defaultColor;
             _panel.draw();
 
             // scrollbar
@@ -399,47 +383,6 @@ package com.bit101.components
             }
         }
 
-        /**
-         * Sets/gets the default background color of list items.
-         */
-        public function set defaultColor(value:uint):void
-        {
-            _defaultColor = value;
-            invalidate();
-        }
-
-        public function get defaultColor():uint
-        {
-            return _defaultColor;
-        }
-
-        /**
-         * Sets/gets the selected background color of list items.
-         */
-        public function set selectedColor(value:uint):void
-        {
-            _selectedColor = value;
-            invalidate();
-        }
-
-        public function get selectedColor():uint
-        {
-            return _selectedColor;
-        }
-
-        /**
-         * Sets/gets the rollover background color of list items.
-         */
-        public function set rolloverColor(value:uint):void
-        {
-            _rolloverColor = value;
-            invalidate();
-        }
-
-        public function get rolloverColor():uint
-        {
-            return _rolloverColor;
-        }
 
         /**
          * Sets the height of each list item.
@@ -505,20 +448,6 @@ package com.bit101.components
         public function get listItemClass():Class
         {
             return _listItemClass;
-        }
-
-        /**
-         * Sets / gets the color for alternate rows if alternateRows is set to true.
-         */
-        public function set alternateColor(value:uint):void
-        {
-            _alternateColor = value;
-            invalidate();
-        }
-
-        public function get alternateColor():uint
-        {
-            return _alternateColor;
         }
 
         /**
