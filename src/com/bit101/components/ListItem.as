@@ -49,6 +49,7 @@ package com.bit101.components
         public function ListItem(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, data:Object = null)
         {
             _data = data;
+            buttonMode = true;
             super(parent, xpos, ypos);
         }
 
@@ -85,13 +86,17 @@ package com.bit101.components
             super.draw();
             graphics.clear();
 
-            if (_selected)
+            if (_selected && _mouseOver)
+            {
+                graphics.beginFill(0xFFFFFF, 0.45);
+            }
+            else if (_selected)
             {
                 graphics.beginFill(0xFFFFFF, 0.35);
             }
             else if (_mouseOver)
             {
-                graphics.beginFill(0xFFFFFF, 0.35);
+                graphics.beginFill(0xFFFFFF, 0.25);
             }
             else
             {

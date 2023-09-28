@@ -28,7 +28,9 @@
 
 package com.bit101.components
 {
+    import assets.menu.icons.fa.iconLeft;
     import flash.display.DisplayObjectContainer;
+    import flash.display.Sprite;
     import flash.display.Stage;
     import flash.events.Event;
     import flash.events.MouseEvent;
@@ -42,9 +44,10 @@ package com.bit101.components
         public static const BOTTOM:String = "bottom";
 
         protected var _defaultLabel:String = "";
-        protected var _dropDownButton:PushButton;
         protected var _items:Array;
         protected var _labelButton:PushButton;
+        protected var _divider:Sprite;
+        protected var _triangle:iconLeft;
         protected var _list:List;
         protected var _numVisibleItems:int = 6;
         protected var _open:Boolean = false;
@@ -93,7 +96,17 @@ package com.bit101.components
                 numVisibleItems = Math.min(6, Math.max(1, _items.length));
 
             _labelButton = new PushButton(this, 0, 0, "", onDropDown);
-            _dropDownButton = new PushButton(this, 0, 0, "+", onDropDown);
+
+            _divider = new Sprite();
+            _divider.mouseEnabled = false;
+            addChild(_divider);
+
+            _triangle = new iconLeft();
+            _triangle.mouseEnabled = false;
+            _triangle.scaleX = _triangle.scaleY = 0.15;
+            _triangle.rotation = -90;
+            _triangle.alpha = 0.75;
+            addChild(_triangle);
         }
 
         /**
@@ -127,7 +140,7 @@ package com.bit101.components
             if (_stage.contains(_list))
                 _stage.removeChild(_list);
             _stage.removeEventListener(MouseEvent.CLICK, onStageClick);
-            _dropDownButton.label = "+";
+            _triangle.scaleX = 0.15;
         }
 
 
@@ -139,12 +152,17 @@ package com.bit101.components
         public override function draw():void
         {
             super.draw();
-            _labelButton.setSize(_width - _height + 1, _height);
+            _labelButton.setSize(_width, _height);
             _labelButton.draw();
 
-            _dropDownButton.setSize(_height, _height);
-            _dropDownButton.draw();
-            _dropDownButton.x = _width - height;
+            _divider.x = _width - 20;
+            _divider.graphics.clear();
+            _divider.graphics.lineStyle(1, 0xFFFFFF, 0.35);
+            _divider.graphics.moveTo(0, 1);
+            _divider.graphics.lineTo(0, _height - 1);
+
+            _triangle.x = _width - 10;
+            _triangle.y = _height / 2;
 
             _list.setSize(_width, _numVisibleItems * _list.listItemHeight);
         }
@@ -226,7 +244,7 @@ package com.bit101.components
                 _list.move(point.x, point.y);
                 _stage.addChild(_list);
                 _stage.addEventListener(MouseEvent.CLICK, onStageClick);
-                _dropDownButton.label = "-";
+                _triangle.scaleX = -0.15;
             }
             else
             {
@@ -240,7 +258,7 @@ package com.bit101.components
         protected function onStageClick(event:MouseEvent):void
         {
             // ignore clicks within buttons or list
-            if (event.target == _dropDownButton || event.target == _labelButton)
+            if (event.target == _labelButton)
                 return;
             if (new Rectangle(_list.x, _list.y, _list.width, _list.height).contains(event.stageX, event.stageY))
                 return;
@@ -255,7 +273,7 @@ package com.bit101.components
         protected function onSelect(event:Event):void
         {
             _open = false;
-            _dropDownButton.label = "+";
+            _triangle.scaleX = 0.15;
             if (stage != null && stage.contains(_list))
             {
                 stage.removeChild(_list);
@@ -437,7 +455,6 @@ package com.bit101.components
         public function set fontSize(val:int):void
         {
             _labelButton.fontSize = val;
-            _dropDownButton.fontSize = val;
             invalidate();
         }
     }

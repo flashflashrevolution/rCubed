@@ -34,14 +34,13 @@ package com.bit101.components
 
     public class PushButton extends Component
     {
-        protected var _back:Sprite;
-        protected var _face:Sprite;
         protected var _label:Label;
         protected var _labelText:String = "";
         protected var _over:Boolean = false;
         protected var _down:Boolean = false;
         protected var _selected:Boolean = false;
         protected var _toggle:Boolean = false;
+        protected var _align:String = "left";
 
         /**
          * Constructor
@@ -77,16 +76,6 @@ package com.bit101.components
          */
         override protected function addChildren():void
         {
-            _back = new Sprite();
-            _back.mouseEnabled = false;
-            addChild(_back);
-
-            _face = new Sprite();
-            _face.mouseEnabled = false;
-            _face.x = 1;
-            _face.y = 1;
-            addChild(_face);
-
             _label = new Label();
             addChild(_label);
 
@@ -99,19 +88,19 @@ package com.bit101.components
          */
         protected function drawFace():void
         {
-            _face.graphics.clear();
+            this.graphics.clear();
             if (_down)
             {
-                _face.graphics.lineStyle(1, 0xFFFFFF, 0.55, true);
-                _face.graphics.beginFill(0xFFFFFF, 0.1225);
+                this.graphics.lineStyle(1, 0xFFFFFF, 0.55, true);
+                this.graphics.beginFill(0xFFFFFF, 0.1225);
             }
             else
             {
-                _face.graphics.lineStyle(1, 0xFFFFFF, 0.35, true);
-                _face.graphics.beginFill(0xFFFFFF, 0.07);
+                this.graphics.lineStyle(1, 0xFFFFFF, 0.35, true);
+                this.graphics.beginFill(0xFFFFFF, 0.07);
             }
-            _face.graphics.drawRect(0, 0, _width - 2, _height - 2);
-            _face.graphics.endFill();
+            this.graphics.drawRect(0, 0, _width - 1, _height - 1);
+            this.graphics.endFill();
         }
 
 
@@ -125,10 +114,6 @@ package com.bit101.components
         override public function draw():void
         {
             super.draw();
-            _back.graphics.clear();
-            _back.graphics.beginFill(0xFFFFFF, 0);
-            _back.graphics.drawRect(0, 0, _width, _height);
-            _back.graphics.endFill();
 
             drawFace();
 
@@ -145,8 +130,11 @@ package com.bit101.components
                 _label.autoSize = true;
             }
             _label.draw();
-            _label.move(5, _height / 2 - _label.height / 2);
 
+            if (_align == "center")
+                _label.move(_width / 2 - _label.width / 2, _height / 2 - _label.height / 2 - 1);
+            else
+                _label.move(5, _height / 2 - _label.height / 2 - 1);
         }
 
 
@@ -253,6 +241,12 @@ package com.bit101.components
         public function set fontSize(val:int):void
         {
             _label.fontSize = val;
+        }
+
+        public function set align(dir:String):void
+        {
+            _align = dir;
+            draw();
         }
 
     }
