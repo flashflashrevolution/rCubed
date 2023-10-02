@@ -1,14 +1,13 @@
 package classes.ui
 {
     import assets.GameBackgroundColor;
+    import classes.ui.UILockWait;
     import com.flashfla.utils.SpriteUtil;
     import flash.display.Bitmap;
+    import flash.display.DisplayObject;
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
-    import flash.display.DisplayObject;
     import flash.filters.DropShadowFilter;
-    import flash.display.CapsStyle;
-    import flash.display.JointStyle;
 
     public class Prompt extends Sprite
     {
@@ -16,6 +15,7 @@ package classes.ui
         protected var _height:Number;
         protected var _content:Sprite;
         protected var _dropshadow:Sprite;
+        protected var _lock:UILockWait;
 
         public function Prompt(parent:DisplayObjectContainer, width:Number = 200, height:Number = 200)
         {
@@ -61,6 +61,19 @@ package classes.ui
             super.addChildAt(_dropshadow, 0);
         }
 
+        public function set uiLock(val:Boolean):void
+        {
+            if (val && _lock == null)
+            {
+                _lock = new UILockWait(stage);
+            }
+            else if (!val && _lock != null)
+            {
+                _lock.remove();
+                _lock = null;
+            }
+        }
+
         override public function addChild(child:DisplayObject):DisplayObject
         {
             return _content.addChild(child);
@@ -79,6 +92,14 @@ package classes.ui
         override public function get height():Number
         {
             return _height;
+        }
+
+        public function close():void
+        {
+            if (parent != null && parent.contains(this))
+            {
+                parent.removeChild(this);
+            }
         }
     }
 }

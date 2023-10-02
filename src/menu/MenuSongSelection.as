@@ -1339,7 +1339,7 @@ package menu
 
             // Search Box
             if (searchBox == null)
-                searchBox = new BoxText(null, 5, 5, 164, 27);
+                searchBox = new BoxText(null, 5, 5, 163, 25);
 
             infoBox.addChild(searchBox);
 
@@ -1352,13 +1352,13 @@ package menu
             if (searchTypeBox != null)
                 searchTypeBox.removeEventListener(Event.SELECT, searchTypeSelect);
 
-            searchTypeBox = new ComboBox(null, 5, 37, "", searchTypeBoxItems);
-            searchTypeBox.setSize(164, 25);
+            searchTypeBox = new ComboBox(null, 5, 36, "", searchTypeBoxItems);
+            searchTypeBox.setSize(165, 27);
             searchTypeBox.fontSize = 11;
             searchTypeBox.addEventListener(Event.SELECT, searchTypeSelect);
             infoBox.addChild(searchTypeBox);
 
-            var searchBtn:BoxButton = new BoxButton(infoBox, 5, 67, 164, 27, _lang.string("song_selection_search_panel_search"), 12, clickHandler);
+            var searchBtn:BoxButton = new BoxButton(infoBox, 5, 68, 164, 25, _lang.string("song_selection_search_panel_search"), 12, clickHandler);
             searchBtn.action = "doSearch";
 
             // Order Type
@@ -1382,7 +1382,7 @@ package menu
                 sortTypeBox.removeEventListener(Event.SELECT, sortTypeSelect);
 
             sortTypeBox = new ComboBox(null, 5, 162, "", sortTypeBoxItems);
-            sortTypeBox.setSize(164, 25);
+            sortTypeBox.setSize(165, 25);
             sortTypeBox.fontSize = 11;
             sortTypeBox.numVisibleItems = sortTypeBoxItems.length;
             sortTypeBox.addEventListener(Event.SELECT, sortTypeSelect);
@@ -1394,8 +1394,8 @@ package menu
             if (sortOrderBox != null)
                 sortOrderBox.removeEventListener(Event.SELECT, sortOrderSelect);
 
-            sortOrderBox = new ComboBox(null, 5, 188, "", sortOrderBoxItems);
-            sortOrderBox.setSize(164, 25);
+            sortOrderBox = new ComboBox(null, 5, 191, "", sortOrderBoxItems);
+            sortOrderBox.setSize(165, 25);
             sortOrderBox.fontSize = 11;
             sortOrderBox.addEventListener(Event.SELECT, sortOrderSelect);
             infoBox.addChild(sortOrderBox);

@@ -164,7 +164,7 @@ package com.bit101.components
             _triangle.x = _width - 10;
             _triangle.y = _height / 2;
 
-            _list.setSize(_width, _numVisibleItems * _list.listItemHeight);
+            _list.setSize(_width - 1, _numVisibleItems * _list.listItemHeight);
         }
 
 
