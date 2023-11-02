@@ -44,7 +44,6 @@ package
         public static const HIGHSCORES_LOAD_COMPLETE:String = "HighscoresLoadComplete";
         public static const HIGHSCORES_LOAD_ERROR:String = "HighscoresLoadError";
 
-        public var flashvars:Object;
         public var gameMain:Main;
 
         public var options:GameOptions;

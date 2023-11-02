@@ -9,7 +9,6 @@ package game
     {
         public static const GAME_LOADING:String = "GameLoading";
         public static const GAME_PLAY:String = "GamePlay";
-        public static const GAME_REPLAY:String = "GameReplay";
         public static const GAME_RESULTS:String = "GameResults";
 
         private var _gvars:GlobalVariables = GlobalVariables.instance;
@@ -33,7 +32,7 @@ package game
             {
                 // Clone Song queue
                 _gvars.totalSongQueue = _gvars.songQueue.concat();
-                switchTo(_gvars.flashvars.replay || _gvars.flashvars.preview_file ? GAME_REPLAY : GAME_LOADING);
+                switchTo(GAME_LOADING);
             }
             return false;
         }
@@ -85,13 +84,6 @@ package game
                     _gvars.gameMain.bg.updateDisplay(true);
                     _gvars.gameMain.ver.visible = false;
                     panel = new GameplayDisplay(this);
-                    isFound = true;
-                    break;
-
-                case GAME_REPLAY:
-                    _gvars.gameMain.bg.updateDisplay(true);
-                    _gvars.gameMain.ver.visible = false;
-                    panel = new GameReplay(this);
                     isFound = true;
                     break;
 

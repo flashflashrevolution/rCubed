@@ -190,12 +190,8 @@ package game
             navReplay = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_replay_song"), 17, eventHandler);
             buttonMenuItems.push(navReplay);
 
-
-            if (!_gvars.flashvars.replay && !_gvars.flashvars.preview_file)
-            {
-                navMenu = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_exit_menu"), 17, eventHandler);
-                buttonMenuItems.push(navMenu);
-            }
+            navMenu = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_exit_menu"), 17, eventHandler);
+            buttonMenuItems.push(navMenu);
 
             var BUTTON_GAP:int = 11;
             var BUTTON_WIDTH:int = (735 - (Math.max(0, (buttonMenuItems.length - 1)) * BUTTON_GAP)) / buttonMenuItems.length;
@@ -655,7 +651,7 @@ package game
          */
         private function e_graphHover(e:MouseEvent):void
         {
-            //trace(e.stageX - graphOverlay.x, e.stageY - graphOverlay.y); 
+            //trace(e.stageX - graphOverlay.x, e.stageY - graphOverlay.y);
             if (activeGraph != null)
             {
                 activeGraph.drawOverlay(e.stageX - graphOverlay.x, e.stageY - graphOverlay.y);
@@ -674,7 +670,7 @@ package game
          */
         private function updateJudgeOffset(result:GameScoreResult):void
         {
-            if (_gvars.activeUser.AUTO_JUDGE_OFFSET && // Auto Judge Offset enabled 
+            if (_gvars.activeUser.AUTO_JUDGE_OFFSET && // Auto Judge Offset enabled
                 (result.amazing + result.perfect + result.good + result.average >= 50) && // Accuracy data is reliable
                 result.accuracy !== 0)
             {
@@ -822,7 +818,7 @@ package game
             {
                 var skipload:Boolean = (songResults.length == 1 && songResults[0].song && songResults[0].song.isLoaded);
 
-                if (!_gvars.options.replay || _gvars.flashvars.replay || _gvars.flashvars.preview_file)
+                if (!_gvars.options.replay)
                     _gvars.options.fill();
 
                 if (skipload)
@@ -953,7 +949,7 @@ package game
             var ret:Boolean = false;
             ret ||= valid_score && !result.options.isScoreValid(true, false);
             ret ||= valid_replay && !result.options.isScoreValid(false, true);
-            ret ||= check_replay && (_gvars.flashvars.replay || result.replayData.length <= 0 || result.score <= 0 || (result.options.replay && result.options.replay.isEdited) || result.user.siteId != _gvars.playerUser.siteId)
+            ret ||= check_replay && (result.replayData.length <= 0 || result.score <= 0 || (result.options.replay && result.options.replay.isEdited) || result.user.siteId != _gvars.playerUser.siteId)
             ret ||= check_alt_engine && (result.user.isGuest || result.songInfo.engine != null);
             return !ret;
         }
@@ -974,7 +970,7 @@ package game
             var ret:Boolean = false;
             ret ||= valid_score && !result.options.isScoreUpdated(true, false);
             ret ||= valid_replay && !result.options.isScoreUpdated(false, true);
-            ret ||= check_replay && (_gvars.flashvars.replay || result.replayData.length <= 0 || result.score <= 0 || (result.options.replay && result.options.replay.isEdited) || result.user.siteId != _gvars.playerUser.siteId)
+            ret ||= check_replay && (result.replayData.length <= 0 || result.score <= 0 || (result.options.replay && result.options.replay.isEdited) || result.user.siteId != _gvars.playerUser.siteId)
             ret ||= check_alt_engine && (result.user.isGuest || result.songInfo.engine != null);
             return !ret;
         }
