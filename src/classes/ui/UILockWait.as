@@ -1,14 +1,21 @@
 package classes.ui
 {
+    import classes.ui.Throbber;
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
-    import classes.ui.Throbber;
+    import flash.events.TimerEvent;
+    import flash.utils.Timer;
+    import classes.Language;
+    import flash.events.Event;
 
     public class UILockWait extends Sprite
     {
         private var icon:Throbber;
+        private var timer:Timer;
+        private var callback:Function;
+        private var closeBtn:BoxButton;
 
-        public function UILockWait(parent:DisplayObjectContainer):void
+        public function UILockWait(parent:DisplayObjectContainer, useTimer:Boolean = false, closeFunction:Function = null):void
         {
             this.graphics.beginFill(0x000000, 0.5);
             this.graphics.drawRect(0, 0, Main.GAME_WIDTH, Main.GAME_HEIGHT);
@@ -27,6 +34,29 @@ package classes.ui
             icon.start();
 
             parent.addChild(this);
+
+            if (useTimer)
+            {
+                timer = new Timer(10000, 1);
+                timer.addEventListener(TimerEvent.TIMER_COMPLETE, e_timerComplete);
+                timer.start();
+
+                closeBtn = new BoxButton(this, Main.GAME_WIDTH / 2 - 75, Main.GAME_HEIGHT - 50, 150, 30, Language.instance.string("menu_close"), 12, e_closeButton);
+                closeBtn.visible = false;
+            }
+        }
+
+        private function e_timerComplete(e:TimerEvent):void
+        {
+            closeBtn.visible = true;
+        }
+
+        private function e_closeButton(e:Event):void
+        {
+            remove();
+
+            if (callback != null)
+                callback();
         }
 
         public function remove():void
