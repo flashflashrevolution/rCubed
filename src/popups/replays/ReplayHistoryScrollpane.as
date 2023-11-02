@@ -94,7 +94,7 @@ package popups.replays
             for (i = len; i >= 0; i--)
             {
                 entryButton = entryButtons[i];
-                entryButton.garbageSweep = 0;
+                entryButton.isStale = true;
 
                 _y = START_POINT + entryButton.index * GAP;
                 _inBounds = (_y > -GAP && _y < height);
@@ -138,7 +138,7 @@ package popups.replays
             for (i = len; i >= 0; i--)
             {
                 entryButton = entryButtons[i];
-                if (entryButton.garbageSweep == 0)
+                if (entryButton.isStale)
                     removeEntryButton(entryButton);
             }
         }
@@ -152,7 +152,7 @@ package popups.replays
         public function moveEntryButton(_y:int, btn:ReplayHistoryEntry):void
         {
             btn.y = _y;
-            btn.garbageSweep = 1;
+            btn.isStale = false;
         }
 
         /**
@@ -214,7 +214,7 @@ package popups.replays
             for (; len >= 0; len--)
             {
                 entryButton = entryButtons[len];
-                if (entryButton.garbageSweep == 0 || force)
+                if (entryButton.isStale || force)
                     removeEntryButton(entryButton);
             }
         }

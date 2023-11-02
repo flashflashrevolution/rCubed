@@ -41,7 +41,7 @@ package popups.replays
         public var btn_copy:SimpleBoxButton;
 
         public var index:int = 0;
-        public var garbageSweep:Boolean = false;
+        public var isStale:Boolean = true;
 
         public function ReplayHistoryEntry():void
         {

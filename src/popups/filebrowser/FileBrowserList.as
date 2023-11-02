@@ -148,7 +148,7 @@ package popups.filebrowser
             for (i = len; i >= 0; i--)
             {
                 songButton = songButtons[i];
-                songButton.garbageSweep = false;
+                songButton.isStale = true;
 
                 _y = START_POINT + int(songButton.index) * GAP;
                 _inBounds = (_y > -GAP && _y < _height);
@@ -195,7 +195,7 @@ package popups.filebrowser
             for (i = len; i >= 0; i--)
             {
                 songButton = songButtons[i];
-                if (songButton.garbageSweep == false)
+                if (songButton.isStale)
                     removeSongButton(songButton);
             }
         }
@@ -209,7 +209,7 @@ package popups.filebrowser
         public function moveSongButton(_y:int, btn:FileBrowserItem):void
         {
             btn.y = _y;
-            btn.garbageSweep = true;
+            btn.isStale = false;
         }
 
         /**
@@ -292,7 +292,7 @@ package popups.filebrowser
             for (; len >= 0; len--)
             {
                 songButton = songButtons[len];
-                if (songButton.garbageSweep == false || force)
+                if (songButton.isStale || force)
                     removeSongButton(songButton);
             }
         }
