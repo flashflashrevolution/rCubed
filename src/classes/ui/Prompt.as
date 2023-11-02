@@ -99,6 +99,12 @@ package classes.ui
             if (parent != null && parent.contains(this))
             {
                 parent.removeChild(this);
+
+                if (_lock != null)
+                {
+                    _lock.remove();
+                    _lock = null;
+                }
             }
         }
     }
