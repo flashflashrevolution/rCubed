@@ -46,8 +46,6 @@ package menu
 
         public var _MenuSingleplayer:MenuPanel;
         private var _MenuMultiplayer:MenuPanel;
-        private var _MenuFriends:MenuPanel;
-        private var _MenuStats:MenuPanel;
         private var _MenuTokens:MenuPanel;
 
         private var hover_message:MouseTooltip;
@@ -136,6 +134,14 @@ package menu
                     this.removeChild(_MenuSingleplayer);
                 _MenuSingleplayer = null;
             }
+            if (_MenuTokens)
+            {
+                _MenuTokens.stageRemove();
+                _MenuTokens.dispose();
+                if (this.contains(_MenuTokens))
+                    this.removeChild(_MenuTokens);
+                _MenuTokens = null;
+            }
             if (_MenuMultiplayer)
             {
                 _MenuMultiplayer.stageRemove();
@@ -144,21 +150,6 @@ package menu
                     this.removeChild(_MenuMultiplayer);
                 _MenuMultiplayer = null;
             }
-            if (_MenuFriends)
-            {
-                _MenuFriends.stageRemove();
-                _MenuFriends.dispose();
-                if (this.contains(_MenuFriends))
-                    this.removeChild(_MenuFriends);
-                _MenuFriends = null;
-            }
-            if (_MenuStats)
-            {
-                _MenuStats.stageRemove();
-                _MenuStats.dispose();
-                if (this.contains(_MenuStats))
-                    this.removeChild(_MenuStats);
-                _MenuStats = null;
             }
             super.stageRemove();
         }
