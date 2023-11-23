@@ -299,6 +299,7 @@ import classes.Alert;
 import classes.Language;
 import classes.User;
 import classes.ui.BoxButton;
+import classes.ui.Prompt;
 import classes.ui.SimpleBoxButton;
 import classes.ui.Text;
 import com.flashfla.utils.SpriteUtil;
@@ -313,7 +314,6 @@ import flash.text.TextField;
 import flash.text.TextFieldType;
 import flash.text.TextFormat;
 import popups.settings.SettingsWindow;
-import classes.ui.Prompt;
 
 internal class TabButton extends Sprite
 {

@@ -87,7 +87,7 @@ package popups
             //- Closed
             closeButton = new BoxButton(box, box.width - 105, 5, 100, 31, _lang.string("popup_close"), 12, e_closeButton);
 
-            //- Saved 
+            //- Saved
             filterListButton = new BoxButton(box, closeButton.x - 105, 5, 100, 31, _lang.string("popup_filter_saved_filters"), 12, e_toggleTabButton);
 
             //- Clear
