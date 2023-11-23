@@ -2,6 +2,7 @@ package game.controls
 {
     import flash.display.Bitmap;
     import flash.display.BitmapData;
+    import flash.display.DisplayObjectContainer;
     import flash.display.Shape;
     import flash.display.Sprite;
     import flash.geom.ColorTransform;
@@ -34,9 +35,13 @@ package game.controls
 
         private var _colors:Array;
 
-        public function AccuracyBar(options:GameOptions):void
+        public function AccuracyBar(options:GameOptions, parent:DisplayObjectContainer):void
         {
+            if (parent)
+                parent.addChild(this);
+
             this.options = options;
+
             updateJudge();
 
             // Parse Colors

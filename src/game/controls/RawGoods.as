@@ -1,6 +1,7 @@
 package game.controls
 {
     import com.flashfla.utils.NumberUtil;
+    import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
@@ -14,8 +15,11 @@ package game.controls
         private var colors:Number;
         private var field:TextField;
 
-        public function RawGoods(options:GameOptions)
+        public function RawGoods(options:GameOptions, parent:DisplayObjectContainer)
         {
+            if (parent)
+                parent.addChild(this);
+
             this.options = options;
 
             // Copy Raw Goods Colors

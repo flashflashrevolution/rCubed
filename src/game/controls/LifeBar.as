@@ -1,6 +1,7 @@
 package game.controls
 {
 
+    import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
 
     public class LifeBar extends Sprite
@@ -24,8 +25,11 @@ package game.controls
         // Variables
         private var _health:int = 50;
 
-        public function LifeBar():void
+        public function LifeBar(parent:DisplayObjectContainer):void
         {
+            if (parent)
+                parent.addChild(this);
+
             this.mouseChildren = false;
         }
 

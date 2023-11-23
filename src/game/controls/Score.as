@@ -1,5 +1,6 @@
 package game.controls
 {
+    import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
@@ -13,9 +14,13 @@ package game.controls
 
         private var field:TextField;
 
-        public function Score(options:GameOptions = null)
+        public function Score(options:GameOptions, parent:DisplayObjectContainer)
         {
+            if (parent)
+                parent.addChild(this);
+
             this.options = options;
+
             field = new TextField();
             field.defaultTextFormat = new TextFormat(Fonts.BASE_FONT_CJK, 25, 0xFFFFFF, false);
             field.antiAliasType = AntiAliasType.ADVANCED;

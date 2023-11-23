@@ -1,5 +1,6 @@
 package game.controls
 {
+    import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
@@ -10,16 +11,17 @@ package game.controls
     {
         private var field:TextField;
 
-        public function TextStatic(text:String)
+        public function TextStatic(text:String, parent:DisplayObjectContainer, color:Number = 0x0098CB, size:uint = 17)
         {
+            if (parent)
+                parent.addChild(this);
+
             field = new TextField();
             field.defaultTextFormat = new TextFormat(Fonts.BASE_FONT_CJK, 17, 0x0098CB, true);
             field.antiAliasType = AntiAliasType.ADVANCED;
             field.embedFonts = true;
             field.selectable = false;
             field.autoSize = TextFieldAutoSize.LEFT;
-            field.x = 0;
-            field.y = 0;
             field.htmlText = text;
             addChild(field);
         }
@@ -32,12 +34,6 @@ package game.controls
         public function set alignment(value:String):void
         {
             field.autoSize = value;
-        }
-
-        public function setFormatting(color:Number = 0x0098CB, size:int = 17):void
-        {
-            field.setTextFormat(new TextFormat(Fonts.BASE_FONT_CJK, size, color, true));
-            field.autoSize = TextFieldAutoSize.LEFT;
         }
     }
 }

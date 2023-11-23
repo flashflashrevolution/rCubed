@@ -1,6 +1,7 @@
 package game.controls
 {
     import classes.Language;
+    import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
@@ -17,8 +18,11 @@ package game.controls
 
         private var options:GameOptions;
 
-        public function PAWindow(options:GameOptions)
+        public function PAWindow(options:GameOptions, parent:DisplayObjectContainer)
         {
+            if (parent)
+                parent.addChild(this);
+
             this.options = options;
 
             labels = new Array();

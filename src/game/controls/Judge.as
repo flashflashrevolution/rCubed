@@ -1,6 +1,7 @@
 package game.controls
 {
     import com.greensock.TweenLite;
+    import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.events.Event;
     import flash.geom.Matrix;
@@ -28,8 +29,11 @@ package game.controls
 
         private var speedScale:Number = 1;
 
-        public function Judge(options:GameOptions)
+        public function Judge(options:GameOptions, parent:DisplayObjectContainer)
         {
+            if (parent)
+                parent.addChild(this);
+
             this.options = options;
 
             if (!this.options.displayJudgeAnimations)

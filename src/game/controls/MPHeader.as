@@ -1,11 +1,10 @@
 package game.controls
 {
-    import classes.User;
+    import classes.mp.MPUser;
     import flash.display.Loader;
     import flash.display.Sprite;
     import flash.events.Event;
     import flash.net.URLRequest;
-    import flash.net.URLVariables;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
     import flash.text.TextFieldAutoSize;
@@ -16,12 +15,12 @@ package game.controls
         public static const ALIGN_LEFT:String = TextFieldAutoSize.LEFT;
         public static const ALIGN_RIGHT:String = TextFieldAutoSize.RIGHT;
 
-        public var user:User;
+        public var user:MPUser;
 
         public var avatar:Loader;
         public var field:TextField;
 
-        public function MPHeader(user:User)
+        public function MPHeader(user:MPUser)
         {
             this.user = user;
 
@@ -39,16 +38,7 @@ package game.controls
 
             avatar = new Loader();
             avatar.contentLoaderInfo.addEventListener(Event.COMPLETE, onAvatarComplete);
-            var request:URLRequest = new URLRequest(URLs.resolve(URLs.USER_AVATAR_URL));
-            var vars:URLVariables = new URLVariables();
-            Constant.addDefaultRequestVariables(vars);
-            vars["cHeight"] = 100;
-            vars["cWidth"] = 100;
-            if (user.siteId)
-                vars["uid"] = user.siteId;
-            else
-                vars["uname"] = user.name;
-            request.data = vars;
+            var request:URLRequest = new URLRequest(user.avatarURL);
             avatar.load(request);
         }
 

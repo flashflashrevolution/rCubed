@@ -1,6 +1,7 @@
 package game.controls
 {
     import com.flashfla.utils.ColorUtil;
+    import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
@@ -19,8 +20,11 @@ package game.controls
         private var field:TextField;
         private var fieldShadow:TextField;
 
-        public function Combo(options:GameOptions)
+        public function Combo(options:GameOptions, parent:DisplayObjectContainer)
         {
+            if (parent)
+                parent.addChild(this);
+
             this.options = options;
 
             // Copy Combo Colors

@@ -6,6 +6,7 @@ package game.controls
     import classes.chart.Note;
     import classes.chart.Song;
     import com.flashfla.utils.GameNotePool;
+    import flash.display.DisplayObjectContainer;
     import flash.display.MovieClip;
     import flash.display.Sprite;
     import flash.utils.getTimer;
@@ -39,10 +40,13 @@ package game.controls
         private var recp_colors:Vector.<Number>;
         private var recp_colors_enabled:Vector.<Boolean>;
 
-        public function NoteBox(song:Song, options:GameOptions)
+        public function NoteBox(song:Song, options:GameOptions, parent:DisplayObjectContainer)
         {
-            this.song = song;
+            if (parent)
+                parent.addChild(this);
+
             this.options = options;
+            this.song = song;
 
             // Create Object Pools
             if (_noteskins.data[options.noteskin] == null)
