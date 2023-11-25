@@ -104,7 +104,6 @@ package game
 
         /** Ratio of Song Completion: 0 -> 1 */
         public var song_progress:Number;
-        public var playtime_secs:Number;
 
         // Judge Settings
         public var MIN_TIME:int = 0;

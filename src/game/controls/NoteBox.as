@@ -24,7 +24,7 @@ package game.controls
         private var totalNotes:int;
         private var noteCount:int;
         private var notePool:Object;
-        public var notes:Array;
+        public var notes:Vector.<GameNote>;
 
         public var leftReceptor:MovieClip;
         public var downReceptor:MovieClip;
@@ -34,7 +34,6 @@ package game.controls
         public var receptorTable:Object = {};
 
         public var positionOffsetMax:Object;
-        private var sideScroll:Boolean;
         private var receptorAlpha:Number;
 
         private var recp_colors:Vector.<Number>;
@@ -57,7 +56,7 @@ package game.controls
             notePool = {"L": {}, "D": {}, "U": {}, "R": {}};
 
             var i:int = 0;
-            var preLoadCount:int = 6;
+            var preLoadCount:int = 8;
             for each (var direction:String in options.noteDirections)
             {
                 for each (var color:String in options.noteColors)
@@ -66,7 +65,7 @@ package game.controls
 
                     for (i = 0; i < preLoadCount; i++)
                     {
-                        var gameNote:GameNote = pool.addObject(new GameNote(0, direction, color, 1 * 1000, 0, 0, options.noteskin));
+                        var gameNote:GameNote = pool.addObject(new GameNote(0, direction, color, 1 * 1000, 0, options.noteskin));
                         gameNote.visible = false;
                         pool.unmarkObject(gameNote);
                         addChild(gameNote);
@@ -78,13 +77,9 @@ package game.controls
 
             // Setup Receptors
             leftReceptor = _noteskins.getReceptor(options.noteskin, "L");
-            leftReceptor.KEY = "Left";
             downReceptor = _noteskins.getReceptor(options.noteskin, "D");
-            downReceptor.KEY = "Down";
             upReceptor = _noteskins.getReceptor(options.noteskin, "U");
-            upReceptor.KEY = "Up";
             rightReceptor = _noteskins.getReceptor(options.noteskin, "R");
-            rightReceptor.KEY = "Right";
 
             if (leftReceptor is GameReceptor)
             {
@@ -100,11 +95,10 @@ package game.controls
             addChildAt(rightReceptor, 0);
 
             // Other Stuff
-            sideScroll = options.scrollDirection == "left" || options.scrollDirection == "right";
-            scrollSpeed = options.scrollSpeed * (sideScroll ? 1.5 : 1);
-            readahead = ((sideScroll ? Main.GAME_WIDTH : Main.GAME_HEIGHT) / 300 * 1000 / scrollSpeed);
+            scrollSpeed = options.scrollSpeed;
+            readahead = (Main.GAME_WIDTH / 300 * 1000 / scrollSpeed);
             receptorAlpha = 1.0;
-            notes = [];
+            notes = new <GameNote>[];
             noteCount = 0;
             totalNotes = song.totalNotes;
 
@@ -137,12 +131,12 @@ package game.controls
                 gameNote.ID = noteCount++;
                 gameNote.DIR = direction;
                 gameNote.POSITION = (note.time + 0.5 / 30) * 1000;
-                gameNote.PROGRESS = note.frame;
+                gameNote.FRAME = note.frame;
                 gameNote.alpha = 1;
             }
             else
             {
-                gameNote = spawnPoolRef.addObject(new GameNote(noteCount++, direction, color, (note.time + 0.5 / 30) * 1000, note.frame, 0, options.noteskin));
+                gameNote = spawnPoolRef.addObject(new GameNote(noteCount++, direction, color, (note.time + 0.5 / 30) * 1000, note.frame, options.noteskin));
                 addChild(gameNote);
             }
 
@@ -425,7 +419,7 @@ package game.controls
                 note.visible = false;
             }
 
-            notes = new Array();
+            notes.length = 0;
             noteCount = 0;
         }
 
@@ -441,9 +435,6 @@ package game.controls
             var gap:int = options.receptorSpacing;
             var noteScale:Number = options.noteScale;
             var centerOffset:int = 160;
-
-            //if (data.width > 64)
-            //gap += data.width - 64;
 
             // User-defined note scale
             if (noteScale != 1)
