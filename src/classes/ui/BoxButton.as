@@ -54,6 +54,18 @@ package classes.ui
             {
                 _text.dispose();
             }
+
+            if (_hoverText != null)
+            {
+                _hoverTimer.stop();
+                _hoverTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
+                this.removeEventListener(MouseEvent.ROLL_OVER, e_hoverRollOver);
+                this.removeEventListener(MouseEvent.ROLL_OUT, e_hoverRollOut);
+                this.removeEventListener(Event.REMOVED_FROM_STAGE, e_removedFromStage);
+
+                if (_hoverSprite && _hoverSprite.parent)
+                    _hoverSprite.parent.removeChild(_hoverSprite);
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////
