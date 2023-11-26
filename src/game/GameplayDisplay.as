@@ -52,6 +52,7 @@ package game
     import game.controls.ScreenCut;
     import game.controls.TextStatic;
     import game.events.GameFocusChangeEvent;
+    import game.events.GameKeyDownEvent;
     import game.events.GameKeyUpEvent;
     import game.events.IGameEvent;
     import menu.MenuPanel;
@@ -287,9 +288,6 @@ package game
             if (MenuSongSelection.previewMusic)
                 MenuSongSelection.previewMusic.stop();
 
-            // Create Background
-            initBackground();
-
             // Init Core
             initPlayerVars();
             initCore();
@@ -357,7 +355,7 @@ package game
             }
 
             // Init Game
-            initUI();
+            buildUI();
             initVars();
 
             // Preload next Song
@@ -453,120 +451,6 @@ package game
             songDelay = song.mp3Frame / options.songRate * 1000 / 30 - GLOBAL_OFFSET_MS;
         }
 
-        private function initBackground():void
-        {
-            // Anti-GPU Rampdown Hack
-            GPU_PIXEL_BMD = new BitmapData(1, 1, false, 0x010101);
-            GPU_PIXEL_BITMAP = new Bitmap(GPU_PIXEL_BMD);
-            addChild(GPU_PIXEL_BITMAP);
-
-            stage.color = GameBackgroundColor.BG_STAGE;
-        }
-
-        private function initUI():void
-        {
-            uiNoteField = new NoteBox(song, options, this);
-            uiNoteField.position();
-
-            buildScreenCut();
-
-            if (options.displayGameTopBar)
-            {
-                bgTopBar = sideScroll ? new BarTopSideways() : new BarTopNormal();
-                addChild(bgTopBar);
-            }
-
-            if (options.displayGameBottomBar)
-            {
-                bgBottomBar = sideScroll ? new BarBottomSideways() : new BarBottomNormal();
-                addChild(bgBottomBar);
-            }
-
-            if (options.displayPA)
-            {
-                uiPAWindow = new PAWindow(options, this);
-
-                if (sideScroll)
-                    uiPAWindow.alternateLayout();
-            }
-
-            if (options.displayScore)
-                uiScore = new Score(options, this);
-
-            if (options.displayCombo)
-            {
-                uiCombo = new Combo(options, this);
-                if (!sideScroll)
-                    uiCombo.alignment = "right";
-
-                uiComboStatic = new TextStatic(_lang.string("game_combo"), this);
-            }
-
-            if (options.displayRawGoods)
-            {
-                uiRawGoods = new RawGoods(options, this);
-                uiRawGoodsStatic = new TextStatic(_lang.string("game_raw_goods"), this, options.rawGoodsColor, 12);
-            }
-
-            if (options.displayComboTotal)
-            {
-                uiNoteCount = new Combo(options, this);
-                if (sideScroll)
-                    uiNoteCount.alignment = "right";
-
-                uiNoteCountStatic = new TextStatic(_lang.string("game_combo_total"), this);
-            }
-
-            if (options.displayAccuracyBar)
-                uiAccuracyBar = new AccuracyBar(options, this);
-
-            if (options.displaySongProgress || options.replay)
-            {
-                uiProgressDisplay = new ProgressBar(this, 161, 9, 458, 20, 4, 0x545454, 0.1);
-
-                if (options.replay)
-                    uiProgressDisplay.addEventListener(MouseEvent.CLICK, e_progressMouseClick);
-            }
-
-            if (options.displaySongProgressText)
-                uiProgressDisplayText = new TextStatic("0:00", this);
-
-            if (options.displayJudge)
-            {
-                uiJudge = new Judge(options, this);
-
-                if (options.isEditor)
-                    uiJudge.showJudge(100, true);
-            }
-
-            if (options.displayHealth)
-                uiLifebar = new LifeBar(this);
-
-            if (options.isEditor)
-            {
-                function closeEditor(e:MouseEvent):void
-                {
-                    GAME_STATE = GAME_END;
-                    if (!options.replay)
-                    {
-                        _gvars.activeUser.saveLocal();
-                        _gvars.activeUser.save();
-                    }
-                }
-
-                function resetLayout(e:MouseEvent):void
-                {
-                    for (var key:String in options.layout)
-                        delete options.layout[key];
-                    _avars.interfaceSave();
-                    interfaceSetup();
-                }
-
-                btnExitEditor = new BoxButton(this, (Main.GAME_WIDTH - 75) / 2, (Main.GAME_HEIGHT - 30) / 2, 75, 30, _lang.string("menu_close"), 12, closeEditor);
-                btnResetEditor = new BoxButton(this, btnExitEditor.x, btnExitEditor.y + 35, 75, 30, _lang.string("menu_reset"), 12, resetLayout);
-            }
-        }
-
         private function initPlayerVars():void
         {
             // Force no Judge on SongPreviews
@@ -618,16 +502,6 @@ package game
             gameReplay = [];
             gameReplayHit = [];
 
-            binReplayNotes = new Vector.<ReplayBinFrame>(song.totalNotes, true);
-            binReplayBoos = new <ReplayBinFrame>[];
-            gameHistory = new <IGameEvent>[];
-
-            // Prefill Replay
-            for (var i:int = song.totalNotes - 1; i >= 0; i--)
-                binReplayNotes[i] = new ReplayBinFrame(NaN, song.getNote(i).direction, i);
-
-            replayPressCount = 0;
-
             hitAmazing = 0;
             hitPerfect = 0;
             hitGood = 0;
@@ -637,19 +511,27 @@ package game
             hitCombo = 0;
             hitMaxCombo = 0;
 
-            updateHealth(0);
+            // Replay
+            replayPressCount = 0;
+
+            binReplayNotes = new Vector.<ReplayBinFrame>(song.totalNotes, true);
+            binReplayBoos = new <ReplayBinFrame>[];
+            gameHistory = new <IGameEvent>[];
+
+            // Prefill Replay
+            for (var i:int = song.totalNotes - 1; i >= 0; i--)
+                binReplayNotes[i] = new ReplayBinFrame(NaN, song.getNote(i).direction, i);
+
             if (song != null && song.totalNotes > 0)
             {
                 gameLastNoteFrame = song.getNote(song.totalNotes - 1).frame + Math.ceil(song.songInfo.time_end * 30);
                 gameFirstNoteFrame = song.getNote(0).frame;
             }
-            if (uiNoteCount)
-                uiNoteCount.update(song.totalNotes);
 
             absoluteStart = getTimer();
+            absolutePosition = 0;
             GAME_TIME = 0;
             GAME_FRAME = 0;
-            absolutePosition = 0;
 
             songOffset = new RollingAverage(options.frameRate * 4, _avars.configMusicOffset);
             frameRate = new RollingAverage(options.frameRate * 4, options.frameRate);
@@ -657,7 +539,14 @@ package game
 
             songDelayStarted = false;
 
+            // Update UI
             updateFieldVars();
+
+            if (uiNoteCount)
+                uiNoteCount.update(song.totalNotes);
+
+            if (uiLifebar)
+                uiLifebar.health = gameLife;
 
             if (uiProgressDisplayText)
                 uiProgressDisplayText.update(TimeUtil.convertToHMSS(Math.ceil(gameLastNoteFrame / 30)));
@@ -805,9 +694,10 @@ package game
 
         private function e_onKeyUp(e:KeyboardEvent):void
         {
-            var keyCode:int = e.keyCode;
+            const keyCode:int = e.keyCode;
+            const pressTime:int = getTimer() - absoluteStart + songOffset.value;
 
-            gameHistory.push(new GameKeyUpEvent(gameHistory.length, keyCode, GAME_TIME));
+            gameHistory.push(new GameKeyUpEvent(gameHistory.length, keyCode, pressTime));
 
             // Set Key as used.
             keyDown[keyCode] = false;
@@ -817,8 +707,10 @@ package game
 
         private function e_onKeyDown(e:KeyboardEvent):void
         {
-            var keyCode:int = e.keyCode;
+            const keyCode:int = e.keyCode;
+            const pressTime:int = getTimer() - absoluteStart + songOffset.value;
 
+            gameHistory.push(new GameKeyDownEvent(gameHistory.length, keyCode, pressTime));
 
             // Don't allow key presses unless the key is up.
             if (keyDown[keyCode])
@@ -836,29 +728,24 @@ package game
                     switch (keyCode)
                     {
                         case _gvars.activeUser.keyLeft:
-                            //case Keyboard.NUMPAD_4:
                             dir = "L";
                             break;
 
                         case _gvars.activeUser.keyRight:
-                            //case Keyboard.NUMPAD_6:
                             dir = "R";
                             break;
 
                         case _gvars.activeUser.keyUp:
-                            //case Keyboard.NUMPAD_8:
                             dir = "U";
                             break;
 
                         case _gvars.activeUser.keyDown:
-                            //case Keyboard.NUMPAD_2:
                             dir = "D";
                             break;
                     }
-                    if (dir)
-                    {
-                        judgeScorePosition(dir, Math.round(getTimer() - absoluteStart + songOffset.value));
-                    }
+
+                    if (dir != null)
+                        judgeScorePosition(dir, pressTime);
                 }
             }
 
@@ -1143,8 +1030,7 @@ package game
                 return;
 
             // Stop Music Play
-            if (song)
-                song.stop();
+            song.stop();
 
             // Play through to the end of a replay
             if (options.replay)
@@ -1157,7 +1043,7 @@ package game
 
             // Fill missing notes from replay.
             if (gameReplayHit.length > 0)
-            { // fix crash when spectating game ends
+            {
                 while (gameReplayHit.length < song.totalNotes)
                 {
                     gameReplayHit.push(-5);
@@ -1166,11 +1052,12 @@ package game
             gameReplayHit.push(-10);
             gameReplay.sort(ReplayNote.sortFunction)
 
-            var noteCount:int = hitAmazing + hitPerfect + hitGood + hitAverage + hitMiss;
 
             // Save results for display
             if (!options.isEditor)
             {
+                const noteCount:int = hitAmazing + hitPerfect + hitGood + hitAverage + hitMiss;
+
                 var newGameResults:GameScoreResult = new GameScoreResult();
                 newGameResults.game_index = _gvars.gameIndex++;
                 newGameResults.level = song.id;
@@ -1246,6 +1133,15 @@ package game
                 SOCKET_SCORE_MESSAGE["last_hit"] = null;
                 _gvars.websocketSend("NOTE_JUDGE", SOCKET_SCORE_MESSAGE);
                 _gvars.websocketSend("SONG_END", SOCKET_SONG_MESSAGE);
+            }
+
+            // Cleanup
+            initVars(false);
+
+            if (song != null)
+            {
+                song.stop();
+                song = null;
             }
 
             destroyUI();
@@ -1334,43 +1230,210 @@ package game
          *
            \*#########################################################################################*/
 
-        private function buildScreenCut():void
+        private function buildUI():void
         {
-            if (!options.displayScreencut)
-                return;
+            stage.color = GameBackgroundColor.BG_STAGE;
 
+            // Anti-GPU Rampdown Hack
+            GPU_PIXEL_BMD = new BitmapData(1, 1, false, 0x010101);
+            GPU_PIXEL_BITMAP = new Bitmap(GPU_PIXEL_BMD);
+            addChild(GPU_PIXEL_BITMAP);
+
+            uiNoteField = new NoteBox(song, options, this);
+            uiNoteField.position();
+
+            if (options.displayScreencut)
+                uiScreenCut = new ScreenCut(options, this);
+
+            if (options.displayGameTopBar)
+            {
+                bgTopBar = sideScroll ? new BarTopSideways() : new BarTopNormal();
+                addChild(bgTopBar);
+            }
+
+            if (options.displayGameBottomBar)
+            {
+                bgBottomBar = sideScroll ? new BarBottomSideways() : new BarBottomNormal();
+                addChild(bgBottomBar);
+            }
+
+            if (options.displayPA)
+            {
+                uiPAWindow = new PAWindow(options, this);
+
+                if (sideScroll)
+                    uiPAWindow.alternateLayout();
+            }
+
+            if (options.displayScore)
+                uiScore = new Score(options, this);
+
+            if (options.displayCombo)
+            {
+                uiCombo = new Combo(options, this);
+                if (!sideScroll)
+                    uiCombo.alignment = "right";
+
+                uiComboStatic = new TextStatic(_lang.string("game_combo"), this);
+            }
+
+            if (options.displayRawGoods)
+            {
+                uiRawGoods = new RawGoods(options, this);
+                uiRawGoodsStatic = new TextStatic(_lang.string("game_raw_goods"), this, options.rawGoodsColor, 12);
+            }
+
+            if (options.displayComboTotal)
+            {
+                uiNoteCount = new Combo(options, this);
+                if (sideScroll)
+                    uiNoteCount.alignment = "right";
+
+                uiNoteCountStatic = new TextStatic(_lang.string("game_combo_total"), this);
+            }
+
+            if (options.displayAccuracyBar)
+                uiAccuracyBar = new AccuracyBar(options, this);
+
+            if (options.displaySongProgress || options.replay)
+            {
+                uiProgressDisplay = new ProgressBar(this, 161, 9, 458, 20, 4, 0x545454, 0.1);
+
+                if (options.replay)
+                    uiProgressDisplay.addEventListener(MouseEvent.CLICK, e_progressMouseClick);
+            }
+
+            if (options.displaySongProgressText)
+                uiProgressDisplayText = new TextStatic("0:00", this);
+
+            if (options.displayJudge)
+            {
+                uiJudge = new Judge(options, this);
+
+                if (options.isEditor)
+                    uiJudge.showJudge(100, true);
+            }
+
+            if (options.displayHealth)
+                uiLifebar = new LifeBar(this);
+
+            if (options.isEditor)
+            {
+                function closeEditor(e:MouseEvent):void
+                {
+                    GAME_STATE = GAME_END;
+                    if (!options.replay)
+                    {
+                        _gvars.activeUser.saveLocal();
+                        _gvars.activeUser.save();
+                    }
+                }
+
+                function resetLayout(e:MouseEvent):void
+                {
+                    for (var key:String in options.layout)
+                        delete options.layout[key];
+                    _avars.interfaceSave();
+                    interfaceSetup();
+                }
+
+                btnExitEditor = new BoxButton(this, (Main.GAME_WIDTH - 75) / 2, (Main.GAME_HEIGHT - 30) / 2, 75, 30, _lang.string("menu_close"), 12, closeEditor);
+                btnResetEditor = new BoxButton(this, btnExitEditor.x, btnExitEditor.y + 35, 75, 30, _lang.string("menu_reset"), 12, resetLayout);
+            }
+        }
+
+        private function destroyUI():void
+        {
+            if (uiSongBackground)
+            {
+                this.removeChild(uiSongBackground);
+                uiSongBackground = null;
+            }
+
+            if (GPU_PIXEL_BITMAP)
+            {
+                this.removeChild(GPU_PIXEL_BITMAP);
+                GPU_PIXEL_BITMAP = null;
+                GPU_PIXEL_BMD = null;
+            }
+            if (uiProgressDisplay)
+            {
+                this.removeChild(uiProgressDisplay);
+                uiProgressDisplay = null;
+            }
+            if (uiLifebar)
+            {
+                this.removeChild(uiLifebar);
+                uiLifebar = null;
+            }
+            if (uiJudge)
+            {
+                this.removeChild(uiJudge);
+                uiJudge = null;
+            }
+            if (bgTopBar)
+            {
+                this.removeChild(bgTopBar);
+                bgTopBar = null;
+            }
+            if (bgBottomBar)
+            {
+                this.removeChild(bgBottomBar);
+                bgBottomBar = null;
+            }
+            if (uiNoteField)
+            {
+                uiNoteField.reset();
+                this.removeChild(uiNoteField);
+                uiNoteField = null;
+            }
             if (uiScreenCut)
             {
-                if (this.contains(uiScreenCut))
-                    this.removeChild(uiScreenCut);
+                this.removeChild(uiScreenCut);
                 uiScreenCut = null;
             }
-            uiScreenCut = new ScreenCut(options, this);
+
+            if (btnExitEditor)
+            {
+                btnExitEditor.dispose();
+                this.removeChild(btnExitEditor);
+                btnExitEditor = null;
+            }
+            if (btnResetEditor)
+            {
+                btnResetEditor.dispose();
+                this.removeChild(btnResetEditor);
+                btnResetEditor = null;
+            }
         }
 
         private function interfaceLayout(key:String, defaults:Boolean = true):Object
         {
             if (defaults)
             {
-                var ret:Object = new Object();
+                var ret:Object = {};
                 var def:Object = defaultLayout[key];
+
                 for (var i:String in def)
                     ret[i] = def[i];
+
                 var layout:Object = options.layout[key];
                 for (i in layout)
                     ret[i] = layout[i];
+
                 return ret;
             }
             else if (!options.layout[key])
-                options.layout[key] = new Object();
+                options.layout[key] = {};
+
             return options.layout[key];
         }
 
         private function interfaceSetup():void
         {
-            defaultLayout = new Object();
+            defaultLayout = {};
             defaultLayout[LAYOUT_PROGRESS_BAR] = {x: 161, y: 9};
-            defaultLayout[LAYOUT_PROGRESS_TEXT] = {x: 768, y: 5, properties: {alignment: "right"}};
+            defaultLayout[LAYOUT_PROGRESS_TEXT] = {x: 768, y: 5, alignment: "right"};
             defaultLayout[LAYOUT_JUDGE] = {x: 392, y: 228};
             defaultLayout[LAYOUT_ACCURACY_BAR] = {x: (Main.GAME_WIDTH / 2), y: 328};
             defaultLayout[LAYOUT_HEALTH] = {x: Main.GAME_WIDTH - 37, y: 71.5};
@@ -1381,7 +1444,7 @@ package game
                 defaultLayout[LAYOUT_PA] = {x: 16, y: 418};
                 defaultLayout[LAYOUT_SCORE] = {x: 392, y: 24};
                 defaultLayout[LAYOUT_COMBO] = {x: 508, y: 388};
-                defaultLayout[LAYOUT_COMBO_TOTAL] = {x: 770, y: 420, properties: {alignment: "right"}};
+                defaultLayout[LAYOUT_COMBO_TOTAL] = {x: 770, y: 420, alignment: "right"};
                 defaultLayout[LAYOUT_COMBO_STATIC] = {x: 512, y: 450};
                 defaultLayout[LAYOUT_COMBO_TOTAL_STATIC] = {x: 734, y: 414};
                 defaultLayout[LAYOUT_RAWGOODS] = {x: 90, y: 35};
@@ -1391,7 +1454,7 @@ package game
             {
                 defaultLayout[LAYOUT_PA] = {x: 6, y: 96};
                 defaultLayout[LAYOUT_SCORE] = {x: 392, y: 440};
-                defaultLayout[LAYOUT_COMBO] = {x: 222, y: 402, properties: {alignment: "right"}};
+                defaultLayout[LAYOUT_COMBO] = {x: 222, y: 402, alignment: "right"};
                 defaultLayout[LAYOUT_COMBO_TOTAL] = {x: 544, y: 402};
                 defaultLayout[LAYOUT_COMBO_STATIC] = {x: 228, y: 436};
                 defaultLayout[LAYOUT_COMBO_TOTAL_STATIC] = {x: 502, y: 436};
@@ -1445,16 +1508,9 @@ package game
             if (!sprite)
                 return;
 
-            if ("x" in layout)
-                sprite.x = layout["x"];
-            if ("y" in layout)
-                sprite.y = layout["y"];
-            if ("rotation" in layout)
-                sprite.rotation = layout["rotation"];
-            if ("visible" in layout)
-                sprite.visible = layout["visible"];
-            for (var p:String in layout.properties)
-                sprite[p] = layout.properties[p];
+            for (var p:String in layout)
+                if (p in sprite)
+                    sprite[p] = layout[p];
         }
 
         private function interfaceEditor(sprite:Sprite, layout:Object):void
@@ -1477,73 +1533,6 @@ package game
                 layout["y"] = sprite.y;
                 _avars.interfaceSave();
             });
-        }
-
-        private function destroyUI():void
-        {
-            // Cleanup
-            initVars(false);
-
-            if (song != null)
-                song.stop();
-
-            song = null;
-
-            if (uiSongBackground)
-            {
-                this.removeChild(uiSongBackground);
-                uiSongBackground = null;
-            }
-
-            // Remove UI
-            if (GPU_PIXEL_BITMAP)
-            {
-                this.removeChild(GPU_PIXEL_BITMAP);
-                GPU_PIXEL_BITMAP = null;
-                GPU_PIXEL_BMD = null;
-            }
-            if (uiProgressDisplay)
-            {
-                this.removeChild(uiProgressDisplay);
-                uiProgressDisplay = null;
-            }
-            if (uiLifebar)
-            {
-                this.removeChild(uiLifebar);
-                uiLifebar = null;
-            }
-            if (uiJudge)
-            {
-                this.removeChild(uiJudge);
-                uiJudge = null;
-            }
-            if (bgTopBar)
-            {
-                this.removeChild(bgTopBar);
-                bgTopBar = null;
-            }
-            if (bgBottomBar)
-            {
-                this.removeChild(bgBottomBar);
-                bgBottomBar = null;
-            }
-            if (uiNoteField)
-            {
-                uiNoteField.reset();
-                this.removeChild(uiNoteField);
-                uiNoteField = null;
-            }
-            if (uiScreenCut)
-            {
-                this.removeChild(uiScreenCut);
-                uiScreenCut = null;
-            }
-            if (btnExitEditor)
-            {
-                btnExitEditor.dispose();
-                this.removeChild(btnExitEditor);
-                btnExitEditor = null;
-            }
         }
 
         /*#########################################################################################*\
