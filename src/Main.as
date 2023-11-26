@@ -157,9 +157,6 @@ package
             //- Load Menu Music
             _gvars.loadMenuMusic();
 
-            //- Set Vars
-            _gvars.flashvars = stage.loaderInfo.parameters;
-
             //- Background
             this.stage.color = 0x000000;
 
@@ -487,45 +484,15 @@ package
                     }
                 }
 
-                if ((_gvars.flashvars.replay != null || _gvars.flashvars.preview_file != null) && _gvars.options && _gvars.options.replay)
-                {
-                    if (_gvars.options.replay is SongPreview && !_gvars.options.replay.isLoaded)
-                    {
-                        (_gvars.options.replay as SongPreview).setupSongPreview();
-                        return;
-                    }
-                    if (_gvars.options.replay.isLoaded)
-                    {
-                        loadScripts = 0;
-                        preloader.remove();
-
-                        if (this.contains(loadStatus))
-                            removeChild(loadStatus);
-                        if (this.contains(epilepsyWarning))
-                            removeChild(epilepsyWarning);
-
-                        this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
-
-                        // Setup Vars
-                        _gvars.songQueue.push(Playlist.instance.getSongInfo(_gvars.options.replay.level));
-
-                        // Switch to game
-                        switchTo(GAME_PLAY_PANEL);
-                    }
-                    return;
-                }
-                else
-                {
-                    loadScripts = 0;
-                    preloader.remove();
-                    removeChild(loadStatus);
-                    this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
-                    _playlist.updateSongAccess();
-                    _playlist.updatePublicSongsCount();
-                    _gvars.loadUserSongData();
-                    _gvars.activeUser.getUserSkillRatingData();
-                    switchTo(_gvars.activeUser.isGuest || _gvars.flashvars["__forceLogin"] ? GAME_LOGIN_PANEL : GAME_MENU_PANEL);
-                }
+                loadScripts = 0;
+                preloader.remove();
+                removeChild(loadStatus);
+                this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
+                _playlist.updateSongAccess();
+                _playlist.updatePublicSongsCount();
+                _gvars.loadUserSongData();
+                _gvars.activeUser.getUserSkillRatingData();
+                switchTo(_gvars.activeUser.isGuest ? GAME_LOGIN_PANEL : GAME_MENU_PANEL);
             }
         }
 
