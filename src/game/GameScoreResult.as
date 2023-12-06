@@ -33,6 +33,8 @@ package game
         public var max_combo:int = 0;
         public var score:int = 0;
 
+        private var _score_total:Number = NaN;
+
         public function get is_aaa():Boolean
         {
             return (((amazing + perfect) == note_count) && max_combo == note_count && good == 0 && average == 0 && boo == 0 && miss == 0);
@@ -168,7 +170,15 @@ package game
          */
         public function get score_total():Number
         {
+            if (!isNaN(_score_total))
+                return _score_total;
+
             return Math.max(0, ((amazing + perfect) * 500) + (good * 250) + (average * 50) + (max_combo * 1000) - (miss * 300) - (boo * 15) + score);
+        }
+
+        public function set score_total(val:Number):void
+        {
+            _score_total = val;
         }
 
         /**
