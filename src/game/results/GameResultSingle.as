@@ -102,7 +102,6 @@ package game.results
 
         public function GameResultSingle():void
         {
-
             // Background
             resultsDisplay = new ResultsBackground();
             this.addChild(resultsDisplay);
@@ -210,19 +209,14 @@ package game.results
             graphAccuracy = new BoxIcon(this, 10, 318, 16, 18, new iconSmallT());
             graphAccuracy.padding = 6;
             graphAccuracy.delay = 250;
-
         }
 
         public function onScoreResult(e:ScoreHandlerEvent):void
         {
-
             if (result == e.result)
             {
-                if (currentRank)
-                    currentRank.text = e.rank;
-
-                if (lastRank)
-                    lastRank.text = e.last_best;
+                currentRank.text = e.rank;
+                lastRank.text = e.last_best;
             }
         }
 
@@ -252,7 +246,6 @@ package game.results
                 var songLength:String = (Math.floor(seconds / 60)) + ":" + (seconds % 60 >= 10 ? "" : "0") + (seconds % 60);
                 var rateString:String = result.options.songRate != 1 ? colorWrap(" (" + result.options.songRate + "x Rate)") : "";
 
-
                 // Song Title
                 songTitle = songInfo.engine ? songInfo.name + rateString : "<a href=\"" + URLs.resolve(URLs.LEVEL_STATS_URL) + songInfo.level + "\">" + songInfo.name + rateString + "</a>";
                 songSubTitle = sprintf(_lang.string("game_results_subtitle_difficulty"), {"value": songInfo.difficulty}) + " - " + sprintf(_lang.string("game_results_subtitle_length"), {"value": songLength});
@@ -262,7 +255,6 @@ package game.results
                     songSubTitle += " - " + _lang.wrapFont(sprintf(_lang.stringSimple("game_results_subtitle_stepauthor"), {"value": songInfo.stepauthor_html}));
 
                 displayTime = result.end_time;
-
             }
 
             // Local Backgrounds
@@ -317,7 +309,6 @@ package game.results
             valueMaxCombo.text = NumberUtil.numberFormat(result.max_combo);
             valueCredits.text = NumberUtil.numberFormat(result.credits);
 
-
             /// - Rank Text
             // Has R3 Highscore
             if (_gvars.songResultRanks[result.game_index] != null)
@@ -350,8 +341,8 @@ package game.results
             // Blank
             else
             {
-                currentRank.text = "";
-                lastRank.text = "";
+                currentRank.text = "-";
+                lastRank.text = "-";
             }
 
             // Edited Replay

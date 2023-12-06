@@ -210,7 +210,8 @@ package game
 
         private function e_onScoreResult(e:ScoreHandlerEvent):void
         {
-            resultsDisplay.onScoreResult(e);
+            if (resultsDisplay)
+                resultsDisplay.onScoreResult(e);
         }
 
         //******************************************************************************************//
