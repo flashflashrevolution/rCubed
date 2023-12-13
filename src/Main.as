@@ -714,6 +714,9 @@ package
 
         public function displayPopupQueue():void
         {
+            if (current_popup != null)
+                return;
+
             if (popupQueue.length > 0)
             {
                 var pop:Object = popupQueue.shift();

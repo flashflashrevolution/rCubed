@@ -57,10 +57,8 @@ package menu
                 }
             }
 
-            var style:StyleSheet = new StyleSheet();
-            style.setStyle("A", {textDecoration: "underline", fontWeight: "bold"});
             var messageText:TextField = new TextField();
-            messageText.styleSheet = style;
+            messageText.styleSheet = Constant.STYLESHEET;
             messageText.x = 5;
             messageText.y = 20;
             messageText.selectable = false;

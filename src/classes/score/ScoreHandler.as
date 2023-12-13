@@ -93,7 +93,7 @@ package classes.score
             var ret:Boolean = false;
             ret ||= valid_score && !result.options.isScoreValid(true, false);
             ret ||= valid_replay && !result.options.isScoreValid(false, true);
-            ret ||= check_replay && (result.replayData.length <= 0 || result.score <= 0 || (result.options.replay && result.options.replay.isEdited) || result.user.siteId != _gvars.playerUser.siteId)
+            ret ||= check_replay && (result.replayData == null || result.replayData.length <= 0 || result.score <= 0 || (result.options.replay && result.options.replay.isEdited) || result.user.siteId != _gvars.playerUser.siteId)
             ret ||= check_alt_engine && (result.user.isGuest || result.songInfo.engine != null);
             return !ret;
         }
@@ -421,10 +421,6 @@ package classes.score
                 }
 
                 // Has Reponse
-                var result:Object = JSON.parse(e.target.postData.data);
-                var songInfo:SongInfo = e.target.song;
-                var gameResult:GameScoreResult = e.target.results;
-
                 Logger.success(instance, "Alt Score Save Result: " + data.result);
 
                 if (data.result == 0)
@@ -448,7 +444,7 @@ package classes.score
                     }
 
                     // Display Popup Queue
-                    _gvars.gameMain.displayPopupQueue(); // TODO Add into GameResults
+                    _gvars.gameMain.displayPopupQueue();
                 }
             }
 

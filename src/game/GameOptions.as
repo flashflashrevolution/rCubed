@@ -264,7 +264,7 @@ package game
         {
             if (!modCache)
             {
-                modCache = new Object();
+                modCache = {};
                 for each (var gameMod:String in mods)
                     modCache[gameMod] = true;
             }
@@ -274,7 +274,7 @@ package game
         public function settingsEncode():Object
         {
             var i:int;
-            var settings:Object = new Object();
+            var settings:Object = {};
             settings["viewOffset"] = offsetGlobal;
             settings["judgeOffset"] = offsetJudge;
             settings["autoJudgeOffset"] = autoJudgeOffset;

@@ -348,7 +348,10 @@ package menu
 
             //- Add Listeners
             if (stage)
+            {
                 stage.addEventListener(KeyboardEvent.KEY_DOWN, keyHandler, false, 0, true);
+                buildInfoBox();
+            }
         }
 
         override public function stageRemove():void

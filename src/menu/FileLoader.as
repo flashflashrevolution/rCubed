@@ -37,7 +37,7 @@ package menu
 
                 // Build Song Info
                 var songInfo:SongInfo = new SongInfo();
-                songInfo.access = SongInfo.SONG_TYPE_PUBLIC;
+                songInfo.access = GlobalVariables.SONG_ACCESS_PLAYABLE;
                 songInfo.genre = 14;
                 songInfo.author = songInfo.author_html = chartinfo.author;
                 songInfo.stepauthor = songInfo.stepauthor_html = chartinfo.stepauthor;

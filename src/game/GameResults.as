@@ -32,7 +32,6 @@ package game
         private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _avars:ArcGlobals = ArcGlobals.instance;
         private var _lang:Language = Language.instance;
-        private var _loader:DynamicURLLoader;
         private var _playlist:Playlist = Playlist.instance;
         private var _score:ScoreHandler = ScoreHandler.instance;
 
@@ -125,13 +124,13 @@ package game
             resultsDisplay = new GameResultSingle();
             addChild(resultsDisplay);
 
+            // Main Navigation Buttons
             var buttonMenu:Sprite = new Sprite();
             var buttonMenuItems:Array = [];
             buttonMenu.x = 22;
             buttonMenu.y = 428;
             this.addChild(buttonMenu);
 
-            // Main Bavigation Buttons
             navOptions = new BoxButton(buttonMenu, 0, 0, 170, 40, _lang.string("game_results_menu_options"), 17, eventHandler);
             buttonMenuItems.push(navOptions);
 
@@ -211,7 +210,12 @@ package game
         private function e_onScoreResult(e:ScoreHandlerEvent):void
         {
             if (resultsDisplay)
+            {
                 resultsDisplay.onScoreResult(e);
+
+                // Display Popup Queue
+                _gvars.gameMain.displayPopupQueue();
+            }
         }
 
         //******************************************************************************************//
@@ -336,9 +340,8 @@ package game
 
         /**
          * Handles Auto Judge Offset options by changing the judge offset and saving
-         * the user settings. This is called when scores are saved successfully and
-         * passes in the site response post vars, not GameScoreResult.
-         * @param result Post Vars
+         * the user settings. This is called when scores are saved successfully.
+         * @param result GameScoreResult
          */
         private function updateJudgeOffset(result:GameScoreResult):void
         {
