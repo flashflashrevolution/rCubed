@@ -10,7 +10,7 @@ package game.events
         private var isFocus:Boolean;
         private var timestamp:int;
 
-        public function GameFocusChangeEvent(index:uint, isFocus:Boolean, timestamp:int):void
+        public function GameFocusChangeEvent(index:uint, timestamp:int, isFocus:Boolean):void
         {
             this.index = index;
             this.isFocus = isFocus;
@@ -20,9 +20,9 @@ package game.events
         public function writeData(output:IDataOutput):void
         {
             output.writeUnsignedInt(index);
+            output.writeUnsignedInt(timestamp);
             output.writeByte(ID);
             output.writeByte(isFocus ? 1 : 0);
-            output.writeInt(timestamp);
         }
     }
 }

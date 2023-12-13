@@ -10,19 +10,19 @@ package game.events
         private var key:uint;
         private var timestamp:Number;
 
-        public function GameKeyDownEvent(index:uint, key:uint, timestamp:Number):void
+        public function GameKeyDownEvent(index:uint, timestamp:Number, key:uint):void
         {
             this.index = index;
-            this.key = key;
             this.timestamp = timestamp;
+            this.key = key;
         }
 
         public function writeData(output:IDataOutput):void
         {
             output.writeUnsignedInt(index);
+            output.writeUnsignedInt(timestamp);
             output.writeByte(ID);
             output.writeByte(key);
-            output.writeFloat(timestamp);
         }
     }
 }
