@@ -30,7 +30,7 @@ package game.results
     import game.graph.GraphBase;
     import game.graph.GraphCombo;
 
-    public class GameResultSingle extends Sprite
+    public class GameResultSingleView extends Sprite
     {
         public static const GRAPH_WIDTH:int = 718;
         public static const GRAPH_HEIGHT:int = 117;
@@ -100,7 +100,7 @@ package game.results
         private var graphOverlay:Sprite;
         private var graphOverlayText:Text;
 
-        public function GameResultSingle():void
+        public function GameResultSingleView():void
         {
             // Background
             resultsDisplay = new ResultsBackground();
@@ -127,17 +127,17 @@ package game.results
             songDecription.mouseChildren = true;
             songDecription.mouseEnabled = true;
 
-            textAmazing = new Text(this, 15, 115, "Amazing:", 14, "#79F02A");
+            textAmazing = new Text(this, 15, 115, _lang.string("results_amazing"), 14, "#79F02A");
             textAmazing.setAreaParams(104, 24, "right");
-            textPerfect = new Text(this, 15, 143, "Perfect:", 14, "#12FF00");
+            textPerfect = new Text(this, 15, 143, _lang.string("results_perfect"), 14, "#12FF00");
             textPerfect.setAreaParams(104, 24, "right");
-            textGood = new Text(this, 15, 170, "Good:", 14, "#00AD0F");
+            textGood = new Text(this, 15, 170, _lang.string("results_good"), 14, "#00AD0F");
             textGood.setAreaParams(104, 24, "right");
-            textAverage = new Text(this, 15, 196, "Average:", 14, "#FF9A00");
+            textAverage = new Text(this, 15, 196, _lang.string("results_average"), 14, "#FF9A00");
             textAverage.setAreaParams(104, 24, "right");
-            textMiss = new Text(this, 15, 223, "Miss:", 14, "#FF0000");
+            textMiss = new Text(this, 15, 223, _lang.string("results_miss"), 14, "#FF0000");
             textMiss.setAreaParams(104, 24, "right");
-            textBoo = new Text(this, 15, 249, "Boo:", 14, "#874300");
+            textBoo = new Text(this, 15, 249, _lang.string("results_boo"), 14, "#874300");
             textBoo.setAreaParams(104, 24, "right");
 
             valueAmazing = new Text(this, 122, 114, "", 19, "#DCFFCB");
@@ -153,17 +153,17 @@ package game.results
             valueBoo = new Text(this, 122, 246, "", 17, "#E7D0B8");
             valueBoo.setAreaParams(130, 28);
 
-            textAAAeq = new Text(this, 257, 113, "AAA Equivalency:", 14, "#B1E8EA");
+            textAAAeq = new Text(this, 257, 113, _lang.string("results_aaaeq"), 14, "#B1E8EA");
             textAAAeq.setAreaParams(148, 24, "right");
-            textRawGoods = new Text(this, 258, 139, "Raw Goods:", 14, "#B1E8EA");
+            textRawGoods = new Text(this, 258, 139, _lang.string("results_raw_goods"), 14, "#B1E8EA");
             textRawGoods.setAreaParams(148, 24, "right");
-            textRawScore = new Text(this, 257, 167, "Raw Score:", 14, "#B1E8EA");
+            textRawScore = new Text(this, 257, 167, _lang.string("results_raw_score"), 14, "#B1E8EA");
             textRawScore.setAreaParams(148, 24, "right");
-            textGrandtotal = new Text(this, 257, 194, "Grandtotal:", 14, "#B1E8EA");
+            textGrandtotal = new Text(this, 257, 194, _lang.string("results_grandtotal"), 14, "#B1E8EA");
             textGrandtotal.setAreaParams(148, 24, "right");
-            textMaxCombo = new Text(this, 257, 221, "Max Combo:", 14, "#B1E8EA");
+            textMaxCombo = new Text(this, 257, 221, _lang.string("results_max_combo"), 14, "#B1E8EA");
             textMaxCombo.setAreaParams(148, 24, "right");
-            textCredits = new Text(this, 257, 248, "Credits:", 14, "#B1E8EA");
+            textCredits = new Text(this, 257, 248, _lang.string("results_credits"), 14, "#B1E8EA");
             textCredits.setAreaParams(148, 24, "right");
 
             valueAAAeq = new Text(this, 408, 111, "0", 16, "#FFFFFF");
@@ -181,7 +181,7 @@ package game.results
 
             currentRank = new Text(this, 575, 220, "", 15, "#FFFFFF");
             currentRank.setAreaParams(180, 28, "center");
-            lastRank = new Text(this, 575, 246, "", 14, "#FFFFFF");
+            lastRank = new Text(this, 575, 248, "", 14, "#FFFFFF");
             lastRank.setAreaParams(180, 28, "center");
 
             resultsMods = new Text(this, 18, 276, "---");
@@ -239,12 +239,11 @@ package game.results
                 songSubTitle = songInfo.name;
                 displayTime = resultsTime;
             }
-            else if (result.game_index >= 0)
+            else
             {
-
                 var seconds:Number = Math.floor(songInfo.time_secs * (1 / result.options.songRate));
                 var songLength:String = (Math.floor(seconds / 60)) + ":" + (seconds % 60 >= 10 ? "" : "0") + (seconds % 60);
-                var rateString:String = result.options.songRate != 1 ? colorWrap(" (" + result.options.songRate + "x Rate)") : "";
+                var rateString:String = result.options.songRate != 1 ? sprintf(_lang.string("results_rate"), {value: result.options.songRate}) : "";
 
                 // Song Title
                 songTitle = songInfo.engine ? songInfo.name + rateString : "<a href=\"" + URLs.resolve(URLs.LEVEL_STATS_URL) + songInfo.level + "\">" + songInfo.name + rateString + "</a>";
@@ -290,7 +289,7 @@ package game.results
                 song_weight = 0;
 
             // Text
-            header.text = (result.options.replay ? "Replay r" : "R") + "esults for " + skillLevel + result.user.name + ":";
+            header.text = sprintf(_lang.string(result.options.replay ? "results_header_replay" : "results_header_play"), {name: skillLevel + result.user.name});
             time.text = displayTime;
             songName.text = songTitle;
             songDecription.text = songSubTitle;
@@ -311,10 +310,19 @@ package game.results
 
             /// - Rank Text
             // Has R3 Highscore
-            if (_gvars.songResultRanks[result.game_index] != null)
+            var savedRankResult:Object = _gvars.songResultRanks[result.game_index];
+            if (savedRankResult != null)
             {
-                currentRank.text = "Rank: " + _gvars.songResultRanks[result.game_index].new_ranking;
-                lastRank.text = "Last Best: " + _gvars.songResultRanks[result.game_index].old_ranking;
+                if (savedRankResult.error)
+                {
+                    currentRank.text = savedRankResult.text1;
+                    lastRank.text = savedRankResult.text2;
+                }
+                else
+                {
+                    currentRank.text = sprintf(_lang.string("results_rank"), {rank: _gvars.songResultRanks[result.game_index].new_ranking});
+                    lastRank.text = sprintf(_lang.string("results_last_rank"), {rank: _gvars.songResultRanks[result.game_index].old_ranking});
+                }
             }
             // Alt Engine Score
             else if (result.songInfo && result.songInfo.engine)
@@ -323,26 +331,26 @@ package game.results
                 var rank:Object = result.legacyLastRank;
                 if (rank)
                 {
-                    currentRank.text = (rank.score < result.score ? "Last" : "Current") + " Best: " + rank.score;
+                    currentRank.text = sprintf(_lang.string((rank.score < result.score ? "results_last_best" : "results_best")), {score: rank.score});
                     lastRank.text = rank.results;
                 }
                 else
                 {
-                    currentRank.text = "Saved score locally";
+                    currentRank.text = _lang.string("results_saved_score_locally");
                     lastRank.text = "";
                 }
             }
             // Getting Rank / Unsendable Score
-            else if (!result.options.replay && result.game_index != -1 && !result.user.isGuest)
+            else if (!result.options.replay && result.game_index >= 0 && !result.user.isGuest)
             {
-                currentRank.text = canScoreSave ? "Saving score..." : "Score not saved";
+                currentRank.text = _lang.string(canScoreSave ? "results_saving_score" : "results_score_not_saved");
                 lastRank.text = "";
             }
             // Blank
             else
             {
-                currentRank.text = "-";
-                lastRank.text = "-";
+                currentRank.text = "";
+                lastRank.text = "";
             }
 
             // Edited Replay
@@ -355,14 +363,14 @@ package game.results
             // Song Preview
             if (result.is_preview)
             {
-                header.text = "Song Preview:";
+                header.text = _lang.string("results_song_preview");
                 valueCredits.text = "0";
             }
 
             // Mod Text
-            resultsMods.text = colorWrap("Scroll Speed: ") + result.options.scrollSpeed;
+            resultsMods.text = sprintf(_lang.string("results_scroll_speed"), {value: result.options.scrollSpeed});
             if (result.restarts > 0)
-                resultsMods.text += ", " + colorWrap("Restarts: ") + result.restarts;
+                resultsMods.text += ", " + sprintf(_lang.string("results_restarts"), {value: result.restarts});
 
             var mods:Array = [];
             for each (var mod:String in result.options.mods)
@@ -371,9 +379,9 @@ package game.results
             if (result.options.judgeWindow)
                 mods.push(_lang.string("options_mod_judge"));
             if (mods.length > 0)
-                resultsMods.text += ", " + colorWrap("Game Mods: ") + mods.join(", ");
+                resultsMods.text += ", " + sprintf(_lang.string("results_game_mods"), {value: mods.join(", ")});
             if (result.last_note > 0)
-                resultsMods.text += ", " + colorWrap("Last Note: ") + result.last_note;
+                resultsMods.text += ", " + sprintf(_lang.string("results_last_note"), {value: result.last_note});
 
             if (result.game_index != -1)
             {
@@ -446,12 +454,6 @@ package game.results
                 }
             }
         }
-
-        private function colorWrap(str:String, color:String = "#B1E8EA"):String
-        {
-            return "<font color=\"" + color + "\">" + str + "</font>";
-        }
-
 
         //******************************************************************************************//
         // Graph Logic

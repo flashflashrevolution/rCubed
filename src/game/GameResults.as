@@ -22,7 +22,7 @@ package game
     import flash.ui.Keyboard;
     import flash.utils.getTimer;
     import game.results.GameResultBackground;
-    import game.results.GameResultSingle;
+    import game.results.GameResultSingleView;
     import menu.MenuPanel;
     import popups.PopupHighscores;
     import popups.PopupSongNotes;
@@ -43,7 +43,7 @@ package game
         private var queueTotalResult:GameScoreResult;
 
         private var background:GameResultBackground;
-        private var resultsDisplay:GameResultSingle;
+        private var resultsDisplay:GameResultSingleView;
 
         // Title Bar
         private var navSaveReplay:BoxIcon;
@@ -121,7 +121,7 @@ package game
             noiseImage.alpha = 0.2;
             background.addChild(noiseImage);
 
-            resultsDisplay = new GameResultSingle();
+            resultsDisplay = new GameResultSingleView();
             addChild(resultsDisplay);
 
             // Main Navigation Buttons

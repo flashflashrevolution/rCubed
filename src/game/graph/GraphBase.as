@@ -3,7 +3,7 @@ package game.graph
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import game.GameScoreResult;
-    import game.results.GameResultSingle;
+    import game.results.GameResultSingleView;
 
     public class GraphBase
     {
@@ -28,8 +28,8 @@ package game.graph
                 "0": "game_miss",
                 "-5": "game_boo"};
 
-        protected var graphWidth:Number = GameResultSingle.GRAPH_WIDTH;
-        protected var graphHeight:Number = GameResultSingle.GRAPH_HEIGHT;
+        protected var graphWidth:Number = GameResultSingleView.GRAPH_WIDTH;
+        protected var graphHeight:Number = GameResultSingleView.GRAPH_HEIGHT;
 
         protected var result:GameScoreResult;
         protected var graph:Sprite;
