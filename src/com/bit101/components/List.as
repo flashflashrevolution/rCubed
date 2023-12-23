@@ -370,7 +370,7 @@ package com.bit101.components
             for (var i:int = 0; i < _items.length; i++)
             {
                 var it:Object = _items[i];
-                if (it is String && it == item)
+                if ((it is String || it is Number) && it == item)
                 {
                     selectedIndex = i;
                     break;
