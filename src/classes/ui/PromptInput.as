@@ -48,8 +48,7 @@ package classes.ui
             _close_button.dispose();
             _text.dispose();
 
-            if (parent != null && parent.contains(this))
-                parent.removeChild(this);
+            close();
         }
 
         protected function submitPrompt(e:MouseEvent = null):void
