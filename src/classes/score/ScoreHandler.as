@@ -197,7 +197,7 @@ package classes.score
 
                     Alert.add(_lang.string("error_failed_to_save_results") + " (ERR: JSON_ERROR)", 360, Alert.RED);
 
-                    instance.dispatchEvent(new ScoreHandlerEvent(ScoreHandlerEvent.FAILURE, gameResult, "Score save failed!", "")); // TODO Language
+                    instance.dispatchEvent(new ScoreHandlerEvent(ScoreHandlerEvent.FAILURE, gameResult, _lang.string("results_score_saved_failed"), ""));
 
                     return;
                 }
@@ -243,7 +243,7 @@ package classes.score
                     // Valid Legal Score
                     if (postData.update)
                     {
-                        _gvars.songResultRanks[gameResult.game_index] = {old_ranking: data.old_ranking, new_ranking: data.new_ranking};
+                        _gvars.songResultRanks[gameResult.game_index] = {error: false, old_ranking: data.old_ranking, new_ranking: data.new_ranking};
 
                         // Check Old vs New Rankings.
                         if (data.new_ranking < data.old_ranking && data.old_ranking > 0)
@@ -294,22 +294,25 @@ package classes.score
                             previousLevelRanks["fcs"] += newLevelRanks["fcs"];
                         }
 
-                        instance.dispatchEvent(new ScoreHandlerEvent(ScoreHandlerEvent.SUCCESS, gameResult, "Rank: " + _gvars.songResultRanks[gameResult.game_index].new_ranking, "Last Best: " + _gvars.songResultRanks[gameResult.game_index].old_ranking)); // TODO Language Update
+                        instance.dispatchEvent(new ScoreHandlerEvent(ScoreHandlerEvent.SUCCESS, gameResult, sprintf(_lang.string("results_rank"), {rank: _gvars.songResultRanks[gameResult.game_index].new_ranking}), sprintf(_lang.string("results_last_rank"), {rank: _gvars.songResultRanks[gameResult.game_index].old_ranking})));
                     }
                     else
                     {
-                        instance.dispatchEvent(new ScoreHandlerEvent(ScoreHandlerEvent.FAILURE, gameResult, "Game Mods", "Enabled")); // TODO Language Update
+                        instance.dispatchEvent(new ScoreHandlerEvent(ScoreHandlerEvent.FAILURE, gameResult, _lang.string("results_game_mods_enabled_1"), _lang.string("results_game_mods_enabled_1")));
                     }
-
-                    // Display Popup Queue
-                    _gvars.gameMain.displayPopupQueue(); // TODO Add into GameResults
                 }
                 else
                 {
                     if (data.ignore)
+                    {
+                        _gvars.songResultRanks[gameResult.game_index] = {error: true, text1: "", text2: ""};
                         instance.dispatchEvent(new ScoreHandlerEvent(ScoreHandlerEvent.SUCCESS, gameResult, "", ""));
+                    }
                     else
-                        instance.dispatchEvent(new ScoreHandlerEvent(ScoreHandlerEvent.FAILURE, gameResult, "Score save failed!", "(ERR: " + data.result + ")")); // TODO Language Update
+                    {
+                        _gvars.songResultRanks[gameResult.game_index] = {error: true, text1: _lang.string("results_score_save_failed"), text2: "(ERR: " + data.result + ")"};
+                        instance.dispatchEvent(new ScoreHandlerEvent(ScoreHandlerEvent.FAILURE, gameResult, _lang.string("results_score_save_failed"), "(ERR: " + data.result + ")"));
+                    }
                 }
             }
 
@@ -319,7 +322,9 @@ package classes.score
                 removeLoaderListeners(_loader, onComplete, onFailure);
                 Alert.add(_lang.string("error_server_connection_failure"), 120, Alert.RED);
 
-                instance.dispatchEvent(new ScoreHandlerEvent(ScoreHandlerEvent.FAILURE, gameResult, "Score save failed!", "")) // TODO Language Update
+                _gvars.songResultRanks[gameResult.game_index] = {error: true, text1: _lang.string("results_score_save_failed"), text2: "(ERR: Connect)"};
+
+                instance.dispatchEvent(new ScoreHandlerEvent(ScoreHandlerEvent.FAILURE, gameResult, _lang.string("results_score_save_failed"), ""))
             }
         }
 

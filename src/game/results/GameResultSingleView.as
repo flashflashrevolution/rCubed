@@ -118,8 +118,8 @@ package game.results
 
             songName = new Text(this, 115, 56, "If you see this, something broke.", 16, "#E2FEFF");
             songName.setAreaParams(545, 30, "center");
+            songName.mouseChildren = true;
             songName.mouseEnabled = true;
-            songName.buttonMode = true;
 
             songDecription = new Text(this, 115, 83, "Which isn't good. Anyway Hello!", 12, "#E2FEFF");
             songDecription.textfield.styleSheet = Constant.STYLESHEET;
@@ -281,6 +281,8 @@ package game.results
                     userAvatar.y = 114 + ((99 - userAvatar.height) / 2);
                     addChild(userAvatar);
                 }
+                else
+                    userAvatar = null;
             }
 
             // Skill rating
@@ -309,48 +311,47 @@ package game.results
             valueCredits.text = NumberUtil.numberFormat(result.credits);
 
             /// - Rank Text
-            // Has R3 Highscore
-            var savedRankResult:Object = _gvars.songResultRanks[result.game_index];
-            if (savedRankResult != null)
+            currentRank.text = "";
+            lastRank.text = "";
+            if (result.user.siteId == _gvars.playerUser.siteId)
             {
-                if (savedRankResult.error)
+                // Has R3 Highscore
+                var savedRankResult:Object = _gvars.songResultRanks[result.game_index];
+                if (savedRankResult != null)
                 {
-                    currentRank.text = savedRankResult.text1;
-                    lastRank.text = savedRankResult.text2;
+                    if (savedRankResult.error)
+                    {
+                        currentRank.text = savedRankResult.text1;
+                        lastRank.text = savedRankResult.text2;
+                    }
+                    else
+                    {
+                        currentRank.text = sprintf(_lang.string("results_rank"), {rank: _gvars.songResultRanks[result.game_index].new_ranking});
+                        lastRank.text = sprintf(_lang.string("results_last_rank"), {rank: _gvars.songResultRanks[result.game_index].old_ranking});
+                    }
                 }
-                else
+                // Alt Engine Score
+                else if (result.songInfo && result.songInfo.engine)
                 {
-                    currentRank.text = sprintf(_lang.string("results_rank"), {rank: _gvars.songResultRanks[result.game_index].new_ranking});
-                    lastRank.text = sprintf(_lang.string("results_last_rank"), {rank: _gvars.songResultRanks[result.game_index].old_ranking});
+                    valueCredits.text = "0";
+                    var rank:Object = result.legacyLastRank;
+                    if (rank)
+                    {
+                        currentRank.text = sprintf(_lang.string((rank.score < result.score ? "results_last_best" : "results_best")), {score: rank.score});
+                        lastRank.text = rank.results;
+                    }
+                    else
+                    {
+                        currentRank.text = _lang.string("results_saved_score_locally");
+                        lastRank.text = "";
+                    }
                 }
-            }
-            // Alt Engine Score
-            else if (result.songInfo && result.songInfo.engine)
-            {
-                valueCredits.text = "0";
-                var rank:Object = result.legacyLastRank;
-                if (rank)
+                // Getting Rank / Unsendable Score
+                else if (!result.options.replay && result.game_index >= 0 && !result.user.isGuest)
                 {
-                    currentRank.text = sprintf(_lang.string((rank.score < result.score ? "results_last_best" : "results_best")), {score: rank.score});
-                    lastRank.text = rank.results;
-                }
-                else
-                {
-                    currentRank.text = _lang.string("results_saved_score_locally");
+                    currentRank.text = _lang.string(canScoreSave ? "results_saving_score" : "results_score_not_saved");
                     lastRank.text = "";
                 }
-            }
-            // Getting Rank / Unsendable Score
-            else if (!result.options.replay && result.game_index >= 0 && !result.user.isGuest)
-            {
-                currentRank.text = _lang.string(canScoreSave ? "results_saving_score" : "results_score_not_saved");
-                lastRank.text = "";
-            }
-            // Blank
-            else
-            {
-                currentRank.text = "";
-                lastRank.text = "";
             }
 
             // Edited Replay

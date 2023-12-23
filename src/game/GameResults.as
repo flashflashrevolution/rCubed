@@ -118,7 +118,7 @@ package game
             var noiseSource:BitmapData = new BitmapData(Main.GAME_WIDTH, Main.GAME_HEIGHT, false, 0x00000000);
             noiseSource.perlinNoise(Main.GAME_WIDTH, Main.GAME_HEIGHT, 12, getTimer(), true, false, 7, true);
             var noiseImage:Bitmap = new Bitmap(noiseSource);
-            noiseImage.alpha = 0.2;
+            noiseImage.alpha = 0.15;
             background.addChild(noiseImage);
 
             resultsDisplay = new GameResultSingleView();
