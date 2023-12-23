@@ -19,6 +19,7 @@ package com.worlize.websocket
     import by.blooddy.crypto.Base64;
     import by.blooddy.crypto.SHA1;
     import com.flashfla.utils.StringUtil;
+    import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.events.IOErrorEvent;
@@ -488,6 +489,7 @@ package com.worlize.websocket
             {
                 logger("Socket Disconnected");
             }
+            dispatchEvent(new ErrorEvent(ErrorEvent.ERROR, false, false, "Socket Disconnected", 0));
             dispatchClosedEvent();
         }
 
@@ -742,7 +744,7 @@ package com.worlize.websocket
             {
                 logger("IO Error: " + event);
             }
-            dispatchEvent(event);
+            dispatchEvent(new ErrorEvent(ErrorEvent.ERROR, false, false, "IO Error", event.errorID));
             dispatchClosedEvent();
         }
 
@@ -752,7 +754,7 @@ package com.worlize.websocket
             {
                 logger("Security Error: " + event);
             }
-            dispatchEvent(event.clone());
+            dispatchEvent(new ErrorEvent(ErrorEvent.ERROR, false, false, "Security Error", event.errorID));
             dispatchClosedEvent();
         }
 
