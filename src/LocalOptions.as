@@ -100,7 +100,6 @@ package
             SO_OBJECT["legacy_engines"] = LocalStore.getVariable("legacyEngines", null);
             SO_OBJECT["legacy_default_engine"] = LocalStore.getVariable("legacyDefaultEngine", null);
             SO_OBJECT["rolling_music_offset"] = LocalStore.getVariable("arcMusicOffset", 0);
-            SO_OBJECT["mp_text_size"] = LocalStore.getVariable("arcMPSize", 10);
             SO_OBJECT["layouts"] = LocalStore.getVariable("arcLayout", {});
         }
     }

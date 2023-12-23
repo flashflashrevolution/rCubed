@@ -26,8 +26,6 @@ package arc
 
         public var configInterface:Object = {};
 
-        public var configMPSize:int = 10;
-
         public function ArcGlobals(en:SingletonEnforcer)
         {
             if (en == null)
@@ -145,11 +143,6 @@ package arc
             LocalOptions.setVariable("rolling_music_offset", configMusicOffset);
         }
 
-        public function mpSave():void
-        {
-            LocalOptions.setVariable("mp_text_size", configMPSize);
-        }
-
         public function legacyLevelRanksGet(songInfo:SongInfo):Object
         {
             if (!legacyLevelRanks)
@@ -197,12 +190,10 @@ package arc
             legacyDefaultEngine = LocalOptions.getVariable("legacy_default_engine", null);
             configMusicOffset = LocalOptions.getVariable("rolling_music_offset", 0);
             configInterface = LocalOptions.getVariable("layouts", {});
-            configMPSize = LocalOptions.getVariable("mp_text_size", 10);
         }
 
         public function resetSettings():void
         {
-            LocalOptions.deleteVariable("mp_text_size");
             LocalOptions.deleteVariable("rolling_music_offset");
             LocalOptions.deleteVariable("layouts");
 

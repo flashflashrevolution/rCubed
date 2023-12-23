@@ -31,11 +31,6 @@ package popups.settings
         private var optionGameLanguages:Array;
         private var languageCombo:ComboBox;
         private var languageComboIgnore:Boolean;
-        private var startUpScreenSelections:Array = [];
-        private var startUpScreenCombo:ComboBox;
-
-        private var optionMPSize:ValidatedText;
-        private var timestampCheck:BoxCheck;
 
         private var useCacheCheckbox:BoxCheck;
         private var autoSaveLocalCheckbox:BoxCheck;
@@ -104,39 +99,6 @@ package popups.settings
             languageCombo.fontSize = 11;
             languageCombo.addEventListener(Event.SELECT, languageSelect);
             setLanguage();
-            yOff += 30;
-
-            // Start Up Screen
-            new Text(container, xOff, yOff, _lang.string("options_startup_screen"));
-            yOff += 20;
-
-            startUpScreenSelections = [];
-            for (i = 0; i <= 2; i++)
-            {
-                startUpScreenSelections.push({"label": _lang.stringSimple("options_startup_" + i), "data": i});
-            }
-
-            startUpScreenCombo = new ComboBox(container, xOff, yOff, "Selection...", startUpScreenSelections);
-            startUpScreenCombo.x = xOff;
-            startUpScreenCombo.y = yOff;
-            startUpScreenCombo.setSize(200, 22);
-            startUpScreenCombo.openPosition = ComboBox.BOTTOM;
-            startUpScreenCombo.fontSize = 11;
-            startUpScreenCombo.addEventListener(Event.SELECT, startUpScreenSelect);
-            yOff += 30;
-
-            yOff += drawSeperator(container, xOff, 250, yOff, 0, 0);
-
-            // Multiplayer - Text Size
-            new Text(container, xOff, yOff, _lang.string("options_mp_textsize"));
-            yOff += 20;
-
-            optionMPSize = new ValidatedText(container, xOff + 3, yOff + 3, 120, 20, ValidatedText.R_INT_P, changeHandler);
-            yOff += 30;
-
-            // Multiplayer - Timestamps
-            new Text(container, xOff + 23, yOff, _lang.string("options_mp_timestamp"));
-            timestampCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
             yOff += 30;
 
             yOff += drawSeperator(container, xOff, 250, yOff, 0, 0);
@@ -246,10 +208,6 @@ package popups.settings
             // Set Framerate
             optionFPS.text = _gvars.activeUser.frameRate.toString();
 
-            timestampCheck.checked = _gvars.activeUser.DISPLAY_MP_TIMESTAMP;
-            optionMPSize.text = _avars.configMPSize.toString();
-            startUpScreenCombo.selectedIndex = _gvars.activeUser.startUpScreen;
-
             setLanguage();
 
             autoSaveLocalCheckbox.checked = _gvars.air_autoSaveLocalReplays;
@@ -272,15 +230,8 @@ package popups.settings
 
         override public function clickHandler(e:MouseEvent):void
         {
-            // MP Timestamp
-            if (e.target == timestampCheck)
-            {
-                e.target.checked = !e.target.checked;
-                _gvars.activeUser.DISPLAY_MP_TIMESTAMP = !_gvars.activeUser.DISPLAY_MP_TIMESTAMP;
-            }
-
             //- Auto Save Local Replays
-            else if (e.target == autoSaveLocalCheckbox)
+            if (e.target == autoSaveLocalCheckbox)
             {
                 e.target.checked = !e.target.checked;
                 _gvars.air_autoSaveLocalReplays = !_gvars.air_autoSaveLocalReplays;
@@ -391,12 +342,6 @@ package popups.settings
             {
                 _gvars.activeUser.frameRate = optionFPS.validate(60);
                 _gvars.activeUser.frameRate = Math.max(Math.min(_gvars.activeUser.frameRate, 1000), 10);
-            }
-
-            else if (e.target == optionMPSize)
-            {
-                // TODO MP Font Size
-                _avars.mpSave();
             }
         }
 
