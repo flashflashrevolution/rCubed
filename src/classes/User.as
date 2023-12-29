@@ -71,7 +71,6 @@ package classes
         public var skill_rating_top_count:int = 50;
         public var skill_rating_levelranks:Array = [];
         public var avatar:Loader;
-        public var startUpScreen:int = 0; // 0 = MP Connect + MP Screen   |   1 = MP Connect + Song List   |   2 = Song List
         public var loggedIn:Boolean;
 
         public var songQueues:Vector.<Object> = new <Object>[];
@@ -783,9 +782,6 @@ package classes
             if (_settings.isolationLength != null)
                 _avars.configIsolationLength = _settings.isolationLength;
 
-            if (_settings.startUpScreen != null)
-                this.startUpScreen = Math.max(0, Math.min(2, _settings.startUpScreen));
-
             if (_settings.filters != null)
                 this.filters = doImportFilters(_settings.filters);
 
@@ -888,7 +884,6 @@ package classes
             gameSave.songQueues = this.songQueues;
             gameSave.gameVolume = this.gameVolume;
             gameSave.filters = doExportFilters(this.filters);
-            gameSave.startUpScreen = this.startUpScreen;
 
             if (returnObject)
                 return gameSave;

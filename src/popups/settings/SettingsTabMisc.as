@@ -383,11 +383,6 @@ package popups.settings
             hideTooltip();
         }
 
-        private function startUpScreenSelect(e:Event):void
-        {
-            _gvars.activeUser.startUpScreen = e.target.selectedItem.data as int;
-        }
-
         private function setLanguage():void
         {
             languageComboIgnore = true;
