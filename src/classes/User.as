@@ -6,6 +6,7 @@ package classes
     import classes.user.UserSongData;
     import classes.user.UserSongNotes;
     import com.flashfla.utils.VectorUtil;
+    import flash.display.DisplayObject;
     import flash.display.Loader;
     import flash.display.LoaderInfo;
     import flash.events.ErrorEvent;
@@ -70,7 +71,7 @@ package classes
         public var level_ranks:Object = {};
         public var skill_rating_top_count:int = 50;
         public var skill_rating_levelranks:Array = [];
-        public var avatar:Loader;
+        public var avatar:DisplayObject;
         public var loggedIn:Boolean;
 
         public var songQueues:Vector.<Object> = new <Object>[];
@@ -270,7 +271,7 @@ package classes
             }
         }
 
-        public function UpdateSRList(newLevelRanks:Object):void
+        public function updateSRList(newLevelRanks:Object):void
         {
             if (newLevelRanks.equiv > skill_rating_levelranks[skill_rating_top_count - 1].equiv)
             {
@@ -480,18 +481,20 @@ package classes
 
         public function loadAvatar():void
         {
-            this.avatar = new Loader();
-            if (isActiveUser && !isGuest)
-            {
-                this.avatar.contentLoaderInfo.addEventListener(Event.COMPLETE, avatarLoadComplete);
+            const _loader:Loader = new Loader();
 
-                function avatarLoadComplete(e:Event):void
-                {
+            _loader.contentLoaderInfo.addEventListener(Event.COMPLETE, avatarLoadComplete);
+            _loader.load(new URLRequest(URLs.resolve(URLs.USER_AVATAR_URL) + "?uid=" + this.siteId + "&cHeight=99&cWidth=99"));
+
+            function avatarLoadComplete(e:Event):void
+            {
+                if (isActiveUser && !isGuest)
                     LocalStore.setVariable("uAvatar", LoaderInfo(e.target).bytes);
-                    avatar.removeEventListener(Event.COMPLETE, avatarLoadComplete);
-                }
+
+                avatar = _loader.content;
+
+                _loader.removeEventListener(Event.COMPLETE, avatarLoadComplete);
             }
-            this.avatar.load(new URLRequest(URLs.resolve(URLs.USER_AVATAR_URL) + "?uid=" + this.siteId + "&cHeight=99&cWidth=99"));
         }
 
         ///- Level Ranks
