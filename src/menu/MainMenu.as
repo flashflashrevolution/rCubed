@@ -71,7 +71,7 @@ package menu
             ["menu_options", MENU_OPTIONS, false, "iconGear"]];
 
         public var panel:MenuPanel;
-        public var options:Object;
+        public var activePanelID:int = -1;
 
         ///- Constructor
         public function MainMenu(myParent:MenuPanel)
@@ -83,10 +83,6 @@ package menu
 
         override public function init():Boolean
         {
-            //- Setup Options
-            options = {};
-            options.activePanel = -1;
-
             //- Add Logo
             logo = new Logo();
             logo.x = 18 + logo.width * 0.5;
@@ -219,7 +215,7 @@ package menu
                     menuItemSmall.panel = menuItems[i][1];
                     menuItemSmall.setIconColor("#DDDDDD");
                     menuItemSmall.setHoverText(_lang.string(menuItems[i][0]), "bottom");
-                    menuItemSmall.active = (i == options.activePanel);
+                    menuItemSmall.active = (i == activePanelID);
                     btnPosition += (28 + 6);
 
                     // Filter - Set to Green if enabled.
@@ -232,7 +228,7 @@ package menu
                 }
                 else
                 {
-                    var menuItem:MenuButton = new MenuButton(menuItemBox, btnPosition, btnWidth, _lang.string(menuItems[i][0]), i == options.activePanel, menuItemClick);
+                    var menuItem:MenuButton = new MenuButton(menuItemBox, btnPosition, btnWidth, _lang.string(menuItems[i][0]), i == activePanelID, menuItemClick);
                     menuItem.panel = menuItems[i][1];
                     btnPosition += (btnWidth + 6);
                 }
@@ -356,7 +352,7 @@ package menu
             if (panel != null)
             {
                 panel.stageRemove();
-                this.removeChild(panel);
+                panel.parent.removeChild(panel);
             }
 
             switch (_panel)
@@ -365,7 +361,7 @@ package menu
                     if (_MenuSingleplayer == null || useNew)
                         _MenuSingleplayer = new MenuSongSelection(this);
                     panel = _MenuSingleplayer;
-                    options.activePanel = 0;
+                    activePanelID = 0;
                     isFound = true;
                     break;
                 /*
@@ -381,7 +377,7 @@ package menu
                     if (_MenuTokens == null || useNew)
                         _MenuTokens = new MenuTokens(this);
                     panel = _MenuTokens;
-                    options.activePanel = 2;
+                    activePanelID = 2;
                     isFound = true;
                     break;
             }
