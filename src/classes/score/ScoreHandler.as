@@ -298,7 +298,7 @@ package classes.score
                     }
                     else
                     {
-                        instance.dispatchEvent(new ScoreHandlerEvent(ScoreHandlerEvent.FAILURE, gameResult, _lang.string("results_game_mods_enabled_1"), _lang.string("results_game_mods_enabled_1")));
+                        instance.dispatchEvent(new ScoreHandlerEvent(ScoreHandlerEvent.FAILURE, gameResult, _lang.string("results_game_mods_enabled_1"), _lang.string("results_game_mods_enabled_2")));
                     }
                 }
                 else
