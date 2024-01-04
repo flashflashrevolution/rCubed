@@ -390,7 +390,6 @@ package game.controls
             {
                 note.scaleX = note.scaleY = 1 - (updateBaseOffsetRef * 0.65);
             }
-
         }
 
         private var removeNoteIndex:int = 0;
@@ -398,7 +397,8 @@ package game.controls
 
         public function removeNote(id:int):void
         {
-            for (removeNoteIndex = 0; removeNoteIndex < notes.length; removeNoteIndex++)
+            const len:Number = notes.length;
+            for (removeNoteIndex = 0; removeNoteIndex < len; removeNoteIndex++)
             {
                 removeNoteRef = notes[removeNoteIndex];
                 if (removeNoteRef.ID == id)
