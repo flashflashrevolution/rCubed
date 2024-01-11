@@ -188,68 +188,7 @@ package game
             if (!r)
                 return;
 
-            var i:int;
-            var settings:Object = r.settings;
-
-            songRate = settings["songRate"] || 1;
-
-            scrollDirection = settings["direction"] || "up";
-            judgeSpeed = settings["judgeSpeed"] || 1;
-            scrollSpeed = settings["speed"] || 1.5;
-            receptorSpacing = settings["gap"] || 80;
-            noteScale = settings["noteScale"] || 1;
-            judgeScale = settings["judgeScale"] || 1;
-            screencutPosition = settings["screencutPosition"] || 0;
-            mods = settings["visual"] || [];
-            modCache = null;
-            noteskin = settings["noteskin"] || 1;
-
-            offsetGlobal = settings["viewOffset"] || 0;
-            offsetJudge = settings["judgeOffset"] || 0;
-            autoJudgeOffset = settings["autoJudgeOffset"] || false;
-
-            isolationOffset = settings["isolationOffset"] || 0;
-            isolationLength = settings["isolationLength"] || 0;
-
-            displayJudge = settings["viewJudge"];
-            displayHealth = settings["viewHealth"];
-            displayCombo = settings["viewCombo"];
-            displayRawGoods = settings["viewRawGoods"];
-            displayComboTotal = settings["viewTotal"];
-            displayPA = settings["viewPACount"];
-            displayAmazing = settings["viewAmazing"];
-            displayPerfect = settings["viewPerfect"];
-            displayScreencut = settings["viewScreencut"];
-            displaySongProgress = settings["viewSongProgress"];
-            displaySongProgressText = settings["viewSongProgressText"];
-
-            if (settings["viewScore"] != null)
-                displayScore = settings["viewScore"];
-            if (settings["viewGameTopBar"] != null)
-                displayGameTopBar = settings["viewGameTopBar"];
-            if (settings["viewGameBottomBar"] != null)
-                displayGameBottomBar = settings["viewGameBottomBar"];
-
-            if (settings["viewJudgeAnimations"] != null)
-                displayJudgeAnimations = settings["viewJudgeAnimations"];
-            if (settings["viewReceptorAnimations"] != null)
-                displayReceptorAnimations = settings["viewReceptorAnimations"];
-
-            if (settings["noteSwapColours"] != null)
-            {
-                for (i = 0; i < noteColors.length; i++)
-                {
-                    noteSwapColors[noteColors[i]] = settings["noteSwapColours"][i];
-                }
-            }
-
-            if (settings["judgeColors"] != null)
-            {
-                for (i = 0; i < judgeColors.length; i++)
-                {
-                    judgeColors[i] = settings["judgeColors"][i];
-                }
-            }
+            settingsDecode(r.settings);
         }
 
         public function fill():void
@@ -318,10 +257,23 @@ package game
             {
                 settings["noteSwapColours"][i] = noteSwapColors[noteColors[i]];
             }
+
             settings["judgeColors"] = [];
             for (i = 0; i < judgeColors.length; i++)
             {
                 settings["judgeColors"][i] = judgeColors[i];
+            }
+
+            settings["receptorColors"] = [];
+            for (i = 0; i < receptorColors.length; i++)
+            {
+                settings["receptorColors"][i] = receptorColors[i];
+            }
+
+            settings["enableReceptorColors"] = [];
+            for (i = 0; i < enableReceptorColors.length; i++)
+            {
+                settings["enableReceptorColors"][i] = enableReceptorColors[i];
             }
 
             var user:User = GlobalVariables.instance.activeUser;
@@ -330,18 +282,92 @@ package game
             return settings;
         }
 
+        public function settingsDecode(settings:Object):void
+        {
+            var i:int;
+
+            songRate = settings["songRate"] || 1;
+
+            scrollDirection = settings["direction"] || "up";
+            judgeSpeed = settings["judgeSpeed"] || 1;
+            scrollSpeed = settings["speed"] || 1.5;
+            receptorSpacing = settings["gap"] || 80;
+            noteScale = settings["noteScale"] || 1;
+            judgeScale = settings["judgeScale"] || 1;
+            screencutPosition = settings["screencutPosition"] || 0;
+            mods = settings["visual"] || [];
+            modCache = null;
+            noteskin = settings["noteskin"] != null ? settings["noteskin"] : 1;
+
+            offsetGlobal = settings["viewOffset"] || 0;
+            offsetJudge = settings["judgeOffset"] || 0;
+            autoJudgeOffset = settings["autoJudgeOffset"] || false;
+
+            isolationOffset = settings["isolationOffset"] || 0;
+            isolationLength = settings["isolationLength"] || 0;
+
+            displayJudge = settings["viewJudge"];
+            displayHealth = settings["viewHealth"];
+            displayCombo = settings["viewCombo"];
+            displayRawGoods = settings["viewRawGoods"];
+            displayComboTotal = settings["viewTotal"];
+            displayPA = settings["viewPACount"];
+            displayAmazing = settings["viewAmazing"];
+            displayPerfect = settings["viewPerfect"];
+            displayScreencut = settings["viewScreencut"];
+            displaySongProgress = settings["viewSongProgress"];
+            displaySongProgressText = settings["viewSongProgressText"];
+
+            if (settings["viewScore"] != null)
+                displayScore = settings["viewScore"];
+            if (settings["viewGameTopBar"] != null)
+                displayGameTopBar = settings["viewGameTopBar"];
+            if (settings["viewGameBottomBar"] != null)
+                displayGameBottomBar = settings["viewGameBottomBar"];
+
+            if (settings["viewJudgeAnimations"] != null)
+                displayJudgeAnimations = settings["viewJudgeAnimations"];
+            if (settings["viewReceptorAnimations"] != null)
+                displayReceptorAnimations = settings["viewReceptorAnimations"];
+
+            if (settings["noteSwapColours"] != null)
+            {
+                for (i = 0; i < noteColors.length; i++)
+                {
+                    noteSwapColors[noteColors[i]] = settings["noteSwapColours"][i];
+                }
+            }
+
+            if (settings["judgeColors"] != null)
+            {
+                for (i = 0; i < judgeColors.length; i++)
+                {
+                    judgeColors[i] = settings["judgeColors"][i];
+                }
+            }
+
+            if (settings["receptorColors"] != null)
+            {
+                for (i = 0; i < receptorColors.length; i++)
+                {
+                    receptorColors[i] = settings["receptorColors"][i];
+                }
+            }
+
+            if (settings["enableReceptorColors"] != null)
+            {
+                for (i = 0; i < enableReceptorColors.length; i++)
+                {
+                    enableReceptorColors[i] = settings["enableReceptorColors"][i];
+                }
+            }
+        }
+
         public function isScoreValid(score:Boolean = true, replay:Boolean = true):Boolean
         {
             var ret:Boolean = false;
-            ret ||= score && (isAutoplay ||
-                //modEnabled("shuffle") ||
-                //modEnabled("random") ||
-                //modEnabled("scramble") ||
-                judgeWindow);
-            ret ||= replay && ( //songRate != 1 ||
-                modEnabled("reverse") ||
-                //modEnabled("nobackground") ||
-                isolation);
+            ret ||= score && (isAutoplay || judgeWindow);
+            ret ||= replay && (modEnabled("reverse") || isolation);
             return !ret;
         }
 
@@ -349,10 +375,7 @@ package game
         {
             var ret:Boolean = false;
             ret ||= score && (isAutoplay || modEnabled("shuffle") || modEnabled("random") || modEnabled("scramble") || judgeWindow);
-            ret ||= replay && (songRate != 1 || modEnabled("reverse") //||
-                //modEnabled("nobackground") ||
-                //isolation
-                );
+            ret ||= replay && (songRate != 1 || modEnabled("reverse"));
             return !ret;
         }
 
