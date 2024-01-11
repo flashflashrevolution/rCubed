@@ -7,12 +7,12 @@ package game.events
     {
         public static const ID:uint = 2;
 
-        private var noteID:int;
-        private var accuracy:int;
+        public var noteID:int;
+        public var accuracy:int;
 
         public function GamePlaybackJudgeResult(index:uint, noteID:uint, accuracy:int, timestamp:Number):void
         {
-            super(index, timestamp);
+            super(ID, index, timestamp);
             this.noteID = index;
             this.accuracy = accuracy;
         }
@@ -20,7 +20,7 @@ package game.events
         override public function writeData(output:IDataOutput):void
         {
             output.writeByte(ID);
-            output.writeByte(4 + 4 + 4 + 2) // Length of everything below this.
+            output.writeByte(4 + 4 + 4 + 2); // Length of everything below this.
             output.writeUnsignedInt(index);
             output.writeUnsignedInt(timestamp);
             output.writeInt(noteID);

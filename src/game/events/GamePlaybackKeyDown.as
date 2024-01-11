@@ -7,18 +7,18 @@ package game.events
     {
         public static const ID:uint = 3;
 
-        private var key:uint;
+        public var key:uint;
 
         public function GamePlaybackKeyDown(index:uint, timestamp:Number, key:uint):void
         {
-            super(index, timestamp);
+            super(ID, index, timestamp);
             this.key = key;
         }
 
         override public function writeData(output:IDataOutput):void
         {
             output.writeByte(ID);
-            output.writeByte(4 + 4 + 1) // Length of everything below this.
+            output.writeByte(4 + 4 + 1); // Length of everything below this.
             output.writeUnsignedInt(index);
             output.writeUnsignedInt(timestamp);
             output.writeByte(key);

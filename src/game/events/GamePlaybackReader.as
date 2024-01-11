@@ -6,10 +6,13 @@ package game.events
     {
         public static function parse(data:ByteArray, initialPosition:int = 0, output:Vector.<GamePlaybackEvent> = null):Vector.<GamePlaybackEvent>
         {
-            trace("read start");
+            var lastIndex:int = -1;
+
             // Use new History if not provided.
             if (output == null)
                 output = new <GamePlaybackEvent>[];
+            else if (output.length > 0)
+                lastIndex = output[output.length - 1].index;
 
             try
             {
@@ -20,29 +23,46 @@ package game.events
                     var TAG:int = data.readUnsignedByte();
                     var LEN:int = data.readUnsignedByte();
 
+                    var event:GamePlaybackEvent;
+
                     switch (TAG)
                     {
                         case GamePlaybackJudgeResult.ID:
-                            output.push(GamePlaybackJudgeResult.readData(data));
+                            event = GamePlaybackJudgeResult.readData(data);
                             break;
 
                         case GamePlaybackKeyDown.ID:
-                            output.push(GamePlaybackKeyDown.readData(data));
+                            event = GamePlaybackKeyDown.readData(data);
                             break;
 
                         case GamePlaybackKeyUp.ID:
-                            output.push(GamePlaybackKeyUp.readData(data));
+                            event = GamePlaybackKeyUp.readData(data);
                             break;
 
                         case GamePlaybackFocusChange.ID:
-                            output.push(GamePlaybackFocusChange.readData(data));
+                            event = GamePlaybackFocusChange.readData(data);
+                            break;
+
+                        case GamePlaybackSpectatorHit.ID:
+                            event = GamePlaybackSpectatorHit.readData(data);
+                            break;
+
+                        case GamePlaybackSpectatorEnd.ID:
+                            event = GamePlaybackSpectatorEnd.readData(data);
                             break;
 
                         default:
                             trace("unknown tag", TAG, "length", LEN);
+                            event = null;
                             data.position += LEN;
                             break;
                     }
+
+                    if (event == null)
+                        continue;
+
+                    if (event.index > lastIndex)
+                        output.push(event);
                 }
 
             }
@@ -51,10 +71,6 @@ package game.events
                 return null;
             }
 
-            for (var i:int = 0; i < output.length; i++)
-            {
-                trace(output[i]);
-            }
             return output;
         }
     }

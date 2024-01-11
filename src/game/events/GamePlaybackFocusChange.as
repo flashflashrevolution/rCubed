@@ -7,18 +7,18 @@ package game.events
     {
         public static const ID:uint = 5;
 
-        private var isFocus:Boolean;
+        public var isFocus:Boolean;
 
         public function GamePlaybackFocusChange(index:uint, timestamp:int, isFocus:Boolean):void
         {
-            super(index, timestamp);
+            super(ID, index, timestamp);
             this.isFocus = isFocus;
         }
 
         override public function writeData(output:IDataOutput):void
         {
             output.writeByte(ID);
-            output.writeByte(4 + 4 + 1) // Length of everything below this.
+            output.writeByte(4 + 4 + 1); // Length of everything below this.
             output.writeUnsignedInt(index);
             output.writeUnsignedInt(timestamp);
             output.writeByte(isFocus ? 1 : 0);

@@ -4,11 +4,13 @@ package game.events
 
     public class GamePlaybackEvent
     {
+        public var id:uint;
         public var index:uint;
         public var timestamp:uint;
 
-        public function GamePlaybackEvent(index:uint, timestamp:uint)
+        public function GamePlaybackEvent(id:uint, index:uint, timestamp:uint)
         {
+            this.id = id;
             this.index = index;
             this.timestamp = timestamp;
         }
