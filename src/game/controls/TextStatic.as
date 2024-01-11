@@ -17,11 +17,12 @@ package game.controls
                 parent.addChild(this);
 
             field = new TextField();
-            field.defaultTextFormat = new TextFormat(Fonts.BASE_FONT_CJK, 17, 0x0098CB, true);
+            field.defaultTextFormat = new TextFormat(Fonts.BASE_FONT_CJK, size, color, true);
             field.antiAliasType = AntiAliasType.ADVANCED;
             field.embedFonts = true;
             field.selectable = false;
             field.autoSize = TextFieldAutoSize.LEFT;
+            field.x = field.y = 0; // Fixes Bug
             field.htmlText = text;
             addChild(field);
         }
