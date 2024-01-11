@@ -54,7 +54,6 @@ package popups.settings
 
         private var btn_editor_gameplay:TabButton;
         private var btn_editor_multiplayer:TabButton;
-        private var btn_editor_spectator:TabButton;
 
         private var game_options_test:GameOptions = new GameOptions();
 
@@ -162,12 +161,10 @@ package popups.settings
             }
 
             // editor buttons
-            btn_editor_gameplay = new TabButton(box, -1, 364, -1, _lang.string("settings_tab_editor_gameplay"), true);
+            btn_editor_gameplay = new TabButton(box, -1, 397, -1, _lang.string("settings_tab_editor_gameplay"), true);
             btn_editor_gameplay.addEventListener(MouseEvent.CLICK, clickHandler);
-            btn_editor_multiplayer = new TabButton(box, -1, 397, -1, _lang.string("settings_tab_editor_multiplayer"));
+            btn_editor_multiplayer = new TabButton(box, -1, 430, -1, _lang.string("settings_tab_editor_multiplayer"));
             btn_editor_multiplayer.addEventListener(MouseEvent.CLICK, clickHandler);
-            btn_editor_spectator = new TabButton(box, -1, 430, -1, _lang.string("settings_tab_editor_spectator"));
-            btn_editor_spectator.addEventListener(MouseEvent.CLICK, clickHandler);
         }
 
         public function changeTab(idx:int, force:Boolean = false):void
@@ -220,10 +217,11 @@ package popups.settings
 
         private function clickHandler(e:MouseEvent):void
         {
-            if (e.currentTarget == btn_editor_gameplay || e.currentTarget == btn_editor_multiplayer || e.currentTarget == btn_editor_spectator)
+            if (e.currentTarget == btn_editor_gameplay || e.currentTarget == btn_editor_multiplayer)
             {
                 _gvars.options = new GameOptions();
                 _gvars.options.isEditor = true;
+                _gvars.options.isMultiplayer = (e.currentTarget == btn_editor_multiplayer);
 
                 var tempSongInfo:SongInfo = new SongInfo();
                 tempSongInfo.level = 1337;
