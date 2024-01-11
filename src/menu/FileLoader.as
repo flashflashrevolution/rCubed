@@ -23,17 +23,17 @@ package menu
                 playlistURL: "",
                 songURL: ""}
 
-        public static function setupLocalFile(loc:String, id:int):Boolean
+        public static function buildSongInfo(loc:String, id:int, isUnique:Boolean = false):SongInfo
         {
+            if (loc == null || loc.length == 0)
+                return null;
+
             // Parse Chart
             var emb:ExternalChartBase = new ExternalChartBase();
             if (emb.load(new File(loc)))
             {
                 var chartinfo:Object = emb.getInfo();
                 var chartData:Object = emb.getValidChartData(id);
-
-                ENGINE_INFO.cache_id = emb.ID;
-                ENGINE_INFO.chart_id = id;
 
                 // Build Song Info
                 var songInfo:SongInfo = new SongInfo();
@@ -48,26 +48,67 @@ package menu
                 songInfo.time = chartinfo.time;
                 songInfo.time_secs = chartinfo.time_secs;
                 songInfo.time_end = 0;
-                songInfo.engine = ENGINE_INFO;
                 songInfo.background = chartinfo.background != "" ? chartinfo.folder + chartinfo.background : null;
 
-                // Build Chart
-                var noteChart:NoteChart = new NoteChart();
-                noteChart.type = "EXTERNAL";
-                for each (var note:Array in chartData.notes)
+                if (isUnique)
                 {
-                    noteChart.Notes.push(new Note(note[1], note[0], note[2], Math.floor(note[0] * 30)));
+                    songInfo.engine = {id: "fileloader", cache_id: emb.ID, chart_id: id};
+                }
+                else
+                {
+                    ENGINE_INFO.cache_id = emb.ID;
+                    ENGINE_INFO.chart_id = id;
+                    songInfo.engine = ENGINE_INFO;
                 }
 
-                // Build Song
-                var song:Song = new Song(songInfo, false);
-                song.chart = noteChart;
-                song.loadSoundBytes(emb.getAudioData());
-                song.isChartLoaded = song.isMusicLoaded = song.isLoaded = true;
+                // File Loader Assistance
+                songInfo.is_local = true;
+                songInfo.chart_parser = emb;
 
-                // Setup Loading
-                _gvars.externalSongInfo = songInfo;
-                _gvars.externalSong = song;
+                return songInfo;
+            }
+
+            return null;
+        }
+
+        public static function buildSong(info:SongInfo):void
+        {
+            if (!info.is_local)
+                return;
+
+            const emb:ExternalChartBase = info.chart_parser;
+            const id:int = info.engine.chart_id;
+
+            var chartData:Object = emb.getValidChartData(id);
+
+            ENGINE_INFO.cache_id = emb.ID;
+            ENGINE_INFO.chart_id = id;
+
+            // Build Chart
+            var noteChart:NoteChart = new NoteChart();
+            noteChart.type = "EXTERNAL";
+            for each (var note:Array in chartData.notes)
+            {
+                noteChart.Notes.push(new Note(note[1], note[0], note[2], Math.floor(note[0] * 30)));
+            }
+
+            // Build Song
+            var song:Song = new Song(info, false);
+            song.chart = noteChart;
+            song.loadSoundBytes(emb.getAudioData());
+            song.isChartLoaded = song.isMusicLoaded = song.isLoaded = true;
+
+            // Setup Loading
+            _gvars.externalSongInfo = info;
+            _gvars.externalSong = song;
+        }
+
+        public static function setupLocalFile(loc:String, id:int):Boolean
+        {
+            var info:SongInfo = buildSongInfo(loc, id);
+            if (info != null)
+            {
+                buildSong(info);
                 return true;
             }
             return false;

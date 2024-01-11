@@ -239,7 +239,7 @@ package popups.replays
                     if (replay.isFileLoader)
                     {
                         var chartLoaded:Boolean = true;
-                        if (_gvars.externalSongInfo.engine.cache_id != replay.cacheID)
+                        if (_gvars.externalSongInfo == null || _gvars.externalSongInfo.engine == null || _gvars.externalSongInfo.engine.cache_id != replay.cacheID)
                             chartLoaded = FileLoader.setupLocalFile(replay.chartPath, replay.settings.arc_engine.chartID);
 
                         replay.song = _gvars.externalSongInfo;
