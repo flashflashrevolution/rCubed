@@ -16,14 +16,14 @@ package game.controls
     {
         private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _noteskins:Noteskins = Noteskins.instance;
-        private var options:GameOptions;
-        private var song:Song;
+        public var options:GameOptions;
+        public var song:Song;
 
-        private var scrollSpeed:Number;
-        private var readahead:Number;
-        private var totalNotes:int;
-        private var noteCount:int;
-        private var notePool:Object;
+        public var scrollSpeed:Number;
+        public var readahead:Number;
+        public var totalNotes:int;
+        public var noteCount:int;
+        public var notePool:Object;
         public var notes:Vector.<GameNote>;
 
         public var leftReceptor:MovieClip;
@@ -34,10 +34,10 @@ package game.controls
         public var receptorTable:Object = {};
 
         public var positionOffsetMax:Object;
-        private var receptorAlpha:Number;
+        public var receptorAlpha:Number;
 
-        private var recp_colors:Vector.<Number>;
-        private var recp_colors_enabled:Vector.<Boolean>;
+        public var recp_colors:Vector.<Number>;
+        public var recp_colors_enabled:Vector.<Boolean>;
 
         public function NoteBox(song:Song, options:GameOptions, parent:DisplayObjectContainer)
         {
@@ -320,9 +320,9 @@ package game.controls
             }
         }
 
-        private var updateReceptorRef:MovieClip;
-        private var updateOffsetRef:Number;
-        private var updateBaseOffsetRef:Number;
+        public var updateReceptorRef:MovieClip;
+        public var updateOffsetRef:Number;
+        public var updateBaseOffsetRef:Number;
 
         public function updateNotePosition(note:GameNote, position:int):void
         {
@@ -392,8 +392,8 @@ package game.controls
             }
         }
 
-        private var removeNoteIndex:int = 0;
-        private var removeNoteRef:GameNote;
+        public var removeNoteIndex:int = 0;
+        public var removeNoteRef:GameNote;
 
         public function removeNote(id:int):void
         {
