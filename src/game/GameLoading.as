@@ -103,7 +103,6 @@ package game
         {
             loadTimer++;
 
-            // TODO: use localized strings here
             namedisplay.htmlText = "";
             if (song.songInfo.name)
             {
