@@ -397,6 +397,9 @@ package game
 
         override public function stageRemove():void
         {
+            // Reset Window Title
+            stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE;
+
             stage.frameRate = 60;
 
             if (options.isEditor)

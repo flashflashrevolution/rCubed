@@ -107,9 +107,6 @@ package game
 
         override public function stageAdd():void
         {
-            // Reset Window Title
-            stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE;
-
             // Background
             background = new GameResultBackground();
             addChild(background);
