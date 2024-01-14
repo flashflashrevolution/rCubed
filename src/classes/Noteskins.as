@@ -26,6 +26,9 @@ package classes
         public static const CUSTOM_NOTESKIN_IMPORT:String = "custom_noteskin_import";
         public static const CUSTOM_NOTESKIN_FILE:String = "custom_noteskin_filename";
 
+        public static const JSON_LOAD:String = "json_load";
+        public static const JSON_ERROR:String = "json_error";
+
         ///- Singleton Instance
         private static var _instance:Noteskins = null;
         private static var _externalNoteskins:Vector.<ExternalNoteskin>;
@@ -37,6 +40,7 @@ package classes
         private var _loadError:Boolean = false;
 
         private var _data:Object;
+        public var lastCustomNoteskin:String;
 
         public var totalNoteskins:int = 0;
         public var totalLoaded:int = 0;
@@ -411,6 +415,8 @@ package classes
             var arr:Object = buildFromBitmapData(bmp, noteskin_struct);
             if (arr == null)
             {
+                dispatchEvent(new Event(JSON_ERROR));
+
                 totalNoteskins--;
                 delete _data[noteID];
                 loadComplete();
@@ -433,12 +439,16 @@ package classes
             // Verify or Remove
             if (verifyNoteSkin(noteID))
             {
+                dispatchEvent(new Event(JSON_LOAD));
+
                 totalLoaded++;
                 delete _data[noteID]["data"];
                 delete _data[noteID]["rects"];
             }
             else
             {
+                dispatchEvent(new Event(JSON_ERROR));
+
                 totalNoteskins--;
                 delete _data[noteID];
             }
@@ -461,6 +471,8 @@ package classes
             //- Remove From List
             totalNoteskins--;
             delete _data[noteID];
+
+            dispatchEvent(new Event(JSON_ERROR));
 
             loadComplete();
         }
@@ -615,21 +627,24 @@ package classes
             loadCustomNoteskinJSON(noteskinData);
         }
 
-        public function loadCustomNoteskinJSON(data:String):void
+        public function loadCustomNoteskinJSON(data:String, noteskinID:String = "0"):void
         {
             if (data != null)
             {
+                if (noteskinID == "0")
+                    lastCustomNoteskin = data;
+
                 var obj:Object = JSON.parse(data);
-                obj["id"] = "0";
+                obj["id"] = noteskinID;
                 obj["_hidden"] = true;
                 obj["notes"] = {};
                 _data[obj["id"]] = obj;
-                loadNoteskinBitmap("0");
+                loadNoteskinBitmap(noteskinID);
             }
             else
             {
-                if (_data["0"] != null)
-                    delete _data["0"];
+                if (_data[noteskinID] != null)
+                    delete _data[noteskinID];
             }
         }
 
