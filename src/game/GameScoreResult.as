@@ -218,5 +218,10 @@ package game
 
             return out;
         }
+
+        public function compare(i:GameScoreResult):Boolean
+        {
+            return this.user.siteId == i.user.siteId && this.amazing == i.amazing && this.perfect == i.perfect && this.good == i.good && this.average == i.average && this.miss == i.miss && this.boo == i.boo;
+        }
     }
 }
