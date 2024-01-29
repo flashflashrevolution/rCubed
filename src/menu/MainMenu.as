@@ -45,7 +45,7 @@ package menu
         private var _lang:Language = Language.instance;
 
         public var _MenuSingleplayer:MenuPanel;
-        private var _MenuMultiplayer:MenuPanel;
+        private static var _MenuMultiplayer:MenuPanel;
         private var _MenuTokens:MenuPanel;
 
         private var hover_message:MouseTooltip;
@@ -116,15 +116,34 @@ package menu
             }
 
             //- Add Main Panel to Stage
-            switchTo(MENU_SONGSELECTION);
+            if (Flags.VALUES[Flags.MP_MENU_RETURN])
+            {
+                switchTo(MENU_MULTIPLAYER);
+                Flags.VALUES[Flags.MP_MENU_RETURN] = false;
+            }
+            else
+                switchTo(MENU_SONGSELECTION);
             return false;
+        }
+
+        override public function stageRemove():void
+        {
+            if (_MenuSingleplayer)
+                _MenuSingleplayer.stageRemove();
+
+            if (_MenuTokens)
+                _MenuTokens.stageRemove();
+
+            if (_MenuMultiplayer)
+                _MenuMultiplayer.stageRemove();
+
+            super.stageRemove();
         }
 
         override public function dispose():void
         {
             if (_MenuSingleplayer)
             {
-                _MenuSingleplayer.stageRemove();
                 _MenuSingleplayer.dispose();
                 if (this.contains(_MenuSingleplayer))
                     this.removeChild(_MenuSingleplayer);
@@ -132,7 +151,6 @@ package menu
             }
             if (_MenuTokens)
             {
-                _MenuTokens.stageRemove();
                 _MenuTokens.dispose();
                 if (this.contains(_MenuTokens))
                     this.removeChild(_MenuTokens);
@@ -140,14 +158,10 @@ package menu
             }
             if (_MenuMultiplayer)
             {
-                _MenuMultiplayer.stageRemove();
-                _MenuMultiplayer.dispose();
                 if (this.contains(_MenuMultiplayer))
                     this.removeChild(_MenuMultiplayer);
-                _MenuMultiplayer = null;
             }
-            }
-            super.stageRemove();
+            super.dispose();
         }
 
         override public function draw():void
@@ -317,11 +331,19 @@ package menu
             }
         }
 
-        override public function switchTo(_panel:String, useNew:Boolean = false):Boolean
+        override public function switchTo(_panel:String):Boolean
         {
             //- Check Parent Function first.
-            if (super.switchTo(_panel, useNew))
+            if (super.switchTo(_panel))
+            {
+                if (panel != null)
+                {
+                    panel.stageRemove();
+                    panel.parent.removeChild(panel);
+                    panel.dispose();
+                }
                 return true;
+            }
 
             //- Do current panel.
             var isFound:Boolean = false;
@@ -349,6 +371,7 @@ package menu
                 return true;
             }
 
+            // Remove Active Panel
             if (panel != null)
             {
                 panel.stageRemove();
@@ -358,23 +381,25 @@ package menu
             switch (_panel)
             {
                 case MENU_SONGSELECTION:
-                    if (_MenuSingleplayer == null || useNew)
+                    if (_MenuSingleplayer == null)
                         _MenuSingleplayer = new MenuSongSelection(this);
                     panel = _MenuSingleplayer;
                     activePanelID = 0;
                     isFound = true;
                     break;
-                /*
-                   case MENU_MULTIPLAYER:
-                   if (_MenuMultiplayer == null || useNew)
-                   _MenuMultiplayer =
-                   panel = _MenuMultiplayer;
-                   options.activePanel = 1;
-                   isFound = true;
-                   break;
-                 */
+
+                case MENU_MULTIPLAYER:
+                    if (_MenuMultiplayer == null)
+                        _MenuMultiplayer = new MenuMultiplayer(this);
+                    else
+                        _MenuMultiplayer.my_Parent = this;
+                    panel = _MenuMultiplayer;
+                    activePanelID = 1;
+                    isFound = true;
+                    break;
+
                 case MENU_TOKENS:
-                    if (_MenuTokens == null || useNew)
+                    if (_MenuTokens == null)
                         _MenuTokens = new MenuTokens(this);
                     panel = _MenuTokens;
                     activePanelID = 2;

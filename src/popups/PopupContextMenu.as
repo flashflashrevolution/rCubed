@@ -3,6 +3,7 @@ package popups
     import assets.GameBackgroundColor;
     import classes.Language;
     import classes.Playlist;
+    import classes.mp.Multiplayer;
     import classes.ui.Box;
     import classes.ui.BoxButton;
     import com.flashdynamix.utils.SWFProfiler;
@@ -143,6 +144,7 @@ package popups
                 if (_gvars.gameMain.loadComplete && !(_gvars.gameMain.activePanel is GameMenu))
                 {
                     Flags.VALUES = {};
+                    Multiplayer.instance.disconnect();
                     _gvars.playerUser.refreshUser();
                     _gvars.gameMain.switchTo(Main.GAME_LOGIN_PANEL);
                 }

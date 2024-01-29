@@ -1,7 +1,6 @@
 package game
 {
     import classes.Language;
-    import classes.Playlist;
     import com.flashfla.utils.SystemUtil;
     import menu.MenuPanel;
 
@@ -10,10 +9,11 @@ package game
         public static const GAME_LOADING:String = "GameLoading";
         public static const GAME_PLAY:String = "GamePlay";
         public static const GAME_RESULTS:String = "GameResults";
+        public static const GAME_MP_WAIT:String = "GameMPWait";
+        public static const GAME_MP_RESULTS:String = "GameMPResults";
 
         private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _lang:Language = Language.instance;
-        private var _playlist:Playlist = Playlist.instance;
 
         public var panel:MenuPanel;
 
@@ -24,7 +24,12 @@ package game
 
         override public function init():Boolean
         {
-            if (_gvars.options.isEditor)
+            if (Flags.VALUES[Flags.MP_MENU_RESULTS])
+            {
+                Flags.VALUES[Flags.MP_MENU_RESULTS] = false;
+                switchTo(GAME_MP_RESULTS);
+            }
+            else if (_gvars.options.isEditor)
             {
                 switchTo(GAME_PLAY);
             }
@@ -37,26 +42,41 @@ package game
             return false;
         }
 
+        override public function stageRemove():void
+        {
+            if (panel && panel.stage)
+                panel.stageRemove();
+
+            super.stageRemove();
+        }
+
         override public function dispose():void
         {
             if (panel)
             {
-                panel.stageRemove();
                 panel.dispose();
                 if (this.contains(panel))
                     this.removeChild(panel);
                 panel = null;
             }
-            super.stageRemove();
+            super.dispose();
         }
 
-        override public function switchTo(_panel:String, useNew:Boolean = false):Boolean
+        override public function switchTo(_panel:String):Boolean
         {
             //- Check Parent Function first.
-            if (super.switchTo(_panel, useNew))
+            if (super.switchTo(_panel))
             {
                 _gvars.gameMain.bg.updateDisplay();
                 _gvars.gameMain.ver.visible = true;
+
+                if (panel != null)
+                {
+                    panel.stageRemove();
+                    panel.parent.removeChild(panel);
+                    panel.dispose();
+                }
+
                 return true;
             }
 
@@ -67,7 +87,7 @@ package game
             if (panel != null)
             {
                 panel.stageRemove();
-                this.removeChild(panel);
+                panel.parent.removeChild(panel);
                 panel.dispose();
             }
 
@@ -81,14 +101,28 @@ package game
                     break;
 
                 case GAME_PLAY:
+                    panel = new GameplayDisplay(this);
                     _gvars.gameMain.bg.updateDisplay(true);
                     _gvars.gameMain.ver.visible = false;
-                    panel = new GameplayDisplay(this);
                     isFound = true;
                     break;
 
                 case GAME_RESULTS:
                     panel = new GameResults(this);
+                    _gvars.gameMain.ver.visible = true;
+                    isFound = true;
+                    break;
+
+                case GAME_MP_WAIT:
+                    panel = new GameMultiplayerWait(this);
+                    _gvars.gameMain.bg.updateDisplay(true);
+                    _gvars.gameMain.ver.visible = true;
+                    isFound = true;
+                    break;
+
+                case GAME_MP_RESULTS:
+                    panel = new GameResultsMP(this);
+                    _gvars.gameMain.ver.visible = true;
                     isFound = true;
                     break;
             }

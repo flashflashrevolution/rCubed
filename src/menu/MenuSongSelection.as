@@ -20,6 +20,7 @@ package menu
     import classes.SongQueueItem;
     import classes.User;
     import classes.chart.Song;
+    import classes.mp.Multiplayer;
     import classes.ui.BoxButton;
     import classes.ui.BoxIcon;
     import classes.ui.BoxText;
@@ -74,6 +75,7 @@ package menu
         private var _avars:ArcGlobals = ArcGlobals.instance;
         private var _lang:Language = Language.instance;
         private var _playlist:Playlist = Playlist.instance;
+        private var _mp:Multiplayer = Multiplayer.instance;
 
         private var SORT_VALUE_CACHE:Object = {};
 
@@ -169,8 +171,6 @@ package menu
 
         override public function dispose():void
         {
-            var i:uint = 0;
-
             genreItems = null;
             songItems = null;
 
@@ -356,7 +356,6 @@ package menu
 
         override public function stageRemove():void
         {
-            //- Remove Listeners
             if (stage)
                 stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyHandler);
         }
@@ -370,7 +369,7 @@ package menu
         {
             _playlist.removeEventListener(GlobalVariables.LOAD_ERROR, e_defaultEngineLoadFail);
             _playlist.engineChangeHandler(e);
-            switchTo(MainMenu.MENU_SONGSELECTION, true);
+            switchTo(Main.GAME_MENU_PANEL);
         }
 
         //******************************************************************************************//
@@ -1132,7 +1131,7 @@ package menu
                 {
                     if (!tarSongItem.isLocked && options.infoTab == TAB_PLAYLIST)
                     {
-                        if (false) // TODO
+                        if (_mp.inGameRoom)
                             multiplayerLoad(tarSongItem.level);
                         else
                             playSong(tarSongItem.level);
@@ -1290,6 +1289,9 @@ package menu
          */
         public function buildInfoBox():void
         {
+            if (infoBox == null)
+                return;
+
             // Deselect Buttons
             for (var bti:int = 0; bti < optionsBox.numChildren; bti++)
                 optionsBox.getChildAt(bti).alpha = 0.75;
@@ -1695,15 +1697,17 @@ package menu
                 songOptionsButton.action = "songOptions";
                 songOptionsButton.setHoverText(_lang.string("song_selection_song_panel_hover_song_options"));
 
-                buttonWidth = 164;
-                if (false) // TODO
+                if (_mp.inGameRoom)
                 {
-                    buttonWidth = 79.5;
-                    var songLoadButton:BoxButton = new BoxButton(infoBox, 89.5, 288, 79.5, 27, _lang.string("song_selection_song_panel_mp_load"), 14, songLoadClick);
-                    songLoadButton.level = songInfo.level;
+                    const mpText:String = _lang.string(_mp.GAME_ROOM.owner == _mp.currentUser ? "song_selection_song_panel_mp_select" : "song_selection_song_panel_mp_request");
+                    var songSelectButton:BoxButton = new BoxButton(infoBox, 5, 288, 164, 27, mpText, 14, songLoadClick);
+                    songSelectButton.level = songInfo.level;
                 }
-                var songStartButton:BoxButton = new BoxButton(infoBox, 5, 288, buttonWidth, 27, _lang.string("song_selection_song_panel_play"), 14, songStartClick);
-                songStartButton.level = songInfo.level;
+                else
+                {
+                    var songStartButton:BoxButton = new BoxButton(infoBox, 5, 288, 164, 27, _lang.string("song_selection_song_panel_play"), 14, songStartClick);
+                    songStartButton.level = songInfo.level;
+                }
             }
             else
             {
@@ -1788,8 +1792,7 @@ package menu
             if (level < 0)
                 return;
 
-            //_mp.gameplayPicking(_playlist.getSongInfo(level)); // TODO
-            //_mp.gameplayLoading(); // TODO
+            _mp.ffrSelectSong(_playlist.getSongInfo(level));
             switchTo(MainMenu.MENU_MULTIPLAYER);
         }
 
@@ -2215,7 +2218,7 @@ package menu
                     if (randomList.length > 0)
                     {
                         var random:Object = randomList[int(Math.floor(Math.random() * randomList.length))];
-                        if (false) // TODO
+                        if (_mp.inGameRoom)
                             multiplayerLoad(random.level);
                         else
                             playSong(random.level);
@@ -2300,7 +2303,7 @@ package menu
                 case Keyboard.ENTER:
                     if (!((stage.focus is PushButton) || (stage.focus is TextField)) && options.activeSongId >= 0)
                     {
-                        if (false) // TODO _mp.gameplayHasOpponent()
+                        if (_mp.inGameRoom)
                             multiplayerLoad(options.activeSongId);
                         else
                             playSong(options.activeSongId);

@@ -71,9 +71,9 @@ package
         public var songCache:Array = [];
         public var songHighscores:Object = {};
 
-        public static var divisionColor:Array = [0xC27BA0, 0x8E7CC3, 0x6D9EEB, 0x93C47D, 0xCEA023, 0xE06666, 0x919C86, 0xD2C7AC, 0xBF0000];
-        public static var divisionTitle:Array = ["Novice", "Intermediate", "Advanced", "Expert", "Master", "Guru", "Legendary", "Godly", "Developer"];
-        public static var divisionLevel:Array = [0, 26, 50, 59, 69, 83, 94, 101, 122];
+        public static var divisionColor:Array = ["#C27BA0", "#8E7CC3", "#6D9EEB", "#93C47D", "#CEA023", "#E06666", "#919C86", "#D2C7AC", "#7B738A", "#BF0000"];
+        public static var divisionTitle:Array = ["Novice", "Intermediate", "Advanced", "Expert", "Master", "Guru", "Legendary", "Godly", "Mythical", "Developer"];
+        public static var divisionLevel:Array = [0, 24, 42, 58, 72, 84, 94, 102, 108, 120];
 
         ///- User Vars
         public var userSession:String = "0";
@@ -254,7 +254,7 @@ package
 
         ///- Public
         //- Player Divisions
-        public static function getDivisionColor(level:int):int
+        public static function getDivisionColor(level:int):String
         {
             return divisionColor[getDivisionNumber(level)];
         }
@@ -636,8 +636,6 @@ package
                 }
             }
         }
-
-
 
         public function unlockTokenById(type:String, id:String):void
         {

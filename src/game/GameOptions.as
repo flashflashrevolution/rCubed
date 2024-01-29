@@ -3,6 +3,7 @@ package game
     import arc.ArcGlobals;
     import classes.User;
     import classes.chart.Song;
+    import classes.mp.MPUser;
     import classes.replay.Replay;
 
     public class GameOptions extends Object
@@ -42,6 +43,7 @@ package game
         public var displayScreencut:Boolean = false;
         public var displaySongProgress:Boolean = true;
         public var displaySongProgressText:Boolean = false;
+        public var displayMultiplayerScores:Boolean = true;
 
         public var displayMPUI:Boolean = true;
         public var displayMPJudge:Boolean = true;
@@ -76,6 +78,11 @@ package game
 
         public var isolationOffset:int = 0;
         public var isolationLength:int = 0;
+
+        // Multiplayer
+        public var isMultiplayer:Boolean = false;
+        public var isSpectator:Boolean = false;
+        public var spectatorUser:MPUser;
 
         public function get isolation():Boolean
         {
@@ -126,6 +133,7 @@ package game
             displayScreencut = user.DISPLAY_SCREENCUT;
             displaySongProgress = user.DISPLAY_SONGPROGRESS;
             displaySongProgressText = user.DISPLAY_SONGPROGRESS_TEXT;
+            displayMultiplayerScores = user.DISPLAY_MULTIPLAYER_SCORES;
 
             displayMPUI = user.DISPLAY_MP_UI;
             displayMPPA = user.DISPLAY_MP_PA;
@@ -169,7 +177,7 @@ package game
             isolationOffset = avars.configIsolationStart;
             isolationLength = avars.configIsolationLength;
 
-            var layoutKey:String = "sp"; // TODO: mpRoom ? (mpRoom.connection.currentUser.isPlayer ? "mp" : "mpspec") : "sp";
+            var layoutKey:String = ((isMultiplayer && !isSpectator) ? "mp" : "sp");
             if (!avars.configInterface[layoutKey])
                 avars.configInterface[layoutKey] = {};
             layout = avars.configInterface[layoutKey];
@@ -231,6 +239,7 @@ package game
             settings["viewScreencut"] = displayScreencut;
             settings["viewSongProgress"] = displaySongProgress;
             settings["viewSongProgressText"] = displaySongProgressText;
+            settings["viewMultiplayerScores"] = displayMultiplayerScores;
             settings["viewGameTopBar"] = displayGameTopBar;
             settings["viewGameBottomBar"] = displayGameBottomBar;
             settings["speed"] = scrollSpeed;
@@ -317,6 +326,7 @@ package game
             displayScreencut = settings["viewScreencut"];
             displaySongProgress = settings["viewSongProgress"];
             displaySongProgressText = settings["viewSongProgressText"];
+            displayMultiplayerScores = settings["viewMultiplayerScores"];
 
             if (settings["viewScore"] != null)
                 displayScore = settings["viewScore"];

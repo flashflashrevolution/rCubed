@@ -105,6 +105,7 @@ package classes
         public var DISPLAY_SCREENCUT:Boolean = false;
         public var DISPLAY_SONGPROGRESS:Boolean = true;
         public var DISPLAY_SONGPROGRESS_TEXT:Boolean = false;
+        public var DISPLAY_MULTIPLAYER_SCORES:Boolean = true;
         public var DISPLAY_RAWGOODS:Boolean = false;
 
         public var DISPLAY_MP_UI:Boolean = true;
@@ -659,6 +660,9 @@ package classes
             if (_settings.viewSongProgressText != null)
                 this.DISPLAY_SONGPROGRESS_TEXT = _settings.viewSongProgressText;
 
+            if (_settings.viewMultiplayerScores != null)
+                this.DISPLAY_MULTIPLAYER_SCORES = _settings.viewMultiplayerScores;
+
             if (_settings.viewMPUI != null)
                 this.DISPLAY_MP_UI = _settings.viewMPUI;
 
@@ -850,6 +854,7 @@ package classes
             gameSave.viewScreencut = this.DISPLAY_SCREENCUT;
             gameSave.viewSongProgress = this.DISPLAY_SONGPROGRESS;
             gameSave.viewSongProgressText = this.DISPLAY_SONGPROGRESS_TEXT;
+            gameSave.viewMultiplayerScores = this.DISPLAY_MULTIPLAYER_SCORES;
             gameSave.viewMPUI = this.DISPLAY_MP_UI;
             gameSave.viewMPPA = this.DISPLAY_MP_PA;
             gameSave.viewMPJudge = this.DISPLAY_MP_JUDGE;

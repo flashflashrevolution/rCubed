@@ -2,9 +2,9 @@ package game.results
 {
     import assets.GameBackgroundStripes;
     import flash.display.BitmapData;
+    import flash.display.GradientType;
     import flash.display.Sprite;
     import flash.geom.Matrix;
-    import flash.display.GradientType;
 
     public class GameResultBackground extends Sprite
     {

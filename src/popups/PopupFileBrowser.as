@@ -696,11 +696,20 @@ package popups
             var info:FileFolderItem = tar.cache_info;
             var id:int = tar.chart_id;
 
-            Flags.VALUES[Flags.FILE_LOADER_OPEN] = true;
-
             removePopup();
 
-            FileLoader.loadLocalFile(info.loc, id);
+            if (_mp.inGameRoom)
+            {
+                _mp.ffrSelectSong(FileLoader.buildSongInfo(info.loc, id, true));
+
+                if (_gvars.gameMain.activePanel is MainMenu)
+                    _gvars.gameMain.activePanel.switchTo(MainMenu.MENU_MULTIPLAYER);
+            }
+            else
+            {
+                Flags.VALUES[Flags.FILE_LOADER_OPEN] = true;
+                FileLoader.loadLocalFile(info.loc, id);
+            }
         }
 
         private function e_reloadCache(e:Event):void

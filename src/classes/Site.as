@@ -1,6 +1,5 @@
 package classes
 {
-    import arc.ArcGlobals;
     import flash.events.ErrorEvent;
     import flash.events.Event;
     import flash.events.EventDispatcher;
@@ -109,11 +108,7 @@ package classes
             // MP Divisions
             GlobalVariables.divisionLevel = data.division_levels;
             GlobalVariables.divisionTitle = data.division_titles;
-
-            var divisionColors:Array = [];
-            for each (var value:String in data.division_colors)
-                divisionColors.push(parseInt(value.substring(1), 16));
-            GlobalVariables.divisionColor = divisionColors;
+            GlobalVariables.divisionColor = data.division_colors;
 
             // Tokens
             _gvars.TOKENS = {};

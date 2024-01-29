@@ -12,7 +12,6 @@ package game
     import classes.ui.BoxButton;
     import classes.ui.BoxIcon;
     import classes.ui.StarSelector;
-    import com.flashfla.net.DynamicURLLoader;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
     import flash.display.DisplayObject;

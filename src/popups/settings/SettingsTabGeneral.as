@@ -3,6 +3,7 @@ package popups.settings
     import arc.ArcGlobals;
     import classes.Alert;
     import classes.Language;
+    import classes.mp.Multiplayer;
     import classes.ui.BoxCheck;
     import classes.ui.BoxSlider;
     import classes.ui.PromptInput;
@@ -21,6 +22,7 @@ package popups.settings
         private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _lang:Language = Language.instance;
         private var _avars:ArcGlobals = ArcGlobals.instance;
+        private var _mp:Multiplayer = Multiplayer.instance;
 
         private var optionGameSpeed:ValidatedText;
         private var optionReceptorSpacing:ValidatedText;
@@ -421,6 +423,9 @@ package popups.settings
             {
                 _gvars.activeUser.songRate = optionRate.validate(1, 0.1);
                 _gvars.dirtySongFiles();
+
+                // MP Update
+                _mp.ffrUpdateRate();
             }
 
             else if (e.target == optionIsolation)

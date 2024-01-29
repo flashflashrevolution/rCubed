@@ -10,7 +10,6 @@ package
     import classes.Noteskins;
     import classes.Playlist;
     import classes.Site;
-    import classes.SongPreview;
     import classes.User;
     import classes.ui.BoxButton;
     import classes.ui.ProgressBar;
@@ -368,9 +367,9 @@ package
             loadTotal = (!isLoginLoad) ? 5 : 3;
 
             _gvars.playerUser = new User(true, true);
+            _gvars.playerUser.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
+            _gvars.playerUser.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
             _gvars.activeUser = _gvars.playerUser;
-            _gvars.activeUser.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
-            _gvars.activeUser.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
 
             _playlist.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
             _playlist.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
@@ -392,10 +391,6 @@ package
                 _lang.load();
                 _noteskins.load();
             }
-
-            //_friends.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
-            //_friends.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
-            //_friends.load();
         }
 
         private function gameScriptLoad(e:Event = null):void
@@ -491,8 +486,8 @@ package
                 _playlist.updateSongAccess();
                 _playlist.updatePublicSongsCount();
                 _gvars.loadUserSongData();
-                _gvars.activeUser.getUserSkillRatingData();
-                switchTo(_gvars.activeUser.isGuest ? GAME_LOGIN_PANEL : GAME_MENU_PANEL);
+                _gvars.playerUser.getUserSkillRatingData();
+                switchTo(_gvars.playerUser.isGuest ? GAME_LOGIN_PANEL : GAME_MENU_PANEL);
             }
         }
 
@@ -512,19 +507,15 @@ package
                 _site.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
                 _site.load();
             }
-            if (!_gvars.activeUser.isLoaded())
+            if (!_gvars.playerUser || !_gvars.playerUser.isLoaded())
             {
-                _gvars.activeUser.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
-                _gvars.activeUser.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
-                _gvars.activeUser.load();
+                _gvars.playerUser = new User(true, true);
+                _gvars.playerUser.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
+                _gvars.playerUser.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
+                _gvars.playerUser.load();
+                _gvars.activeUser = _gvars.playerUser;
             }
-            /*
-               if (!_friends.isLoaded()) {
-               _friends.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
-               _friends.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
-               _friends.load();
-               }
-             */
+
             if (!isLoginLoad)
             {
                 if (!_noteskins.isLoaded())
@@ -546,7 +537,7 @@ package
         }
 
         ///- Panels
-        override public function switchTo(_panel:String, useNew:Boolean = false):Boolean
+        override public function switchTo(_panel:String):Boolean
         {
             var isFound:Boolean = false;
             var nextPanel:MenuPanel;
@@ -559,7 +550,10 @@ package
 
                 //- Remove last panel if exist
                 if (activePanel != null)
+                {
+                    activePanel.stageRemove();
                     TweenLite.to(activePanel, 0.5, {alpha: 0, onComplete: removeLastPanel, onCompleteParams: [activePanel]});
+                }
 
                 // Only load data that depend on the global session token after logging in
                 this.isLoginLoad = true;
@@ -646,11 +640,12 @@ package
         {
             if (removePanel)
             {
-                removePanel.dispose();
-                if (this.contains(removePanel))
+                if (removePanel.stage != null)
                 {
-                    this.removeChild(removePanel);
+                    removePanel.stageRemove();
+                    removePanel.parent.removeChild(removePanel);
                 }
+                removePanel.dispose();
                 removePanel = null;
             }
             SystemUtil.gc();

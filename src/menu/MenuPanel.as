@@ -15,13 +15,12 @@ package menu
             super();
         }
 
-        public function switchTo(_panel:String, useNew:Boolean = false):Boolean
+        public function switchTo(_panel:String):Boolean
         {
             if (stage != null && this.stage != null)
-            {
                 stage.focus = this.stage;
-            }
-            return my_Parent.switchTo(_panel, useNew);
+
+            return my_Parent.switchTo(_panel);
         }
 
         public function addPopup(_panel:*, newLayer:Boolean = false):void
@@ -34,7 +33,7 @@ package menu
             return my_Parent.removePopup();
         }
 
-        // Init status depended on use of switchTo in init function. If the function calls a switchTo, return false here. 
+        // Init status depended on use of switchTo in init function. If the function calls a switchTo, return false here.
         public function init():Boolean
         {
             return true;
@@ -58,17 +57,16 @@ package menu
 
         override public function addEventListener(type:String, listener:Function, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void
         {
-            _listeners.push([type, listener]);
+            _listeners.push([type, listener, useCapture]);
             // trace("Added Listener:", this, _listeners.length - 1, type);
             super.addEventListener(type, listener, useCapture, priority, useWeakReference);
         }
 
         override public function removeEventListener(type:String, listener:Function, useCapture:Boolean = false):void
         {
-
             for (var i:int = 0; i < _listeners.length; i++)
             {
-                if (_listeners[i][0] == type && _listeners[i][1] == listener)
+                if (_listeners[i][0] == type && _listeners[i][1] == listener && _listeners[i][2] == useCapture)
                 {
                     _listeners.splice(i, 1);
                         // trace("Removed Listener:", this, i, type);

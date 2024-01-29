@@ -70,6 +70,10 @@ package
         public static var USER_SAVE_SETTINGS_URL:String = "game/r3/r3-userSettings.php";
         public static var USER_STATS_URL:String = "game/r3/r3-userStats.php";
 
+        // Multiplayer
+        public static var MP_HOST:String = "www.flashflashrevolution.com";
+        public static var MP_PORT:int = 8084;
+
         // Unused URLs
         public static var SHOP_URL:String = "tools/ffrshop.php";
         public static var NOTESKIN_SWF_URL:String = "game/r3/noteskins/";
