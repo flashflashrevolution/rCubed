@@ -274,13 +274,20 @@ package classes
 
         public function updateSRList(newLevelRanks:Object):void
         {
-            if (newLevelRanks.equiv > skill_rating_levelranks[skill_rating_top_count - 1].equiv)
+            var worseLevelRank:Object = skill_rating_levelranks[skill_rating_top_count - 1];
+            if (!worseLevelRank || newLevelRanks.equiv > worseLevelRank.equiv)
             {
                 // Check if the song is already included in the top X equiv
-                for (var i:int = 0; i < skill_rating_levelranks.length; i++)
+                if (worseLevelRank)
                 {
-                    if (skill_rating_levelranks[i].id == newLevelRanks.id) // Level ID match, so we've improved on a top score. Drop the old equiv entry
-                        skill_rating_levelranks.splice(i, 1);
+                    for (var i:int = skill_rating_levelranks.length - 1; i >= 0; i--)
+                    {
+                        if (skill_rating_levelranks[i].id == newLevelRanks.id) // Level ID match, so we've improved on a top score. Drop the old equiv entry
+                        {
+                            skill_rating_levelranks.splice(i, 1);
+                            break;
+                        }
+                    }
                 }
 
                 // Add this improved rating
@@ -290,7 +297,7 @@ package classes
                 skill_rating_levelranks.sort(equivSort);
 
                 // Drop the bottom equiv if we have more than the top X count
-                //[won't be necessary for newer players with less than X scores for equiv rating, or if we've improved a score that we already had equiv from]
+                // [won't be necessary for newer players with less than X scores for equiv rating, or if we've improved a score that we already had equiv from]
                 if (skill_rating_levelranks.length > skill_rating_top_count)
                     skill_rating_levelranks.length = skill_rating_top_count;
             }
@@ -762,6 +769,9 @@ package classes
             if (_settings.comboColours != null)
                 mergeIntoArray(this.comboColors, _settings.comboColours);
 
+            if (_settings.rawGoodsColor != null)
+                this.rawGoodsColor = _settings.rawGoodsColor;
+
             if (_settings.enableComboColors != null)
                 mergeIntoArray(this.enableComboColors, _settings.enableComboColors);
 
@@ -883,6 +893,7 @@ package classes
             gameSave.visual = this.activeVisualMods;
             gameSave.judgeColours = this.judgeColors;
             gameSave.comboColours = this.comboColors;
+            gameSave.rawGoodsColor = this.rawGoodsColor;
             gameSave.enableComboColors = this.enableComboColors;
             gameSave.receptorColours = this.receptorColors;
             gameSave.enableReceptorColors = this.enableReceptorColors;
