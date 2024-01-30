@@ -22,9 +22,7 @@ package classes.mp.components
             _name.setAreaParams(width - 4, height / 2 + 1, "center");
 
             _state = new Text(this, 0, height / 2, "----state----", 10, "#FFFFFF");
-            _state.height = height / 2 + 1;
-            _state.width = width;
-            _state.align = Text.CENTER;
+            _state.setAreaParams(width - 4, height / 2 + 1, "center");
 
             //- Set Defaults
             this.mouseEnabled = true;
