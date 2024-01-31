@@ -273,11 +273,8 @@ package game
                 }
             }
 
-            if (options.isEditor)
+            if (options.isEditor && options.isMultiplayer)
             {
-                if (options.isSpectator)
-                    isMultiplayerSpectator = true;
-
                 mpFFRRoom = new MPRoomFFR();
 
                 var fakeMPPlayer:MPUser = new MPUser();
@@ -1675,7 +1672,7 @@ package game
             if (options.displayHealth)
                 uiLifebar = new LifeBar(this);
 
-            if (options.displayMultiplayerScores && (isMultiplayer || isMultiplayerSpectator || options.isEditor))
+            if (options.displayMultiplayerScores && (isMultiplayer || isMultiplayerSpectator || (options.isEditor && options.isMultiplayer)))
                 mpuiFFRScores = new MPFFRScoreCompare(options, this, mpFFRRoom);
 
             if (options.isEditor)

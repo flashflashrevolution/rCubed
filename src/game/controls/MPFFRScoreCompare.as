@@ -15,7 +15,7 @@ package game.controls
         private var options:GameOptions;
 
         private var room:MPRoomFFR;
-        private var labels:Vector.<PlayerLabel> = new <PlayerLabel>[];
+        private var labels:Array = [];
         private var labelCount:int = 0;
         private var startY:Number = 0;
 
@@ -41,10 +41,6 @@ package game.controls
                     const text:PlayerLabel = new PlayerLabel(room, user);
                     addChild(text);
                     labels.push(text);
-
-                    if (isSpectator)
-                        text.buttonMode = true;
-
                 }
             }
 
@@ -57,21 +53,13 @@ package game.controls
 
         public function update():void
         {
-            labels.sort(sort);
+            labels.sortOn(["position", "score", "username"], [Array.NUMERIC, Array.NUMERIC | Array.DESCENDING, Array.CASEINSENSITIVE]);
 
             for (var i:int = 0; i < labelCount; i++)
             {
                 labels[i].update();
-                labels[i].y = startY + (i * 40);
+                labels[i].y = startY + (i * 42);
             }
-        }
-
-        public static function sort(a:PlayerLabel, b:PlayerLabel):int
-        {
-            if (a.data.raw_score > b.data.raw_score)
-                return 1;
-
-            return -1;
         }
     }
 }
@@ -94,11 +82,11 @@ internal class PlayerLabel extends Sprite
 
     public var isSelf:Boolean = false;
 
-    public var position:Text;
-    public var username:Text;
-    public var score:Text;
+    public var txtPosition:Text;
+    public var txtUsername:Text;
+    public var txtScore:Text;
 
-    private var _lastPosition:int = 0;
+    private var _lastPosition:int = -1;
     private var _lastScore:int = -1;
 
     public function PlayerLabel(room:MPRoomFFR, data:MPMatchFFRUser):void
@@ -119,26 +107,41 @@ internal class PlayerLabel extends Sprite
         this.graphics.drawRect(0, 0, 151, 40);
         this.graphics.endFill();
 
-        position = new Text(this, 5, 5, "", 20, "#DBDBDB");
-        position.setAreaParams(30, 30, "right");
+        txtPosition = new Text(this, 5, 5, "", 20, "#DBDBDB");
+        txtPosition.setAreaParams(30, 30, "right");
 
-        username = new Text(this, 40, 2, user.name);
+        txtUsername = new Text(this, 40, 2, user.name);
 
-        score = new Text(this, 40, 18, "", 10, "#EAEAEA");
+        txtScore = new Text(this, 40, 18, "", 10, "#EAEAEA");
     }
 
     public function update():void
     {
         if (_lastPosition != data.position)
         {
-            position.text = data.position.toString();
+            txtPosition.text = data.position.toString();
             _lastPosition = data.position;
         }
 
         if (_lastScore != data.raw_score)
         {
-            score.text = data.raw_score + " / " + data.good + "-" + data.average + "-" + data.miss + "-" + data.boo;
+            txtScore.text = data.raw_score + " / " + data.good + "-" + data.average + "-" + data.miss + "-" + data.boo;
             _lastScore = data.raw_score;
         }
+    }
+
+    public function get position():Number
+    {
+        return data.position;
+    }
+
+    public function get score():Number
+    {
+        return data.raw_score;
+    }
+
+    public function get username():String
+    {
+        return user.name;
     }
 }
