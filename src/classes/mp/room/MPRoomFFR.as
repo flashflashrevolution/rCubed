@@ -284,6 +284,7 @@ package classes.mp.room
         private function modeMatchStart(user:MPUser, cmd:MPSocketDataText):void
         {
             activeMatch = new MPMatchFFR(this);
+            activeMatch.update(cmd.data.teams);
 
             _mp.dispatchEvent(new MPRoomEvent(MPEvent.FFR_MATCH_START, cmd, this, user));
         }
