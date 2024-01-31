@@ -490,7 +490,6 @@ package game
 
         override public function stageRemove():void
         {
-            trace("[GameplayDisplay] stageRemove");
             // Reset Window Title
             stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE;
 
@@ -1609,6 +1608,7 @@ package game
             if (options.displayGameBottomBar)
             {
                 bgBottomBar = sideScroll ? new BarBottomSideways() : new BarBottomNormal();
+                bgBottomBar.y = Main.GAME_HEIGHT;
                 addChild(bgBottomBar);
             }
 
