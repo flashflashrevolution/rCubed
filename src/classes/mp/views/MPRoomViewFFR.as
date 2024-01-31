@@ -488,8 +488,6 @@ package classes.mp.views
         {
             if (room.songInfo == null)
             {
-                chat.addItem(new MPChatLogEntryText("SongInfo null, cannot load song."));
-
                 if (room.isPlayer(_mp.currentUser))
                 {
                     const progress_update_fail:MPCFFRSongLoadProgress = new MPCFFRSongLoadProgress(room, -1, false);
@@ -599,6 +597,12 @@ package classes.mp.views
                 if (!room.song)
                     room.song = _gvars.getSongFile(room.songInfo);
 
+                if (!room.song)
+                {
+                    chat.addItem(new MPChatLogEntryText(_lang.string("mp_room_chat_spectate_error")));
+                    return;
+                }
+
                 var vars:MPFFRState = room.getPlayerVariables(user);
 
                 room.song.isDirty = true;
@@ -611,7 +615,10 @@ package classes.mp.views
                 _gvars.options.spectatorUser = user;
 
                 // User Custom Noteskin.
-                if (_gvars.options.noteskin == 0)
+                if (vars.noteskin == null && _gvars.options.noteskin == 0)
+                    _gvars.options.noteskin = 1;
+
+                if (_gvars.options.noteskin == 0 && vars.noteskin != null)
                 {
                     _gvars.options.noteskin = 9999999;
                     _noteskins.addEventListener(Noteskins.JSON_LOAD, e_onNoteskinComplete);
