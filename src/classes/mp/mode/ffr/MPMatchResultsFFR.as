@@ -128,6 +128,23 @@ package classes.mp.mode.ffr
                 if (ffrSongsMatch.length == 1)
                     songInfo = ffrSongsMatch[0];
             }
+
+            // Still no SongInfo, using songData backup.
+            if (songInfo == null)
+            {
+                songInfo = new SongInfo();
+                songInfo.engine = songData.engine;
+                songInfo.level = songData.id;
+                songInfo.level_id = songData.level_id;
+                songInfo.name = songData.name;
+                songInfo.author = songData.author;
+                songInfo.time = songData.time;
+                songInfo.note_count = songData.note_count;
+                songInfo.difficulty = songData.difficulty;
+
+                songInfo.time_end = 0;
+                songInfo.time_secs = (Number(songInfo.time.split(":")[0]) * 60) + Number(songInfo.time.split(":")[1]);
+            }
         }
 
         public function get winnerText():String
