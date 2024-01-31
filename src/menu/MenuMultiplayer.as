@@ -17,6 +17,7 @@ package menu
     import classes.mp.views.MPServerBrowserView;
     import classes.mp.views.MPUserMessagesView;
     import classes.ui.BoxButton;
+    import classes.ui.Text;
     import classes.ui.Throbber;
     import flash.display.Sprite;
     import flash.events.Event;
@@ -45,6 +46,7 @@ package menu
 
         private var pmAlert:Sprite;
         private var throbber:Throbber;
+        private var guestWarning:Text;
 
         public function MenuMultiplayer(myParent:MenuPanel)
         {
@@ -64,6 +66,9 @@ package menu
             btnGameView.visible = false;
 
             btnConnect = new BoxButton(this, 7, Main.GAME_HEIGHT - 29, 128, 30, _lang.string("mp_connect"), 12, e_mpToggle);
+
+            guestWarning = new Text(this, 5, 100, _lang.string("mp_error_guest"), 14);
+            guestWarning.setAreaParams(Main.GAME_WIDTH - 10, 300, "center");
 
             throbber = new Throbber();
             throbber.x = Main.GAME_WIDTH / 2;
@@ -86,7 +91,7 @@ package menu
             btnPrivateMessages.addChild(pmAlert);
 
             // Connect to MP
-            if (!Flags.VALUES[Flags.MP_INITAL_LOAD])
+            if (!Flags.VALUES[Flags.MP_INITAL_LOAD] && !_gvars.playerUser.isGuest)
             {
                 Flags.VALUES[Flags.MP_INITAL_LOAD] = true;
 
@@ -98,7 +103,11 @@ package menu
         override public function stageAdd():void
         {
             if (stage)
+            {
                 stage.addEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDown);
+                btnConnect.enabled = !_gvars.playerUser.isGuest;
+                guestWarning.visible = _gvars.playerUser.isGuest;
+            }
         }
 
         override public function stageRemove():void
