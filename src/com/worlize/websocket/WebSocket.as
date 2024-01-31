@@ -180,6 +180,11 @@ package com.worlize.websocket
 
         public function connect():void
         {
+            if (_readyState === WebSocketState.OPEN && !socket.connected)
+            {
+                _readyState = WebSocketState.CLOSED;
+            }
+
             if (_readyState === WebSocketState.INIT || _readyState === WebSocketState.CLOSED)
             {
                 _readyState = WebSocketState.CONNECTING;
