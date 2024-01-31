@@ -67,7 +67,7 @@ package popups
             this.songInfo = songInfo;
 
             var engineId:String = songInfo.engine != null ? songInfo.engine.id : Constant.BRAND_NAME_SHORT_LOWER;
-            sDetails = UserSongNotes.getSongDetailsSafe(engineId, String(songInfo.level));
+            sDetails = UserSongNotes.getSongDetailsSafe(engineId, songInfo.level_id);
 
             songRatingValue = _gvars.playerUser.getSongRating(songInfo);
         }
