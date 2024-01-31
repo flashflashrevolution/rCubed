@@ -2219,7 +2219,6 @@ package menu
                     }
                 }
             }
-            stage.focus = stage;
         }
 
         /**
