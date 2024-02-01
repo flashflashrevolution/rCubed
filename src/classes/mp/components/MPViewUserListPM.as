@@ -141,12 +141,20 @@ package classes.mp.components
             item.update();
         }
 
+        private function _markUnactive(item:UserLabel, index:int = 0, vector:Vector.<*> = null):void
+        {
+            item.setActive(false);
+        }
+
         private function e_onUserClick(e:MouseEvent):void
         {
             if (e.target is UserLabel)
             {
+                userLabels.forEach(_markUnactive);
+
                 const label:UserLabel = e.target as UserLabel;
                 label.chat.newMessage = false;
+                label.setActive(true);
                 label.update();
 
                 dispatchEvent(new MPPMSelect(label.chat));
@@ -215,11 +223,13 @@ package classes.mp.components
     }
 }
 
+import assets.menu.icons.fa.iconRight;
 import classes.Language;
 import classes.mp.MPUser;
 import classes.mp.Multiplayer;
 import classes.mp.pm.MPUserChatHistory;
 import classes.ui.Text;
+import com.greensock.TweenLite;
 import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.events.MouseEvent;
@@ -236,10 +246,12 @@ internal class UserLabel extends Sprite
     public var chat:MPUserChatHistory;
     public var user:MPUser;
     public var messageDot:Sprite;
+    private var chevron:iconRight;
 
     protected var nameText:Text;
 
-    private var hover:Sprite;
+    private var active:Boolean = false;
+    private var hover:Boolean = false;
 
     public function UserLabel(chat:MPUserChatHistory):void
     {
@@ -266,9 +278,12 @@ internal class UserLabel extends Sprite
         messageDot.visible = chat.newMessage;
         addChild(messageDot);
 
-        hover = new Sprite();
-        hover.visible = false;
-        addChild(hover);
+        chevron = new iconRight();
+        chevron.x = 9;
+        chevron.y = _height / 2 + 0.5;
+        chevron.scaleX = chevron.scaleY = 0.15;
+        chevron.visible = false;
+        addChild(chevron);
 
         this.addEventListener(MouseEvent.ROLL_OVER, e_showHover);
         this.addEventListener(MouseEvent.ROLL_OUT, e_hideHover);
@@ -282,7 +297,7 @@ internal class UserLabel extends Sprite
         this.graphics.lineTo(_width, _height);
 
         this.graphics.lineStyle(0, 0x000000, 0);
-        this.graphics.beginFill(0, 0);
+        this.graphics.beginFill(0xFFFFFF, (active && hover ? 0.15 : (hover || active ? 0.08 : 0)));
         this.graphics.drawRect(0, 0, _width, _height);
         this.graphics.endFill();
     }
@@ -301,11 +316,6 @@ internal class UserLabel extends Sprite
         nameText.width = nameText.x - 5;
         messageDot.x = _width - 10;
         messageDot.y = _height / 2;
-
-        hover.graphics.clear();
-        hover.graphics.beginFill(0xFFFFFF, 0.05);
-        hover.graphics.drawRect(0, 0, _width, _height);
-        hover.graphics.endFill();
     }
 
     public function update():void
@@ -313,13 +323,26 @@ internal class UserLabel extends Sprite
         messageDot.visible = chat.newMessage;
     }
 
+    public function setActive(newState:Boolean):void
+    {
+        if (this.active != newState)
+        {
+            TweenLite.to(nameText, 0.25, {"x": (newState ? 15 : 5)});
+            this.active = newState;
+            this.chevron.visible = newState;
+            draw();
+        }
+    }
+
     private function e_showHover(e:MouseEvent):void
     {
-        hover.visible = true;
+        hover = true;
+        draw();
     }
 
     private function e_hideHover(e:MouseEvent):void
     {
-        hover.visible = false;
+        hover = false;
+        draw();
     }
 }
