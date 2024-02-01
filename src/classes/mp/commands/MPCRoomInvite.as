@@ -20,6 +20,7 @@ package classes.mp.commands
                     "a": "room_invite",
                     "d": {
                         "uid": user.uid,
+                        "sid": user.sid,
                         "name": room.name,
                         "code": room.joinCode
                     }});

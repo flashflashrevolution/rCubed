@@ -21,6 +21,7 @@ package classes.mp.commands
                     "a": "message",
                     "d": {
                         "uid": user.uid,
+                        "sid": user.sid,
                         "message": message,
                         "type": type
                     }});
