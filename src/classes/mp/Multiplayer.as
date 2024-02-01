@@ -44,8 +44,6 @@ package classes.mp
         public static const VALID_GAME_TYPES:Array = ["ffr"];
 
         // Cache for Data
-        private var garbageCollection:int = 0;
-
         public var users:Vector.<MPUser>;
         public var users_map:Dictionary;
 
@@ -57,6 +55,8 @@ package classes.mp
 
         public var LOBBY:MPRoom;
         public var GAME_ROOM:MPRoom;
+
+        public var SYSTEM_USER:MPUser;
 
         public var currentUser:MPUser;
         public var activeRooms:Vector.<MPRoom>;
@@ -143,7 +143,7 @@ package classes.mp
                 this.LOBBY = null;
                 this.GAME_ROOM = null;
 
-                this.garbageCollection = 0;
+                SYSTEM_USER = _userUpdateDirect({uid: 1});
 
                 websocket.connect();
             }
@@ -171,8 +171,7 @@ package classes.mp
             this.activeRooms = null;
             this.LOBBY = null;
             this.GAME_ROOM = null;
-
-            this.garbageCollection = 0;
+            this.SYSTEM_USER = null;
         }
 
         public function clearEvents():void
@@ -527,13 +526,9 @@ package classes.mp
             }
         }
 
-        private function _garbageCollection():void
+        public function garbageCollection():void
         {
-            //if (garbageCollection++ < 10)
-            //return;
-
             _staleUsers();
-            garbageCollection = 0;
         }
 
         private function _staleUsers():void
@@ -549,6 +544,7 @@ package classes.mp
 
             // Set self as not stale
             currentUser.isStale = false;
+            SYSTEM_USER.isStale = false;
 
             // Check References to User in Rooms
             for each (var room:MPRoom in rooms)
@@ -564,7 +560,7 @@ package classes.mp
             {
                 user = users[i];
 
-                if (user.isStale && !user.permissions.admin)
+                if (user.isStale)
                 {
                     delete users_map[user.uid];
                     users.splice(i, 1);
@@ -613,7 +609,7 @@ package classes.mp
             }
 
             //_roomSort();
-            _garbageCollection();
+            garbageCollection();
 
             // Find Lobby
             if (LOBBY == null)
@@ -642,11 +638,9 @@ package classes.mp
 
             // Add / Update Existing Users
             for (i = temp_users.length - 1; i >= 0; i--)
-            {
                 _userUpdateDirect(temp_users[i]);
-            }
 
-            _garbageCollection();
+            garbageCollection();
 
             dispatchEvent(new MPEvent(MPEvent.SYS_USER_LIST, command));
         }
@@ -700,7 +694,7 @@ package classes.mp
             if (room)
                 room.clearExtra();
 
-            _garbageCollection();
+            garbageCollection();
             dispatchEvent(new MPRoomEvent(MPEvent.ROOM_LEAVE_OK, command, room));
         }
 
@@ -785,7 +779,7 @@ package classes.mp
             {
                 room.userLeave(user);
                 dispatchEvent(new MPRoomEvent(MPEvent.ROOM_USER_LEAVE, command, room, user));
-                _garbageCollection();
+                garbageCollection();
             }
         }
 
@@ -961,7 +955,7 @@ package classes.mp
                 rooms.splice(i, 1);
                 delete rooms_map[room.uid];
 
-                _garbageCollection();
+                garbageCollection();
                 return true;
             }
             return false;
