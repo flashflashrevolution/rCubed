@@ -22,12 +22,16 @@ package menu
     import flash.display.Sprite;
     import flash.events.Event;
     import flash.events.KeyboardEvent;
+    import flash.events.TimerEvent;
+    import flash.utils.Timer;
 
     public class MenuMultiplayer extends MenuPanel
     {
         private static const _gvars:GlobalVariables = GlobalVariables.instance;
         private static const _mp:Multiplayer = Multiplayer.instance;
         private static const _lang:Language = Language.instance;
+
+        private var watchdog:Timer;
 
         private var userMessages:MPUserMessagesView;
         private var roomBrowser:MPServerBrowserView;
@@ -90,6 +94,10 @@ package menu
             pmAlert.y = 7;
             btnPrivateMessages.addChild(pmAlert);
 
+            // Watchdog
+            watchdog = new Timer(5000);
+            watchdog.addEventListener(TimerEvent.TIMER, e_watchdogTick);
+
             // Connect to MP
             if (!Flags.VALUES[Flags.MP_INITAL_LOAD] && !_gvars.playerUser.isGuest)
             {
@@ -105,6 +113,8 @@ package menu
             if (stage)
             {
                 stage.addEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDown);
+                watchdog.start();
+
                 btnConnect.enabled = !_gvars.playerUser.isGuest;
                 guestWarning.visible = _gvars.playerUser.isGuest;
             }
@@ -113,7 +123,10 @@ package menu
         override public function stageRemove():void
         {
             if (stage)
+            {
                 stage.removeEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDown);
+                watchdog.stop();
+            }
         }
 
         private function e_onKeyDown(e:KeyboardEvent):void
@@ -123,6 +136,18 @@ package menu
         }
 
         ////////////////////////////////////////////////////////////////
+
+        private function e_watchdogTick(e:TimerEvent):void
+        {
+            if (!_mp.connected && btnLobbyView.visible)
+            {
+                clearMPViews();
+                setNavigation(false);
+                pmAlert.visible = false;
+                throbber.visible = false;
+                throbber.stop();
+            }
+        }
 
         private function e_onSelectPrivateMessages(e:Event):void
         {
