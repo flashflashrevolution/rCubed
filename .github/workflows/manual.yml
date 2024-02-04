@@ -44,6 +44,12 @@ jobs:
 
             ##########################################################################################
             # Set build version.
+            - name: Generate Date
+              shell: bash
+              id: datestamp
+              run: echo ::set-output name=date::$(date +'%Y-%m-%d')
+
+            # Set build version.
             - name: Token Replace in asconfig
               uses: cschleiden/replace-tokens@v1
               with:
@@ -51,6 +57,7 @@ jobs:
               env:
                   SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
                   VERSION: ${{ inputs.version }}
+                  DATESTAMP: ${{ steps.datestamp.outputs.date }}
 
             - name: Token Replace in runtimes
               uses: cschleiden/replace-tokens@v1
