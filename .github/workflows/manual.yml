@@ -93,10 +93,10 @@ jobs:
               run: Copy-Item "${{ github.workspace }}\bin\release\R3Air.swf" -Destination "${{ github.workspace }}\bundles\64bit"
 
             - name: Rename Release Folder (64-bit)
-              run: Rename-Item -Path "${{ github.workspace }}\bundles\64bit" -NewName "rCubed.${{ inputs.version }}.64bit"
+              run: Rename-Item -Path "${{ github.workspace }}\bundles\64bit" -NewName "R3Air.${{ inputs.version }}.Release.64"
 
             - name: Package Build in Zip (64-bit)
-              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\64bit.zip ${{ github.workspace }}\bundles\rCubed.${{ inputs.version }}.64bit
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\64bit.zip ${{ github.workspace }}\bundles\R3Air.${{ inputs.version }}.Release.64
 
             # Package Version 32-bit
             - name: Copy Changelog (32-bit)
@@ -106,10 +106,10 @@ jobs:
               run: Copy-Item "${{ github.workspace }}\bin\release\R3Air.swf" -Destination "${{ github.workspace }}\bundles\32bit"
 
             - name: Rename Release Folder (32-bit)
-              run: Rename-Item -Path "${{ github.workspace }}\bundles\32bit" -NewName "rCubed.${{ inputs.version }}.32bit"
+              run: Rename-Item -Path "${{ github.workspace }}\bundles\32bit" -NewName "R3Air.${{ inputs.version }}.Release.32"
 
             - name: Package Build in Zip (32-bit)
-              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\32bit.zip ${{ github.workspace }}\bundles\rCubed.${{ inputs.version }}.32bit
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\32bit.zip ${{ github.workspace }}\bundles\R3Air.${{ inputs.version }}.Release.64
 
             # Package Version Hybrid
             - name: Copy Changelog (Hybrid)
@@ -119,10 +119,10 @@ jobs:
               run: Copy-Item "${{ github.workspace }}\bin\release\air.swf" -Destination "${{ github.workspace }}\bundles\Hybrid"
 
             - name: Rename Release Folder (Hybrid)
-              run: Rename-Item -Path "${{ github.workspace }}\bundles\Hybrid" -NewName "rCubed.0.0.8+${{ inputs.version }}.Hybrid"
+              run: Rename-Item -Path "${{ github.workspace }}\bundles\Hybrid" -NewName "R3Air.0.0.8+${{ inputs.version }}"
 
             - name: Package Build in Zip (32-bit)
-              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\Hybrid.zip ${{ github.workspace }}\bundles\rCubed.0.0.8+${{ inputs.version }}.Hybrid
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\Hybrid.zip ${{ github.workspace }}\bundles\R3Air.0.0.8+${{ inputs.version }}
 
             ##########################################################################################
             - name: Create Release
