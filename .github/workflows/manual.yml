@@ -28,16 +28,16 @@ jobs:
               uses: actions/checkout@v4.1.1
               with:
                   repository: flashflashrevolution/rCubed-build-tools
-                  clean: false
+                  path: 'tools'
                   lfs: true
 
             - name: Extract Air SDK [32.0]
               if: matrix.os == 'windows-2019'
-              run: 7z.exe x -tzip SDK-Lite.zip -o${{ github.workspace }}\airsdk
+              run: 7z.exe x -tzip ${{ github.workspace }}\tools\SDK-Lite.zip -o${{ github.workspace }}\airsdk
 
             - name: Extract Runtimes
               if: matrix.os == 'windows-2019'
-              run: 7z.exe x -tzip Runtimes.zip -o${{ github.workspace }}\bundles
+              run: 7z.exe x -tzip ${{ github.workspace }}\tools\Runtimes.zip -o${{ github.workspace }}\bundles
 
             - name: Install Dependencies (asconfigc)
               run: npm install asconfigc
