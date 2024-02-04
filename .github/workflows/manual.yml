@@ -4,7 +4,7 @@ on:
     workflow_dispatch:
         inputs:
             version:
-                description: "Tag version, excluding the v"
+                description: "Game Version (#.#.#)"
                 required: true
 
 jobs:
@@ -20,8 +20,6 @@ jobs:
             - name: Checkout Repo
               uses: actions/checkout@v4.1.1
               with:
-                  fetch-depth: 0
-                  ref: ref/tags/v${{ inputs.version }}
                   lfs: true
 
             ##########################################################################################
