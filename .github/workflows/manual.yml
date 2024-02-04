@@ -28,7 +28,7 @@ jobs:
               uses: actions/checkout@v4.1.1
               with:
                   repository: flashflashrevolution/rCubed-build-tools
-                  path: 'tools'
+                  path: "tools"
                   lfs: true
 
             - name: Extract Air SDK [32.0]
@@ -85,6 +85,26 @@ jobs:
               run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.hybrid.json --verbose
 
             ##########################################################################################
+            # Package Versions
+            - name: Rename Release Folder (64-bit)
+              run: Rename-Item -Path "${{ github.workspace }}\bundles\64bit" -NewName "rCubed.${{ inputs.version }}.64"
+
+            - name: Rename Release Folder (32-bit)
+              run: Rename-Item -Path "${{ github.workspace }}\bundles\32bit" -NewName "rCubed.${{ inputs.version }}.32"
+
+            - name: Rename Release Folder (Hybrid)
+              run: Rename-Item -Path "${{ github.workspace }}\bundles\Hybrid" -NewName "rCubed.0.0.8+${{ inputs.version }}.Hybrid"
+
+            - name: Package Build in Zip (64-bit)
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\64bit.zip ${{ github.workspace }}\bundles\rCubed.${{ inputs.version }}.64
+
+            - name: Package Build in Zip (32-bit)
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\32bit.zip ${{ github.workspace }}\bundles\rCubed.${{ inputs.version }}.32
+
+            - name: Package Build in Zip (32-bit)
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\Hybrid.zip ${{ github.workspace }}\bundles\rCubed.0.0.8+${{ inputs.version }}.Hybrid
+
+            ##########################################################################################
             - name: Create Release
               id: create_release
               uses: actions/create-release@v1
@@ -103,8 +123,19 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: ${{ github.workspace }}/Runtimes.zip
-                  asset_name: Runtimes.zip
+                  asset_path: ${{ github.workspace }}\bundles\64bit.zip
+                  asset_name: rCubed-${{ inputs.version }}-64bit.zip
+                  asset_content_type: application/executable
+
+            - name: Upload ZIP (32-bit)
+              id: upload-zip-release-32
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ${{ github.workspace }}\bundles\32bit.zip
+                  asset_name: rCubed-${{ inputs.version }}-32bit.zip
                   asset_content_type: application/executable
 
             - name: Upload ZIP (Hybrid)
@@ -114,6 +145,6 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: ${{ github.workspace }}/SDK-Lite.zip
-                  asset_name: SDK-Lite.zip
+                  asset_path: ${{ github.workspace }}\bundles\Hybrid.zip
+                  asset_name: rCubed-0.0.8-${{ inputs.version }}-Hybrid-32bit.zip
                   asset_content_type: application/executable
