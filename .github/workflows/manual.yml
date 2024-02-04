@@ -1,0 +1,177 @@
+name: Manual Tag Build
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: "Game Version (#.#.#)"
+                required: true
+
+jobs:
+    build:
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [windows-2019]
+
+        steps:
+            ##########################################################################################
+            # Checkout
+            - name: Checkout Repo
+              uses: actions/checkout@v4.1.1
+              with:
+                  lfs: true
+
+            ##########################################################################################
+            # Setup SDK
+            - name: Checkout Build Tools
+              uses: actions/checkout@v4.1.1
+              with:
+                  repository: flashflashrevolution/rCubed-build-tools
+                  path: "tools"
+                  lfs: true
+
+            - name: Extract Air SDK [32.0]
+              if: matrix.os == 'windows-2019'
+              run: 7z.exe x -tzip ${{ github.workspace }}\tools\SDK-Lite.zip -o${{ github.workspace }}\airsdk
+
+            - name: Extract Runtimes
+              if: matrix.os == 'windows-2019'
+              run: 7z.exe x -tzip ${{ github.workspace }}\tools\Runtimes.zip -o${{ github.workspace }}\bundles
+
+            - name: Install Dependencies (asconfigc)
+              run: npm install asconfigc
+
+            ##########################################################################################
+            # Set build version.
+            - name: Generate Date
+              shell: bash
+              id: datestamp
+              run: echo ::set-output name=date::$(date +'%Y-%m-%d')
+
+            # Set build version.
+            - name: Token Replace in asconfig
+              uses: cschleiden/replace-tokens@v1
+              with:
+                  files: '["asconfig.release.json"]'
+              env:
+                  SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
+                  VERSION: ${{ inputs.version }}
+                  DATESTAMP: ${{ steps.datestamp.outputs.date }}
+
+            - name: Token Replace in runtimes
+              uses: cschleiden/replace-tokens@v1
+              with:
+                  files: '["bundles/**/application.xml"]'
+              env:
+                  VERSION: ${{ inputs.version }}
+
+            ##########################################################################################
+            # Import Branding
+            - name: Import Branding SWC Library
+              uses: RollyPeres/base64-to-path@v1
+              with:
+                  filePath: ${{ github.workspace }}\libs\assets\branding.swc
+                  encodedString: ${{ secrets.BRANDING_SWC }}
+
+            ##########################################################################################
+            # Build SWFs
+            - name: Build Embedded Fonts Library [Windows]
+              if: matrix.os == 'windows-2019'
+              shell: cmd
+              run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project ${{ github.workspace }}/fonts/asconfig.embed-fonts.json --verbose
+
+            - name: Build the Game (Normal) [Windows]
+              if: matrix.os == 'windows-2019'
+              shell: cmd
+              run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.release.json --verbose
+
+            - name: Build the Game (Hybrid) [Windows]
+              if: matrix.os == 'windows-2019'
+              shell: cmd
+              run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.hybrid.json --verbose
+
+            ##########################################################################################
+            # Package Version 64-bit
+            - name: Copy Changelog (64-bit)
+              run: Copy-Item "${{ github.workspace }}\changelog.txt" -Destination "${{ github.workspace }}\bundles\64bit"
+
+            - name: Copy Game (64-bit)
+              run: Copy-Item "${{ github.workspace }}\bin\release\R3Air.swf" -Destination "${{ github.workspace }}\bundles\64bit"
+
+            - name: Rename Release Folder (64-bit)
+              run: Rename-Item -Path "${{ github.workspace }}\bundles\64bit" -NewName "R3Air.${{ inputs.version }}.Release.64"
+
+            - name: Package Build in Zip (64-bit)
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\64bit.zip ${{ github.workspace }}\bundles\R3Air.${{ inputs.version }}.Release.64
+
+            # Package Version 32-bit
+            - name: Copy Changelog (32-bit)
+              run: Copy-Item "${{ github.workspace }}\changelog.txt" -Destination "${{ github.workspace }}\bundles\32bit"
+
+            - name: Copy Game (32-bit)
+              run: Copy-Item "${{ github.workspace }}\bin\release\R3Air.swf" -Destination "${{ github.workspace }}\bundles\32bit"
+
+            - name: Rename Release Folder (32-bit)
+              run: Rename-Item -Path "${{ github.workspace }}\bundles\32bit" -NewName "R3Air.${{ inputs.version }}.Release.32"
+
+            - name: Package Build in Zip (32-bit)
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\32bit.zip ${{ github.workspace }}\bundles\R3Air.${{ inputs.version }}.Release.32
+
+            # Package Version Hybrid
+            - name: Copy Changelog (Hybrid)
+              run: Copy-Item "${{ github.workspace }}\changelog.txt" -Destination "${{ github.workspace }}\bundles\Hybrid"
+
+            - name: Copy Game (Hybrid)
+              run: Copy-Item "${{ github.workspace }}\bin\release\air.swf" -Destination "${{ github.workspace }}\bundles\Hybrid"
+
+            - name: Rename Release Folder (Hybrid)
+              run: Rename-Item -Path "${{ github.workspace }}\bundles\Hybrid" -NewName "R3Air.0.0.8+${{ inputs.version }}"
+
+            - name: Package Build in Zip (32-bit)
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\Hybrid.zip ${{ github.workspace }}\bundles\R3Air.0.0.8+${{ inputs.version }}
+
+            ##########################################################################################
+            - name: Create Release
+              id: create_release
+              uses: actions/create-release@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: v${{ inputs.version }}-M
+                  release_name: rCubed - v${{ inputs.version }} - Manual
+                  draft: true
+                  prerelease: true
+
+            - name: Upload ZIP (64-bit)
+              id: upload-zip-release-64
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ${{ github.workspace }}\bundles\64bit.zip
+                  asset_name: rCubed-${{ inputs.version }}-64bit.zip
+                  asset_content_type: application/executable
+
+            - name: Upload ZIP (32-bit)
+              id: upload-zip-release-32
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ${{ github.workspace }}\bundles\32bit.zip
+                  asset_name: rCubed-${{ inputs.version }}-32bit.zip
+                  asset_content_type: application/executable
+
+            - name: Upload ZIP (Hybrid)
+              id: upload-zip-release-hybrid
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ${{ github.workspace }}\bundles\Hybrid.zip
+                  asset_name: rCubed-0.0.8-${{ inputs.version }}-Hybrid-32bit.zip
+                  asset_content_type: application/executable
