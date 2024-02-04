@@ -1,4 +1,4 @@
-name: Release
+name: Manual Tag Build
 
 on:
     workflow_dispatch:
