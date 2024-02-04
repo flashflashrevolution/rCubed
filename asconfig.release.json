@@ -16,7 +16,7 @@
       },
       {
         "name": "CONFIG::timeStamp",
-        "value": "\"2023-06-30\""
+        "value": "\"#{DATESTAMP}#\""
       },
       {
         "name": "R3::HASH_STRING",
