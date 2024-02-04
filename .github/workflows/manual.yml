@@ -1,0 +1,119 @@
+name: Release
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: "Tag version, excluding the v"
+                required: true
+
+jobs:
+    build:
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [windows-2019]
+
+        steps:
+            ##########################################################################################
+            # Checkout
+            - name: Checkout Repo
+              uses: actions/checkout@v4.1.1
+              with:
+                  ref: ref/tags/v${{ inputs.version }}
+                  lfs: true
+
+            ##########################################################################################
+            # Setup SDK
+            - name: Checkout Build Tools
+              uses: actions/checkout@v4.1.1
+              with:
+                  name: flashflashrevolution/rCubed-build-tools
+                  lfs: true
+
+            - name: Extract Air SDK [32.0]
+              if: matrix.os == 'windows-2019'
+              run: 7z.exe x -tzip SDK-Lite.zip -o${{ github.workspace }}\airsdk
+
+            - name: Extract Runtimes
+              if: matrix.os == 'windows-2019'
+              run: 7z.exe x -tzip Runtimes.zip -o${{ github.workspace }}\bundles
+
+            - name: Install Dependencies (asconfigc)
+              run: npm install asconfigc
+
+            ##########################################################################################
+            # Set build version.
+            - name: Token Replace in asconfig
+              uses: cschleiden/replace-tokens@v1
+              with:
+                  files: '["asconfig.release.json"]'
+              env:
+                  SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
+                  VERSION: ${{ inputs.version }}
+
+            - name: Token Replace in runtimes
+              uses: cschleiden/replace-tokens@v1
+              with:
+                  files: '["bundles/**/application.xml"]'
+              env:
+                  VERSION: ${{ inputs.version }}
+
+            ##########################################################################################
+            # Import Branding
+            - name: Import Branding SWC Library
+              uses: RollyPeres/base64-to-path@v1
+              with:
+                  filePath: ${{ github.workspace }}\libs\assets\branding.swc
+                  encodedString: ${{ secrets.BRANDING_SWC }}
+
+            ##########################################################################################
+            # Build SWFs
+            - name: Build Embedded Fonts Library [Windows]
+              if: matrix.os == 'windows-2019'
+              shell: cmd
+              run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project ${{ github.workspace }}/fonts/asconfig.embed-fonts.json --verbose
+
+            - name: Build the Game (Normal) [Windows]
+              if: matrix.os == 'windows-2019'
+              shell: cmd
+              run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.release.json --verbose
+
+            - name: Build the Game (Hybrid) [Windows]
+              if: matrix.os == 'windows-2019'
+              shell: cmd
+              run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.hybrid.json --verbose
+
+            ##########################################################################################
+            - name: Create Release
+              id: create_release
+              uses: actions/create-release@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: v${{ inputs.version }}-M
+                  release_name: rCubed - v${{ inputs.version }} - Manual
+                  draft: true
+                  prerelease: true
+
+            - name: Upload ZIP (64-bit)
+              id: upload-zip-release-64
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ${{ github.workspace }}/Runtimes.zip
+                  asset_name: Runtimes.zip
+                  asset_content_type: application/executable
+
+            - name: Upload ZIP (Hybrid)
+              id: upload-zip-release-hybrid
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ${{ github.workspace }}/SDK-Lite.zip
+                  asset_name: SDK-Lite.zip
+                  asset_content_type: application/executable
