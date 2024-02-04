@@ -27,7 +27,8 @@ jobs:
             - name: Checkout Build Tools
               uses: actions/checkout@v4.1.1
               with:
-                  name: flashflashrevolution/rCubed-build-tools
+                  repository: flashflashrevolution/rCubed-build-tools
+                  clean: false
                   lfs: true
 
             - name: Extract Air SDK [32.0]
