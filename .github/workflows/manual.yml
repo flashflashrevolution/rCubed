@@ -85,21 +85,41 @@ jobs:
               run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.hybrid.json --verbose
 
             ##########################################################################################
-            # Package Versions
+            # Package Version 64-bit
+            - name: Copy Changelog (64-bit)
+              run: Copy-Item "${{ github.workspace }}\changelog.txt" -Destination "${{ github.workspace }}\bundles\64bit"
+
+            - name: Copy Game (64-bit)
+              run: Copy-Item "${{ github.workspace }}\bin\release\R3Air.swf" -Destination "${{ github.workspace }}\bundles\64bit"
+
             - name: Rename Release Folder (64-bit)
-              run: Rename-Item -Path "${{ github.workspace }}\bundles\64bit" -NewName "rCubed.${{ inputs.version }}.64"
+              run: Rename-Item -Path "${{ github.workspace }}\bundles\64bit" -NewName "rCubed.${{ inputs.version }}.64bit"
+
+            - name: Package Build in Zip (64-bit)
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\64bit.zip ${{ github.workspace }}\bundles\rCubed.${{ inputs.version }}.64bit
+
+            # Package Version 32-bit
+            - name: Copy Changelog (32-bit)
+              run: Copy-Item "${{ github.workspace }}\changelog.txt" -Destination "${{ github.workspace }}\bundles\32bit"
+
+            - name: Copy Game (32-bit)
+              run: Copy-Item "${{ github.workspace }}\bin\release\R3Air.swf" -Destination "${{ github.workspace }}\bundles\32bit"
 
             - name: Rename Release Folder (32-bit)
-              run: Rename-Item -Path "${{ github.workspace }}\bundles\32bit" -NewName "rCubed.${{ inputs.version }}.32"
+              run: Rename-Item -Path "${{ github.workspace }}\bundles\32bit" -NewName "rCubed.${{ inputs.version }}.32bit"
+
+            - name: Package Build in Zip (32-bit)
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\32bit.zip ${{ github.workspace }}\bundles\rCubed.${{ inputs.version }}.32bit
+
+            # Package Version Hybrid
+            - name: Copy Changelog (Hybrid)
+              run: Copy-Item "${{ github.workspace }}\changelog.txt" -Destination "${{ github.workspace }}\bundles\Hybrid"
+
+            - name: Copy Game (Hybrid)
+              run: Copy-Item "${{ github.workspace }}\bin\release\air.swf" -Destination "${{ github.workspace }}\bundles\Hybrid"
 
             - name: Rename Release Folder (Hybrid)
               run: Rename-Item -Path "${{ github.workspace }}\bundles\Hybrid" -NewName "rCubed.0.0.8+${{ inputs.version }}.Hybrid"
-
-            - name: Package Build in Zip (64-bit)
-              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\64bit.zip ${{ github.workspace }}\bundles\rCubed.${{ inputs.version }}.64
-
-            - name: Package Build in Zip (32-bit)
-              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\32bit.zip ${{ github.workspace }}\bundles\rCubed.${{ inputs.version }}.32
 
             - name: Package Build in Zip (32-bit)
               run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\Hybrid.zip ${{ github.workspace }}\bundles\rCubed.0.0.8+${{ inputs.version }}.Hybrid
