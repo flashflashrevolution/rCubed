@@ -116,7 +116,7 @@ jobs:
               run: Rename-Item -Path "${{ github.workspace }}\bundles\32bit" -NewName "R3Air.${{ inputs.version }}.Release.32"
 
             - name: Package Build in Zip (32-bit)
-              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\32bit.zip ${{ github.workspace }}\bundles\R3Air.${{ inputs.version }}.Release.64
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\32bit.zip ${{ github.workspace }}\bundles\R3Air.${{ inputs.version }}.Release.32
 
             # Package Version Hybrid
             - name: Copy Changelog (Hybrid)
