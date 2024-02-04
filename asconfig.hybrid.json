@@ -4,16 +4,8 @@
     "output": "bin/release/air.swf",
     "define": [
       {
-        "name": "R3::VERSION",
-        "value": "\"1.5.3\""
-      },
-      {
         "name": "R3::VERSION_PREFIX",
         "value": "\"0.0.8+\""
-      },
-      {
-        "name": "R3::VERSION_SUFFIX",
-        "value": "\"\""
       }
     ],
     "swf-version": 26,
