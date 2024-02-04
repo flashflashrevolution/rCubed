@@ -80,6 +80,7 @@ package classes.mp
             websocket.addEventListener(WebSocketEvent.OPEN, handleWebSocketOpen);
             websocket.addEventListener(WebSocketEvent.MESSAGE, handleWebSocketMessage);
             websocket.addEventListener(WebSocketErrorEvent.CONNECTION_FAIL, handleConnectionFail);
+            websocket.addEventListener(WebSocketErrorEvent.ABNORMAL_CLOSE, handleConnectionFail);
             websocket.addEventListener(ErrorEvent.ERROR, handleErrorEvent);
         }
 
