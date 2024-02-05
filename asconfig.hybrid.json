@@ -1,14 +1,14 @@
 {
-  "extends": "asconfig.release.json",
-  "compilerOptions": {
-    "output": "bin/release/air.swf",
-    "define": [
-      {
-        "name": "R3::VERSION_PREFIX",
-        "value": "\"0.0.8+\""
-      }
-    ],
-    "swf-version": 26,
-    "target-player": "26.0"
-  }
+	"extends": "asconfig.release.json",
+	"compilerOptions": {
+		"output": "bin/release/air.swf",
+		"define": [
+			{
+				"name": "R3::VERSION_PREFIX",
+				"value": "\"0.0.8+\""
+			}
+		],
+		"swf-version": 26,
+		"target-player": "26.0"
+	}
 }
