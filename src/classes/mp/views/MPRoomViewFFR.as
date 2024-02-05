@@ -579,11 +579,11 @@ package classes.mp.views
                     room.song = _gvars.getSongFile(room.songInfo);
 
                 _gvars.options = new GameOptions();
+                _gvars.options.isMultiplayer = true;
                 _gvars.options.fill();
                 _gvars.options.song = room.song;
                 _gvars.options.judgeWindow = null;
                 _gvars.options.isolationOffset = _gvars.options.isolationLength = 0;
-                _gvars.options.isMultiplayer = true;
                 _gvars.gameMain.switchTo(Main.GAME_PLAY_PANEL);
             }
         }
