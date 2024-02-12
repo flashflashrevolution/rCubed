@@ -42,12 +42,14 @@ package
     import popups.PopupHelp;
     import popups.replays.ReplayHistoryWindow;
     import popups.settings.SettingsWindow;
+    import flash.display.NativeWindow;
 
     public class Main extends MenuPanel
     {
         public static const GAME_WIDTH:int = 780;
         public static const GAME_HEIGHT:int = 480;
         public static var VSYNC_SUPPORT:Boolean = false;
+        public static var window:NativeWindow;
 
         public static const GAME_UPDATE_PANEL:String = "GameAirUpdatePanel";
         public static const GAME_LOGIN_PANEL:String = "GameLoginPanel";
@@ -128,28 +130,29 @@ package
 
             //- Window Options
             VSYNC_SUPPORT = stage.hasOwnProperty("vsyncEnabled");
-            stage.nativeWindow.addEventListener(Event.CLOSING, e_onNativeWindowClosing);
+            window = stage.nativeWindow;
+            window.addEventListener(Event.CLOSING, e_onNativeWindowClosing);
             NativeApplication.nativeApplication.addEventListener(Event.EXITING, e_onNativeShutdown);
-            stage.nativeWindow.addEventListener(NativeWindowBoundsEvent.MOVE, e_onNativeWindowPropertyChange, false, 1);
-            stage.nativeWindow.addEventListener(NativeWindowBoundsEvent.RESIZE, e_onNativeWindowPropertyChange, false, 1);
+            window.addEventListener(NativeWindowBoundsEvent.MOVE, e_onNativeWindowPropertyChange, false, 1);
+            window.addEventListener(NativeWindowBoundsEvent.RESIZE, e_onNativeWindowPropertyChange, false, 1);
             loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, e_uncaughtErrorHandler);
             stage.addEventListener("vSyncStateChangeAvailability", e_onVsyncStateChangeAvailability); // Lacking proper event class due to SDK limitations in Air 26.
 
-            stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE;
+            window.title = Constant.AIR_WINDOW_TITLE;
 
-            WINDOW_WIDTH_EXTRA = stage.nativeWindow.width - GAME_WIDTH;
-            WINDOW_HEIGHT_EXTRA = stage.nativeWindow.height - GAME_HEIGHT;
+            WINDOW_WIDTH_EXTRA = window.width - GAME_WIDTH;
+            WINDOW_HEIGHT_EXTRA = window.height - GAME_HEIGHT;
 
             ignoreWindowChanges = true;
             if (_gvars.air_saveWindowPosition)
             {
-                stage.nativeWindow.x = _gvars.air_windowProperties.x;
-                stage.nativeWindow.y = _gvars.air_windowProperties.y;
+                window.x = _gvars.air_windowProperties.x;
+                window.y = _gvars.air_windowProperties.y;
             }
             if (_gvars.air_saveWindowSize)
             {
-                stage.nativeWindow.width = Math.max(100, _gvars.air_windowProperties.width + WINDOW_WIDTH_EXTRA);
-                stage.nativeWindow.height = Math.max(100, _gvars.air_windowProperties.height + WINDOW_HEIGHT_EXTRA);
+                window.width = Math.max(100, _gvars.air_windowProperties.width + WINDOW_WIDTH_EXTRA);
+                window.height = Math.max(100, _gvars.air_windowProperties.height + WINDOW_HEIGHT_EXTRA);
             }
             ignoreWindowChanges = false;
 
@@ -248,10 +251,10 @@ package
 
         private function e_onNativeWindowClosing(e:Event):void
         {
-            _gvars.air_windowProperties["width"] = stage.nativeWindow.width - Main.WINDOW_WIDTH_EXTRA;
-            _gvars.air_windowProperties["height"] = stage.nativeWindow.height - Main.WINDOW_HEIGHT_EXTRA;
-            _gvars.air_windowProperties["x"] = stage.nativeWindow.x;
-            _gvars.air_windowProperties["y"] = stage.nativeWindow.y;
+            _gvars.air_windowProperties["width"] = window.width - Main.WINDOW_WIDTH_EXTRA;
+            _gvars.air_windowProperties["height"] = window.height - Main.WINDOW_HEIGHT_EXTRA;
+            _gvars.air_windowProperties["x"] = window.x;
+            _gvars.air_windowProperties["y"] = window.y;
             LocalOptions.setVariable("window_properties", _gvars.air_windowProperties);
         }
 

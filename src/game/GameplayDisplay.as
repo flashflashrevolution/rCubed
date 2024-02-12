@@ -395,7 +395,7 @@ package game
                 Mouse.hide();
 
             if (song.songInfo && song.songInfo.name)
-                stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE + " - " + StringUtil.stripHtml(song.songInfo.name);
+                Main.window.title = Constant.AIR_WINDOW_TITLE + " - " + StringUtil.stripHtml(song.songInfo.name);
 
             // Prebuild Websocket Message, this is updated instead of creating a new object every message.
             SOCKET_SONG_MESSAGE = {"player": {
@@ -477,8 +477,8 @@ package game
                 stage.addEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDown, true, int.MAX_VALUE - 10, true);
                 stage.addEventListener(KeyboardEvent.KEY_UP, e_onKeyUp, true, int.MAX_VALUE - 10, true);
 
-                    //stage.nativeWindow.addEventListener(Event.ACTIVATE, e_onWindowFocus);
-                    //stage.nativeWindow.addEventListener(Event.DEACTIVATE, e_onWindowFocus);
+                    //Main.window.addEventListener(Event.ACTIVATE, e_onWindowFocus);
+                    //Main.window.addEventListener(Event.DEACTIVATE, e_onWindowFocus);
             }
 
             if (!isMultiplayerSpectator)
@@ -491,7 +491,7 @@ package game
         override public function stageRemove():void
         {
             // Reset Window Title
-            stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE;
+            Main.window.title = Constant.AIR_WINDOW_TITLE;
 
             stage.frameRate = 60;
 
@@ -507,8 +507,8 @@ package game
                 stage.removeEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDown, true);
                 stage.removeEventListener(KeyboardEvent.KEY_UP, e_onKeyUp, true);
 
-                    //stage.nativeWindow.removeEventListener(Event.ACTIVATE, e_onWindowFocus);
-                    //stage.nativeWindow.removeEventListener(Event.DEACTIVATE, e_onWindowFocus);
+                    //Main.window.removeEventListener(Event.ACTIVATE, e_onWindowFocus);
+                    //Main.window.removeEventListener(Event.DEACTIVATE, e_onWindowFocus);
             }
 
             destroyMultiplayer();
