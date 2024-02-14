@@ -24,11 +24,15 @@ package
     import com.greensock.plugins.TintPlugin;
     import com.greensock.plugins.TweenPlugin;
     import flash.desktop.NativeApplication;
+    import flash.desktop.NativeProcess;
+    import flash.desktop.NativeProcessStartupInfo;
+    import flash.display.NativeWindow;
     import flash.events.ContextMenuEvent;
     import flash.events.Event;
     import flash.events.KeyboardEvent;
     import flash.events.NativeWindowBoundsEvent;
     import flash.events.UncaughtErrorEvent;
+    import flash.filesystem.File;
     import flash.system.Capabilities;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
@@ -42,7 +46,6 @@ package
     import popups.PopupHelp;
     import popups.replays.ReplayHistoryWindow;
     import popups.settings.SettingsWindow;
-    import flash.display.NativeWindow;
 
     public class Main extends MenuPanel
     {
@@ -809,6 +812,36 @@ package
                     }
                 }
             }
+        }
+
+        public function restartApplication():void
+        {
+            var applicationDescriptor:XML = NativeApplication.nativeApplication.applicationDescriptor;
+            var xmlns:Namespace = new Namespace(applicationDescriptor.namespace());
+            var applicationName:String = applicationDescriptor.xmlns::filename;
+
+            var applicationExecutable:File;
+
+            if (Capabilities.os.indexOf("Win") > -1)
+                applicationExecutable = new File(File.applicationDirectory.nativePath + "/" + applicationName + ".exe");
+            else if (Capabilities.os.indexOf("Mac") > -1)
+                applicationExecutable = new File(File.applicationDirectory.nativePath.replace("Resources", "MacOS/" + applicationName));
+
+            if (!applicationExecutable || !applicationExecutable.exists)
+                return;
+
+            // Handle Shutdown
+            NativeApplication.nativeApplication.removeEventListener(Event.EXITING, e_onNativeShutdown);
+            e_onNativeShutdown(null);
+
+            // Start New
+            var nativeProcessStartupInfo:NativeProcessStartupInfo = new NativeProcessStartupInfo();
+            var nativeProcess:NativeProcess = new NativeProcess();
+            nativeProcessStartupInfo.executable = applicationExecutable;
+            nativeProcess.start(nativeProcessStartupInfo);
+
+            // Exit Current
+            NativeApplication.nativeApplication.exit();
         }
     }
 }
