@@ -16,12 +16,7 @@ package popups
 
     public class PopupContextMenu extends MenuPanel
     {
-        CONFIG::debug
-        {
-            private static var redrawBoolean:Boolean = false;
-        }
-
-        public var _gvars:GlobalVariables = GlobalVariables.instance;
+        private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _lang:Language = Language.instance;
 
         //- Background
@@ -51,22 +46,6 @@ package popups
             var cButton:BoxButton;
             var cButtonHeight:Number = 39;
             var yOff:Number = 5;
-
-            // Debug Options
-            CONFIG::debug
-            {
-                //- Profiler
-                cButton = new BoxButton(this, 5, yOff, box.width - 10, cButtonHeight, "Toggle Profiler", 12, clickHandler);
-                cButton.action = "debug_profiler";
-                cButton.boxColor = GameBackgroundColor.BG_POPUP;
-                yOff += cButtonHeight + 5;
-
-                //- Redraw
-                cButton = new BoxButton(this, 5, yOff, box.width - 10, cButtonHeight, "Toggle ReDraw Regions", 12, clickHandler);
-                cButton.action = "redraw_regions";
-                cButton.boxColor = GameBackgroundColor.BG_POPUP;
-                yOff = 5;
-            }
 
             //- Reload Engine
             cButton = new BoxButton(box, 5, yOff, box.width - 10, cButtonHeight, _lang.string("popup_cm_reload_engine_user"), 12, clickHandler);
@@ -105,20 +84,6 @@ package popups
         private function clickHandler(e:MouseEvent):void
         {
             removePopup();
-
-            //- Debug Actions
-            CONFIG::debug
-            {
-                if (e.target.action == "debug_profiler")
-                {
-                    SWFProfiler.onSelect();
-                }
-                else if (e.target.action == "redraw_regions")
-                {
-                    redrawBoolean = !redrawBoolean;
-                    showRedrawRegions(redrawBoolean, 0xFF0000);
-                }
-            }
 
             //- Close
             if (e.target.action == "fullscreen")
