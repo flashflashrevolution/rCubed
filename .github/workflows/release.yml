@@ -1,260 +1,199 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - "v*.*.*"
-    branches: 
-      - feat/workflow
-    paths-ignore:
-      - 'README.md'
-      - 'docs/**'
-      - '.all-contributorsrc'
+    push:
+        tags:
+            - "v*.*.*"
+        branches:
+            - feat/workflow
+        paths-ignore:
+            - "README.md"
+            - "docs/**"
+            - ".all-contributorsrc"
 
 jobs:
-  skip:
-    runs-on: ubuntu-latest
-    if: |
-      !contains(format('{0} {1} {2}', github.event.head_commit.message, github.event.pull_request.title, github.event.pull_request.body), 'skip ci')
-    steps:
-      - run: |
-          cat <<'MESSAGE'
-          github.event_name: ${{ toJson(github.event_name) }}
-          github.event:
-          ${{ toJson(github.event) }}
-          MESSAGE
-  build:
-    needs: skip
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-2019]
+    skip:
+        runs-on: ubuntu-latest
+        if: |
+            !contains(format('{0} {1} {2}', github.event.head_commit.message, github.event.pull_request.title, github.event.pull_request.body), 'skip ci')
+        steps:
+            - run: |
+                  cat <<'MESSAGE'
+                  github.event_name: ${{ toJson(github.event_name) }}
+                  github.event:
+                  ${{ toJson(github.event) }}
+                  MESSAGE
+    build:
+        needs: skip
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [windows-2019]
 
-    steps:
-      - name: Get Numerical Version Number from Tag
-        if: startsWith(github.ref, 'refs/tags')
-        shell: bash
-        id: versionNumber
-        run: echo ::set-output name=tag::$(echo ${GITHUB_REF/refs\/tags\/v/} | sed -r 's/([0-9]+\.[0-9]+\.[0-9]+)-.*/\1/' )
+        steps:
+            ##########################################################################################
+            # Checkout
+            - name: Checkout
+              uses: actions/checkout@v4.1.1
+              with:
+                  lfs: true
 
-      - name: Checkout
-        uses: actions/checkout@v4.1.1
-        with:
-          lfs: true
+            ##########################################################################################
+            # Setup SDK
+            - name: Checkout Build Tools
+              uses: actions/checkout@v4.1.1
+              with:
+                  repository: flashflashrevolution/rCubed-build-tools
+                  path: "tools"
+                  lfs: true
 
-      - name: Cache Choco
-        id: cache-choco
-        uses: actions/cache@v4
-        with:
-          path: |
-            C:\ProgramData\chocolatey\lib\xmlstarlet.portable
-            C:\ProgramData\chocolatey\bin
-          key: ${{ runner.os }}-cache-choco
+            - name: Extract Air SDK [32.0]
+              if: matrix.os == 'windows-2019'
+              run: 7z.exe x -tzip ${{ github.workspace }}\tools\SDK-Lite.zip -o${{ github.workspace }}\airsdk
 
-      - name: Choco Install xmlstarlet
-        uses: crazy-max/ghaction-chocolatey@v2
-        if: steps.cache-choco.outputs.cache-hit != 'true'
-        with:
-          args: install xmlstarlet -y
+            - name: Extract Runtimes
+              if: matrix.os == 'windows-2019'
+              run: 7z.exe x -tzip ${{ github.workspace }}\tools\Runtimes.zip -o${{ github.workspace }}\bundles
 
-      - name: Version Number Substition
-        if: startsWith(github.ref, 'refs/tags')
-        run: xml ed --inplace -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:versionNumber" -v ${{ steps.versionNumber.outputs.tag }} application.xml
+            - name: Install Dependencies (asconfigc)
+              run: npm install asconfigc
 
-      - name: Version Number Substition (Debug)
-        if: startsWith(github.ref, 'refs/tags')
-        run: xml ed -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:versionNumber" -v ${{ steps.versionNumber.outputs.tag }} application.xml
+            ##########################################################################################
+            # Set build version.
+            - name: Get Numerical Version Number from Tag
+              if: startsWith(github.ref, 'refs/tags')
+              shell: bash
+              id: versionNumber
+              run: echo ::set-output name=tag::$(echo ${GITHUB_REF/refs\/tags\/v/} | sed -r 's/([0-9]+\.[0-9]+\.[0-9]+)-.*/\1/' )
 
-      - name: Token Replace in asconfig
-        if: startsWith(github.ref, 'refs/tags')
-        uses: cschleiden/replace-tokens@v1
-        with:
-          files: '["asconfig.release.json"]'
-        env:
-          SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
-          VERSION: ${{ steps.versionNumber.outputs.tag }}
+            - name: Generate Date
+              shell: bash
+              id: datestamp
+              run: echo ::set-output name=date::$(date +'%Y-%m-%d')
 
-      - name: Import Air Signing Certificate
-        uses: RollyPeres/base64-to-path@v1
-        with:
-          filePath: ${{ github.workspace }}\certs\air-cert.p12
-          encodedString: ${{ secrets.CODESIGN_AIR_CERT }}
+            # Set build version.
+            - name: Token Replace in asconfig
+              uses: cschleiden/replace-tokens@v1
+              with:
+                  files: '["asconfig.release.json"]'
+              env:
+                  SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
+                  VERSION: ${{ steps.versionnumber.outputs.tag }}
+                  DATESTAMP: ${{ steps.datestamp.outputs.date }}
 
-      - name: Import Package Signing Certificate
-        uses: RollyPeres/base64-to-path@v1
-        with:
-          filePath: ${{ github.workspace }}\certs\7z-cert.p12
-          encodedString: ${{ secrets.CODESIGN_CERT }}
+            - name: Token Replace in runtimes
+              uses: cschleiden/replace-tokens@v1
+              with:
+                  files: '["bundles/**/application.xml"]'
+              env:
+                  VERSION: ${{ steps.versionnumber.outputs.tag }}
 
-      - name: Import Branding Swc Library
-        uses: RollyPeres/base64-to-path@v1
-        with:
-          filePath: ${{ github.workspace }}\libs\assets\branding.swc
-          encodedString: ${{ secrets.BRANDING_SWC }}
+            ##########################################################################################
+            # Import Branding
+            - name: Import Branding SWC Library
+              uses: RollyPeres/base64-to-path@v1
+              with:
+                  filePath: ${{ github.workspace }}\libs\assets\branding.swc
+                  encodedString: ${{ secrets.BRANDING_SWC }}
 
-      - name: Cache Air SDK
-        id: cache-air-sdk
-        uses: actions/cache@v4
-        with:
-          path: ${{ github.workspace }}\airsdk
-          key: ${{ runner.os }}-air-sdk
+            ##########################################################################################
+            # Build SWFs
+            - name: Build Embedded Fonts Library [Windows]
+              if: matrix.os == 'windows-2019'
+              shell: cmd
+              run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project ${{ github.workspace }}/fonts/asconfig.embed-fonts.json --verbose
 
-      - name: Download Air Windows
-        if: matrix.os == 'windows-2019' && steps.cache-air-sdk.outputs.cache-hit != 'true'
-        run: |
-          $ProgressPreference = 'SilentlyContinue';
-          (irm -Uri "http://airdownload.adobe.com/air/win/download/32.0/AIRSDK_Compiler.zip" -ContentType "application/octet-stream" -OutFile "air-sdk.zip")
+            - name: Build the Game (Normal) [Windows]
+              if: matrix.os == 'windows-2019'
+              shell: cmd
+              run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.release.json --verbose
 
-      - name: extract-7z-action
-        if: matrix.os == 'windows-2019' && steps.cache-air-sdk.outputs.cache-hit != 'true'
-        uses: DuckSoft/extract-7z-action@v1.0
-        with:
-          # archive path to extract
-          pathSource: air-sdk.zip
-          # path to place the extract
-          pathTarget: ${{ github.workspace }}\airsdk
+            - name: Build the Game (Hybrid) [Windows]
+              if: matrix.os == 'windows-2019'
+              shell: cmd
+              run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.hybrid.json --verbose
 
-      - name: Fix Air SDK Target
-        uses: cschleiden/replace-tokens@v1
-        with:
-          files: '["./airsdk/frameworks/flex-config.xml"]'
-          tokenPrefix: "{"
-          tokenSuffix: "}"
-        env:
-          targetPlayerMinorVersion: 0
-          targetPlayerMajorVersion: 32
+            ##########################################################################################
+            # Package Version 64-bit
+            - name: Copy Changelog (64-bit)
+              run: Copy-Item "${{ github.workspace }}\changelog.txt" -Destination "${{ github.workspace }}\bundles\64bit"
 
-      - name: Extract FFR Branded icons
-        run: 7z.exe x -tzip ${{ github.workspace }}\assets\branding-icons.zip -o${{ github.workspace }}/data/icons/ -p'${{ secrets.ICON_ARCHIVE_PASSWORD }}' -aoa
+            - name: Copy Game (64-bit)
+              run: Copy-Item "${{ github.workspace }}\bin\release\R3Air.swf" -Destination "${{ github.workspace }}\bundles\64bit"
 
-      - name: Install Dependencies
-        run: npm install asconfigc
+            - name: Rename Release Folder (64-bit)
+              run: Rename-Item -Path "${{ github.workspace }}\bundles\64bit" -NewName "R3Air.${{ steps.versionnumber.outputs.tag }}.Release.64"
 
-      - name: Generate Filename from tag push
-        if: startsWith(github.ref, 'refs/tags')
-        shell: bash
-        id: tagFileName
-        run: echo ::set-output name=name::-${{ steps.versionNumber.outputs.tag }}-${{ github.sha }}
+            - name: Package Build in Zip (64-bit)
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\64bit.zip ${{ github.workspace }}\bundles\R3Air.${{ steps.versionnumber.outputs.tag }}.Release.64
 
-      - name: Generate Filename from branch push
-        if: startsWith(github.ref, 'refs/heads')
-        shell: bash
-        id: branchFileName
-        run: echo ::set-output name=name::-${{ github.sha }}
+            # Package Version 32-bit
+            - name: Copy Changelog (32-bit)
+              run: Copy-Item "${{ github.workspace }}\changelog.txt" -Destination "${{ github.workspace }}\bundles\32bit"
 
-      - name: Build Filename from Generated Names
-        shell: bash
-        id: packageFilename
-        run: echo ::set-output name=name::rCubed${{ steps.tagFileName.outputs.name }}${{ steps.branchFileName.outputs.name }}
+            - name: Copy Game (32-bit)
+              run: Copy-Item "${{ github.workspace }}\bin\release\R3Air.swf" -Destination "${{ github.workspace }}\bundles\32bit"
 
-      - name: Build Embedded Fonts Library (Windows) (64-bit)
-        if: matrix.os == 'windows-2019'
-        shell: cmd
-        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project ${{ github.workspace }}/fonts/asconfig.embed-fonts.json --verbose
+            - name: Rename Release Folder (32-bit)
+              run: Rename-Item -Path "${{ github.workspace }}\bundles\32bit" -NewName "R3Air.${{ steps.versionnumber.outputs.tag }}.Release.32"
 
-      - name: Build the Game (Windows) (64-bit)
-        if: matrix.os == 'windows-2019'
-        shell: cmd
-        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.release.json --air windows --storepass ${{ secrets.CODESIGN_CERT_PASS }} --verbose
+            - name: Package Build in Zip (32-bit)
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\32bit.zip ${{ github.workspace }}\bundles\R3Air.${{ steps.versionnumber.outputs.tag }}.Release.32
 
-      - name: Sign Game Executable (64-bit)
-        run: |
-          $VerbosePreference = "continue";
-          $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("${{ github.workspace }}\certs\7z-cert.p12", "${{ secrets.CODESIGN_CERT_PASS }}");
-          Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\dist\R3Release\R3.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
+            # Package Version Hybrid
+            - name: Copy Changelog (Hybrid)
+              run: Copy-Item "${{ github.workspace }}\changelog.txt" -Destination "${{ github.workspace }}\bundles\Hybrid"
 
-      - name: Package Build in Self-Extracting Archive (64-bit)
-        run: 7z.exe a -t7z -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}-64bit.exe ${{ github.workspace }}/dist/R3Release -sfx
+            - name: Copy Game (Hybrid)
+              run: Copy-Item "${{ github.workspace }}\bin\release\air.swf" -Destination "${{ github.workspace }}\bundles\Hybrid"
 
-      - name: Package Build in Zip (64-bit)
-        run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}-64bit.zip ${{ github.workspace }}/dist/R3Release
+            - name: Rename Release Folder (Hybrid)
+              run: Rename-Item -Path "${{ github.workspace }}\bundles\Hybrid" -NewName "R3Air.0.0.8+${{ steps.versionnumber.outputs.tag }}"
 
-      - name: Sign Build Packages (64-bit)
-        run: |
-          $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("${{ github.workspace }}\certs\7z-cert.p12", "${{ secrets.CODESIGN_CERT_PASS }}");
-          Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}-64bit.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
+            - name: Package Build in Zip (32-bit)
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\Hybrid.zip ${{ github.workspace }}\bundles\R3Air.0.0.8+${{ steps.versionnumber.outputs.tag }}
 
-      - name: Set Bitness for building 32-bit Release
-        run: xml ed --inplace -N x="http://ns.adobe.com/air/application/32.0" -u "/x:application/x:architecture" -v 32 application.xml
+            ##########################################################################################
+            - name: Create Release
+              id: create_release
+              uses: actions/create-release@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: v${{ steps.versionnumber.outputs.tag }}
+                  release_name: rCubed - v${{ steps.versionnumber.outputs.tag }}
+                  draft: true
+                  prerelease: true
 
-      - name: Build Embedded Fonts Library (Windows) (32-bit)
-        if: matrix.os == 'windows-2019'
-        shell: cmd
-        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project ${{ github.workspace }}/fonts/asconfig.embed-fonts.json --verbose
+            - name: Upload ZIP (64-bit)
+              id: upload-zip-release-64
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ${{ github.workspace }}\bundles\64bit.zip
+                  asset_name: rCubed-${{ steps.versionnumber.outputs.tag }}-64bit.zip
+                  asset_content_type: application/executable
 
-      - name: Build the Game (Windows) (32-bit)
-        if: matrix.os == 'windows-2019'
-        shell: cmd
-        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.release.json --air windows --storepass ${{ secrets.CODESIGN_CERT_PASS }} --verbose
+            - name: Upload ZIP (32-bit)
+              id: upload-zip-release-32
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ${{ github.workspace }}\bundles\32bit.zip
+                  asset_name: rCubed-${{ steps.versionnumber.outputs.tag }}-32bit.zip
+                  asset_content_type: application/executable
 
-      - name: Sign Game Executable (32-bit)
-        run: |
-          $VerbosePreference = "continue";
-          $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("${{ github.workspace }}\certs\7z-cert.p12", "${{ secrets.CODESIGN_CERT_PASS }}");
-          Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\dist\R3Release\R3.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
-
-      - name: Package Build in Self-Extracting Archive (32-bit)
-        run: 7z.exe a -t7z -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}-32bit.exe ${{ github.workspace }}/dist/R3Release -sfx
-
-      - name: Package Build in Zip (32-bit)
-        run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}-32bit.zip ${{ github.workspace }}/dist/R3Release
-
-      - name: Sign Build Packages (32-bit)
-        run: |
-          $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("${{ github.workspace }}\certs\7z-cert.p12", "${{ secrets.CODESIGN_CERT_PASS }}");
-          Set-AuthenticodeSignature -FilePath ${{ github.workspace }}\release\${{ steps.packageFilename.outputs.name }}-32bit.exe -Certificate $cert -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm SHA256
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: rCubed - ${{ github.ref }}
-          draft: true
-          prerelease: true
-
-      - name: Upload SFX (64-bit)
-        id: upload-sfx-release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}-64bit.exe
-          asset_name: ${{ steps.packageFilename.outputs.name }}-64bit.exe
-          asset_content_type: application/executable
-
-      - name: Upload SFX (32-bit)
-        id: upload-sfx-release-32
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}-32bit.exe
-          asset_name: ${{ steps.packageFilename.outputs.name }}-32bit.exe
-          asset_content_type: application/executable
-
-      - name: Upload ZIP (64-bit)
-        id: upload-zip-release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}-64bit.zip
-          asset_name: ${{ steps.packageFilename.outputs.name }}-64bit.zip
-          asset_content_type: application/executable
-
-      - name: Upload ZIP (32-bit)
-        id: upload-zip-release-32
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/release/${{ steps.packageFilename.outputs.name }}-32bit.zip
-          asset_name: ${{ steps.packageFilename.outputs.name }}-32bit.zip
-          asset_content_type: application/executable
+            - name: Upload ZIP (Hybrid)
+              id: upload-zip-release-hybrid
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ${{ github.workspace }}\bundles\Hybrid.zip
+                  asset_name: rCubed-0.0.8-${{ steps.versionnumber.outputs.tag }}-Hybrid-32bit.zip
+                  asset_content_type: application/executable
