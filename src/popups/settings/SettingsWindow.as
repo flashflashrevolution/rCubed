@@ -219,6 +219,8 @@ package popups.settings
         {
             if (e.currentTarget == btn_editor_gameplay || e.currentTarget == btn_editor_multiplayer)
             {
+                setGameColors();
+
                 _gvars.options = new GameOptions();
                 _gvars.options.isEditor = true;
                 _gvars.options.isMultiplayer = (e.currentTarget == btn_editor_multiplayer);
@@ -251,13 +253,7 @@ package popups.settings
                     _gvars.activeUser.saveLocal();
                     _gvars.activeUser.save();
 
-                    // Setup Background Colors
-                    GameBackgroundColor.BG_LIGHT = _gvars.activeUser.gameColors[0];
-                    GameBackgroundColor.BG_DARK = _gvars.activeUser.gameColors[1];
-                    GameBackgroundColor.BG_STATIC = _gvars.activeUser.gameColors[2];
-                    GameBackgroundColor.BG_POPUP = _gvars.activeUser.gameColors[3];
-                    GameBackgroundColor.BG_STAGE = _gvars.activeUser.gameColors[4];
-                    (_gvars.gameMain.getChildAt(0) as GameBackgroundColor).redraw();
+                    setGameColors();
 
                     if (_gvars.gameMain.activePanel is MainMenu && ((_gvars.gameMain.activePanel as MainMenu).panel is MenuSongSelection))
                     {
@@ -286,6 +282,16 @@ package popups.settings
         private function scrollBarMoved(e:Event):void
         {
             pane.scrollTo(e.target.scroll);
+        }
+
+        private function setGameColors():void
+        {
+            GameBackgroundColor.BG_LIGHT = _gvars.activeUser.gameColors[0];
+            GameBackgroundColor.BG_DARK = _gvars.activeUser.gameColors[1];
+            GameBackgroundColor.BG_STATIC = _gvars.activeUser.gameColors[2];
+            GameBackgroundColor.BG_POPUP = _gvars.activeUser.gameColors[3];
+            GameBackgroundColor.BG_STAGE = _gvars.activeUser.gameColors[4];
+            (_gvars.gameMain.getChildAt(0) as GameBackgroundColor).redraw();
         }
     }
 }
