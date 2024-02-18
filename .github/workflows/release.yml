@@ -78,7 +78,7 @@ jobs:
                   files: '["asconfig.release.json"]'
               env:
                   SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
-                  VERSION: ${{ steps.versionnumber.outputs.tag }}
+                  VERSION: ${{ steps.versionNumber.outputs.tag }}
                   DATESTAMP: ${{ steps.datestamp.outputs.date }}
 
             - name: Token Replace in runtimes
@@ -86,7 +86,7 @@ jobs:
               with:
                   files: '["bundles/**/application.xml"]'
               env:
-                  VERSION: ${{ steps.versionnumber.outputs.tag }}
+                  VERSION: ${{ steps.versionNumber.outputs.tag }}
 
             ##########################################################################################
             # Import Branding
@@ -122,10 +122,10 @@ jobs:
               run: Copy-Item "${{ github.workspace }}\bin\release\R3Air.swf" -Destination "${{ github.workspace }}\bundles\64bit"
 
             - name: Rename Release Folder (64-bit)
-              run: Rename-Item -Path "${{ github.workspace }}\bundles\64bit" -NewName "R3Air.${{ steps.versionnumber.outputs.tag }}.Release.64"
+              run: Rename-Item -Path "${{ github.workspace }}\bundles\64bit" -NewName "R3Air.${{ steps.versionNumber.outputs.tag }}.Release.64"
 
             - name: Package Build in Zip (64-bit)
-              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\64bit.zip ${{ github.workspace }}\bundles\R3Air.${{ steps.versionnumber.outputs.tag }}.Release.64
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\64bit.zip ${{ github.workspace }}\bundles\R3Air.${{ steps.versionNumber.outputs.tag }}.Release.64
 
             # Package Version 32-bit
             - name: Copy Changelog (32-bit)
@@ -135,10 +135,10 @@ jobs:
               run: Copy-Item "${{ github.workspace }}\bin\release\R3Air.swf" -Destination "${{ github.workspace }}\bundles\32bit"
 
             - name: Rename Release Folder (32-bit)
-              run: Rename-Item -Path "${{ github.workspace }}\bundles\32bit" -NewName "R3Air.${{ steps.versionnumber.outputs.tag }}.Release.32"
+              run: Rename-Item -Path "${{ github.workspace }}\bundles\32bit" -NewName "R3Air.${{ steps.versionNumber.outputs.tag }}.Release.32"
 
             - name: Package Build in Zip (32-bit)
-              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\32bit.zip ${{ github.workspace }}\bundles\R3Air.${{ steps.versionnumber.outputs.tag }}.Release.32
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\32bit.zip ${{ github.workspace }}\bundles\R3Air.${{ steps.versionNumber.outputs.tag }}.Release.32
 
             # Package Version Hybrid
             - name: Copy Changelog (Hybrid)
@@ -148,10 +148,10 @@ jobs:
               run: Copy-Item "${{ github.workspace }}\bin\release\air.swf" -Destination "${{ github.workspace }}\bundles\Hybrid"
 
             - name: Rename Release Folder (Hybrid)
-              run: Rename-Item -Path "${{ github.workspace }}\bundles\Hybrid" -NewName "R3Air.0.0.8+${{ steps.versionnumber.outputs.tag }}"
+              run: Rename-Item -Path "${{ github.workspace }}\bundles\Hybrid" -NewName "R3Air.0.0.8+${{ steps.versionNumber.outputs.tag }}"
 
             - name: Package Build in Zip (32-bit)
-              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\Hybrid.zip ${{ github.workspace }}\bundles\R3Air.0.0.8+${{ steps.versionnumber.outputs.tag }}
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\Hybrid.zip ${{ github.workspace }}\bundles\R3Air.0.0.8+${{ steps.versionNumber.outputs.tag }}
 
             ##########################################################################################
             - name: Create Release
@@ -160,8 +160,8 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
-                  tag_name: v${{ steps.versionnumber.outputs.tag }}
-                  release_name: rCubed - v${{ steps.versionnumber.outputs.tag }}
+                  tag_name: v${{ steps.versionNumber.outputs.tag }}
+                  release_name: rCubed - v${{ steps.versionNumber.outputs.tag }}
                   draft: true
                   prerelease: true
 
@@ -173,7 +173,7 @@ jobs:
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
                   asset_path: ${{ github.workspace }}\bundles\64bit.zip
-                  asset_name: rCubed-${{ steps.versionnumber.outputs.tag }}-64bit.zip
+                  asset_name: rCubed-${{ steps.versionNumber.outputs.tag }}-64bit.zip
                   asset_content_type: application/executable
 
             - name: Upload ZIP (32-bit)
@@ -184,7 +184,7 @@ jobs:
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
                   asset_path: ${{ github.workspace }}\bundles\32bit.zip
-                  asset_name: rCubed-${{ steps.versionnumber.outputs.tag }}-32bit.zip
+                  asset_name: rCubed-${{ steps.versionNumber.outputs.tag }}-32bit.zip
                   asset_content_type: application/executable
 
             - name: Upload ZIP (Hybrid)
@@ -195,5 +195,5 @@ jobs:
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
                   asset_path: ${{ github.workspace }}\bundles\Hybrid.zip
-                  asset_name: rCubed-0.0.8-${{ steps.versionnumber.outputs.tag }}-Hybrid-32bit.zip
+                  asset_name: rCubed-0.0.8-${{ steps.versionNumber.outputs.tag }}-Hybrid-32bit.zip
                   asset_content_type: application/executable
