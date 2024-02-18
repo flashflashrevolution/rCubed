@@ -1,0 +1,62 @@
+{
+	"application": "application.xml",
+	"type": "lib",
+	"config": "air",
+	"compilerOptions": {
+		"debug": true,
+		"source-path": ["src"],
+		"include-sources": ["src"],
+		"library-path": ["libs/", "libs/assets/"],
+		"include-libraries": ["fonts/bin/"],
+		"output": "bin/R3Lib.swc",
+		"swf-version": 26,
+		"target-player": "26.0",
+		"locale": ["en_US"],
+		"define": [
+			{
+				"name": "CONFIG::debug",
+				"value": true
+			},
+			{
+				"name": "CONFIG::release",
+				"value": false
+			},
+			{
+				"name": "CONFIG::updater",
+				"value": false
+			},
+			{
+				"name": "CONFIG::timeStamp",
+				"value": "\"9999-12-31\""
+			},
+			{
+				"name": "R3::HASH_STRING",
+				"value": "\"hashstring\""
+			},
+			{
+				"name": "R3::BRAND_NAME_LONG",
+				"value": "\"FlashFlashRevolution\""
+			},
+			{
+				"name": "R3::BRAND_NAME_SHORT",
+				"value": "\"FFR\""
+			},
+			{
+				"name": "R3::ROOT_URL",
+				"value": "\"www.flashflashrevolution.com\""
+			},
+			{
+				"name": "R3::VERSION",
+				"value": "\"9.9.9\""
+			},
+			{
+				"name": "R3::VERSION_PREFIX",
+				"value": "\"MAIN_LIB\""
+			},
+			{
+				"name": "R3::VERSION_SUFFIX",
+				"value": "\"\""
+			}
+		]
+	}
+}

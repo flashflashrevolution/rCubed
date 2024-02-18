@@ -1,4 +1,4 @@
-package arc
+package classes.chart
 {
     import classes.chart.Note;
     import classes.chart.Song;
