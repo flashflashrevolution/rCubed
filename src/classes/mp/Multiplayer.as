@@ -1064,7 +1064,7 @@ package classes.mp
 
         public function ffrUpdateRate():Boolean
         {
-            if (!connected)
+            if (!connected || GAME_ROOM == null || !(GAME_ROOM is MPRoomFFR))
                 return false;
 
             if (GAME_ROOM.teamSpectator.contains(currentUser))
@@ -1075,7 +1075,7 @@ package classes.mp
 
         public function ffrSelectSong(song:SongInfo):Boolean
         {
-            if (song == null || !connected)
+            if (song == null || !connected || GAME_ROOM == null || !(GAME_ROOM is MPRoomFFR))
                 return false;
 
             var cmd:MPCFFRSong = new MPCFFRSong(GAME_ROOM as MPRoomFFR);
