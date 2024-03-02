@@ -243,7 +243,7 @@ package classes.score
                     // Valid Legal Score
                     if (postData.update)
                     {
-                        _gvars.songResultRanks[gameResult.game_index] = {error: false, old_ranking: data.old_ranking, new_ranking: data.new_ranking};
+                        _gvars.songResultRanks[gameResult.game_index] = {error: false, old_ranking: data.old_ranking, new_ranking: data.new_ranking, hash: data.hash};
 
                         // Check Old vs New Rankings.
                         if (data.new_ranking < data.old_ranking && data.old_ranking > 0)
@@ -294,7 +294,7 @@ package classes.score
                             previousLevelRanks["fcs"] += newLevelRanks["fcs"];
                         }
 
-                        instance.dispatchEvent(new ScoreHandlerEvent(ScoreHandlerEvent.SUCCESS, gameResult, sprintf(_lang.string("results_rank"), {rank: _gvars.songResultRanks[gameResult.game_index].new_ranking}), sprintf(_lang.string("results_last_rank"), {rank: _gvars.songResultRanks[gameResult.game_index].old_ranking})));
+                        instance.dispatchEvent(new ScoreHandlerEvent(ScoreHandlerEvent.SUCCESS, gameResult, sprintf(_lang.string("results_rank"), {rank: data.new_ranking}), sprintf(_lang.string("results_last_rank"), {rank: data.old_ranking}), data.hash));
                     }
                     else
                     {
@@ -305,12 +305,12 @@ package classes.score
                 {
                     if (data.ignore)
                     {
-                        _gvars.songResultRanks[gameResult.game_index] = {error: true, text1: "", text2: ""};
+                        _gvars.songResultRanks[gameResult.game_index] = {error: true, text1: "", text2: "", hash: ""};
                         instance.dispatchEvent(new ScoreHandlerEvent(ScoreHandlerEvent.SUCCESS, gameResult, "", ""));
                     }
                     else
                     {
-                        _gvars.songResultRanks[gameResult.game_index] = {error: true, text1: _lang.string("results_score_save_failed"), text2: "(ERR: " + data.result + ")"};
+                        _gvars.songResultRanks[gameResult.game_index] = {error: true, text1: _lang.string("results_score_save_failed"), text2: "(ERR: " + data.result + ")", hash: ""};
                         instance.dispatchEvent(new ScoreHandlerEvent(ScoreHandlerEvent.FAILURE, gameResult, _lang.string("results_score_save_failed"), "(ERR: " + data.result + ")"));
                     }
                 }

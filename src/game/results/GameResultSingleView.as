@@ -88,6 +88,7 @@ package game.results
 
         private var currentRank:Text;
         private var lastRank:Text;
+        private var scoreHash:Text;
 
         private var resultsMods:Text;
 
@@ -185,6 +186,9 @@ package game.results
             lastRank.setAreaParams(180, 28, "center");
 
             resultsMods = new Text(this, 18, 276, "---");
+            scoreHash = new Text(this, 18, 276, "");
+            scoreHash.setAreaParams(750, 22, "right");
+            scoreHash.alpha = 0.03;
 
             // Graph
             resultsDisplay.grid.visible = false;
@@ -217,6 +221,7 @@ package game.results
             {
                 currentRank.text = e.rank;
                 lastRank.text = e.last_best;
+                scoreHash.text = e.hash;
             }
         }
 
@@ -313,6 +318,7 @@ package game.results
             /// - Rank Text
             currentRank.text = "";
             lastRank.text = "";
+            scoreHash.text = "";
             if (result.user.siteId == _gvars.playerUser.siteId)
             {
                 // Has R3 Highscore
@@ -326,8 +332,9 @@ package game.results
                     }
                     else
                     {
-                        currentRank.text = sprintf(_lang.string("results_rank"), {rank: _gvars.songResultRanks[result.game_index].new_ranking});
-                        lastRank.text = sprintf(_lang.string("results_last_rank"), {rank: _gvars.songResultRanks[result.game_index].old_ranking});
+                        currentRank.text = sprintf(_lang.string("results_rank"), {rank: savedRankResult.new_ranking});
+                        lastRank.text = sprintf(_lang.string("results_last_rank"), {rank: savedRankResult.old_ranking});
+                        scoreHash.text = savedRankResult.hash;
                     }
                 }
                 // Alt Engine Score
