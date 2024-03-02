@@ -298,6 +298,7 @@ package classes.score
                     }
                     else
                     {
+                        _gvars.songResultRanks[gameResult.game_index] = {error: true, text1: _lang.string("results_game_mods_enabled_1"), text2: _lang.string("results_game_mods_enabled_2"), hash: ""};
                         instance.dispatchEvent(new ScoreHandlerEvent(ScoreHandlerEvent.FAILURE, gameResult, _lang.string("results_game_mods_enabled_1"), _lang.string("results_game_mods_enabled_2")));
                     }
                 }
