@@ -1,22 +1,23 @@
 package game.controls
 {
-    import classes.mp.MPTeam;
     import classes.mp.MPUser;
+    import classes.mp.mode.ffr.MPMatchFFR;
+    import classes.mp.mode.ffr.MPMatchFFRTeam;
+    import classes.mp.mode.ffr.MPMatchFFRUser;
     import classes.mp.room.MPRoomFFR;
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import game.GameOptions;
-    import classes.mp.mode.ffr.MPMatchFFR;
-    import classes.mp.mode.ffr.MPMatchFFRTeam;
-    import classes.mp.mode.ffr.MPMatchFFRUser;
 
-    public class MPFFRScoreCompare extends Sprite
+    public class MPFFRScoreCompare extends GameControl
     {
         private var options:GameOptions;
+        private var lastType:int = 0;
 
         private var room:MPRoomFFR;
         private var labels:Array = [];
         private var labelCount:int = 0;
+        private var labelHeight:int = 40;
         private var startY:Number = 0;
 
         private var match:MPMatchFFR;
@@ -34,6 +35,18 @@ package game.controls
             useTeamView = match.teams.length > 1;
             isSpectator = options.isSpectator;
 
+            lastType = 0;
+            addLabels();
+        }
+
+        public function clearLabels():void
+        {
+            this.removeChildren();
+            this.labels.length = 0;
+        }
+
+        public function addLabels():void
+        {
             for each (var team:MPMatchFFRTeam in match.teams)
             {
                 for each (var user:MPMatchFFRUser in team.users)
@@ -45,8 +58,9 @@ package game.controls
             }
 
             labelCount = labels.length;
+            labelHeight = labelCount > 0 ? labels[0].height : 0;
 
-            startY = (Main.GAME_HEIGHT / 2) - ((labelCount / 2) * 40);
+            startY = (Main.GAME_HEIGHT / 2) - ((labelCount / 2) * labelHeight);
 
             update();
         }
@@ -58,8 +72,23 @@ package game.controls
             for (var i:int = 0; i < labelCount; i++)
             {
                 labels[i].update();
-                labels[i].y = startY + (i * 42);
+                labels[i].y = startY + (i * labelHeight);
             }
+        }
+
+        public function set type(val:Number):void
+        {
+            if (lastType != val)
+            {
+                lastType = val;
+                clearLabels();
+                addLabels();
+            }
+        }
+
+        override public function get id():String
+        {
+            return GameLayoutManager.LAYOUT_MP_FFR_SCORE;
         }
     }
 }
@@ -128,6 +157,11 @@ internal class PlayerLabel extends Sprite
             txtScore.text = data.raw_score + " / " + data.good + "-" + data.average + "-" + data.miss + "-" + data.boo;
             _lastScore = data.raw_score;
         }
+    }
+
+    override public function get height():Number
+    {
+        return 42;
     }
 
     public function get position():Number

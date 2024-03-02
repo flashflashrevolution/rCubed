@@ -39,7 +39,6 @@ package classes
 
         ///- Private Locals
         private var _gvars:GlobalVariables = GlobalVariables.instance;
-        private var _avars:ArcGlobals = ArcGlobals.instance;
         private var _playlist:Playlist = Playlist.instance;
         private var _loader:URLLoader;
         private var _isLoaded:Boolean = false;
@@ -159,6 +158,7 @@ package classes
         public var screencutPosition:Number = 0.5;
         public var frameRate:int = 60;
         public var songRate:Number = 1;
+        public var gameLayout:Object = {};
 
         //- Permissions
         public var isActiveUser:Boolean;
@@ -793,11 +793,8 @@ package classes
             if (_settings.gameVolume != null)
                 this.gameVolume = _settings.gameVolume;
 
-            if (_settings.isolationOffset != null)
-                _avars.configIsolationStart = _settings.isolationOffset;
-
-            if (_settings.isolationLength != null)
-                _avars.configIsolationLength = _settings.isolationLength;
+            if (_settings.layout != null)
+                this.gameLayout = _settings.layout;
 
             if (_settings.filters != null)
                 this.filters = doImportFilters(_settings.filters);
@@ -902,6 +899,7 @@ package classes
             gameSave.rawGoodTracker = this.rawGoodTracker;
             gameSave.songQueues = this.songQueues;
             gameSave.gameVolume = this.gameVolume;
+            gameSave.layout = this.gameLayout;
             gameSave.filters = doExportFilters(this.filters);
 
             if (returnObject)

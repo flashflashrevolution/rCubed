@@ -1,15 +1,17 @@
 package game.controls
 {
+    import classes.ui.BoxCheck;
+    import classes.ui.Text;
     import com.flashfla.utils.ColorUtil;
     import flash.display.DisplayObjectContainer;
-    import flash.display.Sprite;
+    import flash.events.Event;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
     import flash.text.TextFieldAutoSize;
     import flash.text.TextFormat;
     import game.GameOptions;
 
-    public class Combo extends Sprite
+    public class Combo extends GameControl
     {
         private var options:GameOptions;
 
@@ -19,6 +21,8 @@ package game.controls
 
         private var field:TextField;
         private var fieldShadow:TextField;
+
+        private var lastText:String;
 
         public function Combo(options:GameOptions, parent:DisplayObjectContainer)
         {
@@ -65,6 +69,8 @@ package game.controls
             field.text = "0";
             addChild(field);
 
+            lastText = field.text;
+
             if (options && options.isAutoplay && !options.isEditor)
             {
                 field.textColor = 0xD00000;
@@ -76,6 +82,8 @@ package game.controls
         {
             field.text = combo.toString();
             fieldShadow.text = combo.toString();
+
+            lastText = field.text;
 
             /* colors[i]:
                [0] = Normal,
@@ -141,8 +149,77 @@ package game.controls
 
         public function set alignment(value:String):void
         {
+            field.htmlText = "";
+            field.autoSize = TextFieldAutoSize.NONE;
+            field.x = field.y = field.width = 0;
+
             field.autoSize = value;
+            field.htmlText = lastText;
+
+            fieldShadow.htmlText = "";
+            fieldShadow.autoSize = TextFieldAutoSize.NONE;
+            fieldShadow.x = fieldShadow.y = fieldShadow.width = 0;
+
             fieldShadow.autoSize = value;
+            fieldShadow.htmlText = lastText;
+        }
+
+        override public function getEditorInterface():GameControlEditor
+        {
+            var self:Combo = this;
+
+            var out:GameControlEditor = super.getEditorInterface();
+
+            new Text(out, 10, out.cy, _lang.string("editor_component_alignment"));
+            out.cy += 24;
+
+            var checkAlignLeft:BoxCheck = new BoxCheck(out, 10 + 3, out.cy + 3, e_changeHandler);
+            checkAlignLeft.checked = (field.autoSize == "left");
+            new Text(out, 30, out.cy, _lang.string("editor_component_left"));
+            out.cy += 22;
+
+            var checkAlignCenter:BoxCheck = new BoxCheck(out, 10 + 3, out.cy + 3, e_changeHandler);
+            checkAlignCenter.checked = (field.autoSize == "center");
+            new Text(out, 30, out.cy, _lang.string("editor_component_center"));
+            out.cy += 22;
+
+            var checkAlignRight:BoxCheck = new BoxCheck(out, 10 + 3, out.cy + 3, e_changeHandler);
+            checkAlignRight.checked = (field.autoSize == "right");
+            new Text(out, 30, out.cy, _lang.string("editor_component_right"));
+            out.cy += 22;
+
+            function e_changeHandler(e:Event):void
+            {
+                if (e.target == checkAlignLeft)
+                {
+                    checkAlignLeft.checked = true;
+                    checkAlignCenter.checked = checkAlignRight.checked = false;
+                    editorLayout["alignment"] = "left";
+                    self.alignment = editorLayout["alignment"];
+                }
+                if (e.target == checkAlignCenter)
+                {
+                    checkAlignCenter.checked = true;
+                    checkAlignLeft.checked = checkAlignRight.checked = false;
+                    editorLayout["alignment"] = "center";
+                    self.alignment = editorLayout["alignment"];
+                }
+                if (e.target == checkAlignRight)
+                {
+                    checkAlignRight.checked = true;
+                    checkAlignLeft.checked = checkAlignCenter.checked = false;
+                    editorLayout["alignment"] = "right";
+                    self.alignment = editorLayout["alignment"];
+                }
+            }
+
+            return out;
+        }
+
+
+        override public function get id():String
+        {
+            return GameLayoutManager.LAYOUT_COMBO;
         }
     }
 }

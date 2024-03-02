@@ -608,7 +608,6 @@ package classes.mp.views
                 room.song.isDirty = true;
                 _gvars.options = new GameOptions();
                 _gvars.options.settingsDecode(vars.settings);
-                _gvars.options.layout = vars.layout;
                 _gvars.options.song = room.song;
                 _gvars.options.isMultiplayer = true;
                 _gvars.options.isSpectator = true;

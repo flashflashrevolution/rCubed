@@ -1,6 +1,5 @@
 package game
 {
-    import arc.ArcGlobals;
     import assets.menu.icons.fa.iconPhoto;
     import assets.menu.icons.fa.iconVideo;
     import classes.Language;
@@ -29,7 +28,6 @@ package game
     public class GameResultsMP extends MenuPanel
     {
         private static const _gvars:GlobalVariables = GlobalVariables.instance;
-        private static const _avars:ArcGlobals = ArcGlobals.instance;
         private static const _lang:Language = Language.instance;
         private static const _score:ScoreHandler = ScoreHandler.instance;
         private static const _mp:Multiplayer = Multiplayer.instance;

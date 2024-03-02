@@ -17,7 +17,6 @@ package classes.mp.mode.ffr
         public var song_rate:Number = 1;
 
         public var settings:Object = null;
-        public var layout:Object = null;
         public var noteskin:String = null;
         public var replay_buffer:Array = [];
 
@@ -52,9 +51,6 @@ package classes.mp.mode.ffr
 
             if (data.settings != undefined)
                 settings = data.settings;
-
-            if (data.layout != undefined)
-                layout = data.layout;
 
             if (data.noteskin != undefined)
                 noteskin = data.noteskin;

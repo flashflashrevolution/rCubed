@@ -168,6 +168,11 @@ package game
 
             personalBestMode = user.personalBestMode;
             personalBestTracker = user.personalBestTracker;
+
+            var layoutKey:String = ((isMultiplayer && !isSpectator) ? "mp" : "sp");
+            if (!user.gameLayout[layoutKey])
+                user.gameLayout[layoutKey] = {};
+            layout = user.gameLayout[layoutKey];
         }
 
         public function fillFromArcGlobals():void
@@ -176,15 +181,6 @@ package game
 
             isolationOffset = avars.configIsolationStart;
             isolationLength = avars.configIsolationLength;
-
-            var layoutKey:String = ((isMultiplayer && !isSpectator) ? "mp" : "sp");
-            if (!avars.configInterface[layoutKey])
-                avars.configInterface[layoutKey] = {};
-            layout = avars.configInterface[layoutKey];
-            layoutKey = scrollDirection;
-            if (!layout[layoutKey])
-                layout[layoutKey] = {};
-            layout = layout[layoutKey];
 
             judgeWindow = avars.configJudge;
         }
@@ -247,6 +243,7 @@ package game
             settings["receptorSpeed"] = receptorSpeed;
             settings["direction"] = scrollDirection;
             settings["noteskin"] = noteskin;
+            settings["layout"] = layout;
             settings["gap"] = receptorSpacing;
             settings["noteScale"] = noteScale;
             settings["judgeScale"] = judgeScale;
@@ -371,6 +368,9 @@ package game
                     enableReceptorColors[i] = settings["enableReceptorColors"][i];
                 }
             }
+
+            if (settings["layout"] != null)
+                layout = settings["layout"];
         }
 
         public function isScoreValid(score:Boolean = true, replay:Boolean = true):Boolean

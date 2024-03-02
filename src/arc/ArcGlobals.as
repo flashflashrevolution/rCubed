@@ -24,8 +24,6 @@ package arc
 
         public var configJudge:Array;
 
-        public var configInterface:Object = {};
-
         public function ArcGlobals(en:SingletonEnforcer)
         {
             if (en == null)
@@ -54,7 +52,6 @@ package arc
                 ChartFFRLegacy.setEngineSync(engine);
                 if (engine.level_ranks)
                 {
-                    // TODO: check type on this `levelid` (should be int ?)
                     for (var levelid:String in engine.level_ranks)
                     {
                         var songInfo:SongInfo = new SongInfo();
@@ -133,11 +130,6 @@ package arc
             return songInfo;
         }
 
-        public function interfaceSave():void
-        {
-            LocalOptions.setVariable("layouts", configInterface);
-        }
-
         public function musicOffsetSave():void
         {
             LocalOptions.setVariable("rolling_music_offset", configMusicOffset);
@@ -189,13 +181,11 @@ package arc
 
             legacyDefaultEngine = LocalOptions.getVariable("legacy_default_engine", null);
             configMusicOffset = LocalOptions.getVariable("rolling_music_offset", 0);
-            configInterface = LocalOptions.getVariable("layouts", {});
         }
 
         public function resetSettings():void
         {
             LocalOptions.deleteVariable("rolling_music_offset");
-            LocalOptions.deleteVariable("layouts");
 
             resetConfig();
             configJudge = null;

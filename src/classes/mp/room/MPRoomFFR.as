@@ -297,7 +297,6 @@ package classes.mp.room
 
             playerVars.game_state = cmd.data.game_state;
             playerVars.settings = cmd.data.settings;
-            playerVars.layout = cmd.data.layout;
             playerVars.noteskin = cmd.data.noteskin;
             _mp.dispatchEvent(new MPRoomEvent(MPEvent.FFR_SONG_START, cmd, this, user));
         }

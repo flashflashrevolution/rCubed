@@ -1,6 +1,5 @@
 package popups.replays
 {
-    import arc.ArcGlobals;
     import assets.GameBackgroundColor;
     import assets.menu.icons.fa.iconSearch;
     import classes.Alert;
@@ -25,7 +24,6 @@ package popups.replays
     {
         private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _lang:Language = Language.instance;
-        private var _avars:ArcGlobals = ArcGlobals.instance;
 
         private var box:Sprite;
         private var bmp:Bitmap;

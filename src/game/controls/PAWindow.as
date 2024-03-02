@@ -1,18 +1,17 @@
 package game.controls
 {
-    import classes.Language;
+    import classes.ui.BoxCheck;
+    import classes.ui.Text;
     import flash.display.DisplayObjectContainer;
-    import flash.display.Sprite;
+    import flash.events.Event;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
     import flash.text.TextFieldAutoSize;
     import flash.text.TextFormat;
     import game.GameOptions;
 
-    public class PAWindow extends Sprite
+    public class PAWindow extends GameControl
     {
-        private static var _lang:Language = Language.instance;
-
         public var scores:Array;
         private var labels:Array;
 
@@ -28,7 +27,6 @@ package game.controls
             labels = new Array();
             scores = new Array();
 
-            var ypos:int = 0;
             var scoreSize:int = 36;
 
             var labelDesc:Array = [{color: options.judgeColors[0], title: _lang.stringSimple("game_amazing")},
@@ -39,10 +37,7 @@ package game.controls
                 {color: options.judgeColors[5], title: _lang.stringSimple("game_boo")}];
 
             if (!options.displayAmazing)
-            {
                 labelDesc.splice(0, 1);
-                ypos = 49;
-            }
 
             for each (var label:Object in labelDesc)
             {
@@ -51,10 +46,7 @@ package game.controls
                 field.antiAliasType = AntiAliasType.ADVANCED;
                 field.embedFonts = true;
                 field.selectable = false;
-                field.autoSize = TextFieldAutoSize.RIGHT;
-                field.y = ypos;
-                field.x = 50;
-                field.width = 10;
+                field.autoSize = TextFieldAutoSize.LEFT;
                 field.text = label.title;
                 addChild(field);
                 labels.push(field);
@@ -65,13 +57,9 @@ package game.controls
                 field.embedFonts = true;
                 field.selectable = false;
                 field.autoSize = TextFieldAutoSize.LEFT;
-                field.y = ypos - 22 + (36 - scoreSize);
-                field.x = 60;
                 field.text = "0";
                 addChild(field);
                 scores.push(field);
-
-                ypos += 49;
             }
         }
 
@@ -105,47 +93,60 @@ package game.controls
             scores[field].text = score.toString();
         }
 
-        public function alternateLayout():void
+        public function set type(val:Number):void
         {
             var xpos:int = 50;
             var ypos:int = 0;
-            var scoreSize:int = 0;
+            var scoreSize:int = 36;
+
+            var label:TextField;
+            var score:TextField;
+
+            // --- / ---
+            if (val == 1)
+            {
+                scoreSize = 0;
+            }
+            // - / - / - / - / - / -
+            else
+            {
+                if (!options.displayAmazing)
+                    ypos = 49;
+            }
+
             for (var i:int = 0; i < labels.length; i++)
             {
-                var label:TextField = labels[i];
-                var score:TextField = scores[i];
+                label = labels[i];
+                score = scores[i];
 
-                label.x = xpos - label.textWidth;
-                label.y = ypos;
-
-                score.x = xpos;
-                score.y = ypos - 22 + ++scoreSize;
-
-                xpos += 166;
-
-                if (!((i + 1) % 3))
+                // LEFT/RIGHT - 2 Lines
+                if (val == 1)
                 {
-                    xpos = 50;
-                    ypos += 38;
+                    label.x = xpos - label.textWidth;
+                    label.y = ypos;
+
+                    score.x = xpos + 5;
+                    score.y = ypos - 22 + scoreSize++;
+
+                    xpos += 166;
+
+                    if (!((i + 1) % 3))
+                    {
+                        xpos = 50;
+                        ypos += 42;
+                    }
                 }
-            }
-        }
 
-        public function set alignment(val:String):void
-        {
-            if (val == "right")
-            {
-                for (var i:int = 0; i < labels.length; i++)
+                // Normal - 6 Lines
+                else
                 {
-                    var label:TextField = labels[i];
-                    var score:TextField = scores[i];
+                    label.x = xpos - label.textWidth;
+                    label.y = ypos;
 
-                    score.text = "0";
+                    score.x = xpos + 5;
+                    score.y = ypos - 22 + (36 - scoreSize--);
 
-                    label.autoSize = TextFieldAutoSize.LEFT;
-                    label.x = 65;
-                    score.autoSize = TextFieldAutoSize.RIGHT;
-                    score.x = 40;
+                    ypos += 49;
                 }
             }
         }
@@ -156,6 +157,48 @@ package game.controls
             {
                 labels[i].visible = val;
             }
+        }
+
+        override public function get id():String
+        {
+            return GameLayoutManager.LAYOUT_PA;
+        }
+
+        override public function getEditorInterface():GameControlEditor
+        {
+            var self:PAWindow = this;
+
+            var out:GameControlEditor = super.getEditorInterface();
+
+            new Text(out, 10, out.cy, _lang.string("editor_component_show_labels"));
+            var checkLabels:BoxCheck = new BoxCheck(out, 10 + 3, out.cy + 22, e_changeHandler);
+            checkLabels.checked = (editorLayout.show_labels == null || editorLayout.show_labels);
+
+            out.cy += 42;
+
+            new Text(out, 10, out.cy, _lang.string("editor_component_alt_layout"));
+            var checkLayout:BoxCheck = new BoxCheck(out, 10 + 3, out.cy + 22, e_changeHandler);
+            checkLayout.checked = (editorLayout.type == 1);
+
+            out.cy += 42;
+
+            function e_changeHandler(e:Event):void
+            {
+                if (e.target == checkLabels)
+                {
+                    checkLabels.checked = !checkLabels.checked;
+                    editorLayout["show_labels"] = checkLabels.checked;
+                    self.show_labels = editorLayout["show_labels"];
+                }
+                else if (e.target == checkLayout)
+                {
+                    checkLayout.checked = !checkLayout.checked;
+                    editorLayout["type"] = checkLayout.checked ? 1 : 0;
+                    self.type = editorLayout["type"];
+                }
+            }
+
+            return out;
         }
     }
 }

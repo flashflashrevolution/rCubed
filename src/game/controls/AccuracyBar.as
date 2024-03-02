@@ -4,12 +4,11 @@ package game.controls
     import flash.display.BitmapData;
     import flash.display.DisplayObjectContainer;
     import flash.display.Shape;
-    import flash.display.Sprite;
     import flash.geom.ColorTransform;
     import flash.geom.Rectangle;
     import game.GameOptions;
 
-    public class AccuracyBar extends Sprite
+    public class AccuracyBar extends GameControl
     {
         private static var CLEAR_TRANSFORM:ColorTransform = new ColorTransform(1, 1, 1, 0);
         private static var ADJUST_TRANSFORM:ColorTransform = new ColorTransform(1, 1, 1, 0.95)
@@ -148,16 +147,36 @@ package game.controls
 
         override public function set width(val:Number):void
         {
-            _width = val;
+            _width = Math.max(1, val);
             _alphaArea.width = _width;
             draw();
         }
 
         override public function set height(val:Number):void
         {
-            _height = val;
+            _height = Math.max(1, val);
             _alphaArea.height = _height;
             draw();
+        }
+
+        override public function get width():Number
+        {
+            return _width;
+        }
+
+        override public function get height():Number
+        {
+            return _height;
+        }
+
+        override public function get id():String
+        {
+            return GameLayoutManager.LAYOUT_ACCURACY_BAR;
+        }
+
+        override public function get editorFlags():int
+        {
+            return FLAG_POSITION | FLAG_SIZE | FLAG_ROTATE | FLAG_OPACITY;
         }
     }
 

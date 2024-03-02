@@ -2,7 +2,6 @@ package game.controls
 {
     import com.greensock.TweenLite;
     import flash.display.DisplayObjectContainer;
-    import flash.display.Sprite;
     import flash.events.Event;
     import flash.geom.Matrix;
     import flash.text.AntiAliasType;
@@ -11,9 +10,8 @@ package game.controls
     import flash.text.TextFormat;
     import flash.utils.getTimer;
     import game.GameOptions;
-    import AachenLight;
 
-    public class Judge extends Sprite
+    public class Judge extends GameControl
     {
         private var options:GameOptions;
         private var indexes:Object = Judge_Tweens.judge_indexes;
@@ -145,6 +143,16 @@ package game.controls
                     TweenLite.to(field, i[0] / speedScale, {x: sX + next[1], y: (next[2] - 30)});
                 }
             }
+        }
+
+        override public function get id():String
+        {
+            return GameLayoutManager.LAYOUT_JUDGE;
+        }
+
+        override public function get editorFlags():int
+        {
+            return FLAG_POSITION | FLAG_ROTATE | FLAG_OPACITY;
         }
     }
 }
