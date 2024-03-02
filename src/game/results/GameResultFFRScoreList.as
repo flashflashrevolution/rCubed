@@ -121,7 +121,7 @@ package game.results
                     {
                         userLabel = getUserLabel(user);
                         userLabel.y = my;
-                        userLabel.rankText.visible = false;
+                        userLabel.textRank.visible = false;
                         my += labelHeight;
                     }
                 }
@@ -240,9 +240,9 @@ internal class BaseLabel extends Sprite
     protected var _height:Number = 35;
 
     private var hover:Sprite;
-    public var rankText:Text;
-    protected var nameText:Text;
-    protected var scoreText:Text;
+    public var textRank:Text;
+    protected var textName:Text;
+    protected var textScore:Text;
 
     public function BaseLabel():void
     {
@@ -303,17 +303,17 @@ internal class TeamLabel extends BaseLabel
     {
         draw(team.position == 1);
 
-        rankText = new Text(this, 0, 0, team.position, 12, "#c7c7c7");
-        rankText.setAreaParams(25, _height, "center");
-        rankText.cacheAsBitmap = true;
+        textRank = new Text(this, 0, 0, team.position, 12, "#c7c7c7");
+        textRank.setAreaParams(25, _height, "center");
+        textRank.cacheAsBitmap = true;
 
-        nameText = new Text(this, 25, 0, team.name);
-        nameText.setAreaParams(220, _height);
-        nameText.cacheAsBitmap = true;
+        textName = new Text(this, 25, 0, team.name);
+        textName.setAreaParams(220, _height);
+        textName.cacheAsBitmap = true;
 
-        scoreText = new Text(this, 230, 0, NumberUtil.numberFormat(team.raw_score));
-        scoreText.setAreaParams(100, _height, "center");
-        scoreText.cacheAsBitmap = true;
+        textScore = new Text(this, 230, 0, NumberUtil.numberFormat(team.raw_score));
+        textScore.setAreaParams(100, _height, "center");
+        textScore.cacheAsBitmap = true;
 
         super.build();
     }
@@ -324,6 +324,8 @@ internal class UserLabel extends BaseLabel
     public var user:MPMatchResultsUser;
 
     private var avatar:Sprite;
+
+    private var textRate:Text;
 
     private var textAmazing:Text;
     private var textPerfect:Text;
@@ -345,19 +347,23 @@ internal class UserLabel extends BaseLabel
     {
         draw(user.position == 1);
 
-        rankText = new Text(this, 0, 0, user.position, 12, "#c7c7c7");
-        rankText.setAreaParams(25, _height, "center");
+        textRank = new Text(this, 0, 0, user.position, 12, "#c7c7c7");
+        textRank.setAreaParams(25, _height, "center");
 
-        nameText = new Text(this, 50, 0, user.userLabelHTML);
-        nameText.setAreaParams(185, _height);
+        textName = new Text(this, 50, 0, user.userLabelHTML);
+        textName.setAreaParams(185, _height);
 
         avatar = ImageCache.getImage(user.avatarURL, ImageCache.ALIGN_MIDDLE, 25, 25);
         avatar.x = 36 + ((25 - avatar.width) / 2);
         avatar.y = (_height / 2) + ((25 - avatar.height) / 2);
         addChild(avatar);
 
-        scoreText = new Text(this, 230, 0, NumberUtil.numberFormat(user.score.score));
-        scoreText.setAreaParams(100, _height, "center");
+        textRate = new Text(this, 50, 0, "[" + NumberUtil.numberFormat(user.score.options.songRate) + "x]", 12, "#c7c7c7");
+        textRate.setAreaParams(185, _height, "right");
+        textRate.visible = user.score.options.songRate != 1;
+
+        textScore = new Text(this, 230, 0, NumberUtil.numberFormat(user.score.score));
+        textScore.setAreaParams(100, _height, "center");
 
         textPerfect = new Text(this, 330, 0, NumberUtil.numberFormat(user.score.amazing + user.score.perfect), 12, "#DCFFCB");
         textPerfect.setAreaParams(64, _height, "center");
@@ -379,7 +385,7 @@ internal class UserLabel extends BaseLabel
 
         if (!user.alive)
         {
-            rankText.alpha = avatar.alpha = nameText.alpha = scoreText.alpha = textPerfect.alpha = textGood.alpha = textAverage.alpha = textMiss.alpha = textBoo.alpha = textMaxCombo.alpha = 0.4;
+            textRank.alpha = avatar.alpha = textName.alpha = textScore.alpha = textPerfect.alpha = textGood.alpha = textAverage.alpha = textMiss.alpha = textBoo.alpha = textMaxCombo.alpha = 0.4;
         }
 
         super.build();
