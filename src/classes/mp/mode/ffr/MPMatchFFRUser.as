@@ -8,6 +8,8 @@ package classes.mp.mode.ffr
         public var user:MPUser;
         public var room:MPRoomFFR;
 
+        public var rate:Number = 1;
+
         public var raw_score:Number = 0;
         public var position:Number = 1;
 
@@ -53,11 +55,6 @@ package classes.mp.mode.ffr
 
             if (data.max_combo != null)
                 this.max_combo = data.max_combo;
-        }
-
-        public function get getNoteIndex():int
-        {
-            return amazing + perfect + good + average + miss;
         }
     }
 }
