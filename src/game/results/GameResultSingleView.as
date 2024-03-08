@@ -122,7 +122,7 @@ package game.results
             songName.mouseChildren = true;
             songName.mouseEnabled = true;
 
-            songDecription = new Text(this, 115, 83, "Which isn't good. Anyway Hello!", 12, "#E2FEFF");
+            songDecription = new Text(this, 115, 83, "Which isn't good. Anyways Hello!", 12, "#E2FEFF");
             songDecription.textfield.styleSheet = Constant.STYLESHEET;
             songDecription.setAreaParams(545, 20, "center");
             songDecription.mouseChildren = true;
