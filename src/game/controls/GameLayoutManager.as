@@ -68,10 +68,17 @@ package game.controls
             if (!sprite)
                 return;
 
-            var layout:Object = interfaceLayout(key);
-            for (var p:String in layout)
-                if (p in sprite)
-                    sprite[p] = layout[p];
+            try
+            {
+                var layout:Object = interfaceLayout(key);
+                for (var p:String in layout)
+                    if (p in sprite)
+                        sprite[p] = layout[p];
+            }
+            catch (e:Error)
+            {
+
+            }
         }
 
         private function buildDefaultLayout():void
