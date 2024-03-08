@@ -1,6 +1,7 @@
 package classes.replay
 {
     import arc.ArcGlobals;
+    import by.blooddy.crypto.Base64;
     import by.blooddy.crypto.MD5;
     import classes.Alert;
     import classes.Language;
@@ -384,9 +385,7 @@ package classes.replay
         {
             if (replayBin != null)
             {
-                var enc:Base64Encoder = new Base64Encoder();
-                enc.encodeBytes(replayBin);
-                return ReplayPack.MAGIC + "|" + enc.toString();
+                return ReplayPack.MAGIC + "|" + Base64.encode(replayBin);
             }
 
             if (!onlyBinReplay)
@@ -414,10 +413,7 @@ package classes.replay
             {
                 if (str.substr(0, 4) == ReplayPack.MAGIC)
                 {
-                    var aa:String = str.substr(5);
-                    var b64:Base64Decoder = new Base64Decoder();
-                    b64.decode(aa);
-                    parseReplayPack(ReplayPack.readReplay(b64.toByteArray()), loadUser);
+                    parseReplayPack(ReplayPack.readReplay(Base64.decode(str.substr(5))), loadUser);
                 }
                 else
                 {

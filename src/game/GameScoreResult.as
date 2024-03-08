@@ -1,9 +1,9 @@
 package game
 {
+    import by.blooddy.crypto.Base64;
     import classes.SongInfo;
     import classes.User;
     import classes.chart.Song;
-    import classes.replay.Base64Encoder;
     import classes.replay.ReplayBinFrame;
     import classes.replay.ReplayPack;
     import flash.utils.ByteArray;
@@ -95,9 +95,7 @@ package game
             if (replayBin == null || replayBin.length == 0)
                 return null;
 
-            var enc:Base64Encoder = new Base64Encoder();
-            enc.encodeBytes(replayBin);
-            return ReplayPack.MAGIC + "|" + enc.toString();
+            return ReplayPack.MAGIC + "|" + Base64.encode(replayBin);
         }
 
         public var start_time:String;
