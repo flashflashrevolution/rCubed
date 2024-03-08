@@ -3,6 +3,7 @@ package classes.mp.mode.ffr
     import classes.mp.MPUser;
     import classes.mp.room.MPRoomFFR;
     import flash.utils.Dictionary;
+    import flash.utils.getTimer;
 
     public class MPMatchFFR
     {
@@ -13,6 +14,8 @@ package classes.mp.mode.ffr
 
         public var users:Vector.<MPMatchFFRUser> = new <MPMatchFFRUser>[];
         public var users_map:Dictionary = new Dictionary(true);
+
+        public var startTime:Number;
 
         public function MPMatchFFR(room:MPRoomFFR):void
         {
@@ -38,12 +41,16 @@ package classes.mp.mode.ffr
 
                     var matchUser:MPMatchFFRUser = new MPMatchFFRUser(room, scoreUser);
                     matchUser.update(scoreData);
+                    matchUser.rate = room.getPlayerSongRate(scoreUser);
+
                     users.push(matchUser);
                     users_map[scoreUser.uid] = matchUser;
 
                     matchTeam.users.push(matchUser);
                 }
             }
+
+            startTime = getTimer();
         }
 
         public function update(data:Object):void
