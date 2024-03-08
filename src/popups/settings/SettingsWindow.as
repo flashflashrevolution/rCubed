@@ -250,6 +250,7 @@ package popups.settings
                 {
                     _gvars.activeUser.saveLocal();
                     _gvars.activeUser.save();
+                    LocalOptions.flush();
 
                     setGameColors();
 
