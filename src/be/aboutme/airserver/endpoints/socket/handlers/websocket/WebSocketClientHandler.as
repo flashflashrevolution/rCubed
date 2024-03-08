@@ -36,11 +36,9 @@ package be.aboutme.airserver.endpoints.socket.handlers.websocket
     import be.aboutme.airserver.events.MessagesAvailableEvent;
     import be.aboutme.airserver.messages.Message;
     import be.aboutme.airserver.messages.serialization.IMessageSerializer;
-
     import by.blooddy.crypto.Base64;
     import by.blooddy.crypto.MD5;
     import by.blooddy.crypto.SHA1;
-
     import flash.events.ProgressEvent;
     import flash.net.Socket;
     import flash.utils.ByteArray;

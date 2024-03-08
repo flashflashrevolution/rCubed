@@ -1,12 +1,12 @@
 package classes.ui
 {
+    import classes.Language;
     import classes.ui.Throbber;
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
+    import flash.events.Event;
     import flash.events.TimerEvent;
     import flash.utils.Timer;
-    import classes.Language;
-    import flash.events.Event;
 
     public class UILockWait extends Sprite
     {

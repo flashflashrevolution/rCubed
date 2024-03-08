@@ -318,7 +318,7 @@ package game.graph
             }
             last_nearest_index = nearest_cross_index;
 
-            // Get Cross 
+            // Get Cross
             var noteResult:GraphCrossPoint = nearest_is_boo ? boo_points[nearest_hit_index] : cross_points[nearest_hit_index];
             var pos_x:Number = noteResult.x;
             var pos_y:Number = noteResult.y;
@@ -386,7 +386,7 @@ package game.graph
             cross_points = new <GraphCrossPoint>[];
             boo_points = new <GraphCrossPoint>[];
 
-            // Judge 
+            // Judge
             var song_arrows:int = result.note_count;
 
             var i:int;

@@ -4,7 +4,6 @@ package be.aboutme.airserver
     import be.aboutme.airserver.events.MessageReceivedEvent;
     import be.aboutme.airserver.events.MessagesAvailableEvent;
     import be.aboutme.airserver.messages.Message;
-
     import flash.events.Event;
     import flash.events.EventDispatcher;
 

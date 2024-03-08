@@ -1,10 +1,10 @@
 package arc
 {
     import classes.Playlist;
+    import classes.SongInfo;
     import classes.chart.parse.ChartFFRLegacy;
     import flash.events.EventDispatcher;
     import flash.net.SharedObject;
-    import classes.SongInfo;
 
     public class ArcGlobals extends EventDispatcher
     {

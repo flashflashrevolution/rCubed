@@ -50,39 +50,39 @@ package classes.replay
      */
     public class ReplayPack
     {
-        // 00000001 
+        // 00000001
         public static const BIT_P1_LEFT:int = (1 << 0);
-        // 00000010 
+        // 00000010
         public static const BIT_P1_DOWN:int = (1 << 1);
-        // 00000100 
+        // 00000100
         public static const BIT_P1_UP:int = (1 << 2);
-        // 00001000 
+        // 00001000
         public static const BIT_P1_RIGHT:int = (1 << 3);
-        // 00000001 
+        // 00000001
         public static const BIT_P1_KEY_5:int = (1 << 0);
-        // 00000010 
+        // 00000010
         public static const BIT_P1_KEY_6:int = (1 << 1);
 
-        // 00000100 
+        // 00000100
         public static const BIT_P2_LEFT:int = (1 << 2);
-        // 00001000 
+        // 00001000
         public static const BIT_P2_DOWN:int = (1 << 3);
-        // 00010000 
+        // 00010000
         public static const BIT_P2_UP:int = (1 << 4);
-        // 00100000 
+        // 00100000
         public static const BIT_P2_RIGHT:int = (1 << 5);
-        // 01000000 
+        // 01000000
         public static const BIT_P2_KEY_5:int = (1 << 6);
-        // 10000000 
+        // 10000000
         public static const BIT_P2_KEY_6:int = (1 << 7);
 
-        // 00010000 
+        // 00010000
         public static const BIT_FRAME_EXTEND:int = (1 << 4);
-        // 00100000 
+        // 00100000
         public static const BIT_PACK_BYTE:int = (1 << 5);
-        // 01000000 
+        // 01000000
         public static const BIT_PACK_SHORT:int = (1 << 6);
-        // 10000000 
+        // 10000000
         public static const BIT_PACK_INT:int = (1 << 7);
 
         static public const MAGIC:String = "FBRF";
@@ -93,8 +93,8 @@ package classes.replay
         static private const SUPPORT_MIN_VER:uint = 1000;
         static private const SUPPORT_MAX_VER:uint = 1001;
 
-        // because the checksum is assumed to be the last 4 bytes, changes to the format will 
-        // likely need the magic to change so that older engines won't try to parse a different 
+        // because the checksum is assumed to be the last 4 bytes, changes to the format will
+        // likely need the magic to change so that older engines won't try to parse a different
         // format as they didn't do support version range checks until 1.4.4
         // changing the magic will cause the replay parser on <1.4.4 to use the older json format
         // which will error out as the string isn't a json string and about the parsing

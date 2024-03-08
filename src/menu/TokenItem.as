@@ -12,7 +12,6 @@ package menu
     import flash.filters.ColorMatrixFilter;
     import flash.geom.Point;
     import flash.text.AntiAliasType;
-    import flash.text.StyleSheet;
     import flash.text.TextField;
     import flash.text.TextFieldAutoSize;
 

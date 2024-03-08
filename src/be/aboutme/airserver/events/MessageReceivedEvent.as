@@ -1,7 +1,6 @@
 package be.aboutme.airserver.events
 {
     import be.aboutme.airserver.messages.Message;
-
     import flash.events.Event;
 
     public class MessageReceivedEvent extends Event

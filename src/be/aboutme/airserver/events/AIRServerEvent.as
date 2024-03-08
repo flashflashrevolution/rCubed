@@ -1,7 +1,6 @@
 package be.aboutme.airserver.events
 {
     import be.aboutme.airserver.Client;
-
     import flash.events.Event;
 
     public class AIRServerEvent extends Event

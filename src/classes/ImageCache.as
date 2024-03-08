@@ -23,6 +23,8 @@ package classes
     }
 }
 
+import classes.ImageCache;
+import com.flashfla.utils.SpriteUtil;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.DisplayObject;
@@ -31,8 +33,6 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.EventDispatcher;
 import flash.net.URLRequest;
-import com.flashfla.utils.SpriteUtil;
-import classes.ImageCache;
 
 internal class CacheData extends EventDispatcher
 {

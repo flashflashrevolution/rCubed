@@ -1,7 +1,7 @@
 package game.events
 {
-    import flash.utils.IDataOutput;
     import flash.utils.IDataInput;
+    import flash.utils.IDataOutput;
 
     public class GamePlaybackJudgeResult extends GamePlaybackEvent
     {

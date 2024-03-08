@@ -7,7 +7,6 @@ package classes.score
     import classes.Playlist;
     import classes.SongInfo;
     import classes.replay.Replay;
-    import com.flashfla.net.DynamicURLLoader;
     import com.flashfla.utils.sprintf;
     import flash.events.ErrorEvent;
     import flash.events.Event;

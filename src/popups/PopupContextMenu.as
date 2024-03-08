@@ -6,11 +6,9 @@ package popups
     import classes.mp.Multiplayer;
     import classes.ui.Box;
     import classes.ui.BoxButton;
-    import com.flashdynamix.utils.SWFProfiler;
     import com.flashfla.utils.SpriteUtil;
     import flash.display.Bitmap;
     import flash.events.MouseEvent;
-    import flash.profiler.showRedrawRegions;
     import game.GameMenu;
     import menu.MenuPanel;
 
