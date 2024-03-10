@@ -3,6 +3,7 @@ package game
     import assets.menu.icons.fa.iconPhoto;
     import assets.menu.icons.fa.iconVideo;
     import classes.Language;
+    import classes.SongInfo;
     import classes.mp.Multiplayer;
     import classes.mp.commands.MPCFFRGameStateChange;
     import classes.mp.mode.ffr.MPMatchResultsFFR;
@@ -18,12 +19,14 @@ package game
     import flash.events.KeyboardEvent;
     import flash.events.MouseEvent;
     import flash.ui.Keyboard;
+    import flash.utils.Timer;
     import flash.utils.getTimer;
     import game.results.GameResultBackground;
     import game.results.GameResultFFRView;
     import game.results.GameResultSingleView;
     import menu.MenuPanel;
     import popups.PopupHighscores;
+    import flash.events.TimerEvent;
 
     public class GameResultsMP extends MenuPanel
     {
@@ -36,10 +39,10 @@ package game
         private var room:MPRoomFFR;
 
         // Results
-        private var userResult:GameScoreResult;
         private var resultIndex:int = 0;
         private var result:GameScoreResult;
 
+        private var songInfo:SongInfo;
         private var matchResults:MPMatchResultsFFR;
 
         private var background:GameResultBackground;
@@ -57,6 +60,7 @@ package game
         private var navOptions:BoxButton;
         private var navHighscores:BoxButton;
         private var navMenu:BoxButton;
+        private var navEnableTimer:Timer;
 
         public function GameResultsMP(myParent:MenuPanel)
         {
@@ -69,38 +73,8 @@ package game
             room = _mp.GAME_ROOM as MPRoomFFR;
             if (room.lastMatchIndex == -1)
                 matchResults = room.lastMatch;
-            else
+            else if (room.lastMatchIndex >= 0 && room.lastMatchIndex < room.lastMatchHistory.length)
                 matchResults = room.lastMatchHistory[room.lastMatchIndex];
-
-            // Get Local Results
-            if (_gvars.songResults.length > 0 && room.lastMatchIndex == -1)
-            {
-                userResult = _gvars.songResults[0];
-
-                // Update Judge Offset
-                updateJudgeOffset(userResult);
-
-                // Send User Score
-                _score.addEventListener(ScoreHandlerEvent.SUCCESS, e_onScoreResult);
-                _score.addEventListener(ScoreHandlerEvent.FAILURE, e_onScoreResult);
-                _score.sendScore(userResult);
-                _score.saveLocalReplay(userResult);
-
-                // Clear Scores
-                _gvars.songResults.length = 0;
-
-                // Replace MP Result with Personal Result
-                for (var i:int = 0; i < matchResults.users.length; i++)
-                {
-                    var result:GameScoreResult = matchResults.users[i].score;
-
-                    if (userResult.compare(result))
-                    {
-                        matchResults.users[i].score = userResult;
-                        break;
-                    }
-                }
-            }
 
             return true;
         }
@@ -111,6 +85,10 @@ package game
 
         override public function stageAdd():void
         {
+            // Score Update Handlers
+            _score.addEventListener(ScoreHandlerEvent.SUCCESS, e_onScoreResult);
+            _score.addEventListener(ScoreHandlerEvent.FAILURE, e_onScoreResult);
+
             // Background
             background = new GameResultBackground();
             addChild(background);
@@ -122,8 +100,17 @@ package game
             noiseImage.alpha = 0.15;
             background.addChild(noiseImage);
 
-            overviewResult = new GameResultFFRView(room, matchResults, e_onScoreClick);
-            addChild(overviewResult);
+            if (matchResults)
+            {
+                overviewResult = new GameResultFFRView(room, matchResults, e_onScoreClick);
+                addChild(overviewResult);
+
+                songInfo = matchResults.songInfo;
+            }
+            else
+            {
+                songInfo = room.lastMatchScorePersonal.songInfo;
+            }
 
             singleResult = new GameResultSingleView();
             addChild(singleResult);
@@ -165,7 +152,7 @@ package game
             navBack = new BoxButton(this, 18, 62, 90, 32, _lang.string("game_results_mp_back"), 12, eventHandler);
 
             // Display Game Result
-            displayGameResult(-1);
+            displayGameResult(!matchResults ? -2 : -1);
 
             _gvars.gameMain.displayPopupQueue();
 
@@ -177,11 +164,21 @@ package game
 
             // Return to Multiplayer Menu
             Flags.VALUES[Flags.MP_MENU_RETURN] = true;
+
+            // Enable Menu after 1 second.
+            if (room.lastMatchIndex == -1)
+            {
+                navOptions.enabled = navMenu.enabled = navHighscores.enabled = false;
+                navEnableTimer = new Timer(1000);
+                navEnableTimer.addEventListener(TimerEvent.TIMER, e_navEnable);
+                navEnableTimer.start();
+            }
         }
 
         override public function stageRemove():void
         {
-            _mp.sendCommand(new MPCFFRGameStateChange(room, "menu"));
+            if (room.lastMatchIndex < 0)
+                _mp.sendCommand(new MPCFFRGameStateChange(room, "menu"));
 
             // Remove Score Events
             _score.removeEventListener(ScoreHandlerEvent.SUCCESS, e_onScoreResult);
@@ -216,6 +213,12 @@ package game
             _gvars.gameMain.displayPopupQueue();
         }
 
+        private function e_navEnable(e:TimerEvent):void
+        {
+            navOptions.enabled = navMenu.enabled = true;
+            navHighscores.enabled = songInfo && !songInfo.engine;
+        }
+
         //******************************************************************************************//
         // Results Display Logic
         //******************************************************************************************//
@@ -225,8 +228,23 @@ package game
             // Set Index
             resultIndex = gameIndex;
 
+            // Single Score - Skipped
+            if (gameIndex == -2)
+            {
+                singleResult.visible = true;
+                navBack.visible = false;
+
+                result = room.lastMatchScorePersonal;
+
+                // Save Replay Button
+                navSaveReplay.enabled = _score.canSendScore(result, true, false, true, true);
+
+                // Update
+                singleResult.update(result);
+            }
+
             // Score Overview
-            if (gameIndex == -1)
+            else if (gameIndex == -1)
             {
                 navSaveReplay.enabled = false;
                 overviewResult.visible = true;
@@ -235,7 +253,7 @@ package game
             }
 
             // Single Score
-            else
+            else if (resultIndex >= 0 && resultIndex < matchResults.users.length)
             {
                 overviewResult.visible = false;
                 singleResult.visible = true;
@@ -251,29 +269,7 @@ package game
             }
 
             // Highscores
-            navHighscores.enabled = matchResults.songInfo && !matchResults.songInfo.engine;
-        }
-
-        //******************************************************************************************//
-        // Helper Functions
-        //******************************************************************************************//
-
-        /**
-         * Handles Auto Judge Offset options by changing the judge offset and saving
-         * the user settings. This is called when scores are saved successfully.
-         * @param result GameScoreResult
-         */
-        private function updateJudgeOffset(result:GameScoreResult):void
-        {
-            if (_gvars.activeUser.AUTO_JUDGE_OFFSET && // Auto Judge Offset enabled
-                (result.amazing + result.perfect + result.good + result.average >= 50) && // Accuracy data is reliable
-                result.accuracy !== 0)
-            {
-                _gvars.activeUser.JUDGE_OFFSET = Number(result.accuracy_frames.toFixed(3));
-                // Save settings
-                _gvars.activeUser.saveLocal();
-                _gvars.activeUser.save();
-            }
+            navHighscores.enabled = songInfo && !songInfo.engine;
         }
 
         //******************************************************************************************//
@@ -307,7 +303,6 @@ package game
                     stage.removeEventListener(KeyboardEvent.KEY_DOWN, eventHandler);
                 }
             }
-
 
             if (!target)
                 return;
@@ -351,7 +346,7 @@ package game
 
             else if (target == navHighscores)
             {
-                addPopup(new PopupHighscores(this, matchResults.songInfo));
+                addPopup(new PopupHighscores(this, songInfo));
             }
 
             else if (target == navMenu)
