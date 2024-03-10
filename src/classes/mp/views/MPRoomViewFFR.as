@@ -8,6 +8,7 @@ package classes.mp.views
     import classes.mp.MPUser;
     import classes.mp.commands.MPCFFRGameStateChange;
     import classes.mp.commands.MPCFFRReadyForce;
+    import classes.mp.commands.MPCFFRSongLoadError;
     import classes.mp.commands.MPCFFRSongLoadProgress;
     import classes.mp.commands.MPCRoomEdit;
     import classes.mp.components.MPViewChatLogRoom;
@@ -58,6 +59,8 @@ package classes.mp.views
         private var _userProfilePrompt:MPUserProfilePrompt;
         private var _userInvitePrompt:MPRoomUserInvitePrompt;
 
+        private var loadProgressTimer:Timer = new Timer(500);
+
         public function MPRoomViewFFR(room:MPRoomFFR, parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0)
         {
             this.room = room;
@@ -80,6 +83,7 @@ package classes.mp.views
 
             _mp.addEventListener(MPEvent.FFR_LOADING_START, e_loadingStart);
             _mp.addEventListener(MPEvent.FFR_LOADING, e_loadingProgress);
+            _mp.addEventListener(MPEvent.FFR_LOADING_ABORT, e_loadingAbort);
 
             _mp.addEventListener(MPEvent.FFR_COUNTDOWN, e_countdown);
             _mp.addEventListener(MPEvent.FFR_MATCH_START, e_matchStart);
@@ -100,6 +104,7 @@ package classes.mp.views
 
             _mp.removeEventListener(MPEvent.FFR_LOADING_START, e_loadingStart);
             _mp.removeEventListener(MPEvent.FFR_LOADING, e_loadingProgress);
+            _mp.removeEventListener(MPEvent.FFR_LOADING_ABORT, e_loadingAbort);
 
             _mp.removeEventListener(MPEvent.FFR_COUNTDOWN, e_countdown);
             _mp.removeEventListener(MPEvent.FFR_MATCH_START, e_matchStart);
@@ -364,6 +369,14 @@ package classes.mp.views
             }
         }
 
+        protected function e_loadingAbort(e:MPRoomEvent):void
+        {
+            if (e.room === this.room)
+            {
+                _abortSongLoading();
+            }
+        }
+
         protected function e_matchStart(e:MPRoomEvent):void
         {
             if (e.room === this.room)
@@ -490,8 +503,7 @@ package classes.mp.views
             {
                 if (room.isPlayer(_mp.currentUser))
                 {
-                    const progress_update_fail:MPCFFRSongLoadProgress = new MPCFFRSongLoadProgress(room, -1, false);
-                    _mp.sendCommand(progress_update_fail);
+                    _mp.sendCommand(new MPCFFRSongLoadError(room));
                 }
                 return;
             }
@@ -499,12 +511,6 @@ package classes.mp.views
             // Setup Local File
             if (room.songInfo.is_local)
                 FileLoader.buildSong(room.songInfo);
-
-            if (room.isPlayer(_mp.currentUser))
-            {
-                const state:MPCFFRGameStateChange = new MPCFFRGameStateChange(room, "loading");
-                _mp.sendCommand(state);
-            }
 
             room.song = _gvars.getSongFile(room.songInfo);
 
@@ -515,53 +521,63 @@ package classes.mp.views
             else
             {
                 room.song.addEventListener(Event.COMPLETE, e_songFileComplete);
+                loadProgressTimer.addEventListener(TimerEvent.TIMER, e_loadProgressUpdaterTimer);
+                loadProgressTimer.start();
+            }
+        }
 
-                function e_songFileComplete(e:Event):void
+        private function e_songFileComplete(e:Event):void
+        {
+            room.song.removeEventListener(Event.COMPLETE, e_songFileComplete);
+
+            if (room.isSongLoaded())
+                _endSongLoading();
+        }
+
+        private function e_loadProgressUpdaterTimer(e:TimerEvent):void
+        {
+            if (!room.song || room.isSongLoaded())
+                loadProgressTimer.stop();
+            else
+            {
+                if (room.song.loadFail)
                 {
+                    _gvars.removeSongFile(room.song);
                     room.song.removeEventListener(Event.COMPLETE, e_songFileComplete);
+                    room.song = null;
 
-                    if (room.isSongLoaded())
-                        _endSongLoading();
+                    if (room.isPlayer(_mp.currentUser))
+                        _mp.sendCommand(new MPCFFRSongLoadError(room));
+
+                    Alert.add(sprintf(_lang.string("mp_room_ffr_song_load_error"), {song: room.songData.name}));
+                    loadProgressTimer.stop();
+                    return;
                 }
 
-                var timer:Timer = new Timer(500);
-                timer.addEventListener(TimerEvent.TIMER, function(event:TimerEvent):void
-                {
-                    if (!room.song || room.isSongLoaded())
-                        timer.stop();
-                    else
-                    {
-                        if (room.song && room.song.loadFail)
-                        {
-                            _gvars.removeSongFile(room.song);
-                            room.song = null;
-
-                            if (room.isPlayer(_mp.currentUser))
-                            {
-                                const progress_update_fail:MPCFFRSongLoadProgress = new MPCFFRSongLoadProgress(room, -1, false);
-                                _mp.sendCommand(progress_update_fail);
-
-                                const state:MPCFFRGameStateChange = new MPCFFRGameStateChange(room, "menu");
-                                _mp.sendCommand(state);
-                            }
-
-                            Alert.add(sprintf(_lang.string("mp_room_ffr_song_load_error"), {song: room.songData.name}));
-                            timer.stop();
-                        }
-
-                        if (room.isPlayer(_mp.currentUser))
-                        {
-                            const progress_update:MPCFFRSongLoadProgress = new MPCFFRSongLoadProgress(room, room.song.progress, false);
-                            _mp.sendCommand(progress_update);
-                        }
-                    }
-                });
-                timer.start();
+                if (room.isPlayer(_mp.currentUser))
+                    _mp.sendCommand(new MPCFFRSongLoadProgress(room, room.song.progress, false));
             }
+        }
+
+        private function _abortSongLoading():void
+        {
+            if (loadProgressTimer.running)
+            {
+                loadProgressTimer.removeEventListener(TimerEvent.TIMER, e_loadProgressUpdaterTimer);
+                loadProgressTimer.stop();
+            }
+
+            chat.addItem(new MPChatLogEntryText("<font color=\"" + MPColors.SYSTEM_MESSAGE_COLOR + "\">" + _lang.string("mp_room_chat_loading_abort") + "</font>"));
         }
 
         private function _endSongLoading():void
         {
+            if (loadProgressTimer.running)
+            {
+                loadProgressTimer.removeEventListener(TimerEvent.TIMER, e_loadProgressUpdaterTimer);
+                loadProgressTimer.stop();
+            }
+
             if (room.isPlayer(_mp.currentUser))
             {
                 const state:MPCFFRSongLoadProgress = new MPCFFRSongLoadProgress(room, 100, true);

@@ -53,6 +53,7 @@ package classes.mp.events
         public static const FFR_SONG_REQUEST:String = "ffr_song_request";
         public static const FFR_LOADING_START:String = "ffr_loading_start";
         public static const FFR_LOADING:String = "ffr_loading";
+        public static const FFR_LOADING_ABORT:String = "ffr_loading_abort";
         public static const FFR_COUNTDOWN:String = "ffr_countdown";
         public static const FFR_MATCH_START:String = "ffr_match_start";
         public static const FFR_SONG_START:String = "ffr_song_start";

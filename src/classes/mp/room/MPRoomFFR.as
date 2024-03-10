@@ -202,6 +202,11 @@ package classes.mp.room
                     modeLoadingProgress(user, cmd);
                     break;
 
+                case "loading_abort":
+                    update(cmd.data);
+                    _mp.dispatchEvent(new MPRoomEvent(MPEvent.FFR_LOADING_ABORT, cmd, this, user));
+                    break;
+
                 case "countdown":
                     _mp.dispatchEvent(new MPRoomEvent(MPEvent.FFR_COUNTDOWN, cmd, this, user));
                     break;
