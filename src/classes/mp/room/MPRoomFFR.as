@@ -426,7 +426,7 @@ package classes.mp.room
         {
             const playerVars:MPFFRState = player_state_map[user.uid];
             if (!playerVars)
-                return null;
+                return 1;
 
             return playerVars.song_rate;
         }
