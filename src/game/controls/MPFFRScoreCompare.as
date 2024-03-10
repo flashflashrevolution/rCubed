@@ -110,6 +110,7 @@ internal class PlayerLabel extends Sprite
     public var data:MPMatchFFRUser;
 
     public var isSelf:Boolean = false;
+    public var isAlive:Boolean = true;
 
     public var txtPosition:Text;
     public var txtUsername:Text;
@@ -156,6 +157,12 @@ internal class PlayerLabel extends Sprite
         {
             txtScore.text = data.raw_score + " / " + data.good + "-" + data.average + "-" + data.miss + "-" + data.boo;
             _lastScore = data.raw_score;
+        }
+
+        if (data.alive != isAlive)
+        {
+            this.alpha = data.alive ? 1 : 0.5;
+            isAlive = data.alive;
         }
     }
 

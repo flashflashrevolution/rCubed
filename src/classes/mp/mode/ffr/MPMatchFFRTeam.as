@@ -14,7 +14,7 @@ package classes.mp.mode.ffr
             if (data.id != undefined)
                 id = data.id;
 
-            if (data.raw_score != undefined)
+            if (data.position != undefined)
                 position = data.position;
 
             if (data.raw_score != undefined)

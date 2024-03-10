@@ -8,6 +8,7 @@ package classes.mp.mode.ffr
         public var user:MPUser;
         public var room:MPRoomFFR;
 
+        public var alive:Boolean = true;
         public var rate:Number = 1;
 
         public var raw_score:Number = 0;
@@ -34,6 +35,9 @@ package classes.mp.mode.ffr
 
             if (data.position != null)
                 this.position = data.position;
+
+            if (data.alive != null)
+                this.alive = data.alive;
 
             if (data.amazing != null)
                 this.amazing = data.amazing;
