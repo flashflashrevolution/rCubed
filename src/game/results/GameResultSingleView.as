@@ -111,10 +111,10 @@ package game.results
             graphType = LocalStore.getVariable("result_graph_type", 0);
 
             // Text
-            header = new Text(this, 20, 8, "", 16, "#E2FEFF");
+            header = new Text(this, 20, 10, "", 16, "#E2FEFF");
             header.setAreaParams(420, 26);
 
-            time = new Text(this, 576, 8, "", 16, "#E2FEFF");
+            time = new Text(this, 576, 10, "", 16, "#E2FEFF");
             time.setAreaParams(196, 26, "center");
 
             songName = new Text(this, 115, 56, "If you see this, something broke.", 16, "#E2FEFF");

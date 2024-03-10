@@ -53,10 +53,10 @@ package game.results
             addChild(resultsDisplay);
 
             // Text
-            header = new Text(this, 20, 8, sprintf(_lang.string("mp_room_ffr_match_end_results"), {"winner": matchDetails.winnerText}), 16, "#E2FEFF");
+            header = new Text(this, 20, 10, sprintf(_lang.string("mp_room_ffr_match_end_results"), {"winner": matchDetails.winnerText}), 16, "#E2FEFF");
             header.setAreaParams(420, 26);
 
-            time = new Text(this, 576, 8, resultsTime, 16, "#E2FEFF");
+            time = new Text(this, 576, 10, resultsTime, 16, "#E2FEFF");
             time.setAreaParams(196, 26, "center");
 
             const songInfo:SongInfo = matchDetails.songInfo;
