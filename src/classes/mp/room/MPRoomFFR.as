@@ -19,6 +19,7 @@ package classes.mp.room
     import classes.mp.mode.ffr.MPMatchFFRUser;
     import classes.mp.mode.ffr.MPMatchResultsFFR;
     import flash.utils.Dictionary;
+    import game.GameScoreResult;
     import menu.FileLoader;
 
     public class MPRoomFFR extends MPRoom
@@ -27,11 +28,12 @@ package classes.mp.room
         public var songInfo:SongInfo;
         public var song:Song;
 
-        public var activeMatch:MPMatchFFR = new MPMatchFFR(this);
+        public var activeMatch:MPMatchFFR;
 
         public var lastMatch:MPMatchResultsFFR;
-        public var lastMatchHistory:Vector.<MPMatchResultsFFR> = new <MPMatchResultsFFR>[];
+        public var lastMatchHistory:Vector.<MPMatchResultsFFR>;
         public var lastMatchIndex:int = -1;
+        public var lastMatchScorePersonal:GameScoreResult;
 
         public var player_states:Vector.<MPFFRState> = new <MPFFRState>[];
         public var player_state_map:Dictionary = new Dictionary(true);
@@ -56,6 +58,14 @@ package classes.mp.room
 
             if (data.match != undefined)
                 updateLastMatch(data.match);
+        }
+
+        override public function clearExtra():void
+        {
+            super.clearExtra();
+
+            activeMatch = null;
+            lastMatchHistory = null;
         }
 
         public function updateVarsMode(modeData:Object):void
@@ -92,6 +102,14 @@ package classes.mp.room
             lastMatch = new MPMatchResultsFFR(this, lastMatchHistory.length);
             lastMatch.update(matchInfo);
             lastMatchHistory.push(lastMatch);
+        }
+
+        override public function onJoin():void
+        {
+            super.onJoin();
+
+            activeMatch = new MPMatchFFR(this);
+            lastMatchHistory = new <MPMatchResultsFFR>[];
         }
 
         override public function userJoinTeam(user:MPUser, teamUID:int, vars:Object = null):void
@@ -200,6 +218,10 @@ package classes.mp.room
                     modeScoreUpdate(user, cmd);
                     break;
 
+                case "score_update_users":
+                    modeScoreUpdateInProgress(user, cmd);
+                    break;
+
                 case "match_end":
                     update(cmd.data);
                     _mp.dispatchEvent(new MPRoomEvent(MPEvent.FFR_MATCH_END, cmd, this, user));
@@ -284,7 +306,7 @@ package classes.mp.room
         private function modeMatchStart(user:MPUser, cmd:MPSocketDataText):void
         {
             activeMatch = new MPMatchFFR(this);
-            activeMatch.update(cmd.data.teams);
+            activeMatch.build(cmd.data);
 
             _mp.dispatchEvent(new MPRoomEvent(MPEvent.FFR_MATCH_START, cmd, this, user));
         }
@@ -303,7 +325,13 @@ package classes.mp.room
 
         private function modeScoreUpdate(user:MPUser, cmd:MPSocketDataText):void
         {
-            activeMatch.update(cmd.data.teams);
+            activeMatch.update(cmd.data);
+            _mp.dispatchEvent(new MPRoomEvent(MPEvent.FFR_SCORE_UPDATE, cmd, this, user));
+        }
+
+        private function modeScoreUpdateInProgress(user:MPUser, cmd:MPSocketDataText):void
+        {
+            activeMatch.build(cmd.data);
             _mp.dispatchEvent(new MPRoomEvent(MPEvent.FFR_SCORE_UPDATE, cmd, this, user));
         }
 

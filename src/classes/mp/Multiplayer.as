@@ -659,6 +659,7 @@ package classes.mp
             _roomUpdateDirect(command.data);
 
             var room:MPRoom = rooms_map[command.data.uid];
+            room.onJoin();
             activeRooms.push(room);
 
             if (room.type != "lobby")
@@ -672,6 +673,7 @@ package classes.mp
             _roomUpdateDirect(command.data);
 
             var room:MPRoom = rooms_map[command.data.uid];
+            room.onJoin();
             activeRooms.push(room);
 
             if (room.type != "lobby")
@@ -683,6 +685,7 @@ package classes.mp
         private function roomLeaveOK(command:MPSocketDataText):void
         {
             var room:MPRoom = rooms_map[command.data.uid];
+            room.onLeave();
 
             var idx:int = activeRooms.indexOf(room);
             if (idx != -1)

@@ -24,9 +24,12 @@ package classes.mp.mode.ffr
 
         public function build(data:Object):void
         {
-            for (var t:int = 0; t < data.length; t++)
+            var s_users:Array = data.users;
+            var s_teams:Array = data.teams;
+
+            for (var t:int = 0; t < s_teams.length; t++)
             {
-                var teamData:Object = data[t];
+                var teamData:Object = s_teams[t];
 
                 var matchTeam:MPMatchFFRTeam = new MPMatchFFRTeam();
                 matchTeam.update(teamData);
@@ -38,6 +41,15 @@ package classes.mp.mode.ffr
                 {
                     var scoreData:Object = scores[s];
                     var scoreUser:MPUser = room.getUser(scoreData.uid);
+
+                    if (!scoreUser)
+                    {
+                        scoreUser = new MPUser();
+                        if (s_users[scoreUser.uid] != null)
+                            scoreUser.update(s_users[scoreUser.uid]);
+                        else
+                            scoreUser.update({uid: scoreData.uid, name: "UID " + scoreData.uid});
+                    }
 
                     var matchUser:MPMatchFFRUser = new MPMatchFFRUser(room, scoreUser);
                     matchUser.update(scoreData);
@@ -57,11 +69,13 @@ package classes.mp.mode.ffr
         {
             // Not Built
             if (teams.length == 0)
-                build(data);
+                return;
 
-            for (var t:int = 0; t < data.length; t++)
+            var s_teams:Array = data.teams;
+
+            for (var t:int = 0; t < s_teams.length; t++)
             {
-                var teamData:Object = data[t];
+                var teamData:Object = s_teams[t];
                 var matchTeam:MPMatchFFRTeam = teams_map[teamData.id];
                 matchTeam.update(teamData);
 
