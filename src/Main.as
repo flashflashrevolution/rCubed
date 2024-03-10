@@ -54,7 +54,6 @@ package
         public static var VSYNC_SUPPORT:Boolean = false;
         public static var window:NativeWindow;
 
-        public static const GAME_UPDATE_PANEL:String = "GameAirUpdatePanel";
         public static const GAME_LOGIN_PANEL:String = "GameLoginPanel";
         public static const GAME_MENU_PANEL:String = "GameMenuPanel";
         public static const GAME_PLAY_PANEL:String = "GamePlayPanel";
@@ -576,11 +575,6 @@ package
             //- Add Requested Panel
             switch (_panel)
             {
-                case GAME_UPDATE_PANEL:
-                    nextPanel = new AirUpdater(this);
-                    isFound = true;
-                    break;
-
                 case GAME_LOGIN_PANEL:
                     nextPanel = new LoginMenu(this);
                     isFound = true;
