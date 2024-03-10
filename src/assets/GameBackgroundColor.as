@@ -1,5 +1,6 @@
 package assets
 {
+    import com.greensock.TweenLite;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
     import flash.display.GradientType;
@@ -24,6 +25,10 @@ package assets
         static public var BG_IMAGE_EXT:Array = [".png", ".jpg", ".jpeg", ".gif"];
         static public var BG_IMG_MENU:Bitmap;
         static public var BG_IMG_GAME:Bitmap;
+
+        private var lastLight:int = BG_LIGHT;
+        private var lastDark:int = BG_DARK;
+        private var lastFade:Sprite;
 
         public function GameBackgroundColor()
         {
@@ -57,6 +62,30 @@ package assets
             this.graphics.beginBitmapFill(bt, null, false);
             this.graphics.drawRect(0, 0, Main.GAME_WIDTH, Main.GAME_HEIGHT);
             this.graphics.endFill();
+
+            if (!lastFade && (lastLight != BG_LIGHT || lastDark != BG_DARK))
+            {
+                lastFade = new Sprite();
+                lastFade.graphics.beginGradientFill(GradientType.LINEAR, [lastLight, lastDark], [1, 1], [0x00, 0xFF], _matrix);
+                lastFade.graphics.drawRect(0, 0, Main.GAME_WIDTH, Main.GAME_HEIGHT);
+                lastFade.graphics.endFill();
+                lastFade.graphics.beginBitmapFill(bt, null, false);
+                lastFade.graphics.drawRect(0, 0, Main.GAME_WIDTH, Main.GAME_HEIGHT);
+                lastFade.graphics.endFill();
+                lastFade.cacheAsBitmap = true;
+                lastFade.cacheAsBitmapMatrix = _matrix;
+                addChild(lastFade);
+                TweenLite.to(lastFade, 1, {"alpha": 0, "onComplete": onFadeComplete});
+            }
+
+            lastLight = BG_LIGHT;
+            lastDark = BG_DARK;
+        }
+
+        private function onFadeComplete():void
+        {
+            removeChild(lastFade);
+            lastFade = null;
         }
 
         public function updateDisplay(gameMode:Boolean = false):void
