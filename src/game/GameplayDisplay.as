@@ -797,8 +797,7 @@ package game
         public function e_onFrame(e:Event):void
         {
             // UI Updates
-            if (uiJudge != null)
-                uiJudge.updateJudge(e);
+            uiJudge.updateJudge(e);
 
             // Gameplay Logic
             switch (GAME_STATE)
@@ -1649,7 +1648,6 @@ package game
             uiProgressDisplayText.visible = options.displaySongProgressText;
 
             uiJudge = new Judge(options, this);
-            uiJudge.visible = options.displayJudge;
             if (options.isEditor)
                 uiJudge.showJudge(100, true);
 
@@ -2138,7 +2136,7 @@ package game
                 hitAverage = 0;
             }
 
-            if (uiJudge.visible && !options.isEditor)
+            if (options.displayJudge && !options.isEditor)
                 uiJudge.showJudge(jscore);
 
             updateHealth(health > 0 ? _gvars.HEALTH_JUDGE_ADD : _gvars.HEALTH_JUDGE_REMOVE);
