@@ -215,6 +215,16 @@ package classes.mp.room
             return -1;
         }
 
+        public function onJoin():void
+        {
+
+        }
+
+        public function onLeave():void
+        {
+
+        }
+
         public function getUser(uid:uint):MPUser
         {
             return _mp.getUser(uid);
