@@ -57,6 +57,12 @@ package classes.mp.mode.ffr
 
                         mpuser.score.songInfo = songInfo;
 
+                        // User Personal Result instead of server score.
+                        if (room.lastMatchScorePersonal && room.lastMatchScorePersonal.compare(mpuser.score))
+                        {
+                            mpuser.score = room.lastMatchScorePersonal;
+                        }
+
                         team.users.push(mpuser);
                         users.push(mpuser);
                     }
