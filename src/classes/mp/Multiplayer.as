@@ -2,6 +2,7 @@ package classes.mp
 {
     import classes.Alert;
     import classes.Language;
+    import classes.Site;
     import classes.SongInfo;
     import classes.mp.commands.IMPCommand;
     import classes.mp.commands.MPCFFRSong;
@@ -20,7 +21,6 @@ package classes.mp
     import com.worlize.websocket.WebSocketMessage;
     import com.worlize.websocket.WebSocketURI;
     import flash.events.ErrorEvent;
-    import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.utils.ByteArray;
     import flash.utils.Dictionary;
@@ -29,6 +29,7 @@ package classes.mp
     {
         private static const _gvars:GlobalVariables = GlobalVariables.instance;
         private static const _lang:Language = Language.instance;
+        private static const _site:Site = Site.instance;
 
         private static var _instance:Multiplayer = null;
 
@@ -36,7 +37,7 @@ package classes.mp
 
         private var _listeners:Array = [];
 
-        private var DEBUG:Boolean = true;
+        private var DEBUG:Boolean = CONFIG::debug;
         private var AUTO_JOIN_LOBBY:Boolean = true;
 
         private var websocket:WebSocket;
@@ -66,7 +67,7 @@ package classes.mp
          * It's based on keeping single references to Rooms/User/Teams to avoid passing data around.
          * Class data should only be modified due to server responsed and not by the client.
          * !!! Don't alter anything in this class directly. !!!
-         * Responsible for the loss of Velocitys sanity and the start of a 6 month vacation in 2023.
+         * Responsible for the loss of Velocity's sanity.
          */
         public function Multiplayer(en:SingletonEnforcer)
         {
@@ -74,25 +75,17 @@ package classes.mp
             {
                 throw Error("Multi-Instance Blocked");
             }
-
-            websocket = new WebSocket(new WebSocketURI(URLs.MP_HOST, URLs.MP_PORT), "*", "r3");
-            websocket.addEventListener(WebSocketEvent.CLOSED, handleWebSocketClosed);
-            websocket.addEventListener(WebSocketEvent.OPEN, handleWebSocketOpen);
-            websocket.addEventListener(WebSocketEvent.MESSAGE, handleWebSocketMessage);
-            websocket.addEventListener(WebSocketErrorEvent.CONNECTION_FAIL, handleConnectionFail);
-            websocket.addEventListener(WebSocketErrorEvent.ABNORMAL_CLOSE, handleConnectionFail);
-            websocket.addEventListener(ErrorEvent.ERROR, handleErrorEvent);
         }
 
-        public override function dispatchEvent(event:Event):Boolean
-        {
-            if (event is MPEvent)
-            {
-                //trace(event as MPEvent);
-            }
+        /*
+           public override function dispatchEvent(event:Event):Boolean
+           {
+           if (event is MPEvent)
+           trace(event as MPEvent);
 
-            return super.dispatchEvent(event);
-        }
+           return super.dispatchEvent(event);
+           }
+         */
 
         override public function addEventListener(type:String, listener:Function, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void
         {
@@ -120,7 +113,18 @@ package classes.mp
 
         public function get connected():Boolean
         {
-            return websocket.connected;
+            return websocket != null && websocket.connected;
+        }
+
+        private function init():void
+        {
+            websocket = new WebSocket(new WebSocketURI(_site.data["game_mp_host"], _site.data["game_mp_port"]), "*", "r3");
+            websocket.addEventListener(WebSocketEvent.CLOSED, handleWebSocketClosed);
+            websocket.addEventListener(WebSocketEvent.OPEN, handleWebSocketOpen);
+            websocket.addEventListener(WebSocketEvent.MESSAGE, handleWebSocketMessage);
+            websocket.addEventListener(WebSocketErrorEvent.CONNECTION_FAIL, handleConnectionFail);
+            websocket.addEventListener(WebSocketErrorEvent.ABNORMAL_CLOSE, handleConnectionFail);
+            websocket.addEventListener(ErrorEvent.ERROR, handleErrorEvent);
         }
 
         /**
@@ -128,6 +132,9 @@ package classes.mp
          */
         public function connect():void
         {
+            if (!websocket)
+                init();
+
             if (!websocket.connected)
             {
                 this.currentUser = null;
