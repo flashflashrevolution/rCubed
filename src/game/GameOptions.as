@@ -45,12 +45,6 @@ package game
         public var displaySongProgressText:Boolean = false;
         public var displayMultiplayerScores:Boolean = true;
 
-        public var displayMPUI:Boolean = true;
-        public var displayMPJudge:Boolean = true;
-        public var displayMPPA:Boolean = true;
-        public var displayMPCombo:Boolean = true;
-        public var displayMPRawGoods:Boolean = false;
-
         public var judgeColors:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
         public var comboColors:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000, 0xDC00C2]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag, RawGood
         public var enableComboColors:Vector.<Boolean> = new <Boolean>[true, true, true, false, false, false, false, false, false];
@@ -134,12 +128,6 @@ package game
             displaySongProgress = user.DISPLAY_SONGPROGRESS;
             displaySongProgressText = user.DISPLAY_SONGPROGRESS_TEXT;
             displayMultiplayerScores = user.DISPLAY_MULTIPLAYER_SCORES;
-
-            displayMPUI = user.DISPLAY_MP_UI;
-            displayMPPA = user.DISPLAY_MP_PA;
-            displayMPJudge = user.DISPLAY_MP_JUDGE;
-            displayMPCombo = user.DISPLAY_MP_COMBO;
-            displayMPRawGoods = user.DISPLAY_MP_RAWGOODS;
 
             judgeColors = user.judgeColors.concat();
             comboColors = user.comboColors.concat();
@@ -238,6 +226,7 @@ package game
             settings["viewMultiplayerScores"] = displayMultiplayerScores;
             settings["viewGameTopBar"] = displayGameTopBar;
             settings["viewGameBottomBar"] = displayGameBottomBar;
+            settings["viewAccuracyBar"] = displayAccuracyBar;
             settings["speed"] = scrollSpeed;
             settings["judgeSpeed"] = judgeSpeed;
             settings["receptorSpeed"] = receptorSpeed;
@@ -331,6 +320,8 @@ package game
                 displayGameTopBar = settings["viewGameTopBar"];
             if (settings["viewGameBottomBar"] != null)
                 displayGameBottomBar = settings["viewGameBottomBar"];
+            if (settings["viewAccuracyBar"] != null)
+                displayAccuracyBar = settings["viewAccuracyBar"];
 
             if (settings["viewJudgeAnimations"] != null)
                 displayJudgeAnimations = settings["viewJudgeAnimations"];

@@ -107,12 +107,6 @@ package classes
         public var DISPLAY_MULTIPLAYER_SCORES:Boolean = true;
         public var DISPLAY_RAWGOODS:Boolean = false;
 
-        public var DISPLAY_MP_UI:Boolean = true;
-        public var DISPLAY_MP_PA:Boolean = true;
-        public var DISPLAY_MP_JUDGE:Boolean = true;
-        public var DISPLAY_MP_COMBO:Boolean = true;
-        public var DISPLAY_MP_RAWGOODS:Boolean = false;
-
         public var DISPLAY_MP_TIMESTAMP:Boolean = false;
         public var judgeColors:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
         public var comboColors:Array = [0x0099CC, 0x00AD00, 0xFCC200, 0xC7FB30, 0x6C6C6C, 0xF99800, 0xB06100, 0x990000, 0xDC00C2]; // Normal, FC, AAA, SDG, BlackFlag, AvFlag, BooFlag, MissFlag, RawGood
@@ -670,21 +664,6 @@ package classes
             if (_settings.viewMultiplayerScores != null)
                 this.DISPLAY_MULTIPLAYER_SCORES = _settings.viewMultiplayerScores;
 
-            if (_settings.viewMPUI != null)
-                this.DISPLAY_MP_UI = _settings.viewMPUI;
-
-            if (_settings.viewMPPA != null)
-                this.DISPLAY_MP_PA = _settings.viewMPPA;
-
-            if (_settings.viewMPCombo != null)
-                this.DISPLAY_MP_COMBO = _settings.viewMPCombo;
-
-            if (_settings.viewMPRawGoods != null)
-                this.DISPLAY_MP_RAWGOODS = _settings.viewMPRawGoods;
-
-            if (_settings.viewMPJudge != null)
-                this.DISPLAY_MP_JUDGE = _settings.viewMPJudge;
-
             if (_settings.viewMPTimestamp != null)
                 this.DISPLAY_MP_TIMESTAMP = _settings.viewMPTimestamp;
 
@@ -862,11 +841,6 @@ package classes
             gameSave.viewSongProgress = this.DISPLAY_SONGPROGRESS;
             gameSave.viewSongProgressText = this.DISPLAY_SONGPROGRESS_TEXT;
             gameSave.viewMultiplayerScores = this.DISPLAY_MULTIPLAYER_SCORES;
-            gameSave.viewMPUI = this.DISPLAY_MP_UI;
-            gameSave.viewMPPA = this.DISPLAY_MP_PA;
-            gameSave.viewMPJudge = this.DISPLAY_MP_JUDGE;
-            gameSave.viewMPCombo = this.DISPLAY_MP_COMBO;
-            gameSave.viewMPRawGoods = this.DISPLAY_MP_RAWGOODS;
             gameSave.viewMPTimestamp = this.DISPLAY_MP_TIMESTAMP;
             gameSave.viewLegacySongs = this.DISPLAY_LEGACY_SONGS;
             gameSave.viewExplicitSongs = this.DISPLAY_EXPLICIT_SONGS;
