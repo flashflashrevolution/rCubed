@@ -89,11 +89,6 @@ package com.worlize.websocket
 
         public var debug:Boolean = false;
 
-        public static var logger:Function = function(text:String):void
-        {
-            trace(text);
-        };
-
         public function WebSocket(uri:WebSocketURI, origin:String, protocols:* = null, timeout:uint = 10000)
         {
             super(null);
@@ -194,7 +189,7 @@ package com.worlize.websocket
                 socket.connect(_host, _port);
                 if (debug)
                 {
-                    logger("Connecting to " + _host + " on port " + _port);
+                    Logger.info(this, "Connecting to " + _host + " on port " + _port);
                 }
             }
         }
@@ -483,7 +478,7 @@ package com.worlize.websocket
         {
             if (debug)
             {
-                logger("Socket Connected");
+                Logger.info(this, "Socket Connected");
             }
             sendHandshake();
         }
@@ -492,7 +487,7 @@ package com.worlize.websocket
         {
             if (debug)
             {
-                logger("Socket Disconnected");
+                Logger.info(this, "Socket Disconnected");
             }
             dispatchEvent(new ErrorEvent(ErrorEvent.ERROR, false, false, "Socket Disconnected", 0));
             dispatchClosedEvent();
@@ -689,7 +684,7 @@ package com.worlize.websocket
                 case WebSocketOpcode.PING:
                     if (debug)
                     {
-                        logger("Received Ping");
+                        Logger.info(this, "Received Ping");
                     }
                     var pingEvent:WebSocketEvent = new WebSocketEvent(WebSocketEvent.PING, false, true);
                     pingEvent.frame = frame;
@@ -701,7 +696,7 @@ package com.worlize.websocket
                 case WebSocketOpcode.PONG:
                     if (debug)
                     {
-                        logger("Received Pong");
+                        Logger.info(this, "Received Pong");
                     }
                     var pongEvent:WebSocketEvent = new WebSocketEvent(WebSocketEvent.PONG);
                     pongEvent.frame = frame;
@@ -710,14 +705,14 @@ package com.worlize.websocket
                 case WebSocketOpcode.CONNECTION_CLOSE:
                     if (debug)
                     {
-                        logger("Received close frame");
+                        Logger.info(this, "Received close frame");
                     }
                     if (waitingForServerClose)
                     {
                         // got confirmation from server, finish closing connection
                         if (debug)
                         {
-                            logger("Got close confirmation from server.");
+                            Logger.info(this, "Got close confirmation from server.");
                         }
                         closeTimer.stop();
                         waitingForServerClose = false;
@@ -727,7 +722,7 @@ package com.worlize.websocket
                     {
                         if (debug)
                         {
-                            logger("Sending close response to server.");
+                            Logger.info(this, "Sending close response to server.");
                         }
                         close(false);
                         socket.close();
@@ -736,7 +731,7 @@ package com.worlize.websocket
                 default:
                     if (debug)
                     {
-                        logger("Unrecognized Opcode: 0x" + frame.opcode.toString(16));
+                        Logger.info(this, "Unrecognized Opcode: 0x" + frame.opcode.toString(16));
                     }
                     drop(WebSocketCloseStatus.PROTOCOL_ERROR, "Unrecognized Opcode: 0x" + frame.opcode.toString(16));
                     break;
@@ -745,20 +740,14 @@ package com.worlize.websocket
 
         private function handleSocketIOError(event:IOErrorEvent):void
         {
-            if (debug)
-            {
-                logger("IO Error: " + event);
-            }
+            Logger.error(this, "handleSocketIOError: " + Logger.event_error(event));
             dispatchEvent(new ErrorEvent(ErrorEvent.ERROR, false, false, "IO Error", event.errorID));
             dispatchClosedEvent();
         }
 
         private function handleSocketSecurityError(event:SecurityErrorEvent):void
         {
-            if (debug)
-            {
-                logger("Security Error: " + event);
-            }
+            Logger.error(this, "handleSocketSecurityError: " + Logger.event_error(event));
             dispatchEvent(new ErrorEvent(ErrorEvent.ERROR, false, false, "Security Error", event.errorID));
             dispatchClosedEvent();
         }
@@ -800,7 +789,7 @@ package com.worlize.websocket
 
             if (debug)
             {
-                logger(text);
+                Logger.info(this, text);
             }
 
             socket.writeMultiByte(text, 'us-ascii');
@@ -814,7 +803,7 @@ package com.worlize.websocket
         {
             if (debug)
             {
-                logger(message);
+                Logger.error(this, message);
             }
             _readyState = WebSocketState.CLOSED;
             if (socket.connected)
@@ -862,7 +851,7 @@ package com.worlize.websocket
                 logText += (" - " + reasonText);
                 ;
             }
-            logger(logText);
+            Logger.info(this, logText);
 
             frameQueue = new Vector.<WebSocketFrame>();
             fragmentationSize = 0;
@@ -917,7 +906,7 @@ package com.worlize.websocket
 
             if (debug)
             {
-                logger("Server Response Headers:\n" + serverHandshakeResponse);
+                Logger.info(this, "Server Response Headers:\n" + serverHandshakeResponse);
             }
 
             // Slice off the trailing \r\n\r\n from the handshake data
@@ -938,7 +927,7 @@ package com.worlize.websocket
             var statusDescription:String = responseLineMatch[3];
             if (debug)
             {
-                logger("HTTP Status Received: " + statusCode + " " + statusDescription);
+                Logger.info(this, "HTTP Status Received: " + statusCode + " " + statusDescription);
             }
 
             // Verify correct status code received
@@ -978,7 +967,7 @@ package com.worlize.websocket
                         var expectedKey:String = Base64.encode(SHA1.digest(byteArray));
                         if (debug)
                         {
-                            logger("Expected Sec-WebSocket-Accept value: " + expectedKey);
+                            Logger.info(this, "Expected Sec-WebSocket-Accept value: " + expectedKey);
                         }
                         if (header.value === expectedKey)
                         {
@@ -1030,7 +1019,7 @@ package com.worlize.websocket
 
             if (debug)
             {
-                logger("Server Extensions: " + serverExtensions.join(' | '));
+                Logger.info(this, "Server Extensions: " + serverExtensions.join(' | '));
             }
 
             serverSupportsDeflate = false;
