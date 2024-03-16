@@ -29,7 +29,7 @@ package popups.replays
             // Add UI Elements
             if (!btn_import)
             {
-                btn_import = new BoxButton(null, 5, Main.GAME_HEIGHT - 35, 162, 29, _lang.string("popup_replay_import"), 12, e_importClick);
+                btn_import = new BoxButton(null, 5, 410, 162, 29, _lang.string("popup_replay_import"), 12, e_importClick);
             }
             parent.addChild(btn_import);
         }

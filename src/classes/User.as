@@ -773,7 +773,7 @@ package classes
                 this.gameVolume = _settings.gameVolume;
 
             if (_settings.layout != null)
-                this.gameLayout = _settings.layout;
+                this.gameLayout = doLayoutImport(_settings.layout);
 
             if (_settings.filters != null)
                 this.filters = doImportFilters(_settings.filters);
@@ -1026,6 +1026,22 @@ package classes
                     filters.push(exportFilter);
             }
             return filters;
+        }
+
+        private function doLayoutImport(data:Object):Object
+        {
+            var out:Object = {};
+            var keys:Array = ["sp", "mp"];
+
+            for each (var key:String in keys)
+            {
+                if (data[key].constructor.toString().indexOf("Object") != -1)
+                {
+                    out[key] = data[key];
+                }
+            }
+
+            return out;
         }
     }
 }

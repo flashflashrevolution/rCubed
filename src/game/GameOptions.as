@@ -5,6 +5,7 @@ package game
     import classes.chart.Song;
     import classes.mp.MPUser;
     import classes.replay.Replay;
+    import com.flashfla.utils.ObjectUtil;
 
     public class GameOptions extends Object
     {
@@ -232,7 +233,7 @@ package game
             settings["receptorSpeed"] = receptorSpeed;
             settings["direction"] = scrollDirection;
             settings["noteskin"] = noteskin;
-            settings["layout"] = layout;
+            settings["layout"] = ObjectUtil.clone(layout);
             settings["gap"] = receptorSpacing;
             settings["noteScale"] = noteScale;
             settings["judgeScale"] = judgeScale;

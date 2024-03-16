@@ -60,7 +60,7 @@ package popups.replays
             // Add UI Elements
             if (!btn_refresh)
             {
-                btn_refresh = new BoxButton(null, 5, Main.GAME_HEIGHT - 35, 162, 29, _lang.string("menu_refresh"), 12, refreshReplays);
+                btn_refresh = new BoxButton(null, 5, 410, 162, 29, _lang.string("menu_refresh"), 12, refreshReplays);
             }
             parent.addChild(btn_refresh);
 

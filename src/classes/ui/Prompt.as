@@ -94,6 +94,11 @@ package classes.ui
             return _height;
         }
 
+        public function get content():Sprite
+        {
+            return _content;
+        }
+
         public function close():void
         {
             if (parent != null && parent.contains(this))
