@@ -59,7 +59,7 @@ package
                 LOG_STREAM.open(LOG_FILE, FileMode.WRITE);
                 LOG_STREAM.writeUTFBytes("======================" + filename + "======================\n");
                 LOG_STREAM.writeUTFBytes("OS: " + Capabilities.os + " | " + Capabilities.version + "\n");
-                LOG_STREAM.writeUTFBytes("R3 Version: " + Constant.AIR_VERSION + " | " + CONFIG::timeStamp + "\n");
+                LOG_STREAM.writeUTFBytes("R3 Version: " + Constant.AIR_VERSION + " | " + CONFIG::timeStamp + " | " + Main.SWF_VERSION + "\n");
                 LOG_STREAM.close();
             }
 

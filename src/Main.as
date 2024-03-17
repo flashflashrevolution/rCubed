@@ -5,6 +5,7 @@
 package
 {
     import assets.GameBackgroundColor;
+    import by.blooddy.crypto.MD5;
     import classes.Alert;
     import classes.Language;
     import classes.Noteskins;
@@ -69,7 +70,6 @@ package
         public var _gvars:GlobalVariables = GlobalVariables.instance;
         public var _site:Site = Site.instance;
         public var _playlist:Playlist = Playlist.instance;
-        //public var _friends:Friends = Friends.instance;
         public var _noteskins:Noteskins = Noteskins.instance;
 
         public var loadTimer:int = 0;
@@ -92,7 +92,13 @@ package
         public var epilepsyWarning:TextField;
 
         public var ver:Text;
-        public var bg:GameBackgroundColor
+        public var bg:GameBackgroundColor;
+
+        // Application Info
+        public static var SWF_FILE:File;
+        public static var SWF_PATH:String;
+        public static var SWF_VERSION:String;
+        public static var EXE_PATH:String;
 
         ///- Constructor
         public function Main():void
@@ -116,6 +122,12 @@ package
                 this.removeEventListener(Event.ADDED_TO_STAGE, gameInit);
             }
 
+            //- Application
+            SWF_FILE = new File(new File(loaderInfo.loaderURL).nativePath);
+            SWF_PATH = SWF_FILE.nativePath;
+            SWF_VERSION = MD5.hashBytes(AirContext.readFile(SWF_FILE));
+            VSYNC_SUPPORT = stage.hasOwnProperty("vsyncEnabled");
+
             //- Static Class Init
             Logger.init();
             AirContext.initFolders();
@@ -131,16 +143,14 @@ package
             _gvars.loadAirOptions();
 
             //- Window Options
-            VSYNC_SUPPORT = stage.hasOwnProperty("vsyncEnabled");
             window = stage.nativeWindow;
+            window.title = Constant.AIR_WINDOW_TITLE;
             window.addEventListener(Event.CLOSING, e_onNativeWindowClosing);
-            NativeApplication.nativeApplication.addEventListener(Event.EXITING, e_onNativeShutdown);
             window.addEventListener(NativeWindowBoundsEvent.MOVE, e_onNativeWindowPropertyChange, false, 1);
             window.addEventListener(NativeWindowBoundsEvent.RESIZE, e_onNativeWindowPropertyChange, false, 1);
             loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, e_uncaughtErrorHandler);
+            NativeApplication.nativeApplication.addEventListener(Event.EXITING, e_onNativeShutdown);
             stage.addEventListener("vSyncStateChangeAvailability", e_onVsyncStateChangeAvailability); // Lacking proper event class due to SDK limitations in Air 26.
-
-            window.title = Constant.AIR_WINDOW_TITLE;
 
             WINDOW_WIDTH_EXTRA = window.width - GAME_WIDTH;
             WINDOW_HEIGHT_EXTRA = window.height - GAME_HEIGHT;
@@ -453,37 +463,6 @@ package
                 }
 
                 buildContextMenu();
-
-                CONFIG::updater
-                {
-                    CONFIG::release
-                    {
-                        // Do Air Update Check
-                        if (!Flags.VALUES[Flags.DID_AIR_UPDATE_CHECK])
-                        {
-                            Flags.VALUES[Flags.DID_AIR_UPDATE_CHECK] = true;
-                            var airUpdateCheck:int = AirContext.serverVersionHigher(_site.data["game_r3air_version"]);
-                            //addAlert(_site.data["game_r3air_version"] + " " + (airUpdateCheck == -1 ? "&gt;" : (airUpdateCheck == 1 ? "&lt;" : "==")) + " " + Constant.AIR_VERSION, 240);
-                            if (airUpdateCheck == -1)
-                            {
-                                loadScripts = 0;
-                                preloader.remove();
-                                removeChild(loadStatus);
-                                removeChild(epilepsyWarning);
-                                this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
-
-                                // Switch to game
-                                switchTo(GAME_UPDATE_PANEL);
-                                return;
-                            }
-                            else
-                            {
-                                LocalStore.deleteVariable("air_update_checks");
-                            }
-                        }
-                    }
-                }
-
                 loadScripts = 0;
                 preloader.remove();
                 removeChild(loadStatus);
@@ -492,6 +471,7 @@ package
                 _playlist.updatePublicSongsCount();
                 _gvars.loadUserSongData();
                 _gvars.playerUser.getUserSkillRatingData();
+                Updater.handle(_site.data['update_version'], _site.data['update_url']);
                 switchTo(_gvars.playerUser.isGuest ? GAME_LOGIN_PANEL : GAME_MENU_PANEL);
             }
         }
