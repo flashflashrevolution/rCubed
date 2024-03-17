@@ -98,27 +98,29 @@ package classes
             }
 
             // Has Response
-            _gvars.TOTAL_GENRES = data.game_totalgenres;
-            _gvars.MAX_CREDITS = data.game_maxcredits;
-            _gvars.SCORE_PER_CREDIT = data.game_scorepercredit;
-            _gvars.MAX_DIFFICULTY = data.game_maxdifficulty;
+            _gvars.TOTAL_GENRES = data.game_total_genres;
+            _gvars.MAX_CREDITS = data.game_max_credits;
+            _gvars.SCORE_PER_CREDIT = data.game_score_per_credit;
+            _gvars.MAX_DIFFICULTY = data.game_max_difficulty;
             _gvars.DIFFICULTY_RANGES = data.game_difficulty_range;
             _gvars.NONPUBLIC_GENRES = data.game_nonpublic_genres;
 
             // MP Divisions
-            GlobalVariables.divisionLevel = data.division_levels;
-            GlobalVariables.divisionTitle = data.division_titles;
-            GlobalVariables.divisionColor = data.division_colors;
+            _gvars.divisionLevels = data.division_levels;
+            _gvars.divisionTitles = data.division_titles;
+            _gvars.divisionColors = data.division_colors;
 
             // Tokens
             _gvars.TOKENS = {};
             var tokens:Object = {};
-            for each (var tok:Object in data.game_tokens_all)
+            for each (var tok:Object in data.game_tokens)
             {
                 if (!tokens[tok.type])
-                {
                     tokens[tok.type] = [];
-                }
+
+                if (tok.picture != null)
+                    tok.picture = URLs.resolve(tok.picture);
+
                 tokens[tok.type][tok.id] = tok;
 
                 if (tok.level)

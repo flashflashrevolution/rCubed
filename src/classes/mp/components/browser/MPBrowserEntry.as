@@ -11,6 +11,7 @@ package classes.mp.components.browser
 
     public class MPBrowserEntry extends Sprite
     {
+        private static const _gvars:GlobalVariables = GlobalVariables.instance;
         private static const _lang:Language = Language.instance;
 
         public static const ENTRY_HEIGHT:int = 50;
@@ -100,9 +101,9 @@ package classes.mp.components.browser
                 range.visible = true;
 
                 if (room.skillMin == room.skillMax)
-                    range.text = "[ <font color=\"" + GlobalVariables.getDivisionColor(room.skillMin) + "\">" + room.skillMin + "</font> ]";
+                    range.text = "[ <font color=\"" + _gvars.getDivisionColor(room.skillMin) + "\">" + room.skillMin + "</font> ]";
                 else
-                    range.text = "[ <font color=\"" + GlobalVariables.getDivisionColor(room.skillMin) + "\">" + room.skillMin + "</font> - <font color=\"" + GlobalVariables.getDivisionColor(room.skillMax) + "\">" + room.skillMax + " </font>]";
+                    range.text = "[ <font color=\"" + _gvars.getDivisionColor(room.skillMin) + "\">" + room.skillMin + "</font> - <font color=\"" + _gvars.getDivisionColor(room.skillMax) + "\">" + room.skillMax + " </font>]";
             }
             else
             {

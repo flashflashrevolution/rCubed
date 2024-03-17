@@ -3,6 +3,8 @@ package classes.mp
 
     public class MPUser
     {
+        private static const _gvars:GlobalVariables = GlobalVariables.instance;
+
         public var isStale:Boolean = false;
 
         public var uid:uint;
@@ -75,7 +77,7 @@ package classes.mp
             else
             {
                 prefixS += "[" + skillRating + "] ";
-                prefixH += "<font color=\"" + GlobalVariables.getDivisionColor(skillRating) + "\">[" + skillRating + "]</font> ";
+                prefixH += "<font color=\"" + _gvars.getDivisionColor(skillRating) + "\">[" + skillRating + "]</font> ";
             }
 
             if (permissions.admin)

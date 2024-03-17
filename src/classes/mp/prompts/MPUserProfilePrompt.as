@@ -34,6 +34,7 @@ package classes.mp.prompts
 
     public class MPUserProfilePrompt extends Prompt
     {
+        private static const _gvars:GlobalVariables = GlobalVariables.instance;
         private static const _mp:Multiplayer = Multiplayer.instance;
         private static const _lang:Language = Language.instance;
 
@@ -89,13 +90,13 @@ package classes.mp.prompts
             // Skill Rating
             if (user.skillRating >= 255)
             {
-                new Text(this, 136, 46, GlobalVariables.getDivisionTitle(user.skillRating), 16, GlobalVariables.getDivisionColor(user.skillRating)).setAreaParams(width - 145, 22);
+                new Text(this, 136, 46, _gvars.getDivisionTitle(user.skillRating), 16, _gvars.getDivisionColor(user.skillRating)).setAreaParams(width - 145, 22);
             }
             else
             {
                 new Text(this, 136, 46, sprintf(_lang.string("mp_profile_skill_level"), {level: user.skillRating,
-                        division: GlobalVariables.getDivisionNumber(user.skillRating) + 1,
-                        title: GlobalVariables.getDivisionTitle(user.skillRating)}), 16, GlobalVariables.getDivisionColor(user.skillRating)).setAreaParams(width - 145, 22);
+                        division: _gvars.getDivisionNumber(user.skillRating) + 1,
+                        title: _gvars.getDivisionTitle(user.skillRating)}), 16, _gvars.getDivisionColor(user.skillRating)).setAreaParams(width - 145, 22);
             }
 
             // Avatar
