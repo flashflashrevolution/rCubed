@@ -25,10 +25,6 @@
 				"value": false
 			},
 			{
-				"name": "CONFIG::updater",
-				"value": true
-			},
-			{
 				"name": "CONFIG::timeStamp",
 				"value": "\"9999-12-31\""
 			},

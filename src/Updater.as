@@ -11,7 +11,6 @@ package
     import flash.net.URLLoader;
     import flash.net.URLLoaderDataFormat;
     import flash.net.URLRequest;
-    import flash.system.Capabilities;
     import flash.utils.ByteArray;
 
     public class Updater
@@ -21,30 +20,17 @@ package
 
         public static function handle(siteVersion:String, updateURL:String):void
         {
-            if (!siteVersion || !updateURL || didUpdate)
+            if (!siteVersion || !updateURL || didUpdate || skipUpdate())
                 return;
 
             // Only Update check once
             didUpdate = true;
-
-            // Allow Update skipping
-            if (AirContext.doesFileExist("skip_update.txt") || !(CONFIG::updater) || CONFIG::debug)
-                return;
 
             var airUpdateCheck:int = compareVersions(siteVersion);
 
             // No Update
             if (airUpdateCheck >= 0)
                 return;
-
-            // Updates seems to have worked on other platforms, trust.
-            /*
-               if (Capabilities.os.indexOf("Win") < 0)
-               {
-               Alert.add(sprintf(_lang.string("air_game_update_available"), {"old": Constant.AIR_VERSION, "new": siteVersion}), 240, Alert.DARK_GREEN);
-               return;
-               }
-             */
 
             //Alert.add(siteVersion + " " + (airUpdateCheck == -1 ? "&gt;" : (airUpdateCheck == 1 ? "&lt;" : "==")) + " " + Constant.AIR_VERSION, 240);
 
@@ -120,5 +106,9 @@ package
             return 0;
         }
 
+        private static function skipUpdate():Boolean
+        {
+            return AirContext.doesFileExist("skip_update.txt") || CONFIG::debug;
+        }
     }
 }
