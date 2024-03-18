@@ -26,7 +26,7 @@
 			},
 			{
 				"name": "CONFIG::updater",
-				"value": false
+				"value": true
 			},
 			{
 				"name": "CONFIG::timeStamp",
@@ -50,7 +50,7 @@
 			},
 			{
 				"name": "R3::VERSION",
-				"value": "\"9.9.9\""
+				"value": "\"0.0.0\""
 			},
 			{
 				"name": "R3::VERSION_PREFIX",

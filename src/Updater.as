@@ -37,12 +37,14 @@ package
             if (airUpdateCheck >= 0)
                 return;
 
-            // Only handle updates on windows, need to test other platforms?
-            if (Capabilities.os.indexOf("Win") < 0)
-            {
-                Alert.add(sprintf(_lang.string("air_game_update_available"), {"old": Constant.AIR_VERSION, "new": siteVersion}), 240, Alert.DARK_GREEN);
-                return;
-            }
+            // Updates seems to have worked on other platforms, trust.
+            /*
+               if (Capabilities.os.indexOf("Win") < 0)
+               {
+               Alert.add(sprintf(_lang.string("air_game_update_available"), {"old": Constant.AIR_VERSION, "new": siteVersion}), 240, Alert.DARK_GREEN);
+               return;
+               }
+             */
 
             //Alert.add(siteVersion + " " + (airUpdateCheck == -1 ? "&gt;" : (airUpdateCheck == 1 ? "&lt;" : "==")) + " " + Constant.AIR_VERSION, 240);
 
