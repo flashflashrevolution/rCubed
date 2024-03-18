@@ -5,12 +5,12 @@
 package
 {
     import assets.GameBackgroundColor;
+    import by.blooddy.crypto.MD5;
     import classes.Alert;
     import classes.Language;
     import classes.Noteskins;
     import classes.Playlist;
     import classes.Site;
-    import classes.SongPreview;
     import classes.User;
     import classes.ui.BoxButton;
     import classes.ui.ProgressBar;
@@ -25,11 +25,15 @@ package
     import com.greensock.plugins.TintPlugin;
     import com.greensock.plugins.TweenPlugin;
     import flash.desktop.NativeApplication;
+    import flash.desktop.NativeProcess;
+    import flash.desktop.NativeProcessStartupInfo;
+    import flash.display.NativeWindow;
     import flash.events.ContextMenuEvent;
     import flash.events.Event;
     import flash.events.KeyboardEvent;
     import flash.events.NativeWindowBoundsEvent;
     import flash.events.UncaughtErrorEvent;
+    import flash.filesystem.File;
     import flash.system.Capabilities;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
@@ -49,8 +53,8 @@ package
         public static const GAME_WIDTH:int = 780;
         public static const GAME_HEIGHT:int = 480;
         public static var VSYNC_SUPPORT:Boolean = false;
+        public static var window:NativeWindow;
 
-        public static const GAME_UPDATE_PANEL:String = "GameAirUpdatePanel";
         public static const GAME_LOGIN_PANEL:String = "GameLoginPanel";
         public static const GAME_MENU_PANEL:String = "GameMenuPanel";
         public static const GAME_PLAY_PANEL:String = "GamePlayPanel";
@@ -66,7 +70,6 @@ package
         public var _gvars:GlobalVariables = GlobalVariables.instance;
         public var _site:Site = Site.instance;
         public var _playlist:Playlist = Playlist.instance;
-        //public var _friends:Friends = Friends.instance;
         public var _noteskins:Noteskins = Noteskins.instance;
 
         public var loadTimer:int = 0;
@@ -89,7 +92,13 @@ package
         public var epilepsyWarning:TextField;
 
         public var ver:Text;
-        public var bg:GameBackgroundColor
+        public var bg:GameBackgroundColor;
+
+        // Application Info
+        public static var SWF_FILE:File;
+        public static var SWF_PATH:String;
+        public static var SWF_VERSION:String;
+        public static var EXE_PATH:String;
 
         ///- Constructor
         public function Main():void
@@ -113,6 +122,12 @@ package
                 this.removeEventListener(Event.ADDED_TO_STAGE, gameInit);
             }
 
+            //- Application
+            SWF_FILE = new File(new File(loaderInfo.loaderURL).nativePath);
+            SWF_PATH = SWF_FILE.nativePath;
+            SWF_VERSION = MD5.hashBytes(AirContext.readFile(SWF_FILE));
+            VSYNC_SUPPORT = stage.hasOwnProperty("vsyncEnabled");
+
             //- Static Class Init
             Logger.init();
             AirContext.initFolders();
@@ -128,37 +143,33 @@ package
             _gvars.loadAirOptions();
 
             //- Window Options
-            VSYNC_SUPPORT = stage.hasOwnProperty("vsyncEnabled");
-            stage.nativeWindow.addEventListener(Event.CLOSING, e_onNativeWindowClosing);
-            NativeApplication.nativeApplication.addEventListener(Event.EXITING, e_onNativeShutdown);
-            stage.nativeWindow.addEventListener(NativeWindowBoundsEvent.MOVE, e_onNativeWindowPropertyChange, false, 1);
-            stage.nativeWindow.addEventListener(NativeWindowBoundsEvent.RESIZE, e_onNativeWindowPropertyChange, false, 1);
+            window = stage.nativeWindow;
+            window.title = Constant.AIR_WINDOW_TITLE;
+            window.addEventListener(Event.CLOSING, e_onNativeWindowClosing);
+            window.addEventListener(NativeWindowBoundsEvent.MOVE, e_onNativeWindowPropertyChange, false, 1);
+            window.addEventListener(NativeWindowBoundsEvent.RESIZE, e_onNativeWindowPropertyChange, false, 1);
             loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, e_uncaughtErrorHandler);
+            NativeApplication.nativeApplication.addEventListener(Event.EXITING, e_onNativeShutdown);
             stage.addEventListener("vSyncStateChangeAvailability", e_onVsyncStateChangeAvailability); // Lacking proper event class due to SDK limitations in Air 26.
 
-            stage.nativeWindow.title = Constant.AIR_WINDOW_TITLE;
-
-            WINDOW_WIDTH_EXTRA = stage.nativeWindow.width - GAME_WIDTH;
-            WINDOW_HEIGHT_EXTRA = stage.nativeWindow.height - GAME_HEIGHT;
+            WINDOW_WIDTH_EXTRA = window.width - GAME_WIDTH;
+            WINDOW_HEIGHT_EXTRA = window.height - GAME_HEIGHT;
 
             ignoreWindowChanges = true;
             if (_gvars.air_saveWindowPosition)
             {
-                stage.nativeWindow.x = _gvars.air_windowProperties.x;
-                stage.nativeWindow.y = _gvars.air_windowProperties.y;
+                window.x = _gvars.air_windowProperties.x;
+                window.y = _gvars.air_windowProperties.y;
             }
             if (_gvars.air_saveWindowSize)
             {
-                stage.nativeWindow.width = Math.max(100, _gvars.air_windowProperties.width + WINDOW_WIDTH_EXTRA);
-                stage.nativeWindow.height = Math.max(100, _gvars.air_windowProperties.height + WINDOW_HEIGHT_EXTRA);
+                window.width = Math.max(100, _gvars.air_windowProperties.width + WINDOW_WIDTH_EXTRA);
+                window.height = Math.max(100, _gvars.air_windowProperties.height + WINDOW_HEIGHT_EXTRA);
             }
             ignoreWindowChanges = false;
 
             //- Load Menu Music
             _gvars.loadMenuMusic();
-
-            //- Set Vars
-            _gvars.flashvars = stage.loaderInfo.parameters;
 
             //- Background
             this.stage.color = 0x000000;
@@ -252,10 +263,10 @@ package
 
         private function e_onNativeWindowClosing(e:Event):void
         {
-            _gvars.air_windowProperties["width"] = stage.nativeWindow.width - Main.WINDOW_WIDTH_EXTRA;
-            _gvars.air_windowProperties["height"] = stage.nativeWindow.height - Main.WINDOW_HEIGHT_EXTRA;
-            _gvars.air_windowProperties["x"] = stage.nativeWindow.x;
-            _gvars.air_windowProperties["y"] = stage.nativeWindow.y;
+            _gvars.air_windowProperties["width"] = window.width - Main.WINDOW_WIDTH_EXTRA;
+            _gvars.air_windowProperties["height"] = window.height - Main.WINDOW_HEIGHT_EXTRA;
+            _gvars.air_windowProperties["x"] = window.x;
+            _gvars.air_windowProperties["y"] = window.y;
             LocalOptions.setVariable("window_properties", _gvars.air_windowProperties);
         }
 
@@ -371,9 +382,9 @@ package
             loadTotal = (!isLoginLoad) ? 5 : 3;
 
             _gvars.playerUser = new User(true, true);
+            _gvars.playerUser.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
+            _gvars.playerUser.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
             _gvars.activeUser = _gvars.playerUser;
-            _gvars.activeUser.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
-            _gvars.activeUser.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
 
             _playlist.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
             _playlist.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
@@ -395,10 +406,6 @@ package
                 _lang.load();
                 _noteskins.load();
             }
-
-            //_friends.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
-            //_friends.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
-            //_friends.load();
         }
 
         private function gameScriptLoad(e:Event = null):void
@@ -456,76 +463,16 @@ package
                 }
 
                 buildContextMenu();
-
-                CONFIG::updater
-                {
-                    CONFIG::release
-                    {
-                        // Do Air Update Check
-                        if (!Flags.VALUES[Flags.DID_AIR_UPDATE_CHECK])
-                        {
-                            Flags.VALUES[Flags.DID_AIR_UPDATE_CHECK] = true;
-                            var airUpdateCheck:int = AirContext.serverVersionHigher(_site.data["game_r3air_version"]);
-                            //addAlert(_site.data["game_r3air_version"] + " " + (airUpdateCheck == -1 ? "&gt;" : (airUpdateCheck == 1 ? "&lt;" : "==")) + " " + Constant.AIR_VERSION, 240);
-                            if (airUpdateCheck == -1)
-                            {
-                                loadScripts = 0;
-                                preloader.remove();
-                                removeChild(loadStatus);
-                                removeChild(epilepsyWarning);
-                                this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
-
-                                // Switch to game
-                                switchTo(GAME_UPDATE_PANEL);
-                                return;
-                            }
-                            else
-                            {
-                                LocalStore.deleteVariable("air_update_checks");
-                            }
-                        }
-                    }
-                }
-
-                if ((_gvars.flashvars.replay != null || _gvars.flashvars.preview_file != null) && _gvars.options && _gvars.options.replay)
-                {
-                    if (_gvars.options.replay is SongPreview && !_gvars.options.replay.isLoaded)
-                    {
-                        (_gvars.options.replay as SongPreview).setupSongPreview();
-                        return;
-                    }
-                    if (_gvars.options.replay.isLoaded)
-                    {
-                        loadScripts = 0;
-                        preloader.remove();
-
-                        if (this.contains(loadStatus))
-                            removeChild(loadStatus);
-                        if (this.contains(epilepsyWarning))
-                            removeChild(epilepsyWarning);
-
-                        this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
-
-                        // Setup Vars
-                        _gvars.songQueue.push(Playlist.instance.getSongInfo(_gvars.options.replay.level));
-
-                        // Switch to game
-                        switchTo(GAME_PLAY_PANEL);
-                    }
-                    return;
-                }
-                else
-                {
-                    loadScripts = 0;
-                    preloader.remove();
-                    removeChild(loadStatus);
-                    this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
-                    _playlist.updateSongAccess();
-                    _playlist.updatePublicSongsCount();
-                    _gvars.loadUserSongData();
-                    _gvars.activeUser.getUserSkillRatingData();
-                    switchTo(_gvars.activeUser.isGuest || _gvars.flashvars["__forceLogin"] ? GAME_LOGIN_PANEL : GAME_MENU_PANEL);
-                }
+                loadScripts = 0;
+                preloader.remove();
+                removeChild(loadStatus);
+                this.removeEventListener(Event.ENTER_FRAME, updatePreloader);
+                _playlist.updateSongAccess();
+                _playlist.updatePublicSongsCount();
+                _gvars.loadUserSongData();
+                _gvars.playerUser.getUserSkillRatingData();
+                Updater.handle(_site.data['update_version'], _site.data['update_url']);
+                switchTo(_gvars.playerUser.isGuest ? GAME_LOGIN_PANEL : GAME_MENU_PANEL);
             }
         }
 
@@ -545,19 +492,15 @@ package
                 _site.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
                 _site.load();
             }
-            if (!_gvars.activeUser.isLoaded())
+            if (!_gvars.playerUser || !_gvars.playerUser.isLoaded())
             {
-                _gvars.activeUser.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
-                _gvars.activeUser.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
-                _gvars.activeUser.load();
+                _gvars.playerUser = new User(true, true);
+                _gvars.playerUser.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
+                _gvars.playerUser.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
+                _gvars.playerUser.load();
+                _gvars.activeUser = _gvars.playerUser;
             }
-            /*
-               if (!_friends.isLoaded()) {
-               _friends.addEventListener(GlobalVariables.LOAD_COMPLETE, gameScriptLoad);
-               _friends.addEventListener(GlobalVariables.LOAD_ERROR, gameScriptLoadError);
-               _friends.load();
-               }
-             */
+
             if (!isLoginLoad)
             {
                 if (!_noteskins.isLoaded())
@@ -579,7 +522,7 @@ package
         }
 
         ///- Panels
-        override public function switchTo(_panel:String, useNew:Boolean = false):Boolean
+        override public function switchTo(_panel:String):Boolean
         {
             var isFound:Boolean = false;
             var nextPanel:MenuPanel;
@@ -592,7 +535,10 @@ package
 
                 //- Remove last panel if exist
                 if (activePanel != null)
+                {
+                    activePanel.stageRemove();
                     TweenLite.to(activePanel, 0.5, {alpha: 0, onComplete: removeLastPanel, onCompleteParams: [activePanel]});
+                }
 
                 // Only load data that depend on the global session token after logging in
                 this.isLoginLoad = true;
@@ -609,11 +555,6 @@ package
             //- Add Requested Panel
             switch (_panel)
             {
-                case GAME_UPDATE_PANEL:
-                    nextPanel = new AirUpdater(this);
-                    isFound = true;
-                    break;
-
                 case GAME_LOGIN_PANEL:
                     nextPanel = new LoginMenu(this);
                     isFound = true;
@@ -679,11 +620,12 @@ package
         {
             if (removePanel)
             {
-                removePanel.dispose();
-                if (this.contains(removePanel))
+                if (removePanel.stage != null)
                 {
-                    this.removeChild(removePanel);
+                    removePanel.stageRemove();
+                    removePanel.parent.removeChild(removePanel);
                 }
+                removePanel.dispose();
                 removePanel = null;
             }
             SystemUtil.gc();
@@ -747,6 +689,9 @@ package
 
         public function displayPopupQueue():void
         {
+            if (current_popup != null)
+                return;
+
             if (popupQueue.length > 0)
             {
                 var pop:Object = popupQueue.shift();
@@ -841,6 +786,36 @@ package
                     }
                 }
             }
+        }
+
+        public function restartApplication():void
+        {
+            var applicationDescriptor:XML = NativeApplication.nativeApplication.applicationDescriptor;
+            var xmlns:Namespace = new Namespace(applicationDescriptor.namespace());
+            var applicationName:String = applicationDescriptor.xmlns::filename;
+
+            var applicationExecutable:File;
+
+            if (Capabilities.os.indexOf("Win") > -1)
+                applicationExecutable = new File(File.applicationDirectory.nativePath + "/" + applicationName + ".exe");
+            else if (Capabilities.os.indexOf("Mac") > -1)
+                applicationExecutable = new File(File.applicationDirectory.nativePath.replace("Resources", "MacOS/" + applicationName));
+
+            if (!applicationExecutable || !applicationExecutable.exists)
+                return;
+
+            // Handle Shutdown
+            NativeApplication.nativeApplication.removeEventListener(Event.EXITING, e_onNativeShutdown);
+            e_onNativeShutdown(null);
+
+            // Start New
+            var nativeProcessStartupInfo:NativeProcessStartupInfo = new NativeProcessStartupInfo();
+            var nativeProcess:NativeProcess = new NativeProcess();
+            nativeProcessStartupInfo.executable = applicationExecutable;
+            nativeProcess.start(nativeProcessStartupInfo);
+
+            // Exit Current
+            NativeApplication.nativeApplication.exit();
         }
     }
 }

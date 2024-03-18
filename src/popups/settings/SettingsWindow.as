@@ -1,9 +1,7 @@
 package popups.settings
 {
-    import arc.ArcGlobals;
     import assets.GameBackgroundColor;
     import classes.Language;
-    import classes.Room;
     import classes.SongInfo;
     import classes.User;
     import classes.chart.Song;
@@ -12,8 +10,6 @@ package popups.settings
     import classes.ui.ScrollPane;
     import classes.ui.SimpleBoxButton;
     import classes.ui.Text;
-    import com.bit101.components.Window;
-    import com.flashfla.net.Multiplayer;
     import com.flashfla.utils.SpriteUtil;
     import com.greensock.TweenLite;
     import flash.display.Bitmap;
@@ -31,7 +27,6 @@ package popups.settings
     {
         private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _lang:Language = Language.instance;
-        private var _avars:ArcGlobals = ArcGlobals.instance;
 
         private var box:Sprite;
         private var bmp:Bitmap;
@@ -57,11 +52,11 @@ package popups.settings
 
         private var btn_editor_gameplay:TabButton;
         private var btn_editor_multiplayer:TabButton;
-        private var btn_editor_spectator:TabButton;
 
         private var game_options_test:GameOptions = new GameOptions();
 
         private var win_manage:ManageWindow;
+        private var win_reset:ConfirmResetWindow;
 
         public function SettingsWindow(myParent:MenuPanel)
         {
@@ -118,8 +113,7 @@ package popups.settings
             this.addChild(box);
 
             // scroll pane
-            pane = new ScrollPane(this, 175, 61, 589, Main.GAME_HEIGHT - 61);
-            pane.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelMoved, false, 0, false);
+            pane = new ScrollPane(this, 175, 61, 589, Main.GAME_HEIGHT - 61, mouseWheelMoved);
             scrollbar = new ScrollBar(this, Main.GAME_WIDTH - 16, 61, 16, Main.GAME_HEIGHT - 61, null, new Sprite());
             scrollbar.addEventListener(Event.CHANGE, scrollBarMoved, false, 0, false);
 
@@ -165,64 +159,15 @@ package popups.settings
             }
 
             // editor buttons
-            btn_editor_gameplay = new TabButton(box, -1, 364, -1, _lang.string("settings_tab_editor_gameplay"), true);
+            btn_editor_gameplay = new TabButton(box, -1, 397, -1, _lang.string("settings_tab_editor_gameplay"), true);
             btn_editor_gameplay.addEventListener(MouseEvent.CLICK, clickHandler);
-            btn_editor_multiplayer = new TabButton(box, -1, 397, -1, _lang.string("settings_tab_editor_multiplayer"));
+            btn_editor_multiplayer = new TabButton(box, -1, 430, -1, _lang.string("settings_tab_editor_multiplayer"));
             btn_editor_multiplayer.addEventListener(MouseEvent.CLICK, clickHandler);
-            btn_editor_spectator = new TabButton(box, -1, 430, -1, _lang.string("settings_tab_editor_spectator"));
-            btn_editor_spectator.addEventListener(MouseEvent.CLICK, clickHandler);
-
-            // editor options, fake entities for filling gameplay elements
-            var fakePlayer1:User = new User();
-            fakePlayer1.id = 1;
-            fakePlayer1.playerIdx = 1;
-            fakePlayer1.isPlayer = true;
-            fakePlayer1.name = "Player 1";
-            fakePlayer1.siteId = 1830376;
-
-            var fakePlayer2:User = new User();
-            fakePlayer2.id = 2
-            fakePlayer2.playerIdx = 2;
-            fakePlayer2.isPlayer = true;
-            fakePlayer2.name = "Player 2";
-            fakePlayer2.siteId = 249481;
-
-            var fakeSpectator:User = new User();
-            fakeSpectator.id = 3;
-            fakeSpectator.playerIdx = 3;
-            fakeSpectator.isPlayer = false;
-            fakeSpectator.name = "Spectator";
-            fakeSpectator.siteId = 0;
-
-            // Editor - MP
-            var fakeMP1:Multiplayer = new Multiplayer();
-            fakeMP1.currentUser = fakePlayer1;
-
-            var mpEditorRoom:Room = new Room(0);
-            mpEditorRoom.connection = fakeMP1;
-            mpEditorRoom.addUser(fakePlayer1);
-            mpEditorRoom.addUser(fakePlayer2);
-            mpEditorRoom.addPlayer(fakePlayer1);
-            mpEditorRoom.addPlayer(fakePlayer2);
-            btn_editor_multiplayer.editor = mpEditorRoom;
-
-            // Editor - MP Spectate
-            var fakeMP2:Multiplayer = new Multiplayer();
-            fakeMP2.currentUser = fakeSpectator;
-
-            var mpSpectateEditorRoom:Room = new Room(0);
-            mpSpectateEditorRoom.connection = fakeMP2;
-            mpSpectateEditorRoom.addUser(fakePlayer1);
-            mpSpectateEditorRoom.addUser(fakePlayer2);
-            mpSpectateEditorRoom.addUser(fakeSpectator);
-            mpSpectateEditorRoom.addPlayer(fakePlayer1);
-            mpSpectateEditorRoom.addPlayer(fakePlayer2);
-            btn_editor_spectator.editor = mpSpectateEditorRoom;
         }
 
-        public function changeTab(idx:int):void
+        public function changeTab(idx:int, force:Boolean = false):void
         {
-            if (CURRENT_INDEX == idx)
+            if (CURRENT_INDEX == idx && !force)
                 return;
 
             if (CURRENT_TAB != null)
@@ -252,6 +197,11 @@ package popups.settings
             checkValidMods();
         }
 
+        public function refreshTab():void
+        {
+            changeTab(CURRENT_INDEX, true);
+        }
+
         private function tabHandler(e:MouseEvent):void
         {
             changeTab((e.currentTarget as TabButton).index);
@@ -265,11 +215,13 @@ package popups.settings
 
         private function clickHandler(e:MouseEvent):void
         {
-            if (e.currentTarget == btn_editor_gameplay || e.currentTarget == btn_editor_multiplayer || e.currentTarget == btn_editor_spectator)
+            if (e.currentTarget == btn_editor_gameplay || e.currentTarget == btn_editor_multiplayer)
             {
+                setGameColors();
+
                 _gvars.options = new GameOptions();
                 _gvars.options.isEditor = true;
-                _gvars.options.mpRoom = e.currentTarget.editor;
+                _gvars.options.isMultiplayer = (e.currentTarget == btn_editor_multiplayer);
 
                 var tempSongInfo:SongInfo = new SongInfo();
                 tempSongInfo.level = 1337;
@@ -285,41 +237,11 @@ package popups.settings
             else if (e.target == btn_manage)
             {
                 win_manage = new ManageWindow(this);
-                addChild(win_manage);
             }
 
             else if (e.target == btn_reset)
             {
-                var confirmP:Window = new Window(this, 0, 0, "Confirm Settings Reset");
-                confirmP.hasMinimizeButton = false;
-                confirmP.hasCloseButton = false;
-                confirmP.setSize(110, 105);
-                confirmP.x = (Main.GAME_WIDTH / 2 - confirmP.width / 2);
-                confirmP.y = (Main.GAME_HEIGHT / 2 - confirmP.height / 2);
-
-                function doReset(e:Event):void
-                {
-                    confirmP.parent.removeChild(confirmP);
-                    if (_gvars.activeUser == _gvars.playerUser)
-                    {
-                        _gvars.activeUser.settings = new User().settings;
-                        _avars.resetSettings();
-                    }
-                    changeTab(CURRENT_INDEX);
-                }
-
-                function closeReset(e:Event):void
-                {
-                    confirmP.parent.removeChild(confirmP);
-                }
-
-                var resB:BoxButton = new BoxButton(confirmP, 5, 5, 100, 35, _lang.string("menu_reset"), 12, doReset);
-                resB.color = 0x330000;
-                resB.textColor = "#990000";
-
-                var conB:BoxButton = new BoxButton(confirmP, 5, 45, 100, 35, _lang.string("menu_close"), 12, closeReset);
-                conB.color = 0;
-                conB.textColor = "#000000";
+                win_reset = new ConfirmResetWindow(this);
             }
 
             else if (e.target == btn_close)
@@ -328,14 +250,9 @@ package popups.settings
                 {
                     _gvars.activeUser.saveLocal();
                     _gvars.activeUser.save();
+                    LocalOptions.flush();
 
-                    // Setup Background Colors
-                    GameBackgroundColor.BG_LIGHT = _gvars.activeUser.gameColors[0];
-                    GameBackgroundColor.BG_DARK = _gvars.activeUser.gameColors[1];
-                    GameBackgroundColor.BG_STATIC = _gvars.activeUser.gameColors[2];
-                    GameBackgroundColor.BG_POPUP = _gvars.activeUser.gameColors[3];
-                    GameBackgroundColor.BG_STAGE = _gvars.activeUser.gameColors[4];
-                    (_gvars.gameMain.getChildAt(0) as GameBackgroundColor).redraw();
+                    setGameColors();
 
                     if (_gvars.gameMain.activePanel is MainMenu && ((_gvars.gameMain.activePanel as MainMenu).panel is MenuSongSelection))
                     {
@@ -365,15 +282,27 @@ package popups.settings
         {
             pane.scrollTo(e.target.scroll);
         }
+
+        private function setGameColors():void
+        {
+            GameBackgroundColor.BG_LIGHT = _gvars.activeUser.gameColors[0];
+            GameBackgroundColor.BG_DARK = _gvars.activeUser.gameColors[1];
+            GameBackgroundColor.BG_STATIC = _gvars.activeUser.gameColors[2];
+            GameBackgroundColor.BG_POPUP = _gvars.activeUser.gameColors[3];
+            GameBackgroundColor.BG_STAGE = _gvars.activeUser.gameColors[4];
+            (_gvars.gameMain.getChildAt(0) as GameBackgroundColor).redraw();
+        }
     }
 }
 
+import arc.ArcGlobals;
 import assets.GameBackgroundColor;
 import assets.menu.icons.fa.iconRight;
 import classes.Alert;
 import classes.Language;
-import classes.Room;
+import classes.User;
 import classes.ui.BoxButton;
+import classes.ui.Prompt;
 import classes.ui.SimpleBoxButton;
 import classes.ui.Text;
 import com.flashfla.utils.SpriteUtil;
@@ -392,8 +321,6 @@ import popups.settings.SettingsWindow;
 internal class TabButton extends Sprite
 {
     public var index:int;
-
-    public var editor:Room;
 
     private var text:Text;
     private var button:SimpleBoxButton;
@@ -460,15 +387,13 @@ internal class TabButton extends Sprite
     }
 }
 
-internal class ManageWindow extends Sprite
+internal class ManageWindow extends Prompt
 {
     private var _gvars:GlobalVariables = GlobalVariables.instance;
     private var _lang:Language = Language.instance;
-    private var bmp:Bitmap;
-    private var box:Sprite;
     private var win:SettingsWindow;
 
-    private var boxMid:Number = (Main.GAME_WIDTH - 200) / 2;
+    private var boxMid:Number = 290;
 
     private var saveJSON:String;
 
@@ -481,33 +406,19 @@ internal class ManageWindow extends Sprite
     public function ManageWindow(win:SettingsWindow):void
     {
         this.win = win;
+        super(win, 580, 320);
 
         saveJSON = JSON.stringify(_gvars.activeUser.save(true));
 
-        bmp = SpriteUtil.getBitmapSprite(win.stage);
-        this.addChild(bmp);
+        var xOff:Number = 0;
+        var yOff:Number = 0;
 
-        box = new Sprite();
-        box.graphics.beginFill(0, 0.25);
-        box.graphics.drawRect(0, 0, Main.GAME_WIDTH, Main.GAME_HEIGHT);
-        box.graphics.endFill();
+        // Close
+        btn_close = new BoxButton(this, width - 110, height - 39, 100, 29, _lang.string("menu_close"), 12, clickHandler);
 
-        box.graphics.lineStyle(1, 0xffffff, 0.35);
-        box.graphics.beginFill(GameBackgroundColor.BG_POPUP, 0.7);
-        box.graphics.drawRect(100, 100, Main.GAME_WIDTH - 200, Main.GAME_HEIGHT - 200);
-        box.graphics.endFill();
-
-        box.graphics.moveTo(100 + boxMid, 110);
-        box.graphics.lineTo(100 + boxMid, 100 + Main.GAME_HEIGHT - 210);
-        this.addChild(box);
-
-        var xOff:Number = 100;
-        var yOff:Number = 100;
-
-        btn_close = new BoxButton(box, xOff + Main.GAME_WIDTH - 300, yOff + Main.GAME_HEIGHT - 190, 100, 29, _lang.string("menu_close"), 12, clickHandler);
-
-        new Text(box, xOff + 10, yOff + 12, "Export", 16).setAreaParams(160, 30);
-        btn_export = new BoxButton(box, xOff + 179, yOff + 10, 100, 26, "Copy", 12, clickHandler);
+        // Export
+        new Text(this, xOff + 10, yOff + 12, _lang.string("settings_manage_export"), 16).setAreaParams(160, 30);
+        btn_export = new BoxButton(this, xOff + 179, yOff + 10, 100, 26, _lang.string("menu_copy"), 12, clickHandler);
 
         txt_export = makeTextfield();
         txt_export.x = xOff + 15;
@@ -515,23 +426,24 @@ internal class ManageWindow extends Sprite
         txt_export.type = TextFieldType.DYNAMIC;
         txt_export.text = saveJSON;
 
-        box.graphics.beginFill(0, 0.4);
-        box.graphics.drawRect(txt_export.x - 4, txt_export.y - 4, txt_export.width + 8, txt_export.height + 8);
-        box.graphics.endFill();
+        _content.graphics.beginFill(0, 0.4);
+        _content.graphics.drawRect(txt_export.x - 4, txt_export.y - 4, txt_export.width + 8, txt_export.height + 8);
+        _content.graphics.endFill();
 
         xOff += boxMid;
 
-        new Text(box, xOff + 10, yOff + 12, "Import", 16).setAreaParams(160, 30);
-        btn_import = new BoxButton(box, xOff + 179, yOff + 10, 100, 26, "Save", 12, clickHandler);
+        // Import
+        new Text(this, xOff + 10, yOff + 12, _lang.string("settings_manage_import"), 16).setAreaParams(160, 30);
+        btn_import = new BoxButton(this, xOff + 179, yOff + 10, 100, 26, _lang.string("menu_save"), 12, clickHandler);
 
         txt_import = makeTextfield();
         txt_import.x = xOff + 15;
         txt_import.y = yOff + 50;
         txt_import.type = TextFieldType.INPUT;
 
-        box.graphics.beginFill(0, 0.4);
-        box.graphics.drawRect(txt_import.x - 4, txt_import.y - 4, txt_import.width + 8, txt_import.height + 8);
-        box.graphics.endFill();
+        _content.graphics.beginFill(0, 0.4);
+        _content.graphics.drawRect(txt_import.x - 4, txt_import.y - 4, txt_import.width + 8, txt_import.height + 8);
+        _content.graphics.endFill();
     }
 
     private function makeTextfield():TextField
@@ -546,7 +458,7 @@ internal class ManageWindow extends Sprite
         _tf.antiAliasType = AntiAliasType.ADVANCED;
         _tf.gridFitType = GridFitType.SUBPIXEL;
         _tf.wordWrap = true;
-        box.addChild(_tf);
+        addChild(_tf);
         return _tf;
     }
 
@@ -571,19 +483,67 @@ internal class ManageWindow extends Sprite
                 {
                     var item:Object = JSON.parse(optionsJSON);
                     _gvars.activeUser.settings = item;
-                    Alert.add("Settings Imported!", 120, Alert.GREEN);
+                    Alert.add(_lang.string("settings_manage_import_success"), 120, Alert.GREEN);
                 }
                 else
                 {
-                    Alert.add("Nothing to Import", 120, Alert.RED);
+                    Alert.add(_lang.string("settings_manage_import_blank"), 120, Alert.RED);
                 }
             }
             catch (e:Error)
             {
-                Alert.add("Import Fail...", 120, Alert.RED);
+                Alert.add(_lang.string("settings_manage_import_fail"), 120, Alert.RED);
             }
         }
 
+        else if (e.target == btn_close)
+        {
+            win.removeChild(this);
+        }
+    }
+}
+
+internal class ConfirmResetWindow extends Prompt
+{
+    private var _gvars:GlobalVariables = GlobalVariables.instance;
+    private var _lang:Language = Language.instance;
+    private var _avars:ArcGlobals = ArcGlobals.instance;
+    private var win:SettingsWindow;
+
+    private var boxMid:Number = Main.GAME_WIDTH / 2;
+
+    private var btn_close:BoxButton;
+    private var btn_confirm:BoxButton;
+
+    public function ConfirmResetWindow(win:SettingsWindow):void
+    {
+        this.win = win;
+        super(win, 450, 200)
+
+        // Title
+        new Text(this, 0, 22, _lang.string("option_reset_settings_confirm_text"), 26).setAreaParams(width, 35, "center");
+
+        // Confirm
+        btn_confirm = new BoxButton(this, 15, height - 50, 120, 35, _lang.string("menu_reset"), 12, clickHandler);
+        btn_confirm.color = 0xAA0000;
+        btn_confirm.textColor = "#AA0000";
+
+        // Close
+        btn_close = new BoxButton(this, width - 135, height - 50, 120, 35, _lang.string("menu_close"), 12, clickHandler);
+    }
+
+    private function clickHandler(e:Event):void
+    {
+        if (e.target == btn_confirm)
+        {
+            win.removeChild(this);
+            if (_gvars.activeUser == _gvars.playerUser)
+            {
+                _gvars.activeUser.settings = new User().settings;
+                _avars.resetSettings();
+            }
+            win.refreshTab();
+        }
         else if (e.target == btn_close)
         {
             win.removeChild(this);

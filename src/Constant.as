@@ -1,6 +1,5 @@
 package
 {
-    import classes.Language;
     import flash.geom.Matrix;
     import flash.net.URLVariables;
     import flash.text.StyleSheet;
@@ -32,7 +31,9 @@ package
         public static const TEXT_FORMAT:TextFormat = new TextFormat(Fonts.BASE_FONT, 14, 0xFFFFFF, true);
         public static const TEXT_FORMAT_12:TextFormat = new TextFormat(Fonts.BASE_FONT, 12, 0xFFFFFF, true);
         public static const TEXT_FORMAT_CENTER:TextFormat = new TextFormat(Fonts.BASE_FONT, 14, 0xFFFFFF, true, null, null, null, null, TextFormatAlign.CENTER);
+        public static const TEXT_FORMAT_CENTER_12:TextFormat = new TextFormat(Fonts.BASE_FONT, 12, 0xFFFFFF, true, null, null, null, null, TextFormatAlign.CENTER);
         public static const TEXT_FORMAT_UNICODE:TextFormat = new TextFormat(Fonts.BASE_FONT_CJK, 14, 0xFFFFFF, true);
+        public static const TEXT_FORMAT_UNICODE_12:TextFormat = new TextFormat(Fonts.BASE_FONT_CJK, 12, 0xFFFFFF, true);
 
         // Other
         public static const NOTESKIN_EDITOR_URL:String = "https://www.flashflashrevolution.com/~velocity/ffrjs/noteskin/";
@@ -68,6 +69,7 @@ package
             requestVars['ver'] = Constant.ENGINE_VERSION;
             requestVars['is_air'] = true;
             requestVars['air_ver'] = Constant.AIR_VERSION;
+            requestVars['swf_ver'] = Main.SWF_VERSION;
         }
     }
 }

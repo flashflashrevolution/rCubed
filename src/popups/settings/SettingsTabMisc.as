@@ -7,11 +7,10 @@ package popups.settings
     import classes.chart.parse.ChartFFRLegacy;
     import classes.ui.BoxButton;
     import classes.ui.BoxCheck;
-    import classes.ui.Prompt;
+    import classes.ui.PromptInput;
     import classes.ui.Text;
     import classes.ui.ValidatedText;
     import com.bit101.components.ComboBox;
-    import com.bit101.components.Style;
     import com.flashfla.utils.sprintf;
     import flash.events.Event;
     import flash.events.MouseEvent;
@@ -32,11 +31,6 @@ package popups.settings
         private var optionGameLanguages:Array;
         private var languageCombo:ComboBox;
         private var languageComboIgnore:Boolean;
-        private var startUpScreenSelections:Array = [];
-        private var startUpScreenCombo:ComboBox;
-
-        private var optionMPSize:ValidatedText;
-        private var timestampCheck:BoxCheck;
 
         private var useCacheCheckbox:BoxCheck;
         private var autoSaveLocalCheckbox:BoxCheck;
@@ -72,8 +66,8 @@ package popups.settings
 
         override public function openTab():void
         {
-            _gvars.gameMain.stage.nativeWindow.addEventListener(NativeWindowBoundsEvent.MOVE, e_windowPropertyChange);
-            _gvars.gameMain.stage.nativeWindow.addEventListener(NativeWindowBoundsEvent.RESIZE, e_windowPropertyChange);
+            Main.window.addEventListener(NativeWindowBoundsEvent.MOVE, e_windowPropertyChange);
+            Main.window.addEventListener(NativeWindowBoundsEvent.RESIZE, e_windowPropertyChange);
 
             var i:int;
             var xOff:int = 15;
@@ -100,44 +94,11 @@ package popups.settings
             languageCombo = new ComboBox(container, xOff, yOff, selectedLanguage, optionGameLanguages);
             languageCombo.x = xOff;
             languageCombo.y = yOff;
-            languageCombo.width = 200;
+            languageCombo.setSize(200, 22);
             languageCombo.openPosition = ComboBox.BOTTOM;
             languageCombo.fontSize = 11;
             languageCombo.addEventListener(Event.SELECT, languageSelect);
             setLanguage();
-            yOff += 30;
-
-            // Start Up Screen
-            new Text(container, xOff, yOff, _lang.string("options_startup_screen"));
-            yOff += 20;
-
-            startUpScreenSelections = [];
-            for (i = 0; i <= 2; i++)
-            {
-                startUpScreenSelections.push({"label": _lang.stringSimple("options_startup_" + i), "data": i});
-            }
-
-            startUpScreenCombo = new ComboBox(container, xOff, yOff, "Selection...", startUpScreenSelections);
-            startUpScreenCombo.x = xOff;
-            startUpScreenCombo.y = yOff;
-            startUpScreenCombo.width = 200;
-            startUpScreenCombo.openPosition = ComboBox.BOTTOM;
-            startUpScreenCombo.fontSize = 11;
-            startUpScreenCombo.addEventListener(Event.SELECT, startUpScreenSelect);
-            yOff += 30;
-
-            yOff += drawSeperator(container, xOff, 250, yOff, 0, 0);
-
-            // Multiplayer - Text Size
-            new Text(container, xOff, yOff, _lang.string("options_mp_textsize"));
-            yOff += 20;
-
-            optionMPSize = new ValidatedText(container, xOff + 3, yOff + 3, 120, 20, ValidatedText.R_INT_P, changeHandler);
-            yOff += 30;
-
-            // Multiplayer - Timestamps
-            new Text(container, xOff + 23, yOff, _lang.string("options_mp_timestamp"));
-            timestampCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
             yOff += 30;
 
             yOff += drawSeperator(container, xOff, 250, yOff, 0, 0);
@@ -167,24 +128,19 @@ package popups.settings
             new Text(container, xOff, yOff, _lang.string("options_game_engine"));
             yOff += 20;
 
-            engineCombo = new ComboBox();
-            engineCombo.x = xOff;
-            engineCombo.y = yOff;
-            engineCombo.width = 200;
+            engineCombo = new ComboBox(container, xOff, yOff);
+            engineCombo.setSize(200, 22);
             engineCombo.openPosition = ComboBox.BOTTOM;
             engineCombo.fontSize = 11;
             engineCombo.addEventListener(Event.SELECT, engineSelect);
-            container.addChild(engineCombo);
             yOff += 30;
 
             // Default Game Engine
             new Text(container, xOff, yOff, _lang.string("options_default_game_engine"));
             yOff += 20;
 
-            engineDefaultCombo = new ComboBox();
-            engineDefaultCombo.x = xOff;
-            engineDefaultCombo.y = yOff;
-            engineDefaultCombo.width = 200;
+            engineDefaultCombo = new ComboBox(container, xOff, yOff);
+            engineDefaultCombo.setSize(200, 22);
             engineDefaultCombo.openPosition = ComboBox.BOTTOM;
             engineDefaultCombo.fontSize = 11;
             engineDefaultCombo.addEventListener(Event.SELECT, engineDefaultSelect);
@@ -243,18 +199,14 @@ package popups.settings
 
         override public function closeTab():void
         {
-            _gvars.gameMain.stage.nativeWindow.removeEventListener(NativeWindowBoundsEvent.MOVE, e_windowPropertyChange);
-            _gvars.gameMain.stage.nativeWindow.removeEventListener(NativeWindowBoundsEvent.RESIZE, e_windowPropertyChange);
+            Main.window.removeEventListener(NativeWindowBoundsEvent.MOVE, e_windowPropertyChange);
+            Main.window.removeEventListener(NativeWindowBoundsEvent.RESIZE, e_windowPropertyChange);
         }
 
         override public function setValues():void
         {
             // Set Framerate
             optionFPS.text = _gvars.activeUser.frameRate.toString();
-
-            timestampCheck.checked = _gvars.activeUser.DISPLAY_MP_TIMESTAMP;
-            optionMPSize.text = _avars.configMPSize.toString();
-            startUpScreenCombo.selectedIndex = _gvars.activeUser.startUpScreen;
 
             setLanguage();
 
@@ -278,15 +230,8 @@ package popups.settings
 
         override public function clickHandler(e:MouseEvent):void
         {
-            // MP Timestamp
-            if (e.target == timestampCheck)
-            {
-                e.target.checked = !e.target.checked;
-                _gvars.activeUser.DISPLAY_MP_TIMESTAMP = !_gvars.activeUser.DISPLAY_MP_TIMESTAMP;
-            }
-
             //- Auto Save Local Replays
-            else if (e.target == autoSaveLocalCheckbox)
+            if (e.target == autoSaveLocalCheckbox)
             {
                 e.target.checked = !e.target.checked;
                 _gvars.air_autoSaveLocalReplays = !_gvars.air_autoSaveLocalReplays;
@@ -357,14 +302,14 @@ package popups.settings
             {
                 parent.addChild(new WindowSettingConfirm(this, _gvars.air_windowProperties));
 
-                _gvars.air_windowProperties["x"] = windowXBox.validate(Math.round((Capabilities.screenResolutionX - _gvars.gameMain.stage.nativeWindow.width) * 0.5));
-                _gvars.air_windowProperties["y"] = windowYBox.validate(Math.round((Capabilities.screenResolutionY - _gvars.gameMain.stage.nativeWindow.height) * 0.5));
+                _gvars.air_windowProperties["x"] = windowXBox.validate(Math.round((Capabilities.screenResolutionX - Main.window.width) * 0.5));
+                _gvars.air_windowProperties["y"] = windowYBox.validate(Math.round((Capabilities.screenResolutionY - Main.window.height) * 0.5));
                 e_windowSetUpdate();
             }
             else if (e.target == windowPositionReset)
             {
-                _gvars.air_windowProperties["x"] = Math.round((Capabilities.screenResolutionX - _gvars.gameMain.stage.nativeWindow.width) * 0.5);
-                _gvars.air_windowProperties["y"] = Math.round((Capabilities.screenResolutionY - _gvars.gameMain.stage.nativeWindow.height) * 0.5);
+                _gvars.air_windowProperties["x"] = Math.round((Capabilities.screenResolutionX - Main.window.width) * 0.5);
+                _gvars.air_windowProperties["y"] = Math.round((Capabilities.screenResolutionY - Main.window.height) * 0.5);
                 e_windowSetUpdate();
             }
 
@@ -398,12 +343,6 @@ package popups.settings
                 _gvars.activeUser.frameRate = optionFPS.validate(60);
                 _gvars.activeUser.frameRate = Math.max(Math.min(_gvars.activeUser.frameRate, 1000), 10);
             }
-
-            else if (e.target == optionMPSize)
-            {
-                Style.fontSize = _avars.configMPSize = optionMPSize.validate(10);
-                _avars.mpSave();
-            }
         }
 
         private function e_windowPropertyChange(e:Event):void
@@ -418,10 +357,10 @@ package popups.settings
         public function e_windowSetUpdate():void
         {
             _gvars.gameMain.ignoreWindowChanges = true;
-            _gvars.gameMain.stage.nativeWindow.x = _gvars.air_windowProperties["x"];
-            _gvars.gameMain.stage.nativeWindow.y = _gvars.air_windowProperties["y"];
-            _gvars.gameMain.stage.nativeWindow.width = _gvars.air_windowProperties["width"] + Main.WINDOW_WIDTH_EXTRA;
-            _gvars.gameMain.stage.nativeWindow.height = _gvars.air_windowProperties["height"] + Main.WINDOW_HEIGHT_EXTRA;
+            Main.window.x = _gvars.air_windowProperties["x"];
+            Main.window.y = _gvars.air_windowProperties["y"];
+            Main.window.width = _gvars.air_windowProperties["width"] + Main.WINDOW_WIDTH_EXTRA;
+            Main.window.height = _gvars.air_windowProperties["height"] + Main.WINDOW_HEIGHT_EXTRA;
             _gvars.gameMain.ignoreWindowChanges = false;
         }
 
@@ -442,11 +381,6 @@ package popups.settings
         {
             useWebsocketCheckbox.removeEventListener(MouseEvent.MOUSE_OUT, e_websocketMouseOut);
             hideTooltip();
-        }
-
-        private function startUpScreenSelect(e:Event):void
-        {
-            _gvars.activeUser.startUpScreen = e.target.selectedItem.data as int;
         }
 
         private function setLanguage():void
@@ -496,7 +430,7 @@ package popups.settings
             // Add Engine
             if (data == this)
             {
-                new Prompt(parent, 320, "Engine URL", 120, "Add Engine", e_addEngine);
+                new PromptInput(parent, _lang.string("custom_engine_url"), _lang.string("custom_engine_add_engine"), e_addEngine);
             }
             // Clears Engines
             else if (data == engineCombo)
@@ -517,7 +451,7 @@ package popups.settings
 
         private function engineAdd(engine:Object):void
         {
-            Alert.add("Engine Loaded: " + engine.name, 80);
+            Alert.add(sprintf(_lang.string("custom_engine_loaded"), {"name": engine.name}), 80);
             for (var i:int = 0; i < _avars.legacyEngines.length; i++)
             {
                 if (_avars.legacyEngines[i].id == engine.id)
@@ -561,9 +495,9 @@ package popups.settings
                 if (engine == _avars.legacyDefaultEngine || (_avars.legacyDefaultEngine && engine["id"] == _avars.legacyDefaultEngine["id"]))
                     engineDefaultCombo.selectedItem = item;
             }
-            engineCombo.addItem({label: "Add Engine...", data: this});
+            engineCombo.addItem({label: _lang.stringSimple("custom_engine_add_engine"), data: this});
             if (_avars.legacyEngines.length > 0 && engineCombo.items.length > 2)
-                engineCombo.addItem({label: "Clear Engines", data: engineCombo});
+                engineCombo.addItem({label: _lang.stringSimple("custom_engine_clear_engines"), data: engineCombo});
             engineComboIgnore = false;
         }
     }

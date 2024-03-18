@@ -1,8 +1,6 @@
 package menu
 {
     import arc.ArcGlobals;
-    import arc.mp.MultiplayerPanel;
-    import arc.mp.MultiplayerSingleton;
     import assets.GameBackgroundColor;
     import assets.menu.Logo;
     import assets.menu.MainMenuBackground;
@@ -47,9 +45,7 @@ package menu
         private var _lang:Language = Language.instance;
 
         public var _MenuSingleplayer:MenuPanel;
-        private var _MenuMultiplayer:MenuPanel;
-        private var _MenuFriends:MenuPanel;
-        private var _MenuStats:MenuPanel;
+        private static var _MenuMultiplayer:MenuPanel;
         private var _MenuTokens:MenuPanel;
 
         private var hover_message:MouseTooltip;
@@ -75,7 +71,7 @@ package menu
             ["menu_options", MENU_OPTIONS, false, "iconGear"]];
 
         public var panel:MenuPanel;
-        public var options:Object;
+        public var activePanelID:int = -1;
 
         ///- Constructor
         public function MainMenu(myParent:MenuPanel)
@@ -87,10 +83,6 @@ package menu
 
         override public function init():Boolean
         {
-            //- Setup Options
-            options = {};
-            options.activePanel = -1;
-
             //- Add Logo
             logo = new Logo();
             logo.x = 18 + logo.width * 0.5;
@@ -123,76 +115,53 @@ package menu
                 }
             }
 
-            MultiplayerSingleton.getInstance().gameplayCleanup();
-
             //- Add Main Panel to Stage
-            var targetMenu:String = "";
-            // Guests
-            if (GlobalVariables.instance.activeUser.isGuest || (_gvars.options && _gvars.options.singleplayer))
+            if (Flags.VALUES[Flags.MP_MENU_RETURN])
             {
-                targetMenu = MENU_SONGSELECTION;
+                switchTo(MENU_MULTIPLAYER);
+                Flags.VALUES[Flags.MP_MENU_RETURN] = false;
             }
             else
-            {
-                if (!Flags.VALUES[Flags.STARTUP_SCREEN])
-                {
-                    var playerStartup:int = _gvars.activeUser.startUpScreen;
-
-                    // Auto - Connect MP
-                    if (playerStartup == 0 || playerStartup == 1)
-                        var pan:MultiplayerPanel = MultiplayerSingleton.getInstance().getPanel(this);
-
-                    if (playerStartup == 0)
-                        targetMenu = MENU_MULTIPLAYER;
-                    else
-                        targetMenu = MENU_SONGSELECTION;
-
-                    Flags.VALUES[Flags.STARTUP_SCREEN] = true;
-                }
-                else
-                {
-                    targetMenu = MENU_MULTIPLAYER;
-                }
-            }
-            switchTo(targetMenu);
+                switchTo(MENU_SONGSELECTION);
             return false;
+        }
+
+        override public function stageRemove():void
+        {
+            if (_MenuSingleplayer)
+                _MenuSingleplayer.stageRemove();
+
+            if (_MenuTokens)
+                _MenuTokens.stageRemove();
+
+            if (_MenuMultiplayer)
+                _MenuMultiplayer.stageRemove();
+
+            super.stageRemove();
         }
 
         override public function dispose():void
         {
             if (_MenuSingleplayer)
             {
-                _MenuSingleplayer.stageRemove();
                 _MenuSingleplayer.dispose();
                 if (this.contains(_MenuSingleplayer))
                     this.removeChild(_MenuSingleplayer);
                 _MenuSingleplayer = null;
             }
+            if (_MenuTokens)
+            {
+                _MenuTokens.dispose();
+                if (this.contains(_MenuTokens))
+                    this.removeChild(_MenuTokens);
+                _MenuTokens = null;
+            }
             if (_MenuMultiplayer)
             {
-                _MenuMultiplayer.stageRemove();
-                _MenuMultiplayer.dispose();
                 if (this.contains(_MenuMultiplayer))
                     this.removeChild(_MenuMultiplayer);
-                _MenuMultiplayer = null;
             }
-            if (_MenuFriends)
-            {
-                _MenuFriends.stageRemove();
-                _MenuFriends.dispose();
-                if (this.contains(_MenuFriends))
-                    this.removeChild(_MenuFriends);
-                _MenuFriends = null;
-            }
-            if (_MenuStats)
-            {
-                _MenuStats.stageRemove();
-                _MenuStats.dispose();
-                if (this.contains(_MenuStats))
-                    this.removeChild(_MenuStats);
-                _MenuStats = null;
-            }
-            super.stageRemove();
+            super.dispose();
         }
 
         override public function draw():void
@@ -260,7 +229,7 @@ package menu
                     menuItemSmall.panel = menuItems[i][1];
                     menuItemSmall.setIconColor("#DDDDDD");
                     menuItemSmall.setHoverText(_lang.string(menuItems[i][0]), "bottom");
-                    menuItemSmall.active = (i == options.activePanel);
+                    menuItemSmall.active = (i == activePanelID);
                     btnPosition += (28 + 6);
 
                     // Filter - Set to Green if enabled.
@@ -273,7 +242,7 @@ package menu
                 }
                 else
                 {
-                    var menuItem:MenuButton = new MenuButton(menuItemBox, btnPosition, btnWidth, _lang.string(menuItems[i][0]), i == options.activePanel, menuItemClick);
+                    var menuItem:MenuButton = new MenuButton(menuItemBox, btnPosition, btnWidth, _lang.string(menuItems[i][0]), i == activePanelID, menuItemClick);
                     menuItem.panel = menuItems[i][1];
                     btnPosition += (btnWidth + 6);
                 }
@@ -362,11 +331,19 @@ package menu
             }
         }
 
-        override public function switchTo(_panel:String, useNew:Boolean = false):Boolean
+        override public function switchTo(_panel:String):Boolean
         {
             //- Check Parent Function first.
-            if (super.switchTo(_panel, useNew))
+            if (super.switchTo(_panel))
+            {
+                if (panel != null)
+                {
+                    panel.stageRemove();
+                    panel.parent.removeChild(panel);
+                    panel.dispose();
+                }
                 return true;
+            }
 
             //- Do current panel.
             var isFound:Boolean = false;
@@ -394,35 +371,38 @@ package menu
                 return true;
             }
 
+            // Remove Active Panel
             if (panel != null)
             {
                 panel.stageRemove();
-                this.removeChild(panel);
+                panel.parent.removeChild(panel);
             }
 
             switch (_panel)
             {
                 case MENU_SONGSELECTION:
-                    if (_MenuSingleplayer == null || useNew)
+                    if (_MenuSingleplayer == null)
                         _MenuSingleplayer = new MenuSongSelection(this);
                     panel = _MenuSingleplayer;
-                    options.activePanel = 0;
+                    activePanelID = 0;
                     isFound = true;
                     break;
 
                 case MENU_MULTIPLAYER:
-                    if (_MenuMultiplayer == null || useNew)
-                        _MenuMultiplayer = MultiplayerSingleton.getInstance().getPanel(this); //_MenuMultiplayer = new MenuMultiplayer(this);
+                    if (_MenuMultiplayer == null)
+                        _MenuMultiplayer = new MenuMultiplayer(this);
+                    else
+                        _MenuMultiplayer.my_Parent = this;
                     panel = _MenuMultiplayer;
-                    options.activePanel = 1;
+                    activePanelID = 1;
                     isFound = true;
                     break;
 
                 case MENU_TOKENS:
-                    if (_MenuTokens == null || useNew)
+                    if (_MenuTokens == null)
                         _MenuTokens = new MenuTokens(this);
                     panel = _MenuTokens;
-                    options.activePanel = 2;
+                    activePanelID = 2;
                     isFound = true;
                     break;
             }

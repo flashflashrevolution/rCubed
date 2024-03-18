@@ -1,21 +1,20 @@
 package popups.replays
 {
-
+    import arc.ArcGlobals;
+    import classes.Language;
+    import classes.SongInfo;
+    import classes.replay.Replay;
     import classes.ui.BoxButton;
     import classes.ui.ProgressBar;
     import classes.ui.Text;
-    import flash.display.Sprite;
-    import flash.events.MouseEvent;
-    import classes.replay.Replay;
-    import flash.utils.Timer;
-    import flash.events.TimerEvent;
-    import flash.utils.getTimer;
-    import flash.filesystem.File;
-    import classes.SongInfo;
-    import arc.ArcGlobals;
     import com.flashfla.utils.SpriteUtil;
     import flash.display.Bitmap;
-    import classes.Language;
+    import flash.display.Sprite;
+    import flash.events.MouseEvent;
+    import flash.events.TimerEvent;
+    import flash.filesystem.File;
+    import flash.utils.Timer;
+    import flash.utils.getTimer;
 
     public class ReplayHistoryTabLocal extends ReplayHistoryTabBase
     {
@@ -61,7 +60,7 @@ package popups.replays
             // Add UI Elements
             if (!btn_refresh)
             {
-                btn_refresh = new BoxButton(null, 5, Main.GAME_HEIGHT - 35, 162, 29, _lang.string("menu_refresh"), 12, refreshReplays);
+                btn_refresh = new BoxButton(null, 5, 410, 162, 29, _lang.string("menu_refresh"), 12, refreshReplays);
             }
             parent.addChild(btn_refresh);
 
@@ -383,7 +382,7 @@ package popups.replays
 
         override public function prepareReplay(r:Replay):Replay
         {
-            // Incomplete 
+            // Incomplete
             try
             {
                 if (r.filePath != null)

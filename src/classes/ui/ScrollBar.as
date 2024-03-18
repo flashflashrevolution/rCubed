@@ -36,7 +36,7 @@ package classes.ui
             if (_background == null)
             {
                 _background = new Sprite();
-                _background.graphics.beginFill(0x64A4B8, 0.25);
+                _background.graphics.beginFill(0xFFFFFF, 0.12);
                 _background.graphics.drawRect(0, 0, _width, _height);
                 _background.graphics.endFill();
             }
@@ -46,7 +46,7 @@ package classes.ui
             if (_dragger == null)
             {
                 _dragger = new Sprite();
-                _dragger.graphics.beginFill(0x819AA2, 1);
+                _dragger.graphics.beginFill(0xFFFFFF, 0.5);
                 _dragger.graphics.drawRect(0, 0, _width, (_height < 30 ? _height : 30));
                 _dragger.graphics.endFill();
             }

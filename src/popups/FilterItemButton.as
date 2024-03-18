@@ -1,5 +1,6 @@
 package popups
 {
+    import arc.ArcGlobals;
     import classes.Language;
     import classes.filter.EngineLevelFilter;
     import classes.ui.Box;
@@ -11,7 +12,6 @@ package popups
     import com.flashfla.utils.ArrayUtil;
     import flash.display.DisplayObjectContainer;
     import flash.events.Event;
-    import arc.ArcGlobals;
 
     public class FilterItemButton extends Box
     {

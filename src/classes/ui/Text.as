@@ -1,6 +1,5 @@
 package classes.ui
 {
-    import classes.Language;
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.text.AntiAliasType;

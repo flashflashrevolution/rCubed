@@ -27,9 +27,7 @@ package classes.ui
 
             //- Add Text
             _text = new Text(this, 0, 0, text, size, "#FFFFFF");
-            _text.height = height + 1;
-            _text.width = width;
-            _text.align = Text.CENTER;
+            _text.setAreaParams(width, height + 1, Text.CENTER);
 
             //- Set Defaults
             this.mouseEnabled = true;
@@ -56,6 +54,18 @@ package classes.ui
             {
                 _text.dispose();
             }
+
+            if (_hoverText != null)
+            {
+                _hoverTimer.stop();
+                _hoverTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
+                this.removeEventListener(MouseEvent.ROLL_OVER, e_hoverRollOver);
+                this.removeEventListener(MouseEvent.ROLL_OUT, e_hoverRollOut);
+                this.removeEventListener(Event.REMOVED_FROM_STAGE, e_removedFromStage);
+
+                if (_hoverSprite && _hoverSprite.parent)
+                    _hoverSprite.parent.removeChild(_hoverSprite);
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -80,7 +90,7 @@ package classes.ui
                         _hoverSprite = null;
                     }
 
-                    this.removeEventListener(Event.ENTER_FRAME, e_onEnterFrame);
+                    this.removeEventListener(Event.REMOVED_FROM_STAGE, e_removedFromStage);
                     _hoverTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
                 }
 
@@ -89,7 +99,7 @@ package classes.ui
                 {
                     this.removeEventListener(MouseEvent.ROLL_OVER, e_hoverRollOver);
                     this.removeEventListener(MouseEvent.ROLL_OUT, e_hoverRollOut);
-                    this.removeEventListener(Event.ENTER_FRAME, e_onEnterFrame);
+                    this.removeEventListener(Event.REMOVED_FROM_STAGE, e_removedFromStage);
                     _hoverTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
                 }
 
@@ -121,7 +131,7 @@ package classes.ui
             _hoverTimer.stop();
             _hoverTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
             this.removeEventListener(MouseEvent.ROLL_OUT, e_hoverRollOut);
-            this.removeEventListener(Event.ENTER_FRAME, e_onEnterFrame);
+            this.removeEventListener(Event.REMOVED_FROM_STAGE, e_removedFromStage);
 
             if (_hoverSprite && _hoverSprite.parent)
                 _hoverSprite.parent.removeChild(_hoverSprite);
@@ -175,7 +185,7 @@ package classes.ui
             {
                 _hoverDisplayed = true;
                 this.parent.stage.addChild(_hoverSprite);
-                this.addEventListener(Event.ENTER_FRAME, e_onEnterFrame, false, 0, true);
+                this.addEventListener(Event.REMOVED_FROM_STAGE, e_removedFromStage, false, 0, true);
             }
             else
             {
@@ -183,16 +193,13 @@ package classes.ui
             }
         }
 
-        private function e_onEnterFrame(e:Event):void
+        private function e_removedFromStage(e:Event):void
         {
-            if (!this.parent || !this.parent.stage)
-            {
-                _hoverDisplayed = false;
-                this.removeEventListener(Event.ENTER_FRAME, e_onEnterFrame);
+            _hoverDisplayed = false;
+            this.removeEventListener(Event.REMOVED_FROM_STAGE, e_removedFromStage);
 
-                if (_hoverSprite && _hoverSprite.parent)
-                    _hoverSprite.parent.removeChild(_hoverSprite);
-            }
+            if (_hoverSprite && _hoverSprite.parent)
+                _hoverSprite.parent.removeChild(_hoverSprite);
         }
 
         ////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,6 @@
 package be.aboutme.airserver.events
 {
     import be.aboutme.airserver.endpoints.IClientHandler;
-
     import flash.events.Event;
 
     public class EndPointEvent extends Event

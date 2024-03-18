@@ -299,7 +299,7 @@ package classes.chart.parse
             measureArray = null;
             pre_holds = null;
 
-            trace("parsed in", (getTimer() - t), notes[notes.length - 1][0]);
+            //trace("parsed in", (getTimer() - t), notes[notes.length - 1][0]);
 
             return out;
         }

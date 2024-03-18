@@ -1,13 +1,16 @@
 package popups.replays
 {
-    import arc.ArcGlobals;
     import assets.GameBackgroundColor;
+    import assets.menu.icons.fa.iconClose;
     import assets.menu.icons.fa.iconSearch;
     import classes.Alert;
     import classes.Language;
     import classes.replay.Replay;
     import classes.ui.BoxButton;
+    import classes.ui.BoxCheck;
+    import classes.ui.BoxIcon;
     import classes.ui.BoxText;
+    import classes.ui.Prompt;
     import classes.ui.ScrollBar;
     import classes.ui.SimpleBoxButton;
     import classes.ui.Text;
@@ -25,7 +28,6 @@ package popups.replays
     {
         private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _lang:Language = Language.instance;
-        private var _avars:ArcGlobals = ArcGlobals.instance;
 
         private var box:Sprite;
         private var bmp:Bitmap;
@@ -47,8 +49,12 @@ package popups.replays
         private var search_field_placeholder:Text;
         private var _search_text:String = "";
 
+        // settings
+        private var useReplayLayout:Boolean = true;
+
         // buttons
         private var btn_close:BoxButton;
+        private var btn_options:BoxButton;
 
         public function ReplayHistoryWindow(myParent:MenuPanel):void
         {
@@ -60,6 +66,9 @@ package popups.replays
                 TABS.push(new ReplayHistoryTabOnline(this));
 
             TAB_BUTTONS = new <TabButton>[];
+
+            // Replay Options
+            useReplayLayout = LocalOptions.getVariable("replay_layout", true);
 
             super(myParent);
         }
@@ -132,6 +141,7 @@ package popups.replays
             box.addChild(searchSprite);
 
             btn_close = new BoxButton(box, 685, 15, 80, 29, _lang.string("menu_close"), 12, e_clickHandler);
+            btn_options = new BoxButton(box, 5, 445, 162, 29, _lang.string("menu_options"), 12, e_replayOptions);
 
             changeTab(LAST_INDEX);
         }
@@ -239,7 +249,7 @@ package popups.replays
                     if (replay.isFileLoader)
                     {
                         var chartLoaded:Boolean = true;
-                        if (_gvars.externalSongInfo.engine.cache_id != replay.cacheID)
+                        if (_gvars.externalSongInfo == null || _gvars.externalSongInfo.engine == null || _gvars.externalSongInfo.engine.cache_id != replay.cacheID)
                             chartLoaded = FileLoader.setupLocalFile(replay.chartPath, replay.settings.arc_engine.chartID);
 
                         replay.song = _gvars.externalSongInfo;
@@ -258,7 +268,9 @@ package popups.replays
                     _gvars.options.isolation = false;
                     _gvars.options.replay = replay;
                     _gvars.options.fillFromReplay();
-                    _gvars.options.fillFromArcGlobals();
+
+                    if (!useReplayLayout || _gvars.options.layout == null)
+                        _gvars.options.layout = _gvars.playerUser.gameLayout["sp"];
 
                     _gvars.songResults.length = 0;
                     _gvars.songQueue = [replay.song];
@@ -295,12 +307,50 @@ package popups.replays
         {
             return _search_text;
         }
+
+        private function e_replayOptions(e:Event):void
+        {
+            var prompt:Prompt = new Prompt(this, 300, 150);
+            prompt.content.graphics.moveTo(10, 40);
+            prompt.content.graphics.lineTo(prompt.width - 9, 40);
+
+            //- Add Text
+            var _text:Text = new Text(prompt, 9, 10, _lang.string("popup_replay_settings_title"), 16);
+            _text.setAreaParams(prompt.width - 45, 22);
+
+            //- Add Close Button
+            var _close_button:BoxIcon = new BoxIcon(prompt, prompt.width - 32, 10, 22, 22, new iconClose(), closePrompt);
+
+            var cy:Number = 47;
+
+            var checkUseReplayLayout:BoxCheck = new BoxCheck(prompt, 10 + 3, cy + 3, e_changeHandler);
+            checkUseReplayLayout.checked = useReplayLayout;
+            new Text(prompt, 30, cy, _lang.string("popup_replay_settings_use_layout"));
+            cy += 22;
+
+            function e_changeHandler(e:Event):void
+            {
+                if (e.target == checkUseReplayLayout)
+                {
+                    checkUseReplayLayout.checked = !checkUseReplayLayout.checked;
+                    useReplayLayout = checkUseReplayLayout.checked;
+                    LocalOptions.setVariable("replay_layout", useReplayLayout);
+                }
+            }
+
+            function closePrompt(e:MouseEvent):void
+            {
+                if (prompt.parent)
+                {
+                    prompt.parent.removeChild(prompt);
+                }
+            }
+        }
     }
 }
 
 
 import assets.menu.icons.fa.iconRight;
-import classes.Room;
 import classes.ui.SimpleBoxButton;
 import classes.ui.Text;
 import com.greensock.TweenLite;
@@ -309,8 +359,6 @@ import flash.display.Sprite;
 internal class TabButton extends Sprite
 {
     public var index:int;
-
-    public var editor:Room;
 
     private var text:Text;
     private var button:SimpleBoxButton;

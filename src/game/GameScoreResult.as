@@ -1,12 +1,12 @@
 package game
 {
-    import classes.User;
+    import by.blooddy.crypto.Base64;
     import classes.SongInfo;
+    import classes.User;
     import classes.chart.Song;
-    import classes.replay.Base64Encoder;
+    import classes.replay.ReplayBinFrame;
     import classes.replay.ReplayPack;
     import flash.utils.ByteArray;
-    import classes.replay.ReplayBinFrame;
 
     public class GameScoreResult
     {
@@ -32,6 +32,8 @@ package game
         public var combo:int = 0;
         public var max_combo:int = 0;
         public var score:int = 0;
+
+        private var _score_total:Number = NaN;
 
         public function get is_aaa():Boolean
         {
@@ -93,9 +95,7 @@ package game
             if (replayBin == null || replayBin.length == 0)
                 return null;
 
-            var enc:Base64Encoder = new Base64Encoder();
-            enc.encodeBytes(replayBin);
-            return ReplayPack.MAGIC + "|" + enc.toString();
+            return ReplayPack.MAGIC + "|" + Base64.encode(replayBin);
         }
 
         public var start_time:String;
@@ -104,7 +104,6 @@ package game
 
         /** Ratio of Song Completion: 0 -> 1 */
         public var song_progress:Number;
-        public var playtime_secs:Number;
 
         // Judge Settings
         public var MIN_TIME:int = 0;
@@ -169,7 +168,15 @@ package game
          */
         public function get score_total():Number
         {
+            if (!isNaN(_score_total))
+                return _score_total;
+
             return Math.max(0, ((amazing + perfect) * 500) + (good * 250) + (average * 50) + (max_combo * 1000) - (miss * 300) - (boo * 15) + score);
+        }
+
+        public function set score_total(val:Number):void
+        {
+            _score_total = val;
         }
 
         /**
@@ -199,15 +206,20 @@ package game
          */
         public function get replay_cache_object():Object
         {
-            var out:Object = {'name': song.songInfo.name,
+            var out:Object = {'name': songInfo.name,
                     'rate': options.songRate,
                     'score': score,
                     'judge': [(amazing + perfect), good, average, miss, boo, max_combo]}
 
             if (songInfo.engine != null)
-                out["engine"] = song.songInfo.engine.id;
+                out["engine"] = songInfo.engine.id;
 
             return out;
+        }
+
+        public function compare(i:GameScoreResult):Boolean
+        {
+            return this.user.siteId == i.user.siteId && this.amazing == i.amazing && this.perfect == i.perfect && this.good == i.good && this.average == i.average && this.miss == i.miss && this.boo == i.boo;
         }
     }
 }

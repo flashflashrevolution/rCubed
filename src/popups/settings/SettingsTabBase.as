@@ -3,11 +3,11 @@ package popups.settings
     import classes.ui.MouseTooltip;
     import classes.ui.ScrollPaneContent;
     import classes.ui.Text;
-    import game.GameOptions;
-    import flash.geom.Point;
-    import flash.events.MouseEvent;
-    import flash.events.Event;
     import flash.display.DisplayObject;
+    import flash.events.Event;
+    import flash.events.MouseEvent;
+    import flash.geom.Point;
+    import game.GameOptions;
 
     public class SettingsTabBase
     {

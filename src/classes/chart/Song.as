@@ -1,6 +1,5 @@
 package classes.chart
 {
-    import arc.NoteMod;
     import by.blooddy.crypto.MD5;
     import classes.SongInfo;
     import classes.chart.parse.ChartFFRLegacy;

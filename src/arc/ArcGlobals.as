@@ -1,10 +1,10 @@
 package arc
 {
     import classes.Playlist;
+    import classes.SongInfo;
     import classes.chart.parse.ChartFFRLegacy;
     import flash.events.EventDispatcher;
     import flash.net.SharedObject;
-    import classes.SongInfo;
 
     public class ArcGlobals extends EventDispatcher
     {
@@ -23,10 +23,6 @@ package arc
         public var configIsolationLength:int = 0;
 
         public var configJudge:Array;
-
-        public var configInterface:Object = {};
-
-        public var configMPSize:int = 10;
 
         public function ArcGlobals(en:SingletonEnforcer)
         {
@@ -56,7 +52,6 @@ package arc
                 ChartFFRLegacy.setEngineSync(engine);
                 if (engine.level_ranks)
                 {
-                    // TODO: check type on this `levelid` (should be int ?)
                     for (var levelid:String in engine.level_ranks)
                     {
                         var songInfo:SongInfo = new SongInfo();
@@ -135,19 +130,9 @@ package arc
             return songInfo;
         }
 
-        public function interfaceSave():void
-        {
-            LocalOptions.setVariable("layouts", configInterface);
-        }
-
         public function musicOffsetSave():void
         {
             LocalOptions.setVariable("rolling_music_offset", configMusicOffset);
-        }
-
-        public function mpSave():void
-        {
-            LocalOptions.setVariable("mp_text_size", configMPSize);
         }
 
         public function legacyLevelRanksGet(songInfo:SongInfo):Object
@@ -196,15 +181,11 @@ package arc
 
             legacyDefaultEngine = LocalOptions.getVariable("legacy_default_engine", null);
             configMusicOffset = LocalOptions.getVariable("rolling_music_offset", 0);
-            configInterface = LocalOptions.getVariable("layouts", {});
-            configMPSize = LocalOptions.getVariable("mp_text_size", 10);
         }
 
         public function resetSettings():void
         {
-            LocalOptions.deleteVariable("mp_text_size");
             LocalOptions.deleteVariable("rolling_music_offset");
-            LocalOptions.deleteVariable("layouts");
 
             resetConfig();
             configJudge = null;

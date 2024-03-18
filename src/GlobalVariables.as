@@ -1,6 +1,5 @@
 package
 {
-    import arc.mp.MultiplayerSingleton;
     import be.aboutme.airserver.AIRServer;
     import be.aboutme.airserver.endpoints.socket.SocketEndPoint;
     import be.aboutme.airserver.endpoints.socket.handlers.websocket.WebSocketClientHandlerFactory;
@@ -45,7 +44,6 @@ package
         public static const HIGHSCORES_LOAD_COMPLETE:String = "HighscoresLoadComplete";
         public static const HIGHSCORES_LOAD_ERROR:String = "HighscoresLoadError";
 
-        public var flashvars:Object;
         public var gameMain:Main;
 
         public var options:GameOptions;
@@ -73,9 +71,9 @@ package
         public var songCache:Array = [];
         public var songHighscores:Object = {};
 
-        public static var divisionColor:Array = [0xC27BA0, 0x8E7CC3, 0x6D9EEB, 0x93C47D, 0xCEA023, 0xE06666, 0x919C86, 0xD2C7AC, 0xBF0000];
-        public static var divisionTitle:Array = ["Novice", "Intermediate", "Advanced", "Expert", "Master", "Guru", "Legendary", "Godly", "Developer"];
-        public static var divisionLevel:Array = [0, 26, 50, 59, 69, 83, 94, 101, 122];
+        public var divisionColors:Array = ["#C27BA0", "#8E7CC3", "#6D9EEB", "#93C47D", "#CEA023", "#E06666", "#919C86", "#D2C7AC", "#7B738A", "#BF0000"];
+        public var divisionTitles:Array = ["Novice", "Intermediate", "Advanced", "Expert", "Master", "Guru", "Legendary", "Godly", "Mythical", "Developer"];
+        public var divisionLevels:Array = [0, 24, 42, 58, 72, 84, 94, 102, 108, 120];
 
         ///- User Vars
         public var userSession:String = "0";
@@ -256,22 +254,22 @@ package
 
         ///- Public
         //- Player Divisions
-        public static function getDivisionColor(level:int):int
+        public function getDivisionColor(level:int):String
         {
-            return divisionColor[getDivisionNumber(level)];
+            return divisionColors[getDivisionNumber(level)];
         }
 
-        public static function getDivisionTitle(level:int):String
+        public function getDivisionTitle(level:int):String
         {
-            return divisionTitle[getDivisionNumber(level)];
+            return divisionTitles[getDivisionNumber(level)];
         }
 
-        public static function getDivisionNumber(level:int):int
+        public function getDivisionNumber(level:int):int
         {
             var div:int;
-            for (div = divisionLevel.length - 1; div >= 0; --div)
+            for (div = divisionLevels.length - 1; div >= 0; --div)
             {
-                if (level >= divisionLevel[div])
+                if (level >= divisionLevels[div])
                 {
                     break;
                 }
@@ -333,12 +331,6 @@ package
                 songCache[s].unload();
 
             songCache = [];
-
-            const mpInstance:MultiplayerSingleton = MultiplayerSingleton.getInstance();
-            if (mpInstance != null)
-            {
-                mpInstance.clearStatus();
-            }
         }
 
         public function dirtySongFiles():void
@@ -644,8 +636,6 @@ package
                 }
             }
         }
-
-
 
         public function unlockTokenById(type:String, id:String):void
         {

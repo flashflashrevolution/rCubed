@@ -35,8 +35,6 @@ package com.flashfla.net
     import flash.events.SecurityErrorEvent;
     import flash.net.URLRequest;
     import flash.net.URLStream;
-    import flash.system.ApplicationDomain;
-    import flash.system.LoaderContext;
     import flash.utils.ByteArray;
     import flash.utils.Endian;
 

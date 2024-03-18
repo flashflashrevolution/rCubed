@@ -194,7 +194,7 @@ package classes.chart.parse
 
             var t:Number = getTimer();
             parse();
-            trace("parsed in", (getTimer() - t));
+            //trace("parsed in", (getTimer() - t));
 
             return true;
         }

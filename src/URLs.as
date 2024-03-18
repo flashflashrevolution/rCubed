@@ -39,7 +39,7 @@ package
         }
 
         // Site URLs
-        public static var SITE_DATA_URL:String = "game/r3/r3-siteData.v2.php";
+        public static var SITE_DATA_URL:String = "game/r3/r3-siteData.v3.php";
         public static var SITE_PLAYLIST_URL:String = "game/r3/r3-playlist.php";
         public static var SITE_LANGUAGE_URL:String = "game/r3/r3-language.php";
         public static var SITE_HISCORES_URL:String = "game/r3/r3-hiscores.php";
@@ -68,6 +68,7 @@ package
         public static var USER_SAVE_REPLAY_URL:String = "game/r3/r3-userReplay.php";
         public static var USER_LOAD_REPLAY_URL:String = "game/r3/r3-siteReplay.php";
         public static var USER_SAVE_SETTINGS_URL:String = "game/r3/r3-userSettings.php";
+        public static var USER_STATS_URL:String = "game/r3/r3-userStats.php";
 
         // Unused URLs
         public static var SHOP_URL:String = "tools/ffrshop.php";

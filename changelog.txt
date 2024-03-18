@@ -1,3 +1,17 @@
+R^3 (v2.0.0) [2024-01-31]
+---------------------------------------------------------------------
+@Psycast
+- New Multiplayer.
+- File Browser now sorts by Song Name by default.
+- Fix results screen, by remaking it entirely.
+- Fix crash on tokens missing images.
+- Fix a ton of missing hardcoded text for translation.
+- UI components minor refresh:
+    - Color picker now shows New and Current Color.
+    - Dropdown now matchs game look.
+    - Input prompts now have a new look that should match better.
+
+
 R^3 (v1.5.3) [2023-06-30]
 ---------------------------------------------------------------------
 @Psycast
@@ -24,7 +38,7 @@ R^3 (v1.5.1) [2023-06-07]
 - New Result Graph (#367)
 - Personal Best mode checkbox for autofail, which dynamically determines your pb (based on raw goods) and autofails you based on that.
 - Personal Best combo color tracking which functions similarly to the above but doesn't fail you, just changes the combo color
-- AAA Equiv autofail value, which will set autofail at the appropriate number of raw goods necessary to maintain the specified AAA Equiv on any given song. 
+- AAA Equiv autofail value, which will set autofail at the appropriate number of raw goods necessary to maintain the specified AAA Equiv on any given song.
     - If that AAA Equiv is not possible, autofail is set to non-AAA instead.
 - "Skill Rating gain is/isn't possible" filter (shows only songs that you can play to increase your skill rating [or the opposite])
 - Visual improvements to the filter screen
@@ -96,7 +110,7 @@ R^3 (v1.4.4) [2022-06-19]
 - Add test for vsync instead of compile time constraint.
 
 @Zageron
-- Add ability to take and save a screenshot directly to the clipboard. 
+- Add ability to take and save a screenshot directly to the clipboard.
 
 
 R^3 (v1.4.3) [2022-01-28]
@@ -260,7 +274,7 @@ R^3 (v1.3.0) [2020-10-01]
 - Use vector typing for ObjectPool (#128)
 - Remove old Flash version checks (#119)
 - Display foreign fonts correctly (#221)
-- Make most hardcoded strings translatable (#224) 
+- Make most hardcoded strings translatable (#224)
 - Reduce login loading time (#159)
 - Song selection menu improvements (#172)
 - Refactor takeScreenShot (#178)
@@ -270,7 +284,7 @@ R^3 (v1.3.0) [2020-10-01]
 - Add Additional Combo Color Options (#111)
 
 @Sploder12
-- Add Profile Change in context menu. (#183) 
+- Add Profile Change in context menu. (#183)
 
 R^3 (v1.2.4) [2020-06-22]
 ---------------------------------------------------------------------

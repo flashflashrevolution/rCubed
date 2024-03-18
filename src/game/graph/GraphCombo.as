@@ -1,9 +1,9 @@
 package game.graph
 {
-    import flash.display.Sprite;
-    import game.GameScoreResult;
     import classes.chart.Song;
     import classes.replay.ReplayNote;
+    import flash.display.Sprite;
+    import game.GameScoreResult;
 
     public class GraphCombo extends GraphBase
     {

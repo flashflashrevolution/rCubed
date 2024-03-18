@@ -14,9 +14,9 @@ package com.flashfla.net
     import flash.net.URLRequestHeader;
     import flash.net.URLRequestMethod;
     import flash.utils.ByteArray;
-    import flash.utils.clearInterval;
     import flash.utils.Dictionary;
     import flash.utils.Endian;
+    import flash.utils.clearInterval;
     import flash.utils.setTimeout;
 
     /**

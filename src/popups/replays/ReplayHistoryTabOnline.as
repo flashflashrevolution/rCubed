@@ -1,17 +1,16 @@
 package popups.replays
 {
-
+    import classes.Alert;
+    import classes.Language;
     import classes.replay.Replay;
     import classes.ui.BoxButton;
+    import classes.ui.Text;
+    import com.flashfla.net.WebRequest;
+    import com.flashfla.utils.SpriteUtil;
     import flash.display.Bitmap;
     import flash.display.Sprite;
-    import flash.events.MouseEvent;
-    import classes.ui.Text;
-    import com.flashfla.utils.SpriteUtil;
-    import classes.Language;
-    import com.flashfla.net.WebRequest;
     import flash.events.Event;
-    import classes.Alert;
+    import flash.events.MouseEvent;
 
     public class ReplayHistoryTabOnline extends ReplayHistoryTabBase
     {
@@ -49,7 +48,7 @@ package popups.replays
             // Add UI Elements
             if (!btn_refresh)
             {
-                btn_refresh = new BoxButton(null, 5, Main.GAME_HEIGHT - 35, 162, 29, _lang.string("menu_refresh"), 12, loadOnlineReplays);
+                btn_refresh = new BoxButton(null, 5, 410, 162, 29, _lang.string("menu_refresh"), 12, loadOnlineReplays);
             }
             parent.addChild(btn_refresh);
 

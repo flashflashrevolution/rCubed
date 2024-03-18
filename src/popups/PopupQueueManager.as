@@ -3,10 +3,11 @@ package popups
     import assets.GameBackgroundColor;
     import classes.Language;
     import classes.Playlist;
+    import classes.SongInfo;
     import classes.SongQueueItem;
     import classes.ui.Box;
     import classes.ui.BoxButton;
-    import classes.ui.Prompt;
+    import classes.ui.PromptInput;
     import classes.ui.ScrollBar;
     import classes.ui.ScrollPane;
     import classes.ui.Text;
@@ -17,7 +18,6 @@ package popups
     import flash.filters.BlurFilter;
     import flash.geom.Point;
     import menu.MenuPanel;
-    import classes.SongInfo;
 
     public class PopupQueueManager extends MenuPanel
     {
@@ -202,7 +202,7 @@ package popups
         {
             if (e.target == importBtn)
             {
-                new Prompt(box.parent, 320, _lang.string("popup_queue_import_song_queue"), 100, "SUBMIT", e_importSongQueue);
+                new PromptInput(box.parent, _lang.string("popup_queue_import_song_queue"), _lang.string("popup_queue_submit"), e_importSongQueue);
             }
             else if (e.target == menuPregen)
             {
@@ -257,10 +257,11 @@ package popups
 import classes.Alert;
 import classes.Language;
 import classes.Playlist;
+import classes.SongInfo;
 import classes.SongQueueItem;
 import classes.ui.Box;
 import classes.ui.BoxButton;
-import classes.ui.Prompt;
+import classes.ui.PromptInput;
 import classes.ui.Text;
 import com.flashfla.utils.SystemUtil;
 import com.flashfla.utils.TimeUtil;
@@ -269,7 +270,6 @@ import flash.events.MouseEvent;
 import menu.MainMenu;
 import menu.MenuSongSelection;
 import popups.PopupQueueManager;
-import classes.SongInfo;
 
 internal class QueueBox extends Sprite
 {
@@ -414,7 +414,7 @@ internal class QueueBox extends Sprite
 
     private function renameQueue():void
     {
-        new Prompt(this.popup, 320, _lang.string("popup_queue_rename_no_caps"), 100, "RENAME", e_renameQueue);
+        new PromptInput(this.popup, _lang.string("popup_queue_rename_no_caps"), _lang.string("popup_queue_rename"), e_renameQueue);
     }
 
     public function dispose():void

@@ -4,7 +4,6 @@ package be.aboutme.airserver.endpoints.socket.handlers.websocket
     import be.aboutme.airserver.endpoints.socket.handlers.SocketClientHandlerFactory;
     import be.aboutme.airserver.messages.serialization.IMessageSerializer;
     import be.aboutme.airserver.messages.serialization.JSONSerializer;
-
     import flash.net.Socket;
 
     public class WebSocketClientHandlerFactory extends SocketClientHandlerFactory

@@ -9,13 +9,13 @@
 		"editor.formatOnPaste": true,
 		"editor.formatOnSave": true,
 		"editor.fontLigatures": true,
-		"editor.renderFinalNewline": true,
+		"editor.renderFinalNewline": "on",
 		"editor.insertSpaces": true,
 		"workbench.editor.highlightModifiedTabs": true,
 		"files.trimFinalNewlines": true,
 		"files.insertFinalNewline": true,
 		"as3mxml.sdk.framework": "c:\\airsdk\\32.0.0.116",
-		"files.eol": "\n",
+		"files.eol": "\r\n",
 		"markdown.extension.toc.githubCompatibility": true,
 		"files.exclude": {
 			"node_modules/": true,
@@ -27,6 +27,7 @@
 			"http://json.schemastore.org/github-workflow": [
 				".github/workflows/*"
 			]
-		}
+		},
+		"as3mxml.sources.organizeImports.insertNewLineBetweenTopLevelPackages": false
 	}
 }

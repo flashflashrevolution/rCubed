@@ -1,7 +1,7 @@
 package classes.chart
 {
-    import classes.chart.parse.*;
     import classes.SongInfo;
+    import classes.chart.parse.*;
 
     public class NoteChart
     {

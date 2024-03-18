@@ -1,7 +1,6 @@
 package be.aboutme.airserver.endpoints.socket.handlers
 {
     import be.aboutme.airserver.messages.serialization.IMessageSerializer;
-
     import flash.net.Socket;
 
     public class SocketClientHandlerFactory

@@ -3,18 +3,16 @@ package popups
     import assets.menu.icons.fa.iconClose;
     import assets.menu.icons.fa.iconFolder;
     import assets.menu.icons.fa.iconUpLevel;
-    import by.blooddy.crypto.MD5;
+    import classes.Alert;
     import classes.Language;
-    import classes.SongInfo;
-    import classes.chart.Note;
-    import classes.chart.NoteChart;
-    import classes.chart.Song;
     import classes.chart.parse.ExternalChartBase;
+    import classes.mp.Multiplayer;
     import classes.ui.Box;
     import classes.ui.BoxButton;
     import classes.ui.BoxIcon;
     import classes.ui.BoxText;
     import classes.ui.Text;
+    import com.flashfla.utils.sprintf;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
     import flash.display.Loader;
@@ -33,7 +31,8 @@ package popups
     import flash.text.TextFormat;
     import flash.utils.Timer;
     import flash.utils.getTimer;
-    import game.GameOptions;
+    import menu.FileLoader;
+    import menu.MainMenu;
     import menu.MenuPanel;
     import popups.filebrowser.FileBrowserDifficultyItem;
     import popups.filebrowser.FileBrowserFilter;
@@ -41,12 +40,12 @@ package popups
     import popups.filebrowser.FileBrowserList;
     import popups.filebrowser.FileFolder;
     import popups.filebrowser.FileFolderItem;
-    import menu.FileLoader;
 
     public class PopupFileBrowser extends MenuPanel
     {
-        private var _gvars:GlobalVariables = GlobalVariables.instance;
-        private var _lang:Language = Language.instance;
+        private static const _gvars:GlobalVariables = GlobalVariables.instance;
+        private static const _lang:Language = Language.instance;
+        private static const _mp:Multiplayer = Multiplayer.instance;
 
         public var lc:LoaderContext = new LoaderContext();
 
@@ -116,7 +115,7 @@ package popups
             closeWindow = new BoxIcon(box, box.width - 32, 6, 27, 27, new iconClose(), clickHandler);
             selectFolder = new BoxIcon(box, closeWindow.x - 32, 6, 27, 27, new iconFolder(), clickHandler);
 
-            displayFolderPath = new Text(box, 40, 6, "&lt;no folder selected&gt;");
+            displayFolderPath = new Text(box, 40, 6, _lang.string("file_loader_no_folder_selected"));
             displayFolderPath.setAreaParams(selectFolder.x - displayFolderPath.x - 5, 27);
             displayFolderPath.mouseEnabled = true;
             displayFolderPath.useHandCursor = true;
@@ -141,7 +140,7 @@ package popups
             box.addChild(songDetails);
 
             // Search
-            searchPlaceholder = new Text(box, 13, box.height - 29, "Search...");
+            searchPlaceholder = new Text(box, 13, box.height - 29, _lang.string("file_loader_search"));
             searchPlaceholder.alpha = 0.4;
             searchPlaceholder.visible = listFilter.term.length == 0;
             searchInput = new BoxText(box, 11, box.height - 32, 490, 25, new TextFormat(Constant.TEXT_FORMAT_UNICODE.font, 12, 0xFFFFFF));
@@ -167,7 +166,7 @@ package popups
             uiLock.graphics.drawRect(0, 0, 780, 480);
             uiLock.graphics.endFill();
 
-            var lockUIText:Text = new Text(uiLock, 0, 200, "Loading Files", 24);
+            var lockUIText:Text = new Text(uiLock, 0, 200, _lang.string("file_loader_loading_files"), 24);
             lockUIText.setAreaParams(780, 30, "center");
 
             loadingPathIndex = new Text(uiLock, 0, 340, "", 20);
@@ -177,7 +176,7 @@ package popups
             loadingPathSong = new Text(uiLock, 0, 400, "", 18);
             loadingPathSong.setAreaParams(780, 30, "center");
 
-            loadingCancelButton = new BoxButton(uiLock, 390 - 40, 440, 80, 30, "CANCEL", 12, clickHandler);
+            loadingCancelButton = new BoxButton(uiLock, 390 - 40, 440, 80, 30, _lang.string("menu_cancel"), 12, clickHandler);
 
             if (rootFolder != null && pathList == null)
                 refreshFolder();
@@ -249,7 +248,7 @@ package popups
                 elm1.name = elm1.data[0].info.name;
                 elm1.banner = elm1.data[0].info.banner;
             }
-            renderList.sortOn(["author", "name"], [Array.CASEINSENSITIVE, Array.CASEINSENSITIVE]);
+            renderList.sortOn(["name", "author"], [Array.CASEINSENSITIVE, Array.CASEINSENSITIVE]);
 
             // Display
             songBrowser.setRenderList(renderList);
@@ -283,7 +282,7 @@ package popups
             {
                 var tempFolder:File = new File();
                 tempFolder.addEventListener(Event.SELECT, dirSelected);
-                tempFolder.browseForDirectory("Select a directory");
+                tempFolder.browseForDirectory(_lang.stringSimple("file_loader_select_a_directory"));
             }
             if (e.target == loadingCancelButton)
             {
@@ -324,7 +323,7 @@ package popups
 
             function e_startFileSearch():void
             {
-                loadingPathIndex.text = "Scanning";
+                loadingPathIndex.text = _lang.string("file_loader_scanning");
                 loadingPathFolder.text = '';
                 loadingPathSong.text = '';
 
@@ -386,7 +385,7 @@ package popups
                     pathList.length = 0;
                 }
 
-                loadingPathIndex.text = "Found: " + fileQueue.length;
+                loadingPathIndex.text = sprintf(_lang.string("file_loader_found_files"), {files: fileQueue.length});
 
                 // Loaded All Files
                 if (dirQueue.length == 0)
@@ -642,6 +641,9 @@ package popups
                 }
             }
 
+            // Reload File
+            var reloadCache:BoxButton = new BoxButton(songDetails, 209, 3, 22, 22, "R", 12, e_reloadCache);
+
             // Print Song Info
             var infoDisplay:Array = [[info['data'][0]['info']['name'], 14], [info['data'][0]['info']['author'], 12]];
             for (var item:String in infoDisplay)
@@ -694,11 +696,73 @@ package popups
             var info:FileFolderItem = tar.cache_info;
             var id:int = tar.chart_id;
 
-            Flags.VALUES[Flags.FILE_LOADER_OPEN] = true;
-
             removePopup();
 
-            FileLoader.loadLocalFile(info.loc, id);
+            if (_mp.inGameRoom)
+            {
+                _mp.ffrSelectSong(FileLoader.buildSongInfo(info.loc, id, true));
+
+                if (_gvars.gameMain.activePanel is MainMenu)
+                    _gvars.gameMain.activePanel.switchTo(MainMenu.MENU_MULTIPLAYER);
+            }
+            else
+            {
+                Flags.VALUES[Flags.FILE_LOADER_OPEN] = true;
+                FileLoader.loadLocalFile(info.loc, id);
+            }
+        }
+
+        private function e_reloadCache(e:Event):void
+        {
+            var chartFile:File;
+            var emb:ExternalChartBase;
+            var cacheObj:Object;
+
+            var file:FileFolder = lastSelectedItem.songData;
+            var fileList:Vector.<FileFolderItem> = file.data;
+            for each (var chartItem:FileFolderItem in fileList)
+            {
+                chartFile = new File(chartItem.loc);
+                cacheObj = {"valid": 0};
+                emb = new ExternalChartBase();
+                if (emb.load(chartFile, true))
+                {
+                    var chartData:Object = emb.getInfo();
+                    var chartCharts:Array = emb.getAllCharts();
+
+                    cacheObj = {"valid": 1,
+                            "name": chartData['name'],
+                            "author": chartData['author'],
+                            "stepauthor": chartData['stepauthor'],
+                            "difficulty": chartData['difficulty'],
+                            "music": chartData['music'],
+                            "banner": chartData['banner'],
+                            "background": chartData['background'],
+                            "ext": chartData['ext'],
+                            "chart": [],
+                            "id": emb.ID}
+
+                    for (var i:int = 0; i < chartCharts.length; i++)
+                    {
+                        var difficultyData:Object = chartCharts[i];
+                        cacheObj['chart'][i] = {"class": difficultyData['class'],
+                                "class_color": difficultyData['class_color'],
+                                "desc": difficultyData['desc'],
+                                "difficulty": difficultyData['difficulty'],
+                                "type": difficultyData['type'],
+                                "time_sec": Number(difficultyData['time_sec'].toFixed(2)),
+                                "nps": Number(difficultyData['nps'].toFixed(2)),
+                                "arrows": difficultyData['arrows'],
+                                "holds": difficultyData['holds'],
+                                "mines": difficultyData['mines']};
+                    }
+                }
+
+                FileLoader.cache.setValue(chartItem.loc, cacheObj);
+            }
+            FileLoader.cache.save();
+            Alert.add(_lang.string("file_loader_reloaded_file"));
+            buildFileList();
         }
 
         public function set lockUI(val:Boolean):void

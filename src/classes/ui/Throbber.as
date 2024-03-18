@@ -22,19 +22,19 @@ package classes.ui
         public var colors:Array = [0xffffff];
         public var alphas:Array = [1, 0.9, 0.8, 0.7, 0.6, 0.5];
 
-        // The alpha value for all lines. 
+        // The alpha value for all lines.
         public var lineAlpha:Number = 1;
 
-        // The thickness of all lines. 
+        // The thickness of all lines.
         public var lineThickness:int = 3;
 
-        // The delay in milliseconds between drawing the animating lines. 
+        // The delay in milliseconds between drawing the animating lines.
         public var delay:int = 100;
 
-        // If true then when this throbber is added to stage it starts (defaults to false). 
+        // If true then when this throbber is added to stage it starts (defaults to false).
         public var autoStart:Boolean = false;
 
-        // If true then the throbber is hidden when it is stopped. 
+        // If true then the throbber is hidden when it is stopped.
         public var hideWhenStopped:Boolean = false;
 
         // the last time the lines were drawn
@@ -79,7 +79,7 @@ package classes.ui
 
         private var _running:Boolean;
 
-        // Returns true when the throbber is animating. 
+        // Returns true when the throbber is animating.
         public function get running():Boolean
         {
             return _running;
@@ -87,13 +87,13 @@ package classes.ui
 
         private var _currentStep:int = 0;
 
-        // Returns the current step in the animation process. 
+        // Returns the current step in the animation process.
         public function get currentStep():int
         {
             return _currentStep;
         }
 
-        // Moves to the next step and redraws. 
+        // Moves to the next step and redraws.
         public function nextStep():void
         {
             _currentStep = (_currentStep + 1) % maxSteps;
@@ -102,13 +102,13 @@ package classes.ui
 
         private var _maxSteps:int = 12;
 
-        // Returns the maximum number of steps in the animation process. 
+        // Returns the maximum number of steps in the animation process.
         public function get maxSteps():int
         {
             return _maxSteps;
         }
 
-        // Starts the animation. 
+        // Starts the animation.
         public function start():void
         {
             if (!_running)
@@ -119,7 +119,7 @@ package classes.ui
             }
         }
 
-        // Stops the animation. 
+        // Stops the animation.
         public function stop():void
         {
             if (_running)
@@ -134,7 +134,7 @@ package classes.ui
             }
         }
 
-        // Resets back to the first step.  Doesn't stop the animation if it's running. 
+        // Resets back to the first step.  Doesn't stop the animation if it's running.
         public function reset():void
         {
             _currentStep = 0;

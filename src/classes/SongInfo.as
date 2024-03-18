@@ -1,6 +1,8 @@
 package classes
 {
 
+    import classes.chart.parse.ExternalChartBase;
+
     public class SongInfo
     {
         public static const SONG_TYPE_PUBLIC:int = 0;
@@ -9,7 +11,7 @@ package classes
         public static const SONG_TYPE_SECRET:int = 3;
 
         // Engine Variables
-        public var access:int;
+        public var access:int = 0;
         public var chart_type:String;
         public var song_type:int;
         public var index:int;
@@ -49,7 +51,7 @@ package classes
 
         public var time:String;
         public var time_secs:int;
-        public var time_end:Number;
+        public var time_end:Number = 0;
 
         public var is_unranked:Boolean = false;
         public var is_explicit:Boolean = false;
@@ -66,6 +68,10 @@ package classes
         public var level_id:String;
         public var sync:int;
         public var background:String;
+
+        // Local Files
+        public var is_local:Boolean = false;
+        public var chart_parser:ExternalChartBase;
 
         public function SongInfo()
         {

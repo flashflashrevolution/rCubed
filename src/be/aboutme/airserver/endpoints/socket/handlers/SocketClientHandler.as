@@ -4,7 +4,6 @@ package be.aboutme.airserver.endpoints.socket.handlers
     import be.aboutme.airserver.events.MessagesAvailableEvent;
     import be.aboutme.airserver.messages.Message;
     import be.aboutme.airserver.messages.serialization.IMessageSerializer;
-
     import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.events.IOErrorEvent;

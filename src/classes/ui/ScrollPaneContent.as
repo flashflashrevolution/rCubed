@@ -22,6 +22,7 @@ package classes.ui
             }
 
             _child = null;
+            updateSizes();
         }
 
         /**

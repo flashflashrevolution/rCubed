@@ -2,18 +2,18 @@ package game.graph
 {
     import assets.menu.icons.fa.iconSmallF;
     import classes.Language;
-    import classes.ui.BoxIcon;
+    import classes.chart.Note;
+    import classes.replay.ReplayBinFrame;
     import classes.ui.BoxButton;
+    import classes.ui.BoxIcon;
     import classes.ui.Text;
+    import com.flashfla.utils.VectorUtil;
     import com.flashfla.utils.sprintf;
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.events.MouseEvent;
     import flash.geom.Rectangle;
     import game.GameScoreResult;
-    import classes.replay.ReplayBinFrame;
-    import classes.chart.Note;
-    import com.flashfla.utils.VectorUtil;
 
     public class GraphAccuracyPrecise extends GraphBase
     {
@@ -318,7 +318,7 @@ package game.graph
             }
             last_nearest_index = nearest_cross_index;
 
-            // Get Cross 
+            // Get Cross
             var noteResult:GraphCrossPoint = nearest_is_boo ? boo_points[nearest_hit_index] : cross_points[nearest_hit_index];
             var pos_x:Number = noteResult.x;
             var pos_y:Number = noteResult.y;
@@ -386,7 +386,7 @@ package game.graph
             cross_points = new <GraphCrossPoint>[];
             boo_points = new <GraphCrossPoint>[];
 
-            // Judge 
+            // Judge
             var song_arrows:int = result.note_count;
 
             var i:int;

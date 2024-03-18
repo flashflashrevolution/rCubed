@@ -3,27 +3,41 @@ package game.controls
     import classes.GameNote;
     import classes.GameReceptor;
     import classes.Noteskins;
-    import classes.chart.Song;
     import classes.chart.Note;
+    import classes.chart.Song;
+    import classes.ui.BoxButton;
+    import classes.ui.BoxSlider;
+    import classes.ui.Text;
+    import com.flashfla.utils.GameNotePool;
+    import flash.display.DisplayObjectContainer;
+    import flash.display.MovieClip;
+    import flash.events.Event;
+    import flash.geom.Point;
     import flash.utils.getTimer;
     import game.GameOptions;
-    import flash.display.Sprite;
-    import flash.display.MovieClip;
-    import com.flashfla.utils.GameNotePool;
 
-    public class NoteBox extends Sprite
+    public class NoteBox extends GameControl
     {
+        public static const VERTEX_X:Number = 0;
+        public static const VERTEX_Y:Number = 1;
+
+        public static const P_CENTER:int = 0;
+        public static const P_TOP:int = 1 << 0;
+        public static const P_LEFT:int = 1 << 1;
+        public static const P_RIGHT:int = 1 << 2;
+        public static const P_BOTTOM:int = 1 << 3;
+
         private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _noteskins:Noteskins = Noteskins.instance;
-        private var options:GameOptions;
-        private var song:Song;
+        public var options:GameOptions;
+        public var song:Song;
 
-        private var scrollSpeed:Number;
-        private var readahead:Number;
-        private var totalNotes:int;
-        private var noteCount:int;
-        private var notePool:Object;
-        public var notes:Array;
+        public var scrollSpeed:Number;
+        public var readahead:Number;
+        public var totalNotes:int;
+        public var noteCount:int;
+        public var notePool:Object;
+        public var notes:Vector.<GameNote>;
 
         public var leftReceptor:MovieClip;
         public var downReceptor:MovieClip;
@@ -33,16 +47,20 @@ package game.controls
         public var receptorTable:Object = {};
 
         public var positionOffsetMax:Object;
-        private var sideScroll:Boolean;
-        private var receptorAlpha:Number;
+        public var receptorAlpha:Number;
 
-        private var recp_colors:Vector.<Number>;
-        private var recp_colors_enabled:Vector.<Boolean>;
+        public var recp_colors:Vector.<Number>;
+        public var recp_colors_enabled:Vector.<Boolean>;
 
-        public function NoteBox(song:Song, options:GameOptions)
+        public var anchorPoints:Vector.<Point>;
+
+        public function NoteBox(song:Song, options:GameOptions, parent:DisplayObjectContainer)
         {
-            this.song = song;
+            if (parent)
+                parent.addChild(this);
+
             this.options = options;
+            this.song = song;
 
             // Create Object Pools
             if (_noteskins.data[options.noteskin] == null)
@@ -53,7 +71,7 @@ package game.controls
             notePool = {"L": {}, "D": {}, "U": {}, "R": {}};
 
             var i:int = 0;
-            var preLoadCount:int = 6;
+            var preLoadCount:int = 8;
             for each (var direction:String in options.noteDirections)
             {
                 for each (var color:String in options.noteColors)
@@ -62,7 +80,7 @@ package game.controls
 
                     for (i = 0; i < preLoadCount; i++)
                     {
-                        var gameNote:GameNote = pool.addObject(new GameNote(0, direction, color, 1 * 1000, 0, 0, options.noteskin));
+                        var gameNote:GameNote = pool.addObject(new GameNote(0, direction, color, 1 * 1000, 0, options.noteskin));
                         gameNote.visible = false;
                         pool.unmarkObject(gameNote);
                         addChild(gameNote);
@@ -74,13 +92,9 @@ package game.controls
 
             // Setup Receptors
             leftReceptor = _noteskins.getReceptor(options.noteskin, "L");
-            leftReceptor.KEY = "Left";
             downReceptor = _noteskins.getReceptor(options.noteskin, "D");
-            downReceptor.KEY = "Down";
             upReceptor = _noteskins.getReceptor(options.noteskin, "U");
-            upReceptor.KEY = "Up";
             rightReceptor = _noteskins.getReceptor(options.noteskin, "R");
-            rightReceptor.KEY = "Right";
 
             if (leftReceptor is GameReceptor)
             {
@@ -96,11 +110,10 @@ package game.controls
             addChildAt(rightReceptor, 0);
 
             // Other Stuff
-            sideScroll = options.scrollDirection == "left" || options.scrollDirection == "right";
-            scrollSpeed = options.scrollSpeed * (sideScroll ? 1.5 : 1);
-            readahead = ((sideScroll ? Main.GAME_WIDTH : Main.GAME_HEIGHT) / 300 * 1000 / scrollSpeed);
+            scrollSpeed = options.scrollSpeed;
+            readahead = (Main.GAME_WIDTH / 300 * 1000 / scrollSpeed);
             receptorAlpha = 1.0;
-            notes = [];
+            notes = new <GameNote>[];
             noteCount = 0;
             totalNotes = song.totalNotes;
 
@@ -117,6 +130,25 @@ package game.controls
             {
                 recp_colors_enabled[i] = options.enableReceptorColors[i];
             }
+
+            // Anchor Points
+            anchorPoints = new <Point>[new Point(0, 0), // P_CENTER,
+                new Point(0, -150), //P_TOP
+                new Point(-300, 0), //P_LEFT
+                new Point(-300, -150), //P_TOP|P_LEFT
+                new Point(300, 0), //P_RIGHT
+                new Point(300, -150), //P_TOP|P_RIGHT
+                new Point(0, 0), //P_LEFT|P_RIGHT
+                new Point(0, -150), //P_TOP|P_LEFT|P_RIGHT
+                new Point(0, 150), //P_BOTTOM
+                new Point(0, 0), //P_TOP|P_BOTTOM
+                new Point(-300, 150), //P_LEFT|P_BOTTOM
+                new Point(-300, 0), //P_TOP|P_LEFT|P_BOTTOM
+                new Point(300, 150), //P_RIGHT|P_BOTTOM
+                new Point(300, 0), //P_TOP|P_RIGHT|P_BOTTOM
+                new Point(0, 150), //P_LEFT|P_RIGHT|P_BOTTOM
+                new Point(0, 0) //P_TOP|P_LEFT|P_RIGHT|P_BOTTOM
+                ];
         }
 
         public function spawnArrow(note:Note, current_position:int = 0):GameNote
@@ -133,12 +165,12 @@ package game.controls
                 gameNote.ID = noteCount++;
                 gameNote.DIR = direction;
                 gameNote.POSITION = (note.time + 0.5 / 30) * 1000;
-                gameNote.PROGRESS = note.frame;
+                gameNote.FRAME = note.frame;
                 gameNote.alpha = 1;
             }
             else
             {
-                gameNote = spawnPoolRef.addObject(new GameNote(noteCount++, direction, color, (note.time + 0.5 / 30) * 1000, note.frame, 0, options.noteskin));
+                gameNote = spawnPoolRef.addObject(new GameNote(noteCount++, direction, color, (note.time + 0.5 / 30) * 1000, note.frame, options.noteskin));
                 addChild(gameNote);
             }
 
@@ -278,11 +310,11 @@ package game.controls
                 var waveOffset:int = 0;
                 for each (var receptor:MovieClip in receptorArray)
                 {
-                    if (receptor.VERTEX == "x")
+                    if (receptor.VERTEX == VERTEX_X)
                     {
                         receptor.y = receptor.ORIG_Y + (Math.sin((getTimer() + waveOffset) / 1000) * 35);
                     }
-                    else if (receptor.VERTEX == "y")
+                    else if (receptor.VERTEX == VERTEX_Y)
                     {
                         receptor.x = receptor.ORIG_X + (Math.sin((getTimer() + waveOffset) / 1000) * 35);
                     }
@@ -322,9 +354,9 @@ package game.controls
             }
         }
 
-        private var updateReceptorRef:MovieClip;
-        private var updateOffsetRef:Number;
-        private var updateBaseOffsetRef:Number;
+        public var updateReceptorRef:MovieClip;
+        public var updateOffsetRef:Number;
+        public var updateBaseOffsetRef:Number;
 
         public function updateNotePosition(note:GameNote, position:int):void
         {
@@ -332,12 +364,12 @@ package game.controls
             updateOffsetRef = (note.POSITION - position) / 1000 * 300 * scrollSpeed;
             updateBaseOffsetRef = (position - note.SPAWN_PROGRESS) / (note.POSITION - note.SPAWN_PROGRESS);
 
-            if (updateReceptorRef.VERTEX == "x")
+            if (updateReceptorRef.VERTEX == VERTEX_X)
             {
                 note.x = updateReceptorRef.x - updateOffsetRef * updateReceptorRef.DIRECTION;
                 note.y = updateReceptorRef.y;
             }
-            else if (updateReceptorRef.VERTEX == "y")
+            else if (updateReceptorRef.VERTEX == VERTEX_Y)
             {
                 note.y = updateReceptorRef.y - updateOffsetRef * updateReceptorRef.DIRECTION;
                 note.x = updateReceptorRef.x;
@@ -347,11 +379,11 @@ package game.controls
             if (options.modEnabled("tornado"))
             {
                 var tornadoOffset:Number = Math.sin(updateBaseOffsetRef * Math.PI) * (options.receptorSpacing / 2);
-                if (updateReceptorRef.VERTEX == "x")
+                if (updateReceptorRef.VERTEX == VERTEX_X)
                 {
                     note.y += tornadoOffset;
                 }
-                if (updateReceptorRef.VERTEX == "y")
+                if (updateReceptorRef.VERTEX == VERTEX_Y)
                 {
                     note.x += tornadoOffset;
                 }
@@ -392,15 +424,15 @@ package game.controls
             {
                 note.scaleX = note.scaleY = 1 - (updateBaseOffsetRef * 0.65);
             }
-
         }
 
-        private var removeNoteIndex:int = 0;
-        private var removeNoteRef:GameNote;
+        public var removeNoteIndex:int = 0;
+        public var removeNoteRef:GameNote;
 
         public function removeNote(id:int):void
         {
-            for (removeNoteIndex = 0; removeNoteIndex < notes.length; removeNoteIndex++)
+            const len:Number = notes.length;
+            for (removeNoteIndex = 0; removeNoteIndex < len; removeNoteIndex++)
             {
                 removeNoteRef = notes[removeNoteIndex];
                 if (removeNoteRef.ID == id)
@@ -421,7 +453,7 @@ package game.controls
                 note.visible = false;
             }
 
-            notes = new Array();
+            notes.length = 0;
             noteCount = 0;
         }
 
@@ -432,22 +464,19 @@ package game.controls
 
         public function position():void
         {
+            var anchor:Point;
             var data:Object = _noteskins.getInfo(options.noteskin);
             var rotation:Number = data.rotation;
             var gap:int = options.receptorSpacing;
             var noteScale:Number = options.noteScale;
-            var centerOffset:int = 160;
-
-            //if (data.width > 64)
-            //gap += data.width - 64;
 
             // User-defined note scale
             if (noteScale != 1)
             {
                 if (noteScale < 0.1)
                     noteScale = 0.1; // min
-                else if (noteScale > 2.0)
-                    noteScale = 2.0; // max
+                else if (noteScale > 3.0)
+                    noteScale = 3.0; // max
                 gap *= noteScale
             }
             else if (options.modEnabled("mini") && !options.modEnabled("mini_resize"))
@@ -458,198 +487,220 @@ package game.controls
             switch (options.scrollDirection)
             {
                 case "down":
-                    downReceptor.x = int(-gap / 2) + centerOffset;
-                    downReceptor.y = 400;
-                    downReceptor.rotation = 0;
-                    downReceptor.VERTEX = "y";
-                    downReceptor.DIRECTION = 1;
+                    anchor = anchorPoints[P_BOTTOM];
 
-                    leftReceptor.x = downReceptor.x - gap;
-                    leftReceptor.y = downReceptor.y;
+                    leftReceptor.x = gap * -1.5;
+                    leftReceptor.y = anchor.y;
                     leftReceptor.rotation = rotation;
-                    leftReceptor.VERTEX = "y";
+                    leftReceptor.VERTEX = VERTEX_Y;
                     leftReceptor.DIRECTION = 1;
 
-                    upReceptor.x = int(gap / 2) + centerOffset;
-                    upReceptor.y = downReceptor.y;
+                    downReceptor.x = gap * -0.5;
+                    downReceptor.y = anchor.y;
+                    downReceptor.rotation = 0;
+                    downReceptor.VERTEX = VERTEX_Y;
+                    downReceptor.DIRECTION = 1;
+
+                    upReceptor.x = gap * 0.5;
+                    upReceptor.y = anchor.y;
                     upReceptor.rotation = rotation * 2;
-                    upReceptor.VERTEX = "y";
+                    upReceptor.VERTEX = VERTEX_Y;
                     upReceptor.DIRECTION = 1;
 
-                    rightReceptor.x = upReceptor.x + gap;
-                    rightReceptor.y = downReceptor.y;
+                    rightReceptor.x = gap * 1.5;
+                    rightReceptor.y = anchor.y;
                     rightReceptor.rotation = rotation * -1;
-                    rightReceptor.VERTEX = "y";
+                    rightReceptor.VERTEX = VERTEX_Y;
                     rightReceptor.DIRECTION = 1;
 
                     receptorArray = [leftReceptor, downReceptor, upReceptor, rightReceptor];
                     positionOffsetMax = {"min_x": -150, "max_x": 150, "min_y": -150, "max_y": 50};
                     break;
+
                 case "right":
-                    centerOffset += 80;
-                    leftReceptor.x = 460;
-                    leftReceptor.y = int(gap / 2) + centerOffset + gap;
+                    anchor = anchorPoints[P_RIGHT];
+
+                    leftReceptor.x = anchor.x;
+                    leftReceptor.y = gap * 1.5;
                     leftReceptor.rotation = rotation;
-                    leftReceptor.VERTEX = "x";
+                    leftReceptor.VERTEX = VERTEX_X;
                     leftReceptor.DIRECTION = 1;
 
-                    upReceptor.x = leftReceptor.x;
-                    upReceptor.y = int(-gap / 2) + centerOffset;
+                    downReceptor.x = anchor.x;
+                    downReceptor.y = gap * 0.5;
+                    downReceptor.rotation = 0;
+                    downReceptor.VERTEX = VERTEX_X;
+                    downReceptor.DIRECTION = 1;
+
+                    upReceptor.x = anchor.x;
+                    upReceptor.y = gap * -0.5;
                     upReceptor.rotation = rotation * 2;
-                    upReceptor.VERTEX = "x";
+                    upReceptor.VERTEX = VERTEX_X;
                     upReceptor.DIRECTION = 1;
 
-                    rightReceptor.x = leftReceptor.x;
-                    rightReceptor.y = int(-gap / 2) + centerOffset - gap
+                    rightReceptor.x = anchor.x;
+                    rightReceptor.y = gap * -1.5;
                     rightReceptor.rotation = rotation * -1;
-                    rightReceptor.VERTEX = "x";
+                    rightReceptor.VERTEX = VERTEX_X;
                     rightReceptor.DIRECTION = 1;
-
-                    downReceptor.x = leftReceptor.x;
-                    downReceptor.y = int(gap / 2) + centerOffset;
-                    downReceptor.rotation = 0;
-                    downReceptor.VERTEX = "x";
-                    downReceptor.DIRECTION = 1;
 
                     receptorArray = [upReceptor, rightReceptor, leftReceptor, downReceptor];
                     positionOffsetMax = {"min_x": -150, "max_x": 50, "min_y": -120, "max_y": 120};
                     break;
+
                 case "left":
-                    centerOffset += 80;
-                    leftReceptor.x = -140;
-                    leftReceptor.y = int(gap / 2) + centerOffset + gap;
+                    anchor = anchorPoints[P_LEFT];
+
+                    leftReceptor.x = anchor.x;
+                    leftReceptor.y = gap * 1.5;
                     leftReceptor.rotation = rotation;
-                    leftReceptor.VERTEX = "x";
+                    leftReceptor.VERTEX = VERTEX_X;
                     leftReceptor.DIRECTION = -1;
 
-                    upReceptor.x = leftReceptor.x;
-                    upReceptor.y = int(-gap / 2) + centerOffset;
+                    downReceptor.x = anchor.x;
+                    downReceptor.y = gap * 0.5;
+                    downReceptor.rotation = 0;
+                    downReceptor.VERTEX = VERTEX_X;
+                    downReceptor.DIRECTION = -1;
+
+                    upReceptor.x = anchor.x;
+                    upReceptor.y = gap * -0.5;
                     upReceptor.rotation = rotation * 2;
-                    upReceptor.VERTEX = "x";
+                    upReceptor.VERTEX = VERTEX_X;
                     upReceptor.DIRECTION = -1;
 
-                    rightReceptor.x = leftReceptor.x;
-                    rightReceptor.y = int(-gap / 2) + centerOffset - gap
+                    rightReceptor.x = anchor.x;
+                    rightReceptor.y = gap * -1.5;
                     rightReceptor.rotation = rotation * -1;
-                    rightReceptor.VERTEX = "x";
+                    rightReceptor.VERTEX = VERTEX_X;
                     rightReceptor.DIRECTION = -1;
-
-                    downReceptor.x = leftReceptor.x;
-                    downReceptor.y = int(gap / 2) + centerOffset;
-                    downReceptor.rotation = 0;
-                    downReceptor.VERTEX = "x";
-                    downReceptor.DIRECTION = -1;
 
                     receptorArray = [upReceptor, rightReceptor, leftReceptor, downReceptor];
                     positionOffsetMax = {"min_x": -50, "max_x": 150, "min_y": -120, "max_y": 120};
                     break;
+
                 case "split":
-                    downReceptor.x = int(-gap / 2) + centerOffset;
-                    downReceptor.y = 400;
+                    anchor = anchorPoints[P_BOTTOM];
+
+                    downReceptor.x = gap * -0.5;
+                    downReceptor.y = anchor.y;
                     downReceptor.rotation = 0;
-                    downReceptor.VERTEX = "y";
+                    downReceptor.VERTEX = VERTEX_Y;
                     downReceptor.DIRECTION = 1;
 
-                    leftReceptor.x = downReceptor.x - gap;
-                    leftReceptor.y = 90;
-                    leftReceptor.rotation = rotation;
-                    leftReceptor.VERTEX = "y";
-                    leftReceptor.DIRECTION = -1;
-
-                    upReceptor.x = int(gap / 2) + centerOffset;
-                    upReceptor.y = 400;
+                    upReceptor.x = gap * 0.5;
+                    upReceptor.y = anchor.y;
                     upReceptor.rotation = rotation * 2;
-                    upReceptor.VERTEX = "y";
+                    upReceptor.VERTEX = VERTEX_Y;
                     upReceptor.DIRECTION = 1;
 
-                    rightReceptor.x = upReceptor.x + gap;
-                    rightReceptor.y = 90;
+                    anchor = anchorPoints[P_TOP];
+
+                    leftReceptor.x = gap * -1.5;
+                    leftReceptor.y = anchor.y;
+                    leftReceptor.rotation = rotation;
+                    leftReceptor.VERTEX = VERTEX_Y;
+                    leftReceptor.DIRECTION = -1;
+
+                    rightReceptor.x = gap * 1.5;
+                    rightReceptor.y = anchor.y;
                     rightReceptor.rotation = rotation * -1;
-                    rightReceptor.VERTEX = "y";
+                    rightReceptor.VERTEX = VERTEX_Y;
                     rightReceptor.DIRECTION = -1;
 
                     receptorArray = [leftReceptor, downReceptor, upReceptor, rightReceptor];
                     positionOffsetMax = {"min_x": -150, "max_x": 150, "min_y": -50, "max_y": 50};
                     break;
+
                 case "split_down":
-                    downReceptor.x = int(-gap / 2) + centerOffset;
-                    downReceptor.y = 90;
+                    anchor = anchorPoints[P_TOP];
+
+                    downReceptor.x = gap * -0.5;
+                    downReceptor.y = anchor.y;
                     downReceptor.rotation = 0;
-                    downReceptor.VERTEX = "y";
+                    downReceptor.VERTEX = VERTEX_Y;
                     downReceptor.DIRECTION = -1;
 
-                    leftReceptor.x = downReceptor.x - gap;
-                    leftReceptor.y = 400;
-                    leftReceptor.rotation = rotation;
-                    leftReceptor.VERTEX = "y";
-                    leftReceptor.DIRECTION = 1;
-
-                    upReceptor.x = int(gap / 2) + centerOffset;
-                    upReceptor.y = 90;
+                    upReceptor.x = gap * 0.5;
+                    upReceptor.y = anchor.y;
                     upReceptor.rotation = rotation * 2;
-                    upReceptor.VERTEX = "y";
+                    upReceptor.VERTEX = VERTEX_Y;
                     upReceptor.DIRECTION = -1;
 
-                    rightReceptor.x = upReceptor.x + gap;
-                    rightReceptor.y = 400;
+                    anchor = anchorPoints[P_BOTTOM];
+
+                    leftReceptor.x = gap * -1.5;
+                    leftReceptor.y = anchor.y;
+                    leftReceptor.rotation = rotation;
+                    leftReceptor.VERTEX = VERTEX_Y;
+                    leftReceptor.DIRECTION = 1;
+
+                    rightReceptor.x = gap * 1.5;
+                    rightReceptor.y = anchor.y;
                     rightReceptor.rotation = rotation * -1;
-                    rightReceptor.VERTEX = "y";
+                    rightReceptor.VERTEX = VERTEX_Y;
                     rightReceptor.DIRECTION = 1;
 
                     receptorArray = [leftReceptor, downReceptor, upReceptor, rightReceptor];
                     positionOffsetMax = {"min_x": -150, "max_x": 150, "min_y": -50, "max_y": 50};
                     break;
-                case "plus":
-                    downReceptor.x = centerOffset;
-                    downReceptor.y = centerOffset + 80 + int(gap / 2);
-                    downReceptor.rotation = 0;
-                    downReceptor.VERTEX = "y";
-                    downReceptor.DIRECTION = -1;
 
-                    leftReceptor.x = centerOffset - int(gap / 2);
-                    leftReceptor.y = centerOffset + 80;
+                case "plus":
+                    anchor = anchorPoints[P_CENTER];
+
+                    leftReceptor.x = gap * -0.5;
+                    leftReceptor.y = anchor.y;
                     leftReceptor.rotation = rotation;
-                    leftReceptor.VERTEX = "x";
+                    leftReceptor.VERTEX = VERTEX_X;
                     leftReceptor.DIRECTION = 1;
 
-                    upReceptor.x = centerOffset;
-                    upReceptor.y = centerOffset + 80 - int(gap / 2);
+                    downReceptor.x = anchor.x;
+                    downReceptor.y = gap * 0.5;
+                    downReceptor.rotation = 0;
+                    downReceptor.VERTEX = VERTEX_Y;
+                    downReceptor.DIRECTION = -1;
+
+                    upReceptor.x = anchor.x;
+                    upReceptor.y = gap * -0.5;
                     upReceptor.rotation = rotation * 2;
-                    upReceptor.VERTEX = "y";
+                    upReceptor.VERTEX = VERTEX_Y;
                     upReceptor.DIRECTION = 1;
 
-                    rightReceptor.x = centerOffset + int(gap / 2);
-                    rightReceptor.y = centerOffset + 80;
+                    rightReceptor.x = gap * 0.5;
+                    rightReceptor.y = anchor.y;
                     rightReceptor.rotation = rotation * -1;
-                    rightReceptor.VERTEX = "x";
+                    rightReceptor.VERTEX = VERTEX_X;
                     rightReceptor.DIRECTION = -1;
 
                     receptorArray = [upReceptor, rightReceptor, downReceptor, leftReceptor];
                     positionOffsetMax = {"min_x": -150, "max_x": 150, "min_y": -150, "max_y": 150};
                     break;
-                default:
-                    downReceptor.x = int(-gap / 2) + centerOffset;
-                    downReceptor.y = 90;
-                    downReceptor.rotation = 0;
-                    downReceptor.VERTEX = "y";
-                    downReceptor.DIRECTION = -1;
 
-                    leftReceptor.x = downReceptor.x - gap;
-                    leftReceptor.y = downReceptor.y;
+                default:
+                    anchor = anchorPoints[P_TOP];
+
+                    leftReceptor.x = gap * -1.5;
+                    leftReceptor.y = anchor.y;
                     leftReceptor.rotation = rotation;
-                    leftReceptor.VERTEX = "y";
+                    leftReceptor.VERTEX = VERTEX_Y;
                     leftReceptor.DIRECTION = -1;
 
-                    upReceptor.x = int(gap / 2) + centerOffset;
-                    upReceptor.y = downReceptor.y;
+                    downReceptor.x = gap * -0.5;
+                    downReceptor.y = anchor.y;
+                    downReceptor.rotation = 0;
+                    downReceptor.VERTEX = VERTEX_Y;
+                    downReceptor.DIRECTION = -1;
+
+                    upReceptor.x = gap * 0.5;
+                    upReceptor.y = anchor.y;
                     upReceptor.rotation = rotation * 2;
-                    upReceptor.VERTEX = "y";
+                    upReceptor.VERTEX = VERTEX_Y;
                     upReceptor.DIRECTION = -1;
 
-                    rightReceptor.x = upReceptor.x + gap;
-                    rightReceptor.y = downReceptor.y;
+                    rightReceptor.x = gap * 1.5;
+                    rightReceptor.y = anchor.y;
                     rightReceptor.rotation = rotation * -1;
-                    rightReceptor.VERTEX = "y";
+                    rightReceptor.VERTEX = VERTEX_Y;
                     rightReceptor.DIRECTION = -1;
 
                     receptorArray = [leftReceptor, downReceptor, upReceptor, rightReceptor];
@@ -685,7 +736,6 @@ package game.controls
             if (options.modEnabled("mini") && !options.modEnabled("mini_resize") && options.noteScale == 1.0)
                 downReceptor.scaleX = downReceptor.scaleY = leftReceptor.scaleX = leftReceptor.scaleY = upReceptor.scaleX = upReceptor.scaleY = rightReceptor.scaleX = rightReceptor.scaleY = 0.75;
 
-
             if (options.modEnabled("mini_resize") && !options.modEnabled("mini") && options.noteScale == 1.0)
                 downReceptor.scaleX = downReceptor.scaleY = leftReceptor.scaleX = leftReceptor.scaleY = upReceptor.scaleX = upReceptor.scaleY = rightReceptor.scaleX = rightReceptor.scaleY = 0.5;
 
@@ -693,6 +743,57 @@ package game.controls
                 receptorAlpha = 0.3;
 
             leftReceptor.alpha = downReceptor.alpha = upReceptor.alpha = rightReceptor.alpha = receptorAlpha;
+        }
+
+        override public function get id():String
+        {
+            return GameLayoutManager.LAYOUT_RECEPTORS;
+        }
+
+        override public function get editorFlags():int
+        {
+            return FLAG_POSITION | FLAG_ROTATE | FLAG_SCALE;
+        }
+
+        override public function getEditorInterface():GameControlEditor
+        {
+            var self:NoteBox = this;
+
+            var out:GameControlEditor = super.getEditorInterface();
+
+            new Text(out, 10, out.cy, _lang.string("editor_component_rotation_x"));
+            var sliderRotate:BoxSlider = new BoxSlider(out, 10 + 3, out.cy + 20, editorWidth - 56, 10, e_changeHandler);
+            sliderRotate.minValue = -180;
+            sliderRotate.maxValue = 180;
+
+            var sliderRotateDisplay:Text = new Text(out, 10, out.cy, "0°");
+            sliderRotateDisplay.setAreaParams(editorWidth - 52, 22, "right");
+            var sliderRotateReset:BoxButton = new BoxButton(out, editorWidth - 36, out.cy + 5, 22, 22, "R", 12, e_changeHandler);
+
+            sliderRotate.slideValue = this.rotationX;
+            sliderRotateDisplay.text = Math.round(sliderRotate.slideValue) + "°";
+
+            out.cy += 42;
+
+            function e_changeHandler(e:Event):void
+            {
+                if (e.target == sliderRotate)
+                {
+                    var rotateSnap:int = Math.round(sliderRotate.slideValue / 5) * 5;
+                    sliderRotateDisplay.text = Math.round(rotateSnap) + "°";
+                    editorLayout["rotationX"] = Math.round(rotateSnap);
+                    self.rotationX = editorLayout["rotationX"];
+                }
+                else if (e.target == sliderRotateReset)
+                {
+                    sliderRotate.slideValue = 0;
+                    sliderRotateDisplay.text = Math.round(sliderRotate.slideValue) + "°";
+                    editorLayout["rotationX"] = 0;
+                    self.rotationX = editorLayout["rotationX"];
+                }
+            }
+
+            return out;
         }
     }
 }

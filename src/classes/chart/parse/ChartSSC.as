@@ -2,7 +2,6 @@ package classes.chart.parse
 {
     import com.flashfla.utils.StringUtil;
     import flash.utils.ByteArray;
-    import flash.utils.getTimer;
 
     public class ChartSSC extends ChartBase
     {

@@ -2,8 +2,9 @@ package game.graph
 {
     import assets.menu.icons.fa.iconSmallF;
     import classes.Language;
-    import classes.ui.BoxIcon;
+    import classes.replay.ReplayBinFrame;
     import classes.ui.BoxButton;
+    import classes.ui.BoxIcon;
     import classes.ui.Text;
     import com.flashfla.utils.sprintf;
     import flash.display.DisplayObjectContainer;
@@ -11,7 +12,6 @@ package game.graph
     import flash.events.MouseEvent;
     import flash.geom.Rectangle;
     import game.GameScoreResult;
-    import classes.replay.ReplayBinFrame;
 
     public class GraphAccuracy extends GraphBase
     {
@@ -234,7 +234,7 @@ package game.graph
             }
             last_nearest_index = nearest_cross_index;
 
-            // Get Cross 
+            // Get Cross
             var noteResult:GraphCrossPoint = nearest_boo ? boo_points[nearest_cross] : cross_points[nearest_cross];
             var pos_x:Number = noteResult.x;
             var pos_y:Number = noteResult.y;
@@ -302,7 +302,7 @@ package game.graph
             cross_points = new <GraphCrossPoint>[];
             boo_points = new <GraphCrossPoint>[];
 
-            // Judge 
+            // Judge
             var song_arrows:int = result.note_count;
 
             var i:int;

@@ -6,6 +6,7 @@ package classes
     import classes.user.UserSongData;
     import classes.user.UserSongNotes;
     import com.flashfla.utils.VectorUtil;
+    import flash.display.DisplayObject;
     import flash.display.Loader;
     import flash.display.LoaderInfo;
     import flash.events.ErrorEvent;
@@ -38,18 +39,11 @@ package classes
 
         ///- Private Locals
         private var _gvars:GlobalVariables = GlobalVariables.instance;
-        private var _avars:ArcGlobals = ArcGlobals.instance;
         private var _playlist:Playlist = Playlist.instance;
         private var _loader:URLLoader;
         private var _isLoaded:Boolean = false;
         private var _isLoading:Boolean = false;
         private var _loadError:Boolean = false;
-
-        //- SFS vars
-        public var id:int;
-        public var variables:Array;
-        public var isSpec:Boolean;
-        public var wantsToWatch:Boolean;
 
         //- User Vars
         public var name:String;
@@ -76,8 +70,7 @@ package classes
         public var level_ranks:Object = {};
         public var skill_rating_top_count:int = 50;
         public var skill_rating_levelranks:Array = [];
-        public var avatar:Loader;
-        public var startUpScreen:int = 0; // 0 = MP Connect + MP Screen   |   1 = MP Connect + Song List   |   2 = Song List
+        public var avatar:DisplayObject;
         public var loggedIn:Boolean;
 
         public var songQueues:Vector.<Object> = new <Object>[];
@@ -111,13 +104,8 @@ package classes
         public var DISPLAY_SCREENCUT:Boolean = false;
         public var DISPLAY_SONGPROGRESS:Boolean = true;
         public var DISPLAY_SONGPROGRESS_TEXT:Boolean = false;
+        public var DISPLAY_MULTIPLAYER_SCORES:Boolean = true;
         public var DISPLAY_RAWGOODS:Boolean = false;
-
-        public var DISPLAY_MP_UI:Boolean = true;
-        public var DISPLAY_MP_PA:Boolean = true;
-        public var DISPLAY_MP_JUDGE:Boolean = true;
-        public var DISPLAY_MP_COMBO:Boolean = true;
-        public var DISPLAY_MP_RAWGOODS:Boolean = false;
 
         public var DISPLAY_MP_TIMESTAMP:Boolean = false;
         public var judgeColors:Array = [0x78ef29, 0x12e006, 0x01aa0f, 0xf99800, 0xfe0000, 0x804100];
@@ -164,9 +152,7 @@ package classes
         public var screencutPosition:Number = 0.5;
         public var frameRate:int = 60;
         public var songRate:Number = 1;
-
-        public var gameplay:Gameplay;
-
+        public var gameLayout:Object = {};
 
         //- Permissions
         public var isActiveUser:Boolean;
@@ -194,19 +180,16 @@ package classes
          * @param	isActiveUser Sets the active user flag.
          * @tiptext
          */
-        public function User(loadData:Boolean = false, isActiveUser:Boolean = false, sfsId:int = -1):void
+        public function User(loadData:Boolean = false, isActiveUser:Boolean = false, siteId:int = -1):void
         {
-            this.id = sfsId;
-            this.variables = [];
-            this.isSpec = false;
-            this.wantsToWatch = false;
+            this.siteId = siteId;
             this.isActiveUser = isActiveUser;
 
             if (loadData)
             {
-                if (sfsId > -1)
+                if (siteId > -1)
                 {
-                    loadUser(sfsId);
+                    loadUser(siteId);
                 }
                 else
                 {
@@ -283,7 +266,7 @@ package classes
             }
         }
 
-        public function UpdateSRList(newLevelRanks:Object):void
+        public function updateSRList(newLevelRanks:Object):void
         {
             var worseLevelRank:Object = skill_rating_levelranks[skill_rating_top_count - 1];
             if (!worseLevelRank || newLevelRanks.equiv > worseLevelRank.equiv)
@@ -500,18 +483,20 @@ package classes
 
         public function loadAvatar():void
         {
-            this.avatar = new Loader();
-            if (isActiveUser && !isGuest)
-            {
-                this.avatar.contentLoaderInfo.addEventListener(Event.COMPLETE, avatarLoadComplete);
+            const _loader:Loader = new Loader();
 
-                function avatarLoadComplete(e:Event):void
-                {
+            _loader.contentLoaderInfo.addEventListener(Event.COMPLETE, avatarLoadComplete);
+            _loader.load(new URLRequest(URLs.resolve(URLs.USER_AVATAR_URL) + "?uid=" + this.siteId + "&cHeight=99&cWidth=99"));
+
+            function avatarLoadComplete(e:Event):void
+            {
+                if (isActiveUser && !isGuest)
                     LocalStore.setVariable("uAvatar", LoaderInfo(e.target).bytes);
-                    avatar.removeEventListener(Event.COMPLETE, avatarLoadComplete);
-                }
+
+                avatar = _loader.content;
+
+                _loader.removeEventListener(Event.COMPLETE, avatarLoadComplete);
             }
-            this.avatar.load(new URLRequest(URLs.resolve(URLs.USER_AVATAR_URL) + "?uid=" + this.siteId + "&cHeight=99&cWidth=99"));
         }
 
         ///- Level Ranks
@@ -676,20 +661,8 @@ package classes
             if (_settings.viewSongProgressText != null)
                 this.DISPLAY_SONGPROGRESS_TEXT = _settings.viewSongProgressText;
 
-            if (_settings.viewMPUI != null)
-                this.DISPLAY_MP_UI = _settings.viewMPUI;
-
-            if (_settings.viewMPPA != null)
-                this.DISPLAY_MP_PA = _settings.viewMPPA;
-
-            if (_settings.viewMPCombo != null)
-                this.DISPLAY_MP_COMBO = _settings.viewMPCombo;
-
-            if (_settings.viewMPRawGoods != null)
-                this.DISPLAY_MP_RAWGOODS = _settings.viewMPRawGoods;
-
-            if (_settings.viewMPJudge != null)
-                this.DISPLAY_MP_JUDGE = _settings.viewMPJudge;
+            if (_settings.viewMultiplayerScores != null)
+                this.DISPLAY_MULTIPLAYER_SCORES = _settings.viewMultiplayerScores;
 
             if (_settings.viewMPTimestamp != null)
                 this.DISPLAY_MP_TIMESTAMP = _settings.viewMPTimestamp;
@@ -799,14 +772,8 @@ package classes
             if (_settings.gameVolume != null)
                 this.gameVolume = _settings.gameVolume;
 
-            if (_settings.isolationOffset != null)
-                _avars.configIsolationStart = _settings.isolationOffset;
-
-            if (_settings.isolationLength != null)
-                _avars.configIsolationLength = _settings.isolationLength;
-
-            if (_settings.startUpScreen != null)
-                this.startUpScreen = Math.max(0, Math.min(2, _settings.startUpScreen));
+            if (_settings.layout != null)
+                this.gameLayout = doLayoutImport(_settings.layout);
 
             if (_settings.filters != null)
                 this.filters = doImportFilters(_settings.filters);
@@ -873,11 +840,7 @@ package classes
             gameSave.viewScreencut = this.DISPLAY_SCREENCUT;
             gameSave.viewSongProgress = this.DISPLAY_SONGPROGRESS;
             gameSave.viewSongProgressText = this.DISPLAY_SONGPROGRESS_TEXT;
-            gameSave.viewMPUI = this.DISPLAY_MP_UI;
-            gameSave.viewMPPA = this.DISPLAY_MP_PA;
-            gameSave.viewMPJudge = this.DISPLAY_MP_JUDGE;
-            gameSave.viewMPCombo = this.DISPLAY_MP_COMBO;
-            gameSave.viewMPRawGoods = this.DISPLAY_MP_RAWGOODS;
+            gameSave.viewMultiplayerScores = this.DISPLAY_MULTIPLAYER_SCORES;
             gameSave.viewMPTimestamp = this.DISPLAY_MP_TIMESTAMP;
             gameSave.viewLegacySongs = this.DISPLAY_LEGACY_SONGS;
             gameSave.viewExplicitSongs = this.DISPLAY_EXPLICIT_SONGS;
@@ -910,8 +873,8 @@ package classes
             gameSave.rawGoodTracker = this.rawGoodTracker;
             gameSave.songQueues = this.songQueues;
             gameSave.gameVolume = this.gameVolume;
+            gameSave.layout = this.gameLayout;
             gameSave.filters = doExportFilters(this.filters);
-            gameSave.startUpScreen = this.startUpScreen;
 
             if (returnObject)
                 return gameSave;
@@ -1065,27 +1028,20 @@ package classes
             return filters;
         }
 
-        /**
-         * Set the User Variables.
-         *
-         * @param	o:	an object containing variables' key-value pairs.
-         *
-         * @exclude
-         */
-        public function setVariables(o:Object):void
+        private function doLayoutImport(data:Object):Object
         {
-            /*
-             * TODO: only string, number (int, uint) and boolean should be allowed
-             */
-            for (var key:String in o)
-            {
-                var v:* = o[key];
-                if (v != null)
-                    this.variables[key] = v;
+            var out:Object = {};
+            var keys:Array = ["sp", "mp"];
 
-                else
-                    delete this.variables[key];
+            for each (var key:String in keys)
+            {
+                if (data[key].constructor.toString().indexOf("Object") != -1)
+                {
+                    out[key] = data[key];
+                }
             }
+
+            return out;
         }
     }
 }

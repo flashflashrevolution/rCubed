@@ -153,6 +153,9 @@ package classes.chart.parse
             {
                 var firstFile:File = fileQueue.pop();
 
+                if (!firstFile.exists)
+                    continue;
+
                 info['filename'] = firstFile.name;
 
                 parser = getParser(firstFile.extension.toLowerCase());
@@ -227,6 +230,9 @@ package classes.chart.parse
 
         public function readFile(file:File):ByteArray
         {
+            if (!file.exists)
+                return null;
+
             var fileStream:FileStream = new FileStream();
             fileStream.addEventListener(SecurityErrorEvent.SECURITY_ERROR, e_error);
             fileStream.addEventListener(IOErrorEvent.IO_ERROR, e_error);

@@ -1,7 +1,6 @@
 package menu
 {
     import arc.ArcGlobals;
-    import arc.mp.MultiplayerSingleton;
     import assets.GameBackgroundColor;
     import assets.menu.GenreSelection;
     import assets.menu.ScrollBackground;
@@ -21,10 +20,11 @@ package menu
     import classes.SongQueueItem;
     import classes.User;
     import classes.chart.Song;
+    import classes.mp.Multiplayer;
     import classes.ui.BoxButton;
     import classes.ui.BoxIcon;
     import classes.ui.BoxText;
-    import classes.ui.Prompt;
+    import classes.ui.PromptInput;
     import classes.ui.ScrollBar;
     import classes.ui.ScrollPane;
     import classes.ui.StarSelector;
@@ -47,11 +47,11 @@ package menu
     import flash.ui.ContextMenuItem;
     import flash.ui.Keyboard;
     import game.GameOptions;
+    import game.SkillRating;
     import menu.MenuSongSelectionOptions;
     import popups.PopupHighscores;
     import popups.PopupQueueManager;
     import popups.PopupSongNotes;
-    import game.SkillRating;
 
     public class MenuSongSelection extends MenuPanel
     {
@@ -75,7 +75,7 @@ package menu
         private var _avars:ArcGlobals = ArcGlobals.instance;
         private var _lang:Language = Language.instance;
         private var _playlist:Playlist = Playlist.instance;
-        private var _mp:MultiplayerSingleton = MultiplayerSingleton.getInstance();
+        private var _mp:Multiplayer = Multiplayer.instance;
 
         private var SORT_VALUE_CACHE:Object = {};
 
@@ -171,8 +171,6 @@ package menu
 
         override public function dispose():void
         {
-            var i:uint = 0;
-
             genreItems = null;
             songItems = null;
 
@@ -350,12 +348,14 @@ package menu
 
             //- Add Listeners
             if (stage)
+            {
                 stage.addEventListener(KeyboardEvent.KEY_DOWN, keyHandler, false, 0, true);
+                buildInfoBox();
+            }
         }
 
         override public function stageRemove():void
         {
-            //- Remove Listeners
             if (stage)
                 stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyHandler);
         }
@@ -369,7 +369,7 @@ package menu
         {
             _playlist.removeEventListener(GlobalVariables.LOAD_ERROR, e_defaultEngineLoadFail);
             _playlist.engineChangeHandler(e);
-            switchTo(MainMenu.MENU_SONGSELECTION, true);
+            switchTo(Main.GAME_MENU_PANEL);
         }
 
         //******************************************************************************************//
@@ -1108,13 +1108,6 @@ package menu
                 pane.scrollTo(scrollVal);
                 scrollbar.scrollTo(scrollVal);
             }
-
-            // Update Multiplayer Selection
-            if (mpUpdate && options.activeSongId != -1)
-            {
-                var songInfo:SongInfo = _playlist.getSongInfo(options.activeSongId);
-                _mp.gameplayPicking(songInfo);
-            }
         }
 
         /**
@@ -1138,7 +1131,7 @@ package menu
                 {
                     if (!tarSongItem.isLocked && options.infoTab == TAB_PLAYLIST)
                     {
-                        if (_mp.gameplayHasOpponent())
+                        if (_mp.inGameRoom)
                             multiplayerLoad(tarSongItem.level);
                         else
                             playSong(tarSongItem.level);
@@ -1296,6 +1289,9 @@ package menu
          */
         public function buildInfoBox():void
         {
+            if (infoBox == null)
+                return;
+
             // Deselect Buttons
             for (var bti:int = 0; bti < optionsBox.numChildren; bti++)
                 optionsBox.getChildAt(bti).alpha = 0.75;
@@ -1348,7 +1344,7 @@ package menu
 
             // Search Box
             if (searchBox == null)
-                searchBox = new BoxText(null, 5, 5, 164, 27);
+                searchBox = new BoxText(null, 5, 5, 163, 25);
 
             infoBox.addChild(searchBox);
 
@@ -1361,13 +1357,13 @@ package menu
             if (searchTypeBox != null)
                 searchTypeBox.removeEventListener(Event.SELECT, searchTypeSelect);
 
-            searchTypeBox = new ComboBox(null, 5, 37, "", searchTypeBoxItems);
-            searchTypeBox.setSize(164, 25);
+            searchTypeBox = new ComboBox(null, 5, 36, "", searchTypeBoxItems);
+            searchTypeBox.setSize(165, 27);
             searchTypeBox.fontSize = 11;
             searchTypeBox.addEventListener(Event.SELECT, searchTypeSelect);
             infoBox.addChild(searchTypeBox);
 
-            var searchBtn:BoxButton = new BoxButton(infoBox, 5, 67, 164, 27, _lang.string("song_selection_search_panel_search"), 12, clickHandler);
+            var searchBtn:BoxButton = new BoxButton(infoBox, 5, 68, 164, 25, _lang.string("song_selection_search_panel_search"), 12, clickHandler);
             searchBtn.action = "doSearch";
 
             // Order Type
@@ -1391,7 +1387,7 @@ package menu
                 sortTypeBox.removeEventListener(Event.SELECT, sortTypeSelect);
 
             sortTypeBox = new ComboBox(null, 5, 162, "", sortTypeBoxItems);
-            sortTypeBox.setSize(164, 25);
+            sortTypeBox.setSize(165, 25);
             sortTypeBox.fontSize = 11;
             sortTypeBox.numVisibleItems = sortTypeBoxItems.length;
             sortTypeBox.addEventListener(Event.SELECT, sortTypeSelect);
@@ -1403,8 +1399,8 @@ package menu
             if (sortOrderBox != null)
                 sortOrderBox.removeEventListener(Event.SELECT, sortOrderSelect);
 
-            sortOrderBox = new ComboBox(null, 5, 188, "", sortOrderBoxItems);
-            sortOrderBox.setSize(164, 25);
+            sortOrderBox = new ComboBox(null, 5, 191, "", sortOrderBoxItems);
+            sortOrderBox.setSize(165, 25);
             sortOrderBox.fontSize = 11;
             sortOrderBox.addEventListener(Event.SELECT, sortOrderSelect);
             infoBox.addChild(sortOrderBox);
@@ -1690,15 +1686,17 @@ package menu
                 songOptionsButton.action = "songOptions";
                 songOptionsButton.setHoverText(_lang.string("song_selection_song_panel_hover_song_options"));
 
-                buttonWidth = 164;
-                if (_mp.gameplayCanPick())
+                if (_mp.inGameRoom)
                 {
-                    buttonWidth = 79.5;
-                    var songLoadButton:BoxButton = new BoxButton(infoBox, 89.5, 288, 79.5, 27, _lang.string("song_selection_song_panel_mp_load"), 14, songLoadClick);
-                    songLoadButton.level = songInfo.level;
+                    const mpText:String = _lang.string(_mp.GAME_ROOM.owner == _mp.currentUser ? "song_selection_song_panel_mp_select" : "song_selection_song_panel_mp_request");
+                    var songSelectButton:BoxButton = new BoxButton(infoBox, 5, 288, 164, 27, mpText, 14, songLoadClick);
+                    songSelectButton.level = songInfo.level;
                 }
-                var songStartButton:BoxButton = new BoxButton(infoBox, 5, 288, buttonWidth, 27, _lang.string("song_selection_song_panel_play"), 14, songStartClick);
-                songStartButton.level = songInfo.level;
+                else
+                {
+                    var songStartButton:BoxButton = new BoxButton(infoBox, 5, 288, 164, 27, _lang.string("song_selection_song_panel_play"), 14, songStartClick);
+                    songStartButton.level = songInfo.level;
+                }
             }
             else
             {
@@ -1783,8 +1781,7 @@ package menu
             if (level < 0)
                 return;
 
-            _mp.gameplayPicking(_playlist.getSongInfo(level));
-            _mp.gameplayLoading();
+            _mp.ffrSelectSong(_playlist.getSongInfo(level));
             switchTo(MainMenu.MENU_MULTIPLAYER);
         }
 
@@ -2195,7 +2192,7 @@ package menu
                 }
                 else if (clickAction == "queueSave")
                 {
-                    new Prompt(this, 320, _lang.string("song_selection_song_queue_name_prompt"), 100, "SUBMIT", e_saveSongQueue);
+                    new PromptInput(this, _lang.string("song_selection_song_queue_name_prompt"), _lang.string("song_selection_queue_panel_save"), e_saveSongQueue);
                 }
                 else if (clickAction == "queueManager")
                 {
@@ -2210,7 +2207,7 @@ package menu
                     if (randomList.length > 0)
                     {
                         var random:Object = randomList[int(Math.floor(Math.random() * randomList.length))];
-                        if (_mp.gameplayHasOpponent())
+                        if (_mp.inGameRoom)
                             multiplayerLoad(random.level);
                         else
                             playSong(random.level);
@@ -2222,7 +2219,6 @@ package menu
                     }
                 }
             }
-            stage.focus = stage;
         }
 
         /**
@@ -2295,7 +2291,7 @@ package menu
                 case Keyboard.ENTER:
                     if (!((stage.focus is PushButton) || (stage.focus is TextField)) && options.activeSongId >= 0)
                     {
-                        if (_mp.gameplayHasOpponent())
+                        if (_mp.inGameRoom)
                             multiplayerLoad(options.activeSongId);
                         else
                             playSong(options.activeSongId);
@@ -2521,9 +2517,7 @@ package menu
 
 
 import assets.GameBackgroundColor;
-
 import classes.ui.Text;
-
 import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.events.Event;

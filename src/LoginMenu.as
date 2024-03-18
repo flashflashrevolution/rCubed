@@ -57,10 +57,13 @@ package
             savedInfos = loadLoginDetails();
         }
 
+        override public function stageRemove():void
+        {
+            stage.removeEventListener(KeyboardEvent.KEY_DOWN, loginKeyDown);
+        }
+
         override public function dispose():void
         {
-            if (stage)
-                stage.removeEventListener(KeyboardEvent.KEY_DOWN, loginKeyDown);
             saveDetails.dispose();
             super.stageRemove();
         }
@@ -76,7 +79,7 @@ package
             // Register Button
             var register_online_btn:BoxButton = new BoxButton(this, box.x, box.y + box.height + 10, 300, 30, _lang.string("register_online"), 12, registerOnline);
 
-            /// 
+            ///
             panel_session = new Sprite();
 
             var draw_pane:Sprite = new Sprite();

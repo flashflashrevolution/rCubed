@@ -19,7 +19,7 @@ package classes.ui
                 _textFormat = textformat;
 
             super(parent, xpos, ypos, false, false);
-            super.setSize(width + 1, height + 1);
+            setSize(width + 1, height + 1);
 
             init();
         }

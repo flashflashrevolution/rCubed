@@ -1,105 +1,115 @@
 package classes.ui
 {
+    import assets.GameBackgroundColor;
+    import classes.ui.UILockWait;
+    import com.flashfla.utils.SpriteUtil;
+    import flash.display.Bitmap;
+    import flash.display.DisplayObject;
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
-    import flash.events.KeyboardEvent;
-    import flash.events.MouseEvent;
-    import flash.ui.Keyboard;
+    import flash.filters.DropShadowFilter;
 
-    dynamic public class Prompt extends Sprite
+    public class Prompt extends Sprite
     {
-        private var _parent:DisplayObjectContainer = null;
-        private var _promptFunc:Function = null;
+        protected var _width:Number;
+        protected var _height:Number;
+        protected var _content:Sprite;
+        protected var _dropshadow:Sprite;
+        protected var _lock:UILockWait;
 
-        private var _box:Box;
-        private var _text:Text;
-        private var _textfield:BoxText;
-        private var _submit_button:BoxButton;
-        private var _close_button:BoxButton;
-
-        public function Prompt(parent:DisplayObjectContainer = null, promptWidth:uint = 320, promptTitle:String = "", buttonWidth:uint = 100, buttonText:String = "", promptFunc:Function = null, displayAsPassword:Boolean = false)
+        public function Prompt(parent:DisplayObjectContainer, width:Number = 200, height:Number = 200)
         {
-            this._promptFunc = promptFunc;
-            if (parent != null)
+            _width = width;
+            _height = height;
+
+            parent.addChild(this);
+
+            // Background
+            const bmp:Bitmap = SpriteUtil.getBitmapSprite(parent.stage);
+            this.graphics.beginBitmapFill(bmp.bitmapData);
+            this.graphics.drawRect((Main.GAME_WIDTH - _width) / 2, (Main.GAME_HEIGHT - _height) / 2, _width, _height);
+            this.graphics.endFill();
+
+            this.graphics.beginFill(0x000000, 0.5);
+            this.graphics.drawRect(0, 0, Main.GAME_WIDTH, Main.GAME_HEIGHT);
+            this.graphics.endFill();
+
+            // Box
+            _content = new Sprite();
+            _content.graphics.lineStyle(1, 0x000000, 0, true);
+            _content.graphics.beginFill(0xFFFFFF, 0.15);
+            _content.graphics.drawRect(0, 0, _width, _height);
+            _content.graphics.endFill();
+            _content.graphics.lineStyle(3, 0xFFFFFF, 0.35);
+            _content.graphics.beginFill(GameBackgroundColor.BG_POPUP, 0.6);
+            _content.graphics.drawRect(0, 0, _width, _height);
+            _content.graphics.endFill();
+            _content.x = (Main.GAME_WIDTH - _width) / 2;
+            _content.y = (Main.GAME_HEIGHT - _height) / 2;
+            super.addChild(_content);
+
+            _content.graphics.lineStyle(1, 0xFFFFFF, 0.35);
+
+            // Shadow
+            _dropshadow = new Sprite();
+            _dropshadow.graphics.beginFill(0x000000, 1);
+            _dropshadow.graphics.drawRect(0, 0, _width, _height);
+            _dropshadow.graphics.endFill();
+            _dropshadow.x = _content.x;
+            _dropshadow.y = _content.y;
+            _dropshadow.filters = [new DropShadowFilter(0, 45, GameBackgroundColor.BG_DARK, 1, 128, 128, 1, 1, false, true, true)];
+            super.addChildAt(_dropshadow, 0);
+        }
+
+        public function set uiLock(val:Boolean):void
+        {
+            if (val && _lock == null)
             {
-                this._parent = parent;
-                parent.addChild(this);
+                _lock = new UILockWait(stage);
             }
-
-            _box = new Box(this, (Main.GAME_WIDTH - promptWidth) / 2, (Main.GAME_HEIGHT - 55) / 2, false, false);
-            _box.setSize(promptWidth, 55);
-            _box.borderColor = 0x656565;
-            _box.normalAlpha = 1;
-            _box.borderAlpha = 1;
-
-            //- Add Text
-            _text = new Text(_box, 1, 0, promptTitle, 12, "#000000");
-            _text.height = 22;
-            _text.width = promptWidth - 2;
-
-            //- Add Close Button
-            _close_button = new BoxButton(_box, promptWidth - 18, 3, 15, 15, "", 12, closePrompt);
-            _close_button.color = 0xFF0000;
-            _close_button.borderColor = 0x880015;
-            _close_button.normalAlpha = 0.45;
-            _close_button.activeAlpha = 1;
-            _close_button.borderAlpha = 1;
-            _close_button.borderActiveAlpha = 1;
-
-            //- Add Textfield
-            _textfield = new BoxText(_box, 3, 23, promptWidth - buttonWidth - 10, 28);
-            _textfield.color = 0x000000;
-            _textfield.normalAlpha = 0.045;
-            _textfield.activeAlpha = 0.175;
-            _textfield.textColor = 0;
-            _textfield.borderColor = 0x000000;
-            _textfield.borderAlpha = 0.2175;
-            _textfield.borderActiveAlpha = 0.455;
-            _textfield.displayAsPassword = displayAsPassword;
-            _textfield.field.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
-
-            //- Add Submit Button
-            _submit_button = new BoxButton(_box, promptWidth - buttonWidth - 3, 23, buttonWidth, 29, buttonText, 12, submitPrompt);
-            _submit_button.color = 0x000000;
-            _submit_button.normalAlpha = 0.045;
-            _submit_button.activeAlpha = 0.175;
-            _submit_button.textColor = "#000000";
-            _submit_button.borderColor = 0x000000;
-            _submit_button.borderAlpha = 0.2175;
-            _submit_button.borderActiveAlpha = 0.455;
-
-            stage.focus = _textfield.field;
-        }
-
-        private function closePrompt(e:MouseEvent = null):void
-        {
-            _textfield.field.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
-            _textfield.dispose();
-            _submit_button.dispose();
-            _close_button.dispose();
-            _text.dispose();
-            _box.dispose();
-
-            if (this._parent != null)
-                this._parent.removeChild(this);
-        }
-
-        private function submitPrompt(e:MouseEvent = null):void
-        {
-            if (this._promptFunc != null && _textfield.field.text.length > 0)
-                this._promptFunc(_textfield.field.text);
-            closePrompt();
-        }
-
-        private function keyDown(e:KeyboardEvent):void
-        {
-            if (e.keyCode == Keyboard.ENTER)
+            else if (!val && _lock != null)
             {
-                submitPrompt();
+                _lock.remove();
+                _lock = null;
             }
-            else if (e.keyCode == Keyboard.ESCAPE)
+        }
+
+        override public function addChild(child:DisplayObject):DisplayObject
+        {
+            return _content.addChild(child);
+        }
+
+        override public function removeChild(child:DisplayObject):DisplayObject
+        {
+            return _content.removeChild(child);
+        }
+
+        override public function get width():Number
+        {
+            return _width;
+        }
+
+        override public function get height():Number
+        {
+            return _height;
+        }
+
+        public function get content():Sprite
+        {
+            return _content;
+        }
+
+        public function close():void
+        {
+            if (parent != null && parent.contains(this))
             {
-                closePrompt();
+                parent.removeChild(this);
+
+                if (_lock != null)
+                {
+                    _lock.remove();
+                    _lock = null;
+                }
             }
         }
     }

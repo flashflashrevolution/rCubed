@@ -23,7 +23,7 @@ package popups.filebrowser
         public var index:int = 0;
 
         /** Marks the Button as in-use to avoid removal in song selector. */
-        public var garbageSweep:Boolean = false;
+        public var isStale:Boolean = true;
 
         public var songData:FileFolder;
 
@@ -55,7 +55,7 @@ package popups.filebrowser
                 parent.addChild(this);
             }
 
-            
+
             _lblSongName = new Text(this, 5, 3, "--", 14);
             _lblSongName.setAreaParams(FIXED_WIDTH - 50, 18);
 
@@ -106,7 +106,7 @@ package popups.filebrowser
         private var chartLookIndex:int;
         private var chartLookChartIndex:int;
         private var chartLookData:Array;
-		
+
         public function setData(songData:FileFolder):void
         {
             this.songData = songData;

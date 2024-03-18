@@ -1,11 +1,11 @@
 package popups.replays
 {
-    import classes.replay.Replay;
     import classes.Alert;
     import classes.Language;
+    import classes.replay.Replay;
     import classes.ui.BoxButton;
+    import classes.ui.PromptInput;
     import flash.events.Event;
-    import classes.ui.Prompt;
 
     public class ReplayHistoryTabSession extends ReplayHistoryTabBase
     {
@@ -29,7 +29,7 @@ package popups.replays
             // Add UI Elements
             if (!btn_import)
             {
-                btn_import = new BoxButton(null, 5, Main.GAME_HEIGHT - 35, 162, 29, _lang.string("popup_replay_import"), 12, e_importClick);
+                btn_import = new BoxButton(null, 5, 410, 162, 29, _lang.string("popup_replay_import"), 12, e_importClick);
             }
             parent.addChild(btn_import);
         }
@@ -58,7 +58,7 @@ package popups.replays
 
         private function e_importClick(e:Event):void
         {
-            new Prompt(parent, 320, _lang.string("popup_replay_import_window_title"), 100, _lang.string("popup_replay_import"), e_importReplay);
+            new PromptInput(parent, _lang.string("popup_replay_import_window_title"), _lang.string("popup_replay_import"), e_importReplay);
         }
 
         private function e_importReplay(replayString:String):void

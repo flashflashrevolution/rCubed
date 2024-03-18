@@ -182,8 +182,7 @@ package com.flashfla.utils
 
         public static function replace(input:String, replace:String, replaceWith:String):String
         {
-            //change to StringBuilder
-            var sb:String = new String();
+            var sb:String = "";
             var found:Boolean = false;
 
             var sLen:Number = input.length;
@@ -218,6 +217,11 @@ package com.flashfla.utils
         static public function containsHtml(text:String):Boolean
         {
             return text && (text.indexOf("<") >= 0 && text.indexOf(">") >= 0 && text.indexOf("</") >= 0);
+        }
+
+        static public function stripHtml(text:String):String
+        {
+            return text ? text.replace(/<[^>]+>/ig, "") : null;
         }
     }
 }

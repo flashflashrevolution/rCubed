@@ -32,32 +32,6 @@ package
             }
         }
 
-        static public function serverVersionHigher(serverVersionString:String):int
-        {
-            var gameVersion:Array = Constant.AIR_VERSION.split(".").map(function(item:*, index:int, array:Array):int
-            {
-                return parseInt(item);
-            });
-
-            var serverVersion:Array = serverVersionString.split(".").map(function(item:*, index:int, array:Array):int
-            {
-                return parseInt(item);
-            });
-
-            var length:int = Math.max(gameVersion.length, serverVersion.length);
-            for (var i:int = 0; i < length; i++)
-            {
-                var thisPart:int = i < gameVersion.length ? gameVersion[i] : 0;
-                var thatPart:int = i < serverVersion.length ? serverVersion[i] : 0;
-
-                if (thisPart < thatPart)
-                    return -1;
-                if (thisPart > thatPart)
-                    return 1;
-            }
-            return 0;
-        }
-
         public static function initFolders():void
         {
             // song cache

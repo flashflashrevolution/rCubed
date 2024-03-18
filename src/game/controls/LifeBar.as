@@ -1,9 +1,9 @@
 package game.controls
 {
 
-    import flash.display.Sprite;
+    import flash.display.DisplayObjectContainer;
 
-    public class LifeBar extends Sprite
+    public class LifeBar extends GameControl
     {
         // 3 Color Gradient, 100 Steps: [#FF0700 -> #F77600 -> #00E900]
         private static const HP_BAR_COLOR:Vector.<uint> = new <uint>[0xFF0700, 0xFF0700, 0xFE0900, 0xFE0B00, 0xFE0D00, 0xFE1000, 0xFE1200, 0xFE1400, 0xFD1600, 0xFD1900, 0xFD1B00,
@@ -24,8 +24,11 @@ package game.controls
         // Variables
         private var _health:int = 50;
 
-        public function LifeBar():void
+        public function LifeBar(parent:DisplayObjectContainer):void
         {
+            if (parent)
+                parent.addChild(this);
+
             this.mouseChildren = false;
         }
 
@@ -46,7 +49,11 @@ package game.controls
             this.graphics.beginFill(0, 0)
             this.graphics.drawRect(0, 0, width - 1, height - 1);
             this.graphics.endFill();
+        }
 
+        override public function get id():String
+        {
+            return GameLayoutManager.LAYOUT_HEALTH;
         }
 
         ////////////////////////////////////////////////////////////////////////

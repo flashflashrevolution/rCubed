@@ -41,7 +41,7 @@ package popups.settings
         {
             container.graphics.lineStyle(1, 0xFFFFFF, 0.35);
             container.graphics.moveTo(295, 10);
-            container.graphics.lineTo(295, 405);
+            container.graphics.lineTo(295, 675);
 
             var i:int;
             var xOff:int = 15;
@@ -172,17 +172,18 @@ package popups.settings
             var gameRawGoodTracker:Text = new Text(container, xOff, yOff, _lang.string("options_raw_goods_tracker"));
             gameRawGoodTracker.width = 144;
             optionRawGoodTracker = new ValidatedText(container, xOff + 149, yOff, 70, 20, ValidatedText.R_FLOAT_P, changeHandler);
-            yOff += 30;
+            yOff += 32;
 
             // Personal Best tracking via Combo color
-            new Text(container, xOff + 30, yOff - 4, _lang.string("options_personalbest_tracker"));
+            new Text(container, xOff + 24, yOff - 3, _lang.string("options_personalbest_tracker"));
 
-            optionPersonalBestTracker = new BoxCheck(container, xOff + 10, yOff, clickHandler);
+            optionPersonalBestTracker = new BoxCheck(container, xOff + 4, yOff, clickHandler);
             optionPersonalBestTracker.addEventListener(MouseEvent.MOUSE_OVER, e_personalBestTrackerMouseOver, false, 0, true);
 
             // Receptor Colors
-            yOff += 18;
+            yOff += 28;
             yOff += drawSeperator(container, xOff, 265, yOff, -3, -4);
+            yOff += 30;
 
             var gameReceptorColorTitle:Text = new Text(container, xOff, yOff, _lang.string("options_receptor_colors_title"), 14);
             gameReceptorColorTitle.width = 265;

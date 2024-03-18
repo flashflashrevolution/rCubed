@@ -1,6 +1,7 @@
 package game.controls
 {
     import assets.GameBackgroundColor;
+    import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
     import flash.events.MouseEvent;
     import flash.geom.Rectangle;
@@ -8,10 +9,17 @@ package game.controls
 
     public class ScreenCut extends Sprite
     {
+        private var options:GameOptions;
+
         private var self:ScreenCut;
 
-        public function ScreenCut(options:GameOptions):void
+        public function ScreenCut(options:GameOptions, parent:DisplayObjectContainer):void
         {
+            if (parent)
+                parent.addChild(this);
+
+            this.options = options;
+
             this.self = this;
             this.graphics.lineStyle(3, GameBackgroundColor.BG_STATIC, 1);
             this.graphics.beginFill(0x000000);
