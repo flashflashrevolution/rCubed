@@ -4,6 +4,7 @@ package classes.ui
     import flash.events.Event;
     import flash.events.FocusEvent;
     import flash.text.AntiAliasType;
+    import flash.text.GridFitType;
     import flash.text.TextField;
     import flash.text.TextFormat;
 
@@ -30,6 +31,7 @@ package classes.ui
             _input.width = width - 4;
             _input.type = "input";
             _input.embedFonts = true;
+            _input.gridFitType = GridFitType.SUBPIXEL;
             _input.antiAliasType = AntiAliasType.ADVANCED;
             _input.defaultTextFormat = _textFormat;
 
