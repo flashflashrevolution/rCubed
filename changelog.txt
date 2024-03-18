@@ -1,11 +1,17 @@
-R^3 (v2.0.0) [2024-01-31]
+R^3 (v2.0.0) [2024-03-18]
 ---------------------------------------------------------------------
 @Psycast
 - New Multiplayer.
-- File Browser now sorts by Song Name by default.
-- Fix results screen, by remaking it entirely.
-- Fix crash on tokens missing images.
-- Fix a ton of missing hardcoded text for translation.
+- New Gameplay Layout Editor.
+    - Existing layouts have been reset, as this is now saved
+      to your game settings, and replays.
+- Add: Auto-Updates.
+- Add: File Browser had a single song reload option.
+- Change: File Browser now sorts by Song Name by default.
+- Fix: Results screen, by remaking it entirely.
+- Fix: Crash on tokens missing images.
+- Fix: The majority of hardcoded text for translation.
+- Fix: Alt engine song notes/options.
 - UI components minor refresh:
     - Color picker now shows New and Current Color.
     - Dropdown now matchs game look.
