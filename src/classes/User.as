@@ -1035,10 +1035,11 @@ package classes
 
             for each (var key:String in keys)
             {
+                if (!data[key])
+                    continue;
+
                 if (data[key].constructor.toString().indexOf("Object") != -1)
-                {
                     out[key] = data[key];
-                }
             }
 
             return out;
