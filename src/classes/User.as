@@ -233,6 +233,9 @@ package classes
                     //Get the song's difficulty
                     var songInfo:SongInfo = _playlist.getSongInfo(key);
 
+                    if (songInfo == null || songInfo.is_unranked)
+                        continue;
+
                     //Calculate the song's equiv
                     levelRank.equiv = SkillRating.calcSongWeightFromScore(levelRank.rawscore, songInfo);
 
