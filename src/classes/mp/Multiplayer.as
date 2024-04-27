@@ -159,7 +159,9 @@ package classes.mp
 
         public function disconnect():void
         {
-            websocket.close();
+            if (websocket)
+                websocket.close();
+
             clearData();
             clearEvents();
         }
