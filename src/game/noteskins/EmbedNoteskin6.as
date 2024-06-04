@@ -4,7 +4,7 @@ package game.noteskins
 
     public class EmbedNoteskin6 extends EmbedNoteskinBase
     {
-        [Embed(source = "Noteskin6.swf", mimeType = 'application/octet-stream')]
+        [Embed(source = "NoteSkin6.swf", mimeType = 'application/octet-stream')]
         private static const EMBED_SWF:Class;
 
         private static const ID:int = 6;
