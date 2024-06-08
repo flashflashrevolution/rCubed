@@ -2437,7 +2437,7 @@ internal class EditorMenu extends Sprite
         gameplay.interfaceSetup();
     }
 
-    function e_setLayoutSingle(e:MouseEvent):void
+    private function e_setLayoutSingle(e:MouseEvent):void
     {
         var layout:Object = gameplay.options.layout;
 
@@ -2447,7 +2447,7 @@ internal class EditorMenu extends Sprite
         gameplay.interfaceSetup();
     }
 
-    function e_setLayoutMulti(e:MouseEvent):void
+    private function e_setLayoutMulti(e:MouseEvent):void
     {
         var layout:Object = gameplay.options.layout;
 

@@ -144,7 +144,7 @@ package game.results
 
         private function e_onPaneClick(e:MouseEvent):void
         {
-            if (!handler)
+            if (handler == null)
                 return;
 
             if (e.target is UserLabel)
