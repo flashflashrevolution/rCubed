@@ -93,6 +93,7 @@ package game.controls
     }
 }
 
+import classes.mp.MPColors;
 import classes.mp.MPUser;
 import classes.mp.Multiplayer;
 import classes.mp.mode.ffr.MPMatchFFRUser;
@@ -163,6 +164,14 @@ internal class PlayerLabel extends Sprite
         {
             this.alpha = data.alive ? 1 : 0.5;
             isAlive = data.alive;
+        }
+        else {
+            // check if user has quit the match (but is still connected)
+            const gameState:String = data.room.player_state_map[data.user.uid].game_state;
+
+            if (gameState != "game" && gameState != "loading") {
+                txtUsername.fontColor = MPColors.USER_LEAVE;
+            }
         }
     }
 
