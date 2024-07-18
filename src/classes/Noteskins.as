@@ -673,7 +673,7 @@ package classes
                 file = files[i];
                 try
                 {
-                    if (file.type != ".txt")
+                    if (file.extension != "txt")
                         continue;
 
                     fileDataJSON = AirContext.readTextFile(file);

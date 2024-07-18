@@ -39,7 +39,7 @@ package classes.mp
                     return new MPSocketDataRaw(type, action, data);
                 }
             }
-            catch (err)
+            catch (err:Error)
             {
                 trace("parseMessage err:", err);
             }

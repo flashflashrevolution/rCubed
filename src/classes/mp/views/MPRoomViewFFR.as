@@ -704,7 +704,7 @@ internal class UserPanel extends Sprite
     private var view:MPRoomViewFFR;
     private var room:MPRoomFFR;
 
-    private var name:Text;
+    private var panelName:Text;
     private var iconLeaveBtn:UIIcon;
 
     private var songName:Text;
@@ -720,8 +720,8 @@ internal class UserPanel extends Sprite
         this.view = view;
         this.room = room;
 
-        name = new Text(this, 20, 0, room.name, 16);
-        name.setAreaParams(view.width - 85, 30);
+        panelName = new Text(this, 20, 0, room.name, 16);
+        panelName.setAreaParams(view.width - 85, 30);
 
         iconLeaveBtn = new UIIcon(this, new iconLeave(), view.width - 15, 16);
         iconLeaveBtn.setSize(15, 15);
@@ -752,7 +752,7 @@ internal class UserPanel extends Sprite
 
     public function update():void
     {
-        name.text = room.name ? room.name : "";
+        panelName.text = room.name ? room.name : "";
 
         if (room.songData.selected)
         {
@@ -802,7 +802,7 @@ internal class OwnerPanel extends Sprite
     private var view:MPRoomViewFFR;
     private var room:MPRoomFFR;
 
-    private var name:Text;
+    private var panelName:Text;
     private var iconEditBtn:UIIcon;
     private var iconLeaveBtn:UIIcon;
 
@@ -821,8 +821,8 @@ internal class OwnerPanel extends Sprite
         this.view = view;
         this.room = room;
 
-        name = new Text(this, 20, 0, "", 16);
-        name.setAreaParams(view.width - 85, 30);
+        panelName = new Text(this, 20, 0, "", 16);
+        panelName.setAreaParams(view.width - 85, 30);
 
         iconEditBtn = new UIIcon(this, new iconGear(), view.width - 45, 16);
         iconEditBtn.setSize(15, 15);
@@ -866,7 +866,7 @@ internal class OwnerPanel extends Sprite
 
     public function update():void
     {
-        name.text = room.name ? room.name : "";
+        panelName.text = room.name ? room.name : "";
 
         if (room.songData.selected)
         {
@@ -930,7 +930,7 @@ internal class OwnerEditPanel extends Sprite
     private var view:MPRoomViewFFR;
     private var room:MPRoomFFR;
 
-    private var name:BoxText;
+    private var panelName:BoxText;
     private var iconCancelBtn:UIIcon;
     private var iconSaveBtn:UIIcon;
 
@@ -953,10 +953,10 @@ internal class OwnerEditPanel extends Sprite
         this.view = view;
         this.room = room;
 
-        name = new BoxText(this, 20, 1, 280, 28);
-        name.field.y += 1;
-        name.borderAlpha = 0;
-        name.borderActiveAlpha = 0;
+        panelName = new BoxText(this, 20, 1, 280, 28);
+        panelName.field.y += 1;
+        panelName.borderAlpha = 0;
+        panelName.borderActiveAlpha = 0;
 
         iconCancelBtn = new UIIcon(this, new iconCancel(), view.width - 45, 16);
         iconCancelBtn.setSize(15, 15);
@@ -1031,17 +1031,17 @@ internal class OwnerEditPanel extends Sprite
 
         // Draw
         this.graphics.lineStyle(1, 0xFFFFFF, 0.35);
-        this.graphics.moveTo(name.x, 1);
-        this.graphics.lineTo(name.x, name.height + 1);
-        this.graphics.moveTo(name.x + name.width, 1);
-        this.graphics.lineTo(name.x + name.width, name.height + 1);
+        this.graphics.moveTo(panelName.x, 1);
+        this.graphics.lineTo(panelName.x, panelName.height + 1);
+        this.graphics.moveTo(panelName.x + panelName.width, 1);
+        this.graphics.lineTo(panelName.x + panelName.width, panelName.height + 1);
 
         update();
     }
 
     public function update():void
     {
-        name.text = room.name ? room.name : "";
+        panelName.text = room.name ? room.name : "";
         roomPassword.text = room.password ? room.password : "";
         joinCode.text = room.joinCode ? room.joinCode : "";
 
@@ -1082,7 +1082,7 @@ internal class OwnerEditPanel extends Sprite
         _mp.addEventListener(MPEvent.ROOM_EDIT_FAIL, e_onEditFail);
 
         const cmd:MPCRoomEdit = new MPCRoomEdit(room);
-        cmd.name = name.text;
+        cmd.name = panelName.text;
         cmd.password = roomPassword.text;
 
         // FFA

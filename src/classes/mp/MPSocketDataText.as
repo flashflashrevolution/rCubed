@@ -38,7 +38,7 @@ package classes.mp
                     }
                 }
             }
-            catch (err)
+            catch (err:Error)
             {
                 trace("parseMessage err:", err);
             }
