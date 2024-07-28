@@ -24,7 +24,7 @@ package classes.mp.mode.ffr
 
         public function build(data:Object):void
         {
-            var s_users:Array = data.users;
+            var s_users:Object = data.users;
             var s_teams:Array = data.teams;
 
             for (var t:int = 0; t < s_teams.length; t++)
