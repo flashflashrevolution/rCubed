@@ -166,11 +166,17 @@ internal class PlayerLabel extends Sprite
             this.alpha = data.alive ? 1 : 0.5;
             isAlive = data.alive;
         }
-        else if (!_hasQuit) {
+        else if (!_hasQuit)
+        {
             // check if user has quit the match (but is still connected)
-            const gameState:String = data.room.player_state_map[data.user.uid].game_state;
+            const userState:Object = data.room.player_state_map[data.user.uid];
 
-            if (gameState != "game" && gameState != "loading") {
+            var hasQuit:Boolean = userState == null;
+            if (userState != null && userState.game_state != "game" && userState.game_state != "loading")
+                hasQuit = true;
+
+            if (hasQuit)
+            {
                 txtUsername.fontColor = MPColors.USER_LEAVE;
                 _hasQuit = true;
             }
