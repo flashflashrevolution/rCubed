@@ -48,7 +48,7 @@ package classes.chart.parse
             return info;
         }
 
-        public function getAudioData():*
+        public function getAudioData():ByteArray
         {
             return AUDIO_BYTES;
         }

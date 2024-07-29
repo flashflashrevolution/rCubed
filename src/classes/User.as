@@ -223,7 +223,7 @@ package classes
         ///- Determine what songs make up the user's Skill Rating
         public function getUserSkillRatingData():void
         {
-            for (var key:int in this.level_ranks)
+            for (var key:Object in this.level_ranks)
             {
                 var levelRank:Object = this.level_ranks[key];
 
@@ -231,7 +231,7 @@ package classes
                 if (levelRank.score > 0)
                 {
                     //Get the song's difficulty
-                    var songInfo:SongInfo = _playlist.getSongInfo(key);
+                    var songInfo:SongInfo = _playlist.getSongInfo(key as int);
 
                     if (songInfo == null || songInfo.is_unranked)
                         continue;

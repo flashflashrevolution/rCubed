@@ -793,6 +793,7 @@ package com.worlize.websocket
             }
 
             socket.writeMultiByte(text, 'us-ascii');
+            socket.flush();
 
             handshakeTimer.stop();
             handshakeTimer.reset();
