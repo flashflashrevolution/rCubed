@@ -62,13 +62,6 @@ package classes.mp.components.chatlog
                 cmd.engine = song.engine;
                 cmd.id = song.id;
                 cmd.level_id = song.level_id;
-
-                // File Loader
-                if (song.engine && song.engine.id == "fileloader")
-                    cmd.engine = {"id": "fileloader",
-                            "cacheID": song.engine.cache_id,
-                            "chartID": song.engine.chart_id};
-
                 _mp.sendCommand(cmd);
             }
         }
