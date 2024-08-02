@@ -404,7 +404,18 @@ package classes.mp.room
 
         public function updateAccessCheck():void
         {
-            _mp.sendCommand(new MPCFFRSongPlayable(this, (songInfo != null && songInfo.access == 0)));
+            var cmd_play:MPCFFRSongPlayable = new MPCFFRSongPlayable(this);
+            if (songInfo != null)
+            {
+                cmd_play.canPlay = songInfo.access == 0;
+                cmd_play.id = songInfo.level;
+                cmd_play.level_id = songInfo.level_id;
+                cmd_play.engine = songInfo.engine;
+            }
+            else
+                cmd_play.canPlay = false;
+            _mp.sendCommand(cmd_play);
+
             _mp.sendCommand(new MPCFFRSongRate(this, GlobalVariables.instance.playerUser.songRate));
         }
 
