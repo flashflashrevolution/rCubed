@@ -368,9 +368,10 @@ package classes.mp.room
                         });
 
                         songInfo = FileLoader.buildSongInfo(chartPath, songData.engine.chartID, true);
-                        _mp.dispatchEvent(new MPRoomEvent(MPEvent.FFR_SONG_CHANGE, cmd, this, user));
-                        return;
                     }
+
+                    _mp.dispatchEvent(new MPRoomEvent(MPEvent.FFR_SONG_CHANGE, cmd, this, user));
+                    return;
                 }
                 else
                 {
