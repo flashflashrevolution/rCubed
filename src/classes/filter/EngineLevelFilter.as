@@ -48,6 +48,19 @@ package classes.filter
         public static const FILTERS_BOOLEAN:Array = ["is", "isnt"];
         public static const FILTERS_SONG_TYPES:Array = ["public", "token", "purchased", "secret"];
 
+        public static const FILTER_FLAGS_MAP:Array = [GlobalVariables.SONG_ICON_NO_SCORE,
+            GlobalVariables.SONG_ICON_UNFINISHED,
+            GlobalVariables.SONG_ICON_PASSED,
+            GlobalVariables.SONG_ICON_FC_STAR,
+            GlobalVariables.SONG_ICON_FC,
+            GlobalVariables.SONG_ICON_SDG,
+            GlobalVariables.SONG_ICON_BLACKFLAG,
+            GlobalVariables.SONG_ICON_BOOFLAG,
+            GlobalVariables.SONG_ICON_AAA,
+            GlobalVariables.SONG_ICON_MISSFLAG,
+            GlobalVariables.SONG_ICON_AVFLAG,
+            GlobalVariables.SONG_ICON_OMNIFLAG];
+
         public var name:String;
         private var _type:String;
         public var comparison:String;
@@ -360,6 +373,9 @@ package classes.filter
 
                 if (obj.hasOwnProperty("inverse"))
                     inverse = obj["inverse"];
+
+                if (type == FILTER_SONG_FLAGS)
+                    input_number = FILTER_FLAGS_MAP[input_number];
             }
         }
 
@@ -396,6 +412,9 @@ package classes.filter
 
                 if (type == FILTER_STATS)
                     obj["input_stat"] = input_stat;
+
+                if (type == FILTER_SONG_FLAGS)
+                    obj["input_number"] = FILTER_FLAGS_MAP.indexOf(input_number);
             }
             return obj;
         }

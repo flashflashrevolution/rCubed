@@ -370,9 +370,12 @@ package
         public static const SONG_ICON_FC_STAR:int = 3;
         public static const SONG_ICON_FC:int = 4;
         public static const SONG_ICON_SDG:int = 5;
-        public static const SONG_ICON_BLACKFLAG:int = 6;
-        public static const SONG_ICON_BOOFLAG:int = 7;
-        public static const SONG_ICON_AAA:int = 8;
+        public static const SONG_ICON_OMNIFLAG:int = 6;
+        public static const SONG_ICON_MISSFLAG:int = 7;
+        public static const SONG_ICON_AVFLAG:int = 8;
+        public static const SONG_ICON_BLACKFLAG:int = 9;
+        public static const SONG_ICON_BOOFLAG:int = 10;
+        public static const SONG_ICON_AAA:int = 11;
 
         public static function getSongIconIndex(_songInfo:SongInfo, _rank:Object):int
         {
@@ -417,6 +420,18 @@ package
                 // SDG
                 if (maxRawScore - _rank.rawscore < 250)
                     songIcon = SONG_ICON_SDG;
+
+                // Omni Flag
+                if (_rank.perfect == noteCount - 1 && _rank.good == 1 && _rank.average == 1 && _rank.miss == 1 && _rank.boo == 1)
+                    songIcon = SONG_ICON_OMNIFLAG;
+
+                // Miss Flag
+                if (_rank.perfect == noteCount - 1 && _rank.good == 0 && _rank.average == 0 && _rank.miss == 1 && _rank.boo == 0)
+                    songIcon = SONG_ICON_MISSFLAG;
+
+                // Average Flag
+                if (_rank.perfect == noteCount - 1 && _rank.good == 0 && _rank.average == 1 && _rank.miss == 0 && _rank.boo == 0 && _rank.maxcombo == noteCount)
+                    songIcon = SONG_ICON_AVFLAG;
 
                 // BlackFlag
                 if (_rank.perfect == noteCount - 1 && _rank.good == 1 && _rank.average == 0 && _rank.miss == 0 && _rank.boo == 0 && _rank.maxcombo == noteCount)
@@ -473,6 +488,18 @@ package
                 if (maxRawScore - _rank.rawscore < 250)
                     songIcon |= (1 << SONG_ICON_SDG);
 
+                // Omni Flag
+                if (_rank.perfect == noteCount - 1 && _rank.good == 1 && _rank.average == 1 && _rank.miss == 1 && _rank.boo == 1)
+                    songIcon |= (1 << SONG_ICON_OMNIFLAG);
+
+                // Miss Flag
+                if (_rank.perfect == noteCount - 1 && _rank.good == 0 && _rank.average == 0 && _rank.miss == 1 && _rank.boo == 0)
+                    songIcon |= (1 << SONG_ICON_MISSFLAG);
+
+                // Average Flag
+                if (_rank.perfect == noteCount - 1 && _rank.good == 0 && _rank.average == 1 && _rank.miss == 0 && _rank.boo == 0 && _rank.maxcombo == noteCount)
+                    songIcon |= (1 << SONG_ICON_AVFLAG);
+
                 // BlackFlag
                 if (_rank.perfect == noteCount - 1 && _rank.good == 1 && _rank.average == 0 && _rank.miss == 0 && _rank.boo == 0 && _rank.maxcombo == noteCount)
                     songIcon |= (1 << SONG_ICON_BLACKFLAG);
@@ -488,13 +515,44 @@ package
             return songIcon;
         }
 
-        public static const SONG_ICON_TEXT:Array = ["<font color=\"#9C9C9C\">UNPLAYED</font>", "", "<font color=\"#9FC4B4\">PASS</font>", "<font color=\"#00FF00\">FC*</font>", "<font color=\"#00FF00\">FC</font>",
-            "<font color=\"#F2A254\">SDG</font>", "<font color=\"#2C2C2C\">BLACKFLAG</font>",
-            "<font color=\"#473218\">BOOFLAG</font>", "<font color=\"#FFFF38\">AAA</font>"];
+        public static const SONG_ICON_TEXT:Array = ["<font color=\"#9C9C9C\">UNPLAYED</font>",
+            "",
+            "<font color=\"#9FC4B4\">PASS</font>",
+            "<font color=\"#00FF00\">FC*</font>",
+            "<font color=\"#00FF00\">FC</font>",
+            "<font color=\"#F2A254\">SDG</font>", // < 10 raw
+            "<font color=\"#cc3333\">O</font><font color=\"#cca633\">M</font><font color=\"#7fcc33\">N</font><font color=\"#33cc59\">I</font><font color=\"#33cbcc\">F</font><font color=\"#6d91ff\">L</font><font color=\"#7f33cc\">A</font><font color=\"#cc33cc\">G</font>",
+            "<font color=\"#660A0A\">MISSFLAG</font>", // 1 miss
+            "<font color=\"#FF9A00\">AVFLAG</font>", // 1 average
+            "<font color=\"#2C2C2C\">BLACKFLAG</font>", // 1 good
+            "<font color=\"#473218\">BOOFLAG</font>", // 1 boo
+            "<font color=\"#FFFF38\">AAA</font>"]; // :)
 
-        public static const SONG_ICON_COLOR:Array = ["#9C9C9C", "#FFFFFF", "#9FC4B4", "#00FF00", "#00FF00", "#F2A254", "#2C2C2C", "#473218", "#FFFF38"];
+        public static const SONG_ICON_COLOR:Array = ["#9C9C9C",
+            "#FFFFFF",
+            "#9FC4B4",
+            "#00FF00",
+            "#00FF00",
+            "#F2A254",
+            "#cc33cc",
+            "#660A0A",
+            "#FF9A00",
+            "#2C2C2C",
+            "#473218",
+            "#FFFF38"];
 
-        public static const SONG_ICON_TEXT_FLAG:Array = ["Unplayed", "Unfinished", "Passed", "Full Combo*", "Full Combo", "Single Digit Good", "Blackflag", "Booflag", "AAA"];
+        public static const SONG_ICON_TEXT_FLAG:Array = ["Unplayed",
+            "Unfinished",
+            "Passed",
+            "Full Combo*",
+            "Full Combo",
+            "Single Digit Good",
+            "Omniflag",
+            "Missflag",
+            "Averageflag",
+            "Blackflag",
+            "Booflag",
+            "AAA"];
 
         public static function getSongIcon(_songInfo:SongInfo, _rank:Object):String
         {
