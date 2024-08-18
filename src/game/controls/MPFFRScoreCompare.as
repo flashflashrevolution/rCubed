@@ -141,12 +141,13 @@ internal class PlayerLabel extends Sprite
         this.graphics.drawRect(0, 0, 151, 40);
         this.graphics.endFill();
 
-        txtPosition = new Text(this, 5, 5, "", 20, "#DBDBDB");
+        txtPosition = new Text(this, 117, 5, "", 20, "#0098CB");
         txtPosition.setAreaParams(30, 30, "right");
 
-        txtUsername = new Text(this, 40, 2, user.name);
+        txtUsername = new Text(this, 5, 2, user.name);
+        txtUsername.width = 107;
 
-        txtScore = new Text(this, 40, 18, "", 10, "#EAEAEA");
+        txtScore = new Text(this, 4, 18, "", 10, "#EAEAEA");
     }
 
     public function update():void
