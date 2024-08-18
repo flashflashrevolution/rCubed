@@ -93,7 +93,6 @@ package game.controls
     }
 }
 
-import classes.mp.MPColors;
 import classes.mp.MPUser;
 import classes.mp.Multiplayer;
 import classes.mp.mode.ffr.MPMatchFFRUser;
@@ -106,12 +105,16 @@ internal class PlayerLabel extends Sprite
 {
     private static const _mp:Multiplayer = Multiplayer.instance;
 
+    private static const USER_PLAYING:String = "#FFFFFF";
+    private static const USER_FINISHED:String = "#F25C5C";
+
     public var room:MPRoom;
     public var user:MPUser;
     public var data:MPMatchFFRUser;
 
     public var isSelf:Boolean = false;
     public var isAlive:Boolean = true;
+    public var isPlaying:Boolean = true;
 
     public var txtPosition:Text;
     public var txtUsername:Text;
@@ -119,7 +122,6 @@ internal class PlayerLabel extends Sprite
 
     private var _lastPosition:int = -1;
     private var _lastScore:int = -1;
-    private var _hasQuit:Boolean = false;
 
     public function PlayerLabel(room:MPRoomFFR, data:MPMatchFFRUser):void
     {
@@ -166,20 +168,10 @@ internal class PlayerLabel extends Sprite
             this.alpha = data.alive ? 1 : 0.5;
             isAlive = data.alive;
         }
-        else if (!_hasQuit)
+        else if (data.playing != isPlaying)
         {
-            // check if user has quit the match (but is still connected)
-            const userState:Object = data.room.player_state_map[data.user.uid];
-
-            var hasQuit:Boolean = userState == null;
-            if (userState != null && userState.game_state != "game" && userState.game_state != "loading")
-                hasQuit = true;
-
-            if (hasQuit)
-            {
-                txtUsername.fontColor = MPColors.USER_LEAVE;
-                _hasQuit = true;
-            }
+            txtUsername.fontColor = data.playing ? USER_PLAYING : USER_FINISHED;
+            isPlaying = data.playing;
         }
     }
 

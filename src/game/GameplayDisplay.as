@@ -281,6 +281,8 @@ package game
                     fakeMPPlayer.update({"name": fakeNames[i - 1]});
 
                     var fakePlayer:MPMatchFFRUser = new MPMatchFFRUser(mpFFRRoom, fakeMPPlayer);
+                    fakePlayer.playing = (i != fakeNames.length - 1);
+                    fakePlayer.alive = (i != fakeNames.length);
                     fakePlayer.raw_score = Math.floor(50000 / i);
                     fakePlayer.good = Math.floor(86 / i);
                     fakePlayer.average = Math.floor(69 / i);
