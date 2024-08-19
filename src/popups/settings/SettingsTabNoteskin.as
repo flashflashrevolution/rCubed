@@ -338,6 +338,7 @@ package popups.settings
             for (var i:int = 0; i < optionNoteColors.length; i++)
             {
                 _gvars.activeUser.noteColors[i] = data;
+                (optionNoteColors[i] as ComboBox).selectedItemByData = data;
                 arrayColorSpritesReplace[i] = replaceNoteImage(arrayColorSpritesReplace[i], 22, _gvars.activeUser.noteColors[i]);
             }
             e.target.selectedItem = null;
