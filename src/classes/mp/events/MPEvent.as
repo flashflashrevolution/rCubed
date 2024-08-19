@@ -41,6 +41,7 @@ package classes.mp.events
         public static const USER_EDIT_OK:String = "user_edit_ok";
         public static const USER_EDIT_FAIL:String = "user_edit_fail";
         public static const USER_MESSAGE:String = "user_message";
+        public static const USER_MESSAGE_READ:String = "user_message_read";
         public static const USER_ROOM_INVITE:String = "user_room_invite";
         public static const USER_BLOCK_UPDATE:String = "user_block_update";
 

@@ -189,6 +189,7 @@ package menu
                 _mp.addEventListener(MPEvent.ROOM_DELETE_OK, e_onRoomDeleteOK);
 
                 _mp.addEventListener(MPEvent.USER_MESSAGE, e_onChatUpdate);
+                _mp.addEventListener(MPEvent.USER_MESSAGE_READ, e_onChatUpdate);
                 _mp.addEventListener(MPEvent.USER_ROOM_INVITE, e_onChatUpdate);
 
                 _mp.connect();

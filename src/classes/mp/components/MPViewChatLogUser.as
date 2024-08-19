@@ -5,6 +5,7 @@ package classes.mp.components
     import classes.mp.Multiplayer;
     import classes.mp.commands.MPCUserMessage;
     import classes.mp.components.chatlog.MPChatLogEntry;
+    import classes.mp.events.MPEvent;
     import classes.mp.events.MPUserEvent;
     import classes.mp.pm.MPUserChatHistory;
     import classes.ui.BoxText;
@@ -157,6 +158,7 @@ package classes.mp.components
                 addItem(history.messages[i]);
 
             history.newMessage = false;
+            _mp.dispatchEvent(new MPUserEvent(MPEvent.USER_MESSAGE_READ, null, e.user));
         }
 
         private function e_onMessageType(e:Event):void
