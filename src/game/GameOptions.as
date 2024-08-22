@@ -22,6 +22,7 @@ package game
         public var screencutPosition:Number = 0.5;
         public var mods:Array = [];
         public var noteskin:int = 1;
+        public var accuracyBarFadeFactor:Number = 0.95;
 
         public var offsetGlobal:Number = 0;
         public var offsetJudge:Number = 0;
@@ -106,6 +107,7 @@ package game
             mods = user.activeMods.concat(user.activeVisualMods);
             modCache = null;
             noteskin = user.activeNoteskin;
+            accuracyBarFadeFactor = user.accuracyBarFadeFactor;
 
             offsetGlobal = user.GLOBAL_OFFSET;
             offsetJudge = user.JUDGE_OFFSET;
@@ -241,6 +243,7 @@ package game
             settings["frameRate"] = frameRate;
             settings["songRate"] = songRate;
             settings["visual"] = mods;
+            settings["accuracyBarFadeFactor"] = accuracyBarFadeFactor;
 
             if (isolation)
             {
@@ -294,6 +297,7 @@ package game
             mods = settings["visual"] || [];
             modCache = null;
             noteskin = settings["noteskin"] != null ? settings["noteskin"] : 1;
+            accuracyBarFadeFactor = settings["accuracyBarFadeFactor"] || 0.95;
 
             offsetGlobal = settings["viewOffset"] || 0;
             offsetJudge = settings["judgeOffset"] || 0;
