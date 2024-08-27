@@ -11,7 +11,7 @@ package game.controls
     public class AccuracyBar extends GameControl
     {
         private static var CLEAR_TRANSFORM:ColorTransform = new ColorTransform(1, 1, 1, 0);
-        private static var ADJUST_TRANSFORM:ColorTransform = new ColorTransform(1, 1, 1, 0.95)
+        private static var ADJUST_TRANSFORM:ColorTransform;
 
         private var options:GameOptions;
 
@@ -51,6 +51,7 @@ package game.controls
             _colors[5] = options.judgeColors[3];
 
             // Setup ColorTransform for Fade
+            ADJUST_TRANSFORM = new ColorTransform(1, 1, 1, options.accuracyBarFadeFactor);
             _renderTarget = new Shape();
             _alphaArea = new Rectangle(0, 0, _width, _height);
 
