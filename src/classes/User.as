@@ -153,6 +153,7 @@ package classes
         public var frameRate:int = 60;
         public var songRate:Number = 1;
         public var gameLayout:Object = {};
+        public var accuracyBarFadeFactor:Number = 0.95;
 
         //- Permissions
         public var isActiveUser:Boolean;
@@ -724,6 +725,9 @@ package classes
             if (_settings.noteScale != null)
                 this.noteScale = _settings.noteScale;
 
+            if (_settings.accuracyBarFadeFactor != null)
+                this.accuracyBarFadeFactor = _settings.accuracyBarFadeFactor;
+
             if (_settings.screencutPosition != null)
                 this.screencutPosition = _settings.screencutPosition;
 
@@ -851,6 +855,7 @@ package classes
 
             gameSave.keys = [this.keyLeft, this.keyDown, this.keyUp, this.keyRight, this.keyRestart, this.keyQuit, this.keyOptions];
 
+            gameSave.accuracyBarFadeFactor = this.accuracyBarFadeFactor;
             gameSave.receptorSpeed = this.receptorSpeed;
             gameSave.judgeSpeed = this.judgeSpeed;
             gameSave.judgeScale = this.judgeScale;

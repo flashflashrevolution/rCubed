@@ -40,6 +40,9 @@ package popups.settings
 
         private var optionDisplays:Array;
 
+        private var optionAccuracyBarFadeFactor:BoxSlider;
+        private var textAccuracyBarFadeFactor:Text;
+
         private var optionReceptorSpeed:BoxSlider;
         private var textReceptorSpeed:Text;
 
@@ -94,6 +97,11 @@ package popups.settings
                 gameDisplayCheck.display = gameUIArray[i];
                 optionDisplays.push(gameDisplayCheck);
                 yOff += 19;
+
+                if (gameUIArray[i] == "ACCURACY_BAR")
+                {
+                    yOff = drawAccuracyBarFadeFactor(xOff, yOff, container);
+                }
 
                 if (gameUIArray[i] == "RECEPTOR_ANIMATIONS")
                 {
@@ -170,6 +178,20 @@ package popups.settings
         }
 
 
+        private function drawAccuracyBarFadeFactor(xOff:int, yOff:int, container:ScrollPaneContent):int
+        {
+            new Text(container, xOff + 23, yOff, _lang.string("options_accuracy_bar_fade_factor"));
+            yOff += 22;
+
+            optionAccuracyBarFadeFactor = new BoxSlider(container, xOff + 23, yOff + 3, 100, 10, changeHandler);
+            optionAccuracyBarFadeFactor.minValue = 0.5;
+            optionAccuracyBarFadeFactor.maxValue = 0.99;
+
+            textAccuracyBarFadeFactor = new Text(container, xOff + 128, yOff - 2);
+            yOff += 20;
+            return yOff + 4;
+        }
+
         private function drawReceptorSpeed(xOff:int, yOff:int, container:ScrollPaneContent):int
         {
             new Text(container, xOff + 23, yOff, _lang.string("options_receptor_speed"));
@@ -221,6 +243,9 @@ package popups.settings
                 item.checked = (_gvars.activeUser["DISPLAY_" + item.display]);
             }
 
+            optionAccuracyBarFadeFactor.slideValue = _gvars.activeUser.accuracyBarFadeFactor;
+            textAccuracyBarFadeFactor.text = (_gvars.activeUser.accuracyBarFadeFactor * 100).toFixed(0) + "%";
+
             optionReceptorSpeed.slideValue = _gvars.activeUser.receptorSpeed;
             textReceptorSpeed.text = _gvars.activeUser.receptorSpeed.toFixed(2) + "x";
 
@@ -271,6 +296,12 @@ package popups.settings
 
         override public function changeHandler(e:Event):void
         {
+            if (e.target == optionAccuracyBarFadeFactor)
+            {
+                _gvars.activeUser.accuracyBarFadeFactor = Math.round(optionAccuracyBarFadeFactor.slideValue * 100) / 100;
+                textAccuracyBarFadeFactor.text = (_gvars.activeUser.accuracyBarFadeFactor * 100).toFixed(0) + "%";
+            }
+
             if (e.target == optionJudgeSpeed)
             {
                 _gvars.activeUser.judgeSpeed = (Math.round((optionJudgeSpeed.slideValue * 100) / 5) * 5) / 100; // Snap to 0.05 intervals.
