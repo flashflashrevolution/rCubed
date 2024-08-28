@@ -325,7 +325,7 @@ package game
             // --- End Per Song Settings
 
             // --- Update RG values for Personal Best or AAA Equiv autofail/tracking if active
-            if (options.personalBestMode || options.personalBestTracker || options.autofail[7] != 0)
+            if (options.isScoreUpdated() && (options.personalBestMode || options.personalBestTracker || options.autofail[7] != 0))
             {
                 var infoRanks:Object = _gvars.playerUser.getLevelRank(song.songInfo);
                 var rawScoreMax:Number = song.songInfo.score_raw;
