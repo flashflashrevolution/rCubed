@@ -422,7 +422,7 @@ package popups.settings
             else if (e.target == optionRate)
             {
                 var newSongRate:Number = optionRate.validate(1, 0.1);
-                newSongRate = Math.max(0.1, Math.min(50, Math.round(newSongRate * 1000) / 1000));
+                newSongRate = Math.max(0.1, Math.min(200, Math.round(newSongRate * 1000) / 1000));
                 if (isNaN(newSongRate) || !isFinite(newSongRate))
                     newSongRate = 1;
 
