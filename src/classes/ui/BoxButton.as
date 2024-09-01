@@ -18,7 +18,7 @@ package classes.ui
         private var _hoverText:String;
         private var _hoverPosition:String = "top";
         private var _hoverSprite:MouseTooltip;
-        private var _hoverTimer:Timer = new Timer(500, 1);
+        private var _hoverTimer:Timer;
 
         public function BoxButton(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0, width:Number = 0, height:Number = 0, text:String = "", size:int = 12, listener:Function = null)
         {
@@ -59,6 +59,7 @@ package classes.ui
             {
                 _hoverTimer.stop();
                 _hoverTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
+                _hoverTimer = null;
                 this.removeEventListener(MouseEvent.ROLL_OVER, e_hoverRollOver);
                 this.removeEventListener(MouseEvent.ROLL_OUT, e_hoverRollOut);
                 this.removeEventListener(Event.REMOVED_FROM_STAGE, e_removedFromStage);
@@ -101,6 +102,7 @@ package classes.ui
                     this.removeEventListener(MouseEvent.ROLL_OUT, e_hoverRollOut);
                     this.removeEventListener(Event.REMOVED_FROM_STAGE, e_removedFromStage);
                     _hoverTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
+                    _hoverTimer = null;
                 }
 
                 _hoverText = hover_text;
@@ -120,6 +122,9 @@ package classes.ui
 
             if (this.parent && this.parent.stage)
             {
+                if (!_hoverTimer)
+                    _hoverTimer = new Timer(500, 1);
+
                 _hoverTimer.addEventListener(TimerEvent.TIMER_COMPLETE, e_hoverTimerComplete);
                 _hoverTimer.start();
             }
