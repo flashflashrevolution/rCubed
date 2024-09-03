@@ -22,7 +22,6 @@ package popups.settings
 
     public class SettingsTabMisc extends SettingsTabBase
     {
-
         private var _gvars:GlobalVariables = GlobalVariables.instance;
         private var _lang:Language = Language.instance;
         private var _avars:ArcGlobals = ArcGlobals.instance;
@@ -68,6 +67,10 @@ package popups.settings
         {
             Main.window.addEventListener(NativeWindowBoundsEvent.MOVE, e_windowPropertyChange);
             Main.window.addEventListener(NativeWindowBoundsEvent.RESIZE, e_windowPropertyChange);
+
+            container.graphics.lineStyle(1, 0xFFFFFF, 0.35);
+            container.graphics.moveTo(295, 15);
+            container.graphics.lineTo(295, 405);
 
             var i:int;
             var xOff:int = 15;
@@ -155,10 +158,13 @@ package popups.settings
             yOff += 20;
 
             optionFPS = new ValidatedText(container, xOff + 3, yOff + 3, 120, 20, ValidatedText.R_INT_P, changeHandler);
-            if (Main.VSYNC_SUPPORT)
+
+            new Text(container, xOff + 163, yOff + 4, _lang.string("air_options_use_vsync"));
+            useVSyncCheckbox = new BoxCheck(container, xOff + 143, yOff + 7, clickHandler);
+            if (!Main.VSYNC_SUPPORT)
             {
-                new Text(container, xOff + 163, yOff + 4, _lang.string("air_options_use_vsync"));
-                useVSyncCheckbox = new BoxCheck(container, xOff + 143, yOff + 7, clickHandler);
+                useVSyncCheckbox.alpha = 0.5;
+                useVSyncCheckbox.addEventListener(MouseEvent.MOUSE_OVER, e_vsyncMouseOver, false, 0, true);
             }
             yOff += 30;
 
@@ -215,9 +221,9 @@ package popups.settings
             useWebsocketCheckbox.checked = _gvars.air_useWebsockets;
 
             if (Main.VSYNC_SUPPORT)
-            {
                 useVSyncCheckbox.checked = _gvars.air_useVSync;
-            }
+            else
+                useVSyncCheckbox.checked = true;
 
             windowWidthBox.text = _gvars.air_windowProperties.width;
             windowHeightBox.text = _gvars.air_windowProperties.height;
@@ -238,7 +244,7 @@ package popups.settings
                 LocalOptions.setVariable("auto_save_local_replays", _gvars.air_autoSaveLocalReplays);
             }
 
-            //- Auto Save Local Replays
+            //- SWF File Cache
             else if (e.target == useCacheCheckbox)
             {
                 e.target.checked = !e.target.checked;
@@ -249,9 +255,9 @@ package popups.settings
             //- Vsync Toggle
             else if (e.target == useVSyncCheckbox)
             {
-                e.target.checked = !e.target.checked;
                 if (Main.VSYNC_SUPPORT)
                 {
+                    e.target.checked = !e.target.checked;
                     _gvars.gameMain.stage.vsyncEnabled = _gvars.air_useVSync = !_gvars.air_useVSync;
                     LocalOptions.setVariable("vsync", _gvars.air_useVSync);
                 }
@@ -499,6 +505,18 @@ package popups.settings
             if (_avars.legacyEngines.length > 0 && engineCombo.items.length > 2)
                 engineCombo.addItem({label: _lang.stringSimple("custom_engine_clear_engines"), data: engineCombo});
             engineComboIgnore = false;
+        }
+
+        private function e_vsyncMouseOver(e:Event):void
+        {
+            useVSyncCheckbox.addEventListener(MouseEvent.MOUSE_OUT, e_vsyncMouseOut);
+            displayToolTip(useVSyncCheckbox.x - 4, useVSyncCheckbox.y, _lang.string("air_options_use_vsync_unavailable"), "right");
+        }
+
+        private function e_vsyncMouseOut(e:Event):void
+        {
+            useVSyncCheckbox.removeEventListener(MouseEvent.MOUSE_OUT, e_vsyncMouseOut);
+            hideTooltip();
         }
     }
 }
