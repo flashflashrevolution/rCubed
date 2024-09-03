@@ -70,7 +70,7 @@ package popups.settings
         {
             container.graphics.lineStyle(1, 0xFFFFFF, 0.35);
             container.graphics.moveTo(295, 15);
-            container.graphics.lineTo(295, 505);
+            container.graphics.lineTo(295, 555);
 
             var i:int;
             var xOff:int = 15;
