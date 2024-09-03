@@ -302,6 +302,7 @@ import classes.Alert;
 import classes.Language;
 import classes.User;
 import classes.ui.BoxButton;
+import classes.ui.BoxCheck;
 import classes.ui.Prompt;
 import classes.ui.SimpleBoxButton;
 import classes.ui.Text;
@@ -403,54 +404,80 @@ internal class ManageWindow extends Prompt
     private var txt_import:TextField;
     private var btn_import:BoxButton;
 
+    private var check_settings:BoxCheck;
+    private var check_layout:BoxCheck;
+    private var check_filters:BoxCheck;
+    private var check_songQueues:BoxCheck;
+
     public function ManageWindow(win:SettingsWindow):void
     {
         this.win = win;
         super(win, 580, 320);
 
-        saveJSON = JSON.stringify(_gvars.activeUser.save(true));
-
-        var xOff:Number = 0;
+        var xOff:Number = 10;
         var yOff:Number = 0;
 
         // Close
         btn_close = new BoxButton(this, width - 110, height - 39, 100, 29, _lang.string("menu_close"), 12, clickHandler);
 
         // Export
-        new Text(this, xOff + 10, yOff + 12, _lang.string("settings_manage_export"), 16).setAreaParams(160, 30);
-        btn_export = new BoxButton(this, xOff + 179, yOff + 10, 100, 26, _lang.string("menu_copy"), 12, clickHandler);
+        new Text(this, xOff, yOff + 12, _lang.string("settings_manage_export"), 16).setAreaParams(160, 30);
+        btn_export = new BoxButton(this, xOff + 169, yOff + 10, 100, 26, _lang.string("menu_copy"), 12, clickHandler);
 
-        txt_export = makeTextfield();
-        txt_export.x = xOff + 15;
+        txt_export = makeTextfield(160);
+        txt_export.x = xOff + 5;
         txt_export.y = yOff + 50;
         txt_export.type = TextFieldType.DYNAMIC;
-        txt_export.text = saveJSON;
 
         _content.graphics.beginFill(0, 0.4);
         _content.graphics.drawRect(txt_export.x - 4, txt_export.y - 4, txt_export.width + 8, txt_export.height + 8);
         _content.graphics.endFill();
 
-        xOff += boxMid;
+        // Filters
+        yOff = txt_export.y + txt_export.height + 13;
+
+        new Text(this, xOff + 21, yOff, _lang.string("settings_manage_filter_settings")).setAreaParams(250, 22);
+        check_settings = new BoxCheck(this, xOff + 1, yOff + 3, clickHandler);
+        check_settings.checked = true;
+        yOff += 22;
+
+        new Text(this, xOff + 21, yOff, _lang.string("settings_manage_filter_layout")).setAreaParams(250, 22);
+        check_layout = new BoxCheck(this, xOff + 1, yOff + 3, clickHandler);
+        yOff += 22;
+
+        new Text(this, xOff + 21, yOff, _lang.string("settings_manage_filter_filters")).setAreaParams(250, 22);
+        check_filters = new BoxCheck(this, xOff + 1, yOff + 3, clickHandler);
+        yOff += 22;
+
+        new Text(this, xOff + 21, yOff, _lang.string("settings_manage_filter_song_queues")).setAreaParams(250, 22);
+        check_songQueues = new BoxCheck(this, xOff + 1, yOff + 3, clickHandler);
+        yOff += 22;
+
+        yOff = 0;
+        xOff = boxMid + 10;
 
         // Import
-        new Text(this, xOff + 10, yOff + 12, _lang.string("settings_manage_import"), 16).setAreaParams(160, 30);
-        btn_import = new BoxButton(this, xOff + 179, yOff + 10, 100, 26, _lang.string("menu_save"), 12, clickHandler);
+        new Text(this, xOff + 0, yOff + 12, _lang.string("settings_manage_import"), 16).setAreaParams(160, 30);
+        btn_import = new BoxButton(this, xOff + 169, yOff + 10, 100, 26, _lang.string("menu_save"), 12, clickHandler);
 
-        txt_import = makeTextfield();
-        txt_import.x = xOff + 15;
+        txt_import = makeTextfield(215);
+        txt_import.x = xOff + 5;
         txt_import.y = yOff + 50;
         txt_import.type = TextFieldType.INPUT;
 
         _content.graphics.beginFill(0, 0.4);
         _content.graphics.drawRect(txt_import.x - 4, txt_import.y - 4, txt_import.width + 8, txt_import.height + 8);
         _content.graphics.endFill();
+
+        // Update
+        updateJSON();
     }
 
-    private function makeTextfield():TextField
+    private function makeTextfield(_h:Number):TextField
     {
         var _tf:TextField = new TextField();
         _tf.width = boxMid - 30;
-        _tf.height = 215;
+        _tf.height = _h;
         _tf.multiline = true;
         _tf.defaultTextFormat = new TextFormat(Fonts.BASE_FONT, 10, 0xFFFFFF, true);
         _tf.type = TextFieldType.DYNAMIC;
@@ -460,6 +487,32 @@ internal class ManageWindow extends Prompt
         _tf.wordWrap = true;
         addChild(_tf);
         return _tf;
+    }
+
+    private function updateJSON():void
+    {
+        // Filter Settings
+        var saveObject:Object = _gvars.activeUser.save(true);
+        delete saveObject.language;
+
+        if (!check_settings.checked)
+        {
+            saveObject = {"layout": saveObject.layout,
+                    "filters": saveObject.filters,
+                    "songQueues": saveObject.songQueues};
+        }
+
+        if (!check_layout.checked)
+            delete saveObject.layout;
+
+        if (!check_filters.checked)
+            delete saveObject.filters;
+
+        if (!check_songQueues.checked)
+            delete saveObject.songQueues;
+
+        saveJSON = JSON.stringify(saveObject);
+        txt_export.text = saveJSON;
     }
 
     private function clickHandler(e:Event):void
@@ -494,6 +547,12 @@ internal class ManageWindow extends Prompt
             {
                 Alert.add(_lang.string("settings_manage_import_fail"), 120, Alert.RED);
             }
+        }
+
+        else if (e.target == check_settings || e.target == check_layout || e.target == check_filters || e.target == check_songQueues)
+        {
+            e.target.checked = !e.target.checked;
+            updateJSON();
         }
 
         else if (e.target == btn_close)
