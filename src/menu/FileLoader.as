@@ -79,6 +79,8 @@ package menu
             const emb:ExternalChartBase = info.chart_parser;
             const id:int = info.engine.chart_id;
 
+            emb.parseData();
+
             var chartData:Object = emb.getValidChartData(id);
 
             ENGINE_INFO.cache_id = emb.ID;

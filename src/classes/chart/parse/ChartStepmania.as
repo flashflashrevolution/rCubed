@@ -2,7 +2,6 @@ package classes.chart.parse
 {
     import com.flashfla.utils.StringUtil;
     import flash.utils.ByteArray;
-    import flash.utils.getTimer;
 
     public class ChartStepmania extends ChartBase
     {
@@ -191,10 +190,6 @@ package classes.chart.parse
             }
 
             this.loaded = true;
-
-            var t:Number = getTimer();
-            parse();
-            //trace("parsed in", (getTimer() - t));
 
             return true;
         }
