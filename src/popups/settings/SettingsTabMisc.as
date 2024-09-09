@@ -104,7 +104,7 @@ package popups.settings
             setLanguage();
             yOff += 30;
 
-            yOff += drawSeperator(container, xOff, 250, yOff, 0, 0);
+            yOff += drawSeperator(container, xOff, 266, yOff, 0, 0);
 
             new Text(container, xOff + 23, yOff, _lang.string("air_options_save_local_replays"));
             autoSaveLocalCheckbox = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
@@ -124,7 +124,7 @@ package popups.settings
             yOff += 30;
 
             /// Col 2
-            xOff = 330;
+            xOff = 310;
             yOff = 15;
 
             // Game Engine
@@ -151,7 +151,7 @@ package popups.settings
             engineRefresh();
             yOff += 30;
 
-            yOff += drawSeperator(container, xOff, 250, yOff, 0, 0);
+            yOff += drawSeperator(container, xOff, 266, yOff, 0, 0);
 
             // Engine Framerate
             new Text(container, xOff, yOff, _lang.string("options_framerate"));
@@ -168,7 +168,7 @@ package popups.settings
             }
             yOff += 30;
 
-            yOff += drawSeperator(container, xOff, 250, yOff, 0, 0);
+            yOff += drawSeperator(container, xOff, 266, yOff, 0, 0);
 
             // Window Size
             new Text(container, xOff, yOff, _lang.string("air_options_window_size"));

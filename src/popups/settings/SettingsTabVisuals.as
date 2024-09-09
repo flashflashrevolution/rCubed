@@ -87,7 +87,7 @@ package popups.settings
             {
                 if (gameUIArray[i] == "----")
                 {
-                    yOff += drawSeperator(container, xOff, 250, yOff, 0, 1);
+                    yOff += drawSeperator(container, xOff, 266, yOff, 0, 1);
                     continue;
                 }
 
@@ -126,7 +126,7 @@ package popups.settings
             {
                 if (gameMPUIArray[i] == "----")
                 {
-                    yOff += drawSeperator(container, xOff, 250, yOff, 0, 1);
+                    yOff += drawSeperator(container, xOff, 266, yOff, 0, 1);
                     continue;
                 }
 
@@ -138,7 +138,7 @@ package popups.settings
                 yOff += 19;
             }
 
-            yOff += drawSeperator(container, xOff, 250, yOff, 6, 5);
+            yOff += drawSeperator(container, xOff, 266, yOff, 6, 5);
 
             new Text(container, xOff, yOff, _lang.string("options_playlist_display"), 14);
             yOff += 25;
@@ -147,7 +147,7 @@ package popups.settings
             {
                 if (gameOtherArray[i] == "----")
                 {
-                    yOff += drawSeperator(container, xOff, 250, yOff, 0, 1);
+                    yOff += drawSeperator(container, xOff, 266, yOff, 0, 1);
                     continue;
                 }
 

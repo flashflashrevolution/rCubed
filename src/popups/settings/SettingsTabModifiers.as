@@ -46,7 +46,7 @@ package popups.settings
             {
                 if (modsData[i] == "----")
                 {
-                    yOff += drawSeperator(container, xOff, 200, yOff, 2, 3);
+                    yOff += drawSeperator(container, xOff, 266, yOff, 2, 3);
                     continue;
                 }
 
@@ -73,7 +73,7 @@ package popups.settings
             {
                 if (modsVisualData[i] == "----")
                 {
-                    yOff += drawSeperator(container, xOff, 200, yOff, 2, 3);
+                    yOff += drawSeperator(container, xOff, 266, yOff, 2, 3);
                     continue;
                 }
 
