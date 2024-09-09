@@ -14,6 +14,7 @@ package
     import classes.user.UserSongNotes;
     import com.flashfla.loader.DataEvent;
     import com.flashfla.net.DynamicURLLoader;
+    import com.flashfla.utils.Crypt;
     import com.flashfla.utils.Screenshots;
     import flash.display.StageDisplayState;
     import flash.events.Event;
@@ -127,6 +128,10 @@ package
 
         public function loadAirOptions():void
         {
+            var sessionToken:String = LocalStore.getVariable("uSessionToken", '');
+            if (sessionToken != '')
+                userSession = Crypt.Decode(sessionToken);
+
             air_useVSync = LocalOptions.getVariable("vsync", false);
             air_useLocalFileCache = LocalOptions.getVariable("use_local_file_cache", true);
             air_autoSaveLocalReplays = LocalOptions.getVariable("auto_save_local_replays", true);
