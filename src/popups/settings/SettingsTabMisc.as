@@ -97,7 +97,7 @@ package popups.settings
             languageCombo = new ComboBox(container, xOff, yOff, selectedLanguage, optionGameLanguages);
             languageCombo.x = xOff;
             languageCombo.y = yOff;
-            languageCombo.setSize(200, 22);
+            languageCombo.setSize(245, 22);
             languageCombo.openPosition = ComboBox.BOTTOM;
             languageCombo.fontSize = 11;
             languageCombo.addEventListener(Event.SELECT, languageSelect);
@@ -120,7 +120,7 @@ package popups.settings
             yOff += 30;
 
             // https://github.com/flashflashrevolution/web-stream-overlay
-            openWebsocketOverlay = new BoxButton(container, xOff, yOff, 200, 27, _lang.string("options_overlay_instructions"), 12, clickHandler);
+            openWebsocketOverlay = new BoxButton(container, xOff, yOff, 245, 27, _lang.string("options_overlay_instructions"), 12, clickHandler);
             yOff += 30;
 
             /// Col 2
@@ -132,7 +132,7 @@ package popups.settings
             yOff += 20;
 
             engineCombo = new ComboBox(container, xOff, yOff);
-            engineCombo.setSize(200, 22);
+            engineCombo.setSize(245, 22);
             engineCombo.openPosition = ComboBox.BOTTOM;
             engineCombo.fontSize = 11;
             engineCombo.addEventListener(Event.SELECT, engineSelect);
@@ -143,7 +143,7 @@ package popups.settings
             yOff += 20;
 
             engineDefaultCombo = new ComboBox(container, xOff, yOff);
-            engineDefaultCombo.setSize(200, 22);
+            engineDefaultCombo.setSize(245, 22);
             engineDefaultCombo.openPosition = ComboBox.BOTTOM;
             engineDefaultCombo.fontSize = 11;
             engineDefaultCombo.addEventListener(Event.SELECT, engineDefaultSelect);
@@ -236,7 +236,7 @@ package popups.settings
 
         override public function clickHandler(e:MouseEvent):void
         {
-            //- Auto Save Local Replays
+            // Auto Save Local Replays
             if (e.target == autoSaveLocalCheckbox)
             {
                 e.target.checked = !e.target.checked;
@@ -244,7 +244,7 @@ package popups.settings
                 LocalOptions.setVariable("auto_save_local_replays", _gvars.air_autoSaveLocalReplays);
             }
 
-            //- SWF File Cache
+            // SWF File Cache
             else if (e.target == useCacheCheckbox)
             {
                 e.target.checked = !e.target.checked;
@@ -252,7 +252,7 @@ package popups.settings
                 LocalOptions.setVariable("use_local_file_cache", _gvars.air_useLocalFileCache);
             }
 
-            //- Vsync Toggle
+            // Vsync Toggle
             else if (e.target == useVSyncCheckbox)
             {
                 if (Main.VSYNC_SUPPORT)
@@ -294,10 +294,9 @@ package popups.settings
             else if (e.target == openWebsocketOverlay)
             {
                 navigateToURL(new URLRequest(Constant.WEBSOCKET_OVERLAY_URL), "_blank");
-                return;
             }
 
-            //- Window Position
+            // Window Position
             else if (e.target == windowSavePositionCheck)
             {
                 e.target.checked = !e.target.checked;
@@ -319,7 +318,7 @@ package popups.settings
                 e_windowSetUpdate();
             }
 
-            //- Window Size
+            // Window Size
             else if (e.target == windowSaveSizeCheck)
             {
                 e.target.checked = !e.target.checked;
