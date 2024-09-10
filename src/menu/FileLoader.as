@@ -130,7 +130,7 @@ package menu
 
         public static function buildCacheObject(chartFile:File):Object
         {
-            var cacheObj:Object = {"valid": 0}
+            var cacheObj:Object = {"valid": 0, "date": chartFile.modificationDate.getTime()}
             var emb:ExternalChartBase = new ExternalChartBase();
             if (emb.load(chartFile, true))
             {
