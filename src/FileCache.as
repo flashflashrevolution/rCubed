@@ -111,6 +111,12 @@ package
             _isDirty = true;
         }
 
+        public function deleteKey(path:String):void
+        {
+            delete CACHE["keys"][path];
+            _isDirty = true;
+        }
+
         public function clear():void
         {
             CACHE = getDefaultCacheObject();

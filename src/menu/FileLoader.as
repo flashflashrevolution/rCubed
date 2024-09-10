@@ -13,7 +13,7 @@ package menu
     {
         private static var _gvars:GlobalVariables = GlobalVariables.instance;
 
-        public static var cache:FileCache = new FileCache("chart_cache.json", 1);
+        public static var cache:FileCache = new FileCache("chart_cache.json", 2);
 
         public static var ENGINE_INFO:Object = {name: "File Loader",
                 id: "fileloader",
@@ -126,6 +126,47 @@ package menu
                 _gvars.options.fill();
                 _gvars.gameMain.switchTo(Main.GAME_PLAY_PANEL);
             }
+        }
+
+        public static function buildCacheObject(chartFile:File):Object
+        {
+            var cacheObj:Object = {"valid": 0}
+            var emb:ExternalChartBase = new ExternalChartBase();
+            if (emb.load(chartFile, true))
+            {
+                var chartData:Object = emb.getInfo();
+                var chartCharts:Array = emb.getAllCharts();
+
+                cacheObj = {"valid": 1,
+                        "name": chartData['name'],
+                        "author": chartData['author'],
+                        "stepauthor": chartData['stepauthor'],
+                        "difficulty": chartData['difficulty'],
+                        "music": chartData['music'],
+                        "banner": chartData['banner'],
+                        "background": chartData['background'],
+                        "ext": chartData['ext'],
+                        "chart": [],
+                        "id": emb.ID,
+                        "date": emb.DATE}
+
+                for (var i:int = 0; i < chartCharts.length; i++)
+                {
+                    var difficultyData:Object = chartCharts[i];
+                    cacheObj['chart'][i] = {"class": difficultyData['class'],
+                            "class_color": difficultyData['class_color'],
+                            "desc": difficultyData['desc'],
+                            "difficulty": difficultyData['difficulty'],
+                            "type": difficultyData['type'],
+                            "time_sec": Number(difficultyData['time_sec'].toFixed(2)),
+                            "nps": Number(difficultyData['nps'].toFixed(2)),
+                            "arrows": difficultyData['arrows'],
+                            "holds": difficultyData['holds'],
+                            "mines": difficultyData['mines']};
+                }
+            }
+
+            return cacheObj;
         }
     }
 }

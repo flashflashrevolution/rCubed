@@ -15,8 +15,8 @@ package popups.filebrowser
 
         private var _pane:Sprite;
 
-        private var _width:Number = 772;
-        private var _height:Number = 402;
+        private var _width:Number = 531;
+        private var _height:Number = 400;
 
         private var sourceElements:Array;
 
@@ -26,6 +26,7 @@ package popups.filebrowser
         private var renderCount:int = 0;
 
         private var filter:FileBrowserFilter;
+        private var filterLastTerm:String;
 
         private var _scrollY:Number = 0;
         private var _calcHeight:int = 0;
@@ -54,7 +55,7 @@ package popups.filebrowser
             _pane.addEventListener(MouseEvent.MOUSE_WHEEL, e_scrollWheel);
             addChild(_pane);
 
-            _vscroll = new ScrollBar(this, _width - 27, 1, 26, _height - 2, null, null, e_scrollVerticalUpdate);
+            _vscroll = new ScrollBar(this, _width - 23, 1, 21, _height - 1, null, null, e_scrollVerticalUpdate);
 
             draw();
 
@@ -93,14 +94,19 @@ package popups.filebrowser
 
             if (filter.type != null && filter.term != null && filter.term.length >= 2)
             {
-                var quickTerm:String = filter.term.toLocaleLowerCase();
-                if (filter.type == "author" || filter.type == "name")
-                {
-                    filterList = sourceElements.filter(function(item:FileFolder, index:int, arr:Array):Boolean
-                    {
-                        return item.name.toLocaleLowerCase().indexOf(quickTerm) >= 0 || item.author.toLocaleLowerCase().indexOf(quickTerm) >= 0;
-                    });
-                }
+                filterLastTerm = filter.term.toLocaleLowerCase();
+
+                if (filter.type == "any")
+                    filterList = sourceElements.filter(_filterAny);
+
+                else if (filter.type == "author")
+                    filterList = sourceElements.filter(_filterAuthor);
+
+                else if (filter.type == "name")
+                    filterList = sourceElements.filter(_filterName);
+
+                else if (filter.type == "stepauthor")
+                    filterList = sourceElements.filter(_filterStepauthor);
             }
 
             if (filterList == null)
@@ -342,6 +348,26 @@ package popups.filebrowser
         private function e_scrollVerticalUpdate(e:Event):void
         {
             scrollVertical = _vscroll.scroll;
+        }
+
+        private function _filterAny(item:FileFolder, index:int, arr:Array):Boolean
+        {
+            return item.name.toLocaleLowerCase().indexOf(filterLastTerm) >= 0 || item.author.toLocaleLowerCase().indexOf(filterLastTerm) >= 0 || item.stepauthor.toLocaleLowerCase().indexOf(filterLastTerm) >= 0;
+        }
+
+        private function _filterAuthor(item:FileFolder, index:int, arr:Array):Boolean
+        {
+            return item.author.toLocaleLowerCase().indexOf(filterLastTerm) >= 0;
+        }
+
+        private function _filterName(item:FileFolder, index:int, arr:Array):Boolean
+        {
+            return item.name.toLocaleLowerCase().indexOf(filterLastTerm) >= 0;
+        }
+
+        private function _filterStepauthor(item:FileFolder, index:int, arr:Array):Boolean
+        {
+            return item.stepauthor.toLocaleLowerCase().indexOf(filterLastTerm) >= 0;
         }
 
 

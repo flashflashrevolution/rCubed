@@ -9,6 +9,7 @@ package popups.filebrowser
 
         public var author:String;
         public var name:String;
+        public var stepauthor:String;
         public var banner:String;
         public var ext:String;
 

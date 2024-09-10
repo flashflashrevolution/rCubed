@@ -20,6 +20,7 @@ package classes.chart.parse
         public static const VALID_CHART_EXTENSIONS:Array = ["sm", "ssc", "osu", "qua"];
 
         public var ID:String;
+        public var DATE:Number;
 
         public var DEFAULT_CHART_ID:int = 0;
 
@@ -180,6 +181,7 @@ package classes.chart.parse
                     info['background'] = parser.data.background || "";
 
                     ID = MD5.hashBytes(CHART_BYTES);
+                    DATE = firstFile.modificationDate.getTime();
 
                     // Folder Path
                     var path:String = firstFile.nativePath;

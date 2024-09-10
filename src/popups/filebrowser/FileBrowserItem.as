@@ -9,7 +9,7 @@ package popups.filebrowser
     public class FileBrowserItem extends Sprite
     {
         public static const FIXED_WIDTH:int = 500;
-        public static const FIXED_HEIGHT:int = 45;
+        public static const FIXED_HEIGHT:int = 42;
 
         private static const COLUMN_COLORS:Array = [,"c1ffff", "e3ffcc", "edddff", "ffffff", "67c7f7", "1ddb00", "ffb600", "f40202", "ac00e5", "7641f2"];
         private static const EXT_COLORS:Object = {"sm": 0x0f78ad,
@@ -56,17 +56,17 @@ package popups.filebrowser
             }
 
 
-            _lblSongName = new Text(this, 5, 3, "--", 14);
-            _lblSongName.setAreaParams(FIXED_WIDTH - 50, 18);
+            _lblSongName = new Text(this, 5, 4, "--", 13);
+            _lblSongName.setAreaParams(FIXED_WIDTH - 100, 16);
 
-            _lblAuthorName = new Text(this, 5, 24, "--");
-            _lblAuthorName.setAreaParams(FIXED_WIDTH - 10, 16);
+            _lblAuthorName = new Text(this, 5, 22, "--", 11);
+            _lblAuthorName.setAreaParams(FIXED_WIDTH - 100, 16);
 
-            _lblType = new Text(this, FIXED_WIDTH - FIXED_HEIGHT - 4, 3, "--", 10);
-            _lblType.setAreaParams(FIXED_HEIGHT, 16, "right");
+            _lblType = new Text(this, 5, 1, "--", 10);
+            _lblType.setAreaParams(FIXED_WIDTH - 7, 16, "right");
 
-            _lblColumnType = new Text(this, 5, 26, "--");
-            _lblColumnType.setAreaParams(FIXED_WIDTH - 4, 16, "right");
+            _lblColumnType = new Text(this, 5, 25, "--", 10);
+            _lblColumnType.setAreaParams(FIXED_WIDTH - 8, 16, "right");
 
             drawBox();
 
@@ -87,15 +87,15 @@ package popups.filebrowser
             this.graphics.drawRect(0, 0, FIXED_WIDTH, FIXED_HEIGHT);
             this.graphics.endFill();
 
-            var textWidth:int = 20;
+            var textWidth:int = _lblType.textfield.textWidth;
             this.graphics.lineStyle(0, 0, 0, true);
             this.graphics.beginFill(_color, 0.75);
-            this.graphics.drawRoundRectComplex(FIXED_WIDTH - textWidth - 11, 2, textWidth + 10, 19, 0, 0, 5, 0);
+            this.graphics.drawRoundRectComplex(FIXED_WIDTH - textWidth - 10, 1, textWidth + 10, 17, 0, 0, 5, 0);
             this.graphics.endFill();
 
-            textWidth = _lblColumnType.textfield.textWidth - 5;
+            textWidth = _lblColumnType.textfield.textWidth;
             this.graphics.beginFill(0x000000, 0.75);
-            this.graphics.drawRoundRectComplex(FIXED_WIDTH - textWidth - 13, FIXED_HEIGHT - 20, textWidth + 12, 19, 5, 0, 0, 0);
+            this.graphics.drawRoundRectComplex(FIXED_WIDTH - textWidth - 9, FIXED_HEIGHT - 17, textWidth + 9, 17, 5, 0, 0, 0);
             this.graphics.endFill();
         }
 
@@ -111,7 +111,7 @@ package popups.filebrowser
         {
             this.songData = songData;
             _lblSongName.text = songData.name;
-            _lblAuthorName.text = songData.author;
+            _lblAuthorName.text = songData.author + " <font color=\"#cccccc\">[" + songData.stepauthor + "]</font>";
             _lblType.text = songData.ext.toUpperCase();
 
             // Reset
@@ -134,7 +134,7 @@ package popups.filebrowser
                 if (COLUMN_COUNTS[chartLookIndex] > 0)
                     columnString += "<font color=\"#" + (COLUMN_COLORS[chartLookIndex] || "ffffff") + "\">" + chartLookIndex + "K</font>  ";
 
-            _lblColumnType.text = columnString;
+            _lblColumnType.text = columnString.substring(0, columnString.length - 2);
 
             _color = EXT_COLORS[songData.ext] || 0;
 

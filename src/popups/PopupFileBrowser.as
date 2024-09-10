@@ -2,7 +2,7 @@ package popups
 {
     import assets.menu.icons.fa.iconClose;
     import assets.menu.icons.fa.iconFolder;
-    import assets.menu.icons.fa.iconUpLevel;
+    import assets.menu.icons.fa.iconRefresh;
     import classes.Alert;
     import classes.Language;
     import classes.chart.parse.ExternalChartBase;
@@ -12,6 +12,7 @@ package popups
     import classes.ui.BoxIcon;
     import classes.ui.BoxText;
     import classes.ui.Text;
+    import com.bit101.components.ComboBox;
     import com.flashfla.utils.sprintf;
     import flash.display.Bitmap;
     import flash.display.BitmapData;
@@ -53,7 +54,7 @@ package popups
         public static var lastSelectedIndex:int = 0;
         public static var listFilter:FileBrowserFilter = new FileBrowserFilter();
 
-        public static var pathList:Vector.<String>;
+        public static var pathList:Vector.<String> = new <String>[];
 
         //- Background
         private var box:Box;
@@ -61,13 +62,14 @@ package popups
         private var bmp:Bitmap;
         private var dividers:Sprite;
 
-        private var upFolder:BoxIcon;
+        private var refreshAllFolder:BoxIcon;
         private var displayFolderPath:Text;
         private var selectFolder:BoxIcon;
         private var closeWindow:BoxIcon;
 
         private var searchInput:BoxText;
         private var searchPlaceholder:Text;
+        private var searchTypeBox:ComboBox;
 
         private var lastSelectedItem:FileBrowserItem;
         private var songBrowser:FileBrowserList;
@@ -112,7 +114,7 @@ package popups
             box.addChild(dividers);
 
             // Top Bar Item
-            closeWindow = new BoxIcon(box, box.width - 32, 6, 27, 27, new iconClose(), clickHandler);
+            closeWindow = new BoxIcon(box, box.width - 34, 6, 27, 27, new iconClose(), clickHandler);
             selectFolder = new BoxIcon(box, closeWindow.x - 32, 6, 27, 27, new iconFolder(), clickHandler);
 
             displayFolderPath = new Text(box, 40, 6, _lang.string("file_loader_no_folder_selected"));
@@ -126,7 +128,8 @@ package popups
             dividers.graphics.drawRect(displayFolderPath.x - 2, displayFolderPath.y, displayFolderPath.width + 2, displayFolderPath.height);
             dividers.graphics.endFill();
 
-            upFolder = new BoxIcon(box, 6, 6, 27, 27, new iconUpLevel(), clickHandler);
+            refreshAllFolder = new BoxIcon(box, 6, 6, 27, 27, new iconRefresh(), clickHandler);
+            refreshAllFolder.setHoverText(_lang.string("file_loader_refresh_cache"), "bottom");
 
             // Song List
             songBrowser = new FileBrowserList(box, 6, 39, listFilter);
@@ -134,29 +137,45 @@ package popups
             songBrowser.activeIndex = lastSelectedIndex;
 
             songDetails = new Sprite();
-            songDetails.x = 511;
+            songDetails.x = 541;
             songDetails.y = 39;
-            songDetailsWidth = box.width - 37 - songDetails.x;
+            songDetailsWidth = box.width - 7 - songDetails.x;
             box.addChild(songDetails);
 
             // Search
             searchPlaceholder = new Text(box, 13, box.height - 29, _lang.string("file_loader_search"));
             searchPlaceholder.alpha = 0.4;
             searchPlaceholder.visible = listFilter.term.length == 0;
-            searchInput = new BoxText(box, 11, box.height - 32, 490, 25, new TextFormat(Constant.TEXT_FORMAT_UNICODE.font, 12, 0xFFFFFF));
+            searchInput = new BoxText(box, 11, box.height - 32, 370, 25, new TextFormat(Constant.TEXT_FORMAT_UNICODE.font, 12, 0xFFFFFF));
             searchInput.text = listFilter.term;
             searchInput.addEventListener(Event.CHANGE, e_searchChange);
 
+            // Search Type
+            var searchTypeBoxItems:Array = [{label: _lang.stringSimple("song_selection_search_any"), data: "any"},
+                {label: _lang.stringSimple("song_selection_search_song_name"), data: "name"},
+                {label: _lang.stringSimple("song_selection_search_author"), data: "author"},
+                {label: _lang.stringSimple("song_selection_search_stepauthor"), data: "stepauthor"}];
+
+            searchTypeBox = new ComboBox(null, searchInput.x + searchInput.width + 5, box.height - 32, "", searchTypeBoxItems);
+            searchTypeBox.setSize(144, 27);
+            searchTypeBox.fontSize = 11;
+            searchTypeBox.selectedItemByData = listFilter.type;
+            searchTypeBox.openPosition = ComboBox.TOP;
+            searchTypeBox.addEventListener(Event.SELECT, searchTypeSelect);
+            box.addChild(searchTypeBox);
+
+            dividers.graphics.beginFill(0x000000, 0.2);
+            dividers.graphics.drawRect(6, box.height - 37, 529, 45);
+            dividers.graphics.endFill();
+
+            // Song Info
             dividers.graphics.beginFill(0x000000, 0.2);
             dividers.graphics.drawRect(songDetails.x, songDetails.y, songDetailsWidth, box.height - 44);
             dividers.graphics.endFill();
 
+            // Scroll Bar
             dividers.graphics.beginFill(0x000000, 0.2);
-            dividers.graphics.drawRect(box.width - 32, 39, closeWindow.width, box.height - 44);
-            dividers.graphics.endFill();
-
-            dividers.graphics.beginFill(0x000000, 0.2);
-            dividers.graphics.drawRect(6, box.height - 37, 500, 45);
+            dividers.graphics.drawRect(songBrowser.x + songBrowser.width - 24, songBrowser.y, 22, songBrowser.height);
             dividers.graphics.endFill();
 
             // UI Lock
@@ -246,6 +265,7 @@ package popups
                 elm1 = renderList[i];
                 elm1.author = elm1.data[0].info.author;
                 elm1.name = elm1.data[0].info.name;
+                elm1.stepauthor = elm1.data[0].info.stepauthor;
                 elm1.banner = elm1.data[0].info.banner;
             }
             renderList.sortOn(["name", "author"], [Array.CASEINSENSITIVE, Array.CASEINSENSITIVE]);
@@ -262,6 +282,7 @@ package popups
         {
             if (stage)
                 stage.focus = null;
+
             rootFolder = e.target as File;
             refreshFolder();
         }
@@ -270,30 +291,57 @@ package popups
         {
             if (stage)
                 stage.focus = null;
-            if (e.target == upFolder)
+
+            if (e.target == refreshAllFolder)
             {
-                if (rootFolder != null)
-                {
-                    rootFolder = rootFolder.parent;
-                    refreshFolder();
-                }
+                refreshCache();
             }
-            if (e.target == selectFolder || e.target == displayFolderPath)
+
+            else if (e.target == selectFolder || e.target == displayFolderPath)
             {
                 var tempFolder:File = new File();
                 tempFolder.addEventListener(Event.SELECT, dirSelected);
                 tempFolder.browseForDirectory(_lang.stringSimple("file_loader_select_a_directory"));
             }
-            if (e.target == loadingCancelButton)
+
+            else if (e.target == loadingCancelButton)
             {
                 cancelRequested = true;
             }
-            //- Close
-            if (e.target == closeWindow)
+
+            else if (e.target == closeWindow)
             {
                 removePopup();
-                return;
             }
+        }
+
+        private function searchTypeSelect(e:Event):void
+        {
+            listFilter.type = e.target.selectedItem["data"];
+        }
+
+
+        private function refreshCache():void
+        {
+            lockUI = true;
+
+            var paths:Vector.<String> = FileLoader.cache.keys;
+            var fileQueue:Vector.<File> = new <File>[];
+            var file:File;
+
+            pathList.length = 0;
+
+            for each (var path:String in paths)
+            {
+                file = new File(path);
+
+                if (file.isHidden || !file.exists)
+                    FileLoader.cache.deleteKey(path);
+
+                fileQueue.push(file);
+            }
+
+            _parseFileQueue(fileQueue);
         }
 
         private function refreshFolder():void
@@ -304,7 +352,7 @@ package popups
             lastSelectedIndex = 0;
             lastSelectedItem = null;
 
-            pathList = new <String>[];
+            pathList.length = 0;
 
             displayFolderPath.text = rootFolder.nativePath;
 
@@ -319,20 +367,15 @@ package popups
             var maxDepth:int = 2;
             var validExt:Array = ExternalChartBase.VALID_CHART_EXTENSIONS;
 
-            e_startFileSearch();
+            loadingPathIndex.text = _lang.string("file_loader_scanning");
+            loadingPathFolder.text = '';
+            loadingPathSong.text = '';
 
-            function e_startFileSearch():void
-            {
-                loadingPathIndex.text = _lang.string("file_loader_scanning");
-                loadingPathFolder.text = '';
-                loadingPathSong.text = '';
+            loadTimer = new Timer(20, 1);
+            loadTimer.addEventListener(TimerEvent.TIMER_COMPLETE, e_timerComplete);
+            loadTimer.start();
 
-                loadTimer = new Timer(20, 1);
-                loadTimer.addEventListener(TimerEvent.TIMER_COMPLETE, e_searchTimer);
-                loadTimer.start();
-            }
-
-            function e_searchTimer(e:TimerEvent):void
+            function e_timerComplete(e:TimerEvent):void
             {
                 var startTimer:Number = getTimer();
                 var isDelay:Boolean = false;
@@ -390,8 +433,8 @@ package popups
                 // Loaded All Files
                 if (dirQueue.length == 0)
                 {
-                    loadTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_searchTimer);
-                    e_startFileQueue();
+                    loadTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_timerComplete);
+                    _parseFileQueue(fileQueue);
                     return;
                 }
 
@@ -400,37 +443,38 @@ package popups
                 {
                     loadTimer.start();
                 }
-
             }
+        }
+
+        private function _parseFileQueue(fileQueue:Vector.<File>):void
+        {
+            var loadTimer:Timer;
 
             // File Loading
+            var rootFolderPath:String = rootFolder ? rootFolder.nativePath : "";
             var pathIndex:int;
             var pathTotal:int;
 
-            function e_startFileQueue():void
+            if (fileQueue.length <= 0)
             {
-                if (fileQueue.length <= 0)
-                {
-                    lockUI = false;
-                    buildFileList();
-                    return;
-                }
-
-                pathIndex = 0;
-                pathTotal = fileQueue.length;
-
-                loadingPathIndex.text = pathIndex + " / " + pathTotal;
-                loadingPathFolder.text = '';
-                loadingPathSong.text = '';
-
-                loadTimer = new Timer(20, 1);
-                loadTimer.addEventListener(TimerEvent.TIMER_COMPLETE, e_parseTimer);
-                loadTimer.start();
+                lockUI = false;
+                buildFileList();
+                return;
             }
 
-            function e_parseTimer(e:TimerEvent):void
+            pathIndex = 0;
+            pathTotal = fileQueue.length;
+
+            loadingPathIndex.text = pathIndex + " / " + pathTotal;
+            loadingPathFolder.text = '';
+            loadingPathSong.text = '';
+
+            loadTimer = new Timer(20, 1);
+            loadTimer.addEventListener(TimerEvent.TIMER_COMPLETE, e_timerComplete);
+            loadTimer.start();
+
+            function e_timerComplete(e:TimerEvent):void
             {
-                var emb:ExternalChartBase;
                 var chartFile:File;
                 var stringPath:String;
                 var startTimer:Number = getTimer();
@@ -441,7 +485,11 @@ package popups
                 {
                     chartFile = fileQueue[pathIndex];
                     stringPath = chartFile.nativePath;
-                    if ((cacheObj = FileLoader.cache.getValue(stringPath)) != null)
+
+                    cacheObj = FileLoader.cache.getValue(stringPath);
+                    var needUpdate:Boolean = cacheObj == null || chartFile.modificationDate.getTime() != cacheObj["date"];
+
+                    if (!needUpdate)
                     {
                         if (cacheObj.valid == 1)
                             pathList.push(stringPath);
@@ -450,7 +498,7 @@ package popups
                     {
                         loadingPathIndex.text = pathIndex + " / " + pathTotal;
 
-                        if (chartFile.parent.parent.nativePath == rootFolder.nativePath)
+                        if (chartFile.parent.parent.nativePath == rootFolderPath)
                         {
                             loadingPathFolder.text = chartFile.parent.name;
                             loadingPathSong.text = '';
@@ -461,40 +509,7 @@ package popups
                             loadingPathSong.text = chartFile.parent.name;
                         }
 
-                        cacheObj = {"valid": 0}
-                        emb = new ExternalChartBase();
-                        if (emb.load(chartFile, true))
-                        {
-                            var chartData:Object = emb.getInfo();
-                            var chartCharts:Array = emb.getAllCharts();
-
-                            cacheObj = {"valid": 1,
-                                    "name": chartData['name'],
-                                    "author": chartData['author'],
-                                    "stepauthor": chartData['stepauthor'],
-                                    "difficulty": chartData['difficulty'],
-                                    "music": chartData['music'],
-                                    "banner": chartData['banner'],
-                                    "background": chartData['background'],
-                                    "ext": chartData['ext'],
-                                    "chart": [],
-                                    "id": emb.ID}
-
-                            for (var i:int = 0; i < chartCharts.length; i++)
-                            {
-                                var difficultyData:Object = chartCharts[i];
-                                cacheObj['chart'][i] = {"class": difficultyData['class'],
-                                        "class_color": difficultyData['class_color'],
-                                        "desc": difficultyData['desc'],
-                                        "difficulty": difficultyData['difficulty'],
-                                        "type": difficultyData['type'],
-                                        "time_sec": Number(difficultyData['time_sec'].toFixed(2)),
-                                        "nps": Number(difficultyData['nps'].toFixed(2)),
-                                        "arrows": difficultyData['arrows'],
-                                        "holds": difficultyData['holds'],
-                                        "mines": difficultyData['mines']};
-                            }
-                        }
+                        cacheObj = FileLoader.buildCacheObject(chartFile);
 
                         FileLoader.cache.setValue(stringPath, cacheObj);
 
@@ -507,7 +522,6 @@ package popups
                     {
                         pathIndex = 0;
                         pathTotal = 0;
-                        dirQueue.length = 0;
                         fileQueue.length = 0;
                         pathList.length = 0;
                     }
@@ -523,7 +537,7 @@ package popups
                 // Loaded All Files
                 if (pathIndex >= pathTotal)
                 {
-                    loadTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_parseTimer);
+                    loadTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_timerComplete);
                     FileLoader.cache.save();
                     lockUI = false;
 
@@ -723,41 +737,7 @@ package popups
             for each (var chartItem:FileFolderItem in fileList)
             {
                 chartFile = new File(chartItem.loc);
-                cacheObj = {"valid": 0};
-                emb = new ExternalChartBase();
-                if (emb.load(chartFile, true))
-                {
-                    var chartData:Object = emb.getInfo();
-                    var chartCharts:Array = emb.getAllCharts();
-
-                    cacheObj = {"valid": 1,
-                            "name": chartData['name'],
-                            "author": chartData['author'],
-                            "stepauthor": chartData['stepauthor'],
-                            "difficulty": chartData['difficulty'],
-                            "music": chartData['music'],
-                            "banner": chartData['banner'],
-                            "background": chartData['background'],
-                            "ext": chartData['ext'],
-                            "chart": [],
-                            "id": emb.ID}
-
-                    for (var i:int = 0; i < chartCharts.length; i++)
-                    {
-                        var difficultyData:Object = chartCharts[i];
-                        cacheObj['chart'][i] = {"class": difficultyData['class'],
-                                "class_color": difficultyData['class_color'],
-                                "desc": difficultyData['desc'],
-                                "difficulty": difficultyData['difficulty'],
-                                "type": difficultyData['type'],
-                                "time_sec": Number(difficultyData['time_sec'].toFixed(2)),
-                                "nps": Number(difficultyData['nps'].toFixed(2)),
-                                "arrows": difficultyData['arrows'],
-                                "holds": difficultyData['holds'],
-                                "mines": difficultyData['mines']};
-                    }
-                }
-
+                cacheObj = FileLoader.buildCacheObject(chartFile);
                 FileLoader.cache.setValue(chartItem.loc, cacheObj);
             }
             FileLoader.cache.save();
