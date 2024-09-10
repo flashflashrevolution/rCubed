@@ -11,6 +11,7 @@ package
     import classes.User;
     import classes.chart.Song;
     import classes.filter.EngineLevelFilter;
+    import classes.mp.Multiplayer;
     import classes.user.UserSongNotes;
     import com.flashfla.loader.DataEvent;
     import com.flashfla.net.DynamicURLLoader;
@@ -30,6 +31,7 @@ package
     import flash.net.URLVariables;
     import flash.system.Capabilities;
     import flash.utils.ByteArray;
+    import game.GameMenu;
     import game.GameOptions;
     import game.GameScoreResult;
 
@@ -709,6 +711,30 @@ package
             catch (err:Error)
             {
                 Logger.error(this, "Attempted Unlock of Unknown Token: " + type + ", " + id);
+            }
+        }
+
+        public function reloadEngineData():void
+        {
+            if (gameMain.loadComplete && !(gameMain.activePanel is GameMenu))
+            {
+                gameMain.removePopup();
+                Flags.VALUES = {};
+                Playlist.clearCanon();
+                gameMain.loadComplete = false;
+                gameMain.switchTo("none");
+            }
+        }
+
+        public function switchUserAccount():void
+        {
+            if (gameMain.loadComplete && !(gameMain.activePanel is GameMenu))
+            {
+                gameMain.removePopup();
+                Flags.VALUES = {};
+                Multiplayer.instance.disconnect();
+                playerUser.refreshUser();
+                gameMain.switchTo(Main.GAME_LOGIN_PANEL);
             }
         }
 

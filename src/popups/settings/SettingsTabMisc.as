@@ -37,6 +37,9 @@ package popups.settings
         private var useWebsocketCheckbox:BoxCheck;
         private var openWebsocketOverlay:BoxButton;
 
+        private var reloadEngineData:BoxButton;
+        private var switchUserAccount:BoxButton;
+
         private var engineCombo:ComboBox;
         private var engineDefaultCombo:ComboBox;
         private var engineComboIgnore:Boolean;
@@ -122,6 +125,14 @@ package popups.settings
             // https://github.com/flashflashrevolution/web-stream-overlay
             openWebsocketOverlay = new BoxButton(container, xOff, yOff, 245, 27, _lang.string("options_overlay_instructions"), 12, clickHandler);
             yOff += 30;
+
+            yOff += drawSeperator(container, xOff, 266, yOff, 0, 2);
+
+            reloadEngineData = new BoxButton(container, xOff, yOff, 245, 27, _lang.string("popup_cm_reload_engine_user"), 12, clickHandler);
+            yOff += 37;
+
+            switchUserAccount = new BoxButton(container, xOff, yOff, 245, 27, _lang.string("popup_cm_switch_profile"), 12, clickHandler);
+            yOff += 37;
 
             /// Col 2
             xOff = 310;
@@ -294,6 +305,17 @@ package popups.settings
             else if (e.target == openWebsocketOverlay)
             {
                 navigateToURL(new URLRequest(Constant.WEBSOCKET_OVERLAY_URL), "_blank");
+            }
+
+            //- Engine Reload
+            else if (e.target == reloadEngineData)
+            {
+                _gvars.reloadEngineData();
+            }
+
+            else if (e.target == switchUserAccount)
+            {
+                _gvars.switchUserAccount();
             }
 
             // Window Position

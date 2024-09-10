@@ -94,23 +94,11 @@ package popups
             }
             else if (e.target.action == "reload_engine")
             {
-                if (_gvars.gameMain.loadComplete && !(_gvars.gameMain.activePanel is GameMenu))
-                {
-                    Flags.VALUES = {};
-                    Playlist.clearCanon();
-                    _gvars.gameMain.loadComplete = false;
-                    _gvars.gameMain.switchTo("none");
-                }
+                _gvars.reloadEngineData();
             }
             else if (e.target.action == "switch_profile")
             {
-                if (_gvars.gameMain.loadComplete && !(_gvars.gameMain.activePanel is GameMenu))
-                {
-                    Flags.VALUES = {};
-                    Multiplayer.instance.disconnect();
-                    _gvars.playerUser.refreshUser();
-                    _gvars.gameMain.switchTo(Main.GAME_LOGIN_PANEL);
-                }
+                _gvars.switchUserAccount();
             }
         }
     }
