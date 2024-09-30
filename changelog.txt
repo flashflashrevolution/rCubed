@@ -1,3 +1,39 @@
+R^3 (v2.0.2) [2024-09-30]
+---------------------------------------------------------------------
+@Psycast
+- File Loader Changes:
+    - Smaller Song Items to show more.
+    - Song Items now also display step author.
+    - Add Search Type.
+    - Added Song Cache Builder.
+    - Added Cache Refresh.
+    - Removed Up Dir navigation.
+    - Changed Popup UI.
+    - Increased Song Cache version to 2.
+- Add Fast Login
+    - Engine Reload/Switch Account to Settings
+- Add New Song Flags (Omni/Average/Miss)
+- Add MP Quit Coloring (#384 / Sploder12)
+- Add song Rate Cap (0.1 - 200x)
+- Add selection for settings Export (Settings/Layout/Filters/Song Queues)
+- Change MP Score UI Component.
+- Change PB Mode for autofail to not apply to unranked gameplay.
+- Change vsync to appear in Hybrid, but disabled and help given.
+- Fix SSC Parsing in File Loader.
+- Fix MP PM unread dot persisting.
+- Fix MP Song Loading to verify song selection.
+- Fix MP Song Loader Request.
+- Fix MP Song Loader Update Event.
+- Fix MP Socket crash.
+- Fix MP Join crash mid-match.
+- Fix invalid songs for equiv calculations.
+- Fix Change All Note Colors not updating dropdowns.
+- Fix Layout Saving if SP/MP Layouts are missing.
+
+@Dash-
+- Add slider to control Accuracy Bar's fade out.
+
+
 R^3 (v2.0.0) [2024-03-18]
 ---------------------------------------------------------------------
 @Psycast
