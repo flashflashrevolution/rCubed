@@ -34,14 +34,14 @@ jobs:
             ##########################################################################################
             # Checkout
             - name: Checkout
-              uses: actions/checkout@v4.2.1
+              uses: actions/checkout@v4.2.2
               with:
                   lfs: true
 
             ##########################################################################################
             # Setup SDK
             - name: Checkout Build Tools
-              uses: actions/checkout@v4.2.1
+              uses: actions/checkout@v4.2.2
               with:
                   repository: flashflashrevolution/rCubed-build-tools
                   path: "tools"
