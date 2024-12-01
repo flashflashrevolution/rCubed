@@ -722,8 +722,12 @@ package menu
 
             songItemRemoveQueueContext.visible = options.activeGenre == PLAYLIST_QUEUE;
 
+            // Null Songlist - Somehow.
+            if (songList == null)
+                songList = [];
+
             // User Filter
-            if (songList != null && songList.length > 0)
+            if (songList.length > 0)
             {
                 if (options.activeGenre != PLAYLIST_ALL && options.infoTab != TAB_QUEUE)
                 {
@@ -779,12 +783,7 @@ package menu
             drawPages();
 
             // Error Messages
-            if (songList == null)
-            {
-                pane_filter_text.visible = true;
-                pane_filter_text.text = _lang.string("song_selection_filter_null_error");
-            }
-            else if (songList != null && songList.length == 0)
+            if (songList.length == 0)
             {
                 pane_filter_text.visible = true;
                 if (options.activeGenre == PLAYLIST_SEARCH)
@@ -793,11 +792,7 @@ package menu
                     pane_filter_text.text = sprintf(_lang.string("song_selection_filter_no_results_hidden"), {"items": sourceListLength});
                 else
                     pane_filter_text.text = _lang.string("song_selection_filter_no_results");
-            }
 
-            //- Sanity
-            if (songList == null || songList.length <= 0)
-            {
                 options.activeIndex = -1;
                 options.activeSongId = -1;
                 return;
