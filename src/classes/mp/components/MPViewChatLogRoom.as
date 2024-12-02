@@ -82,20 +82,6 @@ package classes.mp.components
             addPaneChild(joinLogItem);
         }
 
-        public function setUser(user:MPUser):void
-        {
-            this.user = user;
-            this.displayName = user.name;
-
-            messagePlaceholderLeft.text = sprintf(_lang.string("mp_room_chat_message_user"), {"name": displayName});
-
-            // Add Initial Joining Message
-            const joinLogItem:MPChatLogEntry = new MPChatLogEntryText("<font color=\"" + MPColors.SYSTEM_MESSAGE_COLOR + "\">" + sprintf(_lang.string("mp_pm_chat_start"), {"name": room.name}) + "</font>");
-            joinLogItem.build(pane.width - 1);
-            _cachePositions.push(new CLItemCache(joinLogItem, 5, joinLogItem.height));
-            addPaneChild(joinLogItem);
-        }
-
         public function build():void
         {
             // Chat Log
