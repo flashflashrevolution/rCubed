@@ -9,6 +9,7 @@ package menu
     import classes.mp.components.MPMenuRoomButton;
     import classes.mp.events.MPEvent;
     import classes.mp.events.MPRoomEvent;
+    import classes.mp.events.MPViewEvent;
     import classes.mp.room.MPRoom;
     import classes.mp.room.MPRoomFFR;
     import classes.mp.views.MPRoomView;
@@ -192,6 +193,8 @@ package menu
                 _mp.addEventListener(MPEvent.USER_MESSAGE_READ, e_onChatUpdate);
                 _mp.addEventListener(MPEvent.USER_ROOM_INVITE, e_onChatUpdate);
 
+                _mp.addEventListener(MPViewEvent.CHANGE, e_onViewChange);
+
                 _mp.connect();
                 btnConnect.text = _lang.string("mp_disconnect");
                 showThrobber();
@@ -369,6 +372,28 @@ package menu
             activeView.onSelect();
             roomIndicator.x = btn.x + btn.width + 7;
             roomIndicator.y = btn.y + btn.height / 2;
+        }
+
+        private function e_onViewChange(e:MPViewEvent):void
+        {
+            switch (e.view)
+            {
+                case "menu_pm":
+                    e_onSelectPrivateMessages(null);
+                    break;
+
+                case "menu_browser":
+                    e_onSelectServerBrowser(null);
+                    break;
+
+                case "menu_lobby":
+                    e_onSelectLobby(null);
+                    break;
+
+                case "menu_game":
+                    e_onSelectGame(null);
+                    break;
+            }
         }
 
         private function setNavigation(state:Boolean):void

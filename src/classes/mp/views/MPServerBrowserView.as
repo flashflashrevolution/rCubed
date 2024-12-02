@@ -4,6 +4,7 @@ package classes.mp.views
     import assets.menu.icons.fa.iconEye;
     import assets.menu.icons.fa.iconRefresh;
     import assets.menu.icons.fa.iconUsers;
+    import classes.Alert;
     import classes.mp.MPView;
     import classes.mp.Multiplayer;
     import classes.mp.commands.MPCRoomJoinCode;
@@ -11,6 +12,7 @@ package classes.mp.views
     import classes.mp.components.browser.MPBrowserScrollpane;
     import classes.mp.events.MPEvent;
     import classes.mp.events.MPRoomEvent;
+    import classes.mp.events.MPViewEvent;
     import classes.mp.room.MPRoom;
     import classes.ui.BoxButton;
     import classes.ui.BoxCheck;
@@ -239,8 +241,17 @@ package classes.mp.views
             {
                 var entry:MPBrowserEntry = te as MPBrowserEntry;
 
-                if (_mp.inGameRoom)
+                if (entry.room == _mp.GAME_ROOM)
+                {
+                    _mp.dispatchEvent(new MPViewEvent("menu_game"));
                     return;
+                }
+
+                if (_mp.inGameRoom)
+                {
+                    Alert.add(_lang.string("mp_error_multiple_room_restriction"), 120, Alert.RED);
+                    return;
+                }
 
                 if (entry.room.hasPassword && !_mp.currentUser.permissions.mod)
                 {
