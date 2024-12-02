@@ -1,5 +1,6 @@
 package classes.mp.views
 {
+    import assets.menu.icons.fa.iconEye;
     import assets.menu.icons.fa.iconUserAdd;
     import classes.Alert;
     import classes.Noteskins;
@@ -50,6 +51,7 @@ package classes.mp.views
         private var chat:MPViewChatLogRoom;
         private var userlist:MPViewUserListRoom;
 
+        private var autoSpectateButton:UIIconHover;
         private var inviteButton:UIIconHover;
 
         private var ownerPanel:OwnerPanel;
@@ -60,6 +62,7 @@ package classes.mp.views
         private var _userInvitePrompt:MPRoomUserInvitePrompt;
 
         private var loadProgressTimer:Timer = new Timer(500);
+        private var autoSpectate:Boolean = false;
 
         public function MPRoomViewFFR(room:MPRoomFFR, parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0)
         {
@@ -88,6 +91,7 @@ package classes.mp.views
             _mp.addEventListener(MPEvent.FFR_COUNTDOWN, e_countdown);
             _mp.addEventListener(MPEvent.FFR_MATCH_START, e_matchStart);
             _mp.addEventListener(MPEvent.FFR_SONG_START, e_songStart);
+            _mp.addEventListener(MPEvent.FFR_AUTO_SPECTATE, e_autoSpectate);
             _mp.addEventListener(MPEvent.FFR_MATCH_END, e_matchEnd);
         }
 
@@ -109,6 +113,7 @@ package classes.mp.views
             _mp.removeEventListener(MPEvent.FFR_COUNTDOWN, e_countdown);
             _mp.removeEventListener(MPEvent.FFR_MATCH_START, e_matchStart);
             _mp.removeEventListener(MPEvent.FFR_SONG_START, e_songStart);
+            _mp.removeEventListener(MPEvent.FFR_AUTO_SPECTATE, e_autoSpectate);
             _mp.removeEventListener(MPEvent.FFR_MATCH_END, e_matchEnd);
 
             userlist.removeEventListener(MPEvent.ROOM_USERLIST_SELECT, e_onUserSelect);
@@ -132,6 +137,13 @@ package classes.mp.views
             userlist.setRoom(room);
             userlist.addEventListener(MPEvent.ROOM_USERLIST_SELECT, e_onUserSelect);
             userlist.addEventListener(MPEvent.ROOM_USERLIST_SPECTATE, e_onUserSpectate);
+
+            autoSpectateButton = new UIIconHover(this, new iconEye(), 566, 16);
+            autoSpectateButton.setSize(15, 15);
+            autoSpectateButton.buttonMode = true;
+            autoSpectateButton.setHoverText(_lang.string("mp_room_auto_spectate"));
+            autoSpectateButton.setColor("#eda8a8");
+            autoSpectateButton.addEventListener(MouseEvent.CLICK, e_autoSpectateClick);
 
             inviteButton = new UIIconHover(this, new iconUserAdd(), 596, 16);
             inviteButton.setSize(15, 15);
@@ -395,6 +407,28 @@ package classes.mp.views
             }
         }
 
+        protected function e_autoSpectate(e:MPRoomEvent):void
+        {
+            if (e.room === this.room)
+            {
+                if (autoSpectate)
+                {
+                    if (room.isPlayer(_mp.currentUser))
+                        return;
+
+                    var gameUsers:Vector.<MPUser> = room.users.filter(function(user:MPUser, index:int, array:Vector.<MPUser>):Boolean
+                    {
+                        return room.isPlayer(user) && room.getPlayerState(user) == "game";
+                    });
+
+                    if (gameUsers.length > 0)
+                    {
+                        _spectatePlayer(gameUsers[Math.floor(Math.random() * gameUsers.length)]);
+                    }
+                }
+            }
+        }
+
         protected function e_matchEnd(e:MPRoomEvent):void
         {
             if (e.room === this.room)
@@ -417,6 +451,12 @@ package classes.mp.views
                 else
                     chat.addItem(new MPChatLogEntryText("<font color=\"" + MPColors.SYSTEM_MESSAGE_COLOR + "\">" + _lang.string("mp_room_countdown_" + e.command.data.value) + "</font>"));
             }
+        }
+
+        private function e_autoSpectateClick(e:MouseEvent):void
+        {
+            autoSpectate = !autoSpectate;
+            autoSpectateButton.setColor(autoSpectate ? "#bdeda8" : "#eda8a8");
         }
 
         private function e_inviteClick(e:MouseEvent):void
@@ -613,6 +653,8 @@ package classes.mp.views
             if (room.isPlayer(user) && room.getPlayerState(user) == "game")
             {
                 closePrompts();
+
+                Alert.add(sprintf(_lang.string("mp_room_spectate_user_start"), {"name": user.name}), 120, 0x005e5e);
 
                 if (!room.song)
                     room.song = _gvars.getSongFile(room.songInfo);

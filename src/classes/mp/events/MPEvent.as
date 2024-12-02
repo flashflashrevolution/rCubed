@@ -57,6 +57,7 @@ package classes.mp.events
         public static const FFR_LOADING_ABORT:String = "ffr_loading_abort";
         public static const FFR_COUNTDOWN:String = "ffr_countdown";
         public static const FFR_MATCH_START:String = "ffr_match_start";
+        public static const FFR_AUTO_SPECTATE:String = "ffr_auto_spectate";
         public static const FFR_SONG_START:String = "ffr_song_start";
         public static const FFR_SCORE_UPDATE:String = "ffr_score_update";
         public static const FFR_GET_PLAYBACK:String = "ffr_get_playback";

@@ -215,6 +215,10 @@ package classes.mp.room
                     modeMatchStart(user, cmd);
                     break;
 
+                case "auto_spectate":
+                    _mp.dispatchEvent(new MPRoomEvent(MPEvent.FFR_AUTO_SPECTATE, cmd, this, user));
+                    break;
+
                 case "song_start":
                     modeSongStart(user, cmd);
                     break;
