@@ -3,6 +3,7 @@ package classes.mp.pm
     import classes.Language;
     import classes.mp.MPColors;
     import classes.mp.MPUser;
+    import classes.mp.components.MPChatTypes;
     import classes.mp.components.chatlog.MPChatLogEntry;
     import classes.mp.components.chatlog.MPChatLogEntryText;
     import classes.mp.components.chatlog.MPChatLogRoomInvite;
@@ -42,13 +43,19 @@ package classes.mp.pm
             DATE.setTime(data.timestamp);
 
             var type:Number = data.type;
-            var color:String = (type == 0 ? MPColors.MESSAGE_COLOR : (type == 2 ? MPColors.MESSAGE_ADMIN_COLOR : MPColors.MESSAGE_MOD_COLOR))
+            var color:String = (type == MPChatTypes.ADMIN ? MPColors.MESSAGE_ADMIN_COLOR : (type == MPChatTypes.MOD ? MPColors.MESSAGE_MOD_COLOR : MPColors.MESSAGE_COLOR));
 
             var message:String = "";
 
-            message += "<font color=\"" + MPColors.TIMESTAMP_COLOR + "\">" + StringUtil.pad(DATE.getHours().toString(), 2, "0") + ":" + StringUtil.pad(DATE.getMinutes().toString(), 2, "0") + "</font> ";
-            message += sender.nameHTML + ":  ";
-            message += "<font color=\"" + color + "\">" + data.message + "</font>";
+            if (type == MPChatTypes.SYSTEM)
+            {
+                message += "<font face=\"" + Fonts.BASE_FONT + "\" color=\"" + MPColors.SYSTEM_MESSAGE_COLOR + "\"><i>" + data.message + "</i></font>";
+            }
+            else
+            {
+                message += sender.nameHTML + ":  ";
+                message += "<font color=\"" + color + "\">" + data.message + "</font>";
+            }
 
             add(new MPChatLogEntryText(message));
             newMessage = true;
