@@ -6,7 +6,6 @@ package classes.mp.views
     import classes.mp.MPColors;
     import classes.mp.MPSong;
     import classes.mp.MPUser;
-    import classes.mp.commands.MPCFFRGameStateChange;
     import classes.mp.commands.MPCFFRReadyForce;
     import classes.mp.commands.MPCFFRSongLoadError;
     import classes.mp.commands.MPCFFRSongLoadProgress;
@@ -27,6 +26,7 @@ package classes.mp.views
     import classes.ui.BoxIcon;
     import classes.ui.Text;
     import classes.ui.UIIcon;
+    import classes.ui.UIIconHover;
     import com.flashfla.utils.sprintf;
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
@@ -50,7 +50,7 @@ package classes.mp.views
         private var chat:MPViewChatLogRoom;
         private var userlist:MPViewUserListRoom;
 
-        private var inviteButton:UIIcon;
+        private var inviteButton:UIIconHover;
 
         private var ownerPanel:OwnerPanel;
         private var ownerEditPanel:OwnerEditPanel;
@@ -133,9 +133,10 @@ package classes.mp.views
             userlist.addEventListener(MPEvent.ROOM_USERLIST_SELECT, e_onUserSelect);
             userlist.addEventListener(MPEvent.ROOM_USERLIST_SPECTATE, e_onUserSpectate);
 
-            inviteButton = new UIIcon(this, new iconUserAdd(), 596, 16);
+            inviteButton = new UIIconHover(this, new iconUserAdd(), 596, 16);
             inviteButton.setSize(15, 15);
             inviteButton.buttonMode = true;
+            inviteButton.setHoverText(_lang.string("mp_room_invite_players"));
             inviteButton.addEventListener(MouseEvent.CLICK, e_inviteClick);
 
             // Name
@@ -687,6 +688,7 @@ import classes.ui.BoxIcon;
 import classes.ui.BoxText;
 import classes.ui.Text;
 import classes.ui.UIIcon;
+import classes.ui.UIIconHover;
 import com.bit101.components.ComboBox;
 import com.flashfla.utils.SystemUtil;
 import com.flashfla.utils.sprintf;
@@ -705,7 +707,7 @@ internal class UserPanel extends Sprite
     private var room:MPRoomFFR;
 
     private var panelName:Text;
-    private var iconLeaveBtn:UIIcon;
+    private var iconLeaveBtn:UIIconHover;
 
     private var songName:Text;
     private var songAuthor:Text;
@@ -723,9 +725,10 @@ internal class UserPanel extends Sprite
         panelName = new Text(this, 20, 0, room.name, 16);
         panelName.setAreaParams(view.width - 85, 30);
 
-        iconLeaveBtn = new UIIcon(this, new iconLeave(), view.width - 15, 16);
+        iconLeaveBtn = new UIIconHover(this, new iconLeave(), view.width - 15, 16);
         iconLeaveBtn.setSize(15, 15);
         iconLeaveBtn.buttonMode = true;
+        iconLeaveBtn.setHoverText(_lang.string("mp_room_leave"));
         iconLeaveBtn.addEventListener(MouseEvent.CLICK, e_leaveClick);
 
         new Text(this, 6, 35, _lang.string("mp_room_ffr_song_name"), 13, "#c3c3c3").setAreaParams(250, 20);
@@ -803,8 +806,8 @@ internal class OwnerPanel extends Sprite
     private var room:MPRoomFFR;
 
     private var panelName:Text;
-    private var iconEditBtn:UIIcon;
-    private var iconLeaveBtn:UIIcon;
+    private var iconEditBtn:UIIconHover;
+    private var iconLeaveBtn:UIIconHover;
 
     private var songName:Text;
     private var songAuthor:Text;
@@ -824,14 +827,16 @@ internal class OwnerPanel extends Sprite
         panelName = new Text(this, 20, 0, "", 16);
         panelName.setAreaParams(view.width - 85, 30);
 
-        iconEditBtn = new UIIcon(this, new iconGear(), view.width - 45, 16);
+        iconEditBtn = new UIIconHover(this, new iconGear(), view.width - 45, 16);
         iconEditBtn.setSize(15, 15);
         iconEditBtn.buttonMode = true;
+        iconEditBtn.setHoverText(_lang.string("mp_room_options"));
         iconEditBtn.addEventListener(MouseEvent.CLICK, e_editClick);
 
-        iconLeaveBtn = new UIIcon(this, new iconLeave(), view.width - 15, 16);
+        iconLeaveBtn = new UIIconHover(this, new iconLeave(), view.width - 15, 16);
         iconLeaveBtn.setSize(15, 15);
         iconLeaveBtn.buttonMode = true;
+        iconLeaveBtn.setHoverText(_lang.string("mp_room_leave"));
         iconLeaveBtn.addEventListener(MouseEvent.CLICK, e_leaveClick);
 
         new Text(this, 6, 35, _lang.string("mp_room_ffr_song_name"), 13, "#c3c3c3").setAreaParams(250, 20);
