@@ -204,7 +204,7 @@ package menu
 
         private function e_onSocketConnect(e:MPEvent):void
         {
-            _mp.sendCommand(new MPCLogin(Multiplayer.SERVER_VERSION, _gvars.activeUser));
+            _mp.sendCommand(new MPCLogin(Multiplayer.SERVER_VERSION, _gvars.activeUser, Main.SWF_VERSION, Constant.AIR_VERSION));
         }
 
         private function e_onSocketDisconnect(e:MPEvent):void
