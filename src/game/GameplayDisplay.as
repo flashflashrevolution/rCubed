@@ -233,36 +233,6 @@ package game
 
             layoutManager = new GameLayoutManager(this, options);
 
-            // --- Multiplayer
-            if (!options.isEditor && !options.replay && options.isMultiplayer)
-            {
-                _mp.addEventListener(MPEvent.SOCKET_DISCONNECT, destroyMultiplayer);
-                _mp.addEventListener(MPEvent.SOCKET_ERROR, destroyMultiplayer);
-                _mp.addEventListener(MPEvent.ROOM_LEAVE_OK, destroyMultiplayer);
-                _mp.addEventListener(MPEvent.ROOM_DELETE_OK, destroyMultiplayer);
-
-                if (_mp.GAME_ROOM is MPRoomFFR)
-                {
-                    mpFFRRoom = _mp.GAME_ROOM as MPRoomFFR;
-                    mpFFRRoom.lastMatchIndex = -1;
-                    _mp.addEventListener(MPEvent.FFR_SCORE_UPDATE, e_mpFFRScoreUpdate);
-
-                    if (options.isSpectator && options.spectatorUser != null)
-                    {
-                        isMultiplayerSpectator = true;
-                        spectatorPlayerVars = mpFFRRoom.getPlayerVariables(options.spectatorUser);
-                        _mp.addEventListener(MPEvent.FFR_GET_PLAYBACK, e_mpFFRPlaybackUpdate)
-                    }
-                    else if (mpFFRRoom.getPlayerState(_mp.currentUser) == "loading")
-                    {
-                        isMultiplayer = true;
-
-                        var noteskinData:String = options.noteskin == 0 ? _noteskins.lastCustomNoteskin : null;
-                        _mp.sendCommand(new MPCFFRSongStart(mpFFRRoom, options.settingsEncode(), options.layout, noteskinData));
-                    }
-                }
-            }
-
             if (options.isEditor && options.isMultiplayer)
             {
                 mpFFRRoom = new MPRoomFFR();
@@ -362,6 +332,36 @@ package game
                 }
             }
             // --- End Personal Best tracking
+
+            // --- Multiplayer
+            if (!options.isEditor && !options.replay && options.isMultiplayer)
+            {
+                _mp.addEventListener(MPEvent.SOCKET_DISCONNECT, e_destroyMultiplayer);
+                _mp.addEventListener(MPEvent.SOCKET_ERROR, e_destroyMultiplayer);
+                _mp.addEventListener(MPEvent.ROOM_LEAVE_OK, e_destroyMultiplayer);
+                _mp.addEventListener(MPEvent.ROOM_DELETE_OK, e_destroyMultiplayer);
+
+                if (_mp.GAME_ROOM is MPRoomFFR)
+                {
+                    mpFFRRoom = _mp.GAME_ROOM as MPRoomFFR;
+                    mpFFRRoom.lastMatchIndex = -1;
+                    _mp.addEventListener(MPEvent.FFR_SCORE_UPDATE, e_mpFFRScoreUpdate);
+
+                    if (options.isSpectator && options.spectatorUser != null)
+                    {
+                        isMultiplayerSpectator = true;
+                        spectatorPlayerVars = mpFFRRoom.getPlayerVariables(options.spectatorUser);
+                        _mp.addEventListener(MPEvent.FFR_GET_PLAYBACK, e_mpFFRPlaybackUpdate)
+                    }
+                    else if (mpFFRRoom.getPlayerState(_mp.currentUser) == "loading")
+                    {
+                        isMultiplayer = true;
+
+                        var noteskinData:String = options.noteskin == 0 ? _noteskins.lastCustomNoteskin : null;
+                        _mp.sendCommand(new MPCFFRSongStart(mpFFRRoom, options.settingsEncode(), options.layout, noteskinData));
+                    }
+                }
+            }
 
             return true;
         }
@@ -522,17 +522,27 @@ package game
             Mouse.show();
         }
 
-        public function destroyMultiplayer(e:MPEvent = null):void
+        public function e_destroyMultiplayer(e:MPEvent = null):void
+        {
+            var wasSpectator:Boolean = isMultiplayerSpectator;
+
+            destroyMultiplayer();
+
+            if (wasSpectator && (GAME_STATE == GAME_WAIT || GAME_STATE == GAME_PLAY))
+                GAME_STATE = GAME_END;
+        }
+
+        public function destroyMultiplayer():void
         {
             if (options.isEditor)
                 return;
 
             if (isMultiplayer || isMultiplayerSpectator)
             {
-                _mp.removeEventListener(MPEvent.SOCKET_DISCONNECT, destroyMultiplayer);
-                _mp.removeEventListener(MPEvent.SOCKET_ERROR, destroyMultiplayer);
-                _mp.removeEventListener(MPEvent.ROOM_LEAVE_OK, destroyMultiplayer);
-                _mp.removeEventListener(MPEvent.ROOM_DELETE_OK, destroyMultiplayer);
+                _mp.removeEventListener(MPEvent.SOCKET_DISCONNECT, e_destroyMultiplayer);
+                _mp.removeEventListener(MPEvent.SOCKET_ERROR, e_destroyMultiplayer);
+                _mp.removeEventListener(MPEvent.ROOM_LEAVE_OK, e_destroyMultiplayer);
+                _mp.removeEventListener(MPEvent.ROOM_DELETE_OK, e_destroyMultiplayer);
                 Flags.VALUES[Flags.MP_MENU_RETURN] = true;
             }
 
@@ -1145,7 +1155,7 @@ package game
                 GAME_STATE = GAME_PLAY;
 
                 //  Skip Ahead
-                var lastTimestamp:int = Math.max(0, spectatorHistory[spectatorHistory.length - 1].timestamp - 5000);
+                var lastTimestamp:int = 0; //Math.max(0, spectatorHistory[spectatorHistory.length - 1].timestamp - 5000);
                 var lastFrame:int = lastTimestamp / 1000 * 30;
 
                 absoluteStart = getTimer() - lastTimestamp;
@@ -1220,7 +1230,7 @@ package game
                 tickReplays();
 
             // Multiplayer Spectator
-            else if (options.isSpectator)
+            else if (isMultiplayerSpectator)
                 tickSpectator();
         }
 
@@ -1403,7 +1413,7 @@ package game
                 e_onMPTimerTick();
             }
             else if (isMultiplayer || isMultiplayerSpectator)
-                destroyMultiplayer();
+                e_destroyMultiplayer();
 
             // Save results for display
             if (!options.isEditor && !options.isSpectator)
