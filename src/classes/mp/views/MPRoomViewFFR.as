@@ -412,7 +412,10 @@ package classes.mp.views
         {
             if (e.room === this.room)
             {
-                chat.addItem(new MPChatLogEntryText("<font color=\"" + MPColors.SYSTEM_MESSAGE_COLOR + "\">" + _lang.string("mp_room_countdown_" + e.command.data.value) + "</font>"));
+                if (e.command.data.value > 5)
+                    chat.addItem(new MPChatLogEntryText("<font color=\"" + MPColors.SYSTEM_MESSAGE_COLOR + "\">" + sprintf(_lang.string("mp_room_countdown_general"), {seconds: e.command.data.value}) + "</font>"));
+                else
+                    chat.addItem(new MPChatLogEntryText("<font color=\"" + MPColors.SYSTEM_MESSAGE_COLOR + "\">" + _lang.string("mp_room_countdown_" + e.command.data.value) + "</font>"));
             }
         }
 
