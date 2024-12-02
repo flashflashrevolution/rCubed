@@ -1,9 +1,0 @@
-{
-    "type": "lib",
-    "files": [
-        "src/BebasNeue.as"
-    ],
-    "compilerOptions": {
-        "output": "bin/BebasNeue.swf"
-    }
-}

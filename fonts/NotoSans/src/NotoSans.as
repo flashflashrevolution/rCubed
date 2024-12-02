@@ -23,7 +23,10 @@ package
         [Embed(source = '../assets/NotoSans-CJK-Bold.ttc', fontFamily = 'Noto Sans CJK JP Bold', fontStyle = 'normal', fontWeight = 'bold', mimeType = "application/x-font", advancedAntiAliasing = true, embedAsCFF = false)]
         public static var CJKBold:Class;
 
-        [Embed(source = '../assets/NotoSans-Bold.ttf', fontFamily = 'Noto Sans Bold', fontStyle = 'normal', fontWeight = 'bold', mimeType = "application/x-font", advancedAntiAliasing = true, embedAsCFF = false)]
+        [Embed(source = '../assets/NotoSans-Bold.ttf', fontFamily = 'Noto Sans', fontStyle = 'normal', fontWeight = 'bold', mimeType = "application/x-font", advancedAntiAliasing = true, embedAsCFF = false)]
         public static var Bold:Class;
+
+        [Embed(source = '../assets/NotoSans-BoldItalic.ttf', fontFamily = 'Noto Sans', fontStyle = 'italic', fontWeight = 'bold', mimeType = "application/x-font", advancedAntiAliasing = true, embedAsCFF = false)]
+        public static var BoldItalic:Class;
     }
 }

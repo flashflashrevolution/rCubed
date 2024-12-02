@@ -1,9 +1,0 @@
-{
-    "type": "lib",
-    "files": [
-        "src/Ultra.as"
-    ],
-    "compilerOptions": {
-        "output": "bin/Ultra.swf"
-    }
-}

@@ -4,24 +4,17 @@
         "debug": false,
         "source-path": [
             "./AachenLight/src",
-            "./BebasNeue/src",
-            "./BreeSerifRegular/src",
-            "./Ultra/src",
-            "./Xolonium/src",
-            "./HussarBold/src",
             "./NotoSans/src"
         ],
         "include-sources": [
             "./AachenLight/src",
-            "./BebasNeue/src",
-            "./BreeSerifRegular/src",
-            "./Ultra/src",
-            "./Xolonium/src",
-            "./HussarBold/src",
             "./NotoSans/src"
         ],
         "output": "bin/Embedded-Fonts.swc",
         "swf-version": 43,
-        "target-player": "32.0"
+        "target-player": "32.0",
+        "locale": [
+            "en_US"
+        ]
     }
 }
