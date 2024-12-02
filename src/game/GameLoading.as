@@ -41,7 +41,10 @@ package game
         {
             _gvars.songRestarts = 0;
             //- Set Active Song
-            if (_gvars.songQueue.length > 0)
+            if (_gvars.options.song)
+                song = _gvars.options.song;
+
+            else if (_gvars.songQueue.length > 0)
             {
                 var songInfo:SongInfo = _gvars.songQueue[0];
                 _gvars.songQueue.shift();
@@ -49,13 +52,14 @@ package game
                 song = _gvars.getSongFile(songInfo);
                 _gvars.options.song = song;
             }
-            else if (_gvars.options.song)
-                song = _gvars.options.song;
+
+            // No songs in queue? Something went wrong...
             else
-            { // No songs in queue? Something went wrong...
+            {
                 switchTo(Main.GAME_MENU_PANEL);
                 return false;
             }
+
             if (song && song.isLoaded)
             {
                 switchTo(GameMenu.GAME_PLAY);
