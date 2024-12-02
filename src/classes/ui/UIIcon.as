@@ -14,6 +14,8 @@ package classes.ui
         public var icon:DisplayObject;
         private var _sprWidth:Number = 1;
         private var _sprHeight:Number = 1;
+        private var _width:Number = 0;
+        private var _height:Number = 0;
 
         public function UIIcon(parent:DisplayObjectContainer = null, sprite:DisplayObject = null, xpos:Number = 0, ypos:Number = 0)
         {
@@ -37,6 +39,9 @@ package classes.ui
         {
             if (icon != null)
             {
+                _width = w;
+                _height = h;
+
                 icon.scaleX = icon.scaleY = Math.min(w / _sprWidth, h / _sprHeight);
 
                 this.graphics.clear();
@@ -58,6 +63,16 @@ package classes.ui
 
                 icon.transform.colorTransform = new ColorTransform((rgb.r / 255), (rgb.g / 255), (rgb.b / 255));
             }
+        }
+
+        override public function get width():Number
+        {
+            return _width;
+        }
+
+        override public function get height():Number
+        {
+            return _height;
         }
     }
 }
