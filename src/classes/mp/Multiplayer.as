@@ -311,6 +311,10 @@ package classes.mp
                     dispatchEvent(new MPEvent(MPEvent.SYS_USER_ERROR, command));
                     break;
 
+                case 'alert':
+                    sysAlert(command);
+                    break;
+
                 default:
                     dispatchEvent(new MPEvent(MPEvent.SYS_GENERAL_ERROR, command));
                     break;
@@ -653,6 +657,17 @@ package classes.mp
             garbageCollection();
 
             dispatchEvent(new MPEvent(MPEvent.SYS_USER_LIST, command));
+        }
+
+        private function sysAlert(command:MPSocketDataText):void
+        {
+            var color:Number = command.data.color ? command.data.color : 0;
+            var age:Number = command.data.age ? command.data.age : 120;
+
+            if (command.data.lang != null)
+                Alert.add(_lang.string(command.data.lang), age, color);
+            else if (command.data.msg != null)
+                Alert.add(command.data.msg, age, color);
         }
 
         private function roomUpdate(command:MPSocketDataText):void
