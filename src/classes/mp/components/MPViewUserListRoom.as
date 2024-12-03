@@ -58,7 +58,7 @@ package classes.mp.components
 
         public function build():void
         {
-            new Text(this, 5, 0, _lang.string("mp_user_list"), 16, "#FFFFFF").setAreaParams(_width - 30, 30);
+            new Text(this, 5, 0, _lang.string("mp_user_list"), 16, "#FFFFFF").setAreaParams(_width - 60, 30);
 
             pane = new ScrollPane(this, 0, 31, _width, _height - 31, e_scrollMouseWheel);
             pane.addEventListener(MouseEvent.CLICK, e_onUserClick);
