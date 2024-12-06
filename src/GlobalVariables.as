@@ -71,7 +71,7 @@ package
         public var VISUAL_MODS:Array = ["mirror", "dark", "hide", "mini", "columncolour", "halftime", "----", "nobackground"];
         public var songStartTime:String = "0";
         public var songStartHash:String = "0";
-        public var songCache:Array = [];
+        public var songCache:Vector.<Song> = new <Song>[];
         public var songHighscores:Object = {};
 
         public var divisionColors:Array = ["#C27BA0", "#8E7CC3", "#6D9EEB", "#93C47D", "#CEA023", "#E06666", "#919C86", "#D2C7AC", "#7B738A", "#BF0000"];
@@ -337,7 +337,7 @@ package
             for (var s:int = 0; s < songCache.length; s++)
                 songCache[s].unload();
 
-            songCache = [];
+            songCache.length = 0;
         }
 
         public function dirtySongFiles():void
