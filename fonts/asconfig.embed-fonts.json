@@ -4,11 +4,13 @@
         "debug": false,
         "source-path": [
             "./AachenLight/src",
-            "./NotoSans/src"
+            "./NotoSans/src",
+            "./FontAwesome/src"
         ],
         "include-sources": [
             "./AachenLight/src",
-            "./NotoSans/src"
+            "./NotoSans/src",
+            "./FontAwesome/src"
         ],
         "output": "bin/Embedded-Fonts.swc",
         "swf-version": 43,

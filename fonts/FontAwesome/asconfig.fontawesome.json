@@ -1,0 +1,9 @@
+{
+    "type": "lib",
+    "files": [
+        "src/FontAwesome.as"
+    ],
+    "compilerOptions": {
+        "output": "bin/Font-FontAwesome.swf"
+    }
+}
