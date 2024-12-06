@@ -642,8 +642,6 @@ package classes.mp.views
                 _gvars.options.isMultiplayer = true;
                 _gvars.options.fill();
                 _gvars.options.song = room.song;
-                _gvars.options.judgeWindow = null;
-                _gvars.options.isolationOffset = _gvars.options.isolationLength = 0;
                 _gvars.gameMain.switchTo(Main.GAME_PLAY_PANEL);
             }
         }

@@ -190,6 +190,13 @@ package game
         {
             fillFromUser(GlobalVariables.instance.activeUser);
             fillFromArcGlobals();
+
+            // Force Disable Settings for multiplayer.
+            if (isMultiplayer)
+            {
+                judgeWindow = null;
+                isolationOffset = isolationLength = 0;
+            }
         }
 
         public var modCache:Object = null;
