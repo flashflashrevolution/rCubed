@@ -328,6 +328,7 @@ package classes.mp.components
 
 import assets.menu.icons.fa.iconCrown;
 import classes.Language;
+import classes.mp.MPColors;
 import classes.mp.MPTeam;
 import classes.mp.MPUser;
 import classes.mp.Multiplayer;
@@ -464,10 +465,11 @@ internal class TeamLabel extends BaseLabel
 
 internal class UserLabel extends BaseLabel
 {
+    private static const NAME_CROWN:String = " <font color=\"" + MPColors.SYSTEM_MESSAGE_COLOR + "\" face=\"" + Fonts.FONT_AWESOME + "\">\uf521</font>";
+
     public var user:MPUser;
 
     private var canPlay:Boolean = false;
-    private var ownerCrown:UIIcon;
     private var altText:Text;
 
     private var hover:Sprite;
@@ -482,11 +484,6 @@ internal class UserLabel extends BaseLabel
 
     override protected function build():void
     {
-        ownerCrown = new UIIcon(this, new iconCrown(), 0, _height / 2);
-        ownerCrown.setSize(_height, _height);
-        ownerCrown.visible = false;
-        ownerCrown.alpha = 0.125;
-
         nameText = new Text(this, 5, 0, user.userLabelHTML, 11, "#FFFFFF");
         nameText.setAreaParams(_width - 11, _height);
         nameText.cacheAsBitmap = true;
@@ -508,7 +505,6 @@ internal class UserLabel extends BaseLabel
         super.resize();
         altText.x = _width - 50;
         nameText.width = altText.x - nameText.x - 5;
-        ownerCrown.x = _width - 24;
 
         hover.graphics.clear();
         hover.graphics.beginFill(0xFFFFFF, 0.05);
@@ -544,7 +540,7 @@ internal class UserLabel extends BaseLabel
 
     public function setOwnerCrown(owner:MPUser):void
     {
-        ownerCrown.visible = owner === user;
+        nameText.text = user.userLabelHTML + (owner === user ? NAME_CROWN : "");
     }
 
     public function setPlayability(state:Boolean):void
