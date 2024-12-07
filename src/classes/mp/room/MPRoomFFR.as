@@ -15,6 +15,7 @@ package classes.mp.room
     import classes.mp.events.MPRoomEvent;
     import classes.mp.events.MPRoomRawEvent;
     import classes.mp.mode.ffr.MPFFRState;
+    import classes.mp.mode.ffr.MPGameplayMods;
     import classes.mp.mode.ffr.MPMatchFFR;
     import classes.mp.mode.ffr.MPMatchFFRUser;
     import classes.mp.mode.ffr.MPMatchResultsFFR;
@@ -27,6 +28,8 @@ package classes.mp.room
         public var songData:MPSong = new MPSong();
         public var songInfo:SongInfo;
         public var song:Song;
+
+        public var mods:MPGameplayMods = new MPGameplayMods();
 
         public var activeMatch:MPMatchFFR;
 
@@ -75,6 +78,11 @@ package classes.mp.room
                 songData.update(modeData.song_details);
                 updateSongInfo();
                 updateAccessCheck();
+            }
+
+            if (modeData.mod_details != undefined)
+            {
+                mods.update(modeData.mod_details);
             }
         }
 
@@ -168,6 +176,10 @@ package classes.mp.room
                     modeGameState(user, cmd);
                     break;
 
+                case "game_mods":
+                    modeGameMods(user, cmd);
+                    break;
+
                 case "playable_state":
                     modePlayableState(user, cmd);
                     break;
@@ -258,6 +270,12 @@ package classes.mp.room
             songData.update(cmd.data);
             updateSongInfo(user, cmd);
             updateAccessCheck();
+        }
+
+        private function modeGameMods(user:MPUser, cmd:MPSocketDataText):void
+        {
+            mods.update(cmd.data.value);
+            _mp.dispatchEvent(new MPRoomEvent(MPEvent.FFR_GAME_MODS, cmd, this, user));
         }
 
         private function modeGameState(user:MPUser, cmd:MPSocketDataText):void
@@ -445,6 +463,9 @@ package classes.mp.room
 
         public function getPlayerSongRate(user:MPUser):Number
         {
+            if (mods.rate.enabled)
+                return mods.rate.value;
+
             const playerVars:MPFFRState = player_state_map[user.uid];
             if (!playerVars)
                 return 1;

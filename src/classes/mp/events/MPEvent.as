@@ -46,6 +46,7 @@ package classes.mp.events
         public static const USER_BLOCK_UPDATE:String = "user_block_update";
 
         public static const FFR_GAME_STATE:String = "ffr_game_state";
+        public static const FFR_GAME_MODS:String = "ffr_game_mods";
         public static const FFR_PLAYABLE_STATE:String = "ffr_playable_state";
         public static const FFR_READY_STATE:String = "ffr_ready_state";
         public static const FFR_FORCE_START:String = "ffr_force_start";

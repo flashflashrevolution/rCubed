@@ -326,9 +326,7 @@ package classes.mp.components
     }
 }
 
-import assets.menu.icons.fa.iconCrown;
 import classes.Language;
-import classes.mp.MPColors;
 import classes.mp.MPTeam;
 import classes.mp.MPUser;
 import classes.mp.Multiplayer;
@@ -337,7 +335,6 @@ import classes.mp.room.MPRoom;
 import classes.mp.room.MPRoomFFR;
 import classes.ui.Text;
 import classes.ui.Throbber;
-import classes.ui.UIIcon;
 import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.events.MouseEvent;
@@ -465,7 +462,7 @@ internal class TeamLabel extends BaseLabel
 
 internal class UserLabel extends BaseLabel
 {
-    private static const NAME_CROWN:String = " <font color=\"" + MPColors.SYSTEM_MESSAGE_COLOR + "\" face=\"" + Fonts.FONT_AWESOME + "\">\uf521</font>";
+    private static const NAME_CROWN:String = " <font color=\"#FDCF53\" face=\"" + Fonts.FONT_AWESOME + "\">\uf521</font>";
 
     public var user:MPUser;
 
@@ -558,7 +555,12 @@ internal class UserLabel extends BaseLabel
             if (playerState == "menu")
             {
                 const song_rate:Number = castRoom.getPlayerSongRate(user);
-                altText.text = song_rate != 1 ? "[" + song_rate + "x]" : "";
+                var rate_text:String = castRoom.mods.rate.enabled || song_rate != 1 ? "[" + song_rate + "x]" : "";
+
+                if (castRoom.mods.rate.enabled)
+                    rate_text = "<font color=\"#eda8a8\">" + rate_text;
+
+                altText.text = rate_text;
             }
             else if (playerState == "loading")
                 altText.text = castRoom.getPlayerLoadingProgress(user) + "%";

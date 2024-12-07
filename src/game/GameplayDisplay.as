@@ -357,6 +357,8 @@ package game
                     {
                         isMultiplayer = true;
 
+                        mpFFRRoom.mods.apply(options, song);
+
                         var noteskinData:String = options.noteskin == 0 ? _noteskins.lastCustomNoteskin : null;
                         _mp.sendCommand(new MPCFFRSongStart(mpFFRRoom, options.settingsEncode(), options.layout, noteskinData));
                     }

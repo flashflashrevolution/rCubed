@@ -56,6 +56,7 @@ package classes.mp.views
 
         private var ownerPanel:OwnerPanel;
         private var ownerEditPanel:OwnerEditPanel;
+        private var ownerModsPanel:OwnerModsPanel;
         private var userPanel:UserPanel;
 
         private var _userProfilePrompt:MPUserProfilePrompt;
@@ -76,6 +77,7 @@ package classes.mp.views
             super.addRoomEvents();
 
             _mp.addEventListener(MPEvent.FFR_GAME_STATE, e_gameState);
+            _mp.addEventListener(MPEvent.FFR_GAME_MODS, e_gameMods);
             _mp.addEventListener(MPEvent.FFR_PLAYABLE_STATE, e_playableState);
 
             _mp.addEventListener(MPEvent.FFR_SONG_RATE, e_songRate);
@@ -98,6 +100,7 @@ package classes.mp.views
         override public function dispose():void
         {
             _mp.removeEventListener(MPEvent.FFR_GAME_STATE, e_gameState);
+            _mp.removeEventListener(MPEvent.FFR_GAME_MODS, e_gameMods);
             _mp.removeEventListener(MPEvent.FFR_PLAYABLE_STATE, e_playableState);
 
             _mp.removeEventListener(MPEvent.FFR_SONG_RATE, e_songRate);
@@ -131,6 +134,9 @@ package classes.mp.views
 
             chat = new MPViewChatLogRoom(this, 0, 192, _width, _height - 192);
             chat.setRoom(room);
+            chat.graphics.lineStyle(1, 0xFFFFFF, 0.35);
+            chat.graphics.moveTo(1, 0);
+            chat.graphics.lineTo(_width, 0);
 
             // Userlist
             userlist = new MPViewUserListRoom(this, 410, 0);
@@ -160,6 +166,9 @@ package classes.mp.views
 
             ownerEditPanel = new OwnerEditPanel(this, room);
             addChild(ownerEditPanel);
+
+            ownerModsPanel = new OwnerModsPanel(this, room);
+            addChild(ownerModsPanel);
 
             userPanel = new UserPanel(this, room);
             addChild(userPanel);
@@ -192,10 +201,6 @@ package classes.mp.views
             // Title
             this.graphics.moveTo(1, 30);
             this.graphics.lineTo(_width, 30);
-
-            // Chat
-            this.graphics.moveTo(1, 192);
-            this.graphics.lineTo(_width, 192);
         }
 
         override public function onKeyInput(e:KeyboardEvent):void
@@ -292,6 +297,15 @@ package classes.mp.views
             if (e.room === this.room)
             {
                 userlist.updateGameStates();
+            }
+        }
+
+        protected function e_gameMods(e:MPRoomEvent):void
+        {
+            if (e.room === this.room)
+            {
+                userlist.updateGameStates();
+                updatePanelDisplay();
             }
         }
 
@@ -509,6 +523,7 @@ package classes.mp.views
         {
             ownerPanel.update();
             ownerEditPanel.update();
+            ownerModsPanel.update();
             userPanel.update();
 
             // Update User -> Owner Switch
@@ -524,21 +539,36 @@ package classes.mp.views
         {
             ownerPanel.visible = true;
             ownerEditPanel.visible = false;
+            ownerModsPanel.visible = false;
             userPanel.visible = false;
+            chat.visible = true;
         }
 
         public function setPanelEdit():void
         {
             ownerPanel.visible = false;
             ownerEditPanel.visible = true;
+            ownerModsPanel.visible = false;
             userPanel.visible = false;
+            chat.visible = true;
+        }
+
+        public function setPanelMods():void
+        {
+            ownerPanel.visible = false;
+            ownerEditPanel.visible = false;
+            ownerModsPanel.visible = true;
+            userPanel.visible = false;
+            chat.visible = false;
         }
 
         public function setPanelUser():void
         {
             ownerPanel.visible = false;
             ownerEditPanel.visible = false;
+            ownerModsPanel.visible = false;
             userPanel.visible = true;
+            chat.visible = true;
         }
 
         private function _startSongLoading():void
@@ -713,11 +743,14 @@ import assets.menu.icons.fa.iconCancel;
 import assets.menu.icons.fa.iconEye;
 import assets.menu.icons.fa.iconGear;
 import assets.menu.icons.fa.iconLeave;
+import assets.menu.icons.fa.iconLock;
 import assets.menu.icons.fa.iconPlay;
+import assets.menu.icons.fa.iconWrench;
 import classes.Alert;
 import classes.Language;
 import classes.mp.MPModes;
 import classes.mp.Multiplayer;
+import classes.mp.commands.MPCFFRGameModifiers;
 import classes.mp.commands.MPCFFRReady;
 import classes.mp.commands.MPCFFRReadyForce;
 import classes.mp.commands.MPCRoomEdit;
@@ -727,11 +760,15 @@ import classes.mp.events.MPRoomEvent;
 import classes.mp.room.MPRoomFFR;
 import classes.mp.views.MPRoomViewFFR;
 import classes.ui.BoxButton;
+import classes.ui.BoxCheck;
 import classes.ui.BoxIcon;
 import classes.ui.BoxText;
+import classes.ui.ScrollBar;
+import classes.ui.ScrollPane;
 import classes.ui.Text;
 import classes.ui.UIIcon;
 import classes.ui.UIIconHover;
+import classes.ui.ValidatedText;
 import com.bit101.components.ComboBox;
 import com.flashfla.utils.SystemUtil;
 import com.flashfla.utils.sprintf;
@@ -849,6 +886,7 @@ internal class OwnerPanel extends Sprite
     private var room:MPRoomFFR;
 
     private var panelName:Text;
+    private var iconModsBtn:UIIconHover;
     private var iconEditBtn:UIIconHover;
     private var iconLeaveBtn:UIIconHover;
 
@@ -868,7 +906,13 @@ internal class OwnerPanel extends Sprite
         this.room = room;
 
         panelName = new Text(this, 20, 0, "", 16);
-        panelName.setAreaParams(view.width - 85, 30);
+        panelName.setAreaParams(view.width - 115, 30);
+
+        iconModsBtn = new UIIconHover(this, new iconWrench(), view.width - 75, 16);
+        iconModsBtn.setSize(15, 15);
+        iconModsBtn.buttonMode = true;
+        iconModsBtn.setHoverText(_lang.string("mp_room_options_mods"));
+        iconModsBtn.addEventListener(MouseEvent.CLICK, e_modsClick);
 
         iconEditBtn = new UIIconHover(this, new iconGear(), view.width - 45, 16);
         iconEditBtn.setSize(15, 15);
@@ -939,6 +983,11 @@ internal class OwnerPanel extends Sprite
         ready.text = _lang.string(room.isPlayerReady(_mp.currentUser) ? "mp_room_ffr_owner_unready" : "mp_room_ffr_owner_ready");
     }
 
+    private function e_modsClick(e:MouseEvent):void
+    {
+        view.setPanelMods();
+    }
+
     private function e_editClick(e:MouseEvent):void
     {
         view.setPanelEdit();
@@ -962,11 +1011,6 @@ internal class OwnerPanel extends Sprite
     private function e_songsClick(e:MouseEvent):void
     {
         (this.view.parent as MenuMultiplayer).switchTo(MainMenu.MENU_SONGSELECTION);
-    }
-
-    private function e_modsClick(e:MouseEvent):void
-    {
-
     }
 }
 
@@ -1190,4 +1234,266 @@ internal class OwnerEditPanel extends Sprite
         }
     }
 
+}
+
+internal class OwnerModsPanel extends Sprite
+{
+    private static const _gvars:GlobalVariables = GlobalVariables.instance;
+    private static const _mp:Multiplayer = Multiplayer.instance;
+    private static const _lang:Language = Language.instance;
+
+    private var view:MPRoomViewFFR;
+    private var room:MPRoomFFR;
+
+    private var panelName:Text;
+    private var iconCancelBtn:UIIcon;
+    private var iconSaveBtn:UIIcon;
+
+    private var pane:ScrollPane;
+    private const scrollbarWidth:Number = 15;
+    private var scrollbar:ScrollBar;
+
+    private var enabledRate:BoxCheck;
+    private var optionRate:ValidatedText;
+
+    private var enabledHidden:BoxCheck;
+    private var optionHidden:BoxCheck;
+    private var enabledSudden:BoxCheck;
+    private var optionSudden:BoxCheck;
+    private var enabledBlink:BoxCheck;
+    private var optionBlink:BoxCheck;
+
+    private var enabledRotating:BoxCheck;
+    private var optionRotating:BoxCheck;
+    private var enabledRotateCW:BoxCheck;
+    private var optionRotateCW:BoxCheck;
+    private var enabledRotateCCW:BoxCheck;
+    private var optionRotateCCW:BoxCheck;
+    private var enabledWave:BoxCheck;
+    private var optionWave:BoxCheck;
+    private var enabledDrunk:BoxCheck;
+    private var optionDrunk:BoxCheck;
+    private var enabledTornado:BoxCheck;
+    private var optionTornado:BoxCheck;
+    private var enabledMiniResize:BoxCheck;
+    private var optionMiniResize:BoxCheck;
+    private var enabledTapPulse:BoxCheck;
+    private var optionTapPulse:BoxCheck;
+
+    private var enabledNoBackground:BoxCheck;
+    private var optionNoBackground:BoxCheck;
+
+    public function OwnerModsPanel(view:MPRoomViewFFR, room:MPRoomFFR)
+    {
+        this.view = view;
+        this.room = room;
+
+        panelName = new Text(this, 20, 0, "", 16);
+        panelName.setAreaParams(view.width - 115, 30);
+
+        iconCancelBtn = new UIIcon(this, new iconCancel(), view.width - 45, 16);
+        iconCancelBtn.setSize(15, 15);
+        iconCancelBtn.setColor("#eda8a8");
+        iconCancelBtn.buttonMode = true;
+        iconCancelBtn.addEventListener(MouseEvent.CLICK, e_cancelClick);
+
+        iconSaveBtn = new UIIcon(this, new iconAccept(), view.width - 15, 16);
+        iconSaveBtn.setSize(15, 15);
+        iconSaveBtn.setColor("#bdeda8");
+        iconSaveBtn.buttonMode = true;
+        iconSaveBtn.addEventListener(MouseEvent.CLICK, e_saveClick);
+
+        // Settings Pane
+        pane = new ScrollPane(this, 1, 31, view.width - scrollbarWidth - 1, view.height - 31, e_mouseWheelHandler);
+        scrollbar = new ScrollBar(this, view.width - scrollbarWidth, 31, scrollbarWidth, view.height - 31, null, new Sprite(), e_scrollbarUpdater);
+
+        // Scrollbar BG
+        this.graphics.lineStyle(0, 0, 0);
+        this.graphics.beginFill(0xFFFFFF, 0.05);
+        this.graphics.drawRect(view.width - scrollbarWidth, 31, scrollbarWidth, view.height - 31);
+        this.graphics.endFill();
+
+        // Scrollbar
+        this.graphics.lineStyle(1, 0xFFFFFF, 0.35);
+        this.graphics.moveTo(view.width - scrollbarWidth - 1, 31);
+        this.graphics.lineTo(view.width - scrollbarWidth - 1, view.height);
+
+        // Mods
+        var xOff:Number = 12;
+        var yOff:Number = 39;
+
+        var enabledHelp:UIIconHover = new UIIconHover(pane.content, new iconLock(), 20, 16);
+        enabledHelp.setSize(16, 16);
+        enabledHelp.setHoverText("Force Modifiers");
+        enabledHelp.setColor("#c7c7c7");
+
+        new Text(pane.content, 40, 5, _lang.string("mp_room_options_mods"), 12, "#c7c7c7");
+
+        enabledRate = new BoxCheck(pane.content, xOff, yOff + 2, e_changeListener);
+        optionRate = new ValidatedText(pane.content, xOff + 32, yOff, 80, 20, ValidatedText.R_FLOAT_P, e_changeListener);
+        new Text(pane.content, xOff + 122, yOff, _lang.string("options_rate"));
+        yOff += 35;
+
+        enabledHidden = new BoxCheck(pane.content, xOff, yOff + 2, e_changeListener);
+        optionHidden = new BoxCheck(pane.content, xOff + 32, yOff + 2, e_changeListener);
+        new Text(pane.content, xOff + 54, yOff, _lang.string("options_mod_hidden"));
+        yOff += 25;
+
+        enabledSudden = new BoxCheck(pane.content, xOff, yOff + 2, e_changeListener);
+        optionSudden = new BoxCheck(pane.content, xOff + 32, yOff + 2, e_changeListener);
+        new Text(pane.content, xOff + 54, yOff, _lang.string("options_mod_sudden"));
+        yOff += 25;
+
+        enabledBlink = new BoxCheck(pane.content, xOff, yOff + 2, e_changeListener);
+        optionBlink = new BoxCheck(pane.content, xOff + 32, yOff + 2, e_changeListener);
+        new Text(pane.content, xOff + 54, yOff, _lang.string("options_mod_blink"));
+        yOff += 35;
+
+        enabledRotating = new BoxCheck(pane.content, xOff, yOff + 2, e_changeListener);
+        optionRotating = new BoxCheck(pane.content, xOff + 32, yOff + 2, e_changeListener);
+        new Text(pane.content, xOff + 54, yOff, _lang.string("options_mod_rotating"));
+        yOff += 25;
+
+        enabledRotateCW = new BoxCheck(pane.content, xOff, yOff + 2, e_changeListener);
+        optionRotateCW = new BoxCheck(pane.content, xOff + 32, yOff + 2, e_changeListener);
+        new Text(pane.content, xOff + 54, yOff, _lang.string("options_mod_rotate_cw"));
+        yOff += 25;
+
+        enabledRotateCCW = new BoxCheck(pane.content, xOff, yOff + 2, e_changeListener);
+        optionRotateCCW = new BoxCheck(pane.content, xOff + 32, yOff + 2, e_changeListener);
+        new Text(pane.content, xOff + 54, yOff, _lang.string("options_mod_rotate_ccw"));
+        yOff += 25;
+
+        enabledWave = new BoxCheck(pane.content, xOff, yOff + 2, e_changeListener);
+        optionWave = new BoxCheck(pane.content, xOff + 32, yOff + 2, e_changeListener);
+        new Text(pane.content, xOff + 54, yOff, _lang.string("options_mod_wave"));
+        yOff += 25;
+
+        enabledDrunk = new BoxCheck(pane.content, xOff, yOff + 2, e_changeListener);
+        optionDrunk = new BoxCheck(pane.content, xOff + 32, yOff + 2, e_changeListener);
+        new Text(pane.content, xOff + 54, yOff, _lang.string("options_mod_drunk"));
+        yOff += 25;
+
+        enabledTornado = new BoxCheck(pane.content, xOff, yOff + 2, e_changeListener);
+        optionTornado = new BoxCheck(pane.content, xOff + 32, yOff + 2, e_changeListener);
+        new Text(pane.content, xOff + 54, yOff, _lang.string("options_mod_tornado"));
+        yOff += 25;
+
+        enabledMiniResize = new BoxCheck(pane.content, xOff, yOff + 2, e_changeListener);
+        optionMiniResize = new BoxCheck(pane.content, xOff + 32, yOff + 2, e_changeListener);
+        new Text(pane.content, xOff + 54, yOff, _lang.string("options_mod_mini_resize"));
+        yOff += 25;
+
+        enabledTapPulse = new BoxCheck(pane.content, xOff, yOff + 2, e_changeListener);
+        optionTapPulse = new BoxCheck(pane.content, xOff + 32, yOff + 2, e_changeListener);
+        new Text(pane.content, xOff + 54, yOff, _lang.string("options_mod_tap_pulse"));
+        yOff += 35;
+
+        enabledNoBackground = new BoxCheck(pane.content, xOff, yOff + 2, e_changeListener);
+        optionNoBackground = new BoxCheck(pane.content, xOff + 32, yOff + 2, e_changeListener);
+        new Text(pane.content, xOff + 54, yOff, _lang.string("options_mod_nobackground"));
+        yOff += 25;
+
+
+        // Mod Borders
+        pane.content.graphics.lineStyle(1, 0xFFFFFF, 0.35);
+        pane.content.graphics.moveTo(5, 30);
+        pane.content.graphics.lineTo(view.width - scrollbarWidth - 7, 30);
+        pane.content.graphics.moveTo(35, 5);
+        pane.content.graphics.lineTo(35, Math.max(view.height - 36, yOff + 5));
+
+        pane.update();
+        scrollbar.draggerVisibility = (yOff > view.height - 30 && pane.content.height > pane.height - 5);
+
+        update();
+    }
+
+    public function update():void
+    {
+        panelName.text = room.name ? room.name : "";
+
+        enabledRate.checked = room.mods.rate.enabled;
+        optionRate.text = room.mods.rate.value.toString();
+    }
+
+    private function e_saveClick(e:MouseEvent):void
+    {
+        view.setPanelOwner();
+
+        // Build command
+        const mods:Object = {};
+
+        if (enabledRate.checked)
+        {
+            var newSongRate:Number = optionRate.validate(1, 0.1);
+            newSongRate = Math.max(0.1, Math.min(200, Math.round(newSongRate * 1000) / 1000));
+            if (isNaN(newSongRate) || !isFinite(newSongRate))
+                newSongRate = 1;
+
+            mods.rate = newSongRate;
+        }
+
+        if (enabledHidden.checked)
+            mods.hidden = optionHidden.checked;
+        if (enabledSudden.checked)
+            mods.sudden = optionSudden.checked;
+        if (enabledBlink.checked)
+            mods.blink = optionBlink.checked;
+        if (enabledRotating.checked)
+            mods.rotating = optionRotating.checked;
+        if (enabledRotateCW.checked)
+            mods.rotate_cw = optionRotateCW.checked;
+        if (enabledRotateCCW.checked)
+            mods.rotate_ccw = optionRotateCCW.checked;
+        if (enabledWave.checked)
+            mods.wave = optionWave.checked;
+        if (enabledDrunk.checked)
+            mods.drunk = optionDrunk.checked;
+        if (enabledTornado.checked)
+            mods.tornado = optionTornado.checked;
+        if (enabledMiniResize.checked)
+            mods.mini_resize = optionMiniResize.checked;
+        if (enabledTapPulse.checked)
+            mods.tap_pulse = optionTapPulse.checked;
+        if (enabledNoBackground.checked)
+            mods.nobackground = optionNoBackground.checked;
+
+        _mp.sendCommand(new MPCFFRGameModifiers(room, mods));
+    }
+
+    private function e_cancelClick(e:MouseEvent):void
+    {
+        view.setPanelOwner();
+    }
+
+    private function e_changeListener(e:Event):void
+    {
+        if (e.target is BoxCheck)
+            (e.target as BoxCheck).checked = !((e.target as BoxCheck).checked);
+
+        else if (e.target == optionRate)
+            optionRate.validate(1, 0.1);
+    }
+
+    /**
+     * Mouse Wheel Handler for the Mods Pane.
+     * Moves the scroll pane based on the scroll delta direction.
+     * @param e
+     */
+    private function e_mouseWheelHandler(e:MouseEvent):void
+    {
+        // Sanity
+        if (!scrollbar.draggerVisibility)
+            return;
+
+        // Scroll
+        const newScrollPosition:Number = scrollbar.scroll + (pane.scrollFactorVertical / 2) * (e.delta > 0 ? -1 : 1);
+        pane.scrollTo(newScrollPosition);
+        scrollbar.scrollTo(newScrollPosition);
+    }
+
+    private function e_scrollbarUpdater(e:Event):void
+    {
+        pane.scrollTo(e.target.scroll);
+    }
 }

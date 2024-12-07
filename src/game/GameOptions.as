@@ -201,6 +201,20 @@ package game
 
         public var modCache:Object = null;
 
+        public function setModBooleanState(mod:String, value:Boolean):void
+        {
+            if (modEnabled(mod) && !value)
+            {
+                mods.removeAt(mods.indexOf(mod));
+                delete modCache[mod];
+            }
+            else if (!modEnabled(mod) && value)
+            {
+                mods.push(mod);
+                modCache[mod] = true;
+            }
+        }
+
         public function modEnabled(mod:String):Boolean
         {
             if (!modCache)
