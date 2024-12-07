@@ -7,7 +7,6 @@ package classes.mp.pm
     import classes.mp.components.chatlog.MPChatLogEntry;
     import classes.mp.components.chatlog.MPChatLogEntryText;
     import classes.mp.components.chatlog.MPChatLogRoomInvite;
-    import com.flashfla.utils.StringUtil;
     import com.flashfla.utils.sprintf;
     import flash.desktop.NotificationType;
 

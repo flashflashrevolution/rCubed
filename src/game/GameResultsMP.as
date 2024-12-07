@@ -18,6 +18,7 @@ package game
     import flash.display.Sprite;
     import flash.events.KeyboardEvent;
     import flash.events.MouseEvent;
+    import flash.events.TimerEvent;
     import flash.ui.Keyboard;
     import flash.utils.Timer;
     import flash.utils.getTimer;
@@ -26,7 +27,6 @@ package game
     import game.results.GameResultSingleView;
     import menu.MenuPanel;
     import popups.PopupHighscores;
-    import flash.events.TimerEvent;
 
     public class GameResultsMP extends MenuPanel
     {

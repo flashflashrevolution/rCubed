@@ -28,10 +28,10 @@
 
 package com.bit101.components
 {
+    import assets.GameBackgroundColor;
     import flash.display.DisplayObject;
     import flash.display.DisplayObjectContainer;
     import flash.display.Sprite;
-    import assets.GameBackgroundColor;
 
     public class Panel extends Component
     {

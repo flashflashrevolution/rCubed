@@ -2,14 +2,11 @@ package popups
 {
     import assets.GameBackgroundColor;
     import classes.Language;
-    import classes.Playlist;
-    import classes.mp.Multiplayer;
     import classes.ui.Box;
     import classes.ui.BoxButton;
     import com.flashfla.utils.SpriteUtil;
     import flash.display.Bitmap;
     import flash.events.MouseEvent;
-    import game.GameMenu;
     import menu.MenuPanel;
 
     public class PopupContextMenu extends MenuPanel

@@ -229,6 +229,7 @@ package game
 }
 
 import classes.ImageCache;
+import classes.Language;
 import classes.mp.Multiplayer;
 import classes.mp.mode.ffr.MPMatchFFRUser;
 import classes.mp.room.MPRoomFFR;
@@ -241,7 +242,6 @@ import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.utils.getTimer;
 import game.GameMultiplayerWait;
-import classes.Language;
 
 internal class UserDisplayGroup extends Sprite
 {

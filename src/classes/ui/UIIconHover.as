@@ -4,9 +4,9 @@ package classes.ui
     import flash.display.DisplayObjectContainer;
     import flash.events.Event;
     import flash.events.MouseEvent;
+    import flash.events.TimerEvent;
     import flash.geom.Point;
     import flash.utils.Timer;
-    import flash.events.TimerEvent;
 
     public class UIIconHover extends UIIcon
     {
