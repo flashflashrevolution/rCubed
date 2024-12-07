@@ -27,6 +27,10 @@ package game.events
 
                     switch (TAG)
                     {
+                        case GamePlaybackScoreState.ID:
+                            event = GamePlaybackScoreState.readData(data);
+                            break;
+
                         case GamePlaybackJudgeResult.ID:
                             event = GamePlaybackJudgeResult.readData(data);
                             break;
