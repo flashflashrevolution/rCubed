@@ -33,7 +33,7 @@ package classes.mp
 
         private static var _instance:Multiplayer = null;
 
-        public static const SERVER_VERSION:uint = 3;
+        public static const SERVER_VERSION:uint = 4;
 
         private var _listeners:Array = [];
 
