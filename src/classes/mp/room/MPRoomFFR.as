@@ -259,8 +259,12 @@ package classes.mp.room
         {
             switch (cmd.action)
             {
-                case MPEvent.FFR_RAW_REQUEST_PLAYBACK:
+                case MPEvent.FFR_RAW_PLAYBACK_REQUEST:
                     _mp.dispatchEvent(new MPRoomRawEvent(MPEvent.FFR_GET_PLAYBACK, cmd, this, user));
+                    break;
+
+                case MPEvent.FFR_RAW_SCORE_HISTORY_REQUEST:
+                    _mp.dispatchEvent(new MPRoomRawEvent(MPEvent.FFR_GET_SCORE_HISTORY, cmd, this, user));
                     break;
             }
         }

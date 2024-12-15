@@ -12,7 +12,6 @@ package game
     import classes.mp.MPUser;
     import classes.mp.Multiplayer;
     import classes.mp.commands.MPCFFRPlaybackRequest;
-    import classes.mp.commands.MPCFFRScoreUpdate;
     import classes.mp.commands.MPCFFRSongStart;
     import classes.mp.events.MPEvent;
     import classes.mp.events.MPRoomEvent;
@@ -78,6 +77,7 @@ package game
     import game.events.GamePlaybackEvent;
     import game.events.GamePlaybackFocusChange;
     import game.events.GamePlaybackReader;
+    import game.events.GamePlaybackScoreState;
     import game.events.GamePlaybackSpectatorEnd;
     import game.events.GamePlaybackSpectatorHit;
     import menu.MenuPanel;
@@ -203,13 +203,15 @@ package game
         // Multiplayer
         public var isMultiplayer:Boolean = false;
         public var isMultiplayerSpectator:Boolean = false;
-        public var spectatorHistoryUpdate:Boolean = false;
+        public var scoreHistory:Vector.<GamePlaybackEvent>;
+        public var scoreHistoryLastCount:Number;
+        public var scoreHistoryBuffer:ByteArray;
         public var spectatorHistory:Vector.<GamePlaybackEvent>;
         public var spectatorHistoryLastCount:Number;
-        public var spectatorHistoryBuffer:ByteArray;
         public var spectatorPlayerVars:MPFFRState;
         public var mpUpdateTimer:Timer;
         public var mpSpectatorTimer:Timer;
+        public var mpRawBuffer:ByteArray;
         public var mpFFRRoom:MPRoomFFR;
         public var mpuiFFRScores:MPFFRScoreCompare;
 
@@ -548,12 +550,20 @@ package game
                 Flags.VALUES[Flags.MP_MENU_RETURN] = true;
             }
 
+            if (scoreHistory != null)
+            {
+                scoreHistory = null;
+                scoreHistoryLastCount = 0;
+            }
+
             if (spectatorHistory != null)
             {
                 spectatorHistory = null;
                 spectatorHistoryLastCount = 0;
-                spectatorHistoryBuffer = null;
             }
+
+            if (mpRawBuffer != null)
+                mpRawBuffer = null;
 
             if (mpUpdateTimer != null)
             {
@@ -754,7 +764,9 @@ package game
             {
                 spectatorHistory = new <GamePlaybackEvent>[];
                 spectatorHistoryLastCount = 0;
-                spectatorHistoryBuffer = new ByteArray();
+                scoreHistory = new <GamePlaybackEvent>[];
+                scoreHistoryLastCount = 0;
+                mpRawBuffer = new ByteArray();
             }
 
             if (isMultiplayer)
@@ -1090,33 +1102,38 @@ package game
 
             //_mp.sendCommand(new MPCFFRSongProgress(mpFFRRoom, GAME_TIME));
 
+            var i:int;
+
+            // Score Updates
+            if (scoreHistoryLastCount != scoreHistory.length)
+            {
+                //_mp.sendCommand(new MPCFFRScoreUpdate(mpFFRRoom, gameScore, hitAmazing, hitPerfect, hitGood, hitAverage, hitMiss, hitBoo, hitCombo, hitMaxCombo));
+
+                mpRawBuffer.length = 0;
+                mpRawBuffer.writeByte(MPEvent.RAW_TYPE_MODE);
+                mpRawBuffer.writeByte(MPEvent.FFR_RAW_SCORE_HISTORY_APPEND);
+                mpRawBuffer.writeUnsignedInt(mpFFRRoom.uid);
+
+                for (i = scoreHistoryLastCount; i < scoreHistory.length; i++)
+                    scoreHistory[i].writeData(mpRawBuffer);
+
+                _mp.sendBytes(mpRawBuffer);
+                scoreHistoryLastCount = scoreHistory.length;
+            }
+
+            // Spectator Playback
             if (spectatorHistoryLastCount != spectatorHistory.length)
             {
-                spectatorHistoryBuffer.length = 0;
+                mpRawBuffer.length = 0;
+                mpRawBuffer.writeByte(MPEvent.RAW_TYPE_MODE);
+                mpRawBuffer.writeByte(MPEvent.FFR_RAW_PLAYBACK_APPEND);
+                mpRawBuffer.writeUnsignedInt(mpFFRRoom.uid);
 
-                // Score
-                _mp.sendCommand(new MPCFFRScoreUpdate(mpFFRRoom, gameScore, hitAmazing, hitPerfect, hitGood, hitAverage, hitMiss, hitBoo, hitCombo, hitMaxCombo));
+                for (i = spectatorHistoryLastCount; i < spectatorHistory.length; i++)
+                    spectatorHistory[i].writeData(mpRawBuffer);
 
-                // Spectator Playback
-                const newEvents:int = spectatorHistory.length - spectatorHistoryLastCount;
-                spectatorHistoryBuffer.writeByte(MPEvent.RAW_TYPE_MODE);
-                spectatorHistoryBuffer.writeByte(MPEvent.FFR_RAW_APPEND_PLAYBACK);
-                spectatorHistoryBuffer.writeUnsignedInt(mpFFRRoom.uid);
-
-                for (var i:int = spectatorHistoryLastCount; i < spectatorHistory.length; i++)
-                {
-                    spectatorHistory[i].writeData(spectatorHistoryBuffer);
-                }
-
-                _mp.sendBytes(spectatorHistoryBuffer);
-
+                _mp.sendBytes(mpRawBuffer);
                 spectatorHistoryLastCount = spectatorHistory.length;
-                spectatorHistoryUpdate = false;
-            }
-            else if (spectatorHistoryUpdate)
-            {
-                _mp.sendCommand(new MPCFFRScoreUpdate(mpFFRRoom, gameScore, hitAmazing, hitPerfect, hitGood, hitAverage, hitMiss, hitBoo, hitCombo, hitMaxCombo));
-                spectatorHistoryUpdate = false;
             }
         }
 
@@ -1212,10 +1229,7 @@ package game
 
                 if (GAME_FRAME - curNote.FRAME + JUDGE_OFFSET_FRAMES >= 6)
                 {
-                    if (isMultiplayer)
-                        spectatorHistoryUpdate = true;
-
-                    commitJudge(curNote.DIR, GAME_FRAME, -10);
+                    commitJudge(curNote.DIR, GAME_FRAME, -10, curNote.POSITION + 200);
                     uiNoteField.removeNote(curNote.ID);
                     n--;
                 }
@@ -1250,7 +1264,7 @@ package game
 
                     if (options.isEditor)
                     {
-                        commitJudge(curNote.DIR, (curNote.FRAME + JUDGE_OFFSET_FRAMES), 50);
+                        commitJudge(curNote.DIR, (curNote.FRAME + JUDGE_OFFSET_FRAMES), 50, curNote.POSITION);
                         uiNoteField.removeNote(curNote.ID);
                     }
                     else
@@ -1297,7 +1311,7 @@ package game
                 {
                     if (newPress.frame == -2)
                     {
-                        commitJudge(newPress.direction, GAME_FRAME, -5);
+                        commitJudge(newPress.direction, GAME_FRAME, -5, newPress.time);
                         binReplayBoos[binReplayBoos.length] = new ReplayBinFrame(newPress.time, newPress.direction, binReplayBoos.length);
                     }
                     replayPressCount++;
@@ -1956,7 +1970,7 @@ package game
 
             if (score)
             {
-                commitJudge(dir, frame + note.FRAME - JUDGE_OFFSET_FRAMES, score);
+                commitJudge(dir, frame + note.FRAME - JUDGE_OFFSET_FRAMES, score, position);
                 uiNoteField.removeNote(note.ID);
                 accuracy.addValue(rawAccuracy);
                 binReplayNotes[note.ID].time = judgeAccuracy;
@@ -1985,7 +1999,7 @@ package game
                 if (booFrame >= gameFirstNoteFrame)
                     binReplayBoos[binReplayBoos.length] = new ReplayBinFrame(position, dir, binReplayBoos.length);
 
-                commitJudge(dir, booFrame, -5);
+                commitJudge(dir, booFrame, -5, position);
             }
 
             if (options.modEnabled("tap_pulse"))
@@ -2058,7 +2072,7 @@ package game
 
             if (score)
             {
-                commitJudge(dir, frame, score);
+                commitJudge(dir, frame, score, note.POSITION);
                 uiNoteField.removeNote(note.ID);
                 accuracy.addValue((note.FRAME - frame) * 1000 / 30);
 
@@ -2066,12 +2080,12 @@ package game
                     uiAccuracyBar.onScoreSignal(score, diff * 33.3333 - 1);
             }
             else
-                commitJudge(dir, frame, -5);
+                commitJudge(dir, frame, -5, note.POSITION);
 
             return Boolean(score);
         }
 
-        public function commitJudge(dir:String, frame:int, score:int):void
+        public function commitJudge(dir:String, frame:int, score:int, position:int):void
         {
             var health:int = 0;
             var jscore:int = score;
@@ -2170,6 +2184,22 @@ package game
                 gameReplay.push(new ReplayNote(dir, frame, Math.round(getTimer() - absoluteStart + songOffset.value), score));
 
             updateFieldVars();
+
+            // Multiplayer
+            if (isMultiplayer)
+            {
+                var scoreEvent:GamePlaybackScoreState = new GamePlaybackScoreState(scoreHistory.length, position);
+                scoreEvent.raw_score = gameScore;
+                scoreEvent.amazing = hitAmazing;
+                scoreEvent.perfect = hitPerfect;
+                scoreEvent.good = hitGood;
+                scoreEvent.average = hitAverage;
+                scoreEvent.miss = hitMiss;
+                scoreEvent.boo = hitBoo;
+                scoreEvent.combo = hitCombo;
+                scoreEvent.max_combo = hitMaxCombo;
+                scoreHistory.push(scoreEvent);
+            }
 
             // Websocket
             if (_gvars.air_useWebsockets)

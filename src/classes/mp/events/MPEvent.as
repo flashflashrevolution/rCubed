@@ -62,10 +62,13 @@ package classes.mp.events
         public static const FFR_SONG_START:String = "ffr_song_start";
         public static const FFR_SCORE_UPDATE:String = "ffr_score_update";
         public static const FFR_GET_PLAYBACK:String = "ffr_get_playback";
+        public static const FFR_GET_SCORE_HISTORY:String = "ffr_get_score_histry";
         public static const FFR_MATCH_END:String = "ffr_match_end";
 
-        public static const FFR_RAW_APPEND_PLAYBACK:int = 0;
-        public static const FFR_RAW_REQUEST_PLAYBACK:int = 1;
+        public static const FFR_RAW_PLAYBACK_APPEND:int = 0;
+        public static const FFR_RAW_PLAYBACK_REQUEST:int = 1;
+        public static const FFR_RAW_SCORE_HISTORY_APPEND:int = 2;
+        public static const FFR_RAW_SCORE_HISTORY_REQUEST:int = 3;
 
         public static const RAW_TYPE_SYS:int = 1;
         public static const RAW_TYPE_USER:int = 2;
