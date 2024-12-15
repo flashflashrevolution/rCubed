@@ -84,7 +84,6 @@ package classes.mp.mode.ffr
             {
                 options.songRate = rate.value;
                 song.isDirty = true;
-                song.handleDirty(options);
             }
 
             if (hidden.enabled)
@@ -122,6 +121,8 @@ package classes.mp.mode.ffr
 
             if (nobackground.enabled)
                 options.setModBooleanState(nobackground.mod, nobackground.value);
+
+            song.handleDirty(options);
         }
     }
 }
