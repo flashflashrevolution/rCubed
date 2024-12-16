@@ -64,6 +64,7 @@ package classes.mp.views
 
         private var loadProgressTimer:Timer = new Timer(500);
         private var autoSpectate:Boolean = false;
+        private var autoSpectatePlayer:MPUser;
 
         public function MPRoomViewFFR(room:MPRoomFFR, parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number = 0)
         {
@@ -120,7 +121,7 @@ package classes.mp.views
             _mp.removeEventListener(MPEvent.FFR_MATCH_END, e_matchEnd);
 
             userlist.removeEventListener(MPEvent.ROOM_USERLIST_SELECT, e_onUserSelect);
-            userlist.removeEventListener(MPEvent.ROOM_USERLIST_SPECTATE, e_onUserSpectate);
+            userlist.removeEventListener(MPEvent.ROOM_USERLIST_SPECTATE, e_onUserSpectateUserlist);
             inviteButton.removeEventListener(MouseEvent.CLICK, e_inviteClick);
 
             closePrompts();
@@ -142,7 +143,7 @@ package classes.mp.views
             userlist = new MPViewUserListRoom(this, 410, 0);
             userlist.setRoom(room);
             userlist.addEventListener(MPEvent.ROOM_USERLIST_SELECT, e_onUserSelect);
-            userlist.addEventListener(MPEvent.ROOM_USERLIST_SPECTATE, e_onUserSpectate);
+            userlist.addEventListener(MPEvent.ROOM_USERLIST_SPECTATE, e_onUserSpectateUserlist);
 
             autoSpectateButton = new UIIconHover(this, new iconEye(), 566, 16);
             autoSpectateButton.setSize(15, 15);
@@ -346,6 +347,9 @@ package classes.mp.views
                 userlist.update();
                 updateRoomButton();
                 updatePanelDisplay();
+
+                if (autoSpectatePlayer === e.user && autoSpectate)
+                    e_autoSpectateClick(null);
             }
         }
 
@@ -430,6 +434,14 @@ package classes.mp.views
                     if (room.isPlayer(_mp.currentUser))
                         return;
 
+                    // Set Player
+                    if (autoSpectatePlayer)
+                    {
+                        _spectatePlayer(autoSpectatePlayer);
+                        return;
+                    }
+
+                    // Random Player
                     var gameUsers:Vector.<MPUser> = room.users.filter(function(user:MPUser, index:int, array:Vector.<MPUser>):Boolean
                     {
                         return room.isPlayer(user) && room.getPlayerState(user) == "game";
@@ -471,6 +483,12 @@ package classes.mp.views
         {
             autoSpectate = !autoSpectate;
             autoSpectateButton.setColor(autoSpectate ? "#bdeda8" : "#eda8a8");
+
+            if (autoSpectatePlayer)
+            {
+                Alert.add(_lang.string("mp_room_spectate_user_clear"), 120, 0x005e5e);
+                autoSpectatePlayer = null;
+            }
         }
 
         private function e_inviteClick(e:MouseEvent):void
@@ -490,6 +508,17 @@ package classes.mp.views
             _userProfilePrompt = new MPUserProfilePrompt(e.user, this.room, this);
             _userProfilePrompt.addEventListener(Event.CLOSE, e_onProfileClose);
             _userProfilePrompt.addEventListener(MPEvent.ROOM_USERLIST_SPECTATE, e_onUserSpectate);
+        }
+
+        private function e_onUserSpectateUserlist(e:MPUserEvent):void
+        {
+            if (autoSpectate)
+            {
+                autoSpectatePlayer = e.user;
+                Alert.add(sprintf(_lang.string("mp_room_spectate_user_select"), {"name": e.user.name}), 120, 0x005e5e);
+            }
+
+            _spectatePlayer(e.user);
         }
 
         private function e_onUserSpectate(e:MPUserEvent):void
@@ -1457,7 +1486,7 @@ internal class OwnerModsPanel extends Sprite
         view.setPanelOwner();
 
         // Build command
-        const mods:Object = {};
+        var mods:Object = {};
 
         if (enabledRate.checked)
         {
