@@ -47,5 +47,10 @@ package classes.mp.mode.ffr
             score.options = new GameOptions();
             score.options.settingsDecode(data.settings);
         }
+
+        override public function toString():String
+        {
+            return name;
+        }
     }
 }

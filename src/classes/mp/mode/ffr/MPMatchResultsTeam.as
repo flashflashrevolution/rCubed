@@ -23,5 +23,10 @@ package classes.mp.mode.ffr
             if (data.position != undefined)
                 this.position = data.position;
         }
+
+        public function toString():String
+        {
+            return name;
+        }
     }
 }

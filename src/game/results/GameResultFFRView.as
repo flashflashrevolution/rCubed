@@ -53,7 +53,10 @@ package game.results
             addChild(resultsDisplay);
 
             // Text
-            header = new Text(this, 20, 10, sprintf(_lang.string("mp_room_ffr_match_end_results"), {"winner": matchDetails.winnerText}), 16, "#E2FEFF");
+            if (matchDetails.wasTie)
+                header = new Text(this, 20, 10, matchDetails.winnerText, 16, "#E2FEFF");
+            else
+                header = new Text(this, 20, 10, sprintf(_lang.string("mp_room_ffr_match_end_results"), {"winner": matchDetails.winnerText}), 16, "#E2FEFF");
             header.setAreaParams(420, 26);
 
             time = new Text(this, 576, 10, resultsTime, 16, "#E2FEFF");

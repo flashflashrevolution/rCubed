@@ -1,5 +1,6 @@
 package classes.mp.mode.ffr
 {
+    import classes.Language;
     import classes.Playlist;
     import classes.SongInfo;
     import classes.mp.MPSong;
@@ -9,6 +10,8 @@ package classes.mp.mode.ffr
 
     public class MPMatchResultsFFR
     {
+        private static const _lang:Language = Language.instance;
+
         public var room:MPRoomFFR;
 
         public var index:int;
@@ -19,6 +22,7 @@ package classes.mp.mode.ffr
         public var users:Vector.<MPMatchResultsUser> = new <MPMatchResultsUser>[];
 
         private var _winnerText:String;
+        private var _wasTie:Boolean = false;
 
         public function MPMatchResultsFFR(room:MPRoomFFR, index:int):void
         {
@@ -158,6 +162,11 @@ package classes.mp.mode.ffr
             return _winnerText
         }
 
+        public function get wasTie():Boolean
+        {
+            return _wasTie;
+        }
+
         private function _generateWinnerText():String
         {
             if ((teamMode && teams.length == 0) || (!teamMode && users.length == 0))
@@ -165,8 +174,7 @@ package classes.mp.mode.ffr
                 return "Missingno????";
             }
 
-            var winnerText:String = "";
-
+            // Teams
             if (teamMode)
             {
                 const teamList:Vector.<MPMatchResultsTeam> = teams.filter(function(item:MPMatchResultsTeam, index:int, vec:Vector.<MPMatchResultsTeam>):Boolean
@@ -174,22 +182,28 @@ package classes.mp.mode.ffr
                     return item.position == 1;
                 });
 
-                for each (var team:MPMatchResultsTeam in teamList)
-                    winnerText += team.name + ", ";
-            }
-            else
-            {
-                var userWinner:String = "";
-                const userList:Vector.<MPMatchResultsUser> = users.filter(function(item:MPMatchResultsUser, index:int, vec:Vector.<MPMatchResultsUser>):Boolean
+                if (teamList.length == teams.length && teams.length > 1)
                 {
-                    return item.position == 1;
-                });
+                    _wasTie = true;
+                    return _lang.string("mp_match_result_tie_team");
+                }
 
-                for each (var user:MPMatchResultsUser in userList)
-                    winnerText += user.name + ", ";
+                return teamList.join(", ");
             }
 
-            return winnerText.substr(0, winnerText.length - 2);
+            // Users
+            const userList:Vector.<MPMatchResultsUser> = users.filter(function(item:MPMatchResultsUser, index:int, vec:Vector.<MPMatchResultsUser>):Boolean
+            {
+                return item.position == 1;
+            });
+
+            if (userList.length == users.length && users.length > 1)
+            {
+                _wasTie = true;
+                return _lang.string("mp_match_result_tie_user");
+            }
+
+            return userList.join(", ");
         }
     }
 }

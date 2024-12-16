@@ -37,7 +37,11 @@ package classes.mp.components.chatlog
             this.graphics.endFill();
 
             new Text(this, 10, 7, _lang.string("mp_room_ffr_match_end"), 10, "#c3c3c3").setAreaParams(width - 120, 22);
-            new Text(this, 9, 25, sprintf(_lang.string("mp_room_ffr_match_end_results"), {"winner": results.winnerText}), 12).setAreaParams(width - 110, 22);
+
+            if (results.wasTie)
+                new Text(this, 9, 25, sprintf(results.winnerText), 12).setAreaParams(width - 110, 22);
+            else
+                new Text(this, 9, 25, sprintf(_lang.string("mp_room_ffr_match_end_results"), {"winner": results.winnerText}), 12).setAreaParams(width - 110, 22);
 
             btn = new BoxButton(this, width - 96, 14, 85, 26, _lang.string("mp_room_ffr_match_end_view"), 11, e_viewResults);
 
