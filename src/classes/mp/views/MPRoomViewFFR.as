@@ -531,7 +531,7 @@ package classes.mp.views
                 setPanelOwner();
 
             // Update Owner -> User Switch
-            if (this.room.owner != _mp.currentUser && (ownerPanel.visible || ownerEditPanel.visible))
+            if (this.room.owner != _mp.currentUser && (ownerPanel.visible || ownerEditPanel.visible || ownerModsPanel.visible))
                 setPanelUser();
         }
 
@@ -1414,6 +1414,42 @@ internal class OwnerModsPanel extends Sprite
 
         enabledRate.checked = room.mods.rate.enabled;
         optionRate.text = room.mods.rate.value.toString();
+
+        enabledHidden.checked = room.mods.hidden.enabled;
+        optionHidden.checked = room.mods.hidden.value;
+
+        enabledSudden.checked = room.mods.sudden.enabled;
+        optionSudden.checked = room.mods.sudden.value;
+
+        enabledBlink.checked = room.mods.blink.enabled;
+        optionBlink.checked = room.mods.blink.value;
+
+        enabledRotating.checked = room.mods.rotating.enabled;
+        optionRotating.checked = room.mods.rotating.value;
+
+        enabledRotateCW.checked = room.mods.rotate_cw.enabled;
+        optionRotateCW.checked = room.mods.rotate_cw.value;
+
+        enabledRotateCCW.checked = room.mods.rotate_ccw.enabled;
+        optionRotateCCW.checked = room.mods.rotate_ccw.value;
+
+        enabledWave.checked = room.mods.wave.enabled;
+        optionWave.checked = room.mods.wave.value;
+
+        enabledDrunk.checked = room.mods.drunk.enabled;
+        optionDrunk.checked = room.mods.drunk.value;
+
+        enabledTornado.checked = room.mods.tornado.enabled;
+        optionTornado.checked = room.mods.tornado.value;
+
+        enabledMiniResize.checked = room.mods.mini_resize.enabled;
+        optionMiniResize.checked = room.mods.mini_resize.value;
+
+        enabledTapPulse.checked = room.mods.tap_pulse.enabled;
+        optionTapPulse.checked = room.mods.tap_pulse.value;
+
+        enabledNoBackground.checked = room.mods.nobackground.enabled;
+        optionNoBackground.checked = room.mods.nobackground.value;
     }
 
     private function e_saveClick(e:MouseEvent):void
