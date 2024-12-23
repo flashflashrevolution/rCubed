@@ -123,21 +123,7 @@ package
                 history.unshift();
 
             // Create Log Message
-            var msg:String = "";
-            if (text is Error)
-            {
-                var err:Error = (text as Error);
-                msg = "Error: " + exception_error(err);
-            }
-            else if (text is ErrorEvent)
-            {
-                var erre:ErrorEvent = (text as ErrorEvent);
-                msg = "Error: " + event_error(erre);
-            }
-            else
-            {
-                msg = text;
-            }
+            var msg:String = generate_message(text);
 
             msg = ((!simple ? "[" + TimeUtil.convertToHHMMSS(currentTime / 1000) + "][" + class_name(clazz) + "] " : "") + msg);
 
@@ -173,6 +159,17 @@ package
                     LOG_STREAM.close();
                 }
             }
+        }
+
+        public static function generate_message(text:*):String
+        {
+            if (text is Error)
+                return "Error: " + exception_error(text as Error);
+
+            else if (text is ErrorEvent)
+                return "Error: " + event_error(text as ErrorEvent);
+
+            return text;
         }
 
         public static function exception_error(err:Error):String

@@ -659,31 +659,22 @@ package
             Screenshots.saveToClipboard(gameMain);
         }
 
-        public function logDebugError(id:String, params:Object = null):void
+        public function logDebugError(error_message:String):void
         {
-            var output:String = id;
-            if (params is Error)
+            CONFIG::release
             {
-                var err:Error = (params as Error);
-                output += "\n" + err.name + "\n" + err.message + "\n" + err.errorID + "\n" + err.getStackTrace();
+                var _debugLoader:URLLoader = new URLLoader();
+                var req:URLRequest = new URLRequest(URLs.resolve(URLs.CRASH_LOG_URL));
+                var requestVars:URLVariables = new URLVariables();
+                Constant.addDefaultRequestVariables(requestVars);
+                requestVars.session = userSession;
+                requestVars.error = error_message;
+                requestVars.settings = Capabilities.serverString;
+                req.data = requestVars;
+                req.method = URLRequestMethod.POST;
+                _debugLoader.dataFormat = URLLoaderDataFormat.TEXT;
+                _debugLoader.load(req);
             }
-            else
-            {
-                output += "\n" + params;
-            }
-
-            var _debugLoader:URLLoader = new URLLoader();
-            var req:URLRequest = new URLRequest(URLs.resolve(URLs.DEBUG_LOG_URL));
-            var requestVars:URLVariables = new URLVariables();
-            Constant.addDefaultRequestVariables(requestVars);
-            requestVars.session = userSession;
-            requestVars.error = output;
-            requestVars.gameVersion = CONFIG::timeStamp;
-            requestVars.gameSettings = Capabilities.serverString;
-            req.data = requestVars;
-            req.method = URLRequestMethod.POST;
-            _debugLoader.dataFormat = URLLoaderDataFormat.TEXT;
-            _debugLoader.load(req);
         }
 
         //- Full Screen

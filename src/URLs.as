@@ -45,7 +45,7 @@ package
         public static var SITE_HISCORES_URL:String = "game/r3/r3-hiscores.php";
         public static var SITE_REPLAYS_URL:String = "game/r3/r3-replays.php";
         public static var LEVEL_STATS_URL:String = "levelstats.php?level=";
-        public static var DEBUG_LOG_URL:String = "game/r3/r3-debugLog.php";
+        public static var CRASH_LOG_URL:String = "game/r3/r3-crashLog.php";
 
         // Song & Gameplay URLs
         public static var SONG_DATA_URL:String = "game/r3/r3-songLoad.php";
