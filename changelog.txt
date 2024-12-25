@@ -1,3 +1,19 @@
+R^3 (v2.0.3) [2024-12-16]
+---------------------------------------------------------------------
+@Psycast
+- Fix song list null crash.
+- Fix OmniFlag.
+- MP: Add auto-spectating to game rooms.
+- MP: Add forced gameplay modifiers options.
+- MP: Add tooltips to most icons.
+- MP: Add error messages when joining or creating a second game room.
+- MP: Add synced score updates.
+- MP: Selecting the current game room in the server list will now switch to it.
+- MP: Add better countdown messages when >5 seconds.
+- MP: Fix setting desync due to Per-Song Options.
+- MP: Fix song loading desync due to song queues.
+
+
 R^3 (v2.0.2) [2024-09-30]
 ---------------------------------------------------------------------
 @Psycast
@@ -30,7 +46,7 @@ R^3 (v2.0.2) [2024-09-30]
 - Fix Change All Note Colors not updating dropdowns.
 - Fix Layout Saving if SP/MP Layouts are missing.
 
-@Dash-
+@DashDashDashDashDash
 - Add slider to control Accuracy Bar's fade out.
 
 
