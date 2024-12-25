@@ -429,7 +429,7 @@ package
                     songIcon = SONG_ICON_SDG;
 
                 // Omni Flag
-                if (_rank.perfect == noteCount - 1 && _rank.good == 1 && _rank.average == 1 && _rank.miss == 1 && _rank.boo == 1)
+                if (_rank.perfect == noteCount - 3 && _rank.good == 1 && _rank.average == 1 && _rank.miss == 1 && _rank.boo == 1)
                     songIcon = SONG_ICON_OMNIFLAG;
 
                 // Miss Flag
@@ -496,7 +496,7 @@ package
                     songIcon |= (1 << SONG_ICON_SDG);
 
                 // Omni Flag
-                if (_rank.perfect == noteCount - 1 && _rank.good == 1 && _rank.average == 1 && _rank.miss == 1 && _rank.boo == 1)
+                if (_rank.perfect == noteCount - 3 && _rank.good == 1 && _rank.average == 1 && _rank.miss == 1 && _rank.boo == 1)
                     songIcon |= (1 << SONG_ICON_OMNIFLAG);
 
                 // Miss Flag
