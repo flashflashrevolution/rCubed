@@ -88,6 +88,7 @@ package game
             // More songs to play, jump to gameplay or loading.
             if (_gvars.songQueue.length > 0)
             {
+                _gvars.options.song = null;
                 switchTo(GameMenu.GAME_LOADING);
                 return false;
             }
