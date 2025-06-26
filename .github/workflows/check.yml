@@ -1,85 +1,85 @@
 name: Check
 
 on:
-  push:
-    branches:
-      - main
-      - feat/workflow
-  pull_request:
-    branches:
-      - main
-
+    push:
+        branches:
+            - main
+            - feat/workflow
+    pull_request:
+        branches:
+            - main
+    
 jobs:
-  skip:
-    runs-on: ubuntu-latest
-    if: |
-      !contains(format('{0} {1} {2}', github.event.head_commit.message, github.event.pull_request.title, github.event.pull_request.body), 'skip ci')
-    steps:
-      - run: |
-          cat <<'MESSAGE'
-          github.event_name: ${{ toJson(github.event_name) }}
-          github.event:
-          ${{ toJson(github.event) }}
-          MESSAGE
-  build:
-    needs: skip
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-latest]
+    skip:
+        runs-on: ubuntu-latest
+        if: |
+            !contains(format('{0} {1} {2}', github.event.head_commit.message, github.event.pull_request.title, github.event.pull_request.body), 'skip ci')
+        steps:
+            - run: |
+                    cat <<'MESSAGE'
+                    github.event_name: ${{ toJson(github.event_name) }}
+                    github.event:
+                    ${{ toJson(github.event) }}
+                    MESSAGE
+    build:
+        needs: skip
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [windows-latest]
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4.2.2
-        with:
-          lfs: true
+        steps:
+            - name: Checkout
+                uses: actions/checkout@v4.2.2
+                with:
+                    lfs: true
 
-      - name: Cache Air SDK
-        id: cache-air-sdk
-        uses: actions/cache@v4
-        with:
-          path: ${{ github.workspace }}\airsdk
-          key: ${{ runner.os }}-air-sdk
+            - name: Cache Air SDK
+                id: cache-air-sdk
+                uses: actions/cache@v4
+                with:
+                    path: ${{ github.workspace }}\airsdk
+                    key: ${{ runner.os }}-air-sdk
 
-      - name: Download Air Windows
-        if: matrix.os == 'windows-latest' && steps.cache-air-sdk.outputs.cache-hit != 'true'
-        run: |
-          $ProgressPreference = 'SilentlyContinue';
-          (irm -Uri "http://airdownload.adobe.com/air/win/download/32.0/AIRSDK_Compiler.zip" -ContentType "application/octet-stream" -OutFile "air-sdk.zip")
+            - name: Download Air Windows
+                if: matrix.os == 'windows-latest' && steps.cache-air-sdk.outputs.cache-hit != 'true'
+                run: |
+                    $ProgressPreference = 'SilentlyContinue';
+                    (irm -Uri "http://airdownload.adobe.com/air/win/download/32.0/AIRSDK_Compiler.zip" -ContentType "application/octet-stream" -OutFile "air-sdk.zip")
 
-      - name: extract-7z-action
-        if: matrix.os == 'windows-latest' && steps.cache-air-sdk.outputs.cache-hit != 'true'
-        uses: DuckSoft/extract-7z-action@v1.0
-        with:
-          # archive path to extract
-          pathSource: air-sdk.zip
-          # path to place the extract
-          pathTarget: ${{ github.workspace }}\airsdk
+            - name: extract-7z-action
+                if: matrix.os == 'windows-latest' && steps.cache-air-sdk.outputs.cache-hit != 'true'
+                uses: DuckSoft/extract-7z-action@v1.0
+                with:
+                    # archive path to extract
+                    pathSource: air-sdk.zip
+                    # path to place the extract
+                    pathTarget: ${{ github.workspace }}\airsdk
 
-      - name: Fix Air SDK Target
-        uses: cschleiden/replace-tokens@v1
-        with:
-          files: '["./airsdk/frameworks/flex-config.xml"]'
-          tokenPrefix: '{'
-          tokenSuffix: '}'
-        env:
-          targetPlayerMinorVersion: 0
-          targetPlayerMajorVersion: 32
+            - name: Fix Air SDK Target
+                uses: cschleiden/replace-tokens@v1
+                with:
+                    files: '["./airsdk/frameworks/flex-config.xml"]'
+                    tokenPrefix: '{'
+                    tokenSuffix: '}'
+                env:
+                    targetPlayerMinorVersion: 0
+                    targetPlayerMajorVersion: 32
 
-      - name: Install Dependencies
-        run: npm install asconfigc
+            - name: Install Dependencies
+                run: npm install asconfigc
 
-      - name: Build Embedded Fonts Library (Windows)
-        if: matrix.os == 'windows-latest'
-        shell: cmd
-        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project ${{ github.workspace }}/fonts/asconfig.embed-fonts.json --verbose
+            - name: Build Embedded Fonts Library (Windows)
+                if: matrix.os == 'windows-latest'
+                shell: cmd
+                run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project ${{ github.workspace }}/fonts/asconfig.embed-fonts.json --verbose
 
-      - name: Build the Game (Windows Debug)
-        if: matrix.os == 'windows-latest'
-        shell: cmd
-        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.json --debug=true --verbose
-      
-      - name: Build the Game (Windows Release)
-        if: matrix.os == 'windows-latest'
-        shell: cmd
-        run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.release.json --debug=false --verbose
+            - name: Build the Game (Windows Debug)
+                if: matrix.os == 'windows-latest'
+                shell: cmd
+                run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.json --debug=true --verbose
+            
+            - name: Build the Game (Windows Release)
+                if: matrix.os == 'windows-latest'
+                shell: cmd
+                run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.release.json --debug=false --verbose

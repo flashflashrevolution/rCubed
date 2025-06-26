@@ -28,7 +28,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
-                os: [windows-2019]
+                os: [windows-latest]
 
         steps:
             ##########################################################################################
@@ -48,11 +48,11 @@ jobs:
                   lfs: true
 
             - name: Extract Air SDK [32.0]
-              if: matrix.os == 'windows-2019'
+              if: matrix.os == 'windows-latest'
               run: 7z.exe x -tzip ${{ github.workspace }}\tools\SDK-Lite.zip -o${{ github.workspace }}\airsdk
 
             - name: Extract Runtimes
-              if: matrix.os == 'windows-2019'
+              if: matrix.os == 'windows-latest'
               run: 7z.exe x -tzip ${{ github.workspace }}\tools\Runtimes.zip -o${{ github.workspace }}\bundles
 
             - name: Install Dependencies (asconfigc)
@@ -99,17 +99,17 @@ jobs:
             ##########################################################################################
             # Build SWFs
             - name: Build Embedded Fonts Library [Windows]
-              if: matrix.os == 'windows-2019'
+              if: matrix.os == 'windows-latest'
               shell: cmd
               run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project ${{ github.workspace }}/fonts/asconfig.embed-fonts.json --verbose
 
             - name: Build the Game (Normal) [Windows]
-              if: matrix.os == 'windows-2019'
+              if: matrix.os == 'windows-latest'
               shell: cmd
               run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.release.json --verbose
 
             - name: Build the Game (Hybrid) [Windows]
-              if: matrix.os == 'windows-2019'
+              if: matrix.os == 'windows-latest'
               shell: cmd
               run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.hybrid.json --verbose
 
