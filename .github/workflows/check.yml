@@ -29,57 +29,42 @@ jobs:
                 os: [windows-latest]
 
         steps:
+            ##########################################################################################
+            # Checkout
             - name: Checkout
               uses: actions/checkout@v4.2.2
               with:
                   lfs: true
 
-            - name: Cache Air SDK
-              id: cache-air-sdk
-              uses: actions/cache@v4
+            ##########################################################################################
+            # Setup SDK
+            - name: Checkout Build Tools
+              uses: actions/checkout@v4.2.2
               with:
-                  path: ${{ github.workspace }}\airsdk
-                  key: ${{ runner.os }}-air-sdk
+                  repository: flashflashrevolution/rCubed-build-tools
+                  path: "tools"
+                  lfs: true
 
-            - name: Download Air Windows
-              if: matrix.os == 'windows-latest' && steps.cache-air-sdk.outputs.cache-hit != 'true'
-              run: |
-                  $ProgressPreference = 'SilentlyContinue';
-                  (irm -Uri "http://airdownload.adobe.com/air/win/download/32.0/AIRSDK_Compiler.zip" -ContentType "application/octet-stream" -OutFile "air-sdk.zip")
+            - name: Extract Air SDK [32.0]
+              if: matrix.os == 'windows-latest'
+              run: 7z.exe x -tzip ${{ github.workspace }}\tools\SDK-Lite.zip -o${{ github.workspace }}\airsdk
 
-            - name: extract-7z-action
-              if: matrix.os == 'windows-latest' && steps.cache-air-sdk.outputs.cache-hit != 'true'
-              uses: DuckSoft/extract-7z-action@v1.0
-              with:
-                  # archive path to extract
-                  pathSource: air-sdk.zip
-                  # path to place the extract
-                  pathTarget: ${{ github.workspace }}\airsdk
-
-            - name: Fix Air SDK Target
-              uses: cschleiden/replace-tokens@v1
-              with:
-                  files: '["./airsdk/frameworks/flex-config.xml"]'
-                  tokenPrefix: "{"
-                  tokenSuffix: "}"
-              env:
-                  targetPlayerMinorVersion: 0
-                  targetPlayerMajorVersion: 32
-
-            - name: Install Dependencies
+            - name: Install Dependencies (asconfigc)
               run: npm install asconfigc
 
-            - name: Build Embedded Fonts Library (Windows)
+            ##########################################################################################
+            # Build SWFs
+            - name: Build Embedded Fonts Library [Windows]
               if: matrix.os == 'windows-latest'
               shell: cmd
               run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project ${{ github.workspace }}/fonts/asconfig.embed-fonts.json --verbose
 
-            - name: Build the Game (Windows Debug)
+            - name: Build the Game [Windows Debug]
               if: matrix.os == 'windows-latest'
               shell: cmd
               run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.json --debug=true --verbose
 
-            - name: Build the Game (Windows Release)
+            - name: Build the Game [Windows Release]
               if: matrix.os == 'windows-latest'
               shell: cmd
               run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.release.json --debug=false --verbose
