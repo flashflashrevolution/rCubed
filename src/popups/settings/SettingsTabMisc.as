@@ -19,6 +19,8 @@ package popups.settings
     import flash.net.navigateToURL;
     import flash.system.Capabilities;
     import menu.MainMenu;
+    import flash.events.KeyboardEvent;
+    import flash.ui.Keyboard;
 
     public class SettingsTabMisc extends SettingsTabBase
     {
@@ -72,6 +74,8 @@ package popups.settings
         {
             Main.window.addEventListener(NativeWindowBoundsEvent.MOVE, e_windowPropertyChange);
             Main.window.addEventListener(NativeWindowBoundsEvent.RESIZE, e_windowPropertyChange);
+
+            container.stage.addEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDownMenu, true, int.MAX_VALUE - 10, true);
 
             container.graphics.lineStyle(1, 0xFFFFFF, 0.35);
             container.graphics.moveTo(295, 15);
@@ -227,6 +231,7 @@ package popups.settings
         {
             Main.window.removeEventListener(NativeWindowBoundsEvent.MOVE, e_windowPropertyChange);
             Main.window.removeEventListener(NativeWindowBoundsEvent.RESIZE, e_windowPropertyChange);
+            container.stage.removeEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDownMenu);
         }
 
         override public function setValues():void
@@ -395,6 +400,23 @@ package popups.settings
             {
                 _gvars.activeUser.frameRate = optionFPS.validate(60);
                 _gvars.activeUser.frameRate = Math.max(Math.min(_gvars.activeUser.frameRate, 1000), 10);
+            }
+        }
+
+        public function e_onKeyDownMenu(e:KeyboardEvent):void
+        {
+            var keyCode:int = e.keyCode;
+
+            if (keyCode == Keyboard.ESCAPE)
+            {
+                windowFullscreen.checked = false; //ESC exits fullscreen
+                return;
+            }
+
+            if (e.ctrlKey && keyCode == Keyboard.S)
+            {
+                windowFullscreen.checked = false; //CTRL+S also exits fullscreen
+                return;
             }
         }
 
