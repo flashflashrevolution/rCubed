@@ -166,6 +166,10 @@ package
                 window.width = Math.max(100, _gvars.air_windowProperties.width + WINDOW_WIDTH_EXTRA);
                 window.height = Math.max(100, _gvars.air_windowProperties.height + WINDOW_HEIGHT_EXTRA);
             }
+            if (_gvars.air_useFullScreen)
+            {
+                _gvars.toggleFullScreen();
+            }
             ignoreWindowChanges = false;
 
             //- Load Menu Music

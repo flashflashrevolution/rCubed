@@ -108,6 +108,7 @@ package
         public var air_useWebsockets:Boolean = false;
         public var air_saveWindowPosition:Boolean = false;
         public var air_saveWindowSize:Boolean = false;
+        public var air_useFullScreen:Boolean = false;
 
         public var air_windowProperties:Object;
         public var file_replay_cache:FileCache = new FileCache("replays/cache.json", 1);
@@ -140,6 +141,7 @@ package
             air_useWebsockets = LocalOptions.getVariable("use_websockets", false);
             air_saveWindowPosition = LocalOptions.getVariable("save_window_position", false);
             air_saveWindowSize = LocalOptions.getVariable("save_window_size", false);
+            air_useFullScreen = LocalOptions.getVariable("save_usefullscreen", false);
 
             air_windowProperties = LocalOptions.getVariable("window_properties", {"x": 0, "y": 0, "width": 0, "height": 0});
 
@@ -691,6 +693,16 @@ package
                     gameMain.stage.displayState = StageDisplayState.NORMAL;
                 }
             }
+        }
+
+        public function isFullScreen():Boolean
+        {
+            if (gameMain.stage)
+            {
+                return gameMain.stage.displayState == StageDisplayState.FULL_SCREEN_INTERACTIVE;
+            }
+
+            return false;
         }
 
         public function unlockTokenById(type:String, id:String):void
