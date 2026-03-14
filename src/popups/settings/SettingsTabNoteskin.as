@@ -15,6 +15,7 @@ package popups.settings
     import flash.display.Sprite;
     import flash.events.Event;
     import flash.events.MouseEvent;
+    import flash.external.ExternalInterface;
     import flash.net.URLRequest;
     import flash.net.navigateToURL;
     import game.noteskins.ExternalNoteskin;
@@ -65,6 +66,11 @@ package popups.settings
 
         override public function openTab():void
         {
+            if (!CONFIG::air && ExternalInterface.available)
+            {
+                ExternalInterface.addCallback("r3_onNoteskinFileSelected", onNoteskinFileSelected);
+            }
+
             container.graphics.lineStyle(1, 0xFFFFFF, 0.35);
             container.graphics.moveTo(295, 15);
             container.graphics.lineTo(295, 405);
@@ -279,14 +285,24 @@ package popups.settings
             //- Custom Noteskin Folder
             else if (e.target == optionOpenNoteskinFolder)
             {
-                AirContext.STORAGE_PATH.resolvePath(Constant.NOTESKIN_PATH).openWithDefaultApplication();
+                CONFIG::air
+                {
+                    AirContext.STORAGE_PATH.resolvePath(Constant.NOTESKIN_PATH).openWithDefaultApplication();
+                }
                 return;
             }
 
             //- Import Custom Noteskin
             else if (e.target == optionImportCustomNoteskin)
             {
-                new PromptInput(parent, _lang.string("popup_noteskin_import_json"), _lang.string("popup_noteskin_import"), e_importNoteskin);
+                if (!CONFIG::air && ExternalInterface.available)
+                {
+                    ExternalInterface.call("r3_openNoteskinFile");
+                }
+                else
+                {
+                    new PromptInput(parent, _lang.string("popup_noteskin_import_json"), _lang.string("popup_noteskin_import"), e_importNoteskin);
+                }
                 return;
             }
 
@@ -431,6 +447,14 @@ package popups.settings
             parent.addEventListener(Event.ENTER_FRAME, e_delayCustomUpdate);
         }
 
+
+        private function onNoteskinFileSelected(filename:String, textContent:String):void
+        {
+            if (textContent != null && textContent.length > 0)
+            {
+                e_importNoteskin(textContent);
+            }
+        }
 
         private function e_importNoteskin(noteskinJSON:String):void
         {

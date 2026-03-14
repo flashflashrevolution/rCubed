@@ -1,9 +1,12 @@
 package
 {
-    import be.aboutme.airserver.AIRServer;
-    import be.aboutme.airserver.endpoints.socket.SocketEndPoint;
-    import be.aboutme.airserver.endpoints.socket.handlers.websocket.WebSocketClientHandlerFactory;
-    import be.aboutme.airserver.messages.Message;
+    CONFIG::air
+    {
+        import be.aboutme.airserver.AIRServer;
+        import be.aboutme.airserver.endpoints.socket.SocketEndPoint;
+        import be.aboutme.airserver.endpoints.socket.handlers.websocket.WebSocketClientHandlerFactory;
+        import be.aboutme.airserver.messages.Message;
+    }
     import classes.Playlist;
     import classes.SongInfo;
     import classes.SongPlayerBytes;
@@ -22,7 +25,6 @@ package
     import flash.events.EventDispatcher;
     import flash.events.IOErrorEvent;
     import flash.events.SecurityErrorEvent;
-    import flash.filesystem.File;
     import flash.media.SoundTransform;
     import flash.net.URLLoader;
     import flash.net.URLLoaderDataFormat;
@@ -117,8 +119,11 @@ package
         public var externalSongInfo:SongInfo;
         public var externalSong:Song;
 
-        private var websocket_server:AIRServer;
-        private static var websocket_message:Message = new Message();
+        CONFIG::air
+        {
+            private var websocket_server:AIRServer;
+            private static var websocket_message:Message = new Message();
+        }
 
         ///- Constructor
         public function GlobalVariables(en:SingletonEnforcer)
@@ -145,31 +150,29 @@ package
 
             air_windowProperties = LocalOptions.getVariable("window_properties", {"x": 0, "y": 0, "width": 0, "height": 0});
 
-            if (air_useWebsockets)
+            CONFIG::air
             {
-                initWebsocketServer();
+                if (air_useWebsockets)
+                {
+                    initWebsocketServer();
+                }
             }
         }
 
         public function loadUserSongData():void
         {
-            // Export SQL to JSON
             var db_name:String = "dbinfo/" + (activeUser != null && activeUser.siteId > 0 ? activeUser.siteId : "0") + "_info.";
-            var json_file:File = AirContext.getAppFile(db_name + "json");
 
-            if (json_file.exists)
+            var json_str:String = AirContext.readTextFileByPath(db_name + "json");
+            if (json_str != null)
             {
-                var json_str:String = AirContext.readTextFile(json_file);
-                if (json_str != null)
+                try
                 {
-                    try
-                    {
-                        UserSongNotes.loadFromObject(JSON.parse(json_str));
-                    }
-                    catch (e:Error)
-                    {
+                    UserSongNotes.loadFromObject(JSON.parse(json_str));
+                }
+                catch (e:Error)
+                {
 
-                    }
                 }
             }
         }
@@ -177,62 +180,77 @@ package
         public function writeUserSongData():void
         {
             var db_name:String = "dbinfo/" + (activeUser != null && activeUser.siteId > 0 ? activeUser.siteId : "0") + "_info.";
-            var json_file:File = AirContext.getAppFile(db_name + "json");
-            UserSongNotes.writeFile(json_file);
+
+            AirContext.writeTextFileByPath(db_name + "json", JSON.stringify(UserSongNotes.sql_data, null, 2));
         }
 
         public function websocketPortNumber(type:String):uint
         {
-            if (websocket_server != null)
+            CONFIG::air
             {
-                return websocket_server.getPortNumber(type);
+                if (websocket_server != null)
+                {
+                    return websocket_server.getPortNumber(type);
+                }
             }
             return 0;
         }
 
         public function initWebsocketServer():Boolean
         {
-            if (websocket_server == null)
+            CONFIG::air
             {
-                websocket_server = new AIRServer();
-                websocket_server.addEndPoint(new SocketEndPoint(21235, new WebSocketClientHandlerFactory()));
-
-                // didn't start, remove reference
-                if (!websocket_server.start())
+                if (websocket_server == null)
                 {
-                    websocket_server.stop();
-                    websocket_server = null;
-                    return false;
+                    websocket_server = new AIRServer();
+                    websocket_server.addEndPoint(new SocketEndPoint(21235, new WebSocketClientHandlerFactory()));
+
+                    // didn't start, remove reference
+                    if (!websocket_server.start())
+                    {
+                        websocket_server.stop();
+                        websocket_server = null;
+                        return false;
+                    }
+                    return true;
                 }
-                return true;
             }
             return false;
         }
 
         public function destroyWebsocketServer():void
         {
-            if (websocket_server != null)
+            CONFIG::air
             {
-                websocket_server.stop();
-                websocket_server = null;
+                if (websocket_server != null)
+                {
+                    websocket_server.stop();
+                    websocket_server = null;
+                }
             }
         }
 
         public function websocketSend(cmd:String, data:Object):void
         {
-            if (websocket_server != null)
+            CONFIG::air
             {
-                websocket_message.command = cmd;
-                websocket_message.data = data;
-                websocket_server.sendMessageToAllClients(websocket_message);
+                if (websocket_server != null)
+                {
+                    websocket_message.command = cmd;
+                    websocket_message.data = data;
+                    websocket_server.sendMessageToAllClients(websocket_message);
+                }
             }
         }
 
         public function onNativeProcessClose(e:Event):void
         {
-            if (websocket_server != null)
+            CONFIG::air
             {
-                websocket_server.stop();
+                if (websocket_server != null)
+                {
+                    websocket_server.stop();
+                }
             }
         }
 
@@ -240,19 +258,43 @@ package
         {
             menuMusicSoundVolume = menuMusicSoundTransform.volume = LocalOptions.getVariable("menu_music_volume", 1);
 
-            // Load Existing Menu Music SWF
+            if (!CONFIG::air)
+            {
+                // Ruffle: async reads from IndexedDB
+                if (AirContext.doesFileExist(Constant.MENU_MUSIC_PATH))
+                {
+                    AirContext.readFileByPathAsync(Constant.MENU_MUSIC_PATH, 0, function(bytes:ByteArray):void
+                    {
+                        if (bytes && bytes.length > 0)
+                            menuMusic = new SongPlayerBytes(bytes);
+                    });
+                }
+                else if (AirContext.doesFileExist(Constant.MENU_MUSIC_MP3_PATH))
+                {
+                    AirContext.readFileByPathAsync(Constant.MENU_MUSIC_MP3_PATH, 0, function(bytes:ByteArray):void
+                    {
+                        if (bytes && bytes.length > 0)
+                        {
+                            menuMusic = new SongPlayerBytes(bytes, true);
+                            LocalStore.setVariable("menu_music", "External MP3");
+                        }
+                    });
+                }
+                return;
+            }
+
+            // AIR: synchronous reads
             if (AirContext.doesFileExist(Constant.MENU_MUSIC_PATH))
             {
-                var file_bytes:ByteArray = AirContext.readFile(AirContext.getAppFile(Constant.MENU_MUSIC_PATH));
+                var file_bytes:ByteArray = AirContext.readFileByPath(Constant.MENU_MUSIC_PATH);
                 if (file_bytes && file_bytes.length > 0)
                 {
                     menuMusic = new SongPlayerBytes(file_bytes);
                 }
             }
-            // Convert MP3 if exist.
             else if (AirContext.doesFileExist(Constant.MENU_MUSIC_MP3_PATH))
             {
-                var mp3Bytes:ByteArray = AirContext.readFile(AirContext.getAppFile(Constant.MENU_MUSIC_MP3_PATH));
+                var mp3Bytes:ByteArray = AirContext.readFileByPath(Constant.MENU_MUSIC_MP3_PATH);
                 if (mp3Bytes && mp3Bytes.length > 0)
                 {
                     menuMusic = new SongPlayerBytes(mp3Bytes, true);
@@ -686,7 +728,12 @@ package
             {
                 if (gameMain.stage.displayState == StageDisplayState.NORMAL)
                 {
-                    gameMain.stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+                    CONFIG::air
+                    {
+                        gameMain.stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+                        return;
+                    }
+                    gameMain.stage.displayState = StageDisplayState.FULL_SCREEN;
                 }
                 else
                 {
@@ -699,7 +746,11 @@ package
         {
             if (gameMain.stage)
             {
-                return gameMain.stage.displayState == StageDisplayState.FULL_SCREEN_INTERACTIVE;
+                CONFIG::air
+                {
+                    return gameMain.stage.displayState == StageDisplayState.FULL_SCREEN_INTERACTIVE;
+                }
+                return gameMain.stage.displayState == StageDisplayState.FULL_SCREEN;
             }
 
             return false;

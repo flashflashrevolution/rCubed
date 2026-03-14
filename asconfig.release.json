@@ -7,6 +7,10 @@
 		"output": "bin/release/R3Air.swf",
 		"define": [
 			{
+				"name": "CONFIG::air",
+				"value": true
+			},
+			{
 				"name": "CONFIG::debug",
 				"value": false
 			},

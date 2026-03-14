@@ -1,7 +1,10 @@
 package com.flashfla.utils
 {
-    import flash.desktop.Clipboard;
-    import flash.desktop.ClipboardFormats;
+    CONFIG::air
+    {
+        import flash.desktop.Clipboard;
+        import flash.desktop.ClipboardFormats;
+    }
     import flash.system.Capabilities;
     import flash.system.System;
 
@@ -37,14 +40,17 @@ package com.flashfla.utils
 
         static public function setClipboard(value:String):Boolean
         {
-            // FP10+
-            try
+            // FP10+ (AIR only)
+            CONFIG::air
             {
-                Clipboard.generalClipboard.setData(ClipboardFormats.TEXT_FORMAT, value);
-                return true;
-            }
-            catch (e:Error)
-            {
+                try
+                {
+                    Clipboard.generalClipboard.setData(ClipboardFormats.TEXT_FORMAT, value);
+                    return true;
+                }
+                catch (e:Error)
+                {
+                }
             }
 
             // FP9

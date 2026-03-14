@@ -5,6 +5,7 @@ package popups
     import assets.menu.icons.fa.iconRefresh;
     import classes.Alert;
     import classes.Language;
+    import classes.SongInfo;
     import classes.chart.parse.ExternalChartBase;
     import classes.mp.Multiplayer;
     import classes.ui.Box;
@@ -24,7 +25,13 @@ package popups
     import flash.events.MouseEvent;
     import flash.events.SecurityErrorEvent;
     import flash.events.TimerEvent;
-    import flash.filesystem.File;
+    import by.blooddy.crypto.Base64;
+    import flash.external.ExternalInterface;
+    import flash.utils.ByteArray;
+    CONFIG::air
+    {
+        import flash.filesystem.File;
+    }
     import flash.filters.BlurFilter;
     import flash.geom.Point;
     import flash.net.URLRequest;
@@ -50,7 +57,10 @@ package popups
 
         public var lc:LoaderContext = new LoaderContext();
 
-        public static var rootFolder:File;
+        CONFIG::air
+        {
+            public static var rootFolder:File;
+        }
         public static var lastSelectedIndex:int = 0;
         public static var listFilter:FileBrowserFilter = new FileBrowserFilter();
 
@@ -90,8 +100,86 @@ package popups
             super(myParent);
         }
 
+        // Ruffle: flash.filesystem.File unavailable; JS bridge file picker via ExternalInterface
+        private var _ruffleChartBytes:ByteArray;
+        private var _ruffleChartFilename:String;
+        private var _ruffleAudioBytes:ByteArray;
+        private var _ruffleParser:ExternalChartBase;
+        private var _ruffleChartInfo:Text;
+        private var _ruffleAudioInfo:Text;
+        private var _rufflePlayBtn:BoxButton;
+        private var _ruffleDiffButtons:Array = [];
+        private var _ruffleDiffContainer:Sprite;
+        private var _ruffleSelectedDiffId:int = 0;
+
         override public function stageAdd():void
         {
+            if (!CONFIG::air)
+            {
+                bmd = new BitmapData(Main.GAME_WIDTH, Main.GAME_HEIGHT, false, 0x000000);
+                bmd.draw(stage);
+                bmd.applyFilter(bmd, bmd.rect, new Point(), new BlurFilter(16, 16, 3));
+                bmp = new Bitmap(bmd);
+                this.addChild(bmp);
+
+                var noFileBgBox:Box = new Box(this, -1, -1, false, false);
+                noFileBgBox.setSize(Main.GAME_WIDTH + 2, Main.GAME_HEIGHT + 2);
+                noFileBgBox.color = 0x000000;
+                noFileBgBox.normalAlpha = 0.8;
+                noFileBgBox.activeAlpha = 1;
+
+                if (!ExternalInterface.available)
+                {
+                    var msg:Text = new Text(this, 0, 200, _lang.string("file_loader_not_available"), 18);
+                    msg.setAreaParams(Main.GAME_WIDTH, 30, "center");
+
+                    new BoxButton(this, Main.GAME_WIDTH / 2 - 50, 260, 100, 30, _lang.string("menu_close"), 12, function(e:Event):void
+                        {
+                            removePopup();
+                        });
+                    return;
+                }
+
+                // Register ExternalInterface callbacks for file selection
+                ExternalInterface.addCallback("r3_onChartFileSelected", onChartFileSelected);
+                ExternalInterface.addCallback("r3_onAudioFileSelected", onAudioFileSelected);
+
+                var title:Text = new Text(this, 0, 60, "Load Custom Chart", 20);
+                title.setAreaParams(Main.GAME_WIDTH, 30, "center");
+
+                var selectChartBtn:BoxButton = new BoxButton(this, Main.GAME_WIDTH / 2 - 120, 120, 240, 35,
+                    "Select Chart File (.sm / .ssc / .osu / .qua)", 12, function(e:Event):void
+                    {
+                        ExternalInterface.call("r3_openChartFile");
+                    });
+
+                _ruffleChartInfo = new Text(this, 0, 165, "", 12);
+                _ruffleChartInfo.setAreaParams(Main.GAME_WIDTH, 22, "center");
+
+                var selectAudioBtn:BoxButton = new BoxButton(this, Main.GAME_WIDTH / 2 - 100, 195, 200, 35,
+                    "Select Audio File (.mp3)", 12, function(e:Event):void
+                    {
+                        ExternalInterface.call("r3_openAudioFile");
+                    });
+
+                _ruffleAudioInfo = new Text(this, 0, 240, "", 12);
+                _ruffleAudioInfo.setAreaParams(Main.GAME_WIDTH, 22, "center");
+
+                _ruffleDiffContainer = new Sprite();
+                _ruffleDiffContainer.x = 0;
+                _ruffleDiffContainer.y = 270;
+                this.addChild(_ruffleDiffContainer);
+
+                _rufflePlayBtn = new BoxButton(this, Main.GAME_WIDTH / 2 - 60, 420, 120, 35, "Play", 14, e_rufflePlay);
+                _rufflePlayBtn.visible = false;
+
+                new BoxButton(this, Main.GAME_WIDTH / 2 - 50, 460, 100, 25, _lang.string("menu_close"), 11, function(e:Event):void
+                    {
+                        removePopup();
+                    });
+                return;
+            }
+
             bmd = new BitmapData(Main.GAME_WIDTH, Main.GAME_HEIGHT, false, 0x000000);
             bmd.draw(stage);
             bmd.applyFilter(bmd, bmd.rect, new Point(), new BlurFilter(16, 16, 3));
@@ -197,24 +285,150 @@ package popups
 
             loadingCancelButton = new BoxButton(uiLock, 390 - 40, 440, 80, 30, _lang.string("menu_cancel"), 12, clickHandler);
 
-            if (rootFolder != null && pathList == null)
-                refreshFolder();
-            else if (rootFolder != null && pathList != null)
+            CONFIG::air
             {
-                displayFolderPath.text = rootFolder.nativePath;
-                buildFileList();
+                if (rootFolder != null && pathList == null)
+                    refreshFolder();
+                else if (rootFolder != null && pathList != null)
+                {
+                    displayFolderPath.text = rootFolder.nativePath;
+                    buildFileList();
+                }
+            }
+        }
+
+        private function onChartFileSelected(filename:String, base64data:String):void
+        {
+            _ruffleChartBytes = Base64.decode(base64data);
+            _ruffleChartFilename = filename;
+
+            // Try to parse the chart to show info
+            var emb:ExternalChartBase = new ExternalChartBase();
+            // Load without audio to get chart metadata
+            _ruffleChartBytes.position = 0;
+            var tempBytes:ByteArray = new ByteArray();
+            tempBytes.writeBytes(_ruffleChartBytes);
+            tempBytes.position = 0;
+
+            var dotIdx:int = filename.lastIndexOf(".");
+            var ext:String = filename.substr(dotIdx + 1).toLowerCase();
+            emb.parser = emb.getParser(ext);
+            if (emb.parser != null && emb.parser.load(tempBytes, filename))
+            {
+                _ruffleParser = emb;
+                var chartTitle:String = emb.parser.data.title || "???";
+                var chartArtist:String = emb.parser.data.artist || "???";
+                var expectedMusic:String = emb.parser.data.music || "";
+                _ruffleChartInfo.text = chartTitle + " - " + chartArtist + "  [" + filename + "]"
+                    + (expectedMusic != "" ? "  (audio: " + expectedMusic + ")" : "");
+
+                // Show difficulty buttons
+                _ruffleDiffContainer.removeChildren();
+                _ruffleDiffButtons.length = 0;
+                var charts:Array = emb.parser.data['notes'];
+                if (charts != null)
+                {
+                    var diffLabel:Text = new Text(_ruffleDiffContainer, 0, 0, "Select Difficulty:", 13);
+                    diffLabel.setAreaParams(Main.GAME_WIDTH, 22, "center");
+
+                    for (var i:int = 0; i < charts.length; i++)
+                    {
+                        var diffDesc:String = (charts[i]['class'] || "Chart") + " - " + (charts[i]['desc'] || charts[i]['difficulty'] || (i + 1));
+                        var btn:BoxButton = new BoxButton(_ruffleDiffContainer,
+                            Main.GAME_WIDTH / 2 - 150, 25 + i * 28, 300, 25,
+                            diffDesc, 11, e_ruffleDiffSelect);
+                        btn.tag = i;
+                        _ruffleDiffButtons.push(btn);
+                    }
+                    if (_ruffleDiffButtons.length > 0)
+                    {
+                        _ruffleSelectedDiffId = 0;
+                        _ruffleDiffButtons[0].active = true;
+                    }
+                }
+            }
+            else
+            {
+                _ruffleChartInfo.text = "Failed to parse: " + filename;
+                _ruffleParser = null;
+            }
+
+            updateRufflePlayButton();
+        }
+
+        private function onAudioFileSelected(filename:String, base64data:String):void
+        {
+            _ruffleAudioBytes = Base64.decode(base64data);
+            _ruffleAudioInfo.text = "Audio: " + filename;
+            updateRufflePlayButton();
+        }
+
+        private function e_ruffleDiffSelect(e:MouseEvent):void
+        {
+            var btn:BoxButton = e.currentTarget as BoxButton;
+            if (btn == null) return;
+
+            // Unhighlight all
+            for each (var b:BoxButton in _ruffleDiffButtons)
+                b.active = false;
+
+            btn.active = true;
+            _ruffleSelectedDiffId = btn.tag;
+        }
+
+        private function updateRufflePlayButton():void
+        {
+            _rufflePlayBtn.visible = (_ruffleChartBytes != null && _ruffleAudioBytes != null && _ruffleParser != null);
+        }
+
+        private function e_rufflePlay(e:Event):void
+        {
+            if (_ruffleChartBytes == null || _ruffleAudioBytes == null)
+                return;
+
+            var chartBytes:ByteArray = _ruffleChartBytes;
+            var chartFilename:String = _ruffleChartFilename;
+            var audioBytes:ByteArray = _ruffleAudioBytes;
+            var diffId:int = _ruffleSelectedDiffId;
+
+            removePopup();
+
+            chartBytes.position = 0;
+            audioBytes.position = 0;
+
+            if (_mp.inGameRoom)
+            {
+                var mpInfo:SongInfo = FileLoader.buildSongInfoFromBytes(chartBytes, chartFilename, audioBytes, diffId);
+                if (mpInfo != null)
+                {
+                    _mp.ffrSelectSong(mpInfo);
+                    if (_gvars.gameMain.activePanel is MainMenu)
+                        _gvars.gameMain.activePanel.switchTo(MainMenu.MENU_MULTIPLAYER);
+                }
+            }
+            else
+            {
+                Flags.VALUES[Flags.FILE_LOADER_OPEN] = true;
+                FileLoader.loadLocalFileFromBytes(chartBytes, chartFilename, audioBytes, diffId);
             }
         }
 
         override public function stageRemove():void
         {
-            closeWindow.dispose();
-            box.dispose();
-            this.removeChild(box);
-            this.removeChild(bmp);
+            if (box != null)
+            {
+                closeWindow.dispose();
+                box.dispose();
+                this.removeChild(box);
+            }
+            if (bmp != null)
+                this.removeChild(bmp);
             bmd = null;
             bmp = null;
             box = null;
+            _ruffleChartBytes = null;
+            _ruffleAudioBytes = null;
+            _ruffleParser = null;
         }
 
         public function buildFileList():void
@@ -230,7 +444,10 @@ package popups
             {
                 cacheValue = FileLoader.cache.getValue(pathList[i]);
                 path = pathList[i];
-                endOfFolder = path.lastIndexOf(File.separator) + 1;
+                CONFIG::air
+                {
+                    endOfFolder = path.lastIndexOf(File.separator) + 1;
+                }
                 renderList[i] = new FileFolder(path.substr(0, endOfFolder), path.substr(endOfFolder), cacheValue["ext"], new FileFolderItem(pathList[i], cacheValue));
             }
 
@@ -278,6 +495,7 @@ package popups
                 selectedItem(songBrowser.findSongButtonByIndex(lastSelectedIndex));
         }
 
+        CONFIG::air
         private function dirSelected(e:Event):void
         {
             if (stage)
@@ -292,19 +510,22 @@ package popups
             if (stage)
                 stage.focus = null;
 
-            if (e.target == refreshAllFolder)
+            CONFIG::air
             {
-                refreshCache();
+                if (e.target == refreshAllFolder)
+                {
+                    refreshCache();
+                }
+
+                else if (e.target == selectFolder || e.target == displayFolderPath)
+                {
+                    var tempFolder:File = new File();
+                    tempFolder.addEventListener(Event.SELECT, dirSelected);
+                    tempFolder.browseForDirectory(_lang.stringSimple("file_loader_select_a_directory"));
+                }
             }
 
-            else if (e.target == selectFolder || e.target == displayFolderPath)
-            {
-                var tempFolder:File = new File();
-                tempFolder.addEventListener(Event.SELECT, dirSelected);
-                tempFolder.browseForDirectory(_lang.stringSimple("file_loader_select_a_directory"));
-            }
-
-            else if (e.target == loadingCancelButton)
+            if (e.target == loadingCancelButton)
             {
                 cancelRequested = true;
             }
@@ -321,6 +542,7 @@ package popups
         }
 
 
+        CONFIG::air
         private function refreshCache():void
         {
             lockUI = true;
@@ -344,6 +566,7 @@ package popups
             _parseFileQueue(fileQueue);
         }
 
+        CONFIG::air
         private function refreshFolder():void
         {
             if (rootFolder == null)
@@ -446,6 +669,7 @@ package popups
             }
         }
 
+        CONFIG::air
         private function _parseFileQueue(fileQueue:Vector.<File>):void
         {
             var loadTimer:Timer;
@@ -728,21 +952,24 @@ package popups
 
         private function e_reloadCache(e:Event):void
         {
-            var chartFile:File;
-            var emb:ExternalChartBase;
-            var cacheObj:Object;
-
-            var file:FileFolder = lastSelectedItem.songData;
-            var fileList:Vector.<FileFolderItem> = file.data;
-            for each (var chartItem:FileFolderItem in fileList)
+            CONFIG::air
             {
-                chartFile = new File(chartItem.loc);
-                cacheObj = FileLoader.buildCacheObject(chartFile);
-                FileLoader.cache.setValue(chartItem.loc, cacheObj);
+                var chartFile:File;
+                var emb:ExternalChartBase;
+                var cacheObj:Object;
+
+                var file:FileFolder = lastSelectedItem.songData;
+                var fileList:Vector.<FileFolderItem> = file.data;
+                for each (var chartItem:FileFolderItem in fileList)
+                {
+                    chartFile = new File(chartItem.loc);
+                    cacheObj = FileLoader.buildCacheObject(chartFile);
+                    FileLoader.cache.setValue(chartItem.loc, cacheObj);
+                }
+                FileLoader.cache.save();
+                Alert.add(_lang.string("file_loader_reloaded_file"));
+                buildFileList();
             }
-            FileLoader.cache.save();
-            Alert.add(_lang.string("file_loader_reloaded_file"));
-            buildFileList();
         }
 
         public function set lockUI(val:Boolean):void
@@ -764,8 +991,12 @@ package popups
     }
 }
 
-import flash.filesystem.File;
+CONFIG::air
+{
+    import flash.filesystem.File;
+}
 
+CONFIG::air
 internal class FileDirectoryQueue
 {
     public var dir:File;

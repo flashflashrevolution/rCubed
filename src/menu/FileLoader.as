@@ -6,7 +6,11 @@ package menu
     import classes.chart.NoteChart;
     import classes.chart.Song;
     import classes.chart.parse.ExternalChartBase;
-    import flash.filesystem.File;
+    CONFIG::air
+    {
+        import flash.filesystem.File;
+    }
+    import flash.utils.ByteArray;
     import game.GameOptions;
 
     public class FileLoader
@@ -23,19 +27,14 @@ package menu
                 playlistURL: "",
                 songURL: ""}
 
-        public static function buildSongInfo(loc:String, id:int, isUnique:Boolean = false):SongInfo
+        // Ruffle: builds SongInfo from raw bytes via JS bridge file picker
+        public static function buildSongInfoFromBytes(chartBytes:ByteArray, filename:String, audioBytes:ByteArray, id:int):SongInfo
         {
-            if (loc == null || loc.length == 0)
-                return null;
-
-            // Parse Chart
             var emb:ExternalChartBase = new ExternalChartBase();
-            if (emb.load(new File(loc)))
+            if (emb.loadFromBytes(chartBytes, filename, audioBytes))
             {
                 var chartinfo:Object = emb.getInfo();
-                var chartData:Object = emb.getValidChartData(id);
 
-                // Build Song Info
                 var songInfo:SongInfo = new SongInfo();
                 songInfo.access = GlobalVariables.SONG_ACCESS_PLAYABLE;
                 songInfo.genre = 14;
@@ -48,24 +47,66 @@ package menu
                 songInfo.time = chartinfo.time;
                 songInfo.time_secs = chartinfo.time_secs;
                 songInfo.time_end = 0;
-                songInfo.background = chartinfo.background != "" ? chartinfo.folder + chartinfo.background : null;
+                songInfo.background = null;
 
-                if (isUnique)
-                {
-                    songInfo.engine = {id: "fileloader", cache_id: emb.ID, chart_id: id};
-                }
-                else
-                {
-                    ENGINE_INFO.cache_id = emb.ID;
-                    ENGINE_INFO.chart_id = id;
-                    songInfo.engine = ENGINE_INFO;
-                }
+                ENGINE_INFO.cache_id = emb.ID;
+                ENGINE_INFO.chart_id = id;
+                songInfo.engine = ENGINE_INFO;
 
-                // File Loader Assistance
                 songInfo.is_local = true;
                 songInfo.chart_parser = emb;
 
                 return songInfo;
+            }
+            return null;
+        }
+
+        public static function buildSongInfo(loc:String, id:int, isUnique:Boolean = false):SongInfo
+        {
+            CONFIG::air
+            {
+                if (loc == null || loc.length == 0)
+                    return null;
+
+                // Parse Chart
+                var emb:ExternalChartBase = new ExternalChartBase();
+                if (emb.load(new File(loc)))
+                {
+                    var chartinfo:Object = emb.getInfo();
+                    var chartData:Object = emb.getValidChartData(id);
+
+                    // Build Song Info
+                    var songInfo:SongInfo = new SongInfo();
+                    songInfo.access = GlobalVariables.SONG_ACCESS_PLAYABLE;
+                    songInfo.genre = 14;
+                    songInfo.author = songInfo.author_html = chartinfo.author;
+                    songInfo.stepauthor = songInfo.stepauthor_html = chartinfo.stepauthor;
+                    songInfo.name = chartinfo.display;
+                    songInfo.level = 1;
+                    songInfo.level_id = MD5.hash(id + emb.ID);
+                    songInfo.note_count = chartinfo.arrows;
+                    songInfo.time = chartinfo.time;
+                    songInfo.time_secs = chartinfo.time_secs;
+                    songInfo.time_end = 0;
+                    songInfo.background = chartinfo.background != "" ? chartinfo.folder + chartinfo.background : null;
+
+                    if (isUnique)
+                    {
+                        songInfo.engine = {id: "fileloader", cache_id: emb.ID, chart_id: id};
+                    }
+                    else
+                    {
+                        ENGINE_INFO.cache_id = emb.ID;
+                        ENGINE_INFO.chart_id = id;
+                        songInfo.engine = ENGINE_INFO;
+                    }
+
+                    // File Loader Assistance
+                    songInfo.is_local = true;
+                    songInfo.chart_parser = emb;
+
+                    return songInfo;
+                }
             }
 
             return null;
@@ -107,19 +148,41 @@ package menu
 
         public static function setupLocalFile(loc:String, id:int):Boolean
         {
-            var info:SongInfo = buildSongInfo(loc, id);
-            if (info != null)
+            CONFIG::air
             {
-                buildSong(info);
-                return true;
+                var info:SongInfo = buildSongInfo(loc, id);
+                if (info != null)
+                {
+                    buildSong(info);
+                    return true;
+                }
             }
             return false;
         }
 
         public static function loadLocalFile(loc:String, id:int):void
         {
-            if (setupLocalFile(loc, id))
+            CONFIG::air
             {
+                if (setupLocalFile(loc, id))
+                {
+                    _gvars.songQueue = [_gvars.externalSongInfo];
+
+                    _gvars.options = new GameOptions();
+                    _gvars.options.fill();
+                    _gvars.gameMain.switchTo(Main.GAME_PLAY_PANEL);
+                }
+            }
+        }
+
+        // Ruffle: load and play from raw bytes via JS bridge file picker
+        public static function loadLocalFileFromBytes(chartBytes:ByteArray, filename:String, audioBytes:ByteArray, id:int):void
+        {
+            var info:SongInfo = buildSongInfoFromBytes(chartBytes, filename, audioBytes, id);
+            if (info != null)
+            {
+                buildSong(info);
+
                 _gvars.songQueue = [_gvars.externalSongInfo];
 
                 _gvars.options = new GameOptions();
@@ -128,6 +191,7 @@ package menu
             }
         }
 
+        CONFIG::air
         public static function buildCacheObject(chartFile:File):Object
         {
             var cacheObj:Object = {"valid": 0, "date": chartFile.modificationDate.getTime()}

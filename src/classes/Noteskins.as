@@ -8,7 +8,10 @@ package classes
     import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.events.IOErrorEvent;
-    import flash.filesystem.File;
+    CONFIG::air
+    {
+        import flash.filesystem.File;
+    }
     import flash.geom.Matrix;
     import flash.geom.Point;
     import flash.geom.Rectangle;
@@ -232,7 +235,10 @@ package classes
             n.graphics.drawRect(0, 0, bmd.width, bmd.height);
             n.graphics.endFill();
             n.cacheAsBitmap = true;
-            n.cacheAsBitmapMatrix = new Matrix();
+            CONFIG::air
+            {
+                n.cacheAsBitmapMatrix = new Matrix();
+            }
             n.mouseEnabled = false;
             n.doubleClickEnabled = false;
             n.tabEnabled = false;
@@ -613,15 +619,18 @@ package classes
             }
 
             // Reload External Noteskin if exist
-            if (noteskinFilename != null)
+            CONFIG::air
             {
-                Logger.debug(this, "Reloading External Noteskin: " + noteskinFilename);
-                var noteskinJSON:String = AirContext.readTextFile(AirContext.getAppFile(Constant.NOTESKIN_PATH).resolvePath(noteskinFilename));
+                if (noteskinFilename != null)
+                {
+                    Logger.debug(this, "Reloading External Noteskin: " + noteskinFilename);
+                    var noteskinJSON:String = AirContext.readTextFile(AirContext.getAppFile(Constant.NOTESKIN_PATH).resolvePath(noteskinFilename));
 
-                if (noteskinJSON == null)
-                    LocalStore.deleteVariable(CUSTOM_NOTESKIN_FILE);
-                else
-                    noteskinData = noteskinJSON;
+                    if (noteskinJSON == null)
+                        LocalStore.deleteVariable(CUSTOM_NOTESKIN_FILE);
+                    else
+                        noteskinData = noteskinJSON;
+                }
             }
 
             loadCustomNoteskinJSON(noteskinData);
@@ -660,38 +669,43 @@ package classes
         {
             _externalNoteskins = new <ExternalNoteskin>[];
 
-            var noteskinFolder:File = AirContext.getAppFile(Constant.NOTESKIN_PATH);
-            if (!noteskinFolder.exists || !noteskinFolder.isDirectory || noteskinFolder.isHidden)
-                return false;
-
-            var file:File;
-            var fileDataJSON:String;
-            var fileData:Object;
-            var files:Array = noteskinFolder.getDirectoryListing();
-            for (var i:int = 0; i < files.length; i++)
+            CONFIG::air
             {
-                file = files[i];
-                try
+                var noteskinFolder:File = AirContext.getAppFile(Constant.NOTESKIN_PATH);
+                if (!noteskinFolder.exists || !noteskinFolder.isDirectory || noteskinFolder.isHidden)
+                    return false;
+
+                var file:File;
+                var fileDataJSON:String;
+                var fileData:Object;
+                var files:Array = noteskinFolder.getDirectoryListing();
+                for (var i:int = 0; i < files.length; i++)
                 {
-                    if (file.extension != "txt")
-                        continue;
+                    file = files[i];
+                    try
+                    {
+                        if (file.extension != "txt")
+                            continue;
 
-                    fileDataJSON = AirContext.readTextFile(file);
-                    fileData = JSON.parse(fileDataJSON);
+                        fileDataJSON = AirContext.readTextFile(file);
+                        fileData = JSON.parse(fileDataJSON);
 
-                    var extNoteskin:ExternalNoteskin = new ExternalNoteskin();
-                    extNoteskin.file = file.name;
-                    extNoteskin.data = fileData;
-                    extNoteskin.json = fileDataJSON;
-                    _externalNoteskins.push(extNoteskin);
+                        var extNoteskin:ExternalNoteskin = new ExternalNoteskin();
+                        extNoteskin.file = file.name;
+                        extNoteskin.data = fileData;
+                        extNoteskin.json = fileDataJSON;
+                        _externalNoteskins.push(extNoteskin);
+                    }
+                    catch (error:Error)
+                    {
+
+                    }
                 }
-                catch (error:Error)
-                {
 
-                }
+                return true;
             }
 
-            return true;
+            return false;
         }
     }
 }

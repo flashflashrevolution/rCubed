@@ -24,16 +24,19 @@ package
     import com.greensock.plugins.AutoAlphaPlugin;
     import com.greensock.plugins.TintPlugin;
     import com.greensock.plugins.TweenPlugin;
-    import flash.desktop.NativeApplication;
-    import flash.desktop.NativeProcess;
-    import flash.desktop.NativeProcessStartupInfo;
-    import flash.display.NativeWindow;
+    CONFIG::air
+    {
+        import flash.desktop.NativeApplication;
+        import flash.desktop.NativeProcess;
+        import flash.desktop.NativeProcessStartupInfo;
+        import flash.display.NativeWindow;
+        import flash.events.NativeWindowBoundsEvent;
+        import flash.filesystem.File;
+    }
     import flash.events.ContextMenuEvent;
     import flash.events.Event;
     import flash.events.KeyboardEvent;
-    import flash.events.NativeWindowBoundsEvent;
     import flash.events.UncaughtErrorEvent;
-    import flash.filesystem.File;
     import flash.system.Capabilities;
     import flash.text.AntiAliasType;
     import flash.text.TextField;
@@ -53,7 +56,11 @@ package
         public static const GAME_WIDTH:int = 780;
         public static const GAME_HEIGHT:int = 480;
         public static var VSYNC_SUPPORT:Boolean = false;
-        public static var window:NativeWindow;
+
+        CONFIG::air
+        {
+            public static var window:NativeWindow;
+        }
 
         public static const GAME_LOGIN_PANEL:String = "GameLoginPanel";
         public static const GAME_MENU_PANEL:String = "GameMenuPanel";
@@ -95,7 +102,10 @@ package
         public var bg:GameBackgroundColor;
 
         // Application Info
-        public static var SWF_FILE:File;
+        CONFIG::air
+        {
+            public static var SWF_FILE:File;
+        }
         public static var SWF_PATH:String;
         public static var SWF_VERSION:String;
         public static var EXE_PATH:String;
@@ -123,14 +133,25 @@ package
             }
 
             //- Application
-            SWF_FILE = new File(new File(loaderInfo.loaderURL).nativePath);
-            SWF_PATH = SWF_FILE.nativePath;
-            SWF_VERSION = MD5.hashBytes(AirContext.readFile(SWF_FILE));
-            VSYNC_SUPPORT = stage.hasOwnProperty("vsyncEnabled");
+            CONFIG::air
+            {
+                SWF_FILE = new File(new File(loaderInfo.loaderURL).nativePath);
+                SWF_PATH = SWF_FILE.nativePath;
+                SWF_VERSION = MD5.hashBytes(AirContext.readFile(SWF_FILE));
+                VSYNC_SUPPORT = stage.hasOwnProperty("vsyncEnabled");
+            }
+
+            if (!CONFIG::air)
+            {
+                SWF_PATH = loaderInfo.loaderURL;
+                SWF_VERSION = "ruffle";
+            }
 
             //- Static Class Init
             Logger.init();
             AirContext.initFolders();
+            if (!CONFIG::air)
+                IndexedDBStorage.init();
             LocalOptions.init();
             Alert.init(stage);
 
@@ -143,34 +164,44 @@ package
             _gvars.loadAirOptions();
 
             //- Window Options
-            window = stage.nativeWindow;
-            window.title = Constant.AIR_WINDOW_TITLE;
-            window.addEventListener(Event.CLOSING, e_onNativeWindowClosing);
-            window.addEventListener(NativeWindowBoundsEvent.MOVE, e_onNativeWindowPropertyChange, false, 1);
-            window.addEventListener(NativeWindowBoundsEvent.RESIZE, e_onNativeWindowPropertyChange, false, 1);
+            CONFIG::air
+            {
+                window = stage.nativeWindow;
+                window.title = Constant.AIR_WINDOW_TITLE;
+                window.addEventListener(Event.CLOSING, e_onNativeWindowClosing);
+                window.addEventListener(NativeWindowBoundsEvent.MOVE, e_onNativeWindowPropertyChange, false, 1);
+                window.addEventListener(NativeWindowBoundsEvent.RESIZE, e_onNativeWindowPropertyChange, false, 1);
+                NativeApplication.nativeApplication.addEventListener(Event.EXITING, e_onNativeShutdown);
+                stage.addEventListener("vSyncStateChangeAvailability", e_onVsyncStateChangeAvailability);
+
+                WINDOW_WIDTH_EXTRA = window.width - GAME_WIDTH;
+                WINDOW_HEIGHT_EXTRA = window.height - GAME_HEIGHT;
+
+                ignoreWindowChanges = true;
+                if (_gvars.air_saveWindowPosition)
+                {
+                    window.x = _gvars.air_windowProperties.x;
+                    window.y = _gvars.air_windowProperties.y;
+                }
+                if (_gvars.air_saveWindowSize)
+                {
+                    window.width = Math.max(100, _gvars.air_windowProperties.width + WINDOW_WIDTH_EXTRA);
+                    window.height = Math.max(100, _gvars.air_windowProperties.height + WINDOW_HEIGHT_EXTRA);
+                }
+                if (_gvars.air_useFullScreen)
+                {
+                    _gvars.toggleFullScreen();
+                }
+                ignoreWindowChanges = false;
+            }
+
             loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, e_uncaughtErrorHandler);
-            NativeApplication.nativeApplication.addEventListener(Event.EXITING, e_onNativeShutdown);
-            stage.addEventListener("vSyncStateChangeAvailability", e_onVsyncStateChangeAvailability); // Lacking proper event class due to SDK limitations in Air 26.
 
-            WINDOW_WIDTH_EXTRA = window.width - GAME_WIDTH;
-            WINDOW_HEIGHT_EXTRA = window.height - GAME_HEIGHT;
-
-            ignoreWindowChanges = true;
-            if (_gvars.air_saveWindowPosition)
+            if (!CONFIG::air)
             {
-                window.x = _gvars.air_windowProperties.x;
-                window.y = _gvars.air_windowProperties.y;
+                // Ruffle: listen for deactivate on stage instead of NativeApplication exiting
+                stage.addEventListener(Event.DEACTIVATE, e_onRuffleShutdown);
             }
-            if (_gvars.air_saveWindowSize)
-            {
-                window.width = Math.max(100, _gvars.air_windowProperties.width + WINDOW_WIDTH_EXTRA);
-                window.height = Math.max(100, _gvars.air_windowProperties.height + WINDOW_HEIGHT_EXTRA);
-            }
-            if (_gvars.air_useFullScreen)
-            {
-                _gvars.toggleFullScreen();
-            }
-            ignoreWindowChanges = false;
 
             //- Load Menu Music
             _gvars.loadMenuMusic();
@@ -265,24 +296,54 @@ package
             _gvars.onNativeProcessClose(e);
         }
 
-        private function e_onNativeWindowClosing(e:Event):void
+        private function e_onRuffleShutdown(e:Event):void
         {
-            _gvars.air_windowProperties["width"] = window.width - Main.WINDOW_WIDTH_EXTRA;
-            _gvars.air_windowProperties["height"] = window.height - Main.WINDOW_HEIGHT_EXTRA;
-            _gvars.air_windowProperties["x"] = window.x;
-            _gvars.air_windowProperties["y"] = window.y;
-            LocalOptions.setVariable("window_properties", _gvars.air_windowProperties);
+            Logger.destroy();
+            LocalOptions.flush();
+            SharedObjectStorage.flushAll();
         }
 
-        private function e_onNativeWindowPropertyChange(e:NativeWindowBoundsEvent):void
+        CONFIG::air
         {
-            if (ignoreWindowChanges)
-                return;
+            private function e_onNativeWindowClosing(e:Event):void
+            {
+                _gvars.air_windowProperties["width"] = window.width - Main.WINDOW_WIDTH_EXTRA;
+                _gvars.air_windowProperties["height"] = window.height - Main.WINDOW_HEIGHT_EXTRA;
+                _gvars.air_windowProperties["x"] = window.x;
+                _gvars.air_windowProperties["y"] = window.y;
+                LocalOptions.setVariable("window_properties", _gvars.air_windowProperties);
+            }
 
-            _gvars.air_windowProperties["width"] = e.afterBounds.width - Main.WINDOW_WIDTH_EXTRA;
-            _gvars.air_windowProperties["height"] = e.afterBounds.height - Main.WINDOW_HEIGHT_EXTRA;
-            _gvars.air_windowProperties["x"] = e.afterBounds.x;
-            _gvars.air_windowProperties["y"] = e.afterBounds.y;
+            private function e_onNativeWindowPropertyChange(e:NativeWindowBoundsEvent):void
+            {
+                if (ignoreWindowChanges)
+                    return;
+
+                _gvars.air_windowProperties["width"] = e.afterBounds.width - Main.WINDOW_WIDTH_EXTRA;
+                _gvars.air_windowProperties["height"] = e.afterBounds.height - Main.WINDOW_HEIGHT_EXTRA;
+                _gvars.air_windowProperties["x"] = e.afterBounds.x;
+                _gvars.air_windowProperties["y"] = e.afterBounds.y;
+            }
+
+            /**
+             * Called when the vsync state can be set.
+             * This is even called in Air 26, when the actual event doesn't exist yet in the SDK
+             * but is dispatched if you hardcode the event name.
+             */
+            public function e_onVsyncStateChangeAvailability(event:*):void
+            {
+                if (VSYNC_SUPPORT)
+                {
+                    if (event.available)
+                    {
+                        stage.vsyncEnabled = _gvars.air_useVSync;
+                    }
+                    else
+                    {
+                        stage.vsyncEnabled = true;
+                    }
+                }
+            }
         }
 
         private function e_uncaughtErrorHandler(e:UncaughtErrorEvent):void
@@ -292,26 +353,6 @@ package
             Logger.info("INFO", "If possible, please submit this crash to the developers.");
             Alert.add("A fatal error has occured. You should restart the game.", 7200, Alert.RED);
             _gvars.logDebugError(Logger.generate_message(e.error));
-        }
-
-        /**
-         * Called when the vsync state can be set.
-         * This is even called in Air 26, when the actual event doesn't exist yet in the SDK
-         * but is dispatched if you hardcode the event name.
-         */
-        public function e_onVsyncStateChangeAvailability(event:*):void
-        {
-            if (VSYNC_SUPPORT)
-            {
-                if (event.available)
-                {
-                    stage.vsyncEnabled = _gvars.air_useVSync;
-                }
-                else
-                {
-                    stage.vsyncEnabled = true;
-                }
-            }
         }
 
         ///- Preloader
@@ -795,32 +836,39 @@ package
 
         public function restartApplication():void
         {
-            var applicationDescriptor:XML = NativeApplication.nativeApplication.applicationDescriptor;
-            var xmlns:Namespace = new Namespace(applicationDescriptor.namespace());
-            var applicationName:String = applicationDescriptor.xmlns::filename;
+            CONFIG::air
+            {
+                var applicationDescriptor:XML = NativeApplication.nativeApplication.applicationDescriptor;
+                var xmlns:Namespace = new Namespace(applicationDescriptor.namespace());
+                var applicationName:String = applicationDescriptor.xmlns::filename;
 
-            var applicationExecutable:File;
+                var applicationExecutable:File;
 
-            if (Capabilities.os.indexOf("Win") > -1)
-                applicationExecutable = new File(File.applicationDirectory.nativePath + "/" + applicationName + ".exe");
-            else if (Capabilities.os.indexOf("Mac") > -1)
-                applicationExecutable = new File(File.applicationDirectory.nativePath.replace("Resources", "MacOS/" + applicationName));
+                if (Capabilities.os.indexOf("Win") > -1)
+                    applicationExecutable = new File(File.applicationDirectory.nativePath + "/" + applicationName + ".exe");
+                else if (Capabilities.os.indexOf("Mac") > -1)
+                    applicationExecutable = new File(File.applicationDirectory.nativePath.replace("Resources", "MacOS/" + applicationName));
 
-            if (!applicationExecutable || !applicationExecutable.exists)
+                if (!applicationExecutable || !applicationExecutable.exists)
+                    return;
+
+                // Handle Shutdown
+                NativeApplication.nativeApplication.removeEventListener(Event.EXITING, e_onNativeShutdown);
+                e_onNativeShutdown(null);
+
+                // Start New
+                var nativeProcessStartupInfo:NativeProcessStartupInfo = new NativeProcessStartupInfo();
+                var nativeProcess:NativeProcess = new NativeProcess();
+                nativeProcessStartupInfo.executable = applicationExecutable;
+                nativeProcess.start(nativeProcessStartupInfo);
+
+                // Exit Current
+                NativeApplication.nativeApplication.exit();
                 return;
+            }
 
-            // Handle Shutdown
-            NativeApplication.nativeApplication.removeEventListener(Event.EXITING, e_onNativeShutdown);
-            e_onNativeShutdown(null);
-
-            // Start New
-            var nativeProcessStartupInfo:NativeProcessStartupInfo = new NativeProcessStartupInfo();
-            var nativeProcess:NativeProcess = new NativeProcess();
-            nativeProcessStartupInfo.executable = applicationExecutable;
-            nativeProcess.start(nativeProcessStartupInfo);
-
-            // Exit Current
-            NativeApplication.nativeApplication.exit();
+            // Ruffle: cannot restart, show message
+            Alert.add("Restart is not supported in Ruffle. Please close and reopen the application.", 240, Alert.RED);
         }
     }
 }

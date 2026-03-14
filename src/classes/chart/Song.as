@@ -1,5 +1,6 @@
 package classes.chart
 {
+    import by.blooddy.crypto.Base64;
     import by.blooddy.crypto.MD5;
     import classes.SongInfo;
     import classes.chart.parse.ChartFFRLegacy;
@@ -17,6 +18,7 @@ package classes.chart
     import flash.events.ProgressEvent;
     import flash.events.SampleDataEvent;
     import flash.events.SecurityErrorEvent;
+    import flash.external.ExternalInterface;
     import flash.media.Sound;
     import flash.media.SoundChannel;
     import flash.media.SoundMixer;
@@ -56,6 +58,11 @@ package classes.chart
         private var rateSample:int = 0;
         private var rateSampleCount:int = 0;
         private var rateSamples:ByteArray = new ByteArray();
+
+        private var baseSoundBytes:ByteArray;
+        public var isAudioReady:Boolean = true;
+        private var _pendingStart:int = -1;
+        private var _useJSAudio:Boolean = false;
 
         public var isLoaded:Boolean = false;
         public var isChartLoaded:Boolean = false;
@@ -112,17 +119,44 @@ package classes.chart
 
         private function load():void
         {
-            // Load Stored SWF
-            var url_file_hash:String = "";
-            if ((_gvars.air_useLocalFileCache) && AirContext.doesFileExist(AirContext.getSongCachePath(this) + "data.bin"))
+            var cachePath:String = AirContext.getSongCachePath(this) + "data.bin";
+            var cacheKey:uint = songInfo.engine ? 0 : id;
+
+            if (_gvars.air_useLocalFileCache && AirContext.doesFileExist(cachePath))
             {
-                localFileData = AirContext.readFile(AirContext.getAppFile(AirContext.getSongCachePath(this) + "data.bin"), (songInfo.engine ? 0 : id));
+                CONFIG::air
+                {
+                    localFileData = AirContext.readFileByPath(cachePath, cacheKey);
+                    loadWithCacheData();
+                    return;
+                }
+                if (!CONFIG::air)
+                {
+                    AirContext.readFileByPathAsync(cachePath, cacheKey, function(data:ByteArray):void
+                    {
+                        if (loadFail)
+                            return;
+                        localFileData = data;
+                        loadWithCacheData();
+                    });
+                    return;
+                }
+            }
+
+            loadFromNetwork("");
+        }
+
+        private function loadWithCacheData():void
+        {
+            var url_file_hash:String = "";
+            if (localFileData)
+            {
                 localFileHash = MD5.hashBytes(localFileData);
                 url_file_hash = "hash=" + localFileHash + "&";
 
                 if (songInfo.engine)
                 {
-                    if (localFileData && localFileHash == songInfo.swf_hash && type == NoteChart.FFR_MP3)
+                    if (localFileHash == songInfo.swf_hash && type == NoteChart.FFR_MP3)
                     {
                         removeLoaderListeners();
                         musicLoader = new Loader();
@@ -133,6 +167,11 @@ package classes.chart
                 }
             }
 
+            loadFromNetwork(url_file_hash);
+        }
+
+        private function loadFromNetwork(url_file_hash:String):void
+        {
             switch (type)
             {
                 case NoteChart.FFR_MP3:
@@ -295,7 +334,7 @@ package classes.chart
                     try
                     {
                         Logger.info(this, "Saving Cache File for " + this.id + " / " + this.songInfo.level_id);
-                        AirContext.writeFile(AirContext.getAppFile(AirContext.getSongCachePath(this) + "data.bin"), storeChartData);
+                        AirContext.writeFileByPath(AirContext.getSongCachePath(this) + "data.bin", storeChartData);
                     }
                     catch (err:Error)
                     {
@@ -361,16 +400,27 @@ package classes.chart
             // Add Sound
             if (rateRate != 1 || rateReverse)
             {
-                sound = new Sound();
+                CONFIG::air
+                {
+                    sound = new Sound();
 
-                if (rateReverse)
-                    sound.addEventListener("sampleData", onReverseSound);
-                else
-                    sound.addEventListener("sampleData", onRateSound);
+                    if (rateReverse)
+                        sound.addEventListener("sampleData", onReverseSound);
+                    else
+                        sound.addEventListener("sampleData", onRateSound);
+                }
+                if (!CONFIG::air)
+                {
+                    // Sound.extract() / SampleDataEvent are unimplemented in Ruffle
+                    _useJSAudio = true;
+                    buildResampledSound();
+                }
             }
             else
             {
+                _useJSAudio = false;
                 sound = baseSound;
+                isAudioReady = true;
             }
 
             isDirty = false;
@@ -379,8 +429,47 @@ package classes.chart
         public function loadSoundBytes(bytes:ByteArray):void
         {
             bytes.position = 0;
+            if (!CONFIG::air)
+            {
+                baseSoundBytes = new ByteArray();
+                baseSoundBytes.writeBytes(bytes, 0, bytes.length);
+            }
             baseSound = new Sound();
             baseSound.loadCompressedDataFromByteArray(bytes, bytes.length);
+        }
+
+        private function buildResampledSound():void
+        {
+            if (!baseSoundBytes || !ExternalInterface.available)
+            {
+                Logger.error(this, "Cannot resample: no MP3 data or ExternalInterface unavailable");
+                _useJSAudio = false;
+                sound = baseSound;
+                return;
+            }
+
+            isAudioReady = false;
+            _pendingStart = -1;
+
+            ExternalInterface.addCallback("r3_onResampleReady", onResampleReady);
+            ExternalInterface.addCallback("r3_onSongComplete", stopSound);
+
+            baseSoundBytes.position = 0;
+            var mp3Base64:String = Base64.encode(baseSoundBytes);
+            ExternalInterface.call("r3_resampleAudio", mp3Base64, rateRate, rateReverse);
+        }
+
+        private function onResampleReady():void
+        {
+            Logger.success(this, "JS audio buffer ready for playback");
+            isAudioReady = true;
+
+            if (_pendingStart >= 0)
+            {
+                var seek:int = _pendingStart;
+                _pendingStart = -1;
+                start(seek);
+            }
         }
 
         public function getSoundObject():Sound
@@ -462,7 +551,7 @@ package classes.chart
             }
         }
 
-        private function stopSound(e:*):void
+        private function stopSound(e:* = null):void
         {
             musicIsPlaying = false;
         }
@@ -472,18 +561,33 @@ package classes.chart
         {
             updateMusicOffset();
 
-            if (soundChannel)
+            if (!isAudioReady)
             {
-                soundChannel.removeEventListener(Event.SOUND_COMPLETE, stopSound);
-                soundChannel.stop();
-                soundChannel = null;
+                _pendingStart = seek;
+                if (background)
+                    background.gotoAndPlay(2 + musicStartFrames + int(seek * 30 / 1000));
+                return;
             }
 
-            if (sound)
+            if (_useJSAudio)
             {
-                soundChannel = sound.play(musicStartTime + seek);
-                soundChannel.soundTransform = SoundMixer.soundTransform;
-                soundChannel.addEventListener(Event.SOUND_COMPLETE, stopSound);
+                ExternalInterface.call("r3_playAudio", musicStartTime + seek, SoundMixer.soundTransform.volume);
+            }
+            else
+            {
+                if (soundChannel)
+                {
+                    soundChannel.removeEventListener(Event.SOUND_COMPLETE, stopSound);
+                    soundChannel.stop();
+                    soundChannel = null;
+                }
+
+                if (sound)
+                {
+                    soundChannel = sound.play(musicStartTime + seek);
+                    soundChannel.soundTransform = SoundMixer.soundTransform;
+                    soundChannel.addEventListener(Event.SOUND_COMPLETE, stopSound);
+                }
             }
 
             if (background)
@@ -497,20 +601,26 @@ package classes.chart
             if (background)
                 background.stop();
 
-            if (soundChannel)
+            if (_useJSAudio)
+            {
+                ExternalInterface.call("r3_stopAudio");
+            }
+            else if (soundChannel)
             {
                 soundChannel.removeEventListener(Event.SOUND_COMPLETE, stopSound);
                 soundChannel.stop();
-                musicPausePosition = 0;
                 soundChannel = null;
             }
+            musicPausePosition = 0;
             musicIsPlaying = false;
         }
 
         public function pause():void
         {
             var pausePosition:int = 0;
-            if (soundChannel)
+            if (_useJSAudio)
+                pausePosition = ExternalInterface.call("r3_getPosition");
+            else if (soundChannel)
                 pausePosition = soundChannel.position;
             stop();
             musicPausePosition = pausePosition;
@@ -520,7 +630,12 @@ package classes.chart
         {
             if (background)
                 background.play();
-            if (sound)
+
+            if (_useJSAudio)
+            {
+                ExternalInterface.call("r3_playAudio", musicPausePosition, SoundMixer.soundTransform.volume);
+            }
+            else if (sound)
             {
                 soundChannel = sound.play(musicPausePosition);
                 soundChannel.addEventListener(Event.SOUND_COMPLETE, stopSound);
@@ -612,6 +727,9 @@ package classes.chart
 
         public function getPosition():int
         {
+            if (_useJSAudio)
+                return ExternalInterface.call("r3_getPosition") - musicStartTime;
+
             if (soundChannel != null)
                 return soundChannel.position - musicStartTime;
 

@@ -192,7 +192,7 @@ package classes.score
                 {
                     Logger.error(instance, "Canon Parse Failure: " + Logger.exception_error(err));
                     Logger.error(instance, "Wrote invalid response data to log folder. [logs/c_result.txt]");
-                    AirContext.writeTextFile(AirContext.getAppFile("logs/c_result.txt"), siteDataString);
+                    AirContext.writeTextFileByPath("logs/c_result.txt", siteDataString);
 
                     Alert.add(_lang.string("error_failed_to_save_results") + " (ERR: JSON_ERROR)", 360, Alert.RED);
 
@@ -421,7 +421,7 @@ package classes.score
                 {
                     Logger.error(instance, "Alt Parse Failure: " + Logger.exception_error(err));
                     Logger.error(instance, "Wrote invalid response data to log folder. [logs/a_result.txt]");
-                    AirContext.writeTextFile(AirContext.getAppFile("logs/a_result.txt"), siteDataString);
+                    AirContext.writeTextFileByPath("logs/a_result.txt", siteDataString);
                     return;
                 }
 
@@ -514,7 +514,7 @@ package classes.score
                     // Store Bin Encoded Replay
                     if (!AirContext.doesFileExist(path))
                     {
-                        AirContext.writeTextFile(AirContext.getAppFile(path), nR.getEncode());
+                        AirContext.writeTextFileByPath(path, nR.getEncode());
 
                         var cachePath:String = path.substr(Constant.REPLAY_PATH.length);
                         _gvars.file_replay_cache.setValue(cachePath, result.replay_cache_object);

@@ -10,7 +10,10 @@ package assets
     import flash.events.Event;
     import flash.events.IOErrorEvent;
     import flash.events.SecurityErrorEvent;
-    import flash.filesystem.File;
+    CONFIG::air
+    {
+        import flash.filesystem.File;
+    }
     import flash.geom.Matrix;
     import flash.net.URLRequest;
 
@@ -56,7 +59,10 @@ package assets
             this.graphics.drawRect(0, 0, Main.GAME_WIDTH, Main.GAME_HEIGHT);
             this.graphics.endFill();
             this.cacheAsBitmap = true;
-            this.cacheAsBitmapMatrix = _matrix;
+            CONFIG::air
+            {
+                this.cacheAsBitmapMatrix = _matrix;
+            }
 
             var bt:BitmapData = new GameBackgroundStripes();
             this.graphics.beginBitmapFill(bt, null, false);
@@ -73,7 +79,10 @@ package assets
                 lastFade.graphics.drawRect(0, 0, Main.GAME_WIDTH, Main.GAME_HEIGHT);
                 lastFade.graphics.endFill();
                 lastFade.cacheAsBitmap = true;
-                lastFade.cacheAsBitmapMatrix = _matrix;
+                CONFIG::air
+                {
+                    lastFade.cacheAsBitmapMatrix = _matrix;
+                }
                 addChild(lastFade);
                 TweenLite.to(lastFade, 1, {"alpha": 0, "onComplete": onFadeComplete});
             }
@@ -117,42 +126,45 @@ package assets
 
         public function reloadImages():void
         {
-            var path:String;
-            var imageLoader:Loader;
-            var file:File;
-
-            // Menu Background
-            for (var i:int = 0; i < BG_IMAGE_EXT.length; i++)
+            CONFIG::air
             {
-                file = AirContext.getAppFile("bg_menu" + BG_IMAGE_EXT[i]);
-                if (file.exists)
+                var path:String;
+                var imageLoader:Loader;
+                var file:File;
+
+                // Menu Background
+                for (var i:int = 0; i < BG_IMAGE_EXT.length; i++)
                 {
-                    Logger.debug(this, "Found " + file.name);
-                    path = "file:///" + file.nativePath;
-                    imageLoader = new Loader();
-                    imageLoader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, e_bgMenuLoaded);
-                    imageLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, e_bgMenuLoaded);
-                    imageLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, e_bgMenuLoaded);
-                    imageLoader.load(new URLRequest(path), AirContext.getLoaderContext());
-                    break;
+                    file = AirContext.getAppFile("bg_menu" + BG_IMAGE_EXT[i]);
+                    if (file.exists)
+                    {
+                        Logger.debug(this, "Found " + file.name);
+                        path = "file:///" + file.nativePath;
+                        imageLoader = new Loader();
+                        imageLoader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, e_bgMenuLoaded);
+                        imageLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, e_bgMenuLoaded);
+                        imageLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, e_bgMenuLoaded);
+                        imageLoader.load(new URLRequest(path), AirContext.getLoaderContext());
+                        break;
+                    }
                 }
-            }
 
-            // Gameplay Background
-            for (i = 0; i < BG_IMAGE_EXT.length; i++)
-            {
-                file = AirContext.getAppFile("bg_game" + BG_IMAGE_EXT[i]);
-
-                if (file.exists)
+                // Gameplay Background
+                for (i = 0; i < BG_IMAGE_EXT.length; i++)
                 {
-                    Logger.debug(this, "Found " + file.name);
-                    path = "file:///" + file.nativePath;
-                    imageLoader = new Loader();
-                    imageLoader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, e_bgGameLoaded);
-                    imageLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, e_bgGameLoaded);
-                    imageLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, e_bgGameLoaded);
-                    imageLoader.load(new URLRequest(path), AirContext.getLoaderContext());
-                    break;
+                    file = AirContext.getAppFile("bg_game" + BG_IMAGE_EXT[i]);
+
+                    if (file.exists)
+                    {
+                        Logger.debug(this, "Found " + file.name);
+                        path = "file:///" + file.nativePath;
+                        imageLoader = new Loader();
+                        imageLoader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, e_bgGameLoaded);
+                        imageLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, e_bgGameLoaded);
+                        imageLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, e_bgGameLoaded);
+                        imageLoader.load(new URLRequest(path), AirContext.getLoaderContext());
+                        break;
+                    }
                 }
             }
         }

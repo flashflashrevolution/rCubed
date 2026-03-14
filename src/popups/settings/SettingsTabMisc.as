@@ -14,7 +14,10 @@ package popups.settings
     import com.flashfla.utils.sprintf;
     import flash.events.Event;
     import flash.events.MouseEvent;
-    import flash.events.NativeWindowBoundsEvent;
+    CONFIG::air
+    {
+        import flash.events.NativeWindowBoundsEvent;
+    }
     import flash.net.URLRequest;
     import flash.net.navigateToURL;
     import flash.system.Capabilities;
@@ -35,9 +38,12 @@ package popups.settings
 
         private var useCacheCheckbox:BoxCheck;
         private var autoSaveLocalCheckbox:BoxCheck;
-        private var useVSyncCheckbox:BoxCheck;
-        private var useWebsocketCheckbox:BoxCheck;
-        private var openWebsocketOverlay:BoxButton;
+        CONFIG::air
+        {
+            private var useVSyncCheckbox:BoxCheck;
+            private var useWebsocketCheckbox:BoxCheck;
+            private var openWebsocketOverlay:BoxButton;
+        }
 
         private var reloadEngineData:BoxButton;
         private var switchUserAccount:BoxButton;
@@ -47,16 +53,19 @@ package popups.settings
         private var engineComboIgnore:Boolean;
         private var optionFPS:ValidatedText;
 
-        private var windowWidthBox:ValidatedText;
-        private var windowHeightBox:ValidatedText;
-        private var windowSizeSet:BoxButton;
-        private var windowSizeReset:BoxButton;
-        private var windowSaveSizeCheck:BoxCheck;
-        private var windowXBox:ValidatedText;
-        private var windowYBox:ValidatedText;
-        private var windowPositionSet:BoxButton;
-        private var windowPositionReset:BoxButton;
-        private var windowSavePositionCheck:BoxCheck;
+        CONFIG::air
+        {
+            private var windowWidthBox:ValidatedText;
+            private var windowHeightBox:ValidatedText;
+            private var windowSizeSet:BoxButton;
+            private var windowSizeReset:BoxButton;
+            private var windowSaveSizeCheck:BoxCheck;
+            private var windowXBox:ValidatedText;
+            private var windowYBox:ValidatedText;
+            private var windowPositionSet:BoxButton;
+            private var windowPositionReset:BoxButton;
+            private var windowSavePositionCheck:BoxCheck;
+        }
         private var windowFullscreen:BoxCheck;
         private var windowSaveFullscreen:BoxCheck;
 
@@ -72,10 +81,13 @@ package popups.settings
 
         override public function openTab():void
         {
-            Main.window.addEventListener(NativeWindowBoundsEvent.MOVE, e_windowPropertyChange);
-            Main.window.addEventListener(NativeWindowBoundsEvent.RESIZE, e_windowPropertyChange);
+            CONFIG::air
+            {
+                Main.window.addEventListener(NativeWindowBoundsEvent.MOVE, e_windowPropertyChange);
+                Main.window.addEventListener(NativeWindowBoundsEvent.RESIZE, e_windowPropertyChange);
+            }
 
-            container.stage.addEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDownMenu, true, int.MAX_VALUE - 10, true);
+            container.stage.addEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDownMenu, false, int.MAX_VALUE - 10, true);
 
             container.graphics.lineStyle(1, 0xFFFFFF, 0.35);
             container.graphics.moveTo(295, 15);
@@ -123,14 +135,17 @@ package popups.settings
             useCacheCheckbox = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
             yOff += 30;
 
-            new Text(container, xOff + 23, yOff, _lang.string("air_options_use_websockets"));
-            useWebsocketCheckbox = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
-            useWebsocketCheckbox.addEventListener(MouseEvent.MOUSE_OVER, e_websocketMouseOver, false, 0, true);
-            yOff += 30;
+            CONFIG::air
+            {
+                new Text(container, xOff + 23, yOff, _lang.string("air_options_use_websockets"));
+                useWebsocketCheckbox = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
+                useWebsocketCheckbox.addEventListener(MouseEvent.MOUSE_OVER, e_websocketMouseOver, false, 0, true);
+                yOff += 30;
 
-            // https://github.com/flashflashrevolution/web-stream-overlay
-            openWebsocketOverlay = new BoxButton(container, xOff, yOff, 245, 27, _lang.string("options_overlay_instructions"), 12, clickHandler);
-            yOff += 30;
+                // https://github.com/flashflashrevolution/web-stream-overlay
+                openWebsocketOverlay = new BoxButton(container, xOff, yOff, 245, 27, _lang.string("options_overlay_instructions"), 12, clickHandler);
+                yOff += 30;
+            }
 
             yOff += drawSeperator(container, xOff, 266, yOff, 0, 2);
 
@@ -176,46 +191,52 @@ package popups.settings
 
             optionFPS = new ValidatedText(container, xOff + 3, yOff + 3, 120, 20, ValidatedText.R_INT_P, changeHandler);
 
-            new Text(container, xOff + 163, yOff + 4, _lang.string("air_options_use_vsync"));
-            useVSyncCheckbox = new BoxCheck(container, xOff + 143, yOff + 7, clickHandler);
-            if (!Main.VSYNC_SUPPORT)
+            CONFIG::air
             {
-                useVSyncCheckbox.alpha = 0.5;
-                useVSyncCheckbox.addEventListener(MouseEvent.MOUSE_OVER, e_vsyncMouseOver, false, 0, true);
+                new Text(container, xOff + 163, yOff + 4, _lang.string("air_options_use_vsync"));
+                useVSyncCheckbox = new BoxCheck(container, xOff + 143, yOff + 7, clickHandler);
+                if (!Main.VSYNC_SUPPORT)
+                {
+                    useVSyncCheckbox.alpha = 0.5;
+                    useVSyncCheckbox.addEventListener(MouseEvent.MOUSE_OVER, e_vsyncMouseOver, false, 0, true);
+                }
             }
             yOff += 30;
 
             yOff += drawSeperator(container, xOff, 266, yOff, 0, 0);
 
-            // Window Size
-            new Text(container, xOff, yOff, _lang.string("air_options_window_size"));
-            yOff += 20;
+            CONFIG::air
+            {
+                // Window Size
+                new Text(container, xOff, yOff, _lang.string("air_options_window_size"));
+                yOff += 20;
 
-            windowWidthBox = new ValidatedText(container, xOff + 3, yOff + 3, 60, 20, ValidatedText.R_INT);
-            new Text(container, xOff + 73, yOff + 3, "X");
-            windowHeightBox = new ValidatedText(container, xOff + 93, yOff + 3, 60, 20, ValidatedText.R_INT);
-            windowSizeSet = new BoxButton(container, xOff + 163, yOff + 3, 51, 21, "Set", 12, clickHandler);
-            windowSizeReset = new BoxButton(container, xOff + 223, yOff + 3, 21, 21, "R", 12, clickHandler);
-            yOff += 30;
+                windowWidthBox = new ValidatedText(container, xOff + 3, yOff + 3, 60, 20, ValidatedText.R_INT);
+                new Text(container, xOff + 73, yOff + 3, "X");
+                windowHeightBox = new ValidatedText(container, xOff + 93, yOff + 3, 60, 20, ValidatedText.R_INT);
+                windowSizeSet = new BoxButton(container, xOff + 163, yOff + 3, 51, 21, "Set", 12, clickHandler);
+                windowSizeReset = new BoxButton(container, xOff + 223, yOff + 3, 21, 21, "R", 12, clickHandler);
+                yOff += 30;
 
-            new Text(container, xOff + 23, yOff, _lang.string("air_options_save_window_size"));
-            windowSaveSizeCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
-            yOff += 30;
+                new Text(container, xOff + 23, yOff, _lang.string("air_options_save_window_size"));
+                windowSaveSizeCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
+                yOff += 30;
 
-            // Window Position
-            new Text(container, xOff, yOff, _lang.string("air_options_window_position"));
-            yOff += 20;
+                // Window Position
+                new Text(container, xOff, yOff, _lang.string("air_options_window_position"));
+                yOff += 20;
 
-            windowXBox = new ValidatedText(container, xOff + 3, yOff + 3, 60, 20, ValidatedText.R_INT);
-            new Text(container, xOff + 73, yOff + 3, "X");
-            windowYBox = new ValidatedText(container, xOff + 93, yOff + 3, 60, 20, ValidatedText.R_INT);
-            windowPositionSet = new BoxButton(container, xOff + 163, yOff + 3, 51, 21, "Set", 12, clickHandler);
-            windowPositionReset = new BoxButton(container, xOff + 223, yOff + 3, 21, 21, "R", 12, clickHandler);
-            yOff += 30;
+                windowXBox = new ValidatedText(container, xOff + 3, yOff + 3, 60, 20, ValidatedText.R_INT);
+                new Text(container, xOff + 73, yOff + 3, "X");
+                windowYBox = new ValidatedText(container, xOff + 93, yOff + 3, 60, 20, ValidatedText.R_INT);
+                windowPositionSet = new BoxButton(container, xOff + 163, yOff + 3, 51, 21, "Set", 12, clickHandler);
+                windowPositionReset = new BoxButton(container, xOff + 223, yOff + 3, 21, 21, "R", 12, clickHandler);
+                yOff += 30;
 
-            new Text(container, xOff + 23, yOff, _lang.string("air_options_save_window_position"));
-            windowSavePositionCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
-            yOff += 30;
+                new Text(container, xOff + 23, yOff, _lang.string("air_options_save_window_position"));
+                windowSavePositionCheck = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
+                yOff += 30;
+            }
 
             new Text(container, xOff + 23, yOff, _lang.string("air_options_fullscreen"));
             windowFullscreen = new BoxCheck(container, xOff + 3, yOff + 3, clickHandler);
@@ -229,8 +250,11 @@ package popups.settings
 
         override public function closeTab():void
         {
-            Main.window.removeEventListener(NativeWindowBoundsEvent.MOVE, e_windowPropertyChange);
-            Main.window.removeEventListener(NativeWindowBoundsEvent.RESIZE, e_windowPropertyChange);
+            CONFIG::air
+            {
+                Main.window.removeEventListener(NativeWindowBoundsEvent.MOVE, e_windowPropertyChange);
+                Main.window.removeEventListener(NativeWindowBoundsEvent.RESIZE, e_windowPropertyChange);
+            }
             container.stage.removeEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDownMenu);
         }
 
@@ -243,20 +267,23 @@ package popups.settings
 
             autoSaveLocalCheckbox.checked = _gvars.air_autoSaveLocalReplays;
             useCacheCheckbox.checked = _gvars.air_useLocalFileCache;
-            useWebsocketCheckbox.checked = _gvars.air_useWebsockets;
+            CONFIG::air
+            {
+                useWebsocketCheckbox.checked = _gvars.air_useWebsockets;
 
-            if (Main.VSYNC_SUPPORT)
-                useVSyncCheckbox.checked = _gvars.air_useVSync;
-            else
-                useVSyncCheckbox.checked = true;
+                if (Main.VSYNC_SUPPORT)
+                    useVSyncCheckbox.checked = _gvars.air_useVSync;
+                else
+                    useVSyncCheckbox.checked = true;
 
-            windowWidthBox.text = _gvars.air_windowProperties.width;
-            windowHeightBox.text = _gvars.air_windowProperties.height;
-            windowXBox.text = _gvars.air_windowProperties.x;
-            windowYBox.text = _gvars.air_windowProperties.y;
+                windowWidthBox.text = _gvars.air_windowProperties.width;
+                windowHeightBox.text = _gvars.air_windowProperties.height;
+                windowXBox.text = _gvars.air_windowProperties.x;
+                windowYBox.text = _gvars.air_windowProperties.y;
 
-            windowSavePositionCheck.checked = _gvars.air_saveWindowPosition;
-            windowSaveSizeCheck.checked = _gvars.air_saveWindowSize;
+                windowSavePositionCheck.checked = _gvars.air_saveWindowPosition;
+                windowSaveSizeCheck.checked = _gvars.air_saveWindowSize;
+            }
             windowSaveFullscreen.checked = _gvars.air_useFullScreen;
             windowFullscreen.checked = _gvars.isFullScreen();
         }
@@ -269,117 +296,128 @@ package popups.settings
                 e.target.checked = !e.target.checked;
                 _gvars.air_autoSaveLocalReplays = !_gvars.air_autoSaveLocalReplays;
                 LocalOptions.setVariable("auto_save_local_replays", _gvars.air_autoSaveLocalReplays);
+                return;
             }
 
             // SWF File Cache
-            else if (e.target == useCacheCheckbox)
+            if (e.target == useCacheCheckbox)
             {
                 e.target.checked = !e.target.checked;
                 _gvars.air_useLocalFileCache = !_gvars.air_useLocalFileCache;
                 LocalOptions.setVariable("use_local_file_cache", _gvars.air_useLocalFileCache);
+                return;
             }
 
-            // Vsync Toggle
-            else if (e.target == useVSyncCheckbox)
+            CONFIG::air
             {
-                if (Main.VSYNC_SUPPORT)
+                // Vsync Toggle
+                if (e.target == useVSyncCheckbox)
                 {
-                    e.target.checked = !e.target.checked;
-                    _gvars.gameMain.stage.vsyncEnabled = _gvars.air_useVSync = !_gvars.air_useVSync;
-                    LocalOptions.setVariable("vsync", _gvars.air_useVSync);
-                }
-            }
-
-            // Use HTTP Websockets
-            else if (e.target == useWebsocketCheckbox)
-            {
-                if (_gvars.air_useWebsockets)
-                {
-                    _gvars.destroyWebsocketServer();
-                    _gvars.air_useWebsockets = false;
-                    useWebsocketCheckbox.checked = false;
-                    LocalOptions.setVariable("use_websockets", _gvars.air_useWebsockets);
-                }
-                else
-                {
-                    if (_gvars.initWebsocketServer())
+                    if (Main.VSYNC_SUPPORT)
                     {
-                        _gvars.air_useWebsockets = true;
-                        useWebsocketCheckbox.checked = true;
+                        e.target.checked = !e.target.checked;
+                        _gvars.gameMain.stage.vsyncEnabled = _gvars.air_useVSync = !_gvars.air_useVSync;
+                        LocalOptions.setVariable("vsync", _gvars.air_useVSync);
+                    }
+                    return;
+                }
+
+                // Use HTTP Websockets
+                if (e.target == useWebsocketCheckbox)
+                {
+                    if (_gvars.air_useWebsockets)
+                    {
+                        _gvars.destroyWebsocketServer();
+                        _gvars.air_useWebsockets = false;
+                        useWebsocketCheckbox.checked = false;
                         LocalOptions.setVariable("use_websockets", _gvars.air_useWebsockets);
-                        e_websocketMouseOver();
                     }
                     else
                     {
-                        useWebsocketCheckbox.checked = false;
-                        Alert.add(_lang.string("air_options_unable_to_start_websockets"), 120, Alert.RED);
+                        if (_gvars.initWebsocketServer())
+                        {
+                            _gvars.air_useWebsockets = true;
+                            useWebsocketCheckbox.checked = true;
+                            LocalOptions.setVariable("use_websockets", _gvars.air_useWebsockets);
+                            e_websocketMouseOver();
+                        }
+                        else
+                        {
+                            useWebsocketCheckbox.checked = false;
+                            Alert.add(_lang.string("air_options_unable_to_start_websockets"), 120, Alert.RED);
+                        }
                     }
+                    return;
+                }
+
+                // HTTP Websockets Instructions
+                if (e.target == openWebsocketOverlay)
+                {
+                    navigateToURL(new URLRequest(Constant.WEBSOCKET_OVERLAY_URL), "_blank");
+                    return;
+                }
+
+                // Window Position
+                if (e.target == windowSavePositionCheck)
+                {
+                    e.target.checked = !e.target.checked;
+                    _gvars.air_saveWindowPosition = !_gvars.air_saveWindowPosition;
+                    LocalOptions.setVariable("save_window_position", _gvars.air_saveWindowPosition);
+                    return;
+                }
+                if (e.target == windowPositionSet)
+                {
+                    parent.addChild(new WindowSettingConfirm(this, _gvars.air_windowProperties));
+                    _gvars.air_windowProperties["x"] = windowXBox.validate(Math.round((Capabilities.screenResolutionX - Main.window.width) * 0.5));
+                    _gvars.air_windowProperties["y"] = windowYBox.validate(Math.round((Capabilities.screenResolutionY - Main.window.height) * 0.5));
+                    e_windowSetUpdate();
+                    windowFullscreen.checked = _gvars.isFullScreen();
+                    return;
+                }
+                if (e.target == windowPositionReset)
+                {
+                    _gvars.air_windowProperties["x"] = Math.round((Capabilities.screenResolutionX - Main.window.width) * 0.5);
+                    _gvars.air_windowProperties["y"] = Math.round((Capabilities.screenResolutionY - Main.window.height) * 0.5);
+                    e_windowSetUpdate();
+                    windowFullscreen.checked = _gvars.isFullScreen();
+                    return;
+                }
+
+                // Window Size
+                if (e.target == windowSaveSizeCheck)
+                {
+                    e.target.checked = !e.target.checked;
+                    _gvars.air_saveWindowSize = !_gvars.air_saveWindowSize;
+                    LocalOptions.setVariable("save_window_size", _gvars.air_saveWindowSize);
+                    return;
+                }
+                if (e.target == windowSizeSet)
+                {
+                    parent.addChild(new WindowSettingConfirm(this, _gvars.air_windowProperties));
+                    _gvars.air_windowProperties["width"] = windowWidthBox.validate(Main.GAME_WIDTH);
+                    _gvars.air_windowProperties["height"] = windowHeightBox.validate(Main.GAME_HEIGHT);
+                    e_windowSetUpdate();
+                    windowFullscreen.checked = _gvars.isFullScreen();
+                    return;
+                }
+                if (e.target == windowSizeReset)
+                {
+                    _gvars.air_windowProperties["width"] = Main.GAME_WIDTH;
+                    _gvars.air_windowProperties["height"] = Main.GAME_HEIGHT;
+                    e_windowSetUpdate();
+                    windowFullscreen.checked = _gvars.isFullScreen();
+                    return;
                 }
             }
 
-            // HTTP Websockets Instructions
-            else if (e.target == openWebsocketOverlay)
-            {
-                navigateToURL(new URLRequest(Constant.WEBSOCKET_OVERLAY_URL), "_blank");
-            }
-
             //- Engine Reload
-            else if (e.target == reloadEngineData)
+            if (e.target == reloadEngineData)
             {
                 _gvars.reloadEngineData();
             }
-
             else if (e.target == switchUserAccount)
             {
                 _gvars.switchUserAccount();
-            }
-
-            // Window Position
-            else if (e.target == windowSavePositionCheck)
-            {
-                e.target.checked = !e.target.checked;
-                _gvars.air_saveWindowPosition = !_gvars.air_saveWindowPosition;
-                LocalOptions.setVariable("save_window_position", _gvars.air_saveWindowPosition);
-            }
-            else if (e.target == windowPositionSet)
-            {
-                parent.addChild(new WindowSettingConfirm(this, _gvars.air_windowProperties));
-
-                _gvars.air_windowProperties["x"] = windowXBox.validate(Math.round((Capabilities.screenResolutionX - Main.window.width) * 0.5));
-                _gvars.air_windowProperties["y"] = windowYBox.validate(Math.round((Capabilities.screenResolutionY - Main.window.height) * 0.5));
-                e_windowSetUpdate();
-                windowFullscreen.checked = _gvars.isFullScreen();
-            }
-            else if (e.target == windowPositionReset)
-            {
-                _gvars.air_windowProperties["x"] = Math.round((Capabilities.screenResolutionX - Main.window.width) * 0.5);
-                _gvars.air_windowProperties["y"] = Math.round((Capabilities.screenResolutionY - Main.window.height) * 0.5);
-                e_windowSetUpdate();
-                windowFullscreen.checked = _gvars.isFullScreen();
-            }
-
-            // Window Size
-            else if (e.target == windowSaveSizeCheck)
-            {
-                e.target.checked = !e.target.checked;
-                _gvars.air_saveWindowSize = !_gvars.air_saveWindowSize;
-                LocalOptions.setVariable("save_window_size", _gvars.air_saveWindowSize);
-            }
-            else if (e.target == windowSizeSet)
-            {
-                parent.addChild(new WindowSettingConfirm(this, _gvars.air_windowProperties));
-
-                _gvars.air_windowProperties["width"] = windowWidthBox.validate(Main.GAME_WIDTH);
-                _gvars.air_windowProperties["height"] = windowHeightBox.validate(Main.GAME_HEIGHT);
-                e_windowSetUpdate();
-                windowFullscreen.checked = _gvars.isFullScreen();
-            }
-            else if (e.target == windowSizeReset)
-            {
-                _gvars.air_windowProperties["width"] = Main.GAME_WIDTH;
-                _gvars.air_windowProperties["height"] = Main.GAME_HEIGHT;
-                e_windowSetUpdate();
-                windowFullscreen.checked = _gvars.isFullScreen();
             }
             else if (e.target == windowSaveFullscreen)
             {
@@ -420,6 +458,7 @@ package popups.settings
             }
         }
 
+        CONFIG::air
         private function e_windowPropertyChange(e:Event):void
         {
             windowWidthBox.text = _gvars.air_windowProperties["width"];
@@ -431,14 +470,18 @@ package popups.settings
 
         public function e_windowSetUpdate():void
         {
-            _gvars.gameMain.ignoreWindowChanges = true;
-            Main.window.x = _gvars.air_windowProperties["x"];
-            Main.window.y = _gvars.air_windowProperties["y"];
-            Main.window.width = _gvars.air_windowProperties["width"] + Main.WINDOW_WIDTH_EXTRA;
-            Main.window.height = _gvars.air_windowProperties["height"] + Main.WINDOW_HEIGHT_EXTRA;
-            _gvars.gameMain.ignoreWindowChanges = false;
+            CONFIG::air
+            {
+                _gvars.gameMain.ignoreWindowChanges = true;
+                Main.window.x = _gvars.air_windowProperties["x"];
+                Main.window.y = _gvars.air_windowProperties["y"];
+                Main.window.width = _gvars.air_windowProperties["width"] + Main.WINDOW_WIDTH_EXTRA;
+                Main.window.height = _gvars.air_windowProperties["height"] + Main.WINDOW_HEIGHT_EXTRA;
+                _gvars.gameMain.ignoreWindowChanges = false;
+            }
         }
 
+        CONFIG::air
         private function e_websocketMouseOver(e:Event = null):void
         {
             if (_gvars.air_useWebsockets)
@@ -452,6 +495,7 @@ package popups.settings
             }
         }
 
+        CONFIG::air
         private function e_websocketMouseOut(e:Event):void
         {
             useWebsocketCheckbox.removeEventListener(MouseEvent.MOUSE_OUT, e_websocketMouseOut);
@@ -576,12 +620,14 @@ package popups.settings
             engineComboIgnore = false;
         }
 
+        CONFIG::air
         private function e_vsyncMouseOver(e:Event):void
         {
             useVSyncCheckbox.addEventListener(MouseEvent.MOUSE_OUT, e_vsyncMouseOut);
             displayToolTip(useVSyncCheckbox.x - 4, useVSyncCheckbox.y, _lang.string("air_options_use_vsync_unavailable"), "right");
         }
 
+        CONFIG::air
         private function e_vsyncMouseOut(e:Event):void
         {
             useVSyncCheckbox.removeEventListener(MouseEvent.MOUSE_OUT, e_vsyncMouseOut);

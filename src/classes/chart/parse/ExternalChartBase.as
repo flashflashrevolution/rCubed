@@ -10,9 +10,12 @@ package classes.chart.parse
     import flash.events.ErrorEvent;
     import flash.events.IOErrorEvent;
     import flash.events.SecurityErrorEvent;
-    import flash.filesystem.File;
-    import flash.filesystem.FileMode;
-    import flash.filesystem.FileStream;
+    CONFIG::air
+    {
+        import flash.filesystem.File;
+        import flash.filesystem.FileMode;
+        import flash.filesystem.FileStream;
+    }
     import flash.utils.ByteArray;
 
     public class ExternalChartBase
@@ -127,6 +130,63 @@ package classes.chart.parse
 
         //----------------------------------------------------------------------------------------------------------//
 
+        public function loadFromBytes(chartBytes:ByteArray, filename:String, audioBytes:ByteArray = null):Boolean
+        {
+            var dotIdx:int = filename.lastIndexOf(".");
+            if (dotIdx == -1)
+                return false;
+
+            var ext:String = filename.substr(dotIdx + 1).toLowerCase();
+            if (VALID_CHART_EXTENSIONS.indexOf(ext) == -1)
+                return false;
+
+            info['filename'] = filename;
+            parser = getParser(ext);
+
+            CHART_BYTES = chartBytes;
+
+            if (parser.load(CHART_BYTES, filename))
+            {
+                info['ext'] = ext;
+                info['name'] = parser.data.title || "???";
+                info['display'] = parser.data.title || "???";
+                info['author'] = parser.data.artist || "???";
+                info['stepauthor'] = parser.data.stepauthor || "???";
+                info['difficulty'] = parser.data.difficulty || 1;
+                info['arrows'] = parser.data.notes[DEFAULT_CHART_ID].arrows;
+                info['holds'] = parser.data.notes[DEFAULT_CHART_ID].holds;
+                info['mines'] = parser.data.notes[DEFAULT_CHART_ID].mines;
+                info['time_secs'] = getChartTime(DEFAULT_CHART_ID);
+                info['time'] = getChartTimeFormat(info['time_secs']);
+                info['music'] = parser.data.music || "";
+                info['banner'] = parser.data.banner || "";
+                info['background'] = parser.data.background || "";
+
+                ID = MD5.hashBytes(CHART_BYTES);
+                DATE = new Date().getTime();
+                info['folder'] = "";
+
+                if (audioBytes != null)
+                {
+                    AUDIO_BYTES = audioBytes;
+                }
+                else
+                {
+                    // No audio provided and can't read from disk
+                    if (parser.data.music.length >= 4
+                        && parser.data.music.substr(-3).toLowerCase() == "mp3")
+                    {
+                        return false;
+                    }
+                }
+
+                fileQueue.length = 0;
+                return true;
+            }
+            return false;
+        }
+
+        CONFIG::air
         public function load(folder:File, skipMusicLoad:Boolean = false):Boolean
         {
             // Search Folder for Parseable Files
@@ -230,6 +290,7 @@ package classes.chart.parse
             return null;
         }
 
+        CONFIG::air
         public function readFile(file:File):ByteArray
         {
             if (!file.exists)

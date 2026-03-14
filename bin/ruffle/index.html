@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>rCubed</title>
+    <style>
+        * { margin: 0; padding: 0; }
+        html, body { height: 100%; background: #0a0a0a; }
+        body {
+            display: flex; justify-content: center; align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        /* Grid pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-size: 40px 40px;
+            background-image:
+                linear-gradient(to right, rgba(255,255,255,.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,.04) 1px, transparent 1px);
+        }
+        /* Radial fade */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at center, transparent 20%, #0a0a0a 70%);
+        }
+        #player {
+            position: relative;
+            z-index: 1;
+            width: 780px;
+            height: 480px;
+            background: #000;
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 0 1px rgba(255,255,255,.05), 0 20px 50px rgba(0,0,0,.5);
+        }
+        ruffle-player { width: 100%; height: 100%; display: block; }
+    </style>
+</head>
+<body>
+    <div id="player"></div>
+    <script>
+        // Force preserveDrawingBuffer so canvas screenshots aren't blank
+        const _origGetContext = HTMLCanvasElement.prototype.getContext;
+        HTMLCanvasElement.prototype.getContext = function(type, attrs) {
+            if (type === "webgl" || type === "webgl2") {
+                attrs = Object.assign({}, attrs, { preserveDrawingBuffer: true });
+            }
+            return _origGetContext.call(this, type, attrs);
+        };
+    </script>
+    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+    <script>
+        let r3Player = null;
+
+        window.addEventListener("DOMContentLoaded", async () => {
+            await r3_initIdb();
+            const ruffle = window.RufflePlayer.newest();
+            r3Player = ruffle.createPlayer();
+            r3Player.style.width = "780px";
+            r3Player.style.height = "480px";
+            document.getElementById("player").appendChild(r3Player);
+            await r3Player.load({
+                url: "R3Ruffle.swf",
+                allowScriptAccess: true,
+                splashScreen: false,
+                autoplay: "on"
+            });
+        });
+
+        // JS-controlled audio playback for rate mods
+        let r3AudioBuffer = null;
+        let r3AudioCtx = null;
+        let r3AudioSource = null;
+        let r3GainNode = null;
+        let r3StartTime = 0;
+        let r3StartOffset = 0;
+        let r3IsPlaying = false;
+
+        window.r3_resampleAudio = async function(mp3Base64, rate, reverse) {
+            try {
+                const binaryString = atob(mp3Base64);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                const decodeCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const decoded = await decodeCtx.decodeAudioData(bytes.buffer.slice(0));
+                decodeCtx.close();
+
+                const srcLeft = decoded.getChannelData(0);
+                const srcRight = decoded.numberOfChannels > 1 ? decoded.getChannelData(1) : srcLeft;
+                const srcLength = srcLeft.length;
+                const sampleRate = decoded.sampleRate;
+                const outputLength = Math.floor(srcLength / rate);
+                const outLeft = new Float32Array(outputLength);
+                const outRight = new Float32Array(outputLength);
+
+                for (let i = 0; i < outputLength; i++) {
+                    let srcIdx;
+                    if (reverse) {
+                        srcIdx = srcLength - 1 - (i * rate);
+                    } else {
+                        srcIdx = i * rate;
+                    }
+                    const idx = Math.floor(srcIdx);
+                    const frac = srcIdx - idx;
+                    if (idx >= 0 && idx < srcLength - 1) {
+                        outLeft[i] = srcLeft[idx] * (1 - frac) + srcLeft[idx + 1] * frac;
+                        outRight[i] = srcRight[idx] * (1 - frac) + srcRight[idx + 1] * frac;
+                    } else if (idx >= 0 && idx < srcLength) {
+                        outLeft[i] = srcLeft[idx];
+                        outRight[i] = srcRight[idx];
+                    }
+                }
+                // Create persistent AudioContext and store the resampled buffer
+                if (r3AudioCtx) r3AudioCtx.close();
+                r3AudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                r3GainNode = r3AudioCtx.createGain();
+                r3GainNode.connect(r3AudioCtx.destination);
+
+                r3AudioBuffer = r3AudioCtx.createBuffer(2, outputLength, sampleRate);
+                r3AudioBuffer.getChannelData(0).set(outLeft);
+                r3AudioBuffer.getChannelData(1).set(outRight);
+
+                if (r3Player) {
+                    r3Player.r3_onResampleReady();
+                }
+            } catch (e) {
+                console.error("[r3] r3_resampleAudio error:", e);
+            }
+        };
+
+        window.r3_playAudio = function(positionMs, volume) {
+            if (!r3AudioBuffer || !r3AudioCtx) return;
+            if (r3AudioCtx.state === "suspended") r3AudioCtx.resume();
+
+            // Stop any current source
+            if (r3AudioSource) {
+                try { r3AudioSource.stop(); } catch(e) {}
+                r3AudioSource.disconnect();
+                r3AudioSource = null;
+            }
+
+            r3AudioSource = r3AudioCtx.createBufferSource();
+            r3AudioSource.buffer = r3AudioBuffer;
+            r3AudioSource.connect(r3GainNode);
+            r3GainNode.gain.value = volume;
+
+            r3StartOffset = Math.max(0, positionMs / 1000);
+            r3StartTime = r3AudioCtx.currentTime;
+            r3AudioSource.start(0, r3StartOffset);
+            r3IsPlaying = true;
+
+            r3AudioSource.onended = function() {
+                r3IsPlaying = false;
+                if (r3Player) {
+                    try { r3Player.r3_onSongComplete(); } catch(e) {}
+                }
+            };
+        };
+
+        window.r3_stopAudio = function() {
+            if (r3AudioSource) {
+                try { r3AudioSource.stop(); } catch(e) {}
+                r3AudioSource.disconnect();
+                r3AudioSource = null;
+            }
+            r3IsPlaying = false;
+        };
+
+        window.r3_getPosition = function() {
+            if (!r3IsPlaying || !r3AudioCtx) return 0;
+            return (r3StartOffset + (r3AudioCtx.currentTime - r3StartTime)) * 1000;
+        };
+
+        // Ruffle: BitmapData.draw() returns blank data, so screenshots use
+        // the canvas directly via ExternalInterface. preserveDrawingBuffer
+        // is patched above to prevent WebGL from clearing the framebuffer.
+        window.r3_takeScreenshot = function(filename) {
+            try {
+                const canvas = r3Player.shadowRoot.querySelector("canvas");
+                if (!canvas) return false;
+                canvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = filename || "screenshot.png";
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, "image/png");
+                return true;
+            } catch (e) {
+                console.error("[r3] r3_takeScreenshot error:", e);
+                return false;
+            }
+        };
+
+        // --- WebSocket bridge for multiplayer ---
+        let r3Ws = null;
+
+        function arrayBufferToBase64(buffer) {
+            const bytes = new Uint8Array(buffer);
+            let binary = '';
+            for (let i = 0; i < bytes.length; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary);
+        }
+
+        function base64ToArrayBuffer(base64) {
+            const binary = atob(base64);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+                bytes[i] = binary.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        window.r3_wsConnect = function(url) {
+            if (r3Ws) { try { r3Ws.close(); } catch(e) {} }
+            r3Ws = new WebSocket(url, ["r3"]);
+            r3Ws.binaryType = "arraybuffer";
+            r3Ws.onopen = () => {
+                if (r3Player) r3Player.r3_onWsOpen();
+            };
+            r3Ws.onclose = (e) => {
+                if (r3Player) r3Player.r3_onWsClose(e.code, e.reason, e.wasClean);
+                r3Ws = null;
+            };
+            r3Ws.onerror = () => {
+                if (r3Player) r3Player.r3_onWsError("Connection failed");
+            };
+            r3Ws.onmessage = (e) => {
+                if (!r3Player) return;
+                if (typeof e.data === "string") {
+                    r3Player.r3_onWsMessage(e.data);
+                } else {
+                    r3Player.r3_onWsBinaryMessage(arrayBufferToBase64(e.data));
+                }
+            };
+        };
+
+        window.r3_wsSend = function(data) {
+            if (r3Ws && r3Ws.readyState === WebSocket.OPEN) r3Ws.send(data);
+        };
+
+        window.r3_wsSendBinary = function(base64) {
+            if (r3Ws && r3Ws.readyState === WebSocket.OPEN) r3Ws.send(base64ToArrayBuffer(base64));
+        };
+
+        window.r3_wsClose = function() {
+            if (r3Ws) { try { r3Ws.close(); } catch(e) {} r3Ws = null; }
+        };
+
+        // --- File picker for custom charts ---
+        window.r3_openChartFile = function() {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = ".sm,.ssc,.osu,.qua";
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64 = arrayBufferToBase64(reader.result);
+                    if (r3Player) r3Player.r3_onChartFileSelected(file.name, base64);
+                };
+                reader.readAsArrayBuffer(file);
+            };
+            input.click();
+        };
+
+        window.r3_openAudioFile = function() {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = ".mp3";
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64 = arrayBufferToBase64(reader.result);
+                    if (r3Player) r3Player.r3_onAudioFileSelected(file.name, base64);
+                };
+                reader.readAsArrayBuffer(file);
+            };
+            input.click();
+        };
+
+        window.r3_openNoteskinFile = function() {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = ".txt,.json";
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    if (r3Player) r3Player.r3_onNoteskinFileSelected(file.name, reader.result);
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        };
+
+        // --- IndexedDB cache for binary data (songs, replays, menu music) ---
+        let r3IdbKeys = new Set();
+        let r3Idb = null;
+        let r3IdbNextId = 1;
+
+        async function r3_initIdb() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open("r3_file_cache", 1);
+                req.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains("files")) {
+                        db.createObjectStore("files", { keyPath: "path" });
+                    }
+                };
+                req.onsuccess = (e) => {
+                    r3Idb = e.target.result;
+                    const tx = r3Idb.transaction("files", "readonly");
+                    const store = tx.objectStore("files");
+                    const keysReq = store.getAllKeys();
+                    keysReq.onsuccess = () => {
+                        for (const k of keysReq.result) r3IdbKeys.add(k);
+                        resolve();
+                    };
+                    keysReq.onerror = () => resolve();
+                };
+                req.onerror = () => resolve();
+            });
+        }
+
+        window.r3_idbExists = function(path) {
+            return r3IdbKeys.has(path);
+        };
+
+        window.r3_idbRead = function(path) {
+            const id = r3IdbNextId++;
+            if (!r3Idb) {
+                setTimeout(() => { if (r3Player) r3Player.r3_onIdbRead(id, ""); }, 0);
+                return id;
+            }
+            const tx = r3Idb.transaction("files", "readonly");
+            const store = tx.objectStore("files");
+            const req = store.get(path);
+            req.onsuccess = () => {
+                const base64 = req.result ? arrayBufferToBase64(req.result.data) : "";
+                if (r3Player) r3Player.r3_onIdbRead(id, base64);
+            };
+            req.onerror = () => {
+                if (r3Player) r3Player.r3_onIdbRead(id, "");
+            };
+            return id;
+        };
+
+        window.r3_idbWrite = function(path, base64data) {
+            r3IdbKeys.add(path);
+            if (!r3Idb) return;
+            const tx = r3Idb.transaction("files", "readwrite");
+            const store = tx.objectStore("files");
+            store.put({ path: path, data: base64ToArrayBuffer(base64data) });
+        };
+
+        window.r3_idbDelete = function(path) {
+            r3IdbKeys.delete(path);
+            if (!r3Idb) return;
+            const tx = r3Idb.transaction("files", "readwrite");
+            const store = tx.objectStore("files");
+            store.delete(path);
+        };
+
+        window.r3_screenshotToClipboard = function() {
+            try {
+                const canvas = r3Player.shadowRoot.querySelector("canvas");
+                if (!canvas || !navigator.clipboard || !window.ClipboardItem) return false;
+                canvas.toBlob(function(blob) {
+                    navigator.clipboard.write([
+                        new ClipboardItem({"image/png": blob})
+                    ]).catch(function(e) {
+                        console.error("[r3] clipboard write error:", e);
+                    });
+                }, "image/png");
+                return true;
+            } catch (e) {
+                console.error("[r3] r3_screenshotToClipboard error:", e);
+                return false;
+            }
+        };
+
+    </script>
+</body>
+</html>

@@ -396,8 +396,11 @@ package game
             if (!options.isEditor && !options.replay && !isMultiplayerSpectator)
                 Mouse.hide();
 
-            if (song.songInfo && song.songInfo.name)
-                Main.window.title = Constant.AIR_WINDOW_TITLE + " - " + StringUtil.stripHtml(song.songInfo.name);
+            CONFIG::air
+            {
+                if (song.songInfo && song.songInfo.name)
+                    Main.window.title = Constant.AIR_WINDOW_TITLE + " - " + StringUtil.stripHtml(song.songInfo.name);
+            }
 
             // Prebuild Websocket Message, this is updated instead of creating a new object every message.
             SOCKET_SONG_MESSAGE = {"player": {
@@ -474,13 +477,21 @@ package game
                 editorMenu = new EditorMenu(this);
                 editorSpriteMenus = [];
                 stage.addEventListener(Event.ENTER_FRAME, e_onFrameEditor, false, int.MAX_VALUE - 10, true);
-                stage.addEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDownEditor, true, int.MAX_VALUE - 10, true);
+                stage.addEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDownEditor, false, int.MAX_VALUE - 10, true);
             }
             else
             {
                 stage.addEventListener(Event.ENTER_FRAME, e_onFrame, false, int.MAX_VALUE - 10, true);
-                stage.addEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDown, true, int.MAX_VALUE - 10, true);
-                stage.addEventListener(KeyboardEvent.KEY_UP, e_onKeyUp, true, int.MAX_VALUE - 10, true);
+                CONFIG::air
+                {
+                    stage.addEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDown, true, int.MAX_VALUE - 10, true);
+                    stage.addEventListener(KeyboardEvent.KEY_UP, e_onKeyUp, true, int.MAX_VALUE - 10, true);
+                }
+                if (!CONFIG::air)
+                {
+                    stage.addEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDown, false, int.MAX_VALUE - 10, true);
+                    stage.addEventListener(KeyboardEvent.KEY_UP, e_onKeyUp, false, int.MAX_VALUE - 10, true);
+                }
 
                     //Main.window.addEventListener(Event.ACTIVATE, e_onWindowFocus);
                     //Main.window.addEventListener(Event.DEACTIVATE, e_onWindowFocus);
@@ -496,7 +507,10 @@ package game
         override public function stageRemove():void
         {
             // Reset Window Title
-            Main.window.title = Constant.AIR_WINDOW_TITLE;
+            CONFIG::air
+            {
+                Main.window.title = Constant.AIR_WINDOW_TITLE;
+            }
 
             stage.frameRate = 60;
 
@@ -504,13 +518,21 @@ package game
             {
                 _gvars.activeUser.screencutPosition = options.screencutPosition;
                 stage.removeEventListener(Event.ENTER_FRAME, e_onFrameEditor);
-                stage.removeEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDownEditor, true);
+                stage.removeEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDownEditor, false);
             }
             else
             {
                 stage.removeEventListener(Event.ENTER_FRAME, e_onFrame);
-                stage.removeEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDown, true);
-                stage.removeEventListener(KeyboardEvent.KEY_UP, e_onKeyUp, true);
+                CONFIG::air
+                {
+                    stage.removeEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDown, true);
+                    stage.removeEventListener(KeyboardEvent.KEY_UP, e_onKeyUp, true);
+                }
+                if (!CONFIG::air)
+                {
+                    stage.removeEventListener(KeyboardEvent.KEY_DOWN, e_onKeyDown, false);
+                    stage.removeEventListener(KeyboardEvent.KEY_UP, e_onKeyUp, false);
+                }
 
                     //Main.window.removeEventListener(Event.ACTIVATE, e_onWindowFocus);
                     //Main.window.removeEventListener(Event.DEACTIVATE, e_onWindowFocus);

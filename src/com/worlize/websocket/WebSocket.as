@@ -26,7 +26,11 @@ package com.worlize.websocket
     import flash.events.ProgressEvent;
     import flash.events.SecurityErrorEvent;
     import flash.events.TimerEvent;
-    import flash.net.SecureSocket;
+    import flash.external.ExternalInterface;
+    CONFIG::air
+    {
+        import flash.net.SecureSocket;
+    }
     import flash.net.Socket;
     import flash.utils.ByteArray;
     import flash.utils.Endian;
@@ -85,6 +89,9 @@ package com.worlize.websocket
         private var handshakeTimer:Timer;
         private var handshakeTimeout:int = 10000;
 
+        // Ruffle: Socket doesn't work in-browser, so we bridge to JS WebSocket via ExternalInterface
+        private var _useJSBridge:Boolean = false;
+
         public var config:WebSocketConfig = new WebSocketConfig();
 
         public var debug:Boolean = false;
@@ -135,7 +142,30 @@ package com.worlize.websocket
             handshakeTimer = new Timer(handshakeTimeout, 1);
             handshakeTimer.addEventListener(TimerEvent.TIMER, handleHandshakeTimer);
 
-            socket = secure ? new SecureSocket() : new Socket();
+            if (!CONFIG::air)
+            {
+                // Ruffle: Socket stub can't do TCP; bridge to browser WebSocket via ExternalInterface
+                if (ExternalInterface.available)
+                {
+                    _useJSBridge = true;
+                    ExternalInterface.addCallback("r3_onWsOpen", jsBridge_onOpen);
+                    ExternalInterface.addCallback("r3_onWsClose", jsBridge_onClose);
+                    ExternalInterface.addCallback("r3_onWsMessage", jsBridge_onMessage);
+                    ExternalInterface.addCallback("r3_onWsBinaryMessage", jsBridge_onBinaryMessage);
+                    ExternalInterface.addCallback("r3_onWsError", jsBridge_onError);
+                    _readyState = WebSocketState.INIT;
+                    return;
+                }
+            }
+
+            CONFIG::air
+            {
+                socket = secure ? new SecureSocket() : new Socket();
+            }
+            if (!CONFIG::air)
+            {
+                socket = new Socket();
+            }
             socket.endian = Endian.BIG_ENDIAN;
             socket.timeout = timeout;
 
@@ -146,6 +176,60 @@ package com.worlize.websocket
             socket.addEventListener(ProgressEvent.SOCKET_DATA, handleSocketData);
 
             _readyState = WebSocketState.INIT;
+        }
+
+        private function jsBridge_onOpen():void
+        {
+            _readyState = WebSocketState.OPEN;
+            dispatchEvent(new WebSocketEvent(WebSocketEvent.OPEN));
+        }
+
+        private function jsBridge_onClose(code:int, reason:String, wasClean:Boolean):void
+        {
+            if (_readyState == WebSocketState.CLOSED)
+                return;
+
+            _readyState = WebSocketState.CLOSED;
+
+            if (!wasClean || code != 1000)
+            {
+                var errorEvent:WebSocketErrorEvent = new WebSocketErrorEvent(WebSocketErrorEvent.ABNORMAL_CLOSE);
+                errorEvent.text = "Close code: " + code + " reason: " + reason;
+                dispatchEvent(errorEvent);
+            }
+
+            dispatchEvent(new WebSocketEvent(WebSocketEvent.CLOSED));
+        }
+
+        private function jsBridge_onMessage(data:String):void
+        {
+            var event:WebSocketEvent = new WebSocketEvent(WebSocketEvent.MESSAGE);
+            event.message = new WebSocketMessage();
+            event.message.type = WebSocketMessage.TYPE_UTF8;
+            event.message.utf8Data = data;
+            dispatchEvent(event);
+        }
+
+        private function jsBridge_onBinaryMessage(base64:String):void
+        {
+            var event:WebSocketEvent = new WebSocketEvent(WebSocketEvent.MESSAGE);
+            event.message = new WebSocketMessage();
+            event.message.type = WebSocketMessage.TYPE_BINARY;
+            event.message.binaryData = Base64.decode(base64);
+            dispatchEvent(event);
+        }
+
+        private function jsBridge_onError(errorMsg:String):void
+        {
+            var errorEvent:WebSocketErrorEvent = new WebSocketErrorEvent(WebSocketErrorEvent.CONNECTION_FAIL);
+            errorEvent.text = errorMsg;
+            dispatchEvent(errorEvent);
+
+            if (_readyState != WebSocketState.CLOSED)
+            {
+                _readyState = WebSocketState.CLOSED;
+                dispatchEvent(new WebSocketEvent(WebSocketEvent.CLOSED));
+            }
         }
 
         private function validateProtocol():void
@@ -175,6 +259,21 @@ package com.worlize.websocket
 
         public function connect():void
         {
+            if (_useJSBridge)
+            {
+                if (_readyState === WebSocketState.INIT || _readyState === WebSocketState.CLOSED)
+                {
+                    _readyState = WebSocketState.CONNECTING;
+                    var wsUrl:String = uri;
+                    if (debug)
+                    {
+                        Logger.info(this, "JS Bridge connecting to " + wsUrl);
+                    }
+                    ExternalInterface.call("r3_wsConnect", wsUrl);
+                }
+                return;
+            }
+
             if (_readyState === WebSocketState.OPEN && !socket.connected)
             {
                 _readyState = WebSocketState.CLOSED;
@@ -196,10 +295,13 @@ package com.worlize.websocket
 
         public function addBinaryChainBuildingCertificate(certificate:ByteArray, trusted:Boolean):void
         {
-            if (!secure)
-                throw new Error("addBinaryChainBuildingCertificate only available for secure websockets");
+            CONFIG::air
+            {
+                if (!secure)
+                    throw new Error("addBinaryChainBuildingCertificate only available for secure websockets");
 
-            (socket as SecureSocket).addBinaryChainBuildingCertificate(certificate, trusted);
+                (socket as SecureSocket).addBinaryChainBuildingCertificate(certificate, trusted);
+            }
         }
 
         private function parseUrl():void
@@ -295,7 +397,7 @@ package com.worlize.websocket
 
         public function get connected():Boolean
         {
-            return readyState === WebSocketState.OPEN;
+            return _readyState === WebSocketState.OPEN;
         }
 
         // Pseudo masking is useful for speeding up wbesocket usage in a controlled environment,
@@ -322,6 +424,12 @@ package com.worlize.websocket
 
         public function sendUTF(data:String):void
         {
+            if (_useJSBridge)
+            {
+                verifyConnectionForSend();
+                ExternalInterface.call("r3_wsSend", data);
+                return;
+            }
             verifyConnectionForSend();
             var frame:WebSocketFrame = new WebSocketFrame();
             frame.opcode = WebSocketOpcode.TEXT_FRAME;
@@ -332,6 +440,13 @@ package com.worlize.websocket
 
         public function sendBytes(data:ByteArray):void
         {
+            if (_useJSBridge)
+            {
+                verifyConnectionForSend();
+                data.position = 0;
+                ExternalInterface.call("r3_wsSendBinary", Base64.encode(data));
+                return;
+            }
             verifyConnectionForSend();
             var frame:WebSocketFrame = new WebSocketFrame();
             frame.opcode = WebSocketOpcode.BINARY_FRAME;
@@ -427,6 +542,13 @@ package com.worlize.websocket
 
         public function close(waitForServer:Boolean = true):void
         {
+            if (_useJSBridge)
+            {
+                ExternalInterface.call("r3_wsClose");
+                dispatchClosedEvent();
+                return;
+            }
+
             if (!socket.connected && _readyState === WebSocketState.CONNECTING)
             {
                 _readyState = WebSocketState.CLOSED;

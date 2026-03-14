@@ -21,7 +21,10 @@ package game.results
             this.graphics.drawRect(0, 0, Main.GAME_WIDTH, Main.GAME_HEIGHT);
             this.graphics.endFill();
             this.cacheAsBitmap = true;
-            this.cacheAsBitmapMatrix = _matrix;
+            CONFIG::air
+            {
+                this.cacheAsBitmapMatrix = _matrix;
+            }
 
             var bt:BitmapData = new GameBackgroundStripes();
             this.graphics.beginBitmapFill(bt, null, false);

@@ -42,6 +42,8 @@ R^3 is the third and latest game engine for **[Flash Flash Revolution](http://ww
     - [Use AIR SDK](#use-air-sdk)
     - [Build Fonts](#build-fonts)
     - [Debugging](#debugging)
+  - [Building for Ruffle (macOS)](#building-for-ruffle-macos)
+  - [Building for Ruffle (Windows)](#building-for-ruffle-windows)
   - [Contributing](#contributing)
   - [Packaging](#packaging)
   - [Contact](#contact)
@@ -130,6 +132,48 @@ Files with the `.as` extension will now automatically format on save (You can ma
 
 ---
 
+## Building for Ruffle (macOS)
+
+```bash
+# SDK (once)
+git clone --depth 1 https://github.com/flashflashrevolution/rCubed-build-tools.git tools
+cd tools && git lfs pull && cd .. && mkdir -p airsdk && unzip -q tools/SDK-Lite.zip -d airsdk
+
+# Fonts (once)
+cd fonts && npx asconfigc --sdk ../airsdk --project asconfig.embed-fonts.json && cd ..
+
+# Build
+npx asconfigc --sdk airsdk --project asconfig.ruffle.json
+
+# Run
+npx serve bin/ruffle
+# Open http://localhost:3000
+```
+
+---
+
+## Building for Ruffle (Windows)
+
+```powershell
+# SDK (once)
+git clone --depth 1 https://github.com/flashflashrevolution/rCubed-build-tools.git tools
+cd tools; git lfs pull; cd ..
+New-Item -ItemType Directory -Force -Path airsdk | Out-Null
+Expand-Archive -Path tools\SDK-Lite.zip -DestinationPath airsdk
+
+# Fonts (once)
+cd fonts; npx asconfigc --sdk ..\airsdk --project asconfig.embed-fonts.json; cd ..
+
+# Build
+npx asconfigc --sdk airsdk --project asconfig.ruffle.json
+
+# Run
+npx serve bin\ruffle
+# Open http://localhost:3000
+```
+
+---
+
 ## Contributing
 
 Please read through the [FFR Contribution Guidelines][CONTRIBUTING] before opening a pull request.
@@ -160,7 +204,7 @@ To contact a member of the FFR development team:
 [master-status-badge]: https://github.com/flashflashrevolution/rCubed/workflows/Check/badge.svg
 [latest-release-badge]: https://img.shields.io/github/v/release/flashflashrevolution/rcubed?label=rCubed
 [discord-badge]: https://discordapp.com/api/guilds/196381154880782336/widget.png?style=shield
-[platforms-badge]: https://img.shields.io/badge/platforms-windows-lightgrey
+[platforms-badge]: https://img.shields.io/badge/platforms-windows%20|%20macOS%20|%20Ruffle%20(macOS%20%2F%20Windows)-lightgrey
 
 <!-- Image Shortlinks -->
 

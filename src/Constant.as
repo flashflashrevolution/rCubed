@@ -70,6 +70,11 @@ package
             requestVars['is_air'] = true;
             requestVars['air_ver'] = Constant.AIR_VERSION;
             requestVars['swf_ver'] = Main.SWF_VERSION;
+
+            if (!CONFIG::air)
+            {
+                requestVars['is_ruffle'] = true;
+            }
         }
     }
 }

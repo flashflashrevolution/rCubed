@@ -1,7 +1,9 @@
 package
 {
-
-    import flash.filesystem.File;
+    CONFIG::air
+    {
+        import flash.filesystem.File;
+    }
 
     public class LocalOptions
     {
@@ -11,23 +13,45 @@ package
 
         public static function init():void
         {
-            var json_file:File = File.applicationStorageDirectory.resolvePath(FILE_NAME);
-
-            // Use JSON first
-            if (json_file.exists)
+            CONFIG::air
             {
-                var json_str:String = AirContext.readTextFile(json_file);
-                if (json_str != null)
+                var json_file:File = File.applicationStorageDirectory.resolvePath(FILE_NAME);
+
+                // Use JSON first
+                if (json_file.exists)
                 {
-                    try
+                    var json_str:String = AirContext.readTextFile(json_file);
+                    if (json_str != null)
                     {
-                        SO_OBJECT = JSON.parse(json_str);
-                        Logger.debug("LocalOptions", "Loaded \"" + json_file.nativePath + "\"")
+                        try
+                        {
+                            SO_OBJECT = JSON.parse(json_str);
+                            Logger.debug("LocalOptions", "Loaded \"" + json_file.nativePath + "\"")
+                        }
+                        catch (e:Error)
+                        {
+                            Logger.error("LocalOptions", "Error parsing \"" + json_file.nativePath + "\"");
+                        }
                     }
-                    catch (e:Error)
-                    {
-                        Logger.error("LocalOptions", "Error parsing \"" + json_file.nativePath + "\"");
-                    }
+                }
+                else
+                {
+                    importFromLocalStore();
+                }
+                return;
+            }
+
+            var so_str:String = SharedObjectStorage.getString("r3_options", "options_json");
+            if (so_str != null)
+            {
+                try
+                {
+                    SO_OBJECT = JSON.parse(so_str);
+                    Logger.debug("LocalOptions", "Loaded options from SharedObject");
+                }
+                catch (e:Error)
+                {
+                    Logger.error("LocalOptions", "Error parsing options from SharedObject");
                 }
             }
             else
@@ -90,7 +114,14 @@ package
          */
         public static function flush(minDiskSize:int = 0):void
         {
-            AirContext.writeTextFile(File.applicationStorageDirectory.resolvePath(FILE_NAME), JSON.stringify(SO_OBJECT, null, 2));
+            CONFIG::air
+            {
+                AirContext.writeTextFile(File.applicationStorageDirectory.resolvePath(FILE_NAME), JSON.stringify(SO_OBJECT, null, 2));
+                return;
+            }
+
+            SharedObjectStorage.setString("r3_options", "options_json", JSON.stringify(SO_OBJECT, null, 2));
+            SharedObjectStorage.flush("r3_options");
         }
 
         public static function importFromLocalStore():void

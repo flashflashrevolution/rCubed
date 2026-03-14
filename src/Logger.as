@@ -5,16 +5,22 @@ package
     import flash.events.Event;
     import flash.events.IOErrorEvent;
     import flash.events.SecurityErrorEvent;
-    import flash.filesystem.File;
-    import flash.filesystem.FileMode;
-    import flash.filesystem.FileStream;
+    CONFIG::air
+    {
+        import flash.filesystem.File;
+        import flash.filesystem.FileMode;
+        import flash.filesystem.FileStream;
+    }
     import flash.system.Capabilities;
     import flash.utils.getTimer;
 
     public class Logger
     {
-        private static var LOG_FILE:File;
-        private static var LOG_STREAM:FileStream;
+        CONFIG::air
+        {
+            private static var LOG_FILE:File;
+            private static var LOG_STREAM:FileStream;
+        }
 
         private static const DEBUG_LINES:Array = ["Info: ", "Debug: ", "Warning: ", "Error: ", "Success: "];
         private static const DEBUG_COLORS:Array = ["", "\u001b[1;35m", "\u001b[1;33m", "\u001b[1;31m", "\u001b[1;32m"];
@@ -35,12 +41,15 @@ package
 
         public static function init():void
         {
-            // Check for special file to enable file logging.
-            if (AirContext.doesFileExist("logging.txt"))
+            CONFIG::air
             {
-                trace("Logging Flag Found, enabling.");
-                file_log = true;
-                enabled = true;
+                // Check for special file to enable file logging.
+                if (AirContext.doesFileExist("logging.txt"))
+                {
+                    trace("Logging Flag Found, enabling.");
+                    file_log = true;
+                    enabled = true;
+                }
             }
 
             initLogFile();
@@ -48,28 +57,31 @@ package
 
         public static function initLogFile():void
         {
-            if (file_log && LOG_STREAM == null)
+            CONFIG::air
             {
-                var now:Date = new Date();
-                var filename:String = AirContext.createFileName(now.toLocaleString(), " ");
-                LOG_FILE = AirContext.getAppFile("logs/" + filename + ".txt");
-                LOG_STREAM = new FileStream();
-                LOG_STREAM.addEventListener(SecurityErrorEvent.SECURITY_ERROR, e_logFileFail);
-                LOG_STREAM.addEventListener(IOErrorEvent.IO_ERROR, e_logFileFail);
-                LOG_STREAM.open(LOG_FILE, FileMode.WRITE);
-                LOG_STREAM.writeUTFBytes("======================" + filename + "======================\n");
-                LOG_STREAM.writeUTFBytes("OS: " + Capabilities.os + " | " + Capabilities.version + "\n");
-                LOG_STREAM.writeUTFBytes("R3 Version: " + Constant.AIR_VERSION + " | " + CONFIG::timeStamp + " | " + Main.SWF_VERSION + "\n");
-                LOG_STREAM.close();
-            }
+                if (file_log && LOG_STREAM == null)
+                {
+                    var now:Date = new Date();
+                    var filename:String = AirContext.createFileName(now.toLocaleString(), " ");
+                    LOG_FILE = AirContext.getAppFile("logs/" + filename + ".txt");
+                    LOG_STREAM = new FileStream();
+                    LOG_STREAM.addEventListener(SecurityErrorEvent.SECURITY_ERROR, e_logFileFail);
+                    LOG_STREAM.addEventListener(IOErrorEvent.IO_ERROR, e_logFileFail);
+                    LOG_STREAM.open(LOG_FILE, FileMode.WRITE);
+                    LOG_STREAM.writeUTFBytes("======================" + filename + "======================\n");
+                    LOG_STREAM.writeUTFBytes("OS: " + Capabilities.os + " | " + Capabilities.version + "\n");
+                    LOG_STREAM.writeUTFBytes("R3 Version: " + Constant.AIR_VERSION + " | " + CONFIG::timeStamp + " | " + Main.SWF_VERSION + "\n");
+                    LOG_STREAM.close();
+                }
 
-            function e_logFileFail(e:Event):void
-            {
-                trace("Unable to use file logging.");
-                LOG_STREAM.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, e_logFileFail);
-                LOG_STREAM.removeEventListener(IOErrorEvent.IO_ERROR, e_logFileFail);
-                LOG_FILE = null;
-                LOG_STREAM = null;
+                function e_logFileFail(e:Event):void
+                {
+                    trace("Unable to use file logging.");
+                    LOG_STREAM.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, e_logFileFail);
+                    LOG_STREAM.removeEventListener(IOErrorEvent.IO_ERROR, e_logFileFail);
+                    LOG_FILE = null;
+                    LOG_STREAM = null;
+                }
             }
         }
 
@@ -131,32 +143,38 @@ package
             //trace(DEBUG_COLORS[level] + msg + DEBUG_COLOR_RESET); // For consoles that support color.
             trace(level + ":" + msg);
 
-            if (LOG_STREAM != null)
+            CONFIG::air
             {
-                file_log_buffer += (msg + "\n");
-
-                // Buffer file writes if within the last 150ms of a write to prevent file writing bottlenecks.
-                if (currentTime - file_log_buffer_time > 150)
+                if (LOG_STREAM != null)
                 {
-                    LOG_STREAM.open(LOG_FILE, FileMode.APPEND);
-                    LOG_STREAM.writeUTFBytes(file_log_buffer);
-                    LOG_STREAM.close();
+                    file_log_buffer += (msg + "\n");
 
-                    file_log_buffer = "";
-                    file_log_buffer_time = currentTime;
+                    // Buffer file writes if within the last 150ms of a write to prevent file writing bottlenecks.
+                    if (currentTime - file_log_buffer_time > 150)
+                    {
+                        LOG_STREAM.open(LOG_FILE, FileMode.APPEND);
+                        LOG_STREAM.writeUTFBytes(file_log_buffer);
+                        LOG_STREAM.close();
+
+                        file_log_buffer = "";
+                        file_log_buffer_time = currentTime;
+                    }
                 }
             }
         }
 
         public static function destroy():void
         {
-            if (LOG_STREAM != null)
+            CONFIG::air
             {
-                if (file_log_buffer.length > 0)
+                if (LOG_STREAM != null)
                 {
-                    LOG_STREAM.open(LOG_FILE, FileMode.APPEND);
-                    LOG_STREAM.writeUTFBytes(file_log_buffer);
-                    LOG_STREAM.close();
+                    if (file_log_buffer.length > 0)
+                    {
+                        LOG_STREAM.open(LOG_FILE, FileMode.APPEND);
+                        LOG_STREAM.writeUTFBytes(file_log_buffer);
+                        LOG_STREAM.close();
+                    }
                 }
             }
         }

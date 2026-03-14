@@ -3,7 +3,6 @@ package classes.user
     import classes.SongInfo;
     import classes.user.UserSongData;
     import com.flashfla.utils.ObjectUtil;
-    import flash.filesystem.File;
 
     public class UserSongNotes
     {
@@ -102,14 +101,5 @@ package classes.user
             return (sql_data.song_details[engine_id][level_id] as UserSongData);
         }
 
-        /**
-         * Writes the Song Details DB into a JSON file.
-         * @param db_file
-         */
-        public static function writeFile(db_file:File):void
-        {
-            var my_data:Object = sql_data;
-            AirContext.writeTextFile(db_file, JSON.stringify(sql_data, null, 2));
-        }
     }
 }

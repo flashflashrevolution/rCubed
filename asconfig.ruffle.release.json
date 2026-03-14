@@ -1,0 +1,17 @@
+{
+	"extends": "asconfig.ruffle.json",
+	"compilerOptions": {
+		"verbose-stacktraces": false,
+		"advanced-telemetry": false,
+		"optimize": true,
+		"define": [
+			{ "name": "CONFIG::debug", "value": false },
+			{ "name": "CONFIG::release", "value": true },
+			{ "name": "CONFIG::timeStamp", "value": "\"#{DATESTAMP}#\"" },
+			{ "name": "R3::HASH_STRING", "value": "\"hash:#{SCORE_SAVE_SALT}#\"" },
+			{ "name": "R3::VERSION", "value": "\"#{VERSION}#\"" }
+		],
+		"debug": false,
+		"omit-trace-statements": true
+	}
+}

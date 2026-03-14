@@ -327,7 +327,7 @@ package menu
                 _gvars.menuMusic = null;
                 menuMusicControls.parent.removeChild(menuMusicControls);
 
-                AirContext.deleteFile(AirContext.getAppFile(Constant.MENU_MUSIC_PATH));
+                AirContext.deleteFileByPath(Constant.MENU_MUSIC_PATH);
             }
         }
 

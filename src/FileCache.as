@@ -28,7 +28,7 @@ package
 
             _didLoad = true;
 
-            var data:String = AirContext.readTextFile(AirContext.getAppFile(CACHE_FILE_NAME));
+            var data:String = AirContext.readTextFileByPath(CACHE_FILE_NAME);
             if (data != null && data.length > 2)
             {
                 try
@@ -58,7 +58,7 @@ package
         {
             if (_isDirty)
             {
-                AirContext.writeTextFile(AirContext.getAppFile(CACHE_FILE_NAME), JSON.stringify(CACHE));
+                AirContext.writeTextFileByPath(CACHE_FILE_NAME, JSON.stringify(CACHE));
                 _isDirty = false;
                 _cacheFound = true;
                 Logger.debug(this, "Saving Cache \"" + CACHE_FILE_NAME + "\"");

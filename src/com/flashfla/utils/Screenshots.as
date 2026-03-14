@@ -7,9 +7,13 @@ package com.flashfla.utils
     import by.blooddy.crypto.image.PNGEncoder;
     import classes.Alert;
     import classes.Language;
-    import flash.desktop.Clipboard;
-    import flash.desktop.ClipboardFormats;
+    CONFIG::air
+    {
+        import flash.desktop.Clipboard;
+        import flash.desktop.ClipboardFormats;
+    }
     import flash.display.BitmapData;
+    import flash.external.ExternalInterface;
     import flash.net.FileReference;
     import Main;
 
@@ -35,6 +39,18 @@ package com.flashfla.utils
          */
         public static function takeScreenshot(gameMain:Main, filename:String = null):void
         {
+            // Ruffle: BitmapData.draw() returns blank data, so capture
+            // the canvas directly via a JS bridge.
+            if (!CONFIG::air)
+            {
+                if (ExternalInterface.available)
+                {
+                    var jsFilename:String = AirContext.createFileName((filename != null ? filename : "R^3 - " + DateUtil.toRFC822(new Date()).replace(/:/g, ".")) + ".png");
+                    ExternalInterface.call("r3_takeScreenshot", jsFilename);
+                }
+                return;
+            }
+
             var b:BitmapData = captureStage(gameMain);
 
             try
@@ -54,10 +70,21 @@ package com.flashfla.utils
          */
         public static function saveToClipboard(gameMain:Main):void
         {
-            var b:BitmapData = captureStage(gameMain);
-            Clipboard.generalClipboard.clear();
-            Clipboard.generalClipboard.setData(ClipboardFormats.BITMAP_FORMAT, b, false);
-            Alert.add(Language.instance.string("copy_image_to_clipboard"), 120, Alert.GREEN);
+            CONFIG::air
+            {
+                var b:BitmapData = captureStage(gameMain);
+                Clipboard.generalClipboard.clear();
+                Clipboard.generalClipboard.setData(ClipboardFormats.BITMAP_FORMAT, b, false);
+                Alert.add(Language.instance.string("copy_image_to_clipboard"), 120, Alert.GREEN);
+                return;
+            }
+            if (ExternalInterface.available)
+            {
+                ExternalInterface.call("r3_screenshotToClipboard");
+                Alert.add(Language.instance.string("copy_image_to_clipboard"), 120, Alert.GREEN);
+                return;
+            }
+            Alert.add("Clipboard screenshots are not supported in this build.", 120);
         }
     }
 }

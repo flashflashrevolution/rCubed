@@ -1,6 +1,9 @@
 .vscode/settings.json
 *.code-workspace
 !r3.code-workspace
+airsdk/
 bin/
+!bin/ruffle/
 node_modules/
 package-lock.json
+tools/

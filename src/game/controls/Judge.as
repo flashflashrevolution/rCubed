@@ -62,7 +62,10 @@ package game.controls
             field.y = -30;
             field.visible = true;
             field.alpha = 1;
-            field.cacheAsBitmapMatrix = new Matrix();
+            CONFIG::air
+            {
+                field.cacheAsBitmapMatrix = new Matrix();
+            }
             addChild(field)
 
             //updateDisplay();

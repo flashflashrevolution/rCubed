@@ -2505,7 +2505,7 @@ package menu
          */
         private function writeMenuMusicBytes(song:Song):void
         {
-            AirContext.writeFile(AirContext.getAppFile(Constant.MENU_MUSIC_PATH), song.bytesSWF);
+            AirContext.writeFileByPath(Constant.MENU_MUSIC_PATH, song.bytesSWF);
         }
     }
 }

@@ -68,3 +68,8 @@ jobs:
               if: matrix.os == 'windows-latest'
               shell: cmd
               run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.release.json --debug=false --verbose
+
+            - name: Build the Game (Ruffle) [Windows]
+              if: matrix.os == 'windows-latest'
+              shell: cmd
+              run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.ruffle.json --verbose

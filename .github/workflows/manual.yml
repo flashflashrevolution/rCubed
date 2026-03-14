@@ -53,7 +53,7 @@ jobs:
             - name: Token Replace in asconfig
               uses: cschleiden/replace-tokens@v1
               with:
-                  files: '["asconfig.release.json"]'
+                  files: '["asconfig.release.json", "asconfig.ruffle.release.json"]'
               env:
                   SCORE_SAVE_SALT: ${{ secrets.SCORE_SAVE_SALT }}
                   VERSION: ${{ inputs.version }}
@@ -90,6 +90,11 @@ jobs:
               if: matrix.os == 'windows-latest'
               shell: cmd
               run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.hybrid.json --verbose
+
+            - name: Build the Game (Ruffle) [Windows]
+              if: matrix.os == 'windows-latest'
+              shell: cmd
+              run: ${{ github.workspace }}\node_modules\.bin\asconfigc.cmd --sdk ${{ github.workspace }}\airsdk --project asconfig.ruffle.release.json --verbose
 
             ##########################################################################################
             # Package Version 64-bit
@@ -130,6 +135,25 @@ jobs:
 
             - name: Package Build in Zip (32-bit)
               run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\Hybrid.zip ${{ github.workspace }}\bundles\R3Air.0.0.8+${{ inputs.version }}
+
+            # Package Version Ruffle Web
+            - name: Create Ruffle Package Directory
+              run: New-Item -ItemType Directory -Path "${{ github.workspace }}\bundles\ruffle-web" -Force
+
+            - name: Copy Ruffle SWF
+              run: Copy-Item "${{ github.workspace }}\bin\ruffle\R3Ruffle.swf" -Destination "${{ github.workspace }}\bundles\ruffle-web"
+
+            - name: Copy Ruffle HTML
+              run: Copy-Item "${{ github.workspace }}\bin\ruffle\index.html" -Destination "${{ github.workspace }}\bundles\ruffle-web"
+
+            - name: Copy Changelog (Ruffle)
+              run: Copy-Item "${{ github.workspace }}\changelog.txt" -Destination "${{ github.workspace }}\bundles\ruffle-web"
+
+            - name: Rename Release Folder (Ruffle)
+              run: Rename-Item -Path "${{ github.workspace }}\bundles\ruffle-web" -NewName "R3Ruffle.${{ inputs.version }}.Web"
+
+            - name: Package Build in Zip (Ruffle)
+              run: 7z.exe a -tzip -mx=9 ${{ github.workspace }}\bundles\ruffle-web.zip ${{ github.workspace }}\bundles\R3Ruffle.${{ inputs.version }}.Web
 
             ##########################################################################################
             - name: Create Release
@@ -175,3 +199,14 @@ jobs:
                   asset_path: ${{ github.workspace }}\bundles\Hybrid.zip
                   asset_name: rCubed-0.0.8-${{ inputs.version }}-Hybrid-32bit.zip
                   asset_content_type: application/executable
+
+            - name: Upload ZIP (Ruffle Web)
+              id: upload-zip-release-ruffle
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ${{ github.workspace }}\bundles\ruffle-web.zip
+                  asset_name: rCubed-${{ inputs.version }}-Ruffle-Web.zip
+                  asset_content_type: application/zip

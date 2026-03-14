@@ -12,7 +12,10 @@ package popups.replays
     import flash.display.Sprite;
     import flash.events.MouseEvent;
     import flash.events.TimerEvent;
-    import flash.filesystem.File;
+    CONFIG::air
+    {
+        import flash.filesystem.File;
+    }
     import flash.utils.Timer;
     import flash.utils.getTimer;
 
@@ -148,206 +151,209 @@ package popups.replays
 
         private function refreshReplays(e:MouseEvent = null):void
         {
-            Logger.info(this, "Reloading External Replays");
-            lockUI = true;
-
-            _gvars.file_replay_cache.clear();
-            REPLAYS = new <Replay>[];
-
-            var loadTimer:Timer;
-            var TIME:Number = new Date().getTime();
-
-            // File Searching
-            var dirQueue:Vector.<FileDirectoryQueue> = new <FileDirectoryQueue>[new FileDirectoryQueue(AirContext.getAppFile("replays"), 0)];
-            var fileQueue:Vector.<File> = new <File>[];
-            var activeDirQueue:FileDirectoryQueue;
-            var maxDepth:int = 2;
-
-            e_startFileSearch();
-
-            function e_startFileSearch():void
+            CONFIG::air
             {
-                loadingIndex.text = '';
-                loadingProgress.update(0);
+                Logger.info(this, "Reloading External Replays");
+                lockUI = true;
 
-                loadTimer = new Timer(20, 1);
-                loadTimer.addEventListener(TimerEvent.TIMER_COMPLETE, e_searchTimer);
-                loadTimer.start();
-            }
+                _gvars.file_replay_cache.clear();
+                REPLAYS = new <Replay>[];
 
-            function e_searchTimer(e:TimerEvent):void
-            {
-                var startTimer:Number = getTimer();
-                var isDelay:Boolean = false;
+                var loadTimer:Timer;
+                var TIME:Number = new Date().getTime();
 
-                // File Loop
-                var found:Array;
-                var len:int;
-                var file:File;
-                var i:int;
+                // File Searching
+                var dirQueue:Vector.<FileDirectoryQueue> = new <FileDirectoryQueue>[new FileDirectoryQueue(AirContext.getAppFile("replays"), 0)];
+                var fileQueue:Vector.<File> = new <File>[];
+                var activeDirQueue:FileDirectoryQueue;
+                var maxDepth:int = 2;
 
-                while (dirQueue.length > 0)
+                e_startFileSearch();
+
+                function e_startFileSearch():void
                 {
-                    activeDirQueue = dirQueue.pop();
+                    loadingIndex.text = '';
+                    loadingProgress.update(0);
 
-                    found = activeDirQueue.dir.getDirectoryListing();
-                    len = found.length;
-
-                    for (i = 0; i < len; i++)
-                    {
-                        file = found[i];
-
-                        if (file.isHidden || !file.exists)
-                        {
-                            continue;
-                        }
-                        else if (file.isDirectory)
-                        {
-                            if (activeDirQueue.level < maxDepth)
-                            {
-                                dirQueue.push(new FileDirectoryQueue(file, activeDirQueue.level + 1));
-                            }
-                        }
-                        else
-                        {
-                            if (file.extension != null && file.extension.toLowerCase() == "txt")
-                            {
-                                fileQueue.push(file);
-                            }
-                        }
-                    }
-
-                    var endTimer:Number = getTimer();
-                    if (endTimer - startTimer > 250)
-                    {
-                        isDelay = true;
-                        break;
-                    }
-                }
-
-                if (cancelRequested)
-                {
-                    dirQueue.length = 0;
-                    fileQueue.length = 0;
-                }
-
-                loadingIndex.text = "#" + fileQueue.length;
-
-                // Loaded All Files
-                if (dirQueue.length == 0)
-                {
-                    loadTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_searchTimer);
-                    e_startFileQueue();
-                    return;
-                }
-
-                // Not Finished, Continue next frame.
-                if (isDelay && dirQueue.length > 0)
-                {
+                    loadTimer = new Timer(20, 1);
+                    loadTimer.addEventListener(TimerEvent.TIMER_COMPLETE, e_searchTimer);
                     loadTimer.start();
                 }
-            }
 
-            // File Loading
-            var pathIndex:int;
-            var pathTotal:int;
-
-            function e_startFileQueue():void
-            {
-                if (fileQueue.length <= 0)
+                function e_searchTimer(e:TimerEvent):void
                 {
-                    lockUI = false;
-                    setValues();
-                    return;
-                }
+                    var startTimer:Number = getTimer();
+                    var isDelay:Boolean = false;
 
-                pathIndex = 0;
-                pathTotal = fileQueue.length;
+                    // File Loop
+                    var found:Array;
+                    var len:int;
+                    var file:File;
+                    var i:int;
 
-                loadingIndex.text = pathIndex + " / " + pathTotal;
-                loadingProgress.update(0);
-
-                loadTimer = new Timer(20, 1);
-                loadTimer.addEventListener(TimerEvent.TIMER_COMPLETE, e_parseTimer);
-                loadTimer.start();
-            }
-
-            function e_parseTimer(e:TimerEvent):void
-            {
-                var r:Replay;
-                var chartFile:File;
-                var stringPath:String;
-                var startTimer:Number = getTimer();
-                var isDelay:Boolean = false;
-                var cacheObj:Object;
-
-                while (pathIndex < pathTotal)
-                {
-                    chartFile = fileQueue[pathIndex];
-                    stringPath = chartFile.nativePath;
-
-                    loadingIndex.text = pathIndex + " / " + pathTotal;
-
-                    r = new Replay(TIME + pathIndex);
-
-                    // Read File
-                    var txt:String = AirContext.readFile(chartFile).toString();
-                    r.parseEncode(txt, false);
-                    r.fileReplay = true;
-                    if (r.isValid())
+                    while (dirQueue.length > 0)
                     {
-                        r.loadSongInfo();
+                        activeDirQueue = dirQueue.pop();
 
-                        if (r.song != null)
+                        found = activeDirQueue.dir.getDirectoryListing();
+                        len = found.length;
+
+                        for (i = 0; i < len; i++)
                         {
-                            REPLAYS[REPLAYS.length] = r;
+                            file = found[i];
 
-                            cacheObj = {'name': r.song.name,
-                                    'rate': r.settings.songRate,
-                                    'score': r.score,
-                                    'judge': [r.perfect, r.good, r.average, r.miss, r.boo, r.maxcombo]}
+                            if (file.isHidden || !file.exists)
+                            {
+                                continue;
+                            }
+                            else if (file.isDirectory)
+                            {
+                                if (activeDirQueue.level < maxDepth)
+                                {
+                                    dirQueue.push(new FileDirectoryQueue(file, activeDirQueue.level + 1));
+                                }
+                            }
+                            else
+                            {
+                                if (file.extension != null && file.extension.toLowerCase() == "txt")
+                                {
+                                    fileQueue.push(file);
+                                }
+                            }
+                        }
 
-                            if (r.settings.arc_engine != null)
-                                cacheObj["engine"] = r.song.engine.id;
-
-                            _gvars.file_replay_cache.setValue(chartFile.parent.name + "/" + chartFile.name, cacheObj);
+                        var endTimer:Number = getTimer();
+                        if (endTimer - startTimer > 250)
+                        {
+                            isDelay = true;
+                            break;
                         }
                     }
-
-                    pathIndex++;
 
                     if (cancelRequested)
                     {
-                        pathIndex = 0;
-                        pathTotal = 0;
+                        dirQueue.length = 0;
                         fileQueue.length = 0;
-                        REPLAYS.length = 0;
                     }
 
-                    var endTimer:Number = getTimer();
-                    if (endTimer - startTimer > 250)
+                    loadingIndex.text = "#" + fileQueue.length;
+
+                    // Loaded All Files
+                    if (dirQueue.length == 0)
                     {
-                        loadingProgress.update(pathIndex / pathTotal);
-                        isDelay = true;
-                        break;
+                        loadTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_searchTimer);
+                        e_startFileQueue();
+                        return;
+                    }
+
+                    // Not Finished, Continue next frame.
+                    if (isDelay && dirQueue.length > 0)
+                    {
+                        loadTimer.start();
                     }
                 }
 
-                // Loaded All Files
-                if (pathIndex >= pathTotal)
-                {
-                    loadTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_parseTimer);
-                    _gvars.file_replay_cache.save();
-                    lockUI = false;
+                // File Loading
+                var pathIndex:int;
+                var pathTotal:int;
 
-                    setValues();
-                    return;
+                function e_startFileQueue():void
+                {
+                    if (fileQueue.length <= 0)
+                    {
+                        lockUI = false;
+                        setValues();
+                        return;
+                    }
+
+                    pathIndex = 0;
+                    pathTotal = fileQueue.length;
+
+                    loadingIndex.text = pathIndex + " / " + pathTotal;
+                    loadingProgress.update(0);
+
+                    loadTimer = new Timer(20, 1);
+                    loadTimer.addEventListener(TimerEvent.TIMER_COMPLETE, e_parseTimer);
+                    loadTimer.start();
                 }
 
-                // Not Finished, Continue next frame.
-                if (isDelay && pathIndex < pathTotal)
+                function e_parseTimer(e:TimerEvent):void
                 {
-                    loadTimer.start();
+                    var r:Replay;
+                    var chartFile:File;
+                    var stringPath:String;
+                    var startTimer:Number = getTimer();
+                    var isDelay:Boolean = false;
+                    var cacheObj:Object;
+
+                    while (pathIndex < pathTotal)
+                    {
+                        chartFile = fileQueue[pathIndex];
+                        stringPath = chartFile.nativePath;
+
+                        loadingIndex.text = pathIndex + " / " + pathTotal;
+
+                        r = new Replay(TIME + pathIndex);
+
+                        // Read File
+                        var txt:String = AirContext.readFile(chartFile).toString();
+                        r.parseEncode(txt, false);
+                        r.fileReplay = true;
+                        if (r.isValid())
+                        {
+                            r.loadSongInfo();
+
+                            if (r.song != null)
+                            {
+                                REPLAYS[REPLAYS.length] = r;
+
+                                cacheObj = {'name': r.song.name,
+                                        'rate': r.settings.songRate,
+                                        'score': r.score,
+                                        'judge': [r.perfect, r.good, r.average, r.miss, r.boo, r.maxcombo]}
+
+                                if (r.settings.arc_engine != null)
+                                    cacheObj["engine"] = r.song.engine.id;
+
+                                _gvars.file_replay_cache.setValue(chartFile.parent.name + "/" + chartFile.name, cacheObj);
+                            }
+                        }
+
+                        pathIndex++;
+
+                        if (cancelRequested)
+                        {
+                            pathIndex = 0;
+                            pathTotal = 0;
+                            fileQueue.length = 0;
+                            REPLAYS.length = 0;
+                        }
+
+                        var endTimer:Number = getTimer();
+                        if (endTimer - startTimer > 250)
+                        {
+                            loadingProgress.update(pathIndex / pathTotal);
+                            isDelay = true;
+                            break;
+                        }
+                    }
+
+                    // Loaded All Files
+                    if (pathIndex >= pathTotal)
+                    {
+                        loadTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, e_parseTimer);
+                        _gvars.file_replay_cache.save();
+                        lockUI = false;
+
+                        setValues();
+                        return;
+                    }
+
+                    // Not Finished, Continue next frame.
+                    if (isDelay && pathIndex < pathTotal)
+                    {
+                        loadTimer.start();
+                    }
                 }
             }
         }
@@ -387,17 +393,20 @@ package popups.replays
             {
                 if (r.filePath != null)
                 {
-                    Logger.debug(this, "Loading Local replay: " + "replays/" + r.filePath);
-                    var txt:String = AirContext.readFile(AirContext.getAppFile("replays/" + r.filePath)).toString();
-
-                    if (txt != null && txt.length > 0)
+                    CONFIG::air
                     {
-                        r.parseEncode(txt, false);
-                        r.fileReplay = true;
-                        if (r.isValid())
+                        Logger.debug(this, "Loading Local replay: " + "replays/" + r.filePath);
+                        var txt:String = AirContext.readFile(AirContext.getAppFile("replays/" + r.filePath)).toString();
+
+                        if (txt != null && txt.length > 0)
                         {
-                            r.loadSongInfo();
-                            return r;
+                            r.parseEncode(txt, false);
+                            r.fileReplay = true;
+                            if (r.isValid())
+                            {
+                                r.loadSongInfo();
+                                return r;
+                            }
                         }
                     }
 
@@ -416,16 +425,19 @@ package popups.replays
     }
 }
 
-import flash.filesystem.File;
-
-internal class FileDirectoryQueue
+CONFIG::air
 {
-    public var dir:File;
-    public var level:int;
+    import flash.filesystem.File;
 
-    public function FileDirectoryQueue(dir:File, level:int)
+    internal class FileDirectoryQueue
     {
-        this.dir = dir;
-        this.level = level;
+        public var dir:File;
+        public var level:int;
+
+        public function FileDirectoryQueue(dir:File, level:int)
+        {
+            this.dir = dir;
+            this.level = level;
+        }
     }
 }

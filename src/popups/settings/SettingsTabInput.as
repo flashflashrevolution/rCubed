@@ -37,8 +37,8 @@ package popups.settings
 
         override public function openTab():void
         {
-            parent.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyHandlerDown, true, int.MAX_VALUE - 10, true);
-            parent.stage.addEventListener(KeyboardEvent.KEY_UP, keyHandlerUp, true, int.MAX_VALUE - 10, true);
+            parent.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyHandlerDown, false, int.MAX_VALUE - 10, true);
+            parent.stage.addEventListener(KeyboardEvent.KEY_UP, keyHandlerUp, false, int.MAX_VALUE - 10, true);
 
             var i:int;
             var xOff:int = 15;
@@ -135,8 +135,8 @@ package popups.settings
 
         override public function closeTab():void
         {
-            parent.stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyHandlerDown, true);
-            parent.stage.removeEventListener(KeyboardEvent.KEY_UP, keyHandlerUp, true);
+            parent.stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyHandlerDown, false);
+            parent.stage.removeEventListener(KeyboardEvent.KEY_UP, keyHandlerUp, false);
             super.closeTab();
         }
 
